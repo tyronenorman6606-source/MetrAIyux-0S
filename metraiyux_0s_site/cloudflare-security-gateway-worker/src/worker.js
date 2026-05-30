@@ -1,11 +1,26 @@
 
-const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,Authorization"};
+const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,Authorization,x-0s-shared-gate,x-0s-internal-proxy-secret"};
 const j=(data,status=200)=>new Response(JSON.stringify(data,null,2),{status,headers:{"content-type":"application/json",...CORS}});
 const now=()=>new Date().toISOString();
 const uuid=()=>crypto.randomUUID();
 async function body(req){try{return await req.json()}catch{return {}}}
-function adminAuth(req,env){const need=env.ADMIN_TOKEN; if(!need) return false; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===need;}
-function customerAuth(req,env){if(!env.CUSTOMER_COMMAND_TOKEN) return true; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===env.CUSTOMER_COMMAND_TOKEN;}
+function sharedGateRequired(env){return ['1','true','yes','on'].includes(String(env.ZERO_OS_SHARED_GATE_REQUIRED||env.SKYE_SHARED_GATE_REQUIRED||'').toLowerCase());}
+function sharedProxySecret(env){return String(env.ZERO_OS_INTERNAL_PROXY_SECRET||env.METRAIYUX_0S_INTERNAL_PROXY_SECRET||env.OMEGA_INTERNAL_PROXY_SECRET||'').trim();}
+function sharedProxyAuth(req,env){
+  const secret=sharedProxySecret(env);
+  if(!secret) return false;
+  return String(req.headers.get('x-0s-shared-gate')||'').toLowerCase()==='operator' && String(req.headers.get('x-0s-internal-proxy-secret')||'').trim()===secret;
+}
+function adminAuth(req,env){
+  if(sharedProxyAuth(req,env)) return true;
+  if(sharedProxySecret(env)||sharedGateRequired(env)) return false;
+  const need=env.ADMIN_TOKEN; if(!need) return false; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===need;
+}
+function customerAuth(req,env){
+  if(sharedProxyAuth(req,env)) return true;
+  if(sharedProxySecret(env)||sharedGateRequired(env)) return false;
+  if(!env.CUSTOMER_COMMAND_TOKEN) return true; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===env.CUSTOMER_COMMAND_TOKEN;
+}
 function scan(command,payload={}){
   const text=String(command||'');
   const tests=[

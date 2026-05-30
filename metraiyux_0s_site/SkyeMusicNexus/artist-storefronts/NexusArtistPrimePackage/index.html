@@ -1,0 +1,202 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050507">
+  <title>Gray Skyes Prime Package | Skye Music Nexus</title>
+  <meta name="description" content="Video-led Gray Skyes prime artist universe with one persistent music player, storefront rooms, release vault, Brain room, and SkyeNet-ready publishing lane.">
+  <meta property="og:title" content="Gray Skyes Prime Package">
+  <meta property="og:description" content="The prime reference artist profile for Gray Skyes inside Skye Music Nexus.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="./originals/gray-skyes/media/images/gray-red-portrait.jpg">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./originals/gray-skyes/media/images/gray-cutout.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+</head>
+<body class="skyesol-living-page">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <canvas id="frequencyField" class="frequency-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="skyesol-scanline" aria-hidden="true"></div>
+
+  <header class="prime-topbar" aria-label="Gray Skyes Prime navigation">
+    <a class="prime-mark" href="./" aria-label="Gray Skyes Prime home">
+      <img src="./originals/gray-skyes/media/images/gray-cutout.png" alt="">
+      <span>Gray Skyes Prime</span>
+    </a>
+    <nav class="prime-nav" aria-label="Prime sections">
+      <a href="#stage">Stage</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#video-vault">Video</a>
+      <a href="#rooms">Rooms</a>
+      <a href="#skyenet">SkyeNet</a>
+    </nav>
+    <a class="gate-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/signup.html">Gate Signup</a>
+  </header>
+
+  <main>
+    <section class="hero" id="stage" aria-labelledby="hero-title">
+      <video id="heroVideo" class="hero-video" autoplay muted loop playsinline poster="./originals/gray-skyes/media/images/gray-wide-stage.jpg">
+        <source src="./originals/gray-skyes/media/video/chicago-underground-trap-metal-king-main.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Prime artist universe / Skye Music Nexus</p>
+          <h1 id="hero-title" class="neon-gradient-text">Gray Skyes Prime</h1>
+          <p class="hero-line">Trap-metal footage, ragecore records, late-night R&B modes, Brain drops, product rooms, and collective releases folded into one SkyeNet-ready storefront world.</p>
+          <div class="hero-actions" aria-label="Prime actions">
+            <button class="button primary" type="button" data-track-play="blades">Play Blades</button>
+            <button class="button" type="button" data-video-play="gray-skyes-concert-recap">Concert Recap</button>
+            <a class="button ghost" href="./originals/gray-skyes/app.html">Artist App</a>
+            <a class="button ghost" href="https://skyes-over-london-legal.pages.dev/legal/music-nexus/">Legal Readiness</a>
+          </div>
+        </div>
+
+        <aside class="hero-command" aria-label="Gray Skyes command deck">
+          <div class="artist-orbit">
+            <img src="./originals/gray-skyes/media/images/gray-cutout.png" alt="Gray Skyes">
+            <span class="orbit-line line-one"></span>
+            <span class="orbit-line line-two"></span>
+          </div>
+          <div class="signal-metrics" aria-label="Prime package summary">
+            <span><strong>9</strong> video cuts</span>
+            <span><strong>42</strong> audio assets</span>
+            <span><strong>3</strong> copied Nexus worlds</span>
+            <span><strong>1</strong> player source</span>
+          </div>
+        </aside>
+      </div>
+      <div class="video-dock" id="heroVideoDock" aria-label="Hero video selector"></div>
+    </section>
+
+    <section class="catalog section-shell" id="catalog" aria-labelledby="catalog-title">
+      <div class="section-head">
+        <p class="eyebrow">Persistent catalog</p>
+        <h2 id="catalog-title">Every play button feeds the same player.</h2>
+        <p>The bottom player is the only audio engine on the page. Catalog cards, release cards, and hero actions all load the same queue.</p>
+      </div>
+      <div class="filter-bar" aria-label="Catalog filters">
+        <button type="button" class="filter-chip active" data-filter="all">All</button>
+        <button type="button" class="filter-chip" data-filter="rage">Ragecore</button>
+        <button type="button" class="filter-chip" data-filter="rnb">R&B Mode</button>
+        <button type="button" class="filter-chip" data-filter="movie">Movie</button>
+        <button type="button" class="filter-chip" data-filter="brain">Brain</button>
+      </div>
+      <div class="catalog-grid" id="trackGrid"></div>
+    </section>
+
+    <section class="video-vault section-shell" id="video-vault" aria-labelledby="video-title">
+      <div class="section-head">
+        <p class="eyebrow">Video vault</p>
+        <h2 id="video-title">Gray has the footage. The package uses it.</h2>
+        <p>The hero can switch between the real cuts without adding another audio source. Video stays muted; music stays owned by the global player.</p>
+      </div>
+      <div class="vault-layout">
+        <div class="vault-screen">
+          <video id="vaultVideo" controls playsinline poster="./originals/gray-skyes/media/images/gray-red-portrait.jpg">
+            <source src="./originals/gray-skyes/media/video/chicago-underground-trap-metal-king-main.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="vault-list" id="videoGrid"></div>
+      </div>
+    </section>
+
+    <section class="rooms section-shell" id="rooms" aria-labelledby="rooms-title">
+      <div class="section-head">
+        <p class="eyebrow">Copied Nexus worlds</p>
+        <h2 id="rooms-title">Storefront, Brain, Collective, all wired back.</h2>
+        <p>The originals stay untouched outside this package. The prime build wraps copied rooms with a better front door and live Nexus links.</p>
+      </div>
+      <div class="room-grid" id="roomGrid"></div>
+    </section>
+
+    <section class="release-wall section-shell" aria-labelledby="release-title">
+      <div class="section-head">
+        <p class="eyebrow">Release rooms</p>
+        <h2 id="release-title">Drops, products, albums, proof lanes.</h2>
+        <p>Each release path can load the player, open the copied room, or jump to the current live Nexus route.</p>
+      </div>
+      <div class="release-grid" id="releaseGrid"></div>
+    </section>
+
+    <section class="rights-lane" aria-labelledby="rights-title">
+      <div>
+        <p class="eyebrow">Gate, rights, artist data</p>
+        <h2 id="rights-title">The signup lane now collects context with a reason.</h2>
+        <p>Artist story, visual identity, links, split notes, rights holds, launch goals, EPK preferences, and SkyeNet publishing preferences stay optional, but when artists share them the system can build richer pages, storefronts, press kits, Brain memory, and release metadata.</p>
+      </div>
+      <div class="rights-actions">
+        <a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/signup.html">Start Gate Signup</a>
+        <a class="button" href="https://skyes-over-london-legal.pages.dev/legal/music-nexus/">Artist Readiness</a>
+        <a class="button ghost" href="https://skyes-over-london-legal.pages.dev/legal/dmca-ip/">IP / DMCA</a>
+      </div>
+    </section>
+
+    <section class="skyenet-lane section-shell" id="skyenet" aria-labelledby="skyenet-title">
+      <div class="section-head">
+        <p class="eyebrow">SkyeNet lane</p>
+        <h2 id="skyenet-title">Artist drops should ship as static worlds.</h2>
+        <p>Gate identity, optional onboarding context, rights metadata, generated package, SkyeNet route. Music Nexus should then point at the latest route instead of needing a full production push for each artist drop.</p>
+      </div>
+      <div class="release-flow">
+        <div><strong>01</strong><span>Gate identity</span></div>
+        <div><strong>02</strong><span>Artist context</span></div>
+        <div><strong>03</strong><span>Rights metadata</span></div>
+        <div><strong>04</strong><span>Static package</span></div>
+        <div><strong>05</strong><span>SkyeNet route</span></div>
+      </div>
+      <div class="skyenet-actions">
+        <button class="button primary" type="button" id="installApp">Install Prime App</button>
+        <button class="button" type="button" id="copySkyeNetPlan">Copy Release Plan</button>
+        <a class="button ghost" href="./SKYENET_DEPLOY_RECEIPT.json">Deploy Receipt</a>
+      </div>
+      <p class="copy-result" id="copyResult" role="status">Release plan ready.</p>
+    </section>
+  </main>
+
+  <footer class="prime-footer">
+    <span>Gray Skyes Prime Package</span>
+    <a href="./originals/gray-skyes/">Copied main storefront</a>
+    <a href="./originals/gray-skyes-brain/">Copied Brain storefront</a>
+    <a href="./originals/gray-skyes-collective/">Copied Collective hub</a>
+    <a href="https://skye-music-nexus.pages.dev/artist-storefronts/gray-skyes/">Live Nexus storefront</a>
+  </footer>
+
+  <aside class="global-player" aria-label="Persistent music player">
+    <audio id="primeAudio" preload="metadata" src="./originals/gray-skyes/media/audio/cupid.mp3"></audio>
+    <div class="player-art">
+      <img id="playerArt" src="./originals/gray-skyes/media/images/gray-red-portrait.jpg" alt="">
+    </div>
+    <div class="player-meta">
+      <p class="tiny-label">Now playing</p>
+      <strong id="currentTitle">Cupid</strong>
+      <span id="currentLane">melodic pressure</span>
+    </div>
+    <div class="player-controls">
+      <button type="button" id="prevTrack" aria-label="Previous track">Prev</button>
+      <button type="button" id="toggleAudio" class="play-toggle" aria-label="Play or pause">Play</button>
+      <button type="button" id="nextTrack" aria-label="Next track">Next</button>
+    </div>
+    <div class="player-progress">
+      <span id="elapsedTime">0:00</span>
+      <input id="seekBar" type="range" min="0" max="1000" value="0" aria-label="Seek track">
+      <span id="durationTime">0:00</span>
+    </div>
+    <div class="player-tools">
+      <button type="button" id="muteAudio" aria-label="Mute player">Mute</button>
+      <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.86" aria-label="Volume">
+      <button type="button" id="copyPrimeLink" aria-label="Copy prime package link">Copy</button>
+    </div>
+    <p class="player-status" id="playerStatus" role="status">Prime catalog ready.</p>
+  </aside>
+
+  <script src="./prime.js" defer></script>
+</body>
+</html>

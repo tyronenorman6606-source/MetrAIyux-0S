@@ -64,7 +64,6 @@ Current active counts after the May 19, 2026 cleanup:
 - 0 blank phone/email/website records
 - 0 active demo seed rows
 - `npm run smoke` passed 1013 checks
-- `npm run v21-smoke` passed 51 checks
 - `npm run v22-smoke` passed 33 checks
 - `npm run v23-smoke` passed 101 checks
 

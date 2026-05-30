@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Village Health Clubs &amp; Spas - Camelback | Phoenix Fitness center</title>
+  <meta name="description" content="The Village Health Clubs &amp; Spas - Camelback is a Valley Verified fitness center profile at 4444 East Camelback Road, Phoenix, AZ 85018, highlighting.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15222a;
+      --deep: #1f5568;
+      --aqua: #34a7a1;
+      --gold: #d6aa48;
+      --paper: #f6fbfb;
+      --muted: #60717a;
+      --line: rgba(31, 85, 104, .18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(52, 167, 161, .10) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(52, 167, 161, .08) 1px, transparent 1px),
+        var(--paper);
+      background-size: 66px 66px;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; color: var(--deep); font-weight: 900; }
+    .hero { min-height: 70vh; display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .92fr); gap: 34px; align-items: center; padding: 42px 0; }
+    .eyebrow { margin: 0 0 16px; color: var(--aqua); font-size: .86rem; font-weight: 900; text-transform: uppercase; }
+    h1 { margin: 0; color: var(--deep); font-size: 3.7rem; line-height: 1; letter-spacing: 0; }
+    .lead { max-width: 700px; margin: 22px 0 0; color: var(--muted); font-size: 1.12rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button { display: inline-flex; align-items: center; min-height: 46px; padding: 0 18px; border: 1px solid var(--deep); border-radius: 6px; color: var(--deep); font-weight: 900; text-decoration: none; }
+    .button.primary { background: var(--deep); color: white; }
+    .club {
+      min-height: 370px;
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    .club:before {
+      content: "";
+      position: absolute;
+      left: 54px;
+      right: 54px;
+      top: 72px;
+      height: 190px;
+      border-radius: 90px;
+      border: 18px solid var(--aqua);
+    }
+    .club:after {
+      content: "";
+      position: absolute;
+      left: 92px;
+      right: 92px;
+      top: 154px;
+      height: 28px;
+      background: var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 70px 0 var(--deep);
+    }
+    .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 14px 0 58px; }
+    .fact { min-height: 142px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 255, 255, .88); }
+    .label { margin: 0 0 8px; color: var(--muted); font-size: .78rem; font-weight: 900; text-transform: uppercase; }
+    .value { margin: 0; font-weight: 900; }
+    @media (max-width: 820px) {
+      header, .hero, .facts { display: grid; grid-template-columns: 1fr; }
+      h1 { font-size: 2.45rem; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <span>Directory profile</span>
+    <span>The Village Health Clubs &amp; Spas - Camelback Valley Verified profile.</span>
+  </header>
+  <main class="wrap">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Health Club / Spa - Phoenix, AZ 85018</p>
+        <h1>The Village Health Clubs &amp; Spas - Camelback</h1>
+        <p class="lead">The Village Health Clubs &amp; Spas - Camelback is the flagship Biltmore corridor club with fitness equipment, Pilates, yoga, signature classes, personal training, aquatics, tennis, pickleball, spa, recovery, Kids Club, cafe, lounge, workspaces, and community programming.</p>
+        <div class="actions">
+          <a class="button primary" href="tel:+16028406412">Call (602) 840-6412</a>
+          <a class="button" href="https://business.phoenixchamber.com/list/ql/personal-services-care-17">Public evidence</a>
+        </div>
+      </div>
+      <aside class="club" aria-label="The Village Health Clubs and Spas Camelback listing visual"></aside>
+    </section>
+    <section class="facts" aria-label="The Village Health Clubs and Spas Camelback facts">
+      <div class="fact"><p class="label">Address</p><p class="value">4444 E. Camelback Rd, Phoenix, AZ 85018</p></div>
+      <div class="fact"><p class="label">Category</p><p class="value">Beauty And Wellness</p></div>
+      <div class="fact"><p class="label">Pricing Mode</p><p class="value">Contact for quote</p></div>
+      <div class="fact"><p class="label">Language</p><p class="value">English</p></div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-the-village-health-clubs-and-spas-camelback-phoenix-85018-38c7b54">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-the-village-health-clubs-and-spas-camelback-phoenix-85018-38c7b54">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says The Village Health Clubs & Spas - Camelback is Valley Verified because official location pages confirm the 4444 East Camelback Road address, phone, club hours, flagship positioning, and extensive amenity set. The Chamber profile reinforces the health, wellness, fitness, spa, personal care, sports, and recreation categories, making this a strong Phoenix/Biltmore wellness anchor.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Fitness center, Group fitness classes, Personal training, and Pilates and yoga</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>fitness and wellness members, families using youth programs or Kids Club, and tennis, pickleball, aquatics, and sports users</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>4444 East Camelback Road, Phoenix, AZ 85018; (602) 840-6412</span></div>
+      </div>
+      <p class="vv-note-text">Official website and Greater Phoenix Chamber evidence support this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

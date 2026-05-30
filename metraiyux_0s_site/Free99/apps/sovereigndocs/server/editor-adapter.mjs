@@ -2,22 +2,33 @@ import crypto from 'node:crypto';
 import { scopedOwnerFromSession, withTenantScope } from './runtime/tenant-scope.mjs';
 
 function clean(value, max = 4000){ return String(value ?? '').trim().slice(0, max); }
+const CANONICAL_SKYEDOCXMAX_EDITOR = '/Marketing-Made-Easy/SkyeDocxMax/editor.html';
+function canonicalLaunchUrl(id){
+  const params = new URLSearchParams({
+    source:'sovereigndocs',
+    ws_id:'sovereigndocs',
+    returnTo:'/Free99/apps/sovereigndocs/vault/',
+    sd_handoff:String(id || '')
+  });
+  return `${CANONICAL_SKYEDOCXMAX_EDITOR}?${params.toString()}`;
+}
 
 export function skyeDocxMaxConfig(){
   return {
     ok:true,
     editor:'SkyeDocx Max',
-    mode:'bundled-editor-runtime',
+    mode:'canonical-0s-editor-runtime',
     enabled:true,
     embedsCustomEditor:false,
-    bundledSkyeDocxMax:true,
-    appPath:'/skye-docx-max/app/',
+    bundledSkyeDocxMax:false,
+    canonicalEditor:CANONICAL_SKYEDOCXMAX_EDITOR,
+    appPath:CANONICAL_SKYEDOCXMAX_EDITOR,
     launchParameter:'sd_handoff',
     handoffFormat:'sovereigndocs-skye-docx-max-handoff-v3',
     acceptedPayload:['markdown','html','templateMetadata','documentRecord','answers','auditContext','packetMetadata','fieldMap','sectionMap','caseContext'],
     returnEndpoint:'/api/editor/skye-docx-max/return',
     handoffEndpoint:'/api/editor/skye-docx-max/session',
-    boundary:'SovereignDocs creates governed automation payloads and hands them to the bundled SkyeDocxMax editor runtime. SkyeDocxMax owns serious editing, layout, comments, and authoring; SovereignDocs remains document automation, governance, review, and workflow infrastructure.'
+    boundary:'SovereignDocs creates governed automation payloads and hands them to the canonical 0S SkyeDocxMax editor runtime. SkyeDocxMax owns serious editing, layout, comments, and authoring; SovereignDocs remains document automation, governance, review, and workflow infrastructure.'
   };
 }
 
@@ -28,7 +39,7 @@ export function createSkyeDocxMaxHandoff({ templateId = null, documentId = null,
     id,
     format:'sovereigndocs-skye-docx-max-handoff-v3',
     target:'SkyeDocx Max',
-    launchUrl:`/skye-docx-max/app/?sd_handoff=${encodeURIComponent(id)}`,
+    launchUrl:canonicalLaunchUrl(id),
     createdAt:now,
     templateId:templateId ? String(templateId) : null,
     documentId:documentId ? String(documentId) : null,
@@ -42,7 +53,7 @@ export function createSkyeDocxMaxHandoff({ templateId = null, documentId = null,
       notLegalAdvice:true,
       source:'SovereignDocs',
       generatedForSkyeDocxMax:true,
-      editorRuntime:'SkyeDocxMax bundled app',
+      editorRuntime:'canonical 0S SkyeDocxMax',
       integrationVersion:'v18'
     },
     owner:scopedOwnerFromSession(session),

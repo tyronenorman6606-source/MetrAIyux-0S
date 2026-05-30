@@ -16,13 +16,15 @@ function createLenisRuntime(options) {
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
   const params = new URLSearchParams(window.location.search);
+  const LEGAL_ACCEPTANCE_VERSION = "legal-skyes-transaction-pack-2026-05-28";
   const state = {
     clientSlug: (params.get("client") || "bobs-smoke-shop").trim(),
     dryRun: params.get("dry_run") === "1" || params.get("proof") === "1",
     offers: [],
     client: null,
     skyemerit: null,
-    selectedOfferId: ""
+    selectedOfferId: "",
+    skyCartAddOnOfferId: ""
   };
 
   function isBobLane() {
@@ -54,16 +56,42 @@ function createLenisRuntime(options) {
     $("#statusText").textContent = text;
   }
 
-  function calculateMerit(rule, subtotalCents) {
+  function legalAcceptancePayload(form, source) {
+    const accepted = Boolean(form.legal_acceptance?.checked);
+    return {
+      legal_acceptance: {
+        legal_terms_accepted: accepted,
+        arbitration_accepted: accepted,
+        payments_policy_accepted: accepted,
+        no_outcome_guarantee_accepted: accepted,
+        truthful_review_boundary_acknowledged: accepted,
+        privacy_policy_accepted: accepted,
+        legal_version: LEGAL_ACCEPTANCE_VERSION,
+        accepted_at: accepted ? new Date().toISOString() : "",
+        acceptance_surface: source,
+        source_url: window.location.href
+      }
+    };
+  }
+
+  function calculateMerit(rule, subtotalCents, offer = null) {
     const subtotal = Math.max(0, Math.round(Number(subtotalCents || 0)));
     if (!rule) return null;
+    if (rule.expires_at) {
+      const expiry = Date.parse(rule.expires_at);
+      if (Number.isFinite(expiry) && Date.now() > expiry) return null;
+    }
+    const allowedOffers = Array.isArray(rule.applicable_offer_ids) ? rule.applicable_offer_ids : [];
+    if (allowedOffers.length && !allowedOffers.includes(offer?.id)) return null;
     const min = Math.max(0, Math.round(Number(rule.min_transaction_cents || 0)));
     const max = rule.max_transaction_cents == null ? null : Math.max(0, Math.round(Number(rule.max_transaction_cents || 0)));
     if (subtotal < min || (max != null && subtotal > max)) return null;
     const floor = Math.max(0, Math.round(Number(rule.floor_cents || 0)));
     const cap = rule.cap_cents == null ? subtotal : Math.max(0, Math.round(Number(rule.cap_cents || 0)));
     const eligible = Math.max(0, Math.min(subtotal, cap) - floor);
-    const discount = Math.min(subtotal, Math.round((eligible * Number(rule.rate_bps || 0)) / 10000));
+    const rawDiscount = Math.round((eligible * Number(rule.rate_bps || 0)) / 10000);
+    const maxDiscount = rule.max_discount_cents == null ? rawDiscount : Math.min(rawDiscount, Math.max(0, Math.round(Number(rule.max_discount_cents || 0))));
+    const discount = Math.min(subtotal, maxDiscount);
     return {
       code: rule.code,
       title: rule.title,
@@ -73,14 +101,21 @@ function createLenisRuntime(options) {
     };
   }
 
+  function selectedMeritCodeForOffer(offer) {
+    const selected = $("#skyemeritCode")?.value || "SKYEMERIT-FIRST-BEST";
+    if (selected === "none") return "";
+    if (selected === "SKYEMERIT-FIRST-BEST") return offer?.skyemerit?.default_code || selected;
+    return selected;
+  }
+
   function bestMeritForOffer(offer) {
     const subtotal = Number(offer?.skyemerit?.discountable_cents || 0);
     const rules = state.skyemerit?.rules || [];
-    const selectedCode = $("#skyemeritCode")?.value || "SKYEMERIT-FIRST-BEST";
+    const selectedCode = selectedMeritCodeForOffer(offer) || "none";
     if (selectedCode === "none" || subtotal <= 0) return null;
     const candidates = rules
       .filter((rule) => selectedCode === "SKYEMERIT-FIRST-BEST" ? rule.family === "first_time" : rule.code === selectedCode)
-      .map((rule) => calculateMerit(rule, subtotal))
+      .map((rule) => calculateMerit(rule, subtotal, offer))
       .filter(Boolean)
       .sort((a, b) => b.discount_cents - a.discount_cents);
     return candidates[0] || null;
@@ -106,6 +141,72 @@ function createLenisRuntime(options) {
       <strong>${escapeHtml(merit.title)}</strong>
       <span>${escapeHtml(merit.code)} lowers eligible checkout spend by ${money(merit.discount_cents)}. Customer pays ${money(merit.payable_cents)} on the eligible charge. Stripe promo-code stacking turns off when this applies.</span>
     `;
+  }
+
+  function eligibleSkyCartAddOns(primaryOffer) {
+    if (!primaryOffer || primaryOffer.mode !== "payment") return [];
+    const preferredIds = new Set([
+      "skyemusicnexus-social-caption-pack",
+      "skyemusicnexus-short-form-clip-brief",
+      "skyemusicnexus-release-content-kit",
+      "media-over-london-static-preview-page",
+      "media-over-london-floating-orb-gallery"
+    ]);
+    return state.offers
+      .filter((offer) => offer.id !== primaryOffer.id && offer.mode === "payment" && Number(offer.today_cents || offer.setup_cents || 0) > 0)
+      .filter((offer) => offer.family === primaryOffer.family || preferredIds.has(offer.id) || preferredIds.has(primaryOffer.id))
+      .sort((a, b) => {
+        const ap = preferredIds.has(a.id) ? 0 : 1;
+        const bp = preferredIds.has(b.id) ? 0 : 1;
+        return ap - bp || Number(a.today_cents || 0) - Number(b.today_cents || 0);
+      })
+      .slice(0, 3);
+  }
+
+  function renderSkyCartUpsell() {
+    let panel = $("#skyecartUpsellPanel");
+    const form = $("#skypayForm");
+    if (!panel && form) {
+      panel = document.createElement("div");
+      panel.id = "skyecartUpsellPanel";
+      panel.className = "skyecart-upsell-panel";
+      const meritPanel = $(".skyemerit-panel");
+      if (meritPanel?.parentNode) meritPanel.insertAdjacentElement("afterend", panel);
+    }
+    if (!panel) return;
+    const primary = state.offers.find((item) => item.id === state.selectedOfferId) || state.offers[0];
+    const candidates = isBobLane() ? [] : eligibleSkyCartAddOns(primary);
+    if (!primary || !candidates.length) {
+      panel.hidden = true;
+      state.skyCartAddOnOfferId = "";
+      return;
+    }
+    panel.hidden = false;
+    if (state.skyCartAddOnOfferId && !candidates.some((offer) => offer.id === state.skyCartAddOnOfferId)) {
+      state.skyCartAddOnOfferId = "";
+    }
+    panel.innerHTML = `
+      <div class="skyecart-upsell-copy">
+        <span class="mini-label">SkyeCart</span>
+        <strong>Want an additional SkyeMerit today?</strong>
+        <p>Add a related product to SkyeCart. That add-on gets 31% off, then the 31% SkyeCart Add-On Merit applies to its eligible charge. Guardrails keep stacked merit from making premium plans free without owner approval.</p>
+      </div>
+      <div class="skyecart-addons">
+        ${candidates.map((offer) => `
+          <button type="button" class="skyecart-addon-option" data-skyecart-add-on="${escapeHtml(offer.id)}" aria-pressed="${offer.id === state.skyCartAddOnOfferId ? "true" : "false"}">
+            <span>${escapeHtml(offer.title)}</span>
+            <strong>${escapeHtml(offerPrice(offer))}</strong>
+          </button>
+        `).join("")}
+        <button type="button" class="skyecart-addon-option skyecart-addon-option--none" data-skyecart-add-on="" aria-pressed="${state.skyCartAddOnOfferId ? "false" : "true"}">No add-on today</button>
+      </div>
+    `;
+    panel.querySelectorAll("[data-skyecart-add-on]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.skyCartAddOnOfferId = button.dataset.skyecartAddOn || "";
+        renderSkyCartUpsell();
+      });
+    });
   }
 
   async function fetchJson(url, options) {
@@ -145,7 +246,7 @@ function createLenisRuntime(options) {
     if (!select) return;
     const rules = state.skyemerit?.rules || [];
     select.innerHTML = `
-      <option value="SKYEMERIT-FIRST-BEST">Auto first-time SkyeMerit</option>
+      <option value="SKYEMERIT-FIRST-BEST">Auto SkyeMerit</option>
       ${rules.map((rule) => `<option value="${escapeHtml(rule.code)}">${escapeHtml(rule.title)} - ${Number(rule.rate_percent || 0)}%</option>`).join("")}
       <option value="none">No SkyeMerit</option>
     `;
@@ -260,6 +361,13 @@ function createLenisRuntime(options) {
   }
 
   function offerPrice(offer) {
+    if (offer.price_label) return offer.price_label;
+    const listedValue = Number(offer.skyemerit?.listed_value_cents || 0);
+    const discount = Number(offer.skyemerit?.estimated_discount_cents || 0);
+    const payable = Number(offer.skyemerit?.estimated_payable_today_cents || 0);
+    if (listedValue > 0 && discount > 0) {
+      return `${money(listedValue)} listed • ${money(discount)} SkyeMerit • ${money(payable)} due`;
+    }
     const setup = Number(offer.setup_cents || 0);
     const monthly = Number(offer.recurring_cents || 0);
     const trialDays = Number(offer.trial_days || 0);
@@ -276,10 +384,25 @@ function createLenisRuntime(options) {
     const parts = [];
     if (offer.badge) parts.push(offer.badge);
     if (offer.owner_approval_required) parts.push("owner approval");
+    if (offer.launch_window_ends_on) parts.push(`SkyeMerit ends ${offer.launch_window_ends_on}`);
+    if (offer.relay13_inbox_delivery) parts.push("Relay13 inbox");
     if (offer.rate_limits?.rpm) parts.push(`${offer.rate_limits.rpm} rpm`);
     if (offer.rate_limits?.vault_workspace_limit) parts.push(`${offer.rate_limits.vault_workspace_limit} workspace${offer.rate_limits.vault_workspace_limit === 1 ? "" : "s"}`);
     if (offer.deferred_one_time_cents) parts.push(`${money(offer.deferred_one_time_cents)} deferred setup`);
     return parts.slice(0, 3).map((item) => `<em>${escapeHtml(item)}</em>`).join("");
+  }
+
+  function offerMeritBanner(offer) {
+    const discount = Number(offer.skyemerit?.estimated_discount_cents || 0);
+    const payable = Number(offer.skyemerit?.estimated_payable_today_cents || 0);
+    if (discount <= 0 || payable <= 0) return "";
+    return `
+      <span class="skyemerit-offer-banner">
+        <b>-${escapeHtml(money(discount))}</b>
+        <em>SkyeMerit</em>
+        <small>${escapeHtml(money(payable))} due after merit</small>
+      </span>
+    `;
   }
 
   function renderOffers() {
@@ -306,9 +429,10 @@ function createLenisRuntime(options) {
     }
     wrap.classList.remove("bob-offer-summary");
     wrap.innerHTML = state.offers.map((offer) => `
-      <button type="button" class="offer-option neon-magnetic" data-offer-id="${escapeHtml(offer.id)}" aria-pressed="${offer.id === state.selectedOfferId ? "true" : "false"}">
+      <button type="button" class="offer-option neon-magnetic${Number(offer.skyemerit?.estimated_discount_cents || 0) > 0 ? " has-skyemerit-deal" : ""}" data-offer-id="${escapeHtml(offer.id)}" aria-pressed="${offer.id === state.selectedOfferId ? "true" : "false"}">
         <span>
           <strong>${escapeHtml(offer.title)}</strong>
+          ${offerMeritBanner(offer)}
           <p>${escapeHtml(offer.description)}</p>
           <small class="offer-meta">${offerMeta(offer)}</small>
         </span>
@@ -318,10 +442,13 @@ function createLenisRuntime(options) {
     $$(".offer-option").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.selectedOfferId = btn.dataset.offerId;
+        state.skyCartAddOnOfferId = "";
         $$(".offer-option").forEach((node) => node.setAttribute("aria-pressed", String(node === btn)));
+        renderSkyCartUpsell();
         renderSkyeMeritPreview();
       });
     });
+    renderSkyCartUpsell();
     renderSkyeMeritPreview();
   }
 
@@ -334,6 +461,11 @@ function createLenisRuntime(options) {
     event.preventDefault();
     const form = event.currentTarget;
     const button = $("#checkoutBtn");
+    if (!form.legal_acceptance?.checked) {
+      setStatus("Legal acceptance required", "Please accept the Legal Skyes transaction terms before checkout.");
+      form.legal_acceptance?.focus();
+      return;
+    }
     button.disabled = true;
     button.textContent = isBobLane() ? "Opening Bob's tester lane..." : "Preparing secure lane...";
     setStatus(
@@ -348,10 +480,13 @@ function createLenisRuntime(options) {
       customer_email: form.customer_email.value,
       company_name: form.company_name.value || state.client?.company_name || "",
       dry_run: state.dryRun,
-      skyemerit_code: $("#skyemeritCode")?.value === "none" ? "" : ($("#skyemeritCode")?.value || "SKYEMERIT-FIRST-BEST"),
-      skyemerit_pack_id: state.skyemerit?.first_time_pack_id || "SKYEMERIT-FIRST-PACK",
+      skyemerit_code: state.skyCartAddOnOfferId ? "SKYEMERIT-CART-ADDON-31" : selectedMeritCodeForOffer(state.offers.find((item) => item.id === state.selectedOfferId) || null),
+      skyemerit_pack_id: state.skyCartAddOnOfferId ? "SKYEMERIT-SKYCART-PACK" : ((state.offers.find((item) => item.id === state.selectedOfferId)?.skyemerit?.default_pack_id) || state.skyemerit?.first_time_pack_id || "SKYEMERIT-FIRST-PACK"),
       skyemerit_first_time: true,
-      skyemerit_apply: $("#skyemeritCode")?.value !== "none"
+      skyemerit_apply: state.skyCartAddOnOfferId ? true : $("#skyemeritCode")?.value !== "none",
+      skyecart_add_on_accepted: Boolean(state.skyCartAddOnOfferId),
+      skyecart_add_on_offer_id: state.skyCartAddOnOfferId,
+      ...legalAcceptancePayload(form, "skyepay-gateway")
     };
     payload.idempotency_key = requestToken(payload);
 

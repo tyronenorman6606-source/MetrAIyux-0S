@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,6 +74,7 @@
     .founder-ribbon-stats { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
     .ribbon-stat { text-align: center; padding: 12px 20px; border: 1px solid var(--line); border-radius: 10px; }
     .ribbon-stat strong { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--gold); line-height: 1; margin-bottom: 3px; }
+    .ribbon-stat.value-band strong { font-size: clamp(18px, 2vw, 22px); }
     .ribbon-stat span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 
     /* ── PLATFORM TABS ── */
@@ -185,6 +186,66 @@
     .how-item h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
     .how-item p { font-size: 13px; color: var(--soft); line-height: 1.6; }
     .how-num { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: rgba(244,199,91,.25); line-height: 1; margin-bottom: 8px; }
+
+    .featured-essay {
+      max-width: 1240px;
+      margin: 0 auto 64px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, .72fr);
+      background: linear-gradient(135deg, rgba(244,199,91,.12), rgba(100,217,255,.06)), rgba(11,15,20,.82);
+      box-shadow: var(--shadow);
+    }
+    .featured-essay-copy { padding: clamp(24px, 4vw, 42px); }
+    .featured-essay-kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 14px; color: var(--gold);
+      font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    }
+    .featured-essay h2 {
+      margin: 0 0 14px;
+      font-family: var(--font-display);
+      font-size: clamp(24px, 4vw, 40px);
+      line-height: 1.08;
+      color: var(--ink);
+    }
+    .featured-essay h2 em { color: var(--gold); font-style: normal; }
+    .featured-essay p {
+      margin: 0;
+      color: var(--soft);
+      font-size: 15px;
+      line-height: 1.72;
+      max-width: 660px;
+    }
+    .featured-essay-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .featured-essay-actions a {
+      border-radius: 7px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid rgba(244,199,91,.28);
+      color: var(--gold);
+      background: rgba(244,199,91,.07);
+    }
+    .featured-essay-actions a:first-child { background: var(--gold); color: #060810; }
+    .featured-essay-media {
+      min-height: 100%;
+      border-left: 1px solid var(--line);
+      background: rgba(5,8,12,.55);
+    }
+    .featured-essay-media img {
+      width: 100%;
+      height: 100%;
+      min-height: 320px;
+      object-fit: cover;
+      object-position: center top;
+    }
+    @media (max-width: 860px) {
+      .featured-essay { grid-template-columns: 1fr; }
+      .featured-essay-media { border-left: 0; border-top: 1px solid var(--line); }
+    }
   </style>
 </head>
 <body class="skyesol-living-page">
@@ -207,6 +268,7 @@
       <a href="valuation.html">Valuation</a>
       <a href="social.html">Social</a>
       <a class="is-active" href="founder-drops.html">Founder Drops</a>
+      <a href="https://devooderator.pages.dev/" target="_blank" rel="noopener">☣️ DevoodeRator</a>
       <a href="gray-skyes.html">Gray Skyes</a>
       <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
       <a class="nav-cta" href="index.html#pricing">Pricing</a>
@@ -228,13 +290,14 @@
       <img class="founder-ribbon-photo" src="assets/SkyesOverLondonFounder.png" alt="Gray Skyes">
       <div class="founder-ribbon-info">
         <div class="founder-ribbon-name">Gray Skyes</div>
-        <div class="founder-ribbon-role">Builder · Architect · Founder of MetrAIyux 0S</div>
+      <div class="founder-ribbon-role">Builder · Architect · Founder of MetrAIyux 0S</div>
+        <a href="https://devooderator.pages.dev/" target="_blank" rel="noopener" style="display:inline-flex;margin-top:8px;color:var(--gold);font-size:12px;font-weight:800;">☣️ Read DevoodeRator</a>
       </div>
     </div>
     <div class="founder-ribbon-stats">
       <div class="ribbon-stat"><strong>28</strong><span>Platform Lanes</span></div>
-      <div class="ribbon-stat"><strong>58</strong><span>Live Products</span></div>
-      <div class="ribbon-stat"><strong>$2.5M</strong><span>Built Value</span></div>
+      <div class="ribbon-stat"><strong>62</strong><span>Live Products</span></div>
+      <div class="ribbon-stat value-band"><strong>$13.5M-$39M</strong><span>Founder Range</span></div>
       <div class="ribbon-stat"><strong>$0</strong><span>Funding</span></div>
     </div>
   </div>
@@ -242,6 +305,23 @@
 
 <!-- ══ HOW TO USE ══ -->
 <div class="section-wrap">
+  <article class="featured-essay" aria-labelledby="repo-rescue-essay-title">
+    <div class="featured-essay-copy">
+      <div class="featured-essay-kicker">🗃️ Founder longform · repo rescue daemon</div>
+      <h2 id="repo-rescue-essay-title">ShYT happens. <em>Skye keeps the sKache.</em></h2>
+      <p>
+        The founder note explains the ten-minute encrypted SkyeVault autosync daemon in my voice: what a daemon is, how VS Code/workspace shutdowns really work, why literal repo custody is not GitHub, and where the no-perfect-tech boundary stays honest.
+      </p>
+      <div class="featured-essay-actions">
+        <a href="founder-notes/skyevault-autosync-daemon.html">Read the blog</a>
+        <a href="https://skyevault-drop.graylondonskyes.workers.dev/agent-install.html" target="_blank" rel="noopener">Agent install prompt</a>
+        <a href="https://skyevault-drop.graylondonskyes.workers.dev/repo.html" target="_blank" rel="noopener">Vault repo lane</a>
+      </div>
+    </div>
+    <a class="featured-essay-media" href="founder-notes/skyevault-autosync-daemon.html" aria-label="Read the SkyeVault autosync daemon founder note">
+      <img src="assets/skyevault-autosync-daemon-blog-screenshot.png" alt="Screenshot of the SkyeVault autosync daemon founder note" loading="lazy" decoding="async">
+    </a>
+  </article>
   <div class="how-strip">
     <div class="how-item">
       <div class="how-num">01</div>
@@ -334,7 +414,7 @@ const POSTS = {
       title: 'You\'re paying $3,000/month for hosting. I pay $0.',
       caption: `Everyone told me hosting was expensive. They were paying $2,000–$3,000/month for servers they barely touched.
 
-I run 17 live Cloudflare Workers. Globally distributed. Zero cold starts. CF-Ray verified on every single endpoint. 875+ deployed HTML surfaces. 7 D1 databases. KV stores holding session data and config.
+I run 17 live Cloudflare Workers. Globally distributed. Zero cold starts. CF-Ray verified on every single endpoint. 875+ deployed HTML surfaces. 9 live SQL database lanes. KV stores holding session data and config.
 
 Monthly infrastructure cost: $0.
 
@@ -346,7 +426,7 @@ When you stop renting centralized compute and start building at the edge, the un
 
 The difference between a SaaS that bleeds $3K/month on infrastructure before revenue and a sovereign OS that costs $0 to run isn't just money. It's leverage. Every dollar you're not spending on servers is a dollar of runway.
 
-I built MetrAIyux 0S on this model. 12 months. $0 infra. $2.5M in deployed replacement value.
+I built MetrAIyux 0S on this model. 12 months. $0 infra. $13.5M-$24M full-repo engineering replacement range, with a $13.5M-$39M founder/operator range.
 
 The edge isn't a trend. It's the architecture that changes the math.`,
       hashtags: '#cloudflare #serverless #infrastructure #buildinpublic #solofounder #edgecomputing #metraiyux0s #zeroinfracost'
@@ -354,12 +434,12 @@ The edge isn't a trend. It's the architecture that changes the math.`,
     {
       img: 'assets/social/grayskyes/ig-02.png',
       problem: 'The "you need a team" myth',
-      title: '28 lanes. 17 brains. 58 products. 1 person.',
+      title: '28 lanes. 17 brains. 62 products. 1 person.',
       caption: `Every advisor, every investor, every "well-meaning" mentor said the same thing: you need a team.
 
 I didn't listen.
 
-28 platform lanes. 17 custom AI brains. 58 Stripe products live in cs_live mode — not test, not sandbox. $0 funding. Zero investors. Zero dilution.
+28 platform lanes. 17 custom AI brains. 62 Stripe products live in cs_live mode — not test, not sandbox. $0 funding. Zero investors. Zero dilution.
 
 One person. Twelve months.
 
@@ -386,7 +466,7 @@ This isn't about being cheaper. It's about the coordination overhead that agenci
 
 When one person knows the full stack, the coordination cost disappears. The $180K quote becomes an 8-week build.
 
-MetrAIyux 0S has a full replacement cost audit: $2.0M–$2.5M, based on section-level methodology at CF-edge specialist rates. Every surface is verifiable. 875+ deployed HTML surfaces. Each one has a CF-Ray header or a git receipt. Not a screenshot. A live proof.
+MetrAIyux 0S has a current valuation source of truth: $13.5M-$24M engineering replacement and $13.5M-$39M founder/operator range, backed by full-repo inventory, route atlas, proof receipts, and remediation reruns. Every surface is verifiable. Each one has a CF-Ray header or a git receipt. Not a screenshot. A live proof.
 
 The agency model survives because most founders don't know what's actually possible without it. That's the only reason.`,
       hashtags: '#devagency #agencykiller #buildinpublic #softwaredevelopment #founders #cloudflare #metraiyux0s #replaceagencies'
@@ -452,7 +532,7 @@ When your infrastructure is already built and your patterns are already proven, 
 
 I raised $0. I had 1 person (me). My first deployable product took 12 months.
 
-And MetrAIyux 0S has a replacement cost audit of $2.0M–$2.5M.
+And MetrAIyux 0S has a $13.5M-$24M engineering replacement range.
 
 The math is the math.
 
@@ -460,7 +540,7 @@ I'm not saying VC funding is wrong. I'm saying the model of "raise $2M to hire 4
 
 Zero investors means zero dilution. It also means zero permissions required to make the next move. No board approval for product decisions. No investor calls on Tuesdays. No cap table negotiations when a new player wants in.
 
-When you own 100% of a $2.5M platform, you control 100% of what happens to it. That's not a consolation prize for not getting funded. That's a specific kind of power that most funded founders will never have.
+When you own 100% of a platform in the $13.5M-$39M founder/operator range, you control 100% of what happens to it. That's not a consolation prize for not getting funded. That's a specific kind of power that most funded founders will never have.
 
 The funding-to-build ratio matters. Most startups aren't underfunded. They're over-headcounted.`,
       hashtags: '#startupfunding #bootstrap #vc #venturecapital #solofounder #metraiyux0s #grayskyes #founder'
@@ -468,10 +548,10 @@ The funding-to-build ratio matters. Most startups aren't underfunded. They're ov
     {
       img: 'assets/social/grayskyes/ig-08.png',
       problem: 'The "demo mode" credibility problem',
-      title: '58 Stripe products. cs_live session IDs. Not test mode.',
+      title: '62 Stripe products. cs_live session IDs. Not test mode.',
       caption: `Not test mode. Not sandbox. Not sk_test keys. cs_live session IDs.
 
-58 Stripe products live inside MetrAIyux 0S. Music drops. Staffing fees. Vault access. API tiers. White-label seats. SkyePay transaction fees. SkyeVault memberships.
+62 Stripe products live inside MetrAIyux 0S. Music drops. Staffing fees. Vault access. API tiers. White-label seats. SkyePay transaction fees. SkyeVault memberships.
 
 Every product in cs_live mode means real money changes hands when a transaction completes. That's a different standard than a demo where the card number is 4242 4242 4242 4242.
 
@@ -479,7 +559,7 @@ Here's the credibility test I use: when someone says their product "has Stripe i
 
 cs_ means it's a real checkout session. live means it's production. If they show you cs_test, they're in sandbox. If they can't show you anything, they have a screenshot.
 
-MetrAIyux 0S doesn't do screenshots. 58 products. Live commerce. CF-Ray on the payment Workers. Full auditability from session creation through webhook processing.
+MetrAIyux 0S doesn't do screenshots. 62 products. Live commerce. CF-Ray on the payment Workers. Full auditability from session creation through webhook processing.
 
 The standard isn't "does it work in demo mode." The standard is: does it work when real money is on the line.`,
       hashtags: '#stripe #payments #ecommerce #buildinpublic #saas #metraiyux0s #liveproduct #founder'
@@ -547,7 +627,7 @@ Startups raise money, hire fast, sprint toward an exit, and hope the market vali
 
 I built a sovereign business operating system.
 
-MetrAIyux 0S is 28 platform lanes, 17 AI brains, 58 live Stripe products, 875+ deployed surfaces, and $2.0M–$2.5M in replacement value — built by one person over 12 months with $0 in funding and zero external dependencies for the decisions that matter.
+MetrAIyux 0S is 28 platform lanes, 17 AI brains, 62 live Stripe products, deployed proof surfaces, a $13.5M-$24M engineering replacement range, and a $13.5M-$39M founder/operator range — built by one person over 12 months with $0 in funding and zero external dependencies for the decisions that matter.
 
 Software. Automation. Infrastructure. Freedom.
 
@@ -572,7 +652,7 @@ That's not a startup. That's sovereignty.`,
 
 I spent 12 months ignoring that advice. Here's what actually happened.
 
-MetrAIyux 0S is a 28-lane sovereign business operating system. 17 live Cloudflare Workers. 58 Stripe products in cs_live mode — not test, not sandbox, real money. 875+ deployed HTML surfaces, each with a CF-Ray header or git receipt. $2.0M–$2.5M replacement cost. $0 funding. Zero investors.
+MetrAIyux 0S is a 28-lane sovereign business operating system. 17 live Cloudflare Workers. 62 Stripe products in cs_live mode — not test, not sandbox, real money. Deployed proof surfaces, each with a CF-Ray header or git receipt. $13.5M-$24M engineering replacement range. $13.5M-$39M founder/operator range. $0 funding. Zero investors.
 
 One person. Twelve months.
 
@@ -621,7 +701,8 @@ My path:
 → Founder dilution: 0%
 → Infrastructure cost: $0/month
 → Payroll: Not applicable
-→ Replacement cost audit: $2.0M–$2.5M
+→ Engineering replacement range: $13.5M-$24M
+→ Founder/operator range: $13.5M-$39M
 
 I'm not presenting this as "bootstrapping is always better." There are categories of businesses — hardware, regulated industries, capital-intensive markets — where the funded path is the only path.
 
@@ -631,7 +712,7 @@ The real question is: what is the minimum viable team and minimum viable capital
 
 The coordination overhead of a 4-person seed team is real. The equity you give up is permanent. The investor relationships you enter into change the nature of every decision you make after.
 
-For MetrAIyux 0S, the answer was one person and zero dollars. The replacement cost came out the same as the average seed round anyway.
+For MetrAIyux 0S, the answer was one person and zero dollars. The engineering replacement range now clears the average seed round by a wide margin.
 
 That's not luck. That's architecture.`,
       hashtags: '#venturecapital #startup #founder #bootstrap #entrepreneurship #metraiyux0s #grayskyes #buildvsraise'
@@ -646,7 +727,7 @@ I want to walk through the actual architecture of MetrAIyux 0S, because I think 
 
 What's running:
 → 17 Cloudflare Workers handling auth, email routing, payment processing, AI inference routing, git vault operations, and more
-→ 7 CF D1 SQLite databases (separate per domain: users, sessions, payments, content, AI logs, etc.)
+→ 9 live SQL database lanes (separate per domain: users, sessions, payments, content, AI logs, etc.)
 → CF KV for session state and configuration data
 → 875+ HTML surfaces deployed to CF Pages
 → Stripe webhooks processing through Workers
@@ -667,7 +748,7 @@ The edge model changes the unit economics of SaaS in a fundamental way. You stop
 
 The tradeoffs are real: you're in Cloudflare's ecosystem, Workers have CPU time constraints, and D1 isn't a Postgres replacement for complex relational workloads. I accepted all of these tradeoffs deliberately. For this architecture, they're irrelevant.
 
-When your infrastructure costs nothing and your platform is worth $2.5M, the math of being a solo founder stops looking impossible.`,
+When your infrastructure costs nothing and your platform carries a $13.5M-$39M founder/operator range, the math of being a solo founder stops looking impossible.`,
       hashtags: '#cloudflare #serverless #infrastructure #saas #devops #metraiyux0s #edgecomputing #buildinpublic'
     },
     {
@@ -737,7 +818,7 @@ Here's what changes when one person knows the full stack:
 
 Most of that $180K is paying for coordination costs that don't exist in a solo build. The actual complexity — the auth, the Stripe integration, the dashboard — is genuinely 8 weeks of work when you eliminate the overhead.
 
-MetrAIyux 0S replacement cost audit: $2.0M–$2.5M. Total agency fees paid: $0. Every surface has a CF-Ray or git receipt.
+MetrAIyux 0S valuation source of truth: $13.5M-$24M engineering replacement, $13.5M-$39M founder/operator range. Total agency fees paid: $0. Every surface has a CF-Ray or git receipt.
 
 This isn't a flex on agencies. It's a data point about what's possible when the coordination tax is zero.`,
       hashtags: '#devagency #saas #startup #founder #entrepreneurship #cloudflare #metraiyux0s #buildinpublic'
@@ -872,9 +953,10 @@ I kept building.
 Here's where I ended up:
 • 28 platform lanes live inside the OS
 • 17 Cloudflare Workers handling everything from auth to payments to AI routing
-• 58 Stripe products in live mode — cs_live session IDs, not test mode
+• 62 Stripe products in live mode — cs_live session IDs, not test mode
 • 875+ deployed HTML surfaces, each with a CF-Ray header or git receipt
-• $2.0M–$2.5M replacement cost audit based on market rates
+• $13.5M-$24M engineering replacement range
+• $13.5M-$39M founder/operator range
 • $0 in funding raised
 • $0 in infrastructure costs monthly
 
@@ -958,7 +1040,7 @@ The follow-up is always the same: "Oh, so you're still early stage then?"
 
 And that's where the conversation gets interesting.
 
-I have 17 live Workers, 58 Stripe products in cs_live mode, 28 platform lanes, $2.0M–$2.5M in replacement cost, and $0 in monthly infrastructure costs. The platform is deployed and running. It's generating real commerce transactions.
+I have 17 live Workers, 62 Stripe products in cs_live mode, 28 platform lanes, a $13.5M-$24M engineering replacement range, a $13.5M-$39M founder/operator range, and $0 in monthly infrastructure costs. The platform is deployed and running. It's generating real commerce transactions.
 
 "Early stage" because I haven't raised money?
 
@@ -1039,7 +1121,7 @@ The ownership question is worth asking before you're in a situation where you ha
 **What's running:**
 
 - 17 Cloudflare Workers — auth (NorthStar SignInPro), email routing, payment webhook processing, AI inference routing (BrainSync), git vault operations (SkyeVault), content automation, client delivery pipeline, and more
-- 7 CF D1 SQLite databases, each domain-separated (users, sessions, payments, content, AI logs, client records, system config)
+- 9 live SQL database lanes, each domain-separated (users, sessions, payments, content, AI logs, client records, system config)
 - CF KV for session state and high-read config data
 - 875+ HTML surfaces deployed to CF Pages (marketing site, client sites, platform surfaces)
 - Stripe webhooks processing through dedicated Workers with signature verification
@@ -1179,7 +1261,7 @@ This isn't replicable for every team or every project. If you need a 10-person t
 
 The solo approach works when one person genuinely knows the full stack and the problem is primarily coordination-taxed, not complexity-taxed.
 
-MetrAIyux 0S replacement cost audit: $2.0M–$2.5M. Total agency fees: $0. Every surface has a CF-Ray or git receipt.
+MetrAIyux 0S valuation source of truth: $13.5M-$24M engineering replacement, $13.5M-$39M founder/operator range. Total agency fees: $0. Every surface has a CF-Ray or git receipt.
 
 Not saying this is for everyone. Saying the gap between $180K and 8 weeks is mostly coordination overhead, not fundamental complexity.`,
       hashtags: 'r/entrepreneur r/startups r/webdev r/freelance'
@@ -1315,5 +1397,6 @@ renderGrid('rd-grid', 'reddit');
   }
 })();
 </script>
+  <script src="/script.js"></script>
 </body>
 </html>

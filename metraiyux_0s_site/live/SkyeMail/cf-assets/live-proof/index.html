@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SkyeMail Live Proof | Provider Inbox Demo</title>
-  <meta name="description" content="A public SkyeMail proof surface showing active-provider send and inbox-read proof without exposing OAuth tokens, private keys, or passphrases.">
+  <title>SkyeMail Live Proof | Citadel Inbox Demo</title>
+  <meta name="description" content="A public SkyeMail proof surface showing Citadel/SkyeNet send and inbox-read proof without exposing OAuth tokens, private keys, or passphrases.">
   <link rel="icon" href="/assets/skyes-over-london-deity-logo.png">
   <link rel="stylesheet" href="/assets/marketing.css">
   <script type="importmap">
@@ -29,6 +29,8 @@
     <a class="brand" href="/"><img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo"><span>SkyeMail</span></a>
     <div class="nav-links">
       <a href="/marketing">Marketing</a>
+      <a href="/security">Security</a>
+      <a href="/tech-stack">Tech Stack</a>
       <a href="/suite">Platform</a>
       <a href="/login">Login</a>
       <a href="/monitoring">Monitoring</a>
@@ -41,11 +43,13 @@
       <canvas class="skymail-webgl" data-skymail-webgl aria-hidden="true"></canvas>
       <div class="hero-copy-stack">
         <p class="eyebrow">Buyer-safe live proof</p>
-        <h1 class="glow-text">Active provider sends. The inbox reads it back.</h1>
-        <p class="lead">This public <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command room</span> reads the latest sanitized <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> proof receipt. The run uses the active hosted-mail provider, sends live proof mail, then verifies the same provider-backed inbox can read the received messages. Raw OAuth tokens, private keys, and passphrases never appear on this page.</p>
+        <h1 class="glow-text">Citadel sends. The inbox reads it back.</h1>
+        <p class="lead">This public <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command room</span> reads the latest sanitized <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> proof receipt. The run uses the Citadel/SkyeNet mail lane, sends live proof mail, then verifies the same sovereign-backed inbox can read the received messages. Raw OAuth tokens, private keys, and passphrases never appear on this page.</p>
         <div class="actions">
           <a class="button primary magnetic" href="#proof">View Latest Run</a>
           <a class="button magnetic" href="/marketing">Open Marketing Surface</a>
+          <a class="button magnetic" href="/security">Security</a>
+          <a class="button magnetic" href="/tech-stack">Tech Stack</a>
         </div>
       </div>
       <div class="surface command-surface live-proof-surface">
@@ -56,16 +60,16 @@
         </div>
         <div class="mail-stage">
           <div class="mail-list">
-            <div class="mail-row active"><b>Provider send</b><span data-proof-ab>Waiting for latest run</span></div>
+            <div class="mail-row active"><b>Citadel send</b><span data-proof-ab>Waiting for latest run</span></div>
             <div class="mail-row active"><b>Inbox read</b><span data-proof-ba>Waiting for latest run</span></div>
-            <div class="mail-row"><b>Vault keys</b><span>Active for proof identities</span></div>
+            <div class="mail-row"><b>Sovereign keys</b><span>Active for proof identities</span></div>
             <div class="mail-row"><b>Private data</b><span>No passphrases or private keys are published</span></div>
           </div>
           <div class="reader">
             <p class="eyebrow">Latest receipt</p>
             <h2 data-proof-title>Loading proof receipt...</h2>
             <p class="lead" data-proof-summary>The public proof JSON is loading from SkyeMail.</p>
-            <div class="seal"><b>What this proves</b><span> The active provider accepted the sends, and SkyeMail confirmed the inbox could read the received proof messages through the deployed provider lane.</span></div>
+            <div class="seal"><b>What this proves</b><span> The Citadel/SkyeNet mail lane accepted the sends, and SkyeMail confirmed the inbox could read the received proof messages through the deployed sovereign lane.</span></div>
           </div>
         </div>
       </div>
@@ -74,7 +78,7 @@
     <section class="section" id="proof" data-motion-section>
       <div class="section-head">
         <p class="eyebrow">Proof records</p>
-        <h2 class="neon-text">Latest provider-backed email run.</h2>
+        <h2 class="neon-text">Latest sovereign email run.</h2>
       </div>
       <div class="grid two proof-run" data-proof-runs>
         <article class="proof-item"><b>Proof not loaded yet</b><span>Run the live proof generator to publish a fresh receipt.</span></article>
@@ -98,7 +102,7 @@
     </section>
   </main>
 
-  <footer class="footer">Proof generated by SkyeMail live email runner. OAuth tokens, private keys, and passphrases are never published.</footer>
+  <footer class="footer">Proof generated by SkyeMail live email runner. OAuth tokens, private keys, passphrases, and private implementation source are never published. <a href="/security">Security</a> • <a href="/tech-stack">Tech Stack</a></footer>
   <script src="/assets/live-proof.js"></script>
 </body>
 </html>

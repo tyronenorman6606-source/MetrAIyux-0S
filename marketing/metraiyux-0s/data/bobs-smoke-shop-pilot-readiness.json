@@ -1,0 +1,68 @@
+{
+  "client": "Bob's Smoke Shop",
+  "checked_at": "2026-05-26T03:15:42Z",
+  "public_offer": "free_workspace_pilot",
+  "public_contact": {
+    "email": "MediaOverLondon@solenterprises.org",
+    "phone": "1-(800)-484-4783"
+  },
+  "production_urls": {
+    "customer_app": "https://bobs-smoke-shop.pages.dev/",
+    "workspace_preview": "https://bobs-smoke-shop.pages.dev/workspace-preview/",
+    "review_page": "https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot",
+    "flyer": "https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot-flyer"
+  },
+  "status": [
+    {
+      "lane": "customer_app",
+      "state": "live_verified",
+      "evidence": "HTTP 200 from https://bobs-smoke-shop.pages.dev/ with Bob's Smoke Shop title and age gate."
+    },
+    {
+      "lane": "workspace_preview",
+      "state": "live_verified",
+      "evidence": "HTTP 200 from /workspace-preview/ with Relay13 widget config and Bob workspace metadata."
+    },
+    {
+      "lane": "connectlog_relay13",
+      "state": "live_verified",
+      "workspace_slug": "bobs-smoke-shop",
+      "workspace_id": "ws_bobs_smoke_shop",
+      "account_code": "BOBS-SMOKE-SHOP-SKM",
+      "evidence": "npm run 0s:relay13-chat:proof returned ok:true for Bob create_conversation, visitor_followup, message_history, and customer_websocket checks."
+    },
+    {
+      "lane": "skyemail",
+      "state": "reserved_pending_acceptance",
+      "reserved_mailbox": "bobs-smokeshop@skyemail.solenterprises.org",
+      "default_reserved_mailbox": "bobs-smokeshop@skyemail.solenterprises.org",
+      "can_change_mailbox": true,
+      "change_request_endpoint": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley-verified/skyemail-handle-request",
+      "accept_path": "/valley-verified/live/SkyeMail/login.html?workspace=valley-verified&business=bobs-smoke-shop-litchfield-park&mailbox=bobs-smokeshop%40skyemail.solenterprises.org",
+      "activation_window_hours": 24,
+      "evidence": "Bob exists in valley_verified_skyemail_acceptance with activation_status pending_team_provisioning."
+    },
+    {
+      "lane": "crm_notes",
+      "state": "included_after_shared_gate_handoff",
+      "evidence": "Bob workspace preview includes proof/export and follow-up routes; VantaCore/AE CRM handling should be activated after Bob accepts shared workspace access."
+    },
+    {
+      "lane": "backup_receipts",
+      "state": "proof_exports_live_recurring_backup_after_acceptance",
+      "included_free_review_exports": 5,
+      "evidence": "Bob preview data includes 5 proof/export receipts. Recurring biweekly mirror/backup should not be claimed as active until Bob approves the workspace."
+    },
+    {
+      "lane": "auth",
+      "state": "shared_gate_handoff_only",
+      "evidence": "Bob workspace source no longer issues or advertises an app-local preview credential; workspace access routes to the shared 0S client login."
+    }
+  ],
+  "sales_boundary": [
+    "Safe to tell Bob the app, review page, flyer, QR, and Relay13/ConnectLog workspace preview are live.",
+    "Safe to tell Bob bobs-smokeshop@skyemail.solenterprises.org is reserved, and he can request a different handle before activation.",
+    "Do not tell Bob the SkyEmail inbox, recurring biweekly backup, or managed CRM operations are already active before he accepts the shared-gate handoff.",
+    "Do not present Relay13 as full Slack parity; present it as a free starter workspace chat and intake lane."
+  ]
+}

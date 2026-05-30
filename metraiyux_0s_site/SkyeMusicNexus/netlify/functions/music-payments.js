@@ -78,6 +78,52 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+const WORKFORCE_COMMAND_URL = '/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel';
+const WORKFORCE_PACKET_URL = '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html';
+const CONNECTLOG_URL = '/connectlog-v7.7-relay13-operator-proof/app.html';
+const RELAY13_INBOX_URL = '/connectlog-v7.7-relay13-operator-proof/relay13-inbox.html';
+
+function slugify(value, fallback = 'new-artist') {
+  return String(value || fallback).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90) || fallback;
+}
+
+function artistLinkSlug(artist) {
+  return slugify(artist && (artist.slug || artist.name || artist.artistId || artist.id || artist.skyeId || artist.email), 'new-artist');
+}
+
+function paperworkComplete(artist) {
+  return ['complete', 'completed', 'approved', 'on_file', 'verified'].includes(String(artist && artist.paperwork && artist.paperwork.status || '').toLowerCase());
+}
+
+function paperworkFor(artist = {}) {
+  const existing = artist.paperwork && typeof artist.paperwork === 'object' ? artist.paperwork : {};
+  const slug = artistLinkSlug({ ...artist, slug: existing.artistSlug || artist.slug });
+  return {
+    requiredBeforePayout: true,
+    payoutHold: !paperworkComplete({ paperwork: { status: existing.status || 'required' } }),
+    status: String(existing.status || 'required').toLowerCase(),
+    artistSlug: slug,
+    legalPaymentNotice: 'If paperwork is not completed, this artist cannot legally be paid through SkyePay.',
+    workforceFormUrl: existing.workforceFormUrl || `${WORKFORCE_PACKET_URL}?source=SkyeMusicNexus&artist=${encodeURIComponent(slug)}`,
+    workforceCommandUrl: existing.workforceCommandUrl || WORKFORCE_COMMAND_URL,
+    connectLogUrl: existing.connectLogUrl || CONNECTLOG_URL,
+    relay13InboxUrl: existing.relay13InboxUrl || RELAY13_INBOX_URL,
+    payoutHoldReason: existing.payoutHoldReason || 'Paperwork must be completed and owner-approved before external payout release.',
+  };
+}
+
+function findArtist(artists, artistId) {
+  const target = String(artistId || '').toLowerCase();
+  return artists.find((artist) =>
+    String(artist.id || '').toLowerCase() === target ||
+    String(artist.artistId || '').toLowerCase() === target ||
+    String(artist.skyeId || '').toLowerCase() === target ||
+    String(artist.identityId || '').toLowerCase() === target ||
+    String(artist.email || '').toLowerCase() === target ||
+    String(artist.slug || '').toLowerCase() === target
+  );
+}
+
 // ---------------------------------------------------------------------------
 // JSON response helper
 // ---------------------------------------------------------------------------
@@ -115,8 +161,9 @@ function handleCredit(payload) {
   }
 
   const artists = loadArtists();
-  const artistIdx = artists.findIndex((a) => a.id === artistId);
-  if (artistIdx === -1) {
+  const artist = findArtist(artists, artistId);
+  const artistIdx = artists.indexOf(artist);
+  if (!artist || artistIdx === -1) {
     return respond(404, { ok: false, error: 'Artist not found' });
   }
 
@@ -167,8 +214,9 @@ function handlePayout(payload) {
   }
 
   const artists = loadArtists();
-  const artistIdx = artists.findIndex((a) => a.id === artistId);
-  if (artistIdx === -1) {
+  const artist = findArtist(artists, artistId);
+  const artistIdx = artists.indexOf(artist);
+  if (!artist || artistIdx === -1) {
     return respond(404, { ok: false, error: 'Artist not found' });
   }
 
@@ -178,6 +226,27 @@ function handlePayout(payload) {
       ok: false,
       error: `Insufficient balance. Available: ${currentBalance}, requested: ${payoutAmount}`,
     });
+  }
+
+  if (!paperworkComplete(artist)) {
+    const payouts = loadPayouts();
+    const paperwork = paperworkFor(artist);
+    const payout = {
+      id: makeId(),
+      artistId: String(artistId),
+      amount: payoutAmount,
+      payoutMethod,
+      payoutDetails: payoutDetails && typeof payoutDetails === 'object' ? payoutDetails : {},
+      status: 'paperwork_hold',
+      holdReason: paperwork.payoutHoldReason,
+      paperwork,
+      ledgerEntryId: '',
+      createdAt: nowIso(),
+      completedAt: null,
+    };
+    payouts.push(payout);
+    savePayouts(payouts);
+    return respond(201, { ok: true, payout, balance: currentBalance });
   }
 
   // Debit artist balance
@@ -209,7 +278,8 @@ function handlePayout(payload) {
     amount: payoutAmount,
     payoutMethod,
     payoutDetails: payoutDetails && typeof payoutDetails === 'object' ? payoutDetails : {},
-    status: 'pending',
+    status: 'pending_owner_approval',
+    paperwork: paperworkFor(artists[artistIdx]),
     ledgerEntryId: ledgerEntry.id,
     createdAt: nowIso(),
     completedAt: null,
@@ -235,7 +305,7 @@ function handleLedger(params) {
   const ledger = loadLedger().filter((e) => e.artistId === artistId);
 
   const artists = loadArtists();
-  const artist = artists.find((a) => a.id === artistId);
+  const artist = findArtist(artists, artistId);
 
   return respond(200, {
     ok: true,
@@ -281,6 +351,16 @@ function handleCompletePayout(payload, params) {
 
   if (payouts[idx].status === 'completed') {
     return respond(409, { ok: false, error: 'Payout is already completed' });
+  }
+
+  const artists = loadArtists();
+  const artist = findArtist(artists, payouts[idx].artistId);
+  if (!artist || !paperworkComplete(artist)) {
+    payouts[idx].status = 'paperwork_hold';
+    payouts[idx].holdReason = 'Paperwork must be completed before this payout can legally be released.';
+    payouts[idx].paperwork = paperworkFor(artist || { id: payouts[idx].artistId });
+    savePayouts(payouts);
+    return respond(409, { ok: false, error: 'paperwork_required_before_payout', payout: payouts[idx], paperwork: payouts[idx].paperwork });
   }
 
   payouts[idx].status = 'completed';

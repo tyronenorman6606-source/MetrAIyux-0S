@@ -1,0 +1,267 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "gray-vox-stay-through-static",
+  "title": "Stay Through Static",
+  "project": "Vox Gray Modes",
+  "createdAt": "2026-05-25T21:52:39.617Z",
+  "provider": {
+    "id": "elevenlabs",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 2880619,
+    "promptStored": true
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "444666666666",
+      "slug": "gray-skyes",
+      "stageName": "Gray Skyes"
+    },
+    {
+      "artistId": "artist_live_browser_20260523062845",
+      "slug": "artist-live-browser-20260523062845",
+      "stageName": "Vox Selene"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "444666666666",
+    "slug": "gray-skyes",
+    "stageName": "Gray Skyes"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/audio/stay-through-static.mp3",
+    "audioSha256": "965142bdf1b6e987cf0c67200f8f3ecb992a1cdabed1c827db6b66a62a720c7f",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/",
+    "productId": "prod_gray_skyes_stay_through_static",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "444666666666",
+      "name": "Gray Skyes",
+      "shareBps": 5000,
+      "role": "collaborator"
+    },
+    {
+      "artistId": "artist_live_browser_20260523062845",
+      "name": "Vox Selene",
+      "shareBps": 5000,
+      "role": "collaborator"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_1752742bc6c08723",
+      "metadata": {
+        "artist_names": [
+          "Gray Skyes",
+          "Vox Selene"
+        ],
+        "audio_sha256": "965142bdf1b6e987cf0c67200f8f3ecb992a1cdabed1c827db6b66a62a720c7f",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/vox-gray-modes/stay-through-static",
+        "fs27_tracked": true,
+        "primary_artist": "Gray Skyes",
+        "product_id": "prod_gray_skyes_stay_through_static",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/",
+        "release": "Vox Gray Modes",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 2880619,
+      "package_name": "stay-through-static.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/audio/stay-through-static.mp3",
+      "package_sha256": "965142bdf1b6e987cf0c67200f8f3ecb992a1cdabed1c827db6b66a62a720c7f",
+      "schema": "skye.submission.job",
+      "slug": "stay-through-static",
+      "title": "Stay Through Static",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 2880619,
+      "package_name": "stay-through-static.mp3",
+      "package_sha256": "965142bdf1b6e987cf0c67200f8f3ecb992a1cdabed1c827db6b66a62a720c7f",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "stay-through-static",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Stay Through Static",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_1752742bc6c08723",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_1752742bc6c08723",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "stay-through-static:sub_1752742bc6c08723",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "stay-through-static",
+      "submitted_at": "2026-05-25T21:52:39.617Z",
+      "title": "Stay Through Static",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_965142bdf1b6e987",
+      "upload_sha256": "965142bdf1b6e987cf0c67200f8f3ecb992a1cdabed1c827db6b66a62a720c7f",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/",
+    "productId": "prod_gray_skyes_stay_through_static"
+  }
+}

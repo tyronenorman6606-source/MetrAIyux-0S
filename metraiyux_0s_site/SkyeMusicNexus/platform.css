@@ -581,7 +581,26 @@ body{
     grid-column:1;
   }
 
-  .surface{
-    grid-row:2;
+.surface{
+  grid-row:2;
   }
+}
+
+.brand img{
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  object-fit:contain;
+  filter:drop-shadow(0 0 16px rgba(88,245,255,.46)) drop-shadow(0 0 30px rgba(255,209,102,.2));
+  animation:realNexusLogoFloat 5.6s ease-in-out infinite,realNexusLogoPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes realNexusLogoFloat{
+  0%,100%{transform:translate3d(0,-3px,0) rotate(-1deg)}
+  50%{transform:translate3d(0,6px,0) rotate(1deg)}
+}
+
+@keyframes realNexusLogoPulse{
+  0%,100%{opacity:.92;filter:drop-shadow(0 0 14px rgba(88,245,255,.42)) drop-shadow(0 0 26px rgba(255,209,102,.18))}
+  50%{opacity:1;filter:drop-shadow(0 0 24px rgba(88,245,255,.68)) drop-shadow(0 0 42px rgba(255,209,102,.32)) drop-shadow(0 0 62px rgba(157,255,127,.18))}
 }

@@ -25,7 +25,7 @@
     "no-theater-gate": "node tools/no-theater-gate.mjs",
     "smoke:v12-product": "pnpm build && node tools/smoke-v12-product.mjs",
     "smoke:v13-product": "pnpm build && node tools/smoke-v13-product.mjs",
-    "smoke:console-browser": "pnpm build && node tools/smoke-console-browser.mjs",
+    "smoke:console-browser": "node ../../../../tools/browser-proof-disabled.mjs --lane=skyeapi-aegiscore-console-browser-smoke",
     "smoke:worker-http": "pnpm build && node tools/smoke-worker-http.mjs",
     "smoke:v14-product": "pnpm build && node tools/smoke-v14-product.mjs",
     "proof:full": "node tools/build-workspaces.mjs && node tools/typecheck-workspaces.mjs && node tools/proof-fast.mjs",

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DM Cantor | Phoenix Law Firm</title>
+  <meta name="description" content="DM Cantor is a Valley Verified law firm profile at 40 N Central Ave, Suite 2300, Phoenix, AZ 85004, highlighting Law Firm, Legal / Professional Services /.">
+  <style>
+    :root {
+      --ink: #17191f;
+      --paper: #f7f3ea;
+      --burgundy: #7c2f3a;
+      --gold: #c89a3d;
+      --blue: #2e4f6f;
+      --line: rgba(23,25,31,.16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        linear-gradient(90deg, rgba(46,79,111,.09), transparent 32%),
+        var(--paper);
+    }
+    a { color: inherit; }
+    main {
+      width: min(1060px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: clamp(28px, 6vw, 76px) 0;
+    }
+    .brief {
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 60px rgba(23,25,31,.10);
+    }
+    .brief-head {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      gap: 20px;
+      padding: clamp(28px, 6vw, 70px);
+      border-bottom: 1px solid var(--line);
+    }
+    .kicker {
+      margin: 0 0 20px;
+      color: var(--burgundy);
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font: 700 12px Arial, Helvetica, sans-serif;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(58px, 12vw, 136px);
+      line-height: .86;
+      letter-spacing: 0;
+    }
+    .seal {
+      border: 1px solid var(--line);
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      color: var(--gold);
+      font: 700 42px Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(45deg, transparent 48%, rgba(200,154,61,.28) 49% 51%, transparent 52%),
+        #fbf4df;
+    }
+    .summary {
+      padding: 0 clamp(28px, 6vw, 70px) clamp(28px, 6vw, 70px);
+    }
+    .summary p {
+      max-width: 720px;
+      margin: 26px 0 0;
+      color: #4d4f55;
+      font-size: 22px;
+      line-height: 1.55;
+    }
+    .docket {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+    }
+    .item {
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 22px;
+      min-height: 132px;
+    }
+    .item:nth-child(even) { border-right: 0; }
+    .item b {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font: 700 12px Arial, Helvetica, sans-serif;
+    }
+    .item p {
+      margin: 0;
+      line-height: 1.5;
+      font-size: 17px;
+    }
+    .button {
+      display: inline-block;
+      margin-top: 24px;
+      background: var(--burgundy);
+      color: #fff;
+      padding: 13px 17px;
+      text-decoration: none;
+      font: 700 15px Arial, Helvetica, sans-serif;
+    }
+    @media (max-width: 760px) {
+      .brief-head, .docket { grid-template-columns: 1fr; }
+      .seal { min-height: 120px; place-items: center start; padding-left: 20px; }
+      .item, .item:nth-child(even) { border-right: 0; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="brief" aria-labelledby="business-name">
+      <div class="brief-head">
+        <div>
+          <p class="kicker">Valley Verified profile - Law Firm</p>
+          <h1 id="business-name">DM Cantor</h1>
+        </div>
+        <div class="seal" aria-hidden="true">DM</div>
+      </div>
+      <div class="summary">
+        <p>Phoenix law firm profile with a public phone listing and Central Avenue office address in ZIP 85004.</p>
+        <a class="button" href="tel:+16023070808">Call DM Cantor</a>
+      </div>
+      <div class="docket" aria-label="Local details">
+        <article class="item">
+          <b>Phone</b>
+          <p><a href="tel:+16023070808">(602) 307-0808</a></p>
+        </article>
+        <article class="item">
+          <b>Address</b>
+          <p>40 N Central Ave, Suite 2300, Phoenix, AZ 85004</p>
+        </article>
+        <article class="item">
+          <b>Category</b>
+          <p>Legal And Financial / Law Firm.</p>
+        </article>
+        <article class="item">
+          <b>License type</b>
+          <p>Legal / Professional Services / Law Firm.</p>
+        </article>
+        <article class="item">
+          <b>Pricing</b>
+          <p>Contact directly for availability, scope, and pricing.</p>
+        </article>
+        <article class="item">
+          <b>Profile date</b>
+          <p>Directory profile last reviewed May 19, 2026 from a public Phoenix Chamber business and professional services listing.</p>
+        </article>
+      </div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-dm-cantor-phoenix-85004-e31cc65">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-dm-cantor-phoenix-85004-e31cc65">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>DM Cantor earns this Valley Verified placement because public business evidence connects a real law firm operation to 40 N Central Ave, Suite 2300, Phoenix, AZ 85004 and (602) 307-0808. Greater Phoenix Chamber directory evidence supports this local profile. For individual clients, business clients, and local households, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Law Firm, Legal / Professional Services / Law Firm, Legal / Professional Services, and Legal / Financial Services</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>individual clients, business clients, and local households</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>40 N Central Ave, Suite 2300, Phoenix, AZ 85004; (602) 307-0808</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

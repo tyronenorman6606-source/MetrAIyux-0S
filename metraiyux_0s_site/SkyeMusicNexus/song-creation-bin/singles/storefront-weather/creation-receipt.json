@@ -1,0 +1,257 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "samir-smith-storefront-weather",
+  "title": "Storefront Weather",
+  "project": "",
+  "createdAt": "2026-05-25T23:13:11.194Z",
+  "provider": {
+    "id": "stability-stable-audio-2",
+    "model": "stable-audio-2",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 2401010,
+    "promptStored": true,
+    "generatedText": ""
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "legacy_sam_smith",
+      "slug": "sam-smith",
+      "stageName": "Samir Smith"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "legacy_sam_smith",
+    "slug": "sam-smith",
+    "stageName": "Samir Smith"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/audio/storefront-weather.mp3",
+    "audioSha256": "997d5487f8fc4377e5fdab8207c69a815d837324472ea7a4c348fb956537989c",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/",
+    "productId": "prod_sam_smith_storefront_weather",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "legacy_sam_smith",
+      "name": "Samir Smith",
+      "shareBps": 10000,
+      "role": "primary artist"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_34be1d4a48ec3a4e",
+      "metadata": {
+        "artist_names": [
+          "Samir Smith"
+        ],
+        "audio_sha256": "997d5487f8fc4377e5fdab8207c69a815d837324472ea7a4c348fb956537989c",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/singles/storefront-weather",
+        "fs27_tracked": true,
+        "primary_artist": "Samir Smith",
+        "product_id": "prod_sam_smith_storefront_weather",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/",
+        "release": "",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 2401010,
+      "package_name": "storefront-weather.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/audio/storefront-weather.mp3",
+      "package_sha256": "997d5487f8fc4377e5fdab8207c69a815d837324472ea7a4c348fb956537989c",
+      "schema": "skye.submission.job",
+      "slug": "storefront-weather",
+      "title": "Storefront Weather",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 2401010,
+      "package_name": "storefront-weather.mp3",
+      "package_sha256": "997d5487f8fc4377e5fdab8207c69a815d837324472ea7a4c348fb956537989c",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "storefront-weather",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Storefront Weather",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_34be1d4a48ec3a4e",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_34be1d4a48ec3a4e",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "storefront-weather:sub_34be1d4a48ec3a4e",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "storefront-weather",
+      "submitted_at": "2026-05-25T23:13:11.194Z",
+      "title": "Storefront Weather",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_997d5487f8fc4377",
+      "upload_sha256": "997d5487f8fc4377e5fdab8207c69a815d837324472ea7a4c348fb956537989c",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/sam-smith/drops/storefront-weather/",
+    "productId": "prod_sam_smith_storefront_weather"
+  }
+}

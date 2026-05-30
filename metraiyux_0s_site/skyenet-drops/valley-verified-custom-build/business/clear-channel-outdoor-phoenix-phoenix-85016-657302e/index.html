@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clear Channel Outdoor Phoenix | Phoenix Outdoor Advertising / Media Tech</title>
+  <meta name="description" content="Clear Channel Outdoor Phoenix is a Valley Verified outdoor advertising / media tech profile at 2325 E. Camelback Rd., Ste. 400, Phoenix, AZ 85016.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111315;
+      --muted: #62666a;
+      --black: #111315;
+      --red: #c74434;
+      --yellow: #efc84a;
+      --cyan: #2d8196;
+      --paper: #f7f5ee;
+      --line: rgba(17, 19, 21, .17);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, transparent 0 48%, rgba(239, 200, 74, .22) 48% 63%, transparent 63%),
+        repeating-linear-gradient(90deg, rgba(17, 19, 21, .07) 0 1px, transparent 1px 44px),
+        var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      color: var(--black);
+    }
+
+    .logo img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .hero {
+      min-height: 72vh;
+      display: grid;
+      align-items: center;
+      grid-template-columns: 1fr 1fr;
+      gap: 34px;
+      padding: 32px 0 60px;
+    }
+
+    .billboard {
+      border: 10px solid var(--black);
+      border-radius: 8px;
+      background: white;
+      min-height: 430px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      box-shadow: 18px 22px 0 rgba(199, 68, 52, .23);
+    }
+
+    .billboard-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--yellow);
+    }
+
+    .billboard-head img {
+      width: 68px;
+      height: 68px;
+      padding: 7px;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .billboard-copy {
+      padding: 34px;
+      display: grid;
+      align-content: center;
+    }
+
+    .billboard-copy strong {
+      font-size: 2.65rem;
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .billboard-copy span {
+      margin-top: 16px;
+      color: #3f4448;
+      line-height: 1.45;
+    }
+
+    .billboard-foot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--line);
+    }
+
+    .billboard-foot div {
+      padding: 18px 22px;
+      border-left: 1px solid var(--line);
+    }
+
+    .billboard-foot div:first-child { border-left: 0; }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--red);
+      color: white;
+      font-weight: 800;
+      font-size: .86rem;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      font-size: 4.3rem;
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      max-width: 650px;
+      color: #383d41;
+      font-size: 1.24rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border: 1px solid var(--black);
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 800;
+      background: white;
+    }
+
+    .button.primary {
+      background: var(--black);
+      color: white;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding-bottom: 58px;
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .86);
+      padding: 20px;
+      min-height: 155px;
+      border-top: 6px solid var(--cyan);
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .fact p,
+    .billboard-foot p {
+      margin: 0;
+      line-height: 1.5;
+      color: #3f4448;
+    }
+
+    @media (max-width: 900px) {
+      .top,
+      .hero,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .hero { min-height: auto; }
+      h1 { font-size: 3.05rem; }
+    }
+
+    @media (max-width: 540px) {
+      .top { flex-direction: column; align-items: flex-start; }
+      h1 { font-size: 2.35rem; }
+      .lead { font-size: 1.05rem; }
+      .billboard { border-width: 6px; box-shadow: 10px 14px 0 rgba(199, 68, 52, .23); }
+      .billboard-copy { padding: 24px; }
+      .billboard-copy strong { font-size: 2rem; }
+      .billboard-foot { grid-template-columns: 1fr; }
+      .billboard-foot div { border-left: 0; border-top: 1px solid var(--line); }
+      .billboard-foot div:first-child { border-top: 0; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <header class="top">
+        <div class="logo">
+          <img src="assets/logo.svg" alt="Clear Channel Outdoor Phoenix mark">
+          <span>Clear Channel Outdoor Phoenix</span>
+        </div>
+        <span>Accepted Valley Verified Network listing</span>
+      </header>
+
+      <section class="hero" aria-labelledby="business-name">
+        <aside class="billboard" aria-label="Outdoor media listing board">
+          <div class="billboard-head">
+            <img src="assets/logo.svg" alt="">
+            <strong>Phoenix media office</strong>
+          </div>
+          <div class="billboard-copy">
+            <strong>Outdoor advertising and media tech.</strong>
+            <span>Listed as a local operating office with a website and public phone number.</span>
+          </div>
+          <div class="billboard-foot">
+            <div>
+              <span class="label">Phone</span>
+              <p><a href="tel:+16023815700">(602) 381-5700</a></p>
+            </div>
+            <div>
+              <span class="label">Zip</span>
+              <p>85016</p>
+            </div>
+          </div>
+        </aside>
+
+        <div>
+          <div class="eyebrow">Computers/Telecom / Outdoor Advertising</div>
+          <h1 id="business-name">Clear Channel Outdoor Phoenix</h1>
+          <p class="lead">Clear Channel Outdoor Phoenix gives local businesses, operators, and professional teams a practical Phoenix connection for Outdoor Advertising / Media Tech, Computers/Telecom / Outdoor Advertising / Media Tech, Computers/Telecom, and Local operating office / website listed. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+16023815700">Call (602) 381-5700</a>
+            <a class="button" href="https://www.clearchanneloutdoor.com">Visit website</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="facts" aria-label="Local details">
+        <article class="fact">
+          <span class="label">Address</span>
+          <p>2325 E. Camelback Rd., Ste. 400, Phoenix, AZ 85016</p>
+        </article>
+        <article class="fact">
+          <span class="label">Profile Date</span>
+          <p>Last listed May 19, 2026 from public directory/company listing data.</p>
+        </article>
+        <article class="fact">
+          <span class="label">Public Evidence</span>
+          <p><a href="https://business.phoenixchamber.com/list/ql/computers-telecommunications-6">Phoenix Chamber computers and telecommunications directory</a></p>
+        </article>
+      </section>
+    </div>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-clear-channel-outdoor-phoenix-phoenix-85016-657302e">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-clear-channel-outdoor-phoenix-phoenix-85016-657302e">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Clear Channel Outdoor Phoenix earns this Valley Verified placement because public business evidence connects a real outdoor advertising / media tech operation to 2325 E. Camelback Rd., Ste. 400, Phoenix, AZ 85016 and (602) 381-5700. Greater Phoenix Chamber directory evidence supports this local profile. For local businesses, operators, and professional teams, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Outdoor Advertising / Media Tech, Computers/Telecom / Outdoor Advertising / Media Tech, Computers/Telecom, and Local operating office / website listed</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>local businesses, operators, and professional teams</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>2325 E. Camelback Rd., Ste. 400, Phoenix, AZ 85016; (602) 381-5700</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

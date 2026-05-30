@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agave Home Loans | Phoenix Mortgage lending and mortgage brokering</title>
+  <meta name="description" content="Agave Home Loans is a Valley Verified mortgage lending and mortgage brokering profile at 7776 S Pointe Pkwy W Suite 100, Phoenix, AZ 85044, highlighting.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #222116;
+      --cactus: #526c34;
+      --clay: #b85f36;
+      --sun: #f0c56d;
+      --cream: #fff8ec;
+      --line: rgba(82, 108, 52, 0.24);
+      --shade: rgba(61, 51, 26, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(120deg, #fffaf0 0%, #fffaf0 48%, #eef3df 48%, #eef3df 100%);
+      line-height: 1.52;
+    }
+
+    main {
+      width: min(1140px, calc(100% - 30px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    header {
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .brand-strip {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      background: var(--cream);
+      padding: clamp(24px, 4vw, 46px);
+      box-shadow: 0 28px 80px var(--shade);
+    }
+
+    .brand-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      color: var(--cactus);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .brand-top img {
+      width: 54px;
+      height: 54px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 9px;
+      background: white;
+    }
+
+    h1 {
+      margin: 44px 0 0;
+      font-size: clamp(3rem, 8vw, 7.2rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+      color: var(--clay);
+    }
+
+    .descriptor {
+      margin: 24px 0 0;
+      max-width: 600px;
+      font-size: 1.05rem;
+      color: #5d543c;
+    }
+
+    .loan-card {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(240, 197, 109, 0.55), transparent 32%),
+        linear-gradient(160deg, #526c34, #263a24);
+      color: white;
+      padding: clamp(24px, 4vw, 46px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loan-card:after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -28% 24%;
+      height: 260px;
+      background: rgba(255, 255, 255, 0.12);
+      transform: rotate(-10deg);
+    }
+
+    .label {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #ffebb5;
+    }
+
+    .phone {
+      align-self: center;
+      color: white;
+      font-weight: 900;
+      font-size: clamp(2.1rem, 5vw, 4.4rem);
+      text-decoration: none;
+      line-height: 1;
+      z-index: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .address {
+      z-index: 1;
+      margin: 0;
+      color: #f6efd7;
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    section {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.84);
+      padding: 24px;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      color: var(--cactus);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .fact-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    .fact-row:first-of-type {
+      border-top: 0;
+    }
+
+    .fact-row b {
+      color: var(--clay);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: #f7e4bd;
+      border: 1px solid rgba(184, 95, 54, 0.25);
+      color: #4f3a1b;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    p {
+      margin: 0;
+      color: #5d543c;
+    }
+
+    a {
+      color: var(--clay);
+      font-weight: 800;
+    }
+
+    @media (max-width: 820px) {
+      header,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        min-height: auto;
+      }
+
+      .loan-card {
+        min-height: 320px;
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand-strip">
+        <div class="brand-top">
+          <span>Valley Verified / Real Estate And Property</span>
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div>
+          <h1>Agave Home Loans</h1>
+          <p class="descriptor">Agave Home Loans is a Phoenix-based mortgage lender and broker with purchase, refinance, cash-out, home equity, HELOC, conventional, VA, FHA, jumbo, manufactured home, and non-QM loan paths supported by online processing and weekend phone hours.</p>
+        </div>
+      </div>
+
+      <aside class="loan-card" aria-label="Contact facts">
+        <p class="label">Mortgage / Home Loans</p>
+        <a class="phone" href="tel:+16023255400">(602) 325-5400</a>
+        <p class="address">7776 S Pointe Pkwy W Suite 100<br>Phoenix, AZ 85044</p>
+      </aside>
+    </header>
+
+    <div class="grid">
+      <section aria-labelledby="facts-heading">
+        <h2 id="facts-heading">Local Details</h2>
+        <div class="fact-row"><b>Category</b><span>Real Estate And Property</span></div>
+        <div class="fact-row"><b>Niche</b><span>Mortgage / Home Loans</span></div>
+        <div class="fact-row"><b>License Type</b><span>Finance &amp; Insurance / Mortgage / Home Loans</span></div>
+        <div class="fact-row"><b>Pricing</b><span>Contact for quote</span></div>
+      </section>
+
+      <section aria-labelledby="tags-heading">
+        <h2 id="tags-heading">Tags</h2>
+        <div class="chips">
+          <span class="chip">Mortgage / home loans</span>
+          <span class="chip">Finance &amp; Insurance</span>
+          <span class="chip">Local service business</span>
+          <span class="chip">Property / Real Estate</span>
+        </div>
+      </section>
+    </div>
+
+    <section style="margin-top:18px" aria-labelledby="evidence-heading">
+      <h2 id="evidence-heading">Valley Verified Notes</h2>
+      <p>Agave Home Loans is presented as a finished Phoenix mortgage lending and mortgage brokering profile. Agave Home Loans is presented with public local business facts and clean customer-facing context. Public evidence is summarized below. The profile is kept current with public business evidence. <a href="https://business.phoenixchamber.com/list/ql/finance-insurance-10">Phoenix Chamber finance and insurance directory</a>.</p>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-agave-home-loans-phoenix-85044-c305701">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-agave-home-loans-phoenix-85044-c305701">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says Agave Home Loans is Valley Verified because the official site lists NMLS #1951574, the BBB profile lists accreditation with an A+ rating, and the company publishes a clear Phoenix contact lane. Agave stands out for combining direct lending with broker access, online e-sign workflows, and mortgage options for buyers, homeowners, veterans, and borrowers comparing multiple loan paths.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Mortgage lending and mortgage brokering, Home purchase loans, Refinance loans, and Cash-out refinance</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>Homebuyers, Homeowners refinancing, and Borrowers accessing home equity</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>7776 S Pointe Pkwy W Suite 100, Phoenix, AZ 85044; 833-316-3170; 602-325-5400; 888-300-3440</span></div>
+      </div>
+      <p class="vv-note-text">NMLS #1951574 listed on official website.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

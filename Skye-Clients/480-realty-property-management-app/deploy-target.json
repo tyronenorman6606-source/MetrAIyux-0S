@@ -1,17 +1,86 @@
 {
-  "primary": {
-    "host": "cloudflare",
-    "url": "https://480-realty-property-management.pages.dev/",
-    "envKey": "REALTY_480_PRODUCTION_URL"
+  "schema": "skyenet.static-surface.deploy-target.v1",
+  "updatedAt": "2026-05-30T18:12:57.830Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "lane": "skye-clients",
+  "purpose": "property management operations app",
+  "projectId": "480-realty-property-management",
+  "workspaceId": "480-realty-property-management",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530181108",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/480-realty-property-management/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/480-realty-property-management",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "Skye-Clients/480-realty-property-management-app",
+  "publicBuildDir": "Skye-Clients/480-realty-property-management-app",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=480-realty-property-management&project_id=480-realty-property-management&deployment_id=dep_20260530181108",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "latestDeployment": {
-    "host": "cloudflare",
-    "url": "https://d89b2f5a.480-realty-property-management.pages.dev",
-    "deployedAt": "2026-05-19"
-  },
-  "qr": {
-    "target": "https://480-realty-property-management.pages.dev/",
-    "asset": "/assets/live-site/480-preview-qr.png",
-    "printAsset": "/assets/live-site/480-preview-qr.png"
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "route": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/480-realty-property-management",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/480-realty-property-management",
+          "url_mode": "path",
+          "workspace_id": "480-realty-property-management",
+          "project_id": "480-realty-property-management",
+          "active_deployment_id": "dep_20260530181108",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/480-realty-property-management/dep_20260530181108",
+          "updated_at": "2026-05-30T18:12:32.747Z"
+        },
+        "elapsed_ms": 518.9
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/480-realty-property-management/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/480-realty-property-management",
+        "elapsed_ms": 2047.22
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 202.41,
+        "bytes": 14320,
+        "title": "480 Realty &amp; Property Management | Operations App",
+        "error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=480-realty-property-management&project_id=480-realty-property-management&deployment_id=dep_20260530181108",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 303.37
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 132927,
+        "read_truncated": true,
+        "elapsed_ms": 2790.93,
+        "error": ""
+      }
+    }
   }
 }

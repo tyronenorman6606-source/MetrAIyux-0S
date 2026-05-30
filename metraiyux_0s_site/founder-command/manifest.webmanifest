@@ -1,16 +1,51 @@
 {
-  "name": "MetrAIyux 0S Founder Command",
-  "short_name": "Founder 0S",
+  "name": "0meg4Command 6.7",
+  "short_name": "0meg4Command",
+  "id": "/founder-command/",
+  "description": "Founder Command PWA for MetrAIyux 0S owner controls, client credential handoffs, SkyeMail, Relay13, repo memory, and proof lanes.",
   "start_url": "/founder-command/",
   "scope": "/founder-command/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
+  "orientation": "portrait-primary",
   "background_color": "#080b0f",
   "theme_color": "#080b0f",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/assets/metraiyux-0s-emblem-transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/metraiyux-0s-emblem-transparent.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Client Vault",
+      "short_name": "Clients",
+      "url": "/founder-command/?view=clients",
+      "description": "Open founder-only client credentials and handoff records."
+    },
+    {
+      "name": "Mailboxes",
+      "short_name": "Mailboxes",
+      "url": "/founder-command/?view=mailboxes",
+      "description": "Open SkyeMail handoff and mailbox controls."
+    },
+    {
+      "name": "Bob Internal Handoff",
+      "short_name": "Bob",
+      "url": "/founder-command/?view=clients",
+      "description": "Open Bob's Smoke Shop URLs, QR targets, Relay13, SkyeMail, CRM, and backup handoff map."
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

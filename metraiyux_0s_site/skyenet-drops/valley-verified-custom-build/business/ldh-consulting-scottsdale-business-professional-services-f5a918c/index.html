@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LDH Consulting | Scottsdale Consulting</title>
+  <meta name="description" content="LDH Consulting in Scottsdale: Valley Verified business profile with researched services, local presence, audience fit, and trust signals.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17221f;
+      --muted: #5e6965;
+      --paper: #f7fbf4;
+      --panel: #ffffff;
+      --accent: #21786f;
+      --accent-two: #9fc94d;
+      --soft: #e4f0e6;
+      --line: #d7e2d8;
+    }
+
+    * { box-sizing: border-box; letter-spacing: 0; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      background:
+        linear-gradient(140deg, var(--soft) 0 28%, transparent 28% 100%),
+        var(--paper);
+    }
+
+    a { color: inherit; }.shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0;
+    }.brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+    }.mark {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+    }.top-link,.button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 800;
+    }.top-link {
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }.hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px,.9fr);
+      gap: 28px;
+      align-items: center;
+      min-height: 70vh;
+      padding: 34px 0 44px;
+    }.eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size:.95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: 4.8rem;
+      line-height:.96;
+      overflow-wrap: break-word;
+    }.lead {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: #303a36;
+      font-size: 1.2rem;
+    }.actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }.button {
+      padding: 0 18px;
+      border: 2px solid var(--ink);
+      background: var(--panel);
+    }.button.primary {
+      background: var(--accent-two);
+      box-shadow: 6px 6px 0 var(--ink);
+    }.signal {
+      min-height: 380px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(150deg, var(--accent) 0 48%, transparent 48%),
+        linear-gradient(25deg, var(--accent-two) 0 54%, var(--panel) 54%);
+      box-shadow: 0 20px 60px rgba(23, 34, 31,.12);
+      display: grid;
+      align-content: end;
+      gap: 14px;
+    }.signal span,.signal strong {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.92);
+      padding: 8px 10px;
+    }.signal strong {
+      font-size: 2rem;
+      line-height: 1.05;
+    }.facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 0 0 46px;
+    }
+
+    article,.note {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 12px 30px rgba(23, 34, 31,.08);
+    }
+
+    article {
+      min-height: 150px;
+      padding: 18px;
+    }
+
+    article strong,.note strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size:.82rem;
+      text-transform: uppercase;
+    }
+
+    article p,.note p {
+      margin: 0;
+      color: var(--muted);
+    }.note {
+      margin-bottom: 42px;
+      padding: 20px;
+    }
+
+    @media (max-width: 860px) {
+      header { align-items: flex-start; flex-direction: column; }.hero,.facts { grid-template-columns: 1fr; }
+      h1 { font-size: 3rem; }.signal { min-height: 300px; }
+    }.vv-proof {
+      width: min(1120px, calc(100% - 32px));
+      margin: 30px auto 56px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line, rgba(17, 24, 39,.16));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.88);
+      box-shadow: 0 18px 50px rgba(17, 24, 39,.08);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink, #111827);
+    }.vv-proof-eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted, #5f6574);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+    }.vv-proof h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-transform: none;
+    }.vv-proof p {
+      max-width: 920px;
+      margin: 0;
+      color: var(--muted, #4b5563);
+      font-size: 1rem;
+      line-height: 1.72;
+    }.vv-proof p + p {
+      margin-top: 14px;
+    }.vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }.vv-proof-card {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line, rgba(17, 24, 39,.14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.72);
+    }.vv-proof-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--leaf, var(--green, var(--magenta, #0f766e))));
+      font-size: 12px;
+      letter-spacing:.1em;
+      text-transform: uppercase;
+    }.vv-proof-card span {
+      color: var(--muted, #4b5563);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {.vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <span class="mark">LDH</span>
+        <span>Consulting</span>
+      </div>
+      <a class="top-link" href="tel:+14802056195">(480) 205-6195</a>
+    </header>
+
+    <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Scottsdale, AZ / Business Services</p>
+          <h1 id="page-title">LDH Consulting</h1>
+          <p class="lead">LDH Consulting is a Scottsdale consulting profile for local businesses, operators, and professional teams seeking business support.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14802056195">Call (480) 205-6195</a>
+            <a class="button" href="#facts">Business facts</a>
+          </div>
+        </div>
+        <aside class="signal" aria-label="Business summary">
+          <span>Business type</span>
+          <strong>Consulting</strong>
+          <span>Scottsdale / English / Quote-based service</span>
+        </aside>
+      </section>
+
+      <section class="facts" id="facts" aria-label="Business facts">
+        <article>
+          <strong>Address</strong>
+          <p>Scottsdale, AZ</p>
+        </article>
+        <article>
+          <strong>Phone</strong>
+          <p>(480) 205-6195</p>
+        </article>
+        <article>
+          <strong>Category</strong>
+          <p>Business Services / Consulting</p>
+        </article>
+        <article>
+          <strong>Website</strong>
+          <p>Official channels</p>
+        </article>
+      </section>
+
+      <section class="note" aria-label="Service tags">
+        <strong>Service Tags</strong>
+        <p>Consulting, business services, advertising and media, business and professional services.</p>
+      </section>
+    
+    <section class="vv-proof" aria-labelledby="vv-proof-heading">
+      <p class="vv-proof-eyebrow">Skyes Over London Review</p>
+      <h2 id="vv-proof-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>LDH Consulting is Valley Verified because the record identifies consulting services in Scottsdale with listed phone (480) 205-6195 and business and professional services context.</p>
+      <p>Skyes Over London includes LDH Consulting for local teams that need a simple, evidence-backed consulting contact. The Chamber business and professional services category and advertising and media context support the Scottsdale consulting profile.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Best for</strong><span>Local businesses, operators, and professional teams seeking consulting support in Scottsdale.</span></div>
+        <div class="vv-proof-card"><strong>Local presence</strong><span>Scottsdale, AZ with listed phone (480) 205-6195.</span></div>
+        <div class="vv-proof-card"><strong>Proof signals</strong><span>Valley Verified business record and Greater Phoenix Chamber business and professional services category evidence.</span></div>
+      </div>
+    </section>
+  </main>
+  </div>
+</body>
+</html>

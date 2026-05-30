@@ -66,12 +66,24 @@ function env() {
         const path = new URL(request.url).pathname;
         return new Response(`asset:${path}`, { status: 200 });
       }
+    },
+    SKYGATEFS27_WORKER: {
+      async fetch(request) {
+        const body = await request.json().catch(() => ({}));
+        return Response.json({
+          active: body.token === 'gate-token',
+          sub: 'surface-status-test',
+          email: 'surface-status-test@example.invalid',
+          role: 'admin',
+          scope: 'admin.read admin.write gateway.invoke'
+        });
+      }
     }
   };
 }
 
-function req(path) {
-  return new Request(`https://metraiyux.example${path}`);
+function req(path, options = {}) {
+  return new Request(`https://metraiyux.example${path}`, options);
 }
 
 test('AUD-02 publishes a machine-readable 0S surface registry', async () => {
@@ -133,7 +145,29 @@ test('AUD-04 wires visible runtime badges into shared homepage UI', async () => 
   }
 });
 
-test('AUD-02 registry remains public static data, not blocked source', async () => {
-  const res = await siteWorker.fetch(req('/audits/0S_SURFACE_STATUS.json'), env(), ctx());
+test('AUD-02 registry remains gate-owned static data, not blocked source', async () => {
+  const publicRes = await siteWorker.fetch(req('/audits/0S_SURFACE_STATUS.json'), env(), ctx());
+  assert.equal(publicRes.status, 302);
+  assert.equal(publicRes.headers.get('x-0s-gate'), 'fs27-required');
+
+  const res = await siteWorker.fetch(
+    req('/audits/0S_SURFACE_STATUS.json', { headers: { authorization: 'Bearer gate-token' } }),
+    env(),
+    ctx()
+  );
   assert.equal(res.status, 200);
+});
+
+test('AUD-05 Valley Verified business profiles stay behind the shared 0S gate', async () => {
+  const publicRes = await siteWorker.fetch(req('/valley-verified/business/next-level-gaming-goodyear/'), env(), ctx());
+  assert.equal(publicRes.status, 302);
+  assert.equal(publicRes.headers.get('x-0s-gate'), 'fs27-required');
+  assert.match(publicRes.headers.get('location') || '', /\/admin\/login\.html\?return=%2Fvalley-verified%2Fbusiness%2Fnext-level-gaming-goodyear%2F/i);
+
+  const authedRes = await siteWorker.fetch(
+    req('/valley-verified/business/next-level-gaming-goodyear/', { headers: { authorization: 'Bearer gate-token' } }),
+    env(),
+    ctx()
+  );
+  assert.equal(authedRes.status, 200);
 });

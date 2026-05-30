@@ -1,0 +1,152 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gray Skyes Brain | Gray Gang</title>
+  <meta name="description" content="Gray Skyes Brain, the founder AI artist-brain lane inside Gray Gang with generated avatar, music products, product room, and PWA app." />
+  <meta name="theme-color" content="#030305" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/SkyeMusicNexus/public/store.html" />
+  <link rel="stylesheet" href="../artist-storefronts.css" />
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body class="skyesol-living-page gray-universe" data-artist-id="gray_london_skyes_brain">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <a class="brandmark" href="../gray-skyes-collective/"><span>GB</span>Gray Brain</a>
+    <nav class="nav-actions" aria-label="Gray Brain navigation">
+      <a class="btn primary" href="#store">First Drop</a>
+      <a class="btn" href="../gray-skyes/">Gray Skyes</a>
+      <a class="btn" href="../gray-skyes-collective/">Gray Gang</a>
+      <a class="btn" href="/SkyeMusicNexus/public/brain.html">Nexus Brain</a>
+    <a class="btn" href="./products/">Products</a></nav>
+  </header>
+
+  <main class="gray-stage">
+    <section class="gray-hero gray-brain-hero">
+      <aside class="gray-brain-portrait" aria-label="Gray Skyes Brain generated avatar">
+        <img src="/SkyeMusicNexus/assets/skye-music-nexus-logo.png" alt="Gray Skyes Brain generated avatar" />
+      </aside>
+      <div class="gray-hero-copy">
+        <p class="micro">founder ai artist-brain / gray gang / gray-london-skyes-brain</p>
+        <h1 class="neon-gradient-text">Gray Skyes Brain</h1>
+        <p class="lede">A separate artist-brain lane for the founder persona: neural trap metal, executive synth rap, founder-command ragecore, AI memory, and Skye Radio drops. This is attached to Gray Gang without replacing the human Gray Skyes artist page.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#store">Open first product</a>
+          <a class="btn" href="./app.html">Install artist app</a>
+          <a class="btn" href="../gray-skyes/">Human Gray page</a>
+          <a class="btn" href="/founder-command/apps/0s-command-bridge/">Command Bridge</a>
+        <a class="btn" href="./products/">Products</a></div>
+      </div>
+    </section>
+
+    <section class="gray-quick-grid">
+      <article class="stat"><strong>AI Brain</strong><span>separate artist persona</span></article>
+      <article class="stat"><strong>$4.44</strong><span>first drop price</span></article>
+      <article class="stat"><strong>Gray Gang</strong><span>collective attribution</span></article>
+      <article class="stat"><strong>0S</strong><span>gate-owned brain tooling</span></article>
+    </section>
+
+    <section class="gray-feature-grid">
+      <article class="card">
+        <p class="micro">sound</p>
+        <h2>Neural trap metal</h2>
+        <p>Distorted 808s, glass-room synth pressure, crowd-chant hooks, spoken founder commands, and clean melodic releases.</p>
+      </article>
+      <article class="card">
+        <p class="micro">boundary</p>
+        <h2>Fan-facing mythology</h2>
+        <p>This page keeps the fan-facing mythology visible while legal, payout, and owner records stay in the gated 0S lanes.</p>
+      </article>
+      <article class="card">
+        <p class="micro">tooling</p>
+        <h2>Artist brain tools</h2>
+        <p>Brand kit, logo brief, web creator landing, campaign brief, press kit, and RouteX launch package handoffs are routed through the MusicNexus brain tooling lane.</p>
+      </article>
+    </section>
+
+    <section id="store" class="gray-panel">
+      <p class="micro">Reflection storefront products</p>
+      <h2>Playable drops, PWA packages, SkyePay checkout</h2>
+      <div class="music-player-panel">
+        <p class="micro">Skye Radio</p>
+        <h3 data-brain-now>Command Mirror</h3>
+        <audio controls preload="metadata" data-brain-audio src=""></audio>
+      </div>
+      <div class="track-orbit" data-brain-products>
+        <article class="product-tile">
+          <span>loading</span>
+          <h3>Loading Brain drops</h3>
+          <strong>$4.44</strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="gray-panel">
+      <p class="micro">release lane</p>
+      <h2>Music DNA</h2>
+      <ul class="gray-brain-list">
+        <li>Low direct founder vocal with layered AI-response doubles.</li>
+        <li>Distorted 808s, dark glass synths, founder-command ragecore drums, and crowd-chant hooks.</li>
+        <li>Lyrics about ownership, proof, artist businesses, and the gate opening the real system.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="../assets/mcp-implementation/mcp-effects.js" data-mcp-generated-js></script>
+  <script>
+    const brainProductHost = document.querySelector('[data-brain-products]');
+    const brainAudio = document.querySelector('[data-brain-audio]');
+    const brainNow = document.querySelector('[data-brain-now]');
+    const checkoutFallback = (product) => {
+      const params = new URLSearchParams({
+        client: 'metraiyux-0s',
+        offer: 'skyemusicnexus-artist-store',
+        artistId: 'gray_london_skyes_brain',
+        productId: product.productId || product.id || '',
+        amountCents: String(product.priceCents || 444)
+      });
+      return '/skyepay-store.html?' + params.toString();
+    };
+    const buyProduct = async (product) => {
+      const order = await fetch('/api/skymusicnexus/music-store', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'record-order', productId: product.productId || product.id, quantity: 1 })
+      }).catch(() => null);
+      const data = order ? await order.json().catch(() => null) : null;
+      window.location.href = data?.checkoutIntent?.url || checkoutFallback(product);
+    };
+    const renderBrainProducts = (products) => {
+      const live = products.filter((product) => product.status === 'active');
+      brainProductHost.innerHTML = live.map((product, index) => `
+        <article class="product-tile">
+          <span>${product.project || 'live drop'}</span>
+          <h3>${product.title || 'Gray Brain drop'}</h3>
+          <strong>$${((Number(product.priceCents || 444) || 444) / 100).toFixed(2)}</strong>
+          ${product.audioFile ? `<button class="btn" type="button" data-brain-play="${index}">Play</button>` : ''}
+          <a class="btn" href="${product.pwaUrl || '#store'}">Open Drop PWA</a>
+          <button class="btn primary" type="button" data-brain-buy="${index}">SkyePay checkout</button>
+        </article>`).join('') || '<article class="product-tile"><span>queued</span><h3>Brain drop pending</h3><strong>$4.44</strong></article>';
+      brainProductHost.querySelectorAll('[data-brain-play]').forEach((button) => button.addEventListener('click', () => {
+        const product = live[Number(button.dataset.brainPlay)] || {};
+        if (product.audioFile && brainAudio) {
+          brainAudio.src = product.audioFile;
+          brainAudio.load();
+          brainAudio.play().catch(() => {});
+        }
+        if (brainNow && product.title) brainNow.textContent = product.title;
+      }));
+      brainProductHost.querySelectorAll('[data-brain-buy]').forEach((button) => button.addEventListener('click', () => buyProduct(live[Number(button.dataset.brainBuy)] || {})));
+    };
+    fetch('./products/products.json').then((response) => response.json()).then((payload) => renderBrainProducts(payload.products || payload)).catch(() => renderBrainProducts([]));
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  </script>
+  <script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="artist-storefronts" data-command-bridge-surface="gray-skyes-brain"></script>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

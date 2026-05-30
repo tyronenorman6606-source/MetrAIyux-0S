@@ -1,8 +1,8 @@
 # SkyeNet Platform Lane
 
-Last updated: 2026-05-24
+Last updated: 2026-05-28
 
-SkyeNet is real in this repo as the FS27-backed deployment lane for static edge surfaces and managed SkyeNet platform functions. It is not a separate app with its own password. It uses the shared 0S FS27/SkyGate/Free99 auth lane.
+SkyeNet is real in this repo as the FS27-backed deployment lane for static edge surfaces and managed SkyeNet platform functions. It is also now deployed as its own standalone Cloudflare Worker project at `https://skyenet.graylondonskyes.workers.dev`. It is not a separate app with its own password. It uses the shared 0S FS27/SkyGate/Free99 auth lane.
 
 ## Naming Rule
 
@@ -15,8 +15,10 @@ Customer-facing language says SkyeNet. Do not present the architecture as "Cloud
 - R2 asset storage: `DEPLOYMENT_ASSET_BUCKET`, currently named `zero-os-deploy-artifacts` in the FS27 Worker config
 - KV route registry: `ROUTING_KV`
 - Runtime observer sinks: Analytics Engine, queue events, R2 JSONL logs, optional D1 hourly rollups, optional Citadel ingest
+- Standalone SkyeNet public host: `https://skyenet.graylondonskyes.workers.dev`
+- Standalone SkyeNet console: `https://skyenet.graylondonskyes.workers.dev/console`
 - 0S gated API proxy: `/api/skyenet/*`
-- 0S mounted console: `metraiyux_0s_site/skyenet/index.html`
+- 0S mounted console: `metraiyux_0s_site/skyenet/index.html` for internal/legacy operator access
 - 0S desktop app: `SkyeNet Deploy`
 
 ## Capability Boundary
@@ -24,11 +26,12 @@ Customer-facing language says SkyeNet. Do not present the architecture as "Cloud
 Live today as SkyeNet Edge:
 
 - Static build/drop hosting from uploaded assets.
-- Host/path route registration.
+- Host/path route registration on standalone SkyeNet, with 0S `/skyenet/<project>/` treated as legacy/staging after cutover.
 - Gate-aware route metadata.
 - Fallback-origin route records for platform-owned backends.
 - Managed SkyeNet function lanes mounted through the 0S/FS27 estate.
 - Internal status, route, observability, and cost model APIs.
+- Gated deployed-bundle source download through `/api/skyenet/source-download`.
 
 Signed runtime v1 now:
 
@@ -108,14 +111,30 @@ Official sources:
 
 ## Operator Flow
 
-1. Open `/skyenet/index.html` from the 0S desktop or admin window.
+1. Open `https://skyenet.graylondonskyes.workers.dev/console` for the standalone SkyeNet console, or `/skyenet/index.html` from the 0S desktop for legacy/internal operator access.
 2. Use the shared owner/operator gate session.
 3. Drop static build files.
 4. SkyeNet calls `/api/skyenet/deploy/init`.
 5. Each file uploads through `/api/skyenet/deploy/upload`.
 6. Completion writes a deployment manifest through `/api/skyenet/deploy/complete`.
-7. Route registration writes the host/path record through `/api/skyenet/deploy/route`.
+7. Route registration writes the host/path record through `/api/skyenet/deploy/route`; public company/customer-facing apps should use a platform-native host like `skyenet.<company-slug>`, an empty mount or `/`, and `url_mode: subdomain`. The shared `skyenet.graylondonskyes.workers.dev/<project>` route is infrastructure, fallback, proof, or temporary staging unless the owner explicitly approves it as public copy.
 8. Observability and cost panels read from `/api/skyenet/status`, `/api/skyenet/routes`, `/api/skyenet/observability`, and `/api/skyenet/cost-model`.
+
+CLI deploy shape:
+
+```bash
+npm run skyenet:deploy -- \
+  --dir <client-facing-build-folder> \
+  --project <project-slug> \
+  --workspace <workspace-slug> \
+  --host skyenet.<company-slug> \
+  --mount / \
+  --url-mode subdomain \
+  --public \
+  --concurrency 4
+```
+
+Omit `--public` when the SkyeNet route must stay gate-protected.
 
 ## Proof Commands
 
@@ -125,15 +144,18 @@ npm run 0s:skyenet:proof
 
 This runs the FS27 deploy API test and the main 0S SkyeNet adapter test.
 
-After any production deployment, this repo still requires headed live-browser verification:
+After any production deployment, this repo uses non-browser verification unless the owner explicitly re-enables browser proof for the current task:
 
 ```bash
-npm run proof:live-browser -- --url https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/index.html --expect "SkyeNet Deploy"
+node tools/proof-skynet-source-download-live-http.mjs
 ```
 
-The proof receipt must show desktop and mobile scrolling, interactions, console/network status, and visual nonblank screenshots before the live surface is called ready.
+Save receipts for build checks, API smoke, route smoke, source-download proof, and any blocked items. Browser verification is owner-handled under the repo policy in `AGENTS.md`.
 
 Related internal architecture:
 
 - `docs/SKYENET_FUNCTIONS_NETLIFY_PARITY.md`
 - `docs/SKYENET_HYBRID_RELEASE_ARCHITECTURE.md`
+- `docs/SKYENET_UPLOAD_URL_MODEL.md`
+- `docs/SKYENET_PUBLIC_POSTING_GUIDE.md`
+- `docs/SKYENET_STANDALONE_MIGRATION_DIRECTIVE.md`

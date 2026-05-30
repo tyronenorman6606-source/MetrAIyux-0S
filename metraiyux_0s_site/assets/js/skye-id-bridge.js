@@ -2,6 +2,8 @@
   'use strict';
 
   const LEGACY_DRAFT_KEY = 'kx.onboarding.idDraft';
+  const EMAIL_DRAFT_KEY = 'kx.onboarding.emailDraft';
+  const EMAIL_CLAIM_KEYS = ['skye0s.skyemail.claim.v1', 'SMV_ONBOARDING_CLAIM', EMAIL_DRAFT_KEY];
   const CURRENT_IDENTITY_KEY = 'skye0s.identity.current.v1';
   const REGISTRY_KEY = 'skye0s.identity.registry.v1';
   const MAX_PHOTO_CHARS = 1800000;
@@ -48,8 +50,45 @@
     return dataUrl;
   }
 
+  function normalizeEmail(value) {
+    const email = cleanString(value, 180).toLowerCase();
+    return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : '';
+  }
+
+  function normalizeEmailDraft(input) {
+    const source = input && typeof input === 'object' ? input : {};
+    const mailbox = source.mailbox && typeof source.mailbox === 'object' ? source.mailbox : {};
+    const profile = source.profile && typeof source.profile === 'object' ? source.profile : {};
+    const email = normalizeEmail(
+      source.email ||
+      mailbox.requested_email ||
+      (mailbox.local_part && mailbox.domain ? `${mailbox.local_part}@${mailbox.domain}` : '')
+    );
+    if (!email) return null;
+    const parts = email.split('@');
+    return {
+      schema: 'skye0s.skyemail.draft.v1',
+      email,
+      prefix: cleanString(source.prefix || mailbox.local_part || parts[0], 120),
+      domain: cleanString(source.domain || mailbox.domain || parts.slice(1).join('@'), 180),
+      displayName: cleanString(source.displayName || profile.display_name, 180),
+      source: cleanString(source.source || 'SkyEmail', 80),
+      reason: cleanString(source.reason || 'email-draft', 80),
+      updatedAt: cleanString(source.updatedAt || new Date().toISOString(), 40),
+    };
+  }
+
+  function readCurrentEmailDraft() {
+    for (const key of EMAIL_CLAIM_KEYS) {
+      const draft = normalizeEmailDraft(readStorage(key, null));
+      if (draft) return draft;
+    }
+    return null;
+  }
+
   function normalizeIdentity(input, reason) {
     const source = input && typeof input === 'object' ? input : {};
+    const emailDraft = source.email ? null : readCurrentEmailDraft();
     const idNumber = normalizeSkyeId(source.idNumber || source.number || source.skyeId || source.id || source.identityId);
     const skyeId = normalizeSkyeId(source.skyeId || idNumber || source.identityId);
     const photoObject = source.profilePhoto && typeof source.profilePhoto === 'object' ? source.profilePhoto : {};
@@ -63,13 +102,16 @@
       idNumber: idNumber || skyeId,
       name,
       displayName: name,
-      email: cleanString(source.email, 180).toLowerCase(),
+      email: normalizeEmail(source.email) || (emailDraft ? emailDraft.email : ''),
+      emailPrefix: cleanString(source.emailPrefix || (emailDraft && emailDraft.prefix), 120),
+      emailDomain: cleanString(source.emailDomain || (emailDraft && emailDraft.domain), 180),
       profileType: cleanString(source.profileType || 'artist', 48),
       photoDataUrl,
       photoName: cleanString(source.photoName || photoObject.name, 180),
       photoType: cleanString(source.photoType || photoObject.type, 80),
       photoUpdatedAt: cleanString(source.photoUpdatedAt || photoObject.updatedAt, 40),
       source: cleanString(source.source || 'Skye-ID', 80),
+      emailSource: cleanString(source.emailSource || (emailDraft && emailDraft.source), 80),
       reason: cleanString(reason || source.reason || 'update', 80),
       updatedAt: new Date().toISOString(),
     };
@@ -79,7 +121,9 @@
     const current = readStorage(CURRENT_IDENTITY_KEY, null);
     if (current) return normalizeIdentity(current);
     const legacy = readStorage(LEGACY_DRAFT_KEY, null);
-    return legacy ? normalizeIdentity(legacy) : null;
+    if (legacy) return normalizeIdentity(legacy);
+    const emailDraft = readCurrentEmailDraft();
+    return emailDraft ? normalizeIdentity({ email: emailDraft.email, source: emailDraft.source, profileType: 'artist' }) : null;
   }
 
   function upsertRegistry(identity) {
@@ -102,6 +146,7 @@
       idNumber: identity.idNumber || identity.skyeId,
       skyeId: identity.skyeId || identity.idNumber,
       identityId: identity.identityId,
+      email: identity.email,
       profileType: identity.profileType,
       photoDataUrl: identity.photoDataUrl,
       photoName: identity.photoName,
@@ -113,6 +158,16 @@
     try {
       writeStorage(LEGACY_DRAFT_KEY, legacy);
       writeStorage(CURRENT_IDENTITY_KEY, identity);
+      if (identity.email) {
+        writeStorage(EMAIL_DRAFT_KEY, {
+          email: identity.email,
+          prefix: identity.emailPrefix || identity.email.split('@')[0],
+          domain: identity.emailDomain || identity.email.split('@').slice(1).join('@'),
+          source: identity.emailSource || 'SkyeIDBridge',
+          reason: identity.reason || 'identity-publish',
+          updatedAt: identity.updatedAt,
+        });
+      }
       upsertRegistry(identity);
     } catch (err) {
       console.warn('SkyeIDBridge could not persist identity locally', err);
@@ -127,6 +182,7 @@
     const identity = readCurrentIdentity();
     if (!form || !identity) return identity;
     if (form.elements.name && !form.elements.name.value && identity.name) form.elements.name.value = identity.name;
+    if (form.elements.email && !form.elements.email.value && identity.email) form.elements.email.value = identity.email;
     if (form.elements.skyeId && !form.elements.skyeId.value) form.elements.skyeId.value = identity.skyeId || identity.idNumber || '';
     if (form.elements.identityId) form.elements.identityId.value = identity.identityId || identity.skyeId || identity.idNumber || '';
     const preview = form.querySelector('[data-skye-id-photo-preview]');
@@ -197,12 +253,14 @@
   }
 
   global.SkyeIDBridge = {
-    keys: { LEGACY_DRAFT_KEY, CURRENT_IDENTITY_KEY, REGISTRY_KEY },
+    keys: { LEGACY_DRAFT_KEY, EMAIL_DRAFT_KEY, CURRENT_IDENTITY_KEY, REGISTRY_KEY },
     maxPhotoChars: MAX_PHOTO_CHARS,
     normalizeIdentity,
+    normalizeEmailDraft,
     normalizeSkyeId,
     publishIdentity,
     readCurrentIdentity,
+    readCurrentEmailDraft,
     applyToArtistForm,
     fileToIdentityPhoto,
   };

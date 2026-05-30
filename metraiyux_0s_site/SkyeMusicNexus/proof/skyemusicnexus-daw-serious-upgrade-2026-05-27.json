@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "app": "SkyeMusicNexus DAW",
+  "scope": "serious DAW upgrade implementation and non-browser verification",
+  "createdAt": "2026-05-27T03:45:00.000Z",
+  "browserProof": {
+    "run": false,
+    "reason": "Owner/admin has disabled Codex-run browser proof in this repo."
+  },
+  "fs27Gate": {
+    "sharedGateOnly": true,
+    "appSpecificPasswordAdded": false,
+    "apiLane": "music-studio and music-assets through SkyGate-aware requests; mounted 0S Worker mirror updated"
+  },
+  "implemented": [
+    "Variable DAW timeline bars and dynamic grid math",
+    "Mixer pan controls and stereo browser WAV rendering",
+    "DAW clip promotion into gated music-assets",
+    "Cloud/local project restore surface",
+    "DAW export queue action with Release Forge handoff",
+    "DAW-specific kAIxU assistant plan/apply flow",
+    "kAIxU-only backend assistant policy with daily rate limits",
+    "Mounted 0S Worker mirror for DAW assistant and queue actions"
+  ],
+  "kaixuPolicy": {
+    "publicModelAliasesOnly": [
+      "kaixu-6.7-nano",
+      "kaixu-6.7-mini",
+      "kaixu-6.7",
+      "kaixu-6.7-pro",
+      "kaixu-6.7-max"
+    ],
+    "providerHooksCallableFromDaw": false,
+    "providerCalledByAssistant": false,
+    "rawProviderModelsExposed": false,
+    "dailyLimits": {
+      "free-beta": 24,
+      "artist-pro": 72,
+      "label": 160,
+      "owner-review": 240
+    }
+  },
+  "rating": {
+    "before": "2.8/10",
+    "after": "4.7/10",
+    "paidSeriousTarget": "9.0+/10"
+  },
+  "validation": [
+    {
+      "command": "node --check public/nexus-daw.js",
+      "ok": true
+    },
+    {
+      "command": "node --check netlify/functions/music-studio.js",
+      "ok": true
+    },
+    {
+      "command": "node --check metraiyux_0s_site/cloudflare/worker.js",
+      "ok": true
+    },
+    {
+      "command": "node smoke/open-source-studio-smoke.mjs",
+      "ok": true,
+      "verified": [
+        "Create Hub route",
+        "native fullscreen DAW route",
+        "no third-party DAW iframe",
+        "no vendored third-party DAW source",
+        "SkyGate-protected studio function",
+        "project ledger save",
+        "export manifest queue",
+        "Release Forge handoff",
+        "native DAW module record"
+      ]
+    },
+    {
+      "command": "MCP_APPLY=0 npm run mcp:mine -- metraiyux_0s_site/SkyeMusicNexus",
+      "ok": false,
+      "note": "Post-change MCP mining connected and wrote the target receipt without applying MCP parts, but optional design_luxury_audit failed. No browser proof was run."
+    }
+  ],
+  "changedFiles": [
+    "metraiyux_0s_site/SkyeMusicNexus/public/daw.html",
+    "metraiyux_0s_site/SkyeMusicNexus/public/nexus-daw.js",
+    "metraiyux_0s_site/SkyeMusicNexus/public/nexus-daw.css",
+    "metraiyux_0s_site/SkyeMusicNexus/netlify/functions/music-studio.js",
+    "metraiyux_0s_site/cloudflare/worker.js",
+    "metraiyux_0s_site/SkyeMusicNexus/docs/DAW_SERIOUS_UPGRADE_2026-05-27.md",
+    "metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-daw-serious-upgrade-2026-05-27.json",
+    "metraiyux_0s_site/SkyeMusicNexus/MCP_TOOLING_RECEIPT.json"
+  ],
+  "mcpMiningSideEffects": [
+    "metraiyux_0s_site/SkyeMusicNexus/index.html",
+    "metraiyux_0s_site/SkyeMusicNexus/_worker.js",
+    "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/NexusArtistPrimePackage/assets/mcp-implementation/mcp-effects.css"
+  ],
+  "notes": [
+    "This is still not a paid serious DAW until waveform editing, durable large-asset storage, offline render workers, stems, automation, routing, MIDI editing, and collaboration/versioning land.",
+    "The DAW intentionally does not call music-provider-hooks or expose raw provider model controls."
+  ]
+}

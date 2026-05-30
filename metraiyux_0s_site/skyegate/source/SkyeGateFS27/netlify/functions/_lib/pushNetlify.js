@@ -1,90 +1,70 @@
 import { sleep } from "./http.js";
-import { encodeURIComponentSafePath } from "./pushPath.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./providerRuntime.js";
 
-const API = "https://api.netlify.com/api/v1";
-
-function token(netlify_token) {
-  const t = (netlify_token || process.env.NETLIFY_AUTH_TOKEN || "").toString().trim();
-  if (!t) {
-    const err = new Error("Missing Netlify token");
-    err.code = "CONFIG";
-    err.status = 500;
-    err.hint = "Set a per-customer Netlify token (recommended) or set NETLIFY_AUTH_TOKEN in Netlify env vars.";
-    throw err;
-  }
-  return t;
+function netlifyEnvOverrides(netlify_token) {
+  const token = (netlify_token || "").toString().trim();
+  return token ? { NETLIFY_AUTH_TOKEN: token } : {};
 }
 
-async function nfFetch(url, init = {}, netlify_token = null) {
-  const method = ((init.method || "GET") + "").toUpperCase();
-  const body = init.body;
+function bufferToBase64(body) {
+  if (body == null) return "";
+  if (typeof Buffer !== "undefined" && Buffer.isBuffer(body)) return body.toString("base64");
+  if (body instanceof Uint8Array) return Buffer.from(body).toString("base64");
+  if (body instanceof ArrayBuffer) return Buffer.from(body).toString("base64");
+  if (typeof body === "string") return Buffer.from(body).toString("base64");
+  const err = new Error("Netlify provider runtime upload requires replayable bytes");
+  err.code = "NETLIFY_PROVIDER_RUNTIME_BODY";
+  err.status = 400;
+  throw err;
+}
 
-  const isWebReadableStream = body && typeof body === "object" && typeof body.getReader === "function";
-  const isBuffer = typeof Buffer !== "undefined" && Buffer.isBuffer(body);
-  const isUint8 = body instanceof Uint8Array;
-  const isArrayBuffer = body instanceof ArrayBuffer;
-  const isString = typeof body === "string";
+function resultFromRuntime(runtime) {
+  const result = runtime?.receipt?.provider_result || {};
+  return {
+    ...result,
+    provider_runtime: publicProviderRuntime(runtime?.receipt)
+  };
+}
 
-  // Only retry idempotent-ish requests where the body can be safely replayed.
-  // - GET/HEAD: safe
-  // - PUT with Buffer/Uint8Array/ArrayBuffer/string: safe-ish
-  // - Streams: NOT safely replayable, so no retries.
-  const canReplayBody = !body || isBuffer || isUint8 || isArrayBuffer || isString;
-  const canRetry = (method === "GET" || method === "HEAD" || (method === "PUT" && canReplayBody)) && !isWebReadableStream;
+function throwRuntimeError(runtime, message = "Netlify provider runtime failed") {
+  const receipt = runtime?.receipt || null;
+  const err = new Error(receipt?.error || message);
+  err.code = "NETLIFY_PROVIDER_RUNTIME";
+  err.status = runtime?.status || receipt?.http_status || 502;
+  err.detail = {
+    error: receipt?.error || message,
+    provider_runtime: publicProviderRuntime(receipt)
+  };
+  throw err;
+}
 
-  const maxAttempts = canRetry ? 5 : 1;
+function retryableStatus(status) {
+  return status === 429 || status === 502 || status === 503 || status === 504;
+}
 
+async function runNetlifyProvider({ action, payload, usage_lane, netlify_token = null, retry = false }) {
+  const maxAttempts = retry ? 5 : 1;
+  let lastRuntime = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const headers = {
-      authorization: `Bearer ${token(netlify_token)}`,
-      ...(init.headers || {})
-    };
-
-    let res;
-    let text = "";
-    let data = null;
-
-    try {
-      res = await fetch(url, { ...init, headers });
-      text = await res.text();
-      try { data = JSON.parse(text); } catch {}
-    } catch (e) {
-      // Network-level failure; retry if allowed.
-      if (canRetry && attempt < maxAttempts) {
-        const backoff = Math.min(8000, 250 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 150));
-        await sleep(backoff);
-        continue;
-      }
-      const err = new Error("Netlify API fetch failed");
-      err.code = "NETLIFY_FETCH";
-      err.status = 502;
-      err.detail = String(e && e.message ? e.message : e);
-      throw err;
-    }
-
-    if (res.ok) return data ?? text;
-
-    const status = res.status;
-    const retryable = status === 429 || status === 502 || status === 503 || status === 504;
-
-    if (canRetry && retryable && attempt < maxAttempts) {
-      // Respect Retry-After if present (seconds).
-      const ra = res.headers.get("retry-after");
-      let waitMs = 0;
-      const sec = ra ? parseInt(ra, 10) : NaN;
-      if (Number.isFinite(sec) && sec >= 0) waitMs = Math.min(15000, sec * 1000);
-      if (!waitMs) waitMs = Math.min(15000, 300 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 200));
-      await sleep(waitMs);
-      continue;
-    }
-
-    const err = new Error(`Netlify API error ${status}`);
-    err.code = "NETLIFY_API";
-    err.status = status;
-    err.detail = data || text;
-    throw err;
+    const runtime = await runZeroOsProviderAction({
+      provider_id: "netlify",
+      action,
+      app_id: "skygatefs27-push",
+      workspace_id: payload?.site_id || payload?.siteId || "",
+      customer_id: payload?.customer_id || "",
+      usage_lane: usage_lane || action,
+      payload,
+      env_overrides: netlifyEnvOverrides(netlify_token)
+    });
+    if (runtime.ok) return resultFromRuntime(runtime);
+    lastRuntime = runtime;
+    if (!retry || attempt >= maxAttempts || !retryableStatus(runtime.status)) break;
+    const backoff = Math.min(15000, 300 * Math.pow(2, attempt - 1) + Math.floor(Math.random() * 200));
+    await sleep(backoff);
   }
+  throwRuntimeError(lastRuntime);
 }
+
 export async function createDigestDeploy({ site_id, branch, title, files, netlify_token = null }) {
   const cleanFiles = {};
   for (const [p, sha] of Object.entries(files || {})) {
@@ -92,36 +72,47 @@ export async function createDigestDeploy({ site_id, branch, title, files, netlif
     if (k) cleanFiles[k] = sha;
   }
   const filesForNetlify = cleanFiles;
-  const qs = new URLSearchParams();
-  if (branch) qs.set("branch", branch);
-  if (title) qs.set("title", title);
-  const url = `${API}/sites/${encodeURIComponent(site_id)}/deploys?${qs.toString()}`;
-  return nfFetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ async: true, draft: false, files: filesForNetlify })
-  }, netlify_token);
+  return runNetlifyProvider({
+    action: "netlify.deploy.create",
+    usage_lane: "fs27.push.deploy_init",
+    netlify_token,
+    payload: { site_id, branch, title, async: true, draft: false, files: filesForNetlify }
+  });
 }
 
 export async function getSiteDeploy({ site_id, deploy_id, netlify_token = null }) {
-  const url = `${API}/sites/${encodeURIComponent(site_id)}/deploys/${encodeURIComponent(deploy_id)}`;
-  return nfFetch(url, { method: "GET" }, netlify_token);
+  return runNetlifyProvider({
+    action: "netlify.deploy.get",
+    usage_lane: "fs27.push.deploy_status",
+    netlify_token,
+    retry: true,
+    payload: { site_id, deploy_id }
+  });
 }
 
 export async function getDeploy({ deploy_id, netlify_token = null }) {
-  const url = `${API}/deploys/${encodeURIComponent(deploy_id)}`;
-  return nfFetch(url, { method: "GET" }, netlify_token);
+  return runNetlifyProvider({
+    action: "netlify.deploy.get",
+    usage_lane: "fs27.push.deploy_status",
+    netlify_token,
+    retry: true,
+    payload: { deploy_id }
+  });
 }
 
 export async function putDeployFile({ deploy_id, deploy_path, body, netlify_token = null }) {
-  const encoded = encodeURIComponentSafePath(deploy_path);
-  const url = `${API}/deploys/${encodeURIComponent(deploy_id)}/files/${encoded}`;
-  return nfFetch(url, {
-    method: "PUT",
-    headers: { "content-type": "application/octet-stream" },
-    body,
-    duplex: "half"
-  }, netlify_token);
+  return runNetlifyProvider({
+    action: "netlify.deploy.file.upload",
+    usage_lane: "fs27.push.file_upload",
+    netlify_token,
+    retry: true,
+    payload: {
+      deploy_id,
+      path: deploy_path,
+      content_base64: bufferToBase64(body),
+      content_type: "application/octet-stream"
+    }
+  });
 }
 
 export async function pollDeployUntil({ site_id, deploy_id, timeout_ms = 60000, netlify_token = null }) {

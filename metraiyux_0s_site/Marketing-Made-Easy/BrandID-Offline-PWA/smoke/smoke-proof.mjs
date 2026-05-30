@@ -17,12 +17,11 @@ function read(relPath) {
 
 async function main() {
   const indexHtml = read("index.html");
-  const appHtml = read("app.html");
+  const appHtml = indexHtml;
   const runtimeModule = read("runtime/local-runtime.mjs");
   const serviceWorker = read("sw.js");
 
-  assert(indexHtml.includes("BrandID Offline PWA now has routed surfaces"), "index.html is missing the routed command shell");
-  assert(indexHtml.includes('href="./app.html"'), "index.html is missing the imported app link");
+  assert(!fs.existsSync(path.join(root, "app.html")), "app.html should not exist; BrandID Offline PWA must use one canonical root app");
 
   for (const needle of [
     "btnSyncOutbox",
@@ -44,7 +43,7 @@ async function main() {
     "Target:",
     "Next:",
   ]) {
-    assert(appHtml.includes(needle), `app.html is missing expected intake-runtime marker: ${needle}`);
+    assert(appHtml.includes(needle), `index.html is missing expected intake-runtime marker: ${needle}`);
   }
 
   for (const needle of [
@@ -59,6 +58,7 @@ async function main() {
     "/execution",
     "/dispatch",
     "same-folder-local-runtime",
+    "SkyeMediaCenter",
     "SkyeLeadVault",
     "SkyeWebCreatorMax",
     "createWorkflowActivity",
@@ -92,11 +92,7 @@ async function main() {
     assert(health.platform === "BrandID-Offline-PWA", "health endpoint reported the wrong platform");
 
     const servedIndex = await fetch(`${baseUrl}/`).then((res) => res.text());
-    assert(servedIndex.includes("BrandID Offline PWA now has routed surfaces"), "runtime root did not serve the routed command shell");
-    assert(servedIndex.includes('href="./app.html"'), "runtime root did not serve the imported app link");
-
-    const servedApp = await fetch(`${baseUrl}/app.html`).then((res) => res.text());
-    assert(servedApp.includes("btnSyncOutbox"), "runtime did not serve the updated outbox shell");
+    assert(servedIndex.includes("btnSyncOutbox"), "runtime root did not serve the canonical outbox shell");
 
     const initialStatus = await fetch(`${baseUrl}/api/runtime/status`).then((res) => res.json());
     assert(initialStatus.ok, "runtime status did not report ok");
@@ -130,13 +126,14 @@ async function main() {
             logoEmbedded: true,
             previewTheme: "dark",
           },
-          recommendedDestinations: ["SkyeLeadVault", "SkyeWebCreatorMax", "skyeroutex-workforce-command-v0.4.0"],
+          recommendedDestinations: ["SkyeLeadVault", "SkyeMediaCenter", "SkyeWebCreatorMax", "skyeroutex-workforce-command-v0.4.0"],
         },
       }),
     }).then((res) => res.json());
 
     assert(createResponse.ok, "intake packet POST failed");
     assert(createResponse.intakePacket.handoffSummary.crmLane === "SkyeLeadVault", "intake packet did not inherit CRM destination mapping");
+    assert(createResponse.intakePacket.handoffSummary.mediaLane === "SkyeMediaCenter", "intake packet did not inherit media-center destination mapping");
 
     const packets = await fetch(`${baseUrl}/api/runtime/intake-packets`).then((res) => res.json());
     assert(packets.total === 1, "runtime packet listing did not include the archived intake packet");

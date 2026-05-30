@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-05-25T18:39:43.530Z",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "health_version_0_3_0",
+      "data": {}
+    }
+  ],
+  "failed_at": "2026-05-25T18:39:43.860Z",
+  "failure": "login failed admin@routex.internal.invalid",
+  "data": {
+    "status": 410,
+    "json": {
+      "ok": false,
+      "productionGate": true,
+      "sharedAuth": true,
+      "error": "app_local_auth_disabled_by_shared_gate",
+      "message": "SkyeRouteX local credential entrypoint is owned by the shared FS27/SkyGate/Free99 gate. Use the mounted 0S route with a Gate session."
+    }
+  },
+  "server_log_excerpt": "server spawned with stdio ignored for deterministic smoke exit."
+}

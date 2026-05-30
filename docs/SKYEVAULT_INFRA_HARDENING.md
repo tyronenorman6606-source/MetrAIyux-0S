@@ -18,6 +18,26 @@ SKYEVAULT_GIT_STAGE_PARENT=/tmp/skyevault-git-vault
 SKYEVAULT_GIT_ARCHIVE_DIR=/tmp/skyevault-git-vault/archives
 ```
 
+## Autosync Parity
+
+Run the ten-minute parity loop with:
+
+```bash
+npm run vault:delta:status
+npm run vault:delta:dry-run -- --env-file=env.txt
+npm run vault:autosync:status
+npm run vault:autosync:dry-run
+npm run vault:autosync
+```
+
+Default autosync mode is `git+full`: a changed scan first packs/uploads the encrypted delta journal, then uploads the clone-capable Git vault pack and the encrypted full-repo SkyDrive artifact. The scan skips unchanged digests, writes `.skyevault-out/autosync/` receipts, appends `.skyevault-out/autosync-ledger.jsonl`, and refreshes the SkyeVault 0S map after successful pushes.
+
+Delta receipts live in `.skyevault-out/delta-journal/` and publish only proof-safe counts/digests into the public heartbeat. Use `--skip-delta`, `--no-delta-upload`, or `--require-delta` when an operator needs to change the fast-lane behavior.
+
+Install the production-style timer from `deploy/skyevault-autosync/systemd/`; it runs `npm run vault:autosync:once` every ten minutes and reads private credentials from `/etc/skyevault/autosync.env`.
+
+See `docs/SKYEVAULT_AUTOSYNC_PARITY.md`.
+
 ## Integrity
 
 Every Git vault pack contains:
@@ -51,6 +71,14 @@ npm run vault:git:restore -- --restore=/path/to/pack.zip --to=/workspace/repo --
 ```
 
 Do not store `SKYEVAULT_PACK_SIGNING_KEY` in the repo. Put it in the client vault, platform secret manager, or CI/CDE secret scope.
+
+## Full Repo Restore-Key Boundary
+
+The full-repo SkyDrive artifact is encrypted before upload. The direct restore kit contains artifact key material, so it is now local-only by default. Use the SkyeSecure control pack for vault-owned recovery. Only upload a direct restore kit with an explicit operator decision:
+
+```bash
+npm run vault:repo:full -- --upload-direct-restore-kit
+```
 
 ## Restore Contract
 

@@ -23,12 +23,13 @@ const CANONICAL_TENANTS = Object.freeze([
     workspaceId: 'fade-masters-phx-preview-001',
     valleyBusinessId: 'fade-masters-phx',
     relayInboxId: 'relay13:fade-masters-phx',
-    installQr: '/client-app-factory/client-apps/fade-masters-phx/scan.html',
-    clientAppRoute: '/client-app-factory/client-apps/fade-masters-phx/',
+    installQr: 'https://skyenet.fade-masters-phx/scan.html',
+    clientAppRoute: 'https://skyenet.fade-masters-phx/',
+    legacyZeroOsRoute: '/client-app-factory/client-apps/fade-masters-phx/',
     valleyRoute: '/valley-verified/business/fade-masters-phx/',
     northstarRoute: '/northstar/?workspace=fade-masters-phx',
     defaultAiPlan: 'relay13-ai-response-starter',
-    status: 'live-client-app'
+    status: 'standalone-skynet-live'
   },
   {
     clientId: 'empire-pallets',
@@ -36,12 +37,13 @@ const CANONICAL_TENANTS = Object.freeze([
     workspaceId: 'empire-pallets-preview-001',
     valleyBusinessId: 'empire-pallets-phoenix',
     relayInboxId: 'relay13:empire-pallets',
-    installQr: '/client-app-factory/client-apps/empire-pallets/scan.html',
-    clientAppRoute: '/client-app-factory/client-apps/empire-pallets/',
+    installQr: 'https://skyenet.empire-pallets/scan.html',
+    clientAppRoute: 'https://skyenet.empire-pallets/',
+    legacyZeroOsRoute: '/client-app-factory/client-apps/empire-pallets/',
     valleyRoute: '/valley-verified/business/empire-pallets-phoenix/',
     northstarRoute: '/northstar/?workspace=empire-pallets',
     defaultAiPlan: 'relay13-ai-response-plus',
-    status: 'live-client-app'
+    status: 'standalone-skynet-live'
   },
   {
     clientId: 'next-level-gaming-goodyear',
@@ -49,12 +51,13 @@ const CANONICAL_TENANTS = Object.freeze([
     workspaceId: 'next-level-gaming-goodyear-preview-001',
     valleyBusinessId: 'next-level-gaming-goodyear',
     relayInboxId: 'relay13:next-level-gaming-goodyear',
-    installQr: '/client-app-factory/client-apps/next-level-gaming-goodyear/scan.html',
-    clientAppRoute: '/client-app-factory/client-apps/next-level-gaming-goodyear/',
+    installQr: 'https://skyenet.next-level-gaming-goodyear/scan.html',
+    clientAppRoute: 'https://skyenet.next-level-gaming-goodyear/',
+    legacyZeroOsRoute: '/client-app-factory/client-apps/next-level-gaming-goodyear/',
     valleyRoute: '/valley-verified/business/next-level-gaming-goodyear/',
     northstarRoute: '/northstar/?workspace=next-level-gaming-goodyear',
     defaultAiPlan: 'relay13-ai-response-starter',
-    status: 'live-client-app'
+    status: 'standalone-skynet-live'
   },
   {
     clientId: 'as-you-wish-pottery-westgate',
@@ -62,12 +65,13 @@ const CANONICAL_TENANTS = Object.freeze([
     workspaceId: 'as-you-wish-pottery-westgate-preview-001',
     valleyBusinessId: 'as-you-wish-pottery-westgate',
     relayInboxId: 'relay13:as-you-wish-pottery-westgate',
-    installQr: '/client-app-factory/client-apps/as-you-wish-pottery-westgate/scan.html',
-    clientAppRoute: '/client-app-factory/client-apps/as-you-wish-pottery-westgate/',
+    installQr: 'https://skyenet.as-you-wish-pottery-westgate/scan.html',
+    clientAppRoute: 'https://skyenet.as-you-wish-pottery-westgate/',
+    legacyZeroOsRoute: '/client-app-factory/client-apps/as-you-wish-pottery-westgate/',
     valleyRoute: '/valley-verified/business/as-you-wish-pottery-westgate/',
     northstarRoute: '/northstar/?workspace=as-you-wish-pottery-westgate',
     defaultAiPlan: 'relay13-ai-response-starter',
-    status: 'live-client-app'
+    status: 'standalone-skynet-live'
   },
   {
     clientId: 'bobs-smoke-shop',
@@ -75,12 +79,14 @@ const CANONICAL_TENANTS = Object.freeze([
     workspaceId: 'bobs-smoke-shop-litchfield-park-preview-001',
     valleyBusinessId: 'bobs-smoke-shop-litchfield-park',
     relayInboxId: 'relay13:bobs-smoke-shop-litchfield-park',
-    installQr: '/client-app-factory/client-apps/bobs-smoke-shop/scan.html',
-    clientAppRoute: '/client-app-factory/client-apps/bobs-smoke-shop/',
+    installQr: 'https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/',
+    clientAppRoute: 'https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/',
+    workspacePreviewRoute: 'https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/workspace-preview/',
+    legacyZeroOsRoute: '/skyenet/bobs-smoke-shop/',
     valleyRoute: '/valley-verified/business/bobs-smoke-shop-litchfield-park/',
     northstarRoute: '/northstar/?workspace=bobs-smoke-shop-litchfield-park',
     defaultAiPlan: 'relay13-managed-ai-inbox',
-    status: 'live-client-app'
+    status: 'standalone-skynet-live'
   },
   {
     clientId: '480-realty-property-management',
@@ -337,6 +343,7 @@ export async function recordTenantEvent(env, event = {}) {
       writtenAt: createdAt
     },
     payloadRef: eventKey,
+    payload: stored,
     note: `${stored.type} stored for ${stored.clientId}`
   }, 'metraiyux-0s-system'));
   if (ok) await putJson(env, eventKey, stored);
@@ -466,6 +473,7 @@ export async function recordTenantLead(env, body = {}, options = {}) {
       writtenAt: createdAt
     },
     payloadRef: leadKey,
+    payload: lead,
     note: `Client app lead captured for ${lead.clientId}`
   }, 'metraiyux-0s-system'));
   if (leadStored) await putJson(env, leadKey, lead);

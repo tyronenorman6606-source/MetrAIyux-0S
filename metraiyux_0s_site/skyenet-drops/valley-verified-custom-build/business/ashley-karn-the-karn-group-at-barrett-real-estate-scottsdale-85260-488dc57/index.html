@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ashley Karn, The Karn Group at Barrett Real Estate | Scottsdale Real Estate Agent / team</title>
+  <meta name="description" content="Ashley Karn, The Karn Group at Barrett Real Estate is a Valley Verified real estate agent/team profile at 7721 E Gray Rd #204, Scottsdale, AZ 85260.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171b1f;
+      --muted: #56616a;
+      --charcoal: #26313a;
+      --terra: #bf6543;
+      --sage: #6c8f7d;
+      --cream: #faf7ef;
+      --paper: #ffffff;
+      --line: rgba(23, 27, 31, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(108, 143, 125, .16), transparent 45%),
+        linear-gradient(180deg, rgba(191, 101, 67, .13), transparent 360px),
+        var(--cream);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 50px;
+    }
+
+    .listing-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 20px;
+      color: var(--charcoal);
+      font-weight: 800;
+    }
+
+    .listing-top div {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .listing-top img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(310px, .54fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .brochure {
+      min-height: 580px;
+      display: grid;
+      align-content: center;
+      gap: 24px;
+      padding: clamp(28px, 5vw, 60px);
+      border-radius: 8px;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(38, 49, 58, .96), rgba(38, 49, 58, .76)),
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, .08) 0 1px, transparent 1px 28px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brochure::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: 52px;
+      width: 210px;
+      height: 140px;
+      border: 22px solid rgba(191, 101, 67, .38);
+      border-radius: 8px;
+      transform: rotate(-8deg);
+    }
+
+    .eyebrow {
+      width: fit-content;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: var(--terra);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(38px, 7vw, 82px);
+      line-height: .96;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 720px;
+      color: #eef4f1;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.5;
+    }
+
+    .contact {
+      display: grid;
+      gap: 14px;
+    }
+
+    .contact-card {
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .contact-card.logo {
+      min-height: 230px;
+      display: grid;
+      place-items: center;
+      background: var(--sage);
+    }
+
+    .contact-card.logo img {
+      width: 126px;
+      height: 126px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .contact-card b,
+    .fact b {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--terra);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .contact-card a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 15px;
+      border-radius: 7px;
+      background: var(--charcoal);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    address {
+      color: var(--muted);
+      font-style: normal;
+      line-height: 1.5;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .fact {
+      min-height: 126px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .86);
+    }
+
+    .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .listing-top { align-items: flex-start; flex-direction: column; }
+      .brochure { min-height: 470px; padding: 26px; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="listing-top">
+      <div>
+        <img src="assets/logo.svg" alt="Ashley Karn profile mark">
+        <span>Valley Verified Network</span>
+      </div>
+      <span>Scottsdale, AZ 85260</span>
+    </header>
+
+    <section class="hero">
+      <div class="brochure">
+        <div class="eyebrow">Real estate agent/team</div>
+        <h1>Ashley Karn, The Karn Group at Barrett Real Estate</h1>
+        <p class="lead">Ashley Karn, The Karn Group at Barrett Real Estate gives homeowners, buyers, and rental owners a practical Scottsdale connection for Real Estate Agent/team, Real Estate/Contractors / Real Estate Agent/team, Real Estate/Contractors, and Property / Real Estate. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+      </div>
+
+      <aside class="contact" aria-label="Contact details">
+        <div class="contact-card logo">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="contact-card">
+          <b>Phone</b>
+          <a href="tel:+14804339405">(480) 433-9405</a>
+        </div>
+        <div class="contact-card">
+          <b>Office</b>
+          <address>7721 E Gray Rd #204<br>Scottsdale, AZ 85260</address>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Local details">
+      <div class="fact">
+        <b>Category</b>
+        <span>Real Estate And Property</span>
+      </div>
+      <div class="fact">
+        <b>License Type</b>
+        <span>Real Estate/Contractors</span>
+      </div>
+      <div class="fact">
+        <b>Profile Date</b>
+        <span>May 19, 2026</span>
+      </div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-ashley-karn-the-karn-group-at-barrett-real-estate-scottsdale-85260-488dc57">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-ashley-karn-the-karn-group-at-barrett-real-estate-scottsdale-85260-488dc57">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Ashley Karn, The Karn Group at Barrett Real Estate earns this Valley Verified placement because public business evidence connects a real real estate agent/team operation to 7721 E Gray Rd #204, Scottsdale, AZ 85260 and (480) 433-9405. Greater Phoenix Chamber directory evidence supports this local profile. For homeowners, buyers, and rental owners, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Real Estate Agent/team, Real Estate/Contractors / Real Estate Agent/team, Real Estate/Contractors, and Property / Real Estate</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>homeowners, buyers, and rental owners</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>7721 E Gray Rd #204, Scottsdale, AZ 85260; (480) 433-9405</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

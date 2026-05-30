@@ -3,6 +3,7 @@ const { json, parseJson, verifyAuth } = require("./_utils");
 const {
   getHostedMailbox,
   listMailboxAliases,
+  provisionMailboxAlias,
   saveMailboxAlias,
   validateAliasInput
 } = require("./_mailbox-provider");
@@ -38,13 +39,22 @@ exports.handler = async (event) => {
 
     const body = parseJson(event);
     const alias = validateAliasInput(body.alias_email || body.email || body.alias);
+    const provisionedAlias = await provisionMailboxAlias({
+      mailbox,
+      aliasEmail: alias.email,
+      user,
+      auth,
+      source: body.source || "mailbox-aliases"
+    });
     const created = await saveMailboxAlias({
       userId: user.id,
       mailboxId: mailbox.id,
       aliasEmail: alias.email,
       aliasType: body.alias_type || "custom",
       displayName: body.display_name || body.displayName || null,
+      providerAliasId: provisionedAlias.provider_alias_id || null,
       providerPayload: {
+        ...(provisionedAlias.provider_payload || {}),
         source: "mailbox-aliases",
         requested_by: user.email,
         workspace_id: user.workspace_id || auth.workspace_id || null
@@ -63,6 +73,8 @@ exports.handler = async (event) => {
         mailbox_email: mailbox.mailbox_email,
         alias_email: created.alias_email,
         alias_type: created.alias_type,
+        provider: provisionedAlias.provider || mailbox.provider,
+        provider_alias_id: created.provider_alias_id || null,
         fs27_gate_card_id: user.fs27_gate_card_id || auth.fs27_gate_card_id || null
       }
     }).catch(() => null);

@@ -17,9 +17,24 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const DEFAULT_SITE_URL = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified';
 const SITE_URL = normalizeBaseUrl(process.env.VALLEY_VERIFIED_CANONICAL_URL || process.env.SITE_URL || process.env.URL || DEFAULT_SITE_URL);
 const DATA_ONLY = process.argv.includes('--data-only');
-const STATIC_PROFILE_LIMIT = Math.max(0, Number(process.env.STATIC_PROFILE_LIMIT ?? 300) || 0);
 const DIRECTORY_PAGE_SIZE = Math.max(100, Number(process.env.DIRECTORY_PAGE_SIZE ?? 500) || 500);
 const SITEMAP_CHUNK_SIZE = Math.max(1000, Number(process.env.SITEMAP_CHUNK_SIZE ?? 10000) || 10000);
+const SKYEMAIL_SIGNIN_ORIGIN = String(process.env.SKYEMAIL_SIGNIN_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
+const SKYEMAIL_SIGNIN_BASE = `${SKYEMAIL_SIGNIN_ORIGIN}/live/SkyeMail/login.html?workspace=valley-verified`;
+const SKYEMAIL_DOMAIN = 'skyemail.solenterprises.org';
+const SKYEMAIL_ACTIVATION_HOURS = 24;
+const SKYEMAIL_SEATS_REMAINING = 9;
+const SKYEMAIL_REORDER_THRESHOLD = 2;
+const SKYEMAIL_REORDER_GROUP_SIZE = 5;
+const OWNER_MARKETING_CONTACT_EMAIL = 'MediaOverLondon@solenterprises.org';
+const WORKSPACE_CONFIRMATION_RECIPIENTS = [
+  'grayskyes@solenterprises.org',
+  'SkyesOverLondonLC@solenterprises.org',
+  'skyesoverlondon222@gmail.com'
+];
+const SKYEMAIL_LOCAL_PART_OVERRIDES = new Map([
+  ['bobs-smoke-shop-litchfield-park', 'bobs-smokeshop']
+]);
 const INTERNAL_SURFACE_PATHS = new Set([
   '/ae-command/', '/activation/', '/territories/', '/revenue/', '/sales-playbook/', '/lead-routing/',
   '/owner-verification/', '/lifecycle/', '/audit/', '/coverage/', '/opportunities/', '/outreach/',
@@ -44,6 +59,61 @@ function jsonScript(value){ return JSON.stringify(value).replace(/</g, '\\u003c'
 function slugify(value, fallback = 'item'){
   const out = String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90);
   return out || fallback;
+}
+function enc(value){ return encodeURIComponent(text(value)); }
+function skyEmailAddress(business){
+  const override = SKYEMAIL_LOCAL_PART_OVERRIDES.get(String(business?.id || '').toLowerCase());
+  if(override) return `${override}@${SKYEMAIL_DOMAIN}`;
+  const base = slugify(business.name || business.id || 'business', 'business').replace(/-+/g, '.').slice(0, 48).replace(/\.$/, '') || 'business';
+  return `${base}@${SKYEMAIL_DOMAIN}`;
+}
+function skyEmailAccount(business){
+  const mailbox = skyEmailAddress(business);
+  return {
+    mailbox,
+    href:`${SKYEMAIL_SIGNIN_BASE}&business=${enc(business.id)}&mailbox=${enc(mailbox)}`,
+    activationHours:SKYEMAIL_ACTIVATION_HOURS,
+    seatsRemaining:SKYEMAIL_SEATS_REMAINING,
+    reorderThreshold:SKYEMAIL_REORDER_THRESHOLD,
+    reorderGroupSize:SKYEMAIL_REORDER_GROUP_SIZE
+  };
+}
+function skyEmailProvisioningModel(businesses){
+  return {
+    version:'24.0.0',
+    updated_at:TODAY,
+    program:'valley_verified_skyemail_acceptance',
+    signin_base:SKYEMAIL_SIGNIN_BASE,
+    activation_window_hours:SKYEMAIL_ACTIVATION_HOURS,
+    owner_notification:{
+      required:true,
+      message:'Provision a SkyEmail workspace for the accepted Valley Verified business.',
+      public_contact_email:OWNER_MARKETING_CONTACT_EMAIL,
+      recipient_emails:WORKSPACE_CONFIRMATION_RECIPIENTS,
+      delivery_rule:'Send every workspace acceptance/provisioning confirmation to every recipient in recipient_emails.',
+      escalation_helper:'K4i',
+      escalate_after_hours:SKYEMAIL_ACTIVATION_HOURS
+    },
+    seat_pool:{
+      source:'darthom inbox check',
+      seats_remaining:SKYEMAIL_SEATS_REMAINING,
+      countdown_enabled:true,
+      reorder_threshold:SKYEMAIL_REORDER_THRESHOLD,
+      purchase_group_size:SKYEMAIL_REORDER_GROUP_SIZE,
+      reorder_message:`Buy more SkyEmail seats when the pool reaches ${SKYEMAIL_REORDER_THRESHOLD}; seats are purchased in groups of ${SKYEMAIL_REORDER_GROUP_SIZE}.`
+    },
+    records:businesses.map(b => ({
+      business_id:b.id,
+      business_name:b.name,
+      verified_status:'owner_researched_verified',
+      skyemail:skyEmailAddress(b),
+      accept_url:skyEmailAccount(b).href,
+      activation_status:'pending_team_provisioning',
+      activation_window_hours:SKYEMAIL_ACTIVATION_HOURS,
+      owner_notification_required:true,
+      helper_escalation_after_hours:SKYEMAIL_ACTIVATION_HOURS
+    }))
+  };
 }
 function bool(value){
   if(typeof value === 'boolean') return value;
@@ -150,6 +220,46 @@ async function exists(file){ try{ await fs.access(file); return true; }catch{ re
 async function ensureDir(dir){ await fs.mkdir(dir, { recursive: true }); }
 async function writeFile(file, body){ await ensureDir(path.dirname(file)); await fs.writeFile(file, body); }
 async function copyFile(src, dest){ await ensureDir(path.dirname(dest)); await fs.copyFile(src, dest); }
+async function handbuiltPageIdSet(){
+  const dir = path.join(SRC, 'handbuilt-pages');
+  const entries = await fs.readdir(dir, { withFileTypes:true }).catch(() => []);
+  const ids = new Set();
+  for(const entry of entries){
+    if(!entry.isDirectory()) continue;
+    if(await exists(path.join(dir, entry.name, 'index.html'))) ids.add(entry.name);
+  }
+  return ids;
+}
+async function copyCustomBusinessPages(businesses){
+  const sourceRoot = path.join(SRC, 'handbuilt-pages');
+  const targetRoot = path.join(DIST, 'business');
+  const businessIds = new Set(businesses.map(b => b.id));
+  const missing = [];
+  const invalid = [];
+  await ensureDir(targetRoot);
+  const existingEntries = await fs.readdir(targetRoot, { withFileTypes:true }).catch(() => []);
+  await Promise.all(existingEntries.map(async entry => {
+    if(!entry.isDirectory()) return;
+    if(entry.name === 'page') return;
+    if(!businessIds.has(entry.name)) await fs.rm(path.join(targetRoot, entry.name), { recursive:true, force:true });
+  }));
+  await Promise.all(businesses.map(async business => {
+    const source = path.join(sourceRoot, business.id, 'index.html');
+    const target = path.join(targetRoot, business.id, 'index.html');
+    if(!(await exists(source))){
+      missing.push({ id:business.id, name:business.name });
+      return;
+    }
+    const body = await fs.readFile(source, 'utf8');
+    if(!body.includes('data-static-hand-page="true"')) invalid.push({ id:business.id, name:business.name, reason:'missing data-static-hand-page marker' });
+    await writeFile(target, body);
+  }));
+  if(missing.length || invalid.length){
+    const problems = [...missing.map(item => `missing ${item.id} (${item.name})`), ...invalid.map(item => `invalid ${item.id} (${item.reason})`)].slice(0, 60).join('\n');
+    throw new Error(`Valley Verified custom business pages are incomplete. No generator fallback is allowed.\n${problems}`);
+  }
+  return { copied:businesses.length, missing:0, invalid:0 };
+}
 async function listFiles(dir){
   const out = [];
   async function walk(current){
@@ -315,7 +425,7 @@ async function mapLimit(items, limit, mapper){
 }
 function scalableNotice(total, shown){
   if(total <= shown) return '';
-  return `<div class="notice strong"><strong>Large dataset mode:</strong> showing ${shown.toLocaleString()} representative cards on this hub while ${total.toLocaleString()} generated business profile pages remain live through sitemap, search data, city/category pages, and exports. Open <a href="/data/search-index.json">search index JSON</a> or <a href="/data/businesses.csv">CSV export</a> for the full set.</div>`;
+  return `<div class="notice strong"><strong>Large dataset mode:</strong> showing ${shown.toLocaleString()} representative cards on this hub while ${total.toLocaleString()} static business profile pages remain live through sitemap, search data, city/category pages, and exports. Open <a href="/data/search-index.json">search index JSON</a> or <a href="/data/businesses.csv">CSV export</a> for the full set.</div>`;
 }
 
 
@@ -459,13 +569,12 @@ function seedFieldMap(){
     ]
   };
 }
-function canonicalRoutingIndex(businesses, staticCount){
+function canonicalRoutingIndex(businesses, handbuiltIds){
   return businesses.map((b, index) => ({
     id:b.id,
     name:b.name,
     canonical_url:`/business/${b.id}/`,
-    renderer_url:'/business-profile/',
-    profile_mode:index < staticCount ? 'pre-rendered-static' : 'dynamic-static-renderer',
+    profile_mode:handbuiltIds.has(b.id) ? 'static-hand-page' : 'missing-static-hand-page',
     shard:`/data/profiles/${profileShard(b.id)}.json`,
     archive_page:directoryPageRoute(Math.floor(index / DIRECTORY_PAGE_SIZE) + 1),
     category_url:`/category/${b.category_slug}/`,
@@ -516,7 +625,7 @@ function crawlBudgetReport(report, businesses){
     business_sitemap_chunks:businessSitemapChunks,
     sitemap_files:['sitemap-index.xml','sitemap-pages.xml', ...Array.from({length:businessSitemapChunks}, (_,i)=>`sitemap-business-${i+1}.xml`)],
     crawl_policy:'Use split sitemaps and paginated archives. Keep full dataset in JSON/CSV exports; do not render 26k+ cards on one page.',
-    profile_routing:'Pre-render the first STATIC_PROFILE_LIMIT profiles and route all /business/* URLs through the scalable profile renderer fallback.'
+    profile_routing:'Business URLs publish only from src/handbuilt-pages/<business-id>/index.html. No generated /business/* renderer fallback is allowed.'
   };
 }
 function adminBulkActionsCsv(actionPackets){
@@ -1416,7 +1525,7 @@ function homePage(businesses, facets, report){
   <section class="section glass"><div class="section-head"><div><p class="eyebrow">Marketplace</p><h2>Featured businesses</h2></div><a class="btn small" href="/directory/">View all</a></div><div class="cards">${(featured.length ? featured : newest).map(miniBusinessCard).join('')}</div></section>
   <section class="split-grid"><div class="glass section"><div class="section-head"><div><p class="eyebrow">Category hubs</p><h2>Browse by service lane</h2></div></div><div class="tile-grid">${facets.categories.map(c => categoryCard(c, businesses)).join('')}</div></div><div class="glass section"><div class="section-head"><div><p class="eyebrow">City hubs</p><h2>Browse by location</h2></div></div><div class="tile-grid">${facets.cities.map(c => cityCard(c, businesses)).join('')}</div></div></section>
   <section class="section glass pipeline"><p class="eyebrow">Operator workflow</p><h2>Scrape outside → drop files → redeploy → pages appear.</h2><div class="pipeline-grid"><div><strong>1. Export</strong><p>Collect outside business data as CSV or JSON.</p></div><div><strong>2. Seed</strong><p>Place batches in <code>seed/businesses/inbox/</code>.</p></div><div><strong>3. Build</strong><p>Run <code>npm run build</code> or let Netlify do it.</p></div><div><strong>4. Publish</strong><p>The directory, business pages, hubs, sitemap, and search index update.</p></div></div></section>`;
-  return pageWrap({ title:'Valley Verified Network Platform', description:'Seed-powered Phoenix business discovery platform with generated business profiles, city hubs, category hubs, and operator import tools.', canonical:`${SITE_URL}/`, bodyClass:'home-page' }, body);
+  return pageWrap({ title:'Valley Verified Network Platform', description:'Seed-powered Phoenix business discovery platform with static business profiles, city hubs, category hubs, and operator import tools.', canonical:`${SITE_URL}/`, bodyClass:'home-page' }, body);
 }
 function directoryShell({ businesses, facets, title='Business Directory', eyebrow='Live marketplace', description='Search and filter seeded Phoenix-area business listings.', canonical=`${SITE_URL}/directory/`, routeFilter = {} }){
   const visible = visibleBusinessList(businesses);
@@ -1430,37 +1539,9 @@ function directoryShell({ businesses, facets, title='Business Directory', eyebro
       <div class="tag-cloud" data-tag-cloud>${facets.tags.slice(0,32).map(t=>`<button class="chip" data-tag="${html(t)}">${html(t)}</button>`).join('')}</div>
       <div class="button-row"><button class="btn" data-reset>Reset</button><button class="btn" data-use-location>Use my location</button></div><p class="muted tight">Location stays in the browser and is only used for distance sorting.</p>
     </aside>
-    <section class="results glass"><div class="section-head"><div><p class="eyebrow">Results</p><h2 id="resultsTitle">Seeded business profiles</h2></div><span class="stat-pill" data-visible-count>${visible.length} shown</span></div>${scalableNotice(businesses.length, visible.length)}<div id="cards" class="cards">${visible.map(miniBusinessCard).join('')}</div><div id="empty" class="empty hidden"><h3>No listings match this rendered page.</h3><p>Clear filters, open a generated business route from the sitemap, or use the full JSON/CSV exports for every seeded record.</p></div></section>
+    <section class="results glass"><div class="section-head"><div><p class="eyebrow">Results</p><h2 id="resultsTitle">Seeded business profiles</h2></div><span class="stat-pill" data-visible-count>${visible.length} shown</span></div>${scalableNotice(businesses.length, visible.length)}<div id="cards" class="cards">${visible.map(miniBusinessCard).join('')}</div><div id="empty" class="empty hidden"><h3>No listings match this rendered page.</h3><p>Clear filters, open a business route from the sitemap, or use the full JSON/CSV exports for every seeded record.</p></div></section>
   </section>`;
   return pageWrap({ title:`${title} | Valley Verified`, description, canonical, bodyClass:'directory-page' }, body);
-}
-
-function businessStructuredData(b){
-  return { '@context':'https://schema.org', '@type':'LocalBusiness', name:b.name, description:b.description, telephone:b.phone || undefined, email:b.email || undefined, url:`${SITE_URL}/business/${b.id}/`, sameAs:[b.website,b.media?.instagram,b.media?.tiktok,b.media?.youtube].filter(Boolean), address:{ '@type':'PostalAddress', streetAddress:b.address || undefined, addressLocality:b.city || 'Phoenix', addressRegion:b.state || 'AZ', postalCode:b.zip || undefined, addressCountry:'US' }, geo:b.location ? { '@type':'GeoCoordinates', latitude:b.location.lat, longitude:b.location.lng } : undefined, priceRange:b.starting_price ? priceLabel(b) : undefined };
-}
-function businessCommandCenter(b){
-  return `<section class="command-center business-page-command" data-skye-component="app-first-command-center"><div class="command-center__copy"><p>BUSINESS VISIBILITY CONSOLE</p><h1>${html(b.name)} page console</h1><span>Business page, owner claim path, featured placement, sharing, and optional growth.</span></div><div class="command-center__surface"><header><div><strong>${html(b.name)} visibility console</strong><span>Business page / claim path / optional growth</span></div><a class="btn small primary" href="/claim/?business=${html(b.id)}">Claim this page</a></header><div class="command-center__grid"><aside class="command-rail"><a class="active" href="#landing" data-skye-tab="landing">Landing</a><a href="#claim" data-skye-tab="claim">Claim</a><a href="#upgrade" data-skye-tab="upgrade">Upgrade</a></aside><main><div class="status-grid"><article><i class="status-icon"></i><span>Market</span><strong>${html(b.city || 'Arizona')}</strong></article><article><i class="status-icon"></i><span>Lane</span><strong>${html(b.category || 'Business')}</strong></article><article><i class="status-icon"></i><span>Page</span><strong>Public landing</strong></article><article><i class="status-icon"></i><span>Gift</span><strong>Free page, optional upgrades</strong></article></div><section class="console-card" data-skye-panel="landing"><p>Page control</p><h2>A public page buyers can actually use.</h2><div class="check-list"><span>Request, call, email, website, save, share, and compare actions stay one click away.</span><span>Market, service lane, contact paths, and current data confidence are visible.</span><span>The page is shareable and connected back to the business website or live app.</span></div></section><section class="console-card hidden" data-skye-panel="claim"><p>Owner path</p><h2>Claim, correct, and improve this listing.</h2><div class="check-list"><span>Owners can submit corrections, proof, and better contact details.</span><span>The public route stays attached to one canonical business page.</span><span>Verification claims are reviewed before stronger trust language appears.</span></div></section><section class="console-card hidden" data-skye-panel="upgrade"><p>Optional path</p><h2>Verification, placement, and lead routing only when wanted.</h2><div class="check-list"><span>The included public page remains useful without any extra purchase.</span><span>Featured placement gives market visibility in real city and service lanes.</span><span>Lead routing, sponsor lanes, and managed growth are optional paid products.</span></div></section></main></div></div></section>`;
-}
-function businessPage(b, related){
-  const social = [ ['Website', b.website], ['Instagram', b.media?.instagram], ['TikTok', b.media?.tiktok], ['YouTube', b.media?.youtube] ].filter(([,url])=>url);
-  const hours = ['mon','tue','wed','thu','fri','sat','sun'].map(day => `<div><strong>${day.toUpperCase()}</strong><span>${html(b.hours?.[day] || 'Not listed')}</span></div>`).join('');
-  const contactLinks = `${b.phone ? `<a href="tel:${phoneDigits(b.phone)}"><strong>Phone</strong><span>${html(b.phone)}</span></a>` : ''}${b.email ? `<a href="mailto:${html(b.email)}"><strong>Email</strong><span>${html(b.email)}</span></a>` : ''}${b.website ? `<a href="${html(b.website)}" target="_blank" rel="noopener"><strong>Website</strong><span>${html(displayUrl(b.website))}</span></a>` : ''}${b.booking_url ? `<a href="${html(b.booking_url)}" target="_blank" rel="noopener"><strong>Booking</strong><span>${html(displayUrl(b.booking_url))}</span></a>` : ''}`;
-  const serviceTags = [...(b.tags || []), ...(b.languages || []).map(l=>`${l} speaking`)].slice(0, 18);
-  const marketLine = [b.neighborhood, b.city, b.state, b.zip].filter(Boolean).join(' • ');
-  const trustCopy = b.claim_status === 'claimed' || b.claim_status === 'verified'
-    ? 'This listing has owner activity in the current data model. Keep checking contact details before booking.'
-    : 'This is a seeded public landing. The owner can claim it, correct it, add proof, and request optional exposure after review.';
-  const body = `<section class="business-landing-hero"><div><a class="back-link" href="/directory/">Directory</a><p class="eyebrow">${html(b.city)} ${html(b.category)} webpage</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">${html(b.name)}</h1><p class="business-landing-copy">${html(b.description || `${b.name} has a public Valley Verified landing for ${b.category || 'local services'} in ${b.city || 'Arizona'}.`)}</p>${badgeHtml(b, true)}<div class="hero-actions"><a class="btn primary" href="/request/?business=${html(b.id)}">Request quote</a><a class="btn" href="/claim/?business=${html(b.id)}">Claim / update</a>${b.website ? `<a class="btn" href="${html(b.website)}" target="_blank" rel="noopener">Visit website</a>` : ''}<button class="btn" data-save-business data-business-id="${html(b.id)}" data-business-name="${html(b.name)}" data-url="/business/${html(b.id)}/">Save shortlist</button></div></div><aside class="landing-panel"><p class="eyebrow">Public landing receipt</p><div class="hero-card"><div class="metric"><span>${html(Math.round(Number(b.verification_score || 0)))}</span><small>profile score</small></div><div class="metric"><span>${html(priceLabel(b))}</span><small>pricing signal</small></div></div><div class="landing-list"><div><strong>Market</strong><span>${html(marketLine || 'Arizona')}</span></div><div><strong>Category</strong><span>${html([b.category,b.subcategory || b.niche].filter(Boolean).join(' / '))}</span></div><div><strong>Claim path</strong><span>Owners can correct, enrich, verify, and promote this page.</span></div></div></aside></section>
-  <section class="landing-proof-strip"><div><strong>${html(b.city || 'AZ')}</strong><span>local market</span></div><div><strong>${html(b.category || 'Business')}</strong><span>service lane</span></div><div><strong>${html(formatDate(b.last_verified))}</strong><span>last data pass</span></div><div><strong>One</strong><span>canonical business page</span></div></section>
-  ${businessCommandCenter(b)}
-  <section class="business-webpage-grid"><article class="glass section"><p class="eyebrow">Business webpage</p><h2>A useful page for buyers, not a thin listing.</h2><p class="business-story">We give ${html(b.name)} a public landing page that can be shared, claimed, corrected, and improved. Buyers get the contact path, service context, market location, proof status, and request actions in one place. Existing businesses can use the free page as visibility with no obligation, then add verification, placement, lead routing, sponsor inventory, or managed growth only when they want more reach.</p><div class="tag-list big-tags">${serviceTags.length ? serviceTags.map(t=>`<span>${html(t)}</span>`).join('') : `<span>${html(b.category || 'Local business')}</span><span>${html(b.city || 'Arizona')}</span>`}</div></article>
-  <article class="glass section"><p class="eyebrow">Contact</p><h2>Reach ${html(b.name)}</h2><div class="contact-list">${contactLinks || '<div><strong>Contact</strong><span>Contact fields need enrichment or owner claim.</span></div>'}</div><div class="button-row profile-tools"><button class="btn" data-vcard='${html(JSON.stringify({ name:b.name, phone:b.phone, email:b.email, website:b.website, address:b.address, city:b.city, state:b.state, zip:b.zip, description:b.description }))}'>Download vCard</button><button class="btn" data-copy-profile>Copy page link</button><a class="btn" href="/compare/?ids=${html(b.id)}">Compare</a></div></article></section>
-  <section class="business-webpage-grid"><article class="glass section"><p class="eyebrow">Trust and data honesty</p><h2>What Valley Verified can say today</h2><p class="muted">${html(trustCopy)}</p><div class="policy-list"><div><strong>Fees</strong><span>${html(b.policies?.fees_transparency || b.price_note || 'Confirm directly before booking.')}</span></div><div><strong>Cancellation</strong><span>${html(b.policies?.cancellation || 'Not listed')}</span></div><div><strong>Deposit</strong><span>${html(b.policies?.deposit || 'Not listed')}</span></div></div></article>
-  <article class="glass section"><p class="eyebrow">Location and availability</p><h2>${html([b.city,b.state].filter(Boolean).join(', ') || 'Arizona')}</h2><p class="muted">${html([b.address,b.neighborhood,b.city,b.state,b.zip].filter(Boolean).join(' • ') || 'Address not listed')}</p><div class="map-card">${b.location ? `<span>${b.location.lat.toFixed(4)}, ${b.location.lng.toFixed(4)}</span>` : '<span>No coordinates supplied</span>'}</div><div class="hours">${hours}</div></article></section>
-  <section class="business-webpage-grid"><article class="glass section upgrade-panel"><p class="eyebrow">Included with MetrAIyux 0S</p><h2>Our gift after the first month.</h2><p class="muted">We give every qualified customer one public business posting to this network after their first paid month. The free page gives the business a real shareable landing with no obligation; verification, featured placement, lead routing, sponsor lanes, and managed growth are optional upgrades only if wanted.</p><div class="button-row"><a class="btn primary" href="/for-businesses/">Use the business owner path</a><a class="btn" href="/advertise/">Optional exposure products</a></div></article>
-  <article class="glass section"><p class="eyebrow">Source</p><h2>Data lineage</h2><p class="muted">Source file: <code>${html(b.source_file)}</code></p><p class="muted">Source hash: <code>${html(b.source_hash)}</code></p><p class="muted">Identity key: <code>${html(b.identity?.primary_key || b.identity_key || b.id)}</code></p>${social.length ? `<div class="button-row">${social.map(([label,url])=>`<a class="btn small" href="${html(url)}" target="_blank" rel="noopener">${html(label)}</a>`).join('')}</div>` : ''}</article></section>
-  ${businessOfferSection(b)}<section class="section glass"><div class="section-head"><div><p class="eyebrow">Related local pages</p><h2>More ${html(b.category)} listings</h2></div><a class="btn small" href="/category/${b.category_slug}/">Open category</a></div><div class="cards">${related.map(miniBusinessCard).join('')}</div></section>`;
-  return pageWrap({ title:`${b.name} | Valley Verified`, description:b.description, canonical:`${SITE_URL}/business/${b.id}/`, type:'profile', bodyClass:'profile-page business-landing-page', structuredData:businessStructuredData(b) }, body);
 }
 
 function offersForBusiness(b){
@@ -1476,43 +1557,6 @@ function offerCard(offer){
   const price = offer.price_label || (offer.price !== null && offer.price !== undefined ? money(offer.price) : 'Quote required');
   return `<article class="business-card offer-card" data-card data-name="${html(lower(offer.title + ' ' + offer.business_name))}" data-category="${html(offer.category)}" data-city="${html(offer.city)}" data-tags="${html(lower([offer.title, offer.description, offer.business_name, offer.category, offer.city].join(' ')))}" data-score="${html(offer.score)}" data-date="" data-featured="0"><div class="card-glow"></div><div class="card-top"><div><p class="eyebrow">${html(offer.city)} • ${html(offer.category)}</p><h3>${html(offer.title)}</h3></div><div class="score"><strong>${html(offer.score)}</strong><small>score</small></div></div><p class="card-desc">${html(offer.description)}</p><div class="mini-grid"><span>${html(price)}</span><span>${html(offer.business_name)}</span><span>${html(offer.terms || 'Confirm final scope')}</span><span>${html(offer.cta || 'Request')}</span></div><div class="card-actions"><a class="btn small primary" href="${html(offer.business_url)}">Open provider</a><a class="btn small" href="/request/?business=${html(offer.business_id)}&offer=${html(offer.id)}">Request offer</a>${offer.booking_url ? `<a class="btn small" href="${html(offer.booking_url)}" target="_blank" rel="noopener">Book / Site</a>` : ''}</div></article>`;
 }
-function businessProfileRendererPage(){
-  const body = `<section class="business-landing-hero" id="profileMount"><div><a class="back-link" href="/directory/">Directory</a><p class="eyebrow">Business webpage</p><h1>Loading public landing...</h1><p class="business-landing-copy">This scalable profile renderer loads a real business landing from the generated Valley Verified network data.</p></div><aside class="landing-panel"><p class="eyebrow">Loading receipt</p><div class="landing-list"><div><strong>Status</strong><span>Finding the matching business record.</span></div></div></aside></section><script>
-  const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const phoneDigits = v => String(v||'').replace(/[^0-9]/g,'').replace(/^1(?=[0-9]{10}$)/,'');
-  const slug = location.pathname.split('/').filter(Boolean)[1] || '';
-  const mount = document.getElementById('profileMount');
-  function priceLabel(b){ return b.starting_price ? '$' + b.starting_price : (b.price_note || 'Confirm pricing'); }
-  function commandCenter(b){
-    return '<section class="command-center business-page-command" data-skye-component="app-first-command-center"><div class="command-center__surface"><header><div><strong>'+escapeHtml(b.name)+' visibility console</strong><span>Business page / claim path / optional growth</span></div><a class="btn small primary" href="/claim/?business='+escapeHtml(b.id)+'">Claim this page</a></header><div class="command-center__grid"><aside class="command-rail"><a class="active" href="#landing" data-skye-tab="landing">Landing</a><a href="#claim" data-skye-tab="claim">Claim</a><a href="#upgrade" data-skye-tab="upgrade">Upgrade</a></aside><main><div class="status-grid"><article><i class="status-icon"></i><span>Market</span><strong>'+escapeHtml(b.city || 'Arizona')+'</strong></article><article><i class="status-icon"></i><span>Lane</span><strong>'+escapeHtml(b.category || 'Business')+'</strong></article><article><i class="status-icon"></i><span>Page</span><strong>Public landing</strong></article><article><i class="status-icon"></i><span>Gift</span><strong>Free page, optional upgrades</strong></article></div><section class="console-card" data-skye-panel="landing"><p>Page control</p><h2>A public page buyers can actually use.</h2><div class="check-list"><span>Request, call, email, website, save, share, and compare actions stay one click away.</span><span>Market, service lane, contact paths, and current data confidence are visible.</span><span>The page is shareable and connected back to the business website or live app.</span></div></section><section class="console-card hidden" data-skye-panel="claim"><p>Owner path</p><h2>Claim, correct, and improve this listing.</h2><div class="check-list"><span>Owner can submit corrections and proof.</span><span>Profile stays attached to one canonical identity.</span><span>Claim review prevents fake verification claims.</span></div></section><section class="console-card hidden" data-skye-panel="upgrade"><p>Optional path</p><h2>Verification, placement, and lead routing only when wanted.</h2><div class="check-list"><span>Verification review improves trust presentation.</span><span>Featured placement gives market visibility.</span><span>Lead routing and sponsor lanes are optional paid products.</span></div></section></main></div></div></section>';
-  }
-  function render(b){
-    document.title = b.name + ' | Valley Verified';
-    const tel = phoneDigits(b.phone);
-    const badges = Object.entries(b.badges || {}).filter(([,v])=>v).map(([k])=>'<span class="badge good">'+escapeHtml(k.replaceAll('_',' '))+'</span>').join('') || '<span class="badge">Provider-supplied data</span>';
-    const actions = (tel?'<a class="btn" href="tel:'+tel+'">Call</a>':'')+(b.email?'<a class="btn" href="mailto:'+escapeHtml(b.email)+'">Email</a>':'')+(b.website?'<a class="btn" target="_blank" rel="noopener" href="'+escapeHtml(b.website)+'">Visit website</a>':'')+'<a class="btn primary" href="/request/?business='+escapeHtml(b.id)+'">Request quote</a><a class="btn" href="/claim/?business='+escapeHtml(b.id)+'">Claim / update</a>';
-    const tags = (b.tags && b.tags.length ? b.tags : [b.category,b.city,'public landing']).filter(Boolean).slice(0,12).map(t=>'<span>'+escapeHtml(t)+'</span>').join('');
-    mount.outerHTML = '<section class="business-landing-hero"><div><a class="back-link" href="/directory/">Directory</a><p class="eyebrow">'+escapeHtml([b.city,b.category,'public business webpage'].filter(Boolean).join(' / '))+'</p><h1 class="neon-gradient-text text-highlighter text-effect-reveal">'+escapeHtml(b.name)+'</h1><p class="business-landing-copy">'+escapeHtml(b.description || (b.name + ' has a Valley Verified public landing for local discovery, owner claim, buyer requests, sharing, and optional exposure support.'))+'</p><div class="badge-row big">'+badges+'</div><div class="action-row">'+actions+'</div></div><aside class="landing-panel"><p class="eyebrow">Landing receipt</p><div class="hero-card"><div class="metric"><span>'+escapeHtml(Math.round(Number(b.verification_score || 0)))+'</span><small>profile score</small></div><div class="metric"><span>'+escapeHtml(b.city || 'AZ')+'</span><small>market</small></div></div><div class="landing-list"><div><strong>Service lane</strong><span>'+escapeHtml(b.category || 'Business')+'</span></div><div><strong>Pricing</strong><span>'+escapeHtml(priceLabel(b))+'</span></div><div><strong>Claim path</strong><span>Owners can correct, enrich, verify, and improve this page.</span></div></div></aside></section><section class="landing-proof-strip"><div><strong>'+escapeHtml(b.city || 'AZ')+'</strong><span>local market</span></div><div><strong>'+escapeHtml(b.category || 'Business')+'</strong><span>service lane</span></div><div><strong>'+escapeHtml(b.last_verified || 'Seeded')+'</strong><span>last data pass</span></div><div><strong>One</strong><span>canonical business page</span></div></section>'+commandCenter(b)+'<section class="business-webpage-grid"><article class="glass section"><p class="eyebrow">Business webpage</p><h2>A real page for this business.</h2><p class="business-story">This page is built to be useful before an owner pays for anything: buyers can request help, compare providers, and see what data is currently known. After a first month with MetrAIyux 0S, qualified customers can receive one free public business posting to this network with no obligation to upgrade.</p><div class="tag-list big-tags">'+tags+'</div></article><article class="glass section"><p class="eyebrow">Contact and trust</p><h2>Use or improve this landing.</h2><div class="contact-list">'+(tel?'<a href="tel:'+tel+'"><strong>Phone</strong><span>'+escapeHtml(b.phone)+'</span></a>':'')+(b.email?'<a href="mailto:'+escapeHtml(b.email)+'"><strong>Email</strong><span>'+escapeHtml(b.email)+'</span></a>':'')+(b.website?'<a href="'+escapeHtml(b.website)+'" target="_blank" rel="noopener"><strong>Website</strong><span>'+escapeHtml(b.website)+'</span></a>':'')+'<a href="/claim/?business='+escapeHtml(b.id)+'"><strong>Owner path</strong><span>Claim, correct, and improve the page.</span></a></div></article></section><section class="business-webpage-grid"><article class="glass section upgrade-panel"><p class="eyebrow">Optional upgrades</p><h2>The free page stands on its own.</h2><p class="muted">Verification, featured placement, lead routing, sponsor inventory, and managed growth can be added after the free landing is useful and only if the owner wants more reach.</p><div class="button-row"><a class="btn primary" href="/advertise/">Optional exposure products</a><a class="btn" href="/for-businesses/">Business owner path</a></div></article><article class="glass section"><p class="eyebrow">Source metadata</p><h2>Seeded profile record</h2><div class="policy-list"><div><strong>Identity key</strong><span>'+escapeHtml(b.identity?.primary_key || b.id)+'</span></div><div><strong>Address</strong><span>'+escapeHtml([b.address,b.city,b.state,b.zip].filter(Boolean).join(' • ') || 'Address not listed')+'</span></div><div><strong>Canonical route</strong><span>/business/'+escapeHtml(b.id)+'/</span></div></div></article></section>';
-  }
-  const recordsFrom = data => data.businesses || data.records || [];
-  const showMissing = () => { mount.innerHTML = '<div><a class="back-link" href="/directory/">← Directory</a><p class="eyebrow">404</p><h1>Business not found.</h1><p class="hero-text">This profile id was not found in the current seed export.</p></div>'; };
-  const showError = () => { mount.innerHTML = '<div><p class="eyebrow">Error</p><h1>Profile data failed to load.</h1><p class="hero-text">Check /data/businesses.json.</p></div>'; };
-  const renderPayload = data => {
-    const b = recordsFrom(data).find(x => x.id === slug);
-    if(!b){ showMissing(); return; }
-    render(b);
-  };
-  const shard = (slug.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0,2) || 'xx');
-  fetch('/data/profiles/' + shard + '.json').then(r=>r.ok ? r.json() : Promise.reject(new Error('missing profile shard'))).then(data=>{
-    const b = recordsFrom(data).find(x => x.id === slug);
-    if(!b) return Promise.reject(new Error('missing profile in shard'));
-    render(b);
-  }).catch(()=>fetch('/data/businesses.json').then(r=>r.ok ? r.json() : Promise.reject(new Error('missing compact business data'))).then(renderPayload).catch(showError));
-</script>`;
-  return pageWrap({ title:'Business Profile | Valley Verified', description:'Scalable profile renderer for Valley Verified seeded business landing URLs.', canonical:`${SITE_URL}/business-profile/`, bodyClass:'profile-page business-landing-page' }, body);
-}
-
-
 function exposureProducts(){
   const products = [
     { id:'free-seeded-listing', name:'Free public business landing', audience:'business', price_monthly:0, setup_fee:0, status:'customer_gift', includes:['Canonical public profile page','City/category discovery','Claim/update packet','Basic search placement','One reviewed posting for qualified 0S customers after their first paid month'], requirements:['Public business record, owner-submitted packet, or first-month 0S customer posting credit'], sell_motion:'Lead with the gift: the business gets a useful public landing with no obligation, and trust, placement, routing, or managed growth remain optional only when they want more reach.' },
@@ -1619,7 +1663,7 @@ function productionReadinessGate(report, quality, duplicateClusters, crawlBudget
   const gates = [
     { gate:'Seeded marketplace volume', status:report.records.published >= 1000 ? 'pass':'open', evidence:`${report.records.published} published deduped businesses.` },
     { gate:'Duplicate prevention', status:report.records.exact_merges >= 1 ? 'pass':'warn', evidence:`${report.records.exact_merges} exact duplicate/import collisions merged; ${report.records.possible_duplicates} possible duplicate pairs queued.` },
-    { gate:'Scalable profile routing', status:report.records.profile_mode ? 'pass':'open', evidence:`Profile mode: ${report.records.profile_mode}; static profile sample: ${report.records.static_business_pages}.` },
+    { gate:'Static hand-page routing', status:report.records.missing_static_business_pages === 0 ? 'pass':'open', evidence:`Profile mode: ${report.records.profile_mode}; ${report.records.static_business_pages}/${report.records.static_business_pages_required} hand pages present.` },
     { gate:'Split sitemap/crawl controls', status:crawlBudget.business_sitemap_chunks >= 1 ? 'pass':'open', evidence:`${crawlBudget.business_sitemap_chunks} business sitemap chunk(s), ${crawlBudget.business_archive_pages} archive pages.` },
     { gate:'Admin/operator crawl safety', status:'pass', evidence:'Admin/import/fraud/operator routes are noindex/nofollow and disallowed from robots public crawl paths.' },
     { gate:'Import dry-run and quality reports', status:quality.raw_records === report.records.raw ? 'pass':'open', evidence:`${quality.rejection_candidates.length} rejection candidates exported; source batch ledger generated.` },
@@ -1628,7 +1672,7 @@ function productionReadinessGate(report, quality, duplicateClusters, crawlBudget
     { gate:'Live deployment browser smoke', status:'open', evidence:'Requires deploying the generated dist and testing the real production URL. This build cannot certify live DNS/CDN/browser behavior before deployment.' }
   ];
   const blocking = gates.filter(g => g.status === 'open').map(g=>g.gate);
-  return { updated_at:TODAY, package_status:blocking.length === 1 && blocking[0] === 'Live deployment browser smoke' ? 'production-candidate' : 'not-production-ready', live_production_status:'not-certified-until-live-url-smoke-passes', gates, required_live_checks:['Deploy dist through Netlify/Git build.','Open production URL in browser.','Check homepage, directory filters, at least one static business page, at least one renderer-backed business URL, city/category pages, sitemap-index.xml, robots.txt, and request/claim packet builders.','Confirm admin/operator surfaces are behind upstream auth or at minimum noindex and not publicly promoted.'] };
+  return { updated_at:TODAY, package_status:blocking.length === 1 && blocking[0] === 'Live deployment browser smoke' ? 'production-candidate' : 'not-production-ready', live_production_status:'not-certified-until-live-url-smoke-passes', gates, required_live_checks:['Deploy dist through Netlify/Git build.','Open production URL in browser.','Check homepage, directory filters, static business pages, city/category pages, sitemap-index.xml, robots.txt, and request/claim packet builders.','Confirm admin/operator surfaces are behind upstream auth or at minimum noindex and not publicly promoted.'] };
 }
 function launchPacket(report, claims, readiness){
   return { updated_at:TODAY, launch_position:'Production candidate package, not live-production certified until deployed URL passes smoke.', deploy_folder:'dist', build_commands:['npm run dry-run','npm run build','npm run smoke'], seed_inbox:'seed/businesses/inbox/', public_launch_pages:['/','/directory/','/business/','/category/','/city/','/niche/','/market/','/join/','/pricing/','/trust-network/'], internal_noindex_pages:Array.from(INTERNAL_SURFACE_PATHS), proof_files:['proofs/dry-run-output.txt','proofs/smoke-output.txt','seed-report.json','data/production-readiness.json','data/public-claims-ledger.json'], headline_numbers:{ published_businesses:report.records.published, raw_records:report.records.raw, duplicate_collisions_merged:report.records.exact_merges, platform_routes:report.routes.total, package_status:readiness.package_status }, blocked_public_claims:claims.claims.filter(c=>c.status==='blocked').map(c=>c.claim) };
@@ -2223,7 +2267,7 @@ function internalSurfaceLinks(){ return platformSurfaceLinks().filter(route => i
 function platformPage(businesses, facets, report){
   const body = `<section class="hero glass subhero"><div><p class="eyebrow">Build proof</p><h1>Platform status and route inventory</h1><p class="hero-text">This page documents what the generated platform contains in this build. It is intentionally separate from the public marketplace pages.</p></div><aside class="hero-card"><div class="metric"><span>${businesses.length}</span><small>businesses</small></div><div class="metric"><span>${report.routes.business}</span><small>business pages</small></div><div class="metric"><span>${report.routes.city}</span><small>city pages</small></div><div class="metric"><span>${report.routes.category}</span><small>category pages</small></div></aside></section>
   <section class="platform-strip"><div class="glass proof-card"><span>✓</span><h2>Multi-page shell</h2><p>Generated landing, directory, profile, city, category, niche, duplicate scanner, admin review, operator, data, platform, and 404 surfaces.</p></div><div class="glass proof-card"><span>✓</span><h2>Seed ingestion</h2><p>Loaded ${loadedFiles.length} seed file(s), normalized ${report.records.raw} raw record(s), published ${businesses.length} deduped profile(s), suppressed ${report.records.suppressed} blocked record(s), and flagged ${report.records.possible_duplicates} possible duplicate pair(s).</p></div><div class="glass proof-card"><span>✓</span><h2>Static publishing</h2><p>Generated JSON data, search index, sitemap, robots, manifest, and llms.txt into <code>dist/</code>.</p></div></section>
-  <section class="section glass"><div class="section-head"><div><p class="eyebrow">Route counts</p><h2>Generated surfaces</h2></div><span class="stat-pill">${report.routes.total} total</span></div><div class="table-wrap"><table><tbody>${Object.entries(report.routes).map(([k,v])=>`<tr><th>${html(k)}</th><td>${html(v)}</td></tr>`).join('')}</tbody></table></div></section>
+  <section class="section glass"><div class="section-head"><div><p class="eyebrow">Route counts</p><h2>Published surfaces</h2></div><span class="stat-pill">${report.routes.total} total</span></div><div class="table-wrap"><table><tbody>${Object.entries(report.routes).map(([k,v])=>`<tr><th>${html(k)}</th><td>${html(v)}</td></tr>`).join('')}</tbody></table></div></section>
   <section class="split-grid"><div class="glass section"><p class="eyebrow">Seed files</p><h2>Loaded inputs</h2><ul class="file-list">${loadedFiles.map(f=>`<li><code>${html(f)}</code></li>`).join('')}</ul></div><div class="glass section"><p class="eyebrow">Warnings</p><h2>Build notes</h2>${warnings.length ? `<ul class="file-list">${warnings.map(w=>`<li>${html(w)}</li>`).join('')}</ul>` : '<p class="muted">No build warnings.</p>'}</div></section>
   <section class="section glass"><p class="eyebrow">Activation path</p><h2>How new scraped businesses go live</h2><div class="pipeline-grid"><div><strong>Seed folder</strong><p><code>seed/businesses/inbox/</code></p></div><div><strong>Build command</strong><p><code>npm run build</code></p></div><div><strong>Verification</strong><p><code>npm run smoke</code></p></div><div><strong>Publish folder</strong><p><code>dist</code></p></div></div></section>`;
   return pageWrap({ title:'Platform Status | Valley Verified', description:'Valley Verified platform build status, generated route inventory, seed file ledger, and proof notes.', canonical:`${SITE_URL}/platform/`, bodyClass:'platform-page' }, body);
@@ -2255,8 +2299,6 @@ function notFoundPage(){
   const body = `<section class="error-shell glass"><p class="eyebrow">404</p><h1>Route not found.</h1><p class="muted">This platform generates static business, city, category, directory, data, platform, and operator pages. Use the directory to find a published profile.</p><div class="hero-actions"><a class="btn primary" href="/directory/">Open directory</a><a class="btn" href="/">Go home</a></div></section>`;
   return pageWrap({ title:'404 | Valley Verified', description:'Route not found.', canonical:`${SITE_URL}/404.html`, bodyClass:'error-page' }, body);
 }
-function redirectsFile(){ return `/business/* /business-profile/ 200
-`; }
 function sitemap(routes){ return sitemapDocument(routes); }
 function manifest(){ return JSON.stringify({ name:'Valley Verified Network', short_name:'Valley Verified', start_url:'/', display:'standalone', background_color:'#f5efe3', theme_color:'#f5efe3', icons:[{ src:'/assets/valley-verified-logo.png', sizes:'1024x1024', type:'image/png', purpose:'any' }] }, null, 2); }
 function valleyRuntimeDecision(){
@@ -2301,7 +2343,7 @@ function robots(){
   const disallow = Array.from(INTERNAL_SURFACE_PATHS).sort().map(route => `Disallow: ${route}`).join('\n');
   return `User-agent: *\nAllow: /\n${disallow}\nSitemap: ${SITE_URL}/sitemap-index.xml\nSitemap: ${SITE_URL}/sitemap.xml\n`;
 }
-function llms(report){ return `# Valley Verified Network\n\nValley Verified is a seed-driven Phoenix-area business discovery platform.\n\nGenerated surfaces in this build:\n- ${report.records.published} business profiles\n- ${report.routes.city} city hubs\n- ${report.routes.category} category hubs\n- Directory, category hubs, city/category market pages, niche hubs, offer marketplace, match engine, coverage scanner, outreach desk, sponsor inventory, export vault, map board, submit intake, buyer request, claim packet, duplicate scanner, admin review queue, import dry run, canonical routing, crawl control, verification protocol, owner verification packets, fraud defense, lead routing, lifecycle queue, category opportunity index, monetization readiness, static API endpoints, pricing/exposure products, business owner join page, AE command center, activation pipeline, territory plan, revenue readiness model, sales playbook, trust network page, insights, operator import console, data pipeline page, backend action contracts, owner CRM, AE work orders, lead inbox queues, platform status page\n\nSeed workflow: add CSV/JSON scrape files to seed/businesses/inbox/ and run npm run build.\n`; }
+function llms(report){ return `# Valley Verified Network\n\nValley Verified is a seed-driven Phoenix-area business discovery platform.\n\nPublished static surfaces in this build:\n- ${report.records.published} static business profile pages\n- ${report.routes.city} city hubs\n- ${report.routes.category} category hubs\n- Directory, category hubs, city/category market pages, niche hubs, offer marketplace, match engine, coverage scanner, outreach desk, sponsor inventory, export vault, map board, submit intake, buyer request, claim packet, duplicate scanner, admin review queue, import dry run, canonical routing, crawl control, verification protocol, owner verification packets, fraud defense, lead routing, lifecycle queue, category opportunity index, monetization readiness, static API endpoints, pricing/exposure products, business owner join page, AE command center, activation pipeline, territory plan, revenue readiness model, sales playbook, trust network page, insights, operator import console, data pipeline page, backend action contracts, owner CRM, AE work orders, lead inbox queues, platform status page\n\nSeed workflow: add CSV/JSON scrape files to seed/businesses/inbox/ and run npm run build.\n`; }
 async function main(){
   const raw = await readSeedRecords();
   const suppressions = await readSuppressions();
@@ -2323,10 +2365,12 @@ async function main(){
   const aliases = canonicalAliases(businesses);
   const suppressTemplate = suppressionTemplate(businesses, identityAudit);
   const actionPackets = adminActionPackets(businesses, identityAudit);
-  const canonicalRouting = canonicalRoutingIndex(businesses, Math.min(STATIC_PROFILE_LIMIT, businesses.length));
+  const handbuiltIds = await handbuiltPageIdSet();
+  const staticHandPageCount = businesses.filter(b => handbuiltIds.has(b.id)).length;
+  const canonicalRouting = canonicalRoutingIndex(businesses, handbuiltIds);
   const fieldMap = seedFieldMap();
   const dryRun = importDryRunReport(raw, businesses, identityAudit, quality, posterRisk);
-  const report = { updated_at:TODAY, site_url:SITE_URL, files:{ loaded:loadedFiles.length, loaded_files:loadedFiles }, records:{ raw:raw.length, published:businesses.length, merged_or_duplicates:raw.length - businesses.length, suppressed:identityAudit.suppressed.length, possible_duplicates:identityAudit.possible_duplicates.length, exact_merges:identityAudit.exact_merges.length, import_rejection_candidates:quality.rejection_candidates.length, poster_risk_records:posterRisk.length, static_business_pages:Math.min(STATIC_PROFILE_LIMIT, businesses.length), profile_mode:businesses.length > STATIC_PROFILE_LIMIT ? 'hybrid-static-plus-renderer' : 'full-static' }, facets:{ categories:facets.categories.length, cities:facets.cities.length, tags:facets.tags.length, markets:markets.length, coverage_gaps:coverage.length }, routes:{ home:1, directory:1, business_index:1, business:businesses.length, category_index:1, category:facets.categories.length, city_index:1, city:facets.cities.length, niche_index:1, niche:facets.niches.length, market_index:1, market:markets.length, collection_index:1, collection:collections.length, shortlist:1, compare:1, match:1, lead_routing:1, deal_desk:1, offers:1, map:1, submit:1, request:1, claim:1, owner_verification:1, lifecycle:1, insights:1, audit:1, coverage:1, opportunities:1, outreach:1, sponsor:1, monetization:1, exports:1, admin_review:1, admin_actions:1, admin_batch:1, import_health:1, accounts:1, pipeline:1, kpi:1, service_lanes:1, dry_run:1, crawl:1, routing:1, verification:1, fraud_defense:1, business_archive:Math.ceil(businesses.length / DIRECTORY_PAGE_SIZE), duplicates:1, api:1, embed:1, operator:1, data:1, platform:1, error:1, total:0 }, warnings };
+  const report = { updated_at:TODAY, site_url:SITE_URL, files:{ loaded:loadedFiles.length, loaded_files:loadedFiles }, records:{ raw:raw.length, published:businesses.length, merged_or_duplicates:raw.length - businesses.length, suppressed:identityAudit.suppressed.length, possible_duplicates:identityAudit.possible_duplicates.length, exact_merges:identityAudit.exact_merges.length, import_rejection_candidates:quality.rejection_candidates.length, poster_risk_records:posterRisk.length, static_business_pages:staticHandPageCount, static_business_pages_required:businesses.length, missing_static_business_pages:businesses.length - staticHandPageCount, profile_mode:'static-hand-pages-required' }, facets:{ categories:facets.categories.length, cities:facets.cities.length, tags:facets.tags.length, markets:markets.length, coverage_gaps:coverage.length }, routes:{ home:1, directory:1, business_index:1, business:businesses.length, category_index:1, category:facets.categories.length, city_index:1, city:facets.cities.length, niche_index:1, niche:facets.niches.length, market_index:1, market:markets.length, collection_index:1, collection:collections.length, shortlist:1, compare:1, match:1, lead_routing:1, deal_desk:1, offers:1, map:1, submit:1, request:1, claim:1, owner_verification:1, lifecycle:1, insights:1, audit:1, coverage:1, opportunities:1, outreach:1, sponsor:1, monetization:1, exports:1, admin_review:1, admin_actions:1, admin_batch:1, import_health:1, accounts:1, pipeline:1, kpi:1, service_lanes:1, dry_run:1, crawl:1, routing:1, verification:1, fraud_defense:1, business_archive:Math.ceil(businesses.length / DIRECTORY_PAGE_SIZE), duplicates:1, api:1, embed:1, operator:1, data:1, platform:1, error:1, total:0 }, warnings };
   Object.assign(report.routes, { join:1, pricing:1, ae_command:1, activation:1, territories:1, revenue:1, sales_playbook:1, trust_network:1, production_readiness:1, claims_ledger:1, launch_packet:1, backend:1, action_queue:1, lead_inbox:1, owner_crm:1, ae_work_orders:1, runtime_state:1, db_contracts:1, approval_flow:1 });
   report.routes.total = Object.entries(report.routes).filter(([k])=>k!=='total').reduce((sum,[,v])=>sum+v,0);
   const crawlBudget = crawlBudgetReport(report, businesses);
@@ -2380,6 +2424,18 @@ async function main(){
   await copyFile(path.join(SRC, 'valley-verified-logo.png'), path.join(DIST, 'assets', 'valley-verified-logo.png'));
   await writeFile(path.join(DIST, 'embed', 'businesses.js'), embedScript());
   await writeFile(path.join(DIST, 'data', 'businesses.json'), JSON.stringify({ updated_at:TODAY, businesses, facets }));
+  await writeFile(path.join(DIST, 'data', 'static-page-policy.json'), JSON.stringify({
+    updated_at:TODAY,
+    active:'custom-static-pages-only',
+    generated_profile_pages_enabled:false,
+    deleted_generator:'scripts/v21-enhance.mjs',
+    options:[{
+      id:'custom-static-pages-only',
+      default:true,
+      note:'Business pages publish only from committed src/handbuilt-pages/<business-id>/index.html files. Missing custom pages fail the build; no generated company-page fallback is allowed.'
+    }]
+  }));
+  await writeFile(path.join(DIST, 'data', 'skyemail-provisioning.json'), JSON.stringify(skyEmailProvisioningModel(businesses)));
   const profileShards = new Map();
   for(const b of businesses){ const shard = profileShard(b.id); if(!profileShards.has(shard)) profileShards.set(shard, []); profileShards.get(shard).push(b); }
   await mapLimit(Array.from(profileShards.entries()), 32, async ([shard, rows]) => writeFile(path.join(DIST, 'data', 'profiles', `${shard}.json`), JSON.stringify({ updated_at:TODAY, shard, businesses:rows })));
@@ -2453,6 +2509,14 @@ async function main(){
   await writeFile(path.join(DIST, 'data', 'neon-schema.sql'), dbContracts.neon_sql);
   await writeFile(path.join(DIST, 'data', 'ae-call-queue.csv'), aeCallQueueCsv(territory.call_queue));
   await writeFile(path.join(DIST, 'api', 'businesses.json'), JSON.stringify({ updated_at:TODAY, businesses:businesses.map(compactBusinessRecord), count:businesses.length }));
+  await writeFile(path.join(DIST, 'api', 'skyemail-provisioning.json'), JSON.stringify({
+    updated_at:TODAY,
+    count:businesses.length,
+    seats_remaining:SKYEMAIL_SEATS_REMAINING,
+    reorder_threshold:SKYEMAIL_REORDER_THRESHOLD,
+    href:'/data/skyemail-provisioning.json',
+    workspace_confirmation_recipients:WORKSPACE_CONFIRMATION_RECIPIENTS
+  }));
   await writeFile(path.join(DIST, 'api', 'search-index.json'), JSON.stringify({ updated_at:TODAY, records:searchIndex }));
   await writeFile(path.join(DIST, 'api', 'categories.json'), JSON.stringify({ updated_at:TODAY, categories:facets.categories.map(name=>({ name, slug:slugify(name), count:businesses.filter(b=>b.category===name).length })) }));
   await writeFile(path.join(DIST, 'api', 'cities.json'), JSON.stringify({ updated_at:TODAY, cities:facets.cities.map(name=>({ name, slug:slugify(name), count:businesses.filter(b=>b.city===name).length })) }));
@@ -2551,8 +2615,6 @@ async function main(){
   await writeFile(writePathFor('/data/'), dataPage(report));
   await writeFile(writePathFor('/operator/'), operatorPage());
   await writeFile(path.join(DIST, '404.html'), notFoundPage());
-  await writeFile(writePathFor('/business-profile/'), businessProfileRendererPage());
-  await writeFile(path.join(DIST, '_redirects'), redirectsFile());
 
   const relatedBuckets = new Map();
   const byId = new Map(businesses.map(b => [b.id, b]));
@@ -2570,12 +2632,8 @@ async function main(){
       .slice(0, 4);
   }
   const businessRoutes = businesses.map(b => `/business/${b.id}/`);
-  const staticBusinesses = businesses.slice(0, Math.min(STATIC_PROFILE_LIMIT, businesses.length));
   routes.push(...businessRoutes);
-  await mapLimit(staticBusinesses, 64, async (b) => {
-    const related = relatedFor(b);
-    await writeFile(writePathFor(`/business/${b.id}/`), businessPage(b, related));
-  });
+  await copyCustomBusinessPages(businesses);
   const archivePages = chunkArray(businesses, DIRECTORY_PAGE_SIZE);
   for(let i = 0; i < archivePages.length; i++){
     const route = directoryPageRoute(i + 1); routes.push(route);
@@ -2589,7 +2647,7 @@ async function main(){
   for(const city of facets.cities){
     const subset = businesses.filter(b => b.city === city);
     const route = `/city/${slugify(city)}/`; routes.push(route);
-    await writeFile(writePathFor(route), directoryShell({ businesses:subset, facets, title:`${city} Business Hub`, eyebrow:'City hub', description:`Browse Valley Verified businesses serving ${city}, Arizona with generated profile pages, category filters, and contact actions.`, canonical:`${SITE_URL}${route}`, routeFilter:{ city } }));
+    await writeFile(writePathFor(route), directoryShell({ businesses:subset, facets, title:`${city} Business Hub`, eyebrow:'City hub', description:`Browse Valley Verified businesses serving ${city}, Arizona with static business pages, category filters, and contact actions.`, canonical:`${SITE_URL}${route}`, routeFilter:{ city } }));
   }
   for(const niche of facets.niches){
     const route = `/niche/${niche.slug}/`; routes.push(route);

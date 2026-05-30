@@ -4,9 +4,17 @@ compatibility_date = "2026-05-16"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 [assets]
 directory = "cf-assets"
 binding = "ASSETS"
+run_worker_first = true
+
+[[services]]
+binding = "SKYGATEFS27_WORKER"
+service = "skyegatefs27-citadeldb"
 
 [vars]
 SKYGATE_SOURCE_APP = "skymail"
@@ -14,6 +22,7 @@ SKYMAIL_DB_SCHEMA = "skymail"
 MAILBOX_PROVIDER = "zoho"
 MAIL_FROM_FALLBACK_NAME = "SkyeMail"
 INBOUND_PROVIDER = "resend"
+SKYMAIL_OWNER_EMAIL = "grayskyes@solenterprises.org"
 
 # Put real values in Cloudflare secrets, not in this file:
 # wrangler secret put NEON_DATABASE_URL

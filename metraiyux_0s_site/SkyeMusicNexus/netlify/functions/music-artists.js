@@ -32,9 +32,9 @@ function loadArtists() {
   const file = artistsFile();
   ensureFile(file, []);
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
+    return mergeFoundingArtists(JSON.parse(fs.readFileSync(file, 'utf8')));
   } catch {
-    return [];
+    return mergeFoundingArtists([]);
   }
 }
 
@@ -60,6 +60,144 @@ function makeId() {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+const WORKFORCE_COMMAND_URL = '/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel';
+const WORKFORCE_PACKET_URL = '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html';
+const CONNECTLOG_URL = '/connectlog-v7.7-relay13-operator-proof/app.html';
+const RELAY13_INBOX_URL = '/connectlog-v7.7-relay13-operator-proof/relay13-inbox.html';
+
+function slugify(value, fallback = 'new-artist') {
+  return String(value || fallback).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90) || fallback;
+}
+
+function skyePayRef(artistId) {
+  return `skyepay_artist_${slugify(artistId || 'artist', 'artist')}`;
+}
+
+function artistLinkSlug(artist) {
+  return slugify(artist && (artist.slug || artist.name || artist.artistId || artist.id || artist.skyeId || artist.email), 'new-artist');
+}
+
+function workforcePacketUrl(artist) {
+  return `${WORKFORCE_PACKET_URL}?source=SkyeMusicNexus&artist=${encodeURIComponent(artistLinkSlug(artist))}`;
+}
+
+function paperworkComplete(artist) {
+  return ['complete', 'completed', 'approved', 'on_file', 'verified'].includes(String(artist && artist.paperwork && artist.paperwork.status || '').toLowerCase());
+}
+
+function paperworkFor(artist = {}) {
+  const existing = artist.paperwork && typeof artist.paperwork === 'object' ? artist.paperwork : {};
+  const status = cleanString(existing.status || 'required', 80).toLowerCase() || 'required';
+  const slug = artistLinkSlug({ ...artist, slug: existing.artistSlug || artist.slug });
+  return {
+    requiredBeforePayout: true,
+    payoutHold: !paperworkComplete({ paperwork: { status } }),
+    status,
+    artistSlug: slug,
+    legalPaymentNotice: 'If paperwork is not completed, this artist cannot legally be paid through SkyePay.',
+    requiredForms: ['artist onboarding packet', 'contractor/vendor agreement', 'tax/payment profile', 'owner payout approval'],
+    workforceFormUrl: existing.workforceFormUrl || workforcePacketUrl({ ...artist, slug }),
+    workforceCommandUrl: existing.workforceCommandUrl || WORKFORCE_COMMAND_URL,
+    grayWorkforceFormUrl: workforcePacketUrl({ slug: 'gray-skyes' }),
+    supaboyWorkforceFormUrl: workforcePacketUrl({ slug: 'supaboy' }),
+    connectLogUrl: existing.connectLogUrl || CONNECTLOG_URL,
+    relay13InboxUrl: existing.relay13InboxUrl || RELAY13_INBOX_URL,
+    payoutHoldReason: existing.payoutHoldReason || 'Paperwork must be completed and owner-approved before external payout release.',
+    acknowledgedAt: existing.acknowledgedAt || '',
+    completedAt: existing.completedAt || '',
+    updatedAt: existing.updatedAt || artist.updatedAt || artist.createdAt || '',
+  };
+}
+
+function communicationsFor(artist = {}) {
+  const existing = artist.communications && typeof artist.communications === 'object' ? artist.communications : {};
+  return {
+    ...existing,
+    connectLog: { ...(existing.connectLog || {}), href: (existing.connectLog && existing.connectLog.href) || CONNECTLOG_URL, label: 'ConnectLog relationship workspace', access: 'artist' },
+    relay13: { ...(existing.relay13 || {}), href: (existing.relay13 && existing.relay13.href) || RELAY13_INBOX_URL, label: 'Relay13 inbox', access: 'artist' },
+  };
+}
+
+function ensureArtistContracts(artist) {
+  const id = artist.artistId || artist.id || artist.skyeId || artist.identityId;
+  artist.id = artist.id || id;
+  artist.artistId = artist.artistId || id;
+  artist.skyeId = artist.skyeId || artist.identityId || id;
+  artist.identityId = artist.identityId || artist.skyeId || id;
+  artist.paperwork = paperworkFor(artist);
+  artist.communications = communicationsFor(artist);
+  artist.skyepay = artist.skyepay && typeof artist.skyepay === 'object' ? artist.skyepay : {};
+  artist.skyepay.trackingRef = artist.skyepay.trackingRef || skyePayRef(id);
+  artist.skyepay.trackingStatus = artist.skyepay.trackingStatus || 'reserved';
+  artist.skyepay.artistIdStrategy = artist.skyepay.artistIdStrategy || 'opaque_artist_reference';
+  artist.skyepay.payoutReview = artist.skyepay.payoutReview === 'owner_review_required_before_release' ? 'paperwork_required_before_payout' : (artist.skyepay.payoutReview || 'paperwork_required_before_payout');
+  artist.skyepay.payoutEligibility = paperworkComplete(artist) ? (artist.skyepay.payoutEligibility === 'blocked_until_paperwork_complete' ? 'owner_review_required' : (artist.skyepay.payoutEligibility || 'owner_review_required')) : 'blocked_until_paperwork_complete';
+  artist.profileEditPolicy = artist.profileEditPolicy && typeof artist.profileEditPolicy === 'object' ? artist.profileEditPolicy : {
+    profileEditWindow: 'launch_setup',
+    selfProfileEditsRemaining: 1,
+    identityLocked: false,
+    paymentFieldsLocked: true,
+    managementChangeBoundary: 'Identity and SkyePay tracking fields require owner review after launch setup because payment records depend on stable artist references.',
+  };
+  return artist;
+}
+
+function foundingArtists() {
+  const createdAt = '2026-05-25T05:45:00.000Z';
+  return [
+    ensureArtistContracts({
+      id: '444666666666',
+      artistId: '444666666666',
+      skyeId: '444666666666',
+      identityId: '444666666666',
+      slug: 'gray-skyes',
+      name: 'Gray Skyes',
+      email: 'graylondonskyes@gmail.com',
+      genre: ['artist', 'founder', 'musicnexus'],
+      bio: 'Founding SkyeMusicNexus artist workspace reserved for launch uploads, drops, artist store, and SkyePay tracking.',
+      status: 'active',
+      tier: 'founding-core-2026-05',
+      provisioned: true,
+      provisionSource: 'skyemusicnexus-founding-core',
+      createdAt,
+      updatedAt: createdAt,
+    }),
+    ensureArtistContracts({
+      id: '444666666667',
+      artistId: '444666666667',
+      skyeId: '444666666667',
+      identityId: '444666666667',
+      slug: 'supaboy',
+      name: 'SupaBoy',
+      email: 'supaboy@skymusicnexus.local',
+      genre: ['artist', 'founding-core', 'musicnexus'],
+      bio: 'Founding SkyeMusicNexus artist workspace reserved for first-song upload, drop packaging, artist store, and SkyePay tracking.',
+      status: 'active',
+      tier: 'founding-core-2026-05',
+      provisioned: true,
+      provisionSource: 'skyemusicnexus-founding-core',
+      createdAt,
+      updatedAt: createdAt,
+    }),
+  ];
+}
+
+function mergeFoundingArtists(artists) {
+  const rows = Array.isArray(artists) ? artists.map((artist) => ensureArtistContracts(artist)) : [];
+  for (const founding of foundingArtists()) {
+    const idx = rows.findIndex((artist) =>
+      artist.id === founding.id ||
+      artist.artistId === founding.artistId ||
+      artist.skyeId === founding.skyeId ||
+      artist.identityId === founding.identityId ||
+      artist.email === founding.email
+    );
+    if (idx === -1) rows.push(founding);
+    else rows[idx] = ensureArtistContracts({ ...founding, ...rows[idx], skyepay: { ...founding.skyepay, ...(rows[idx].skyepay || {}) } });
+  }
+  return rows;
 }
 
 const MAX_PROFILE_PHOTO_CHARS = 1800000;
@@ -124,13 +262,17 @@ function normalizeIdentity(value, fallback = {}) {
 
 function findArtistIndex(artists, id) {
   const normalized = normalizeSkyeId(id);
+  const lower = cleanString(id, 180).toLowerCase();
   return artists.findIndex((artist) =>
     artist.id === id ||
     artist.id === normalized ||
     artist.skyeId === id ||
     artist.skyeId === normalized ||
     artist.identityId === id ||
-    artist.identityId === normalized
+    artist.identityId === normalized ||
+    (artist.artistId && String(artist.artistId).toLowerCase() === lower) ||
+    (artist.email && String(artist.email).toLowerCase() === lower) ||
+    (artist.slug && String(artist.slug).toLowerCase() === lower)
   );
 }
 
@@ -185,17 +327,17 @@ function handleRegister(payload) {
   const existing = artists.find((a) =>
     a.email === normalizedEmail ||
     a.id === artistId ||
+    a.artistId === artistId ||
     (skyeId && a.skyeId === skyeId) ||
     (identityId && a.identityId === identityId)
   );
-  if (existing) {
-    return respond(409, { ok: false, error: `Artist identity "${normalizedEmail || artistId}" already exists` });
-  }
 
-  const artist = {
-    id: artistId,
-    skyeId: skyeId || artistId,
-    identityId: identityId || artistId,
+  const artist = ensureArtistContracts({
+    ...(existing || {}),
+    id: existing ? existing.id : artistId,
+    artistId: existing ? (existing.artistId || existing.id || artistId) : artistId,
+    skyeId: skyeId || existing?.skyeId || artistId,
+    identityId: identityId || existing?.identityId || artistId,
     name: cleanString(name, 180),
     email: normalizedEmail,
     phone: phone ? cleanString(phone, 80) : '',
@@ -209,16 +351,26 @@ function handleRegister(payload) {
       photoName: crossAppIdentity.photoName || (profilePhoto ? profilePhoto.name : ''),
       photoType: crossAppIdentity.photoType || (profilePhoto ? profilePhoto.type : ''),
     },
-    status: 'pending_review',
-    balance: 0,
-    createdAt: nowIso(),
+    paperwork: {
+      ...(existing && existing.paperwork || {}),
+      status: existing && existing.paperwork && existing.paperwork.status || 'required',
+      acknowledgedAt: payload.paperworkAcknowledgedAt || (existing && existing.paperwork && existing.paperwork.acknowledgedAt) || nowIso(),
+    },
+    status: existing?.status || 'pending_review',
+    balance: existing?.balance || 0,
+    createdAt: existing?.createdAt || nowIso(),
     updatedAt: nowIso(),
-  };
+  });
 
-  artists.push(artist);
+  if (existing) {
+    const idx = artists.indexOf(existing);
+    artists[idx] = artist;
+  } else {
+    artists.push(artist);
+  }
   saveArtists(artists);
 
-  return respond(201, { ok: true, artist, artistId: artist.id });
+  return respond(existing ? 200 : 201, { ok: true, artist, artistId: artist.id });
 }
 
 // ---------------------------------------------------------------------------
@@ -283,7 +435,7 @@ function handleUpdate(payload) {
     return respond(404, { ok: false, error: 'Artist not found' });
   }
 
-  const protected_fields = ['id', 'createdAt', 'balance'];
+  const protected_fields = ['id', 'action', 'createdAt', 'balance'];
   const artist = { ...artists[idx] };
 
   for (const [key, value] of Object.entries(fields)) {
@@ -325,6 +477,8 @@ function handleUpdate(payload) {
         photoName: identity.photoName || (artist.profilePhoto ? artist.profilePhoto.name : ''),
         photoType: identity.photoType || (artist.profilePhoto ? artist.profilePhoto.type : ''),
       };
+    } else if (key === 'paperwork') {
+      artist.paperwork = value && typeof value === 'object' ? { ...(artist.paperwork || {}), ...value } : artist.paperwork;
     } else if (key === 'name') {
       artist.name = cleanString(value, 180);
     } else if (key === 'phone') {
@@ -336,11 +490,18 @@ function handleUpdate(payload) {
     }
   }
 
+  if (payload.action === 'complete-profile-setup') {
+    artist.profileEditPolicy = artist.profileEditPolicy || {};
+    artist.profileEditPolicy.initialSetupCompletedAt = artist.profileEditPolicy.initialSetupCompletedAt || nowIso();
+    artist.profileEditPolicy.selfProfileEditsRemaining = Math.max(0, Number(artist.profileEditPolicy.selfProfileEditsRemaining || 1) - 1);
+    artist.profileEditPolicy.identityLocked = payload.lockIdentityAfterSetup !== false;
+  }
+
   artist.updatedAt = nowIso();
-  artists[idx] = artist;
+  artists[idx] = ensureArtistContracts(artist);
   saveArtists(artists);
 
-  return respond(200, { ok: true, artist });
+  return respond(200, { ok: true, artist: artists[idx] });
 }
 
 // ---------------------------------------------------------------------------
@@ -361,6 +522,7 @@ function handleApprove(payload, params) {
 
   artists[idx].status = 'active';
   artists[idx].updatedAt = nowIso();
+  ensureArtistContracts(artists[idx]);
   saveArtists(artists);
 
   return respond(200, { ok: true, artist: artists[idx] });
@@ -381,6 +543,12 @@ module.exports.handler = async (event) => {
       const action = params.action || 'list';
       if (action === 'list') return handleList(params);
       if (action === 'get') return handleGet(params);
+      if (action === 'paperwork') {
+        const artists = loadArtists();
+        const idx = findArtistIndex(artists, params.id || params.artist || 'new-artist');
+        const artist = idx === -1 ? { id: params.id || '', slug: params.artist || 'new-artist' } : artists[idx];
+        return respond(200, { ok: true, artistId: artist.id || artist.artistId || '', paperwork: paperworkFor(artist), communications: communicationsFor(artist) });
+      }
       return respond(400, { ok: false, error: `Unknown GET action: ${action}` });
     }
 
@@ -394,6 +562,7 @@ module.exports.handler = async (event) => {
       const action = payload.action || params.action || '';
       if (action === 'register') return handleRegister(payload);
       if (action === 'approve') return handleApprove(payload, params);
+      if (action === 'update' || action === 'complete-profile-setup') return handleUpdate(payload);
       return respond(400, { ok: false, error: `Unknown POST action: ${action}` });
     }
 

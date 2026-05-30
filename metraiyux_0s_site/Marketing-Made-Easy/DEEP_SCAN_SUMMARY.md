@@ -1,26 +1,27 @@
 # Marketing Made Easy Deep Scan
 
-Generated: `2026-05-20T06:48:31.508Z`
+Generated: `2026-05-30T07:52:22.074Z`
 
 ## Inventory
 
 - Target: `metraiyux_0s_site/Marketing-Made-Easy`
-- Platform folders: `8`
-- Files scanned: `464`
+- Platform folders: `9`
+- Files scanned: `451`
 - MCP receipt: `metraiyux_0s_site/Marketing-Made-Easy/MCP_TOOLING_RECEIPT.json`
 
 ## Platform Folders
 
 | Folder | HTML | JS/MJS | CSS | JSON | MD | Runtime | Smoke scripts |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| `AE-FlowPro` | 8 | 7 | 1 | 2 | 2 | yes | 2 |
-| `BrandID-Offline-PWA` | 8 | 6 | 1 | 6 | 2 | yes | 3 |
-| `BusinessLaunchGo` | 8 | 11 | 2 | 3 | 3 | yes | 2 |
-| `SkyeDocxMax` | 11 | 17 | 1 | 10 | 22 | no | 10 |
+| `AE-FlowPro` | 1 | 6 | 1 | 3 | 2 | yes | 2 |
+| `BrandID-Offline-PWA` | 1 | 7 | 1 | 7 | 2 | yes | 3 |
+| `BusinessLaunchGo` | 1 | 11 | 2 | 4 | 3 | yes | 2 |
+| `SkyeDocxBlog` | 1 | 1 | 1 | 0 | 0 | no | 0 |
+| `SkyeDocxMax` | 11 | 17 | 1 | 11 | 22 | no | 10 |
 | `SkyeWebCreatorMax` | 15 | 17 | 2 | 7 | 11 | yes | 8 |
-| `WebGrowthOperator` | 87 | 4 | 1 | 3 | 9 | no | 0 |
-| `arizona-growth-index` | 43 | 6 | 1 | 1 | 1 | no | 0 |
-| `kAIxUBrandKit` | 8 | 7 | 1 | 3 | 3 | yes | 3 |
+| `WebGrowthOperator` | 88 | 5 | 2 | 6 | 9 | no | 0 |
+| `arizona-growth-index` | 43 | 6 | 1 | 2 | 1 | no | 0 |
+| `kAIxUBrandKit` | 1 | 7 | 1 | 4 | 3 | yes | 3 |
 
 ## Gate Boundary
 

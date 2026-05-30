@@ -3,17 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="MetrAIyux 0S launcher: a browser-native operating shell with dock, windows, app wrapping, command registry, and fullscreen mode.">
+  <meta name="description" content="MetrAIyux 0S Browser: a fullscreen owned-app shell, customer launch path, offer engine, route atlas, and workspace launcher.">
   <meta name="theme-color" content="#03070b">
-  <title>MetrAIyux 0S Launcher</title>
+  <title>MetrAIyux 0S Browser</title>
   <link rel="icon" type="image/png" href="../assets/metraiyux-0s-icon-512.png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./os.css">
 <link rel="stylesheet" href="/assets/css/0s-runtime-truth.css" data-runtime-truth-style><script defer src="/assets/js/0s-runtime-truth.js" data-surface-id="launcher" data-repair-href="/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md#phase-4-ui-truth-layer"></script></head>
-<body>
+<body class="skyesol-living-page launcher-entry-active">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
   <canvas class="os-living-field" id="osLivingField" aria-hidden="true"></canvas>
   <div class="os-scanline" aria-hidden="true"></div>
+  <section class="zero-os-entry" id="zeroOsEntry" aria-label="MetrAIyux 0S entry">
+    <div class="entry-starfield" aria-hidden="true"></div>
+    <button class="entry-logo-button" id="zeroOsEnterButton" type="button" aria-label="Enter MetrAIyux 0S">
+      <span class="entry-logo-rings" aria-hidden="true"></span>
+      <span class="entry-logo-core">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="">
+      </span>
+    </button>
+    <strong class="entry-wordmark">MetrAIyux 0S</strong>
+    <span class="entry-helper">Enter the customer path and owned app browser</span>
+  </section>
   <div class="os-shell" id="osShell">
     <header class="os-menu" aria-label="MetrAIyux 0S system menu">
       <a class="os-brand" href="../index.html" aria-label="MetrAIyux 0S home">
@@ -28,6 +41,7 @@
       <div class="os-menu-actions">
         <button class="icon-button" type="button" id="paletteButton" title="Command palette" aria-label="Command palette"><span aria-hidden="true">/</span></button>
         <button class="icon-button" type="button" id="tileButton" title="Tile windows" aria-label="Tile windows"><span aria-hidden="true">[]</span></button>
+        <button class="icon-button" type="button" id="installOsButton" title="Install 0S Browser" aria-label="Install 0S Browser"><span aria-hidden="true">PWA</span></button>
         <button class="icon-button" type="button" id="fullscreenButton" title="Fullscreen" aria-label="Fullscreen"><span aria-hidden="true">FS</span></button>
         <time id="systemClock" datetime="">00:00</time>
       </div>
@@ -36,15 +50,15 @@
     <main class="os-desktop" id="desktop" aria-label="MetrAIyux 0S desktop">
       <section class="boot-panel" id="bootPanel" aria-label="0S status board">
         <div>
-          <p class="system-label">owner command environment</p>
-          <h1>MetrAIyux 0S Launcher</h1>
-          <p class="boot-line">Desktop shell online. Dock, windows, wrapped apps, command registry, live surfaces, and fullscreen mode are mounted.</p>
+          <p class="system-label">customer launch environment</p>
+          <h1 class="neon-gradient-text">MetrAIyux 0S Browser</h1>
+          <p class="boot-line">Start in the guided path, browse owned apps in fullscreen, and let the offer engine surface the next useful upgrade without making customers hunt.</p>
         </div>
         <div class="boot-metrics" aria-label="System metrics">
-          <button type="button" data-launch="command"><strong id="metricApps">0</strong><span>apps</span></button>
-          <button type="button" data-launch="atlas"><strong id="metricSurfaces">0</strong><span>surfaces</span></button>
-          <button type="button" data-launch="commands"><strong id="metricCommands">0</strong><span>commands</span></button>
-          <button type="button" data-command="fullscreen"><strong>1</strong><span>fullscreen shell</span></button>
+          <button type="button" data-launch="customer-path"><strong>GO</strong><span>start here</span></button>
+          <button type="button" data-launch="browser"><strong>0B</strong><span>app browser</span></button>
+          <button type="button" data-launch="offer-engine"><strong>AD</strong><span>offer engine</span></button>
+          <button type="button" data-command="fullscreen"><strong>FS</strong><span>fullscreen shell</span></button>
         </div>
       </section>
 
@@ -52,12 +66,26 @@
     </main>
 
     <nav class="dock" id="dock" aria-label="MetrAIyux 0S dock"></nav>
+
+    <section class="soundtrack-dock" id="soundtrackDock" aria-label="0S background music">
+      <audio id="soundtrackAudio" preload="none"></audio>
+      <div class="soundtrack-meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="soundtrack-copy">
+        <span id="soundtrackStatus">soundtrack ready</span>
+        <strong id="soundtrackTitle">Founder Command</strong>
+      </div>
+      <div class="soundtrack-controls">
+        <button class="icon-button" id="soundtrackPrevButton" type="button" title="Previous track" aria-label="Previous track"><span aria-hidden="true">&lt;&lt;</span></button>
+        <button class="icon-button" id="soundtrackPlayButton" type="button" title="Play soundtrack" aria-label="Play soundtrack"><span aria-hidden="true">&gt;</span></button>
+        <button class="icon-button" id="soundtrackNextButton" type="button" title="Next track" aria-label="Next track"><span aria-hidden="true">&gt;&gt;</span></button>
+      </div>
+    </section>
   </div>
 
   <aside class="palette" id="palette" aria-label="Command palette" aria-hidden="true">
     <form class="palette-panel" id="paletteForm">
       <label class="system-label" for="paletteInput">launch</label>
-      <input id="paletteInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search apps, live surfaces, or commands">
+      <input id="paletteInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search panels, mounted routes, surfaces, or commands">
       <div class="palette-results" id="paletteResults" role="listbox"></div>
     </form>
   </aside>
@@ -91,6 +119,15 @@
     }
   </script>
   <script src="../assets/js/0s-gate-card-bridge.js"></script>
+  <script src="../assets/js/0s-command-bridge.js" data-command-bridge-app="0s-browser" data-command-bridge-surface="MetrAIyux 0S Browser" data-command-bridge-auto="true"></script>
+  <script src="../assets/js/skyehawk-os.js" data-skyehawk-surface="MetrAIyux 0S Browser"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+  </script>
   <script type="module" src="./os.js"></script>
 </body>
 </html>

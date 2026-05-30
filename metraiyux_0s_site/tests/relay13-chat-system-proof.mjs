@@ -1,12 +1,20 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 const root = path.resolve(process.cwd());
+const require = createRequire(import.meta.url);
+const WebSocketCtor = globalThis.WebSocket || require('ws');
+const usesNativeWebSocket = WebSocketCtor === globalThis.WebSocket;
 const origin = (process.env.RELAY13_ORIGIN || 'https://relay13-core.graylondonskyes.workers.dev').replace(/\/$/, '');
 const gateOrigin = (process.env.SKYGATEFS27_ORIGIN || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev').replace(/\/$/, '');
 const reportPath = path.join(root, 'test-artifacts', 'relay13-chat-system-proof.json');
 const publicReportPath = path.join(root, 'metraiyux_0s_site', 'data', 'relay13-chat-system-proof.json');
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function parseEnv(file) {
   if (!fs.existsSync(file)) return {};
@@ -147,13 +155,15 @@ async function relay(pathname, { name, account, method = 'GET', body, headers = 
   return data;
 }
 
-function waitForWebSocket(url, name, workspace) {
+function waitForWebSocket(url, name, workspace, originHeader = '') {
   return new Promise((resolve, reject) => {
-    if (typeof WebSocket === 'undefined') {
-      reject(new Error('Global WebSocket is not available in this Node runtime.'));
+    if (typeof WebSocketCtor !== 'function') {
+      reject(new Error('WebSocket client is not available in this Node runtime.'));
       return;
     }
-    const ws = new WebSocket(url);
+    const ws = originHeader && !usesNativeWebSocket
+      ? new WebSocketCtor(url, undefined, { headers: { Origin: originHeader } })
+      : new WebSocketCtor(url);
     const messages = [];
     let settled = false;
     const timer = setTimeout(() => {
@@ -177,10 +187,30 @@ function waitForWebSocket(url, name, workspace) {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      checks.push({ name, ok: false, status: 0, workspace });
       reject(new Error(`${name} websocket error`));
     });
+    ws.addEventListener('close', () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(new Error(`${name} websocket closed before ready`));
+    });
   });
+}
+
+async function waitForWebSocketReady(url, name, workspace) {
+  let lastError = null;
+  const maxAttempts = 6;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await waitForWebSocket(url, name, workspace);
+    } catch (error) {
+      lastError = error;
+      if (attempt < maxAttempts) await sleep(1000 * attempt);
+    }
+  }
+  checks.push({ name, ok: false, status: 0, workspace, attempts: maxAttempts, error: lastError?.message || 'websocket not ready' });
+  throw lastError || new Error(`${name} websocket not ready`);
 }
 
 async function proveAccount(account) {
@@ -235,7 +265,8 @@ async function proveAccount(account) {
   if ((history.messages || []).length < 2) throw new Error(`${account.workspace} message history did not persist both messages.`);
 
   const wsOrigin = origin.replace(/^http/, 'ws');
-  await waitForWebSocket(`${wsOrigin}/api/ws/${encodeURIComponent(created.conversation_id)}?role=customer&token=${encodeURIComponent(created.visitor_token)}&name=${encodeURIComponent(`${account.label} SKM visitor`)}`, `${account.workspace}:customer_websocket`, account.workspace);
+  await sleep(750);
+  await waitForWebSocketReady(`${wsOrigin}/api/ws/${encodeURIComponent(created.conversation_id)}?role=customer&token=${encodeURIComponent(created.visitor_token)}&name=${encodeURIComponent(`${account.label} SKM visitor`)}`, `${account.workspace}:customer_websocket`, account.workspace);
 
   return {
     account_code: account.account_code,
@@ -352,7 +383,10 @@ try {
   await relay('/api/v1/connectlog/health', { name: 'connectlog:bridge_health' });
 
   const accountProofs = [];
-  for (const account of accounts) accountProofs.push(await proveAccount(account));
+  for (const account of accounts) {
+    accountProofs.push(await proveAccount(account));
+    await sleep(500);
+  }
   const introRoom = await proveIntroRoom();
 
   const report = {

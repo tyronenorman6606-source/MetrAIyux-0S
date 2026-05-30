@@ -12,7 +12,7 @@ function showStatus(message, type = '') {
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  showStatus('Checking operator token…');
+  showStatus('Checking legacy fallback token...');
   try {
     const response = await fetch('/api/operator-session', {
       method: 'POST',
@@ -21,7 +21,7 @@ form.addEventListener('submit', async (event) => {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.ok === false) throw new Error(data.error || `Login failed with ${response.status}.`);
-    showStatus('Operator session active. Opening internal page…', 'success');
+    showStatus('Legacy fallback session active. Opening internal page...', 'success');
     window.location.href = returnTo.startsWith('/') ? returnTo : '/admin.html';
   } catch (error) {
     showStatus(error.message, 'error');

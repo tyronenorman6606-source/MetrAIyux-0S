@@ -64,7 +64,7 @@ const checks = {
     'app.generated',
     'ae.requested',
   ].every((eventType) => EVENT_TYPES.includes(eventType)),
-  skyeGateClientPresent: fs.readFileSync(path.join(PRODUCT_ROOT, 'js/skygate-client.js'), 'utf8').includes('platform-event-ingest'),
+  skyeGateClientPresent: fs.readFileSync(path.join(PRODUCT_ROOT, 'js/skygate-client.js'), 'utf8').includes('/api/skygate/platform-event'),
   platformsRegistered: ['skyewebcreator-max', 'skydexia', 'ae-commandhub'].every((platform) => REGISTERED_PLATFORMS.includes(platform)),
   bridgeLocalReady: readiness.localReady === true,
   invalidSpecRejected: invalidSpecErrors.includes('name is required') && invalidSpecErrors.includes('brief is required'),

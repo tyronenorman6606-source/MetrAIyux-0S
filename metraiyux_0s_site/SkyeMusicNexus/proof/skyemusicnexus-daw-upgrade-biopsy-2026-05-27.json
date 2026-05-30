@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "type": "source_audit_receipt",
+  "generatedAt": "2026-05-27T00:00:00Z",
+  "scope": "SkyeMusicNexus DAW only",
+  "browserProof": {
+    "run": false,
+    "reason": "Owner-disabled browser proof policy; no Playwright or headed browser verification was run."
+  },
+  "report": "../docs/DAW_UPGRADE_BIOPSY_2026-05-27.md",
+  "rating": {
+    "todayVsPaidSeriousDawTarget": 2.8,
+    "minimumBeforeChargingForDawAccess": 8.0
+  },
+  "auditedFiles": [
+    "public/daw.html",
+    "public/nexus-daw.js",
+    "public/nexus-daw.css",
+    "public/skygate-auth.js",
+    "public/pricing-daw.html",
+    "public/open-source-studio.js",
+    "public/upload.html",
+    "public/stems.html",
+    "public/exports.html",
+    "data/skyemusicnexus-pricing.json",
+    "data/skyemusicnexus-simple-pricing.json",
+    "netlify/functions/music-studio.js",
+    "netlify/functions/music-provider-hooks.js",
+    "netlify/functions/music-assets.js",
+    "netlify/functions/_lib/skygate-auth.js",
+    "netlify/functions/_lib/local-identity.js",
+    "_worker.js",
+    "../cloudflare/worker.js",
+    "docs/BANDLAB_PARITY_AUDIT.md",
+    "PLATFORM_TRUTH.json",
+    "README.md"
+  ],
+  "topFindings": [
+    "Current DAW is a real browser-native beta sketchpad, not a paid serious DAW.",
+    "Strong current capability: Web Audio sketching, import/decode/preview, mic recording, Web MIDI trigger, region edits, local loop packs, mixer sliders, local/SkyGate save, and browser WAV mixdown.",
+    "Saved projects record clip metadata but do not persist reconstructable clip audio.",
+    "Timeline is fixed to a 16-beat grid and needs arbitrary song length, zoom, sections, and markers.",
+    "Mixdown is mono browser WAV rendering, not production mastering/export infrastructure.",
+    "DAW Export downloads JSON only; backend queueExport exists in Export Forge/studio APIs but is not called by DAW Export.",
+    "Provider hooks expose provider/model inputs and must be wrapped behind kAIxU action aliases before self-serve AI.",
+    "Mounted 0S Worker marks generate-ai-song/create-ai-song as operator actions, which should remain true for expensive generation.",
+    "Shared FS27/SkyGate/Free99 auth posture is mostly correct; app-local identity is disabled.",
+    "Monetization should keep DAW free/beta and charge for storage, release handling, hands-on ops, and tightly metered kAIxU assistant credits."
+  ],
+  "recommendedNextActions": [
+    "Add DAW assistant API with server-owned kAIxU model aliases and no raw provider/model UI.",
+    "Add AI entitlement, credit ledger, rate limits, provider circuit breakers, and idempotency keys.",
+    "Promote imported DAW clips to gated music-assets storage and restore saved sessions from asset IDs.",
+    "Wire DAW Export to backend queueExport and later an ffmpeg/offline render worker.",
+    "Add timeline drag/trim/resize, pan, fades, meters, arbitrary length, MIDI clips, and revision autosave."
+  ],
+  "writeScope": [
+    "metraiyux_0s_site/SkyeMusicNexus/docs/DAW_UPGRADE_BIOPSY_2026-05-27.md",
+    "metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-daw-upgrade-biopsy-2026-05-27.json"
+  ]
+}

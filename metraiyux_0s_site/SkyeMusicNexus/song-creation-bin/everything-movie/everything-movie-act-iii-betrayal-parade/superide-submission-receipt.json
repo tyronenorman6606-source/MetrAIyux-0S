@@ -1,0 +1,74 @@
+{
+  "channel": "skymusicnexus_audio_asset",
+  "delivery_mode": "fs27-ledger",
+  "draft_id": "draft_sub_745c47433dba54ae",
+  "endpoint": "fs27://skymusicnexus-song-assets",
+  "job_id": "sub_745c47433dba54ae",
+  "normalized_channel": "generic",
+  "ok": true,
+  "portal_session_id": null,
+  "remote_receipt": {
+    "external_vendor_dispatch": false,
+    "fs27_tracked": true,
+    "ok": true,
+    "owner_approval_required": true,
+    "status": "queued"
+  },
+  "remote_reference": "everything-movie-act-iii-betrayal-parade:sub_745c47433dba54ae",
+  "remote_status": "queued_for_fs27_owner_approval",
+  "request_body_kind": "json",
+  "request_schema": "skye.generic.fs27-submission",
+  "schema": "skye.submission.receipt",
+  "slug": "everything-movie-act-iii-betrayal-parade",
+  "submitted_at": "2026-05-25T19:55:08.966Z",
+  "title": "Everything Movie Act III: Betrayal Parade",
+  "transport_history": [
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.fs27.gate.verification",
+      "step": "verify_fs27_gate_session",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.generic.fs27-submission",
+      "step": "record_package_receipt",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.owner.approval.request",
+      "step": "queue_owner_approval",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.skyenet.package.handoff",
+      "step": "prepare_skyenet_handoff",
+      "transport_status": 202
+    }
+  ],
+  "transport_status": 202,
+  "upload_reference": "fs27pkg_63b0998e3457b971",
+  "upload_sha256": "63b0998e3457b97131dccb052a722b058086c791c38764172c741c1d29c9b062",
+  "version": "4.0.0",
+  "workflow_step_count": 4,
+  "workflow_steps": [
+    "verify_fs27_gate_session",
+    "record_package_receipt",
+    "queue_owner_approval",
+    "prepare_skyenet_handoff"
+  ]
+}

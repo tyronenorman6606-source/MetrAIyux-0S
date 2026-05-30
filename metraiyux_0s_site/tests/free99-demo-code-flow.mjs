@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
 import worker from '../cloudflare/worker.js';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 class MemoryKv {
   constructor() {
@@ -54,11 +57,31 @@ async function json(response) {
 }
 
 const kv = new MemoryKv();
+const fs27Worker = {
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === '/admin/login') {
+      return Response.json({ ok: true, token: 'fs27.admin.token' });
+    }
+    if (['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'].includes(url.pathname)) {
+      const body = await request.json().catch(() => ({}));
+      const token = String(body.token || '').replace(/^Bearer\s+/i, '');
+      if (token === 'fs27.admin.token') {
+        return Response.json({ active: true, ok: true, sub: 'owner', email: 'owner@example.com', role: 'owner', scope: 'admin.read admin.write' });
+      }
+      if (token === 'fs27.user.token') {
+        return Response.json({ active: true, ok: true, sub: 'client', email: 'client@example.com', role: 'user', scope: '0s.gate.read' });
+      }
+      return Response.json({ active: false, ok: false, error: 'inactive' }, { status: 401 });
+    }
+    return Response.json({ ok: false, error: 'not found' }, { status: 404 });
+  }
+};
 const env = {
   SITE_EVENTS_KV: kv,
-  FREE99_DEMO_SESSION_SECRET: 'free99-demo-session-secret-for-smoke',
   OWNER_ADMIN_SESSION_SECRET: 'owner-admin-session-secret-for-smoke',
   FREE99_ADMIN_CODE: 'owner-admin-code-for-smoke',
+  SKYGATEFS27_WORKER: fs27Worker,
   ZERO_OS_PUBLIC_ORIGIN: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev',
   ASSETS: {
     fetch: async (request) => new Response(`asset:${new URL(request.url).pathname}`, {
@@ -96,16 +119,15 @@ const login = await call(env, '/api/free99/demo-login', {
 });
 assert.equal(login.status, 200);
 const loginBody = await json(login);
-assert.equal(loginBody.demo, true);
+assert.equal(loginBody.gate_required, true);
+assert.equal(loginBody.demo_code_validated, true);
 assert.equal(loginBody.platform_id, 'signinpro-northstar');
 assert.equal(loginBody.usage_lane, 'free99-business-demo');
 const setCookies = typeof login.headers.getSetCookie === 'function'
   ? login.headers.getSetCookie()
   : [login.headers.get('set-cookie') || ''];
-assert.ok(setCookies.some((cookie) => cookie.startsWith('skye_gate_session=')));
-
-const demoToken = loginBody.token;
-assert.ok(demoToken.startsWith('0s-demo.'));
+assert.ok(!setCookies.some((cookie) => cookie.startsWith('skye_gate_session=')));
+assert.match(loginBody.gateUrl, /\/gate\/signup\//);
 
 const gatedWithoutToken = await call(env, '/northstar/index.html', {
   method: 'GET',
@@ -116,24 +138,24 @@ assert.match(gatedWithoutToken.headers.get('location') || '', /\/admin\/login\.h
 
 const gatedWithDemo = await call(env, '/northstar/index.html', {
   method: 'GET',
-  headers: { authorization: `Bearer ${demoToken}`, accept: 'text/html' }
+  headers: { authorization: 'Bearer fs27.user.token', accept: 'text/html' }
 });
 assert.equal(gatedWithDemo.status, 200);
 assert.equal(await gatedWithDemo.text(), 'asset:/northstar/index.html');
 
 const northstarAuthSession = await call(env, '/api/northstar/auth-session', {
   method: 'GET',
-  headers: { authorization: `Bearer ${demoToken}`, accept: 'application/json' }
+  headers: { authorization: 'Bearer fs27.user.token', accept: 'application/json' }
 });
 assert.equal(northstarAuthSession.status, 200);
 const northstarAuthSessionBody = await json(northstarAuthSession);
 assert.equal(northstarAuthSessionBody.authenticated, true);
-assert.equal(northstarAuthSessionBody.demo, true);
+assert.equal(northstarAuthSessionBody.demo, false);
 assert.equal(northstarAuthSessionBody.platform_id, 'signinpro-northstar');
 
 const northstarWorkspaceSync = await call(env, '/api/northstar/workspace-sync', {
   method: 'GET',
-  headers: { authorization: `Bearer ${demoToken}`, accept: 'application/json' }
+  headers: { authorization: 'Bearer fs27.user.token', accept: 'application/json' }
 });
 assert.equal(northstarWorkspaceSync.status, 200);
 const northstarWorkspaceSyncBody = await json(northstarWorkspaceSync);
@@ -142,7 +164,7 @@ assert.equal(northstarWorkspaceSyncBody.persistence, 'browser-local');
 
 const demoManageAttempt = await call(env, '/api/free99/demo-code/status', {
   method: 'GET',
-  headers: { authorization: `Bearer ${demoToken}` }
+  headers: { authorization: 'Bearer fs27.user.token' }
 });
 assert.equal(demoManageAttempt.status, 403);
 
@@ -183,6 +205,8 @@ const newCodeLogin = await call(env, '/api/free99/demo-login', {
   })
 });
 assert.equal(newCodeLogin.status, 200);
+const newCodeLoginBody = await json(newCodeLogin);
+assert.equal(newCodeLoginBody.gate_required, true);
 
 const status = await call(env, '/api/free99/demo-code/status', {
   method: 'GET',

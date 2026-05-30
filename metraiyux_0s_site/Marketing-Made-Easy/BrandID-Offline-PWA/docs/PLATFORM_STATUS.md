@@ -1,19 +1,15 @@
 # BrandID Offline PWA Platform Status
 
-Generated: 2026-05-09
+Updated: 2026-05-24
 
-This folder is promoted as the local platform truth for BrandID Offline PWA. The app payload, routed surfaces, proof metadata, runtime contract, local visual asset, and smoke check live inside this folder so the platform can be carried forward without reading from the original import location.
+This folder is the canonical BrandID Offline PWA app surface. The offline brand identity generator, SVG export controls, intake outbox, handoff briefs, and service worker now live directly at `index.html`; the old docked shell pages and nested `app.html` entry were removed.
 
 ## Included Surfaces
 
-- Command: `index.html`
-- Dashboard: `dashboard.html`
-- Workflows: `workflows.html`
-- Records: `records.html`
-- Proof: `proof.html`
-- Runtime: `runtime.html`
-- Settings: `settings.html`
-- Imported App: `app.html`
+- Canonical app: `index.html`
+- Local runtime contract: `runtime/local-runtime.mjs`
+- Service worker: `sw.js`
+- Manifest: `manifest.webmanifest`
 
 ## Runtime Proof
 

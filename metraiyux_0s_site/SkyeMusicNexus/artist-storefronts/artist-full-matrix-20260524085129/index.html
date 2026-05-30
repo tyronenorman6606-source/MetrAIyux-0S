@@ -1,0 +1,92 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Veda Wraith Storefront - Gray Gang</title>
+  <meta name="description" content="Veda Wraith fan storefront, player, PWA drops, and SkyePay-tracked catalog inside Gray Gang.">
+  <meta name="theme-color" content="#050506">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="../artist-storefronts.css">
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body class="skyesol-living-page storefront-shell" style="--artist-accent:#43e7ff;" data-artist-id="artist_full_matrix_20260524085129">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <header class="topbar">
+    <a class="brandmark" href="../"><span>GG</span>Veda Wraith</a>
+    <nav class="nav-actions"><a class="btn" href="../gray-skyes-collective/">Gray Gang</a><a class="btn" href="../artist-apps/">Artist Apps</a><a class="btn" href="#music">Music</a><a class="btn primary" href="#store">Store</a><a class="btn" href="./products/">Products</a></nav>
+  </header>
+  <main class="storefront-wrap artist-world">
+    <section class="hero artist-hero">
+      <div>
+        <div class="artist-kicker"><span class="artist-chip">Avondale</span><span class="artist-chip">afro-fusion pop</span><span class="artist-chip">SkyePay tracked</span></div>
+        <h1 class="neon-gradient-text">Veda Wraith</h1>
+        <p class="lede">the melody fighter in Gray Gang. afro-fusion pop / bounce rap / solar soul records packaged as playable storefront drops, installable PWAs, and checkout-ready digital products.</p>
+        <div class="hero-actions"><a class="btn primary" href="#music">Listen</a><a class="btn" href="#store">Shop Drops</a><a class="btn" href="./app.html">Artist App</a><a class="btn" href="./products/">Products</a></div>
+      </div>
+      <aside class="id-panel portrait-panel artist-portrait-mark"><img class="artist-portrait" src="/SkyeMusicNexus/assets/skye-music-nexus-logo.png" alt="Veda Wraith portrait"><strong>Three Suns After Midnight</strong><span>live now</span></aside>
+    </section>
+    <section class="stat-grid"><article class="stat"><strong>afro-fusion pop</strong><span>primary lane</span></article><article class="stat"><strong>92-138</strong><span>bpm pocket</span></article><article class="stat"><strong>1</strong><span>live products</span></article><article class="stat"><strong>Gray Gang</strong><span>collective</span></article></section>
+    <section id="music" class="music-player-panel">
+      <p class="micro">Skye Radio</p>
+      <h2 data-now-title>Three Suns After Midnight</h2>
+      <audio controls preload="metadata" data-artist-audio src=""></audio>
+      <div class="hero-actions"><button class="btn" type="button" data-play-track="0">Three Suns After Midnight</button></div>
+      <p data-player-note>Choose a track or open the PWA drop for the installable package.</p>
+    </section>
+    <section id="store" class="track-orbit"><article class="product-tile real-product-card" data-product-card="0">
+      <span>live drop</span>
+      <h3>Three Suns After Midnight</h3>
+      <strong>$4.44</strong>
+      <button class="btn" type="button" data-play-track="0">Play</button>
+      <a class="btn" href="./drops/three-suns-after-midnight/">Open Drop PWA</a>
+      <button class="btn primary" type="button" data-buy-product="0">SkyePay checkout</button>
+    </article><article class="product-tile real-product-card" data-product-card="1">
+      <span>queued drop</span>
+      <h3>Veda Wraith First Drop Preview</h3>
+      <strong>$4.44</strong>
+      <a class="btn" href="#music">Open player</a>
+      <a class="btn" href="./products/">Product room</a>
+      <button class="btn primary" type="button" data-buy-product="1">Product room</button>
+    </article></section>
+    <section id="world" class="artist-story-grid">
+      <article class="card"><p class="micro">world</p><h2>Avondale</h2><p>Raised around Avondale bus stops, borrowed laptops, church/event speakers, and friends who treated unfinished songs like therapy.</p><p>Joined Gray Gang after seeing the store, feed, drop lane, and SkyePay tracking turn songs into an actual business instead of another folder of almosts.</p></article>
+      <article class="card"><p class="micro">sound</p><h2>raspy rhythmic lead with emotional ad-libs</h2><p>survival without begging for pity, money as freedom not flex theater, life pressure, self-respect after betrayal, building from behind the gate</p></article>
+    </section>
+    <section class="artist-soundboard">
+      <article class="card"><p class="micro">storefront</p><h2>Playable products with real fan paths</h2><p>Fans see the player, PWA drop, and checkout path. Internal approvals stay behind the 0S lanes.</p></article>
+      <article class="card"><p class="micro">business lane</p><h2>Gray Gang attribution</h2><p>Sales track to the artist catalog and collective owner account while owner-reviewed payouts stay in the company lane.</p></article>
+    </section>
+  </main>
+  <script src="../assets/mcp-implementation/mcp-effects.js" data-mcp-generated-js></script>
+  <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('./service-worker.js').catch(()=>{});}</script>
+  <script>
+    const PRODUCTS=[{"title":"Three Suns After Midnight","productId":"prod_artist_full_matrix_20260524085129_three_suns_after_midnight","priceCents":444,"audioFile":"","pwaUrl":"./drops/three-suns-after-midnight/"},{"title":"Veda Wraith First Drop Preview","productId":"blueprint_artist-full-matrix-20260524085129_first_single","priceCents":444,"audioFile":"","pwaUrl":""}];
+    const audio=document.querySelector('[data-artist-audio]');
+    const nowTitle=document.querySelector('[data-now-title]');
+    document.querySelectorAll('[data-play-track]').forEach((button)=>button.addEventListener('click',()=>{
+      const product=PRODUCTS[Number(button.dataset.playTrack)]||{};
+      if(product.audioFile&&audio){audio.src=product.audioFile;audio.load();audio.play().catch(()=>{});}
+      if(nowTitle&&product.title)nowTitle.textContent=product.title;
+      document.querySelector('#music')?.scrollIntoView({behavior:'smooth',block:'start'});
+    }));
+    function checkoutFallback(product){
+      const params=new URLSearchParams({client:'metraiyux-0s',offer:'skyemusicnexus-artist-store',artistId:document.body.dataset.artistId||'',productId:product.productId||'',amountCents:String(product.priceCents||444)});
+      return '/skyepay-store.html?'+params.toString();
+    }
+    document.querySelectorAll('[data-buy-product]').forEach((button)=>button.addEventListener('click',async()=>{
+      const product=PRODUCTS[Number(button.dataset.buyProduct)]||{};
+      if(!product.audioFile&&!product.pwaUrl){window.location.href='./products/';return;}
+      button.disabled=true;button.textContent='Opening checkout';
+      try{
+        const res=await fetch('/api/skymusicnexus/music-store',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({action:'record-order',productId:product.productId,quantity:1})});
+        const data=await res.json().catch(()=>({}));
+        window.location.href=data?.checkoutIntent?.url||checkoutFallback(product);
+      }catch{window.location.href=checkoutFallback(product);}
+    }));
+  </script>
+  <script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="artist-storefronts" data-command-bridge-surface="artist-storefront"></script>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

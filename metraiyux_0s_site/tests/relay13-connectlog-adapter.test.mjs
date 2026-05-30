@@ -3,6 +3,15 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import siteWorker from '../cloudflare/worker.js';
 
+const OWNER_CODE = 'owner-code';
+const RELAY_ADMIN = 'relay-admin-token-long-enough-for-tests';
+const RELAY_API_KEY = 'r13_internal_test_key';
+const GATE_HEADERS = {
+  'x-free99-admin-code': OWNER_CODE,
+  'x-free99-gate-session': OWNER_CODE,
+  'x-skye-gate-session': OWNER_CODE
+};
+
 function ctx() {
   return { waitUntil() {} };
 }
@@ -78,6 +87,9 @@ function relayBinding(calls) {
 function env(overrides = {}) {
   return {
     ASSETS: assetsStub(),
+    FREE99_ADMIN_CODE: OWNER_CODE,
+    RELAY13_ADMIN_TOKEN: RELAY_ADMIN,
+    RELAY13_API_KEY: RELAY_API_KEY,
     RELAY13_WORKER: relayBinding(overrides.calls || []),
     ...overrides
   };
@@ -99,14 +111,19 @@ test('RELAY-01 points ConnectLog and Relay13 console source to the 0S Relay13 AP
   assert.match(adminHtml, /metraiyux-api-bases\.js\?v=relay13-api-base[\s\S]+app\.js/);
   assert.match(adminJs, /function relayApiPath/);
   assert.match(adminJs, /window\.MetrAIyuxApi\.path\('relay13', path\)/);
+  assert.doesNotMatch(adminJs, /localStorage\.getItem\('r13_admin_token'\)/);
+  assert.doesNotMatch(adminJs, /localStorage\.setItem\('r13_admin_token'/);
+  assert.doesNotMatch(adminJs, /token=\$\{encodeURIComponent\(token\)\}/);
+  assert.doesNotMatch(appJs, /cfg\.apiKey\s*\|\|/);
+  assert.doesNotMatch(appJs, /'x-relay13-api-key': token/);
 });
 
 test('RELAY-03 forwards ConnectLog card, conversation, inbox, widget, and guardrail routes through /api/relay13', async () => {
   const calls = [];
   const e = env({ calls });
-  const headers = { 'x-relay13-api-key': 'relay_test_key', authorization: 'Bearer admin-token' };
+  const headers = { ...GATE_HEADERS };
 
-  const health = await siteWorker.fetch(req('/api/relay13/api/v1/connectlog/health'), e, ctx());
+  const health = await siteWorker.fetch(req('/api/relay13/api/v1/connectlog/health', { headers: GATE_HEADERS }), e, ctx());
   assert.equal(health.status, 200);
   assert.equal((await health.json()).bridge, 'connectlog');
 
@@ -156,7 +173,7 @@ test('RELAY-03 forwards ConnectLog card, conversation, inbox, widget, and guardr
   assert.equal(guardrailProof.status, 200);
   assert.equal((await guardrailProof.json()).feature, 'system_guardrails');
 
-  const websocketPath = await siteWorker.fetch(req('/api/relay13/api/ws/conv_0s_relay?workspace_id=ws_0s'), e, ctx());
+  const websocketPath = await siteWorker.fetch(req('/api/relay13/api/ws/conv_0s_relay?workspace_id=ws_0s', { headers: GATE_HEADERS }), e, ctx());
   assert.equal(websocketPath.status, 200);
 
   assert.deepEqual(calls.map((call) => `${call.method} ${call.path}`), [
@@ -171,8 +188,10 @@ test('RELAY-03 forwards ConnectLog card, conversation, inbox, widget, and guardr
     'GET /api/v1/guardrails/proof',
     'GET /api/ws/conv_0s_relay'
   ]);
-  assert.equal(calls[1].apiKey, 'relay_test_key');
-  assert.equal(calls[5].authorization, 'Bearer admin-token');
+  assert.equal(calls[1].apiKey, RELAY_API_KEY);
+  assert.equal(calls[5].authorization, `Bearer ${RELAY_ADMIN}`);
+  assert.equal(new URLSearchParams(calls[9].search).has('token'), false);
+  assert.equal(calls[9].authorization, `Bearer ${RELAY_ADMIN}`);
 });
 
 test('RELAY-02 blocks Relay13 implementation source while public previews remain reachable', async () => {
@@ -193,15 +212,20 @@ test('RELAY-02 blocks Relay13 implementation source while public previews remain
     assert.equal(res.headers.get('x-robots-tag'), 'noindex, nofollow', path);
   }
 
-  const publicPages = [
+  const gatedPages = [
     '/connectlog-v7.7-relay13-operator-proof/app.html',
     '/connectlog-v7.7-relay13-operator-proof/relay13-inbox.html',
     '/relay13-core-v1.7-connectlog-operator-proof/public/index.html',
     '/relay13-core-v1.7-connectlog-operator-proof/public/admin/index.html'
   ];
 
-  for (const path of publicPages) {
-    const res = await siteWorker.fetch(req(path), env({ RELAY13_WORKER: undefined }), ctx());
-    assert.equal(res.status, 200, path);
+  for (const path of gatedPages) {
+    const unauth = await siteWorker.fetch(req(path), env({ RELAY13_WORKER: undefined }), ctx());
+    assert.equal(unauth.status, 302, path);
+    assert.match(unauth.headers.get('location') || '', /\/admin\/login\.html\?return=/, path);
+    assert.equal(unauth.headers.get('x-0s-gate'), 'fs27-required', path);
+
+    const authed = await siteWorker.fetch(req(path, { headers: GATE_HEADERS }), env({ RELAY13_WORKER: undefined }), ctx());
+    assert.equal(authed.status, 200, path);
   }
 });

@@ -31,10 +31,38 @@ function $(id){return document.getElementById(id)}
 function renderJSON(id,data){ const el=$(id); if(el) el.textContent=JSON.stringify(data,null,2); }
 function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function card(title, body, foot=''){ return `<article class="workflow-panel"><h3>${safe(title)}</h3><p>${safe(body)}</p>${foot}</article>`; }
+function sdFormValue(id, fallback=''){ return $(id)?.value?.trim?.() || fallback; }
+function sdSlug(value='business'){ return String(value||'business').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80) || 'business'; }
+function sdFormationWorkflowCards(rows=[]){
+  if(!rows.length) return '<p>No LLC-to-0S business launch workflows are visible to this session yet.</p>';
+  return rows.map(w=>`<article class="workflow-panel">
+    <h3>${safe(w.businessName||w.id)}</h3>
+    <p>${sdBadge(w.status||'pending')} ${sdBadge(w.jurisdiction||'US')} ${sdBadge(w.clientId||'client')}</p>
+    <div class="workflow-row">
+      <a class="button" href="/Free99/apps/sovereigndocs/business-formation/?workflow=${safe(encodeURIComponent(w.id||''))}">Open</a>
+      <a class="button" href="/api/sovereigndocs/business-formation/workflows/${safe(encodeURIComponent(w.id||''))}/client-dashboard">Client status</a>
+      ${w.dashboards?.workforce ? `<a class="button" href="${safe(w.dashboards.workforce)}">Workforce</a>` : ''}
+      ${w.dashboards?.clientApp ? `<a class="button" href="${safe(w.dashboards.clientApp)}">Webpage</a>` : ''}
+      <button class="button approve-llc-workflow" data-id="${safe(w.id)}">Approve prep</button>
+    </div>
+    <div class="workflow-row">
+      <input class="input" data-receipt-ref="${safe(w.id)}" placeholder="Official receipt/reference">
+      <input class="input" data-receipt-url="${safe(w.id)}" placeholder="Official source URL">
+      <button class="button attach-llc-receipt" data-id="${safe(w.id)}">Attach receipt</button>
+    </div>
+    <div class="workflow-row">
+      <input class="input" data-skynet-url="${safe(w.id)}" placeholder="SkyeNet live URL">
+      <input class="input" data-skynet-receipt="${safe(w.id)}" placeholder="SkyeNet receipt id">
+      <button class="button attach-skynet-receipt" data-id="${safe(w.id)}">Attach SkyeNet proof</button>
+    </div>
+  </article>`).join('');
+}
 async function initWorkspaceDashboard(){
   try{ const data=await api('/api/workspace/summary');
     $('dashboard-cards').innerHTML=Object.entries(data.counts||{}).map(([k,v])=>card(k.replace(/[A-Z]/g,m=>' '+m).replace(/^./,m=>m.toUpperCase()), String(v))).join('');
     $('dashboard-actions').innerHTML=(data.nextActions||[]).map(a=>`<a class="button" href="${safe(a.href)}">${safe(a.label)}</a>`).join(' ');
+    const formations=$('dashboard-formation-list');
+    if(formations) formations.innerHTML=sdFormationWorkflowCards(data.panels?.businessFormationWorkflows||[]);
     renderJSON('dashboard-raw',data);
   }catch(e){ $('dashboard-cards').innerHTML=card('Dashboard needs API mode',e.message,'<a class="button" href="/documents/">Browse documents</a>'); }
 }
@@ -66,12 +94,17 @@ async function initTemplateOps(){
   await refresh();
 }
 async function initSkyeDocxMax(){
-  try{ const config=await api('/api/editor/skye-docx-max/config'); renderJSON('skye-config',config); }catch(e){ renderJSON('skye-config',{ok:false,error:e.message}); }
-  let lastLaunch='/skye-docx-max/app/';
+  const canonicalEditor = '/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs&ws_id=sovereigndocs&returnTo=/Free99/apps/sovereigndocs/vault/';
+  let lastLaunch=canonicalEditor;
+  try{
+    const config=await api('/api/editor/skye-docx-max/config');
+    renderJSON('skye-config',config);
+    if(config.canonicalEditor) setLaunch(`${config.canonicalEditor}?source=sovereigndocs&ws_id=sovereigndocs&returnTo=/Free99/apps/sovereigndocs/vault/`);
+  }catch(e){ renderJSON('skye-config',{ok:false,error:e.message}); }
   function setLaunch(url){
     if(!url) return;
-    lastLaunch=url;
-    const a=$('skye-launch-link'); if(a) a.href=url;
+    lastLaunch=new URL(url, location.origin).href;
+    const a=$('skye-launch-link'); if(a) a.href=lastLaunch;
     const frame=$('skye-frame');
     const btn=$('skye-refresh-frame');
     if(btn) btn.onclick=()=>{ if(frame) frame.src=lastLaunch; };
@@ -165,7 +198,99 @@ async function initWorkQueues(){
   $('work-queues-refresh')?.addEventListener('click',refresh); await refresh();
 }
 
-window.SDWorkflow={initWorkspaceDashboard,initPacketBuilder,initReminders,initPartnerWorkbench,initTemplateOps,initSkyeDocxMax,initCaseCommandCenter,initIntakeWizard,initCaseTimeline,initClientStatus,initReviewerNotes,initCaseExport,initWorkQueues};
+async function initLlcTo0sWorkflow(){
+  const stateSelect=$('llc-state');
+  async function refresh(){
+    try{
+      const out=await api('/api/business-formation/workflows');
+      const rows=out.items||[];
+      if($('llc-formation-list')) $('llc-formation-list').innerHTML=sdFormationWorkflowCards(rows);
+      if($('formation-workflow-list')) $('formation-workflow-list').innerHTML=sdFormationWorkflowCards(rows);
+      renderJSON('llc-formation-output',out);
+      renderJSON('formation-output',out);
+    }catch(e){
+      if($('llc-formation-list')) $('llc-formation-list').innerHTML=`<p>${safe(e.message)}</p>`;
+      renderJSON('llc-formation-output',{ok:false,error:e.message,details:e.body});
+      renderJSON('formation-output',{ok:false,error:e.message,details:e.body});
+    }
+  }
+  if(stateSelect){
+    try{
+      const out=await api('/api/business-formation/states');
+      stateSelect.innerHTML=(out.states||[]).map(s=>`<option value="${safe(s.code)}"${s.code==='AZ'?' selected':''}>${safe(s.name)} (${safe(s.code)})</option>`).join('');
+    }catch(e){ stateSelect.innerHTML='<option value="AZ">Arizona (AZ)</option>'; }
+  }
+  $('llc-0s-form')?.addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    const businessName=sdFormValue('llc-business-name','New 0S Business LLC');
+    const clientId=sdFormValue('llc-client-id',sdSlug(businessName));
+    const payload={
+      businessName,
+      clientId,
+      ownerName:sdFormValue('llc-owner-name','Owner'),
+      ownerEmail:sdFormValue('llc-owner-email',`${clientId}@metraiyux.local`),
+      state:sdFormValue('llc-state','AZ'),
+      city:sdFormValue('llc-city','Phoenix'),
+      industry:sdFormValue('llc-industry','local services'),
+      services:sdFormValue('llc-services','Client services, sales, operations, customer support, and 0S-managed business workflows.'),
+      memberCount:Number(sdFormValue('llc-member-count','1')) || 1,
+      operatingModel:sdFormValue('llc-operating-model','owner-managed'),
+      acceptBoundary:Boolean($('llc-boundary')?.checked)
+    };
+    if(!payload.acceptBoundary){
+      renderJSON('llc-formation-output',{ok:false,error:'boundary_acknowledgment_required'});
+      return;
+    }
+    try{
+      const out=await api('/api/business-formation/start-to-0s',{method:'POST',body:JSON.stringify(payload)});
+      renderJSON('llc-formation-output',out);
+      await refresh();
+    }catch(e){ renderJSON('llc-formation-output',{ok:false,error:e.message,details:e.body}); }
+  });
+  document.addEventListener('click',async ev=>{
+    const approve=ev.target?.closest?.('.approve-llc-workflow');
+    if(approve){
+      try{
+        const out=await api(`/api/business-formation/workflows/${encodeURIComponent(approve.dataset.id)}/approve`,{method:'POST',body:JSON.stringify({note:'Owner/admin approved LLC-to-0S prep from SovereignDocs UI.'})});
+        renderJSON('llc-formation-output',out);
+        renderJSON('formation-output',out);
+        await refresh();
+      }catch(e){ renderJSON('llc-formation-output',{ok:false,error:e.message,details:e.body}); }
+    }
+    const receipt=ev.target?.closest?.('.attach-llc-receipt');
+    if(receipt){
+      const id=receipt.dataset.id;
+      const ref=document.querySelector(`[data-receipt-ref="${CSS.escape(id)}"]`)?.value || '';
+      const url=document.querySelector(`[data-receipt-url="${CSS.escape(id)}"]`)?.value || '';
+      try{
+        const out=await api(`/api/business-formation/workflows/${encodeURIComponent(id)}/official-receipt`,{method:'POST',body:JSON.stringify({reference:ref,officialUrl:url,note:'Attached from SovereignDocs LLC-to-0S UI.'})});
+        renderJSON('llc-formation-output',out);
+        renderJSON('formation-output',out);
+        await refresh();
+      }catch(e){ renderJSON('llc-formation-output',{ok:false,error:e.message,details:e.body}); }
+    }
+    const skynet=ev.target?.closest?.('.attach-skynet-receipt');
+    if(skynet){
+      const id=skynet.dataset.id;
+      const liveUrl=document.querySelector(`[data-skynet-url="${CSS.escape(id)}"]`)?.value || '';
+      const receiptId=document.querySelector(`[data-skynet-receipt="${CSS.escape(id)}"]`)?.value || '';
+      try{
+        const out=await api(`/api/business-formation/workflows/${encodeURIComponent(id)}/skyenet-receipt`,{method:'POST',body:JSON.stringify({liveUrl,receiptId,note:'Attached from SovereignDocs LLC-to-0S UI.'})});
+        renderJSON('llc-formation-output',out);
+        renderJSON('formation-output',out);
+        await refresh();
+      }catch(e){ renderJSON('llc-formation-output',{ok:false,error:e.message,details:e.body}); }
+    }
+  });
+  await refresh();
+}
+
+async function initFormationDashboard(){
+  await initLlcTo0sWorkflow();
+  if($('closure-dashboard')||$('dashboard-cards')) await initClosureDashboard();
+}
+
+window.SDWorkflow={initWorkspaceDashboard,initPacketBuilder,initReminders,initPartnerWorkbench,initTemplateOps,initSkyeDocxMax,initCaseCommandCenter,initIntakeWizard,initCaseTimeline,initClientStatus,initReviewerNotes,initCaseExport,initWorkQueues,initLlcTo0sWorkflow,initFormationDashboard};
 
 
 // v17 premium workflow surface helpers: stateful filters, role-aware panels, action tables, and SkyeDocx Max launch affordances.
@@ -188,6 +313,7 @@ async function initClosureDashboard(){
     rootEl.innerHTML=`<div class="workflow-toolbar">${sdFilterBox('closure-filter','Filter cases, actions, reviews, reminders')}</div>`+
       `<section class="stats-grid">${Object.entries(counts).map(([k,v])=>card(k.replace(/[A-Z]/g,m=>' '+m).replace(/^./,m=>m.toUpperCase()),String(v))).join('')}</section>`+
       `<section class="workflow-panel"><h2>Action needed</h2>${sdTable(out.actionNeeded||[],[{label:'Type',key:'type'},{label:'Action',key:'label'},{label:'Open',render:r=>`<a class="button" href="${safe(r.href)}">Open</a>`}])}</section>`+
+      `<section class="workflow-panel"><h2>LLC to 0S business launches</h2><div class="workflow-grid">${sdFormationWorkflowCards(out.panels?.businessFormationWorkflows||[])}</div></section>`+
       `<section class="workflow-panel"><h2>Cases</h2>${sdTable(out.panels?.cases||[],[{label:'Case',render:r=>safe(r.title||r.id)},{label:'Status',render:r=>sdBadge(r.status)},{label:'Docs',key:'documentCount'},{label:'Open',render:r=>`<button class="button v18-case-state" data-id="${safe(r.id)}">State</button>`}])}</section>`+
       `<section class="workflow-panel"><h2>Documents</h2>${sdTable(out.panels?.documents||[],[{label:'Document',render:r=>safe(r.title||r.templateId||r.id)},{label:'Status',render:r=>sdBadge(r.status)},{label:'Risk',render:r=>sdBadge(r.riskLevel)}])}</section>`;
     $('closure-filter')?.addEventListener('input',ev=>{ const term=ev.target.value.toLowerCase(); document.querySelectorAll('.workflow-panel').forEach(panel=>{ panel.style.display=panel.textContent.toLowerCase().includes(term)?'':'none'; }); });
@@ -202,7 +328,7 @@ document.addEventListener('click',async ev=>{
   if(ev.target?.classList?.contains('premium-open-skye-v18')){ const id=ev.target.dataset.case; try{ const out=await api(`/api/v18/cases/${encodeURIComponent(id)}/open-in-skye-docx-max`,{method:'POST',body:JSON.stringify({})}); window.open(out.launchUrl,'_blank','noopener'); }catch(e){ alert(e.message); } }
   if(ev.target?.classList?.contains('close-case-v18')){ const id=ev.target.dataset.case; try{ const out=await api(`/api/v18/cases/${encodeURIComponent(id)}`,{method:'PATCH',body:JSON.stringify({status:'completed',note:'Completed from v18 closure UI'})}); renderJSON('dashboard-raw',out); }catch(e){ alert(e.message); } }
 });
-window.SDWorkflow={...window.SDWorkflow,initClosureDashboard,renderV18CaseState};
+window.SDWorkflow={...window.SDWorkflow,initClosureDashboard,renderV18CaseState,initLlcTo0sWorkflow,initFormationDashboard};
 
 
 // v19 premium surface alignment: product chrome, command deck, visual dock, pointer halo, and richer state treatment.

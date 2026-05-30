@@ -14,10 +14,34 @@ npm run vault:git:dry-run
 npm run vault:git:push
 ```
 
+For unattended repo continuity, use the source-of-truth/autosync wrapper:
+
+```bash
+npm run vault:source:status
+npm run vault:source:start -- --env-file=env.txt --interval-seconds=600
+npm run vault:autosync:dry-run
+npm run vault:autosync
+```
+
+Autosync defaults to `git+full`, so Git parity and encrypted full-repo continuity advance together whenever the workspace digest changes. Coverage is tracked per lane: if a digest already has the full encrypted snapshot but is missing the Git pack, the next `git+full` pass runs only the missing Git lane and merges the old full receipt into the current primary success pointer. Set `SKYEVAULT_AUTOSYNC_MODE=git` when a workspace only needs the clone-capable Git pack. Set `SKYEVAULT_AUTOSYNC_MODE=full` only for a one-off owner checkpoint when Git-level custody is already current.
+
+## Sovereign Source-Of-Truth Model
+
+This lane is meant to make Codespaces disposable. The repo should be recoverable from SkyeVault first, then opened in any Codespace/local IDE after restore.
+
+The owner continuity stack is:
+
+1. Git-level custody: `vault:git:push` produces a clone-capable Git bundle plus sanitized dirty overlay.
+2. Fast dirty custody: the delta journal seals changed/untracked/local-critical files quickly.
+3. Full workspace custody: the literal encrypted `tar.zst` stream preserves the all-bytes disaster-recovery snapshot.
+4. Restore guide/status: `vault:source:status` writes `.skyevault-out/sovereign-source/latest-status.json` and `.skyevault-out/sovereign-source/RESTORE_FROM_SKYEVAULT.md`.
+
+The result is not one mutable zip. It is a stable workspace custody record with additive Git history/refs, encrypted deltas, and immutable full checkpoints.
+
 The Git vault pack contains:
 
 - `git/repository.bundle`: the full Git bundle created with `git bundle create --all`.
-- `source/`: sanitized working tree overlay with safe uncommitted and untracked files.
+- `source/`: sanitized dirty overlay with safe uncommitted and untracked files. The Git bundle supplies committed tracked files. Use `--full-overlay` only when an operator explicitly wants the older full sanitized worktree overlay.
 - `manifest.json`: branch, head commit, refs, remotes with credentials redacted, status, hashes, source file manifest, and secret exclusions.
 - `integrity.json`: hashes for the manifest, bundle, source manifest, neural map, restore instructions, status, and refs.
 - `neural-map.json`: workspace/developer/repo/commit/file graph seed for the account brain map.

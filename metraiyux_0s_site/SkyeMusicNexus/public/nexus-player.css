@@ -1,0 +1,334 @@
+.skye-nexus-player-mounted {
+  --nexus-player-height: 96px;
+}
+
+.skye-nexus-player {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 9998;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto minmax(220px, 320px);
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(247, 245, 234, .18);
+  border-radius: 8px;
+  background: rgba(5, 7, 10, .92);
+  color: #f7f5ea;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, .46);
+  backdrop-filter: blur(18px);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.skye-nexus-player[hidden] {
+  display: none;
+}
+
+.skye-nexus-player * {
+  box-sizing: border-box;
+}
+
+.skye-nexus-player__art {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(247, 245, 234, .16);
+  background: rgba(255, 255, 255, .06);
+}
+
+.skye-nexus-player__meta {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.skye-nexus-player__meta strong,
+.skye-nexus-player__meta span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skye-nexus-player__meta strong {
+  font-size: 15px;
+}
+
+.skye-nexus-player__meta span,
+.skye-nexus-player__stat {
+  color: rgba(247, 245, 234, .68);
+  font-size: 12px;
+}
+
+.skye-nexus-player__bar {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+}
+
+.skye-nexus-player__progress {
+  width: 100%;
+  accent-color: #6ee7f8;
+}
+
+.skye-nexus-player__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.skye-nexus-player__button {
+  min-width: 38px;
+  min-height: 38px;
+  border: 1px solid rgba(247, 245, 234, .18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .07);
+  color: #f7f5ea;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+.skye-nexus-player__button:hover,
+.skye-nexus-player__button.is-active {
+  border-color: #6ee7f8;
+  background: #6ee7f8;
+  color: #071013;
+}
+
+.skye-nexus-player__button--wide {
+  min-width: 76px;
+}
+
+.skye-nexus-player__visual {
+  width: 100%;
+  height: 64px;
+  border: 1px solid rgba(247, 245, 234, .14);
+  border-radius: 6px;
+  background: radial-gradient(circle at 20% 20%, rgba(110, 231, 248, .14), transparent 40%), rgba(255, 255, 255, .04);
+}
+
+.skye-nexus-player__drawer {
+  position: fixed;
+  right: 14px;
+  bottom: 96px;
+  z-index: 9999;
+  width: min(420px, calc(100vw - 28px));
+  max-height: min(560px, calc(100vh - 130px));
+  overflow: auto;
+  border: 1px solid rgba(247, 245, 234, .18);
+  border-radius: 8px;
+  background: rgba(5, 7, 10, .96);
+  color: #f7f5ea;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .5);
+  padding: 12px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.skye-nexus-player__drawer[hidden] {
+  display: none;
+}
+
+.skye-nexus-player__drawer h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.skye-nexus-player__queue-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  border: 1px solid rgba(247, 245, 234, .12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .045);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.skye-nexus-player__queue-item img {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.skye-nexus-player__queue-item strong,
+.skye-nexus-player__queue-item span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.skye-nexus-player__queue-item span {
+  color: rgba(247, 245, 234, .68);
+  font-size: 12px;
+}
+
+.skye-nexus-player__toast {
+  position: fixed;
+  left: 50%;
+  bottom: 106px;
+  z-index: 10000;
+  transform: translateX(-50%);
+  border: 1px solid rgba(110, 231, 248, .35);
+  border-radius: 8px;
+  background: rgba(5, 7, 10, .96);
+  color: #f7f5ea;
+  padding: 10px 13px;
+  box-shadow: 0 14px 50px rgba(0, 0, 0, .42);
+  font: 800 13px Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.skye-nexus-achievement-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 108px;
+  z-index: 10001;
+  width: min(380px, calc(100vw - 36px));
+  overflow: hidden;
+  border: 1px solid rgba(255, 209, 102, .42);
+  border-radius: 8px;
+  background: rgba(7, 9, 12, .97);
+  color: #f7f5ea;
+  box-shadow: 0 24px 90px rgba(0, 0, 0, .52);
+  padding: 16px 16px 16px 74px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(16px) scale(.98);
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+.skye-nexus-achievement-toast.is-live {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.skye-nexus-achievement-toast strong,
+.skye-nexus-achievement-toast span,
+.skye-nexus-achievement-toast a {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.skye-nexus-achievement-toast strong {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.skye-nexus-achievement-toast span {
+  color: rgba(247, 245, 234, .76);
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.skye-nexus-achievement-toast a {
+  color: #6ee7f8;
+  font-size: 12px;
+  font-weight: 900;
+  margin-top: 9px;
+  text-decoration: none;
+}
+
+.skye-nexus-achievement-toast__burst {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 209, 102, .5);
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 45%, #ffd166 45% 55%, transparent 55%),
+    linear-gradient(0deg, transparent 45%, #6ee7f8 45% 55%, transparent 55%),
+    rgba(255, 255, 255, .06);
+  animation: skye-nexus-award-burst 1.25s ease-in-out infinite;
+}
+
+.skye-nexus-achievement-toast::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    repeating-linear-gradient(35deg, rgba(110, 231, 248, .16) 0 2px, transparent 2px 18px),
+    repeating-linear-gradient(145deg, rgba(255, 117, 183, .12) 0 2px, transparent 2px 22px);
+  animation: skye-nexus-award-confetti 3.5s linear infinite;
+}
+
+.skye-nexus-achievement-toast--diamond,
+.skye-nexus-achievement-toast--platinum {
+  border-color: rgba(110, 231, 248, .52);
+}
+
+@keyframes skye-nexus-award-burst {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(18deg) scale(1.12); }
+}
+
+@keyframes skye-nexus-award-confetti {
+  from { transform: translate3d(0, -10px, 0); }
+  to { transform: translate3d(0, 28px, 0); }
+}
+
+body.skye-nexus-player-mounted {
+  padding-bottom: calc(var(--nexus-player-height, 120px) + 24px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 860px) {
+  .skye-nexus-player-mounted {
+    --nexus-player-height: 164px;
+  }
+
+  .skye-nexus-player {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+  }
+
+  .skye-nexus-player__art {
+    width: 54px;
+    height: 54px;
+  }
+
+  .skye-nexus-player__visual {
+    grid-column: 1 / -1;
+    height: 48px;
+  }
+}
+
+@media (max-width: 560px) {
+  .skye-nexus-player-mounted {
+    --nexus-player-height: 226px;
+  }
+
+  .skye-nexus-player {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .skye-nexus-player__art {
+    width: 48px;
+    height: 48px;
+  }
+
+  .skye-nexus-player__controls,
+  .skye-nexus-player__bar,
+  .skye-nexus-player__visual {
+    grid-column: 1 / -1;
+  }
+
+  .skye-nexus-player__controls {
+    justify-content: stretch;
+  }
+
+  .skye-nexus-player__button {
+    flex: 1 1 38px;
+  }
+}

@@ -247,15 +247,13 @@
           ${profile ? `<div class="client-lockup gateway-client-lockup">${gatewayClientMedia(profile, workspaceImage)}<div><strong>${esc(profile.name)}</strong><span>Dedicated SignIn Pro workspace</span></div></div>` : ''}
           ${message ? `<div class="notice ${message.toLowerCase().includes('failed') || message.toLowerCase().includes('invalid') ? 'danger' : ''}">${esc(message)}</div>` : ''}
           <div class="login-tabbar" role="tablist" aria-label="SignIn Pro workspace login tabs">
-            <button type="button" class="${activeTab === 'login' ? 'active' : ''}" data-login-tab="login" role="tab" aria-selected="${activeTab === 'login'}">Workspace Login</button>
+            <button type="button" class="${activeTab === 'login' ? 'active' : ''}" data-login-tab="login" role="tab" aria-selected="${activeTab === 'login'}">Shared 0S Gate</button>
             <button type="button" class="${activeTab === 'about' ? 'active' : ''}" data-login-tab="about" role="tab" aria-selected="${activeTab === 'about'}">About SignIn Pro</button>
           </div>
           <div class="login-panel gateway-login-panel" ${activeTab === 'login' ? '' : 'hidden'}>
             <form id="workspace-login-form" class="form-grid gateway-form" novalidate>
-              <label>Workspace Slug <input name="workspaceSlug" maxlength="120" required value="${esc(workspaceHint)}" placeholder="company-workspace-slug"></label>
-              <label>Email <input name="email" type="email" autocomplete="username" maxlength="254" required placeholder="operator@company.com"></label>
-              <label>Password <input name="password" type="password" autocomplete="current-password" maxlength="160" required placeholder="Workspace password"></label>
-              <button class="primary-btn" type="submit">Enter Workspace</button>
+              <label>Workspace Slug <input name="workspaceSlug" maxlength="120" value="${esc(workspaceHint)}" placeholder="company-workspace-slug" readonly></label>
+              <button class="primary-btn" type="submit">Open With Shared Gate</button>
             </form>
             <p class="security-note">Workspace access is governed by the shared gate and Legal Skyes <a href="https://skyes-over-london-legal.pages.dev/legal/twilio-sms/" target="_blank" rel="noopener">Twilio SMS Consent and 0S Data Notice</a>, <a href="https://skyes-over-london-legal.pages.dev/legal/terms/" target="_blank" rel="noopener">Terms</a>, and <a href="https://skyes-over-london-legal.pages.dev/legal/privacy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
             <details class="owner-unlock">
@@ -297,10 +295,9 @@
 
   async function handleWorkspaceLogin(event) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const input = Object.fromEntries(new FormData(form).entries());
     try {
-      workspaceSession = await Workspace.login(input);
+      workspaceSession = await Workspace.session();
+      if (!workspaceSession?.authenticated) throw new Error('Shared 0S/SkyGate session required.');
       STORE = Workspace.stateKey(workspaceSession.workspace);
       state = loadState();
       applyWorkspaceToState();
@@ -833,7 +830,7 @@
   function renderProvision() {
     const canProvision = can('provision') || workspaceSession.localPreview;
     const rows = ui.provisionResults && ui.provisionResults.length ? ui.provisionResults.map((item) => `
-      <tr><td>${esc(item.slug || '')}</td><td>${esc(item.name || '')}</td><td>${esc(item.email || '')}</td><td><code>${esc(item.oneTimePassword || '')}</code></td><td>${esc(item.ok === false ? item.error || 'failed' : 'created/updated')}</td></tr>
+      <tr><td>${esc(item.slug || '')}</td><td>${esc(item.name || '')}</td><td>${esc(item.email || '')}</td><td>${esc(item.invite || '')}</td><td>${esc(item.ok === false ? item.error || 'failed' : 'shared-gate invite')}</td></tr>
     `).join('') : '<tr><td colspan="5">No provisioning run in this browser session.</td></tr>';
     return `
       <section class="panel-grid">
@@ -846,11 +843,9 @@
         <article class="panel-card">
           <h3>Single Workspace</h3>
           <form id="operator-provision-form" class="form-grid" novalidate>
-            <label>Operator Token <input name="operatorToken" type="password" autocomplete="off" required placeholder="OPERATOR_PROVISION_TOKEN"></label>
             <label>Company / Workspace Name <input name="name" required maxlength="180" placeholder="Company Name"></label>
             <label>Workspace Slug <input name="slug" maxlength="120" placeholder="company-name"></label>
             <label>Owner Email <input name="ownerEmail" type="email" required maxlength="254" placeholder="owner@company.com"></label>
-            <label>Temporary Password <input name="password" type="text" maxlength="120" placeholder="Leave blank to generate one"></label>
             <label>Role <select name="role"><option value="owner">owner</option><option value="admin">admin</option><option value="operator">operator</option><option value="viewer">viewer</option></select></label>
             <button class="primary-btn" type="submit" ${!canProvision ? 'disabled' : ''}>Provision Workspace</button>
           </form>
@@ -858,15 +853,14 @@
         <article class="panel-card">
           <h3>Bulk Provision</h3>
           <form id="operator-bulk-provision-form" class="form-grid" novalidate>
-            <label>Operator Token <input name="operatorToken" type="password" autocomplete="off" required placeholder="OPERATOR_PROVISION_TOKEN"></label>
             <label>Workspace JSON Array <textarea name="workspaces" rows="11" spellcheck="false">${esc(provisionTemplateJson())}</textarea></label>
             <button class="primary-btn" type="submit" ${!canProvision ? 'disabled' : ''}>Provision JSON Batch</button>
           </form>
         </article>
         <article class="panel-card wide">
           <h3>Provisioning Receipts</h3>
-          <p>One-time passwords are shown once. Copy them into your private client handoff file. Do not publish these credentials in a landing page or public repo.</p>
-          <div class="table-scroll"><table class="provision-table"><thead><tr><th>Slug</th><th>Name</th><th>Owner/User Email</th><th>One-Time Password</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <p>Provisioning now creates a shared-gate invite handoff. No SignIn Pro workspace password is issued from the mounted 0S app.</p>
+          <div class="table-scroll"><table class="provision-table"><thead><tr><th>Slug</th><th>Name</th><th>Owner/User Email</th><th>Invite</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
         </article>
       </section>`;
   }
@@ -875,12 +869,11 @@
     event.preventDefault();
     if (!can('provision') && !workspaceSession.localPreview) { ui.provisionNotice = 'Current role cannot provision workspaces.'; render(); return; }
     const data = Object.fromEntries(new FormData(event.currentTarget).entries());
-    const token = data.operatorToken || '';
-    const payload = { name: data.name, slug: data.slug, ownerEmail: data.ownerEmail, password: data.password, role: data.role || 'owner', plan: 'provided-infrastructure', metadata: { source: 'northstar-admin-menu', appSettings: { syncEnabled: true }, securitySettings: { providedInfrastructure: true, tenantScoped: true } } };
+    const payload = { name: data.name, slug: data.slug, ownerEmail: data.ownerEmail, role: data.role || 'owner', plan: 'provided-infrastructure', metadata: { source: 'northstar-admin-menu', appSettings: { syncEnabled: true }, securitySettings: { providedInfrastructure: true, tenantScoped: true } } };
     try {
-      const result = await Workspace.operatorProvision(payload, token);
-      ui.provisionResults = [{ ok: true, slug: result.workspace.slug, name: result.workspace.name, email: result.user.email, oneTimePassword: result.oneTimePassword }].concat(ui.provisionResults || []);
-      ui.provisionNotice = `Provisioned ${result.workspace.slug}. Copy the one-time password now.`;
+      const result = await Workspace.operatorProvision(payload);
+      ui.provisionResults = [{ ok: true, slug: result.workspace.slug, name: result.workspace.name, email: result.user.email, invite: result.inviteHandoff?.gate || '/admin/login.html' }].concat(ui.provisionResults || []);
+      ui.provisionNotice = `Provisioned ${result.workspace.slug}. Shared-gate invite handoff recorded.`;
     } catch (error) {
       ui.provisionNotice = error.message || 'Provisioning failed.';
     }
@@ -897,8 +890,8 @@
     const results = [];
     for (const workspace of workspaces) {
       try {
-        const result = await Workspace.operatorProvision(workspace, data.operatorToken || '');
-        results.push({ ok: true, slug: result.workspace.slug, name: result.workspace.name, email: result.user.email, oneTimePassword: result.oneTimePassword });
+        const result = await Workspace.operatorProvision(workspace);
+        results.push({ ok: true, slug: result.workspace.slug, name: result.workspace.name, email: result.user.email, invite: result.inviteHandoff?.gate || '/admin/login.html' });
       } catch (error) {
         results.push({ ok: false, slug: workspace.slug || workspace.name || 'unknown', name: workspace.name || '', email: workspace.ownerEmail || workspace.email || '', error: error.message || 'failed' });
       }

@@ -8,7 +8,7 @@
     "build": "node tools/build.mjs",
     "typecheck": "node tools/typecheck.mjs",
     "dev": "node tools/serve.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "node ../../../../../../tools/browser-proof-disabled.mjs --lane=skyeapi-aegiscore-console-browser-e2e"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1"

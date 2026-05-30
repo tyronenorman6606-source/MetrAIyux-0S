@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <script defer src="/assets/os-bridge.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>0S Workbench - SkyeMail Citadel</title>
+</head>
+<body data-page-id="workspace" data-page-name="0S Workbench" data-page-hint="Docs, CRM, calendar, finance, audit, and builder routing">
+<div class="wrap">
+  <div id="pageTopbar"></div>
+  <div class="layout">
+    <aside class="rail" id="leftRail"></aside>
+    <main class="main">
+
+      <section class="hero workspace-hero">
+        <section class="card">
+          <div class="badge" id="workspaceBadge">Reading mailbox context...</div>
+          <h1 class="h1 workspace-title">0S Workbench</h1>
+          <p class="sub">Mail stays in SkyeMail. Work moves through the verified 0S lanes: docs, calendar, CRM, finance, legal, builder, and automation.</p>
+          <div class="btnrow">
+            <a class="btn gold" href="compose.html">Compose</a>
+            <button class="btn" id="openDocxBtn" type="button">Open SkyeDocxMax</button>
+            <button class="btn ok" id="archiveContextBtn" type="button">Archive 0S Packet</button>
+            <button class="btn" id="refreshWorkbenchBtn" type="button">Refresh</button>
+          </div>
+          <div class="hr"></div>
+          <div class="grid3">
+            <div class="stat"><b id="liveApiCount">0</b><span class="mini">live API lanes</span></div>
+            <div class="stat"><b id="verifiedAppCount">0</b><span class="mini">verified app surfaces</span></div>
+            <div class="stat"><b id="contextKind">Mailbox</b><span class="mini">Current work context</span></div>
+          </div>
+        </section>
+        <aside class="card">
+          <div class="kicker">Active Context</div>
+          <div class="workspace-context" id="contextPanel"></div>
+          <div class="workspace-health-strip" id="integrationHealth">Checking 0S routes...</div>
+          <div class="mini" id="statusText" style="margin-top:12px">Waiting for workbench load...</div>
+        </aside>
+      </section>
+
+      <section class="card workspace-dock-card">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">0S dock</h2>
+            <div class="mini">Native panels use API calls and workflow packets. Apps open through the shared gate; no iframe handoff.</div>
+          </div>
+          <div class="mini" id="dockStatus">Loading dock...</div>
+        </div>
+        <div class="workspace-tabs" id="dockTabs"></div>
+        <div class="workspace-panel" id="dockPanel"><div class="empty">Loading 0S dock...</div></div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">Verified integration catalog</h2>
+            <div class="mini">Every surface is classified as live API, verified gated app, or packet bridge.</div>
+          </div>
+          <div class="btnrow" style="margin-top:0">
+            <a class="btn" id="calendarLink" href="#" target="_blank" rel="noopener">Calendar</a>
+            <a class="btn" id="crmLink" href="#" target="_blank" rel="noopener">CRM</a>
+            <a class="btn" id="auditLink" href="#" target="_blank" rel="noopener">Audit</a>
+          </div>
+        </div>
+        <div class="workspace-action-grid" id="actionGrid"><div class="empty">Loading 0S actions...</div></div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">Latest handoff packets</h2>
+            <div class="mini">Runtime packets are persisted in the SkyeMail workflow ledger.</div>
+          </div>
+          <div class="mini" id="packetStatus">Checking runtime...</div>
+        </div>
+        <div class="mailtable" id="packetList"><div class="empty">No packet data loaded yet.</div></div>
+      </section>
+
+    </main>
+  </div>
+  <div id="appFooter"></div>
+</div>
+<script defer src="/assets/workspace-page.js"></script>
+</body>
+</html>

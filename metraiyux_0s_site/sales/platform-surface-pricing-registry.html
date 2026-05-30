@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MetrAIyux 0S surface, platform, app, service, pricing, proof, and readiness registry for go-live testing.">
+  <title>Surface + Price Registry - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    .registry-controls{display:grid;grid-template-columns:minmax(240px,1fr) minmax(190px,260px);gap:12px;margin:22px 0}
+    .registry-controls input,.registry-controls select{width:100%;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(0,0,0,.34);color:#fff;padding:13px 14px;font:inherit}
+    .registry-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:18px 0}
+    .registry-summary span{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.045);padding:12px;color:var(--muted)}
+    .registry-summary b{display:block;color:#fff;font-size:1.4rem}
+    .registry-group{margin-top:34px}
+    .registry-status{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:5px 8px;font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#fff;background:rgba(255,255,255,.06)}
+    .registry-status.live_proven{border-color:rgba(87,214,141,.55);background:rgba(87,214,141,.12)}
+    .registry-status.local_proven{border-color:rgba(99,191,255,.55);background:rgba(99,191,255,.12)}
+    .registry-status.provider_gated{border-color:rgba(243,212,131,.62);background:rgba(243,212,131,.12)}
+    .registry-status.scaffolded{border-color:rgba(180,151,255,.58);background:rgba(180,151,255,.12)}
+    .registry-status.quote_only,.registry-status.not_ready{border-color:rgba(255,134,120,.58);background:rgba(255,134,120,.12)}
+    .registry-proof{display:grid;gap:5px;margin:0;padding:0;list-style:none}
+    .registry-proof code{white-space:normal;overflow-wrap:anywhere}
+    @media(max-width:780px){.registry-controls{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">0S Registry</span></a>
+    <nav>
+      <a href="index.html">Sales</a>
+      <a href="pricing-offer-router.html">Pricing Router</a>
+      <a href="../skyeway.html">0s SkyeWay</a>
+      <a href="../proof/index.html">Proof</a>
+      <a href="../admin/index.html">Admin OS</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero commercial-hero">
+      <p class="eyebrow">Go-live operator ledger</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>Every 0S surface, price, proof state, and sales boundary in one place.</h1>
+      <p class="hero-copy">This registry separates core 0S, expansions, mounted apps/platforms, and services so every checkout, quote, proof command, and customer-facing promise can be checked before go-live. Anything marked provider-gated, scaffolded, quote-only, or not-ready needs the listed proof or owner-approved scope before it is sold as complete.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#registry">Review Registry</a>
+        <a class="button" href="pricing-offer-router.html">Pricing Router</a>
+        <a class="button" href="../skyeway.html">0s SkyeWay</a>
+        <a class="button" href="../skyerrors/index.html">SkyErrors</a>
+      </div>
+    </section>
+
+    <section class="section" id="registry">
+      <p class="eyebrow">Filter and audit</p>
+      <h2>Surface registry</h2>
+      <div class="registry-controls">
+        <label class="sr-only" for="registrySearch">Search registry</label>
+        <input id="registrySearch" type="search" placeholder="Search 0S, SkyeMail, Relay13, formation, pricing, proof...">
+        <label class="sr-only" for="registryStatus">Filter by status</label>
+        <select id="registryStatus">
+          <option value="all">All statuses</option>
+        </select>
+      </div>
+      <div class="registry-summary" data-summary></div>
+      <div data-registry-output class="registry-output"></div>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S surface and pricing registry - keep quote-only lanes quote-only and keep every mounted app behind the shared gate.</p></footer>
+  <script>
+    const statusLabels = {
+      live_proven: 'Live proven',
+      local_proven: 'Local proven',
+      provider_gated: 'Provider gated',
+      scaffolded: 'Scaffolded',
+      quote_only: 'Quote only',
+      not_ready: 'Not ready'
+    };
+    const state = { registry: null, query: '', status: 'all' };
+    const out = document.querySelector('[data-registry-output]');
+    const summary = document.querySelector('[data-summary]');
+    const search = document.getElementById('registrySearch');
+    const status = document.getElementById('registryStatus');
+
+    function itemText(item) {
+      return [item.id, item.name, item.route, item.api_route, item.price, item.status, item.boundary, ...(item.proof || [])].join(' ').toLowerCase();
+    }
+    function visibleItems(items) {
+      return items.filter((item) => {
+        const statusOk = state.status === 'all' || item.status === state.status;
+        const queryOk = !state.query || itemText(item).includes(state.query);
+        return statusOk && queryOk;
+      });
+    }
+    function renderSummary(groups) {
+      const items = groups.flatMap((group) => group.items || []);
+      const counts = items.reduce((acc, item) => {
+        acc.total += 1;
+        acc[item.status] = (acc[item.status] || 0) + 1;
+        return acc;
+      }, { total: 0 });
+      summary.innerHTML = [
+        ['Total', counts.total],
+        ['Live proven', counts.live_proven || 0],
+        ['Local proven', counts.local_proven || 0],
+        ['Provider gated', counts.provider_gated || 0],
+        ['Scaffolded', counts.scaffolded || 0],
+        ['Quote only', counts.quote_only || 0]
+      ].map(([label, value]) => `<span><b>${value}</b>${label}</span>`).join('');
+    }
+    function render() {
+      const groups = state.registry?.groups || [];
+      renderSummary(groups);
+      const html = groups.map((group) => {
+        const items = visibleItems(group.items || []);
+        if (!items.length) return '';
+        const rows = items.map((item) => `
+          <tr>
+            <td><strong>${item.name}</strong><br><small><code>${item.id}</code></small></td>
+            <td>${item.price}</td>
+            <td><span class="registry-status ${item.status}">${statusLabels[item.status] || item.status}</span></td>
+            <td>${item.route ? `<a href="${item.route}">surface</a>` : ''}<br><small><code>${item.api_route || ''}</code></small></td>
+            <td><ul class="registry-proof">${(item.proof || []).map((cmd) => `<li><code>${cmd}</code></li>`).join('')}</ul></td>
+            <td>${item.boundary || ''}</td>
+          </tr>`).join('');
+        return `
+          <section class="registry-group">
+            <p class="eyebrow">${group.label}</p>
+            <h2>${group.description}</h2>
+            <div class="table-wrap">
+              <table class="commercial-table">
+                <thead><tr><th>Surface</th><th>Price</th><th>Status</th><th>Route</th><th>Proof</th><th>Boundary</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </section>`;
+      }).join('');
+      out.innerHTML = html || '<div class="billing-disclosure">No surfaces match the current filter.</div>';
+    }
+    fetch('platform-surface-pricing-registry.json', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((registry) => {
+        state.registry = registry;
+        const statuses = [...new Set(registry.groups.flatMap((group) => (group.items || []).map((item) => item.status)))].sort();
+        status.insertAdjacentHTML('beforeend', statuses.map((item) => `<option value="${item}">${statusLabels[item] || item}</option>`).join(''));
+        render();
+      })
+      .catch((error) => {
+        out.innerHTML = `<div class="billing-disclosure">Registry failed to load: ${String(error.message || error)}</div>`;
+      });
+    search.addEventListener('input', () => { state.query = search.value.trim().toLowerCase(); render(); });
+    status.addEventListener('change', () => { state.status = status.value; render(); });
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

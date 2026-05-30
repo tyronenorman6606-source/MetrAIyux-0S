@@ -4,7 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
-const repoRoot = '/workspaces/MetrAIyux-0S';
+const repoRoot = fs.existsSync('/workspaces/MetrAIyux-0S') ? '/workspaces/MetrAIyux-0S' : process.cwd();
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const deploymentVersion = process.env.PROOF_DEPLOYMENT_VERSION || 'unknown';
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -203,7 +203,12 @@ function observe(page, entry, allowedHttpErrors = []) {
 
 async function screenshot(page, entry, label) {
   const file = path.join(artifactDir, `${entry.viewportLabel}-${label}.png`);
-  await page.screenshot({ path: file, fullPage: false });
+  await page.screenshot({
+    path: file,
+    fullPage: false,
+    animations: 'disabled',
+    timeout: Number(process.env.LIVE_BROWSER_SCREENSHOT_TIMEOUT_MS || 90000)
+  });
   const stat = fs.statSync(file);
   entry.screenshots.push({ label, path: file, bytes: stat.size });
   return file;
@@ -214,7 +219,11 @@ async function loginThroughOwnerPage(page, context, owner, entry, returnPath) {
   loginUrl.searchParams.set('return', returnPath);
   const response = await page.goto(loginUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 60000 });
   addCheck(entry, 'owner_login_page_opened', Boolean(response?.ok()), { status: response?.status() || 0, url: page.url() });
-  await page.locator('input[name="code"]').fill(owner.code);
+  await page.locator('input[name="code"]').evaluate((input, code) => {
+    input.value = code;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }, owner.code).catch(() => {});
   const browserSession = await page.evaluate(async ({ proofCode }) => {
     const response = await fetch('/api/owner/admin-login', {
       method: 'POST',
@@ -527,7 +536,18 @@ async function runFullProductionMutationMatrix(page, entry) {
   await post('releases', 'queue-operations', '/api/skymusicnexus/music-releases', { id: releaseId, status: 'queued', checkpoint: 'release-calendar', notes: 'Full matrix operations queue.' });
   await post('releases', 'update-operations', '/api/skymusicnexus/music-releases', { id: releaseId, status: 'active', checkpoint: 'drop-ready', notes: 'Full matrix moved to drop-ready.' });
   await get('releases', 'list', '/api/skymusicnexus/music-releases?action=list');
-  await get('releases', 'get', `/api/skymusicnexus/music-releases?action=get&id=${encodeURIComponent(releaseId)}`);
+  const fetchedRelease = await get('releases', 'get', `/api/skymusicnexus/music-releases?action=get&id=${encodeURIComponent(releaseId)}`);
+  addCheck(entry, 'release_public_metrics_mask_counts_under_one_thousand', (
+    fetchedRelease?.release?.publicMetrics?.playCountThreshold === 1000
+    && fetchedRelease.release.publicMetrics.playsVisible === false
+    && fetchedRelease.release.publicMetrics.streamsVisible === false
+    && /first 1,000 plays/i.test(fetchedRelease.release.publicMetrics.playsLabel || '')
+    && /first 1,000 streams/i.test(fetchedRelease.release.publicMetrics.streamsLabel || '')
+  ), {
+    playsLabel: fetchedRelease?.release?.publicMetrics?.playsLabel || '',
+    streamsLabel: fetchedRelease?.release?.publicMetrics?.streamsLabel || '',
+    threshold: fetchedRelease?.release?.publicMetrics?.playCountThreshold || 0
+  });
   await get('releases', 'rights-audit', '/api/skymusicnexus/music-releases?action=rights-audit');
   await get('releases', 'operations-board', '/api/skymusicnexus/music-releases?action=operations-board');
   await get('releases', 'workflow-timeline', '/api/skymusicnexus/music-releases?action=workflow-timeline');
@@ -597,9 +617,107 @@ async function runFullProductionMutationMatrix(page, entry) {
   await get('social', 'hub', '/api/skymusicnexus/music-social?action=hub');
   await get('social', 'feed', `/api/skymusicnexus/music-social?action=feed&artistId=${encodeURIComponent(artistId)}`);
 
+  await post('store', 'upsert-store', '/api/skymusicnexus/music-store', {
+    artistId,
+    artistName: `Full Matrix Artist ${suffix}`,
+    name: `Full Matrix Nexus Store ${suffix}`,
+    status: 'active',
+    feeMode: 'buyer_covered',
+    fulfillmentEmail: `full-matrix-store-${suffix}@musicnexus.local`,
+    bio: 'Full production matrix artist store.'
+  });
+  const storeProduct = (await post('store', 'create-product', '/api/skymusicnexus/music-store', {
+    artistId,
+    artistName: `Full Matrix Artist ${suffix}`,
+    releaseId,
+    dropId: drop.dropId,
+    title: `Full Matrix Digital Access ${suffix}`,
+    productType: 'digital',
+    priceCents: 1300,
+    fulfillmentType: 'digital-link',
+    status: 'active',
+    description: 'Full matrix digital access product.'
+  })).product;
+  const storeOrder = (await post('store', 'record-order', '/api/skymusicnexus/music-store', {
+    productId: storeProduct.productId || storeProduct.id,
+    quantity: 1,
+    buyerEmail: `full-matrix-fan-${suffix}@musicnexus.local`,
+    feeMode: 'buyer_covered',
+    fanNote: 'Production matrix order intent.'
+  })).order;
+  await post('store', 'fulfill-order', '/api/skymusicnexus/music-store', {
+    orderId: storeOrder.orderId,
+    status: 'fulfilled',
+    note: 'Production matrix fulfillment proof.'
+  });
+  await get('store', 'hub', '/api/skymusicnexus/music-store');
+
+  await post('brain', 'seed-artist-brain', '/api/skymusicnexus/music-brain', {
+    artistId,
+    artistName: `Full Matrix Artist ${suffix}`,
+    tone: 'direct, grateful, release-focused',
+    objectives: 'post release updates, reply to fans, route fans to store, stream network releases',
+    seedMemory: true
+  });
+  await post('brain', 'add-memory', '/api/skymusicnexus/music-brain', {
+    artistId,
+    title: 'Full matrix rollout memory',
+    text: 'This artist has a live release, store product, drop, and social post for the local brain to use.',
+    tags: 'release,store,feed,proof',
+    source: 'production-live-browser'
+  });
+  await post('brain', 'plan-post', '/api/skymusicnexus/music-brain', {
+    artistId,
+    releaseId,
+    title: `Full Matrix Brain Post ${suffix}`,
+    caption: `Full matrix local brain post ${suffix}`,
+    hashtags: 'musicnexus,localbrain,skymeter'
+  });
+  const brainCycle = await post('brain', 'run-local-cycle', '/api/skymusicnexus/music-brain', {
+    artistId,
+    limit: 6,
+    execute: true,
+    goal: 'stream network releases, post update, route store, reply to fans'
+  });
+  await get('brain', 'hub', '/api/skymusicnexus/music-brain');
+
+  const meterActivity = await post('gamify', 'record-activity', '/api/skymusicnexus/music-gamify', {
+    artistId,
+    artistName: `Full Matrix Artist ${suffix}`,
+    activityType: 'operator_award',
+    points: 125,
+    releaseId,
+    note: 'Production matrix SkyeMeter fill.'
+  });
+  await post('gamify', 'award-merits', '/api/skymusicnexus/music-gamify', {
+    artistId,
+    count: 1,
+    reason: 'Production matrix owner-awarded SkyeMerit.'
+  });
+  const giveaway = (await post('gamify', 'open-giveaway', '/api/skymusicnexus/music-gamify', {
+    title: `Full Matrix Content Launch Giveaway ${suffix}`,
+    prizeType: 'content_launch_drop_package',
+    prizeDescription: 'Owner-approved content launch or new drop package.',
+    sponsorArtistId: artistId,
+    entryCostPoints: 0,
+    maxEntries: 25
+  })).giveaway;
+  await post('gamify', 'enter-giveaway', '/api/skymusicnexus/music-gamify', {
+    giveawayId: giveaway.giveawayId,
+    artistId,
+    note: 'Full matrix artist entry.'
+  });
+  await post('gamify', 'draw-giveaway', '/api/skymusicnexus/music-gamify', {
+    giveawayId: giveaway.giveawayId,
+    winnerIndex: 0
+  });
+  await get('gamify', 'hub', '/api/skymusicnexus/music-gamify');
+
   await post('payments', 'credit', '/api/skymusicnexus/music-payments', { artistId, amount: 13.37, reason: 'Full matrix credit.', referenceId: releaseId });
   const payout = (await post('payments', 'payout', '/api/skymusicnexus/music-payments', { artistId, amount: 5.25 })).payout;
-  await post('payments', 'complete-payout', '/api/skymusicnexus/music-payments', { payoutId: payout.id });
+  if (payout.status !== 'paperwork_hold') throw new Error(`Payout should stay on paperwork hold, got ${payout.status}`);
+  const payoutComplete = await post('payments', 'complete-payout', '/api/skymusicnexus/music-payments', { payoutId: payout.id }, false);
+  if (payoutComplete.error !== 'paperwork_required_before_payout') throw new Error('Payout completion did not enforce paperwork hold.');
   await get('payments', 'ledger', '/api/skymusicnexus/music-payments?action=ledger');
   await get('payments', 'payouts', '/api/skymusicnexus/music-payments?action=payouts');
 
@@ -610,7 +728,7 @@ async function runFullProductionMutationMatrix(page, entry) {
   await get('visuals', 'dashboard', '/api/skymusicnexus/visuals');
   await get('observability', 'state', '/api/skymusicnexus/observability');
 
-  const expectedFamilies = ['platform', 'artists', 'assets', 'studio', 'releases', 'drops', 'exchange', 'social', 'payments', 'provider-hooks', 'analytics', 'visuals', 'observability'];
+  const expectedFamilies = ['platform', 'artists', 'assets', 'studio', 'releases', 'drops', 'exchange', 'social', 'store', 'brain', 'gamify', 'payments', 'provider-hooks', 'analytics', 'visuals', 'observability'];
   const missingFamilies = expectedFamilies.filter(family => !families.has(family));
   entry.productionMatrix = {
     artistId,
@@ -631,9 +749,19 @@ async function runFullProductionMutationMatrix(page, entry) {
       fileCount: publishBatch?.deploy?.fileCount || 0
     },
     providerPublicationBoundary: publication?.publication?.note || '',
+    localBrainReceipts: brainCycle?.receipts?.map(receipt => receipt.kind || receipt.error || 'receipt') || [],
+    skyeMeterMeritsIssued: meterActivity?.event?.issuedMerits?.length || 0,
+    giveawayPrizeType: giveaway?.prizeType || '',
     visualsSchema: visuals?.visuals?.schema_version || ''
   };
-  addCheck(entry, 'full_music_api_mutation_matrix_covers_all_function_families', missingFamilies.length === 0 && actions.length >= 70, entry.productionMatrix);
+  addCheck(entry, 'full_music_api_mutation_matrix_covers_all_function_families', missingFamilies.length === 0 && actions.length >= 85, entry.productionMatrix);
+  addCheck(entry, 'local_artist_brain_executed_network_actions', entry.productionMatrix.localBrainReceipts.includes('listen_release') && entry.productionMatrix.localBrainReceipts.some(kind => ['feed_post', 'engage_post'].includes(kind)), {
+    receipts: entry.productionMatrix.localBrainReceipts
+  });
+  addCheck(entry, 'skye_meter_fill_issued_merit_and_giveaway_opened', entry.productionMatrix.skyeMeterMeritsIssued >= 1 && entry.productionMatrix.giveawayPrizeType === 'content_launch_drop_package', {
+    issuedMerits: entry.productionMatrix.skyeMeterMeritsIssued,
+    giveawayPrizeType: entry.productionMatrix.giveawayPrizeType
+  });
   addCheck(entry, 'drop_publish_returns_skynet_cdn_or_explicit_intent', (
     (entry.productionMatrix.dropDeploy.status === 'live' && entry.productionMatrix.dropDeploy.provider === 'fs27-skynet')
     || entry.productionMatrix.dropDeploy.status === 'deploy-intent'
@@ -676,7 +804,10 @@ async function readStress(page, entry) {
     '/api/skymusicnexus/music-analytics',
     '/api/skymusicnexus/music-analytics?action=observability',
     '/api/skymusicnexus/routes/manifest',
-    '/api/skymusicnexus/music-social?action=catalog'
+    '/api/skymusicnexus/music-social?action=catalog',
+    '/api/skymusicnexus/music-store',
+    '/api/skymusicnexus/music-brain',
+    '/api/skymusicnexus/music-gamify'
   ];
   const result = await page.evaluate(async ({ routes }) => {
     const raw = sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION') || localStorage.getItem('FREE99_PLATFORM_GATE_SESSION') || '{}';
@@ -705,9 +836,12 @@ async function readStress(page, entry) {
 
 async function validateMusicApis(page, entry) {
   const manifest = await api(page, entry, 'GET', '/api/skymusicnexus/routes/manifest');
-  addCheck(entry, 'manifest_exposes_music_function_contract', manifest?.base === '/api/skymusicnexus' && Array.isArray(manifest.functions) && manifest.functions.includes('music-assets'), {
+  const requiredFunctions = ['music-assets', 'music-store', 'music-brain', 'music-gamify'];
+  const missingFunctions = requiredFunctions.filter(fn => !(manifest?.functions || []).includes(fn));
+  addCheck(entry, 'manifest_exposes_music_function_contract', manifest?.base === '/api/skymusicnexus' && Array.isArray(manifest.functions) && missingFunctions.length === 0, {
     base: manifest?.base,
-    functionCount: manifest?.functions?.length || 0
+    functionCount: manifest?.functions?.length || 0,
+    missingFunctions
   });
 
   const hub = await api(page, entry, 'GET', '/api/skymusicnexus/hub');
@@ -844,10 +978,12 @@ const nexusRoutes = [
   { path: '/SkyeMusicNexus/public/upload.html', label: 'upload', expects: ['Upload Studio', 'Import audio'], guidance: true },
   { path: '/SkyeMusicNexus/public/player.html', label: 'player', expects: ['Music Player', 'Stream Deck'], guidance: true },
   { path: '/SkyeMusicNexus/public/releases.html', label: 'releases', expects: ['Releases', 'Release Forge'], guidance: true },
-  { path: '/SkyeMusicNexus/public/rights.html', label: 'rights', expects: ['Rights Vault', 'Save Rights Gate'], guidance: true },
+  { path: '/SkyeMusicNexus/public/rights.html', label: 'rights', expects: ['Rights Vault', 'Save Rights'], guidance: true },
   { path: '/SkyeMusicNexus/public/exchange.html', label: 'exchange', expects: ['Artist Exchange', 'Content requests'], guidance: true },
   { path: '/SkyeMusicNexus/public/drops.html', label: 'drops', expects: ['Drops', 'Create Drop'], guidance: true },
-  { path: '/SkyeMusicNexus/public/admin.html', label: 'operator', expects: ['Operator Stage', 'Analytics'], guidance: true },
+  { path: '/SkyeMusicNexus/public/store.html', label: 'store', expects: ['SkyeMusicNexus // Artist Store', 'Every artist can have a real store', 'Create Order Intent'], guidance: false },
+  { path: '/SkyeMusicNexus/public/brain.html', label: 'brain', expects: ['SkyeMusicNexus // Local Artist Brain', 'Artist brains act inside the Nexus', 'SkyeMeter', 'Open Giveaway'], guidance: false },
+  { path: '/SkyeMusicNexus/public/admin.html', label: 'protected-review', expects: ['Protected Review', 'Analytics'], guidance: true },
   { path: '/SkyeMusicNexus/public/exports.html', label: 'exports', expects: ['Export Forge', 'Release Forge handoff'], guidance: true },
   { path: '/SkyeMusicNexus/public/stems.html', label: 'stems', expects: ['Stem Vault', 'Stage stems'], guidance: true },
   { path: '/SkyeMusicNexus/proof.html', label: 'readiness', expects: ['SkyeMusicNexus Readiness', 'Backend Route Matrix'], guidance: false },
@@ -928,7 +1064,7 @@ async function runViewport(browser, owner, viewport, viewportLabel, { seed = fal
     await readStress(page, entry);
     await validateCommandDashboard(page, entry);
     if (fullRouteScan) await scanNexusRoutes(page, entry, nexusRoutes);
-    else await scanNexusRoutes(page, entry, nexusRoutes.filter(route => ['artist-dashboard', 'daw', 'upload', 'rights', 'operator', 'readiness'].includes(route.label)));
+    else await scanNexusRoutes(page, entry, nexusRoutes.filter(route => ['artist-dashboard', 'daw', 'upload', 'rights', 'protected-review', 'readiness'].includes(route.label)));
     await validateSaasVisuals(page, entry);
   } catch (error) {
     entry.failures.push(redact(error?.stack || error?.message || error).split('\n').slice(0, 10).join('\n'));
@@ -952,7 +1088,11 @@ async function main() {
   ];
 
   const owner = await resolveOwnerGate();
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({
+    headless: false,
+    timeout: Number(process.env.LIVE_BROWSER_LAUNCH_TIMEOUT_MS || 300000),
+    args: ['--disable-gpu', '--disable-software-rasterizer']
+  });
   const results = [];
   try {
     results.push(await runViewport(browser, owner, { width: 1440, height: 980 }, 'desktop', { seed: true, fullRouteScan: true }));

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Austin Commercial, L.P. | Valley Verified</title>
+  <meta name="description" content="Valley Verified profile for Austin Commercial, L.P., a commercial construction profile in Phoenix, Arizona.">
+  <style>
+    :root {
+      --ink: #111923;
+      --blue: #123c69;
+      --orange: #f27c38;
+      --steel: #d8e2e9;
+      --paper: #f7fafc;
+      --line: rgba(17, 25, 35, .18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, transparent 0 48%, rgba(242, 124, 56, .22) 48% 50%, transparent 50%),
+        linear-gradient(90deg, rgba(18, 60, 105, .08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(18, 60, 105, .08) 1px, transparent 1px),
+        #eef3f6;
+      background-size: auto, 34px 34px, 34px 34px, auto;
+    }
+
+    a { color: inherit; }
+
+    .site {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .nav {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .hero {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 560px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 60px rgba(18, 60, 105, .12);
+    }
+
+    .rail {
+      background: var(--blue);
+      color: #fff;
+      padding: 28px;
+      display: grid;
+      align-content: space-between;
+      gap: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rail:after {
+      content: "";
+      position: absolute;
+      inset: auto -70px -70px auto;
+      width: 210px;
+      height: 210px;
+      border: 28px solid rgba(242, 124, 56, .58);
+      transform: rotate(18deg);
+    }
+
+    .mark {
+      position: relative;
+      z-index: 1;
+      width: 150px;
+      height: 150px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 8px solid rgba(255,255,255,.22);
+    }
+
+    .mark img {
+      width: 118px;
+      height: 118px;
+      object-fit: contain;
+    }
+
+    .rail p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: #d9e8f4;
+      line-height: 1.6;
+    }
+
+    .main {
+      padding: 44px;
+      display: grid;
+      align-content: space-between;
+      gap: 34px;
+    }
+
+    .stamp {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--orange);
+      color: #fff;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      margin: 20px 0 16px;
+      max-width: 760px;
+      font-size: clamp(44px, 7.5vw, 88px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 760px;
+      margin: 0;
+      color: #3c4b5a;
+      font-size: 19px;
+      line-height: 1.58;
+    }
+
+    .contacts {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 12px;
+    }
+
+    .contact {
+      min-height: 128px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      align-content: center;
+      font-style: normal;
+      text-decoration: none;
+    }
+
+    .contact.primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--orange);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .contact span {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.28;
+      overflow-wrap: anywhere;
+    }
+
+    .specs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .spec {
+      min-height: 126px;
+      padding: 17px;
+      background: rgba(18, 60, 105, .06);
+      border: 1px solid var(--line);
+    }
+
+    .spec span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 930px) {
+      .hero, .contacts { grid-template-columns: 1fr; }
+      .rail { min-height: 260px; }
+      .specs { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .site { width: min(100% - 20px, 1180px); }
+      .main, .rail { padding: 24px; }
+      .nav { grid-template-columns: 1fr; }
+      .specs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="site">
+    <div class="nav">
+      <span>Commercial Construction</span>
+      <span>Phoenix, AZ 85027</span>
+    </div>
+
+    <section class="hero" aria-label="Austin Commercial profile">
+      <aside class="rail">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="Austin Commercial mark">
+        </div>
+        <p>A Valley Verified profile for a Phoenix commercial construction provider.</p>
+      </aside>
+
+      <div class="main">
+        <div>
+          <span class="stamp">Valley Verified Network</span>
+          <h1>Austin Commercial, L.P.</h1>
+          <p class="summary">Austin Commercial, L.P. is listed for commercial construction under the Construction / Commercial Construction license type. Use the listed phone for project scope, scheduling, and quote details.</p>
+        </div>
+
+        <div class="contacts" aria-label="Austin Commercial contact information">
+          <a class="contact primary" href="tel:+16022671879"><b>Phone</b><span>(602) 267-1879</span></a>
+          <a class="contact" href="https://www.austin-ind.com"><b>Website</b><span>austin-ind.com</span></a>
+          <address class="contact"><b>Address</b><span>2001 W. Pinnacle Peak Rd Ste. 200<br>Phoenix, AZ 85027</span></address>
+        </div>
+      </div>
+    </section>
+
+    <section class="specs" aria-label="Austin Commercial facts">
+      <div class="spec"><b>Category</b><span>Home Services</span></div>
+      <div class="spec"><b>Niche</b><span>Commercial Construction</span></div>
+      <div class="spec"><b>Pricing</b><span>Quote-based service</span></div>
+      <div class="spec"><b>Profile date</b><span>May 19, 2026</span></div>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Austin Commercial, L.P. is Valley Verified as a Phoenix commercial construction presence at 2001 W. Pinnacle Peak Rd., Suite 200, with official Austin Industries and Chamber evidence behind the profile.</p>
+        <ul>
+          <li>The focus is commercial and industrial construction for larger property and project needs.</li>
+          <li>The Greater Phoenix Chamber construction category supports the local Phoenix office, phone (602) 267-1879, and industry placement.</li>
+          <li>For owners, developers, and operators comparing construction partners, the page anchors the company to a real North Phoenix office and documented commercial-construction category.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

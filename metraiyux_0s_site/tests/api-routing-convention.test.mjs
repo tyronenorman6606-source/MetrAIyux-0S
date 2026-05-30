@@ -37,12 +37,22 @@ function req(path, options = {}) {
   return new Request(`https://metraiyux.example${path}`, options);
 }
 
+function gatedReq(path, options = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set('authorization', 'Bearer gate-token');
+  return req(path, { ...options, headers });
+}
+
+function gatedEnv(overrides = {}) {
+  return env({ SKYGATEFS27_WORKER: gateWorker(), ...overrides });
+}
+
 async function json(response) {
   return response.json();
 }
 
 test('API-01/API-05 exposes the full-system route manifest and API base decision', async () => {
-  const res = await siteWorker.fetch(req('/api/0s/route-manifest'), env(), ctx());
+  const res = await siteWorker.fetch(gatedReq('/api/0s/route-manifest'), gatedEnv(), ctx());
   assert.equal(res.status, 200);
   const data = await json(res);
   assert.equal(data.ok, true);
@@ -92,7 +102,7 @@ test('API-04 app health endpoints return mounted state instead of static 404', a
   ];
 
   for (const path of healthPaths) {
-    const res = await siteWorker.fetch(req(path), env(), ctx());
+    const res = await siteWorker.fetch(gatedReq(path), gatedEnv(), ctx());
     assert.notEqual(res.status, 404, path);
     const data = await json(res);
     assert.equal(typeof data.mounted, 'boolean', path);
@@ -110,7 +120,7 @@ test('API-03 legacy root app APIs return a collision diagnostic instead of falli
   ];
 
   for (const path of legacyPaths) {
-    const res = await siteWorker.fetch(req(path), env(), ctx());
+    const res = await siteWorker.fetch(gatedReq(path), gatedEnv(), ctx());
     assert.equal(res.status, 409, path);
     const data = await json(res);
     assert.equal(data.error, 'api_root_collision', path);

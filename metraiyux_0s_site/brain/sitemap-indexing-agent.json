@@ -1,0 +1,32 @@
+{
+  "schema": "metraiyux.0s.agent.v1",
+  "id": "sitemap-indexing-agent",
+  "name": "Sitemap Indexing Agent",
+  "created_at": "2026-05-25T00:00:00.000Z",
+  "updated_at": "2026-05-25T00:00:00.000Z",
+  "status": "available_to_0s",
+  "owner_brain": "gray-london-skyes-brain",
+  "purpose": "Keep every public Skyes Over London, MetrAIyux, Free99, SkyeGate, and client surface supplied with sitemap.xml, robots.txt, Google indexing submit JSON, and a repo-wide Search Console submission report.",
+  "triggers": [
+    "update all sitemaps",
+    "refresh Google indexing links",
+    "run sitemap agent",
+    "all sites need sitemap",
+    "SEO submit ledger"
+  ],
+  "local_instruction_file": ".agents/sitemap-indexing-agent/AGENTS.md",
+  "command": "npm run seo:agent",
+  "config": "metraiyux_0s_site/seo/sitemap-agent.config.json",
+  "outputs": [
+    "metraiyux_0s_site/seo/sitemap-agent-report.json",
+    "metraiyux_0s_site/seo/SITEMAP_AGENT_REPORT.md",
+    "metraiyux_0s_site/seo/sitemap-agent-report.html",
+    "metraiyux_0s_site/seo/sitemap-agent-submit-links.json"
+  ],
+  "hard_boundaries": [
+    "Does not create app-specific admin passwords or separate auth lanes.",
+    "Does not print bearer tokens, owner sessions, Cloudflare credentials, or private env values.",
+    "Does not invent a public domain for a site root; missing origins are reported until configured.",
+    "Does not mark live browser proof complete. Human/browser proof is separate from sitemap generation."
+  ]
+}

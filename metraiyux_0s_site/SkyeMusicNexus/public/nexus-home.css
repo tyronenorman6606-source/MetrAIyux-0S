@@ -1,0 +1,1096 @@
+:root {
+  color-scheme: dark;
+  --nexus-bg: #050609;
+  --nexus-ink: #f7f5ea;
+  --nexus-muted: rgba(247, 245, 234, .68);
+  --nexus-soft: rgba(247, 245, 234, .1);
+  --nexus-line: rgba(247, 245, 234, .16);
+  --nexus-panel: rgba(12, 16, 18, .86);
+  --nexus-panel-strong: rgba(19, 24, 27, .94);
+  --nexus-cyan: #6ee7f8;
+  --nexus-pink: #ff75b7;
+  --nexus-gold: #ffd166;
+  --nexus-green: #a4f08a;
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --nexus-ease: var(--ease-expo-out);
+  --nexus-stagger: 0.08;
+  --nexus-reveal-duration: 0.6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: var(--nexus-cyan) rgba(7, 16, 23, .72);
+  scrollbar-width: auto;
+}
+
+html[data-mcp-neon-scrollbar]::-webkit-scrollbar,
+html[data-mcp-neon-scrollbar] body::-webkit-scrollbar,
+body.nexus-home::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background: rgba(7, 16, 23, .72);
+}
+
+html[data-mcp-neon-scrollbar]::-webkit-scrollbar-track,
+html[data-mcp-neon-scrollbar] body::-webkit-scrollbar-track,
+body.nexus-home::-webkit-scrollbar-track {
+  border: 1px solid rgba(110, 231, 248, .34);
+  background: linear-gradient(180deg, rgba(110, 231, 248, .12), rgba(255, 209, 102, .10));
+  box-shadow: inset 0 0 14px rgba(110, 231, 248, .18);
+}
+
+html[data-mcp-neon-scrollbar]::-webkit-scrollbar-thumb,
+html[data-mcp-neon-scrollbar] body::-webkit-scrollbar-thumb,
+body.nexus-home::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .18)) padding-box,
+    linear-gradient(180deg, var(--nexus-gold), var(--nexus-cyan), var(--nexus-pink)) border-box;
+  box-shadow: 0 0 18px rgba(110, 231, 248, .72), 0 0 28px rgba(255, 209, 102, .30);
+}
+
+.neon-gradient-text {
+  background: linear-gradient(90deg, #fff8e7, var(--nexus-gold) 35%, var(--nexus-cyan) 68%, var(--nexus-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(110, 231, 248, .20), 0 0 34px rgba(255, 117, 183, .14);
+}
+
+body.nexus-home,
+body.nexus-dashboard {
+  min-height: 100vh;
+  margin: 0;
+  font-weight: 400;
+  color: var(--nexus-ink);
+  background:
+    radial-gradient(circle at 15% 8%, rgba(110, 231, 248, .18), transparent 28rem),
+    radial-gradient(circle at 82% 18%, rgba(255, 117, 183, .15), transparent 26rem),
+    linear-gradient(135deg, #050609, #10151a 48%, #07090c);
+  padding-bottom: 112px;
+}
+
+.nexus-home-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: .58;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .85), transparent 78%);
+}
+
+.nexus-home-frame {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 340px;
+  gap: 18px;
+  width: min(1720px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-block: 16px 42px;
+  padding-inline: 0;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.nexus-sidebar,
+.nexus-right-rail {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.nexus-sidebar,
+.nexus-panel,
+.nexus-artist-card,
+.nexus-owner-card,
+.nexus-now,
+.nexus-command-bar,
+.nexus-live-strip article,
+.nexus-dashboard-card {
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: var(--nexus-panel);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(18px);
+}
+
+.nexus-sidebar {
+  display: grid;
+  gap: 18px;
+  padding: 16px;
+}
+
+.nexus-brand {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  color: var(--nexus-ink);
+  text-decoration: none;
+}
+
+.nexus-brand img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.nexus-brand strong,
+.nexus-brand small {
+  display: block;
+}
+
+.nexus-brand small,
+.nexus-kicker,
+.nexus-sidebar a,
+.nexus-sidebar__tools a,
+.nexus-sidebar__button,
+.nexus-section__head a,
+.nexus-rail-head a,
+.nexus-panel a,
+.nexus-dashboard-nav a {
+  color: var(--nexus-muted);
+}
+
+.nexus-sidebar__nav,
+.nexus-sidebar__library,
+.nexus-sidebar__tools {
+  display: grid;
+  gap: 7px;
+}
+
+.nexus-sidebar a,
+.nexus-sidebar__tools a,
+.nexus-sidebar__button,
+.nexus-dashboard-nav a {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  padding: 9px 10px;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.nexus-sidebar__button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nexus-sidebar__label {
+  color: rgba(247, 245, 234, .45);
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.nexus-sidebar a:hover,
+.nexus-sidebar a[aria-current="page"],
+.nexus-sidebar__button:hover,
+.nexus-dashboard-nav a[aria-current="page"],
+.nexus-dashboard-nav a:hover {
+  color: #061013;
+  background: var(--nexus-cyan);
+}
+
+.nexus-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.nexus-command-bar {
+  position: sticky;
+  top: 16px;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+}
+
+.nexus-search {
+  display: grid;
+  gap: 6px;
+}
+
+.nexus-search span,
+.nexus-kicker {
+  color: var(--nexus-cyan);
+  font-size: .76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.nexus-search input,
+.nexus-select,
+.nexus-dashboard-select {
+  width: 100%;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .07);
+  color: var(--nexus-ink);
+  min-height: 42px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.nexus-command-actions,
+.nexus-now__actions,
+.nexus-panel-actions,
+.nexus-dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.nexus-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  padding: 9px 13px;
+  color: var(--nexus-ink);
+  background: rgba(255, 255, 255, .07);
+  text-decoration: none;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .18s var(--nexus-ease), border-color .18s var(--nexus-ease), background .18s var(--nexus-ease), box-shadow .18s var(--nexus-ease);
+}
+
+.nexus-button:disabled,
+.nexus-sidebar__button:disabled {
+  opacity: .46;
+  cursor: not-allowed;
+}
+
+.nexus-button:hover,
+.nexus-button--primary {
+  color: #061013;
+  background: var(--nexus-cyan);
+  border-color: var(--nexus-cyan);
+}
+
+.nexus-button:disabled:hover,
+.nexus-sidebar__button:disabled:hover {
+  color: var(--nexus-muted);
+  background: transparent;
+  border-color: var(--nexus-line);
+}
+
+.nexus-link-button {
+  border: 0;
+  padding: 0;
+  color: var(--nexus-cyan);
+  background: transparent;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.nexus-shelf-tabs {
+  position: sticky;
+  top: 86px;
+  z-index: 7;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+}
+
+.nexus-shelf-tabs a {
+  flex: 0 0 auto;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--nexus-line);
+  border-radius: 999px;
+  padding: 8px 13px;
+  color: var(--nexus-ink);
+  background: rgba(255, 255, 255, .07);
+  text-decoration: none;
+  font-size: .85rem;
+  font-weight: 900;
+  backdrop-filter: blur(16px);
+}
+
+.nexus-shelf-tabs a:hover {
+  color: #061013;
+  background: var(--nexus-green);
+  border-color: var(--nexus-green);
+}
+
+.nexus-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 190px);
+  gap: 14px;
+  padding-block: clamp(8rem, 15vw, 14rem);
+  padding-inline: clamp(2rem, 6vw, 6rem);
+}
+
+.nexus-now {
+  display: grid;
+  grid-template-columns: minmax(250px, .74fr) minmax(0, 1fr);
+  gap: 18px;
+  min-height: 460px;
+  padding: 18px;
+}
+
+.nexus-now__art-wrap {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .05);
+}
+
+.nexus-now__art-wrap img,
+.nexus-now__art-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.nexus-now__art-wrap img {
+  object-fit: cover;
+  opacity: .58;
+}
+
+.nexus-now__art-wrap canvas {
+  mix-blend-mode: screen;
+}
+
+.nexus-now__copy {
+  display: grid;
+  align-content: end;
+  gap: 13px;
+  min-width: 0;
+}
+
+.nexus-now h1,
+.nexus-dashboard-hero h1 {
+  margin: 0;
+  color: var(--nexus-ink);
+  font-size: 5.15rem;
+  line-height: 0.92;
+  letter-spacing: 0;
+}
+
+.nexus-now p,
+.nexus-panel p,
+.nexus-dashboard-card p {
+  margin: 0;
+  color: var(--nexus-muted);
+  line-height: 1.55;
+}
+
+.nexus-now__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nexus-now__meta span,
+.nexus-current-card,
+.nexus-shortcut,
+.nexus-playlist-card,
+.nexus-genre-card,
+.nexus-queue-card {
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .055);
+}
+
+.nexus-now__meta span {
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 9px;
+  color: var(--nexus-ink);
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+.nexus-current-card {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+}
+
+.nexus-current-card span,
+.nexus-current-card small {
+  color: var(--nexus-muted);
+}
+
+.nexus-current-card span {
+  font-size: .72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.nexus-current-card strong,
+.nexus-current-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nexus-live-strip {
+  display: grid;
+  gap: 10px;
+}
+
+.nexus-live-strip article,
+.nexus-stat-list article {
+  padding: 14px;
+}
+
+.nexus-live-strip strong,
+.nexus-stat-list strong,
+.nexus-dashboard-metric strong {
+  display: block;
+  color: var(--nexus-ink);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.nexus-live-strip span,
+.nexus-stat-list span,
+.nexus-dashboard-metric span {
+  display: block;
+  margin-top: 7px;
+  color: var(--nexus-muted);
+  font-size: .78rem;
+  text-transform: uppercase;
+}
+
+.nexus-section {
+  display: grid;
+  gap: 12px;
+  padding-block: 6rem;
+  padding-inline: clamp(2rem, 6vw, 6rem);
+}
+
+.nexus-stage,
+.nexus-section,
+.nexus-now,
+.nexus-shortcut,
+.nexus-playlist-card,
+.nexus-track-card,
+.nexus-genre-card {
+  animation: nexusRise 520ms var(--ease-expo-out) both;
+  animation-delay: calc(var(--i, 0) * 0.08s);
+  animation-duration: 520ms;
+  transition: opacity 520ms var(--ease-expo-out), transform 520ms var(--ease-expo-out);
+  transition-delay: calc(var(--stagger-index, 0) * 0.08s);
+}
+
+.nexus-playlist-card,
+.nexus-track-card,
+.nexus-genre-card,
+.nexus-button {
+  transform-style: preserve-3d;
+}
+
+.nexus-playlist-card:hover,
+.nexus-track-card:hover,
+.nexus-genre-card:hover,
+.nexus-button:hover {
+  transform: perspective(900px) rotateX(1.2deg) rotateY(-1.2deg) translateY(-4px);
+}
+
+.nexus-magnetic-pull {
+  transform: translate3d(var(--magnetic-x, 0), var(--magnetic-y, 0), 0);
+}
+
+@keyframes nexusRise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.nexus-section__head,
+.nexus-rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.nexus-section__head h2,
+.nexus-rail-head h2,
+.nexus-panel h2,
+.nexus-dashboard-card h2 {
+  margin: 4px 0 0;
+  color: var(--nexus-ink);
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+
+.nexus-section__head a,
+.nexus-rail-head a {
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.nexus-quick-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(230px, .72fr) minmax(260px, .82fr);
+  gap: 14px;
+}
+
+.nexus-shortcut {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 15px;
+}
+
+.nexus-shortcut strong {
+  display: block;
+  color: var(--nexus-ink);
+  font-size: 1.05rem;
+}
+
+.nexus-shortcut p {
+  margin: 0;
+  color: var(--nexus-muted);
+  line-height: 1.45;
+}
+
+.nexus-shortcut--library {
+  background:
+    linear-gradient(135deg, rgba(164, 240, 138, .1), rgba(255, 255, 255, .045)),
+    rgba(255, 255, 255, .055);
+}
+
+.nexus-playlist-grid,
+.nexus-genre-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nexus-playlist-card,
+.nexus-genre-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 180px;
+  padding: 13px;
+}
+
+.nexus-playlist-card {
+  background:
+    linear-gradient(145deg, rgba(110, 231, 248, .11), rgba(255, 117, 183, .07)),
+    rgba(255, 255, 255, .05);
+}
+
+.nexus-playlist-card__covers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  width: 88px;
+}
+
+.nexus-playlist-card__covers img {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, .06);
+}
+
+.nexus-playlist-card strong,
+.nexus-genre-card strong {
+  display: block;
+  color: var(--nexus-ink);
+  overflow-wrap: anywhere;
+}
+
+.nexus-playlist-card p,
+.nexus-genre-card p,
+.nexus-playlist-card span,
+.nexus-genre-card span {
+  margin: 0;
+  color: var(--nexus-muted);
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+.nexus-playlist-card .nexus-button,
+.nexus-genre-card .nexus-button {
+  align-self: end;
+}
+
+.nexus-track-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(198px, 244px);
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+}
+
+.nexus-track-card,
+.nexus-artist-tile,
+.nexus-feed-item,
+.nexus-workflow-list a,
+.nexus-owner-row,
+.nexus-dashboard-artist-row,
+.nexus-dashboard-track-row {
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .055);
+}
+
+.nexus-track-card {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  scroll-snap-align: start;
+}
+
+.nexus-track-card img,
+.nexus-artist-tile img,
+.nexus-artist-card > img,
+.nexus-dashboard-avatar {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, .06);
+}
+
+.nexus-track-card strong,
+.nexus-track-card span,
+.nexus-artist-tile strong,
+.nexus-artist-tile span,
+.nexus-owner-row strong,
+.nexus-owner-row span,
+.nexus-dashboard-artist-row strong,
+.nexus-dashboard-artist-row span,
+.nexus-dashboard-track-row strong,
+.nexus-dashboard-track-row span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.nexus-track-card span,
+.nexus-artist-tile span,
+.nexus-owner-row span,
+.nexus-feed-item span,
+.nexus-workflow-list span,
+.nexus-queue-row span,
+.nexus-dashboard-artist-row span,
+.nexus-dashboard-track-row span {
+  color: var(--nexus-muted);
+  font-size: .84rem;
+}
+
+.nexus-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.nexus-card-actions .nexus-button {
+  min-height: 34px;
+  padding: 7px 9px;
+  font-size: .84rem;
+}
+
+.nexus-home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(270px, .75fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.nexus-panel {
+  padding: 16px;
+}
+
+.nexus-panel--large {
+  grid-row: span 2;
+}
+
+.nexus-artist-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.nexus-artist-tile {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.nexus-artist-tile .nexus-card-actions {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.nexus-feed-preview,
+.nexus-workflow-list,
+.nexus-owner-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.nexus-feed-item,
+.nexus-workflow-list a,
+.nexus-owner-row {
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  color: var(--nexus-ink);
+  text-decoration: none;
+}
+
+.nexus-right-rail {
+  display: grid;
+  gap: 14px;
+}
+
+.nexus-artist-card,
+.nexus-owner-card,
+.nexus-queue-card {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+}
+
+.nexus-queue-preview {
+  display: grid;
+  gap: 8px;
+}
+
+.nexus-queue-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 9px;
+  align-items: center;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, .045);
+}
+
+.nexus-queue-row img {
+  width: 44px;
+  height: 44px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.nexus-queue-row strong,
+.nexus-queue-row span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nexus-queue-index {
+  color: var(--nexus-cyan);
+  font-size: .76rem;
+  font-weight: 900;
+}
+
+.nexus-stat-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nexus-stat-list article {
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .05);
+}
+
+.nexus-dashboard-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1480px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 18px 0 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.nexus-dashboard-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: var(--nexus-panel);
+}
+
+.nexus-dashboard-nav img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  margin-right: 8px;
+}
+
+.nexus-dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .75fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.nexus-dashboard-card {
+  padding: 18px;
+}
+
+.nexus-dashboard-card--hero {
+  display: grid;
+  align-content: end;
+  min-height: 360px;
+  background:
+    linear-gradient(135deg, rgba(110, 231, 248, .14), rgba(255, 117, 183, .08)),
+    var(--nexus-panel);
+}
+
+.nexus-dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.nexus-dashboard-metric {
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, .05);
+}
+
+.nexus-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+  gap: 14px;
+}
+
+.nexus-dashboard-artist-list,
+.nexus-dashboard-track-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  max-height: 640px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.nexus-dashboard-artist-row,
+.nexus-dashboard-track-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px;
+}
+
+.nexus-dashboard-avatar {
+  width: 56px;
+  height: 56px;
+}
+
+.nexus-dashboard-track-row img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.nexus-mini-map {
+  width: 100%;
+  min-height: 280px;
+  border: 1px solid var(--nexus-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .04);
+}
+
+@media (max-width: 1180px) {
+  .nexus-home-frame {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+
+  .nexus-right-rail {
+    grid-column: 1 / -1;
+    position: static;
+    max-height: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nexus-now h1,
+  .nexus-dashboard-hero h1 {
+    font-size: 4.1rem;
+  }
+
+  .nexus-playlist-grid,
+  .nexus-genre-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .nexus-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nexus-shortcut--library {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .nexus-home-frame,
+  .nexus-stage,
+  .nexus-now,
+  .nexus-home-grid,
+  .nexus-quick-grid,
+  .nexus-dashboard-hero,
+  .nexus-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .nexus-sidebar__nav,
+  .nexus-sidebar__library,
+  .nexus-sidebar__tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nexus-sidebar__label {
+    grid-column: 1 / -1;
+  }
+
+  .nexus-command-bar {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-shelf-tabs {
+    top: 0;
+  }
+
+  .nexus-now h1,
+  .nexus-dashboard-hero h1 {
+    font-size: 3.35rem;
+  }
+
+  .nexus-right-rail,
+  .nexus-artist-grid,
+  .nexus-playlist-grid,
+  .nexus-genre-grid,
+  .nexus-dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-dashboard-artist-row,
+  .nexus-dashboard-track-row {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .nexus-dashboard-artist-row .nexus-button,
+  .nexus-dashboard-track-row .nexus-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .nexus-home-frame,
+  .nexus-dashboard-shell {
+    width: min(100% - 18px, 1480px);
+    padding-top: 9px;
+  }
+
+  .nexus-now {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .nexus-now__art-wrap {
+    min-height: 260px;
+  }
+
+  .nexus-now h1,
+  .nexus-dashboard-hero h1 {
+    font-size: 2.6rem;
+  }
+
+  .nexus-command-actions,
+  .nexus-now__actions,
+  .nexus-panel-actions,
+  .nexus-dashboard-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nexus-button {
+    width: 100%;
+  }
+
+  .nexus-sidebar {
+    padding: 12px;
+  }
+
+  .nexus-sidebar__nav,
+  .nexus-sidebar__library,
+  .nexus-sidebar__tools {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-track-rail {
+    grid-auto-columns: minmax(168px, 82vw);
+  }
+
+  .nexus-card-actions,
+  .nexus-artist-tile .nexus-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .nexus-stat-list,
+  .nexus-live-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

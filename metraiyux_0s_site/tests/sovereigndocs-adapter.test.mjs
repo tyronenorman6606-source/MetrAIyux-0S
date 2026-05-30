@@ -65,8 +65,8 @@ async function call(e, path, options = {}) {
 }
 
 test('SD-01/SD-05 SovereignDocs adapter exposes health with explicit storage mode', async () => {
-  const e = env();
-  const health = await call(e, '/api/sovereigndocs/health');
+  const e = env({SKYGATEFS27_WORKER:gateWorker()});
+  const health = await call(e, '/api/sovereigndocs/health', {token:'gate-token'});
   assert.equal(health.app_id, 'sovereigndocs');
   assert.equal(health.mounted, true);
   assert.equal(health.storage_mode, 'kv');
@@ -89,6 +89,44 @@ test('SD-05 SovereignDocs mutations fail closed when storage is not configured',
   const data = await res.json();
   assert.equal(data.error, 'sovereigndocs_storage_not_configured');
   assert.equal(data.storage_mode, 'not_configured');
+});
+
+test('LLC-to-0S workflow syncs Founder Command CRM onboarding without a new auth lane', async () => {
+  const e = env({SKYGATEFS27_WORKER:gateWorker()});
+
+  const started = await call(e, '/api/sovereigndocs/business-formation/start-to-0s', {
+    method:'POST',
+    token:'gate-token',
+    body:{
+      businessName:'Proof CRM Launch LLC',
+      ownerName:'Proof Owner',
+      ownerEmail:'proof-owner@example.invalid',
+      industry:'0S business services',
+      city:'Phoenix',
+      state:'AZ',
+      clientId:'proof-crm-launch',
+      registeredAgent:'Proof Registered Agent'
+    }
+  });
+  assert.equal(started.workflow.founderCommandCrm.ok, true);
+  assert.equal(started.workflow.founderCommandCrm.accountId, 'founder-client:proof-crm-launch');
+  assert.equal(started.workflow.founderCommandCrm.identityLinks >= 4, true);
+  assert.equal(started.workflow.founderCommandCrm.operations >= 5, true);
+  assert.equal(started.workflow.receipts.some((item) => item.id === 'founder_command_crm' && item.ok), true);
+
+  const clientDashboard = await call(e, `/api/sovereigndocs/business-formation/workflows/${encodeURIComponent(started.workflow.id)}/client-dashboard`, {token:'gate-token'});
+  const crmAction = clientDashboard.nextActions.find((item) => item.id === 'crm_onboarding');
+  assert.equal(crmAction.status, 'account_synced');
+  assert.equal(crmAction.href, started.workflow.dashboards.founderCommand);
+
+  const detail = await call(e, crmAction.href, {token:'gate-token'});
+  assert.equal(detail.account.client_account_id, started.workflow.founderCommandCrm.accountId);
+  assert.equal(detail.account.auth_boundary, 'shared FS27/SkyGate/Free99 owner gate; no client-local founder/admin password');
+  assert.equal(detail.account.lanes.crm_onboarding.status, 'owner_review_queue');
+  assert.equal(detail.account.lanes.skynet.status, 'intent_recorded_owner_deploy_required');
+  assert.equal(detail.operations.length >= 5, true);
+  assert.equal(detail.operations.some((item) => item.lane === 'official_filing_boundary' && item.status === 'waiting_for_external_official_receipt'), true);
+  assert.equal(detail.identity_links.some((item) => item.system === 'sovereigndocs' && item.source_table === 'business_formation_workflows'), true);
 });
 
 test('SD-04 proves dashboard, case, packet, reminders, partner review, editor handoff, return, and closure summary', async () => {

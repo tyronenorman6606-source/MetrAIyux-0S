@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Brain Operations Monitor</title>
+  <meta name="description" content="Dense SkyeMusicNexus artist-brain operations monitor for cycles, listening, stream impact, queue state, and alerts." />
+  <link rel="stylesheet" href="./brain-monitor.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="./brain-monitor.js"></script>
+</head>
+<body data-app="skye-music-nexus" data-room="brain-monitor">
+  <header class="ops-bar">
+    <a class="brand" href="./index.html" aria-label="SkyeMusicNexus home">
+      <img src="../assets/skye-music-nexus-logo.png" alt="" />
+      <span>SkyeMusicNexus</span>
+    </a>
+    <nav aria-label="SkyeMusicNexus rooms">
+      <a href="./index.html">Hub</a>
+      <a href="./brain.html">Brain</a>
+      <a href="./stream-analytics.html">Streams</a>
+      <a href="./artist-dashboard.html">Artists</a>
+      <a href="./brain-monitor.html" aria-current="page">Monitor</a>
+    </nav>
+    <div class="toolbar">
+      <label class="artist-field">
+        <span>Artist</span>
+        <input id="artistIdInput" autocomplete="off" spellcheck="false" />
+      </label>
+      <button class="icon-button" id="refreshButton" type="button" title="Refresh status" aria-label="Refresh status">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.31 6.36M3 12A9 9 0 0 1 18.31 5.64"/><path d="M21 4v6h-6M3 20v-6h6"/></svg>
+      </button>
+      <button class="icon-button control" id="pauseButton" type="button" title="Pause monitor" aria-label="Pause monitor">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <button class="icon-button control" id="resumeButton" type="button" title="Resume monitor" aria-label="Resume monitor">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg>
+      </button>
+      <button class="run-button" id="runCycleButton" type="button">Run Cycle</button>
+    </div>
+  </header>
+
+  <main class="monitor-shell">
+    <section class="status-strip" aria-label="Brain monitor status">
+      <article class="status-card primary">
+        <span class="label">Now Listening</span>
+        <strong id="nowListening">Standby</strong>
+        <small id="trackDetail">No live listen loaded</small>
+      </article>
+      <article class="status-card">
+        <span class="label">Track</span>
+        <strong id="trackTitle">No track</strong>
+        <small id="trackMeta">Waiting for brain or traffic data</small>
+      </article>
+      <article class="status-card">
+        <span class="label">Last Action</span>
+        <strong id="lastAction">Idle</strong>
+        <small id="lastActionMeta">No cycle receipt yet</small>
+      </article>
+      <article class="status-card">
+        <span class="label">Next Action</span>
+        <strong id="nextAction">Not queued</strong>
+        <small id="nextActionMeta">0 pending</small>
+      </article>
+      <article class="status-card alert-card" id="alertCard">
+        <span class="label">Alert Status</span>
+        <strong id="alertStatus">Loading</strong>
+        <small id="alertMeta">Checking API lanes</small>
+      </article>
+    </section>
+
+    <section class="work-grid">
+      <article class="panel map-panel">
+        <div class="panel-head">
+          <div>
+            <span class="label">Neural Map</span>
+            <h1>Brain Operations</h1>
+          </div>
+          <div class="sync-stack">
+            <span id="dataLane">syncing</span>
+            <span id="lastSync">--</span>
+          </div>
+        </div>
+        <canvas id="neuralMap" width="1040" height="560" aria-label="SkyeMusicNexus brain neural map"></canvas>
+      </article>
+
+      <aside class="panel allocation-panel">
+        <div class="panel-head">
+          <div>
+            <span class="label">Allocation</span>
+            <h2>70 / 10 / 20</h2>
+          </div>
+          <span class="pill" id="mixMode">weighted</span>
+        </div>
+        <div class="gauge-grid" aria-label="Brain allocation gauges">
+          <div class="gauge" style="--value:70;--accent:#7ddf64">
+            <div><strong id="listenGauge">70%</strong><span>Listen</span></div>
+          </div>
+          <div class="gauge" style="--value:10;--accent:#f2c14e">
+            <div><strong id="createGauge">10%</strong><span>Create</span></div>
+          </div>
+          <div class="gauge" style="--value:20;--accent:#ff6b6b">
+            <div><strong id="socialGauge">20%</strong><span>Social</span></div>
+          </div>
+        </div>
+        <div class="queue-box">
+          <div>
+            <span class="label">Queue Backlog</span>
+            <strong id="queueBacklog">0</strong>
+          </div>
+          <meter id="queueMeter" min="0" max="24" value="0"></meter>
+        </div>
+        <div class="error-box">
+          <span class="label">Errors</span>
+          <ul id="errorList"></ul>
+        </div>
+      </aside>
+    </section>
+
+    <section class="metrics-grid" aria-label="Stream impact and cycle metrics">
+      <article class="metric-card">
+        <span class="label">Stream Impact</span>
+        <strong id="nexusStreams">0</strong>
+        <small>Nexus streams</small>
+      </article>
+      <article class="metric-card">
+        <span class="label">Play Starts</span>
+        <strong id="playStarts">0</strong>
+        <small>public summary</small>
+      </article>
+      <article class="metric-card">
+        <span class="label">Listen Time</span>
+        <strong id="listenSeconds">0s</strong>
+        <small>qualified seconds</small>
+      </article>
+      <article class="metric-card">
+        <span class="label">System Listens</span>
+        <strong id="systemListens">0</strong>
+        <small>brain cycles</small>
+      </article>
+      <article class="metric-card">
+        <span class="label">Song Drafts</span>
+        <strong id="songDrafts">0</strong>
+        <small>create lane</small>
+      </article>
+      <article class="metric-card">
+        <span class="label">Cycles</span>
+        <strong id="cycleCount">0</strong>
+        <small id="cycleMeta">none loaded</small>
+      </article>
+    </section>
+
+    <section class="lower-grid">
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <span class="label">Action Queue</span>
+            <h2>Planned And Executed</h2>
+          </div>
+          <span class="pill" id="actionCount">0 actions</span>
+        </div>
+        <div id="actionList" class="dense-list"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <span class="label">Stream Impact</span>
+            <h2>Top Tracks</h2>
+          </div>
+          <span class="pill" id="trackCount">0 tracks</span>
+        </div>
+        <div id="streamList" class="dense-list"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head">
+          <div>
+            <span class="label">Cycle Receipts</span>
+            <h2>Latest Runs</h2>
+          </div>
+          <span class="pill" id="receiptCount">0 receipts</span>
+        </div>
+        <div id="receiptList" class="dense-list"></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,8 +1,8 @@
 {
-  "name": "skye-mail-vault",
+  "name": "skye-mail-citadel",
   "private": true,
   "version": "2.3.0",
-  "description": "Skye Mail Vault Command Center \u2014 Gmail-backed dashboard with left rail navigation, drafts, bulk actions, contacts, settings, and thread view",
+  "description": "SkyeMail Citadel Command Center \u2014 Gmail-backed dashboard with left rail navigation, drafts, bulk actions, contacts, settings, and thread view",
   "type": "commonjs",
   "scripts": {
     "build:suite": "node tools/build-suite-dist.mjs",
@@ -20,8 +20,11 @@
     "proof:mcp": "node tools/run-mcp-upgrade-proof.mjs",
     "proof:live-email": "node tools/run-live-proof-demo.mjs",
     "smoke:zoho-provider": "node tools/zoho-provider-smoke.mjs",
+    "smoke:cloudflare-route-compat": "node smoke/cloudflare-route-compat.mjs",
     "smoke:standalone-proof": "node smoke/smoke-standalone-proof.mjs",
-    "smoke:proof": "node smoke/smoke-proof.mjs"
+    "smoke:proof": "node smoke/smoke-proof.mjs",
+    "stress:enterprise": "node smoke/skyemail-enterprise-stress.mjs",
+    "stress:live-production": "node tools/live-production-stress.mjs"
   },
   "engines": {
     "node": ">=18"

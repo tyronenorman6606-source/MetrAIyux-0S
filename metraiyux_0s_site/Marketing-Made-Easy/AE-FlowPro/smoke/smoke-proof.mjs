@@ -17,22 +17,25 @@ function read(relPath) {
 
 async function main() {
   const indexHtml = read("index.html");
-  const appHtml = read("app.html");
   const appJs = read("app.js");
   const manifest = read("manifest.webmanifest");
   const serviceWorker = read("sw.js");
   const runtimeModule = read("runtime/local-runtime.mjs");
 
-  assert(indexHtml.includes("AE-FlowPro now has routed surfaces"), "index.html is missing the routed command shell");
-  assert(indexHtml.includes("href=\"./app.html\""), "index.html is missing the imported app link");
-  assert(appHtml.includes("AE FLOW by Skyes Over London"), "app.html is missing the AE FLOW title");
-  assert(appHtml.includes("runtimeLaneStatus"), "app.html is missing the local runtime lane status surface");
-  assert(appHtml.includes("exportOpsJournalBtn"), "app.html is missing the recovery journal controls");
-  assert(appHtml.includes("saveActivationPackBtn"), "app.html is missing the activation pack control");
-  assert(appHtml.includes("queueActivationWorkflowBtn"), "app.html is missing the activation workflow control");
-  assert(appHtml.includes("queueExecutionBoardBtn"), "app.html is missing the execution board control");
-  assert(appHtml.includes("queueDispatchBoardBtn"), "app.html is missing the dispatch board control");
-  assert(appHtml.includes("workflowTimelineStatus"), "app.html is missing the workflow timeline status surface");
+  assert(indexHtml.includes("AE FlowPro Platform"), "index.html is missing the AE FlowPro platform title");
+  assert(indexHtml.includes("data-platform-hardening=\"single-canonical-real-platform\""), "index.html is missing the single canonical platform marker");
+  assert(indexHtml.includes("platformCommand"), "index.html is missing the integrated platform command strip");
+  assert(indexHtml.includes("AE FLOW"), "index.html is missing the AE FLOW brand surface");
+  assert(indexHtml.includes("intakeForm"), "index.html is missing the lead intake form");
+  assert(indexHtml.includes("runtimeLaneStatus"), "index.html is missing the local runtime lane status surface");
+  assert(indexHtml.includes("exportOpsJournalBtn"), "index.html is missing the recovery journal controls");
+  assert(indexHtml.includes("saveActivationPackBtn"), "index.html is missing the activation pack control");
+  assert(indexHtml.includes("queueActivationWorkflowBtn"), "index.html is missing the activation workflow control");
+  assert(indexHtml.includes("queueExecutionBoardBtn"), "index.html is missing the execution board control");
+  assert(indexHtml.includes("queueDispatchBoardBtn"), "index.html is missing the dispatch board control");
+  assert(indexHtml.includes("workflowTimelineStatus"), "index.html is missing the workflow timeline status surface");
+  assert(!indexHtml.includes("Open Imported App"), "index.html still contains imported app copy");
+  assert(!indexHtml.includes("href=\"./app.html\""), "index.html still links to app.html");
 
   assert(appJs.includes("probeRuntimeLane"), "app.js is missing runtime lane probing");
   assert(appJs.includes("saveRuntimeSnapshot"), "app.js is missing runtime snapshot writes");
@@ -82,12 +85,12 @@ async function main() {
     const baseUrl = `http://127.0.0.1:${port}`;
 
     const servedIndex = await fetch(`${baseUrl}/`).then((res) => res.text());
-    assert(servedIndex.includes("AE-FlowPro now has routed surfaces"), "Runtime root did not serve routed command shell");
-    assert(servedIndex.includes("href=\"./app.html\""), "Runtime root did not serve imported app link");
+    assert(servedIndex.includes("AE FlowPro Platform"), "Runtime root did not serve the canonical platform");
+    assert(servedIndex.includes("runtimeLaneStatus"), "Runtime root did not serve the runtime lane shell");
+    assert(!servedIndex.includes("href=\"./app.html\""), "Runtime root still links to app.html");
 
-    const servedApp = await fetch(`${baseUrl}/app.html`).then((res) => res.text());
-    assert(servedApp.includes("AE FLOW by Skyes Over London"), "Runtime did not serve AE FLOW shell");
-    assert(servedApp.includes("runtimeLaneStatus"), "Runtime did not serve runtime lane shell");
+    const removedAppResponse = await fetch(`${baseUrl}/app.html`);
+    assert(removedAppResponse.status === 404, "Runtime should not serve a second app.html entrypoint");
 
     const servedAppJs = await fetch(`${baseUrl}/app.js`).then((res) => res.text());
     assert(servedAppJs.includes("probeRuntimeLane"), "Runtime did not serve updated browser script");

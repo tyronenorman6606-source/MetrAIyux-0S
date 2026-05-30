@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Avnet | Valley Verified</title>
+  <meta name="description" content="Avnet is a Phoenix electronics distribution profile anchored by the official Avnet website and Valley Verified local business evidence.">
+  <style>
+    :root {
+      --ink: #101622;
+      --violet: #4f2f8f;
+      --amber: #e3a828;
+      --cyan: #56c9d7;
+      --paper: #f7f9ff;
+      --line: rgba(16, 22, 34, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(79, 47, 143, .1) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(86, 201, 215, .12) 1px, transparent 1px),
+        #f2f5fb;
+      background-size: 28px 28px, 28px 28px, auto;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 48px;
+    }
+
+    .top {
+      display: grid;
+      grid-profile-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding-bottom: 18px;
+      color: var(--violet);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .node {
+      width: 14px;
+      height: 14px;
+      background: var(--amber);
+      border: 3px solid var(--violet);
+    }
+
+    .line {
+      height: 2px;
+      background: rgba(79, 47, 143, .28);
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, 1fr) 340px;
+      min-height: 560px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+    }
+
+    .copy {
+      padding: 44px;
+      display: grid;
+      align-content: space-between;
+      gap: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .copy:after {
+      content: "";
+      position: absolute;
+      right: 34px;
+      top: 34px;
+      width: 180px;
+      height: 180px;
+      border-top: 10px solid var(--cyan);
+      border-right: 10px solid var(--amber);
+      opacity: .38;
+    }
+
+    .copy > * { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--violet);
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      margin: 20px 0 16px;
+      color: var(--violet);
+      font-size: clamp(58px, 12vw, 132px);
+      line-height: .84;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 680px;
+      margin: 0;
+      color: #3f485b;
+      font-size: 19px;
+      line-height: 1.58;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-profile-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .contact {
+      min-height: 126px;
+      padding: 20px;
+      display: grid;
+      align-content: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-style: normal;
+    }
+
+    .contact.primary {
+      background: var(--violet);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .contact span {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .signal {
+      border-left: 1px solid var(--line);
+      display: grid;
+      grid-profile-rows: 270px 1fr;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mark img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }
+
+    .status {
+      padding: 26px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px),
+        var(--violet);
+      background-size: 24px 24px, auto;
+      color: #fff;
+      display: grid;
+      align-content: center;
+      gap: 20px;
+    }
+
+    .status p {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .facts {
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .fact {
+      min-height: 126px;
+      padding: 18px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--line);
+    }
+
+    .fact span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 880px) {
+      .hero, .contact-grid { grid-profile-columns: 1fr; }
+      .signal { border-left: 0; }
+      .facts { grid-profile-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {
+      .shell { width: min(100% - 20px, 1120px); }
+      .copy { padding: 28px; }
+      .top { grid-profile-columns: auto 1fr; }
+      .top span:last-child { grid-column: 1 / -1; }
+      .facts { grid-profile-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <span class="node" aria-hidden="true"></span>
+      <span class="line" aria-hidden="true"></span>
+      <span>Phoenix, AZ</span>
+    </div>
+
+    <section class="hero" aria-label="Avnet profile">
+      <div class="copy">
+        <div>
+          <span class="badge">Valley Verified Network</span>
+          <h1>Avnet</h1>
+          <p class="summary">A Phoenix electronics distribution profile with an official Avnet website route. Avnet is included under Contractor / Home Service, with the official website as the primary contact path.</p>
+        </div>
+
+        <div class="contact-grid" aria-label="Avnet contact information">
+          <a class="contact primary" href="https://www.avnet.com"><b>Website</b><span>avnet.com</span></a>
+          <address class="contact"><b>Address</b><span>Phoenix, AZ</span></address>
+        </div>
+      </div>
+
+      <aside class="signal">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="Avnet mark">
+        </div>
+        <div class="status">
+          <b>Profile detail</b>
+          <p>Phone is not included in this profile.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Avnet facts">
+      <div class="fact"><b>Category</b><span>Home Services</span></div>
+      <div class="fact"><b>Niche</b><span>Contractor / Home Service</span></div>
+      <div class="fact"><b>Service type</b><span>Electronics Distribution</span></div>
+      <div class="fact"><b>Profile date</b><span>May 27, 2026</span></div>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-avnet-phoenix-contractor-home-service-014d78b" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-avnet-phoenix-contractor-home-service-014d78b" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Avnet is Valley Verified because the public profile points to a real Phoenix business with electronics distribution as the solid service fact. The official Avnet web presence gives the profile a primary business identity, while the Valley Verified profile keeps the local page scoped to Phoenix.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The available public evidence supports Phoenix, Arizona as the local service area and electronics distribution as the business lane. Rather than force a mismatched home-service story, Valley Verified presents Avnet as a technology supply and distribution profile with official-site routing.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Avnet belongs in Valley Verified because Phoenix companies and operators looking for technology and electronics distribution should reach an official business channel, not a generic contractor page.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Electronics distribution and technology supply profile.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Phoenix operators, professional teams, and business buyers looking for Avnet's official business presence.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Official Avnet website, Phoenix service-area context, and Valley Verified electronics distribution category evidence.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

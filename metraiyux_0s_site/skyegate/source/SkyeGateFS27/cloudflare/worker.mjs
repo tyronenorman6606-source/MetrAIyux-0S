@@ -25,6 +25,7 @@ import openidConfiguration from '../netlify/functions/openid-configuration.js';
 import oauthWellKnown from '../netlify/functions/oauth-well-known.js';
 import skyepayOffers from '../netlify/functions/skyepay-offers.js';
 import skyepayCheckout from '../netlify/functions/skyepay-checkout.js';
+import skyepayRefund from '../netlify/functions/skyepay-refund.js';
 import skyepayStatus from '../netlify/functions/skyepay-status.js';
 import adminSkyePayLedger from '../netlify/functions/admin-skyepay-ledger.js';
 import skysecureApi from '../netlify/functions/skysecure-api.js';
@@ -46,6 +47,7 @@ import { requireGateAuth } from '../netlify/functions/_lib/authz.js';
 import { buildCors, json as httpJson } from '../netlify/functions/_lib/http.js';
 import { handleRuntimeEventQueue, withRuntimeLedger } from './runtime-observer.mjs';
 import handleSkyeNetDeployRequest from './skynet-deploy-api.mjs';
+import '../generators/shared/skye-generators-core.js';
 
 const ROUTES = [
   ['GET', '/health', health],
@@ -141,6 +143,8 @@ const ROUTES = [
   ['GET', '/.netlify/functions/skyepay-offers', skyepayOffers],
   ['POST', '/skyepay/checkout', skyepayCheckout],
   ['POST', '/.netlify/functions/skyepay-checkout', skyepayCheckout],
+  ['POST', '/skyepay/refund', skyepayRefund],
+  ['POST', '/.netlify/functions/skyepay-refund', skyepayRefund],
   ['GET', '/skyepay/status', skyepayStatus],
   ['GET', '/.netlify/functions/skyepay-status', skyepayStatus],
   ['GET', '/admin/skyepay-ledger', adminSkyePayLedger],
@@ -195,6 +199,12 @@ const ROUTES = [
   ['POST', '/.netlify/functions/northstar-operator-provision', northstarOperatorProvision],
   ['GET', '/northstar/operator/workspaces', northstarOperatorWorkspaces],
   ['GET', '/.netlify/functions/northstar-operator-workspaces', northstarOperatorWorkspaces],
+  ['OPTIONS', '/api/generators/onboarding-draft', handleGeneratorOnboardingDraft],
+  ['GET', '/api/generators/onboarding-draft', handleGeneratorOnboardingDraft],
+  ['POST', '/api/generators/onboarding-draft', handleGeneratorOnboardingDraft],
+  ['OPTIONS', '/generators/onboarding-draft', handleGeneratorOnboardingDraft],
+  ['GET', '/generators/onboarding-draft', handleGeneratorOnboardingDraft],
+  ['POST', '/generators/onboarding-draft', handleGeneratorOnboardingDraft],
   ['OPTIONS', '/deploy/status', handleSkyeNetDeployRequest],
   ['GET', '/deploy/status', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/routes', handleSkyeNetDeployRequest],
@@ -204,6 +214,19 @@ const ROUTES = [
   ['POST', '/deploy/workspace', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/dashboard', handleSkyeNetDeployRequest],
   ['GET', '/deploy/dashboard', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/env', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/env', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/env', handleSkyeNetDeployRequest],
+  ['DELETE', '/deploy/env', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-upload', handleSkyeNetDeployRequest],
+  ['PUT', '/deploy/source-upload', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/source-upload', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-complete', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/source-complete', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-download', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/source-download', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-transfer', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/source-transfer', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/receipts', handleSkyeNetDeployRequest],
   ['GET', '/deploy/receipts', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/rollback', handleSkyeNetDeployRequest],
@@ -296,6 +319,60 @@ const BLOCKED_LOCAL_ASSET_FILENAMES = new Set([
 
 function cleanText(value, max = 500) {
   return String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, max);
+}
+
+function cleanEmail(value, max = 240) {
+  return cleanText(value, max).toLowerCase();
+}
+
+function generatorSkyEmailDomain(env) {
+  return cleanText(env.ZERO_OS_SKYEMAIL_DOMAIN || env.SKYMAIL_PRIMARY_DOMAIN || env.INBOUND_DOMAIN || env.SKYE_EMAIL_DOMAIN || 'solenterprises.org', 120).toLowerCase();
+}
+
+async function handleGeneratorOnboardingDraft(request, context = {}) {
+  const cors = buildCors(request);
+  if (request.method === 'OPTIONS') return httpJson(200, { ok: true }, cors);
+  const url = new URL(request.url);
+  const body = request.method === 'POST' ? await request.json().catch(() => ({})) : Object.fromEntries(url.searchParams.entries());
+  const generatorCore = globalThis.SkyeGateGenerators;
+  const email = cleanEmail(body.email || body.login_email || body.recovery_email);
+  const displayName = cleanText(body.display_name || body.displayName || body.name || email.split('@')[0] || '0S user', 120);
+  const phone = cleanText(body.phone || body.phone_number || body.mobile, 40);
+  const profileType = cleanText(body.profile_type || body.profileType || body.account_type || 'member', 60).toLowerCase();
+  const requestedSkyEmail = cleanEmail(body.skyemail || body.skyEmail || body.skye_email || body.requested_email);
+  const requestedParts = requestedSkyEmail.includes('@') ? requestedSkyEmail.split('@') : [];
+  const identity = generatorCore.createSkyeIdDraft({
+    name: displayName,
+    idNumber: body.skye_id || body.skyeId || body.identity_id || '',
+    profileType,
+    phone,
+    reason: body.reason || '0s-gate-draft'
+  });
+  const skyemail = generatorCore.createSkyEmailClaim({
+    email: requestedSkyEmail,
+    localPart: body.local_part || body.localPart || requestedParts[0] || '',
+    domain: body.domain || requestedParts.slice(1).join('@') || body.default_domain || body.defaultDomain || generatorSkyEmailDomain(context.env || {}),
+    display_name: displayName,
+    recovery_email: email,
+    phone,
+    profile_type: profileType,
+    reason: body.reason || '0s-gate-draft'
+  });
+  return httpJson(200, {
+    ok: true,
+    schema: 'skygatefs27.generators.onboarding-draft.v1',
+    generated_at: new Date().toISOString(),
+    generator_service: {
+      owner: 'SkyeGateFS27',
+      core: 'skye-generators-core',
+      core_version: generatorCore.version,
+      core_asset: '/generators/shared/skye-generators-core.js',
+      identity_app: '/generators/Skye-ID/',
+      skyemail_app: '/generators/SKYEMAIL-GEN/'
+    },
+    identity,
+    skyemail
+  }, cors);
 }
 
 function safeDecodePathname(pathname) {

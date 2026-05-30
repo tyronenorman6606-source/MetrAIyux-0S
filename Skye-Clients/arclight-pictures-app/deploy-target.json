@@ -1,17 +1,86 @@
 {
-  "primary": {
-    "host": "cloudflare",
-    "url": "https://arclight-pictures.pages.dev/",
-    "envKey": "ARCLIGHT_PICTURES_PRODUCTION_URL"
+  "schema": "skyenet.static-surface.deploy-target.v1",
+  "updatedAt": "2026-05-30T18:14:53.748Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "lane": "skye-clients",
+  "purpose": "video production and creative studio app",
+  "projectId": "arclight-pictures",
+  "workspaceId": "arclight-pictures",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530181257",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/arclight-pictures/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/arclight-pictures",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "Skye-Clients/arclight-pictures-app",
+  "publicBuildDir": "Skye-Clients/arclight-pictures-app",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=arclight-pictures&project_id=arclight-pictures&deployment_id=dep_20260530181257",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "latestDeployment": {
-    "host": "cloudflare",
-    "url": "https://991138cf.arclight-pictures.pages.dev",
-    "deployedAt": "2026-05-19"
-  },
-  "qr": {
-    "target": "https://arclight-pictures.pages.dev/",
-    "asset": "/assets/live-site/arclight-workspace-qr.png",
-    "printAsset": "/assets/live-site/arclight-workspace-qr.png"
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "route": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/arclight-pictures",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/arclight-pictures",
+          "url_mode": "path",
+          "workspace_id": "arclight-pictures",
+          "project_id": "arclight-pictures",
+          "active_deployment_id": "dep_20260530181257",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/arclight-pictures/dep_20260530181257",
+          "updated_at": "2026-05-30T18:14:25.566Z"
+        },
+        "elapsed_ms": 500.59
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/arclight-pictures/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/arclight-pictures",
+        "elapsed_ms": 1732.38
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 203.36,
+        "bytes": 9742,
+        "title": "ArcLight Pictures | Tucson Video Production",
+        "error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=arclight-pictures&project_id=arclight-pictures&deployment_id=dep_20260530181257",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 305.55
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 133040,
+        "read_truncated": true,
+        "elapsed_ms": 3514.2,
+        "error": ""
+      }
+    }
   }
 }

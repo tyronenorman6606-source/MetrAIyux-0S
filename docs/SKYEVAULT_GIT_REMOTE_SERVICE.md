@@ -7,6 +7,64 @@ This is the Git-hosting lane. It is separate from the Git vault pack lane.
 
 ## Start A Local Remote
 
+Owner-private 0S source custody should use the managed wrapper. It starts the local smart-HTTP Git service, stores the local service token in ignored private state, seeds the bare repo, syncs refs, and proves a fresh clone:
+
+```bash
+npm run vault:origin:start
+npm run vault:origin:seed
+npm run vault:origin:proof
+npm run vault:origin:status
+```
+
+Current owner origin shape:
+
+```text
+http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git
+```
+
+The token is not printed. It is stored at `.skyevault-out/git-remote/owner-git-origin.env` with private file permissions. That token is a local service credential for Git Basic auth, not a separate founder/admin account; owner account identity stays in the shared 0S/FS27/SkyGate/Free99 gate lane.
+
+Browser prompt credentials for the local Git origin:
+
+- username: `x-token`
+- password: the local value of `SKYEVAULT_GIT_REMOTE_TOKEN` in `.skyevault-out/git-remote/owner-git-origin.env`
+
+Use this helper to print the access instructions without printing the password:
+
+```bash
+npm run vault:origin:access
+```
+
+Use this helper to rotate the local Git password and restart/resync the origin:
+
+```bash
+npm run vault:origin:reset-token
+```
+
+May 30, 2026 proof for this repo:
+
+- service PID: recorded in `.skyevault-out/git-remote/owner-git-origin.pid.json`
+- storage root: `.skyevault-out/git-remote/storage`
+- seed receipt: `.skyevault-out/git-remote/owner-git-origin-sync.json`
+- clone proof receipt: `.skyevault-out/git-remote/owner-git-origin-proof.json`
+- remote `main` head: `6336a975e8702e50e06ed26da1cb026ba06290d6`
+- fresh clone proof path: `/tmp/skyevault-owner-git-origin-proof-20260530T074843Z/MetrAIyux-0S`
+- proof result: cloned `HEAD` matched local `HEAD`, and `git fsck --connectivity-only` passed
+
+To clone from a fresh terminal without putting the token in the URL:
+
+```bash
+set -a
+. .skyevault-out/git-remote/owner-git-origin.env
+set +a
+git -c "http.extraHeader=Authorization: Basic $(printf 'x-token:%s' "$SKYEVAULT_GIT_REMOTE_TOKEN" | base64 -w0)" \
+  clone http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git MetrAIyux-0S
+```
+
+Autosync integration: the managed daemon sets `SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC=1`, so future changed scans sync this owner origin after the encrypted delta lane finishes. The full encrypted artifact remains the all-bytes baseline; the Git origin gives clone/fetch/push parity for committed refs.
+
+## Raw Service Start
+
 ```bash
 SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' \
 SKYEVAULT_GIT_REMOTE_ROOT=/srv/skyevault/git-remotes \

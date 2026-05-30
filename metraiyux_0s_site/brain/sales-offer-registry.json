@@ -110,7 +110,7 @@
     },
     {
       "folder": "metraiyux_0s_site/SkyeMusicNexus",
-      "role": "SkyeMusicNexus Lite Free99 music preview plus paid Studio, Label Command, Managed Music Ops, drop add-ons, content request add-ons, artist exchange, artist records, release forge, content requests, Relay13-ready inbox, community signals, achievement progression, release campaigns, royalty ledger motion, payout queue, analytics prism, operations workflows, local SkyGate proof, and gated function boundary.",
+      "role": "SkyeMusicNexus Lite Free99 music preview plus May 2026 core-artist launch grants, paid Artist Host, Artist Collective, Managed Music Ops, drop add-ons, content request add-ons, artist exchange, artist records, release forge, content requests, Relay13-ready inbox, community signals, achievement progression, release campaigns, royalty ledger motion, payout queue, analytics prism, operations workflows, local SkyGate proof, and gated function boundary.",
       "stripe_action": "Do not create a paid Stripe product for Lite. Create/sync paid SkyeMusicNexus products and add-ons only from data/skyemusicnexus-pricing.json and SkyePay catalog. Gate-session auth is required for free and paid lanes."
     },
     {
@@ -671,149 +671,176 @@
       "folder": "metraiyux_0s_site/SkyeMusicNexus",
       "status": "approved_pending_stripe_sync",
       "brain_owner": "naomi-sterling-brain",
-      "stripe_action": "Create/sync paid SkyeMusicNexus products and prices in Stripe, then route checkout through SkyePay. All paid access still requires owner approval and a gate session.",
+      "stripe_action": "Create/sync paid SkyeMusicNexus products and prices in Stripe, then route checkout through SkyePay. May 2026 founding-core artists are no-charge invitees. Artist landing builds show premium listed value, apply $2,000 SkyeMerit before checkout through 2026-06-26, and send Relay13/0S inbox handoff. All paid access still requires owner approval and a gate session.",
       "items": [
         {
-          "product_name": "SkyeMusicNexus Studio",
-          "price_label": "$497/mo + $1,500 setup",
+          "product_name": "SkyeMusicNexus Single / Drop Landing Page",
+          "price_label": "$2,239 listed, $2,000 SkyeMerit, $239 due through 2026-06-26",
+          "lookup_key": "skyemusicnexus_single_drop_landing_page",
+          "gate_session_required": true,
+          "skyemerit_code": "SKYEMUSICNEXUS-LAUNCH-2000",
+          "relay13_inbox_delivery": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Artist Page + EPK",
+          "price_label": "$2,444 listed, $2,000 SkyeMerit, $444 due through 2026-06-26",
+          "lookup_key": "skyemusicnexus_artist_page_epk",
+          "gate_session_required": true,
+          "skyemerit_code": "SKYEMUSICNEXUS-LAUNCH-2000",
+          "relay13_inbox_delivery": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Animated Landing / Visualizer Page",
+          "price_label": "$2,796 listed, $2,000 SkyeMerit, $796 due through 2026-06-26",
+          "lookup_key": "skyemusicnexus_animated_visualizer_page",
+          "gate_session_required": true,
+          "skyemerit_code": "SKYEMUSICNEXUS-LAUNCH-2000",
+          "relay13_inbox_delivery": true
+        },
+        {
+          "product_name": "SkyeMusicNexus Custom Artist Universe",
+          "price_label": "$3,197+ listed, $2,000 SkyeMerit, $1,197+ due through 2026-06-26",
+          "lookup_key": "skyemusicnexus_custom_artist_universe",
+          "gate_session_required": true,
+          "skyemerit_code": "SKYEMUSICNEXUS-LAUNCH-2000",
+          "relay13_inbox_delivery": true,
+          "stripe_action": "Approved floor only; quote manually above the starting artist-universe scope."
+        },
+        {
+          "product_name": "SkyeMusicNexus Artist Host",
+          "price_label": "$9/mo",
           "lookup_key": "skyemusicnexus_studio_monthly",
           "gate_session_required": true
         },
         {
-          "product_name": "SkyeMusicNexus Studio Setup",
-          "price_label": "$1,500 once",
-          "lookup_key": "skyemusicnexus_studio_setup",
-          "gate_session_required": true
-        },
-        {
-          "product_name": "SkyeMusicNexus Label Command",
-          "price_label": "$1,497/mo + $6,500 setup",
+          "product_name": "SkyeMusicNexus Artist Collective",
+          "price_label": "$29/mo + $99 setup",
           "lookup_key": "skyemusicnexus_label_command_monthly",
           "gate_session_required": true
         },
         {
-          "product_name": "SkyeMusicNexus Label Command Setup",
-          "price_label": "$6,500 once",
+          "product_name": "SkyeMusicNexus Artist Collective Setup",
+          "price_label": "$99 once",
           "lookup_key": "skyemusicnexus_label_command_setup",
           "gate_session_required": true
         },
         {
           "product_name": "SkyeMusicNexus Managed Music Ops",
-          "price_label": "$3,997/mo + $15,000 setup",
+          "price_label": "$99/mo + $499 setup",
           "lookup_key": "skyemusicnexus_managed_music_ops_monthly",
           "gate_session_required": true
         },
         {
           "product_name": "SkyeMusicNexus Managed Music Ops Setup",
-          "price_label": "$15,000 once",
+          "price_label": "$499 once",
           "lookup_key": "skyemusicnexus_managed_music_ops_setup",
           "gate_session_required": true
         },
         {
           "product_name": "Single Song Drop",
-          "price_label": "$199 once",
+          "price_label": "$15 once",
           "lookup_key": "skyemusicnexus_single_song_drop",
           "gate_session_required": true
         },
         {
           "product_name": "Release Drop Plus",
-          "price_label": "$399 once",
+          "price_label": "$29 once",
           "lookup_key": "skyemusicnexus_release_drop_plus",
           "gate_session_required": true
         },
         {
           "product_name": "EP Drop",
-          "price_label": "$799 once",
+          "price_label": "$49 once",
           "lookup_key": "skyemusicnexus_ep_drop",
           "gate_session_required": true
         },
         {
           "product_name": "Album Drop",
-          "price_label": "$1,497 once",
+          "price_label": "$99 once",
           "lookup_key": "skyemusicnexus_album_drop",
           "gate_session_required": true
         },
         {
           "product_name": "Catalog Import Pack",
-          "price_label": "$299 once",
+          "price_label": "$49 once",
           "lookup_key": "skyemusicnexus_catalog_import_pack",
           "gate_session_required": true
         },
         {
           "product_name": "Royalty Ledger Setup",
-          "price_label": "$249 once",
+          "price_label": "$25 once",
           "lookup_key": "skyemusicnexus_royalty_ledger_setup",
           "gate_session_required": true
         },
         {
           "product_name": "Payout Review Pack",
-          "price_label": "$149 once",
+          "price_label": "$25 once",
           "lookup_key": "skyemusicnexus_payout_review_pack",
           "gate_session_required": true
         },
         {
           "product_name": "Artist Profile Buildout",
-          "price_label": "$99 once",
+          "price_label": "$15 once",
           "lookup_key": "skyemusicnexus_artist_profile_buildout",
           "gate_session_required": true
         },
         {
           "product_name": "Social Caption Pack",
-          "price_label": "$99 once",
+          "price_label": "$15 once",
           "lookup_key": "skyemusicnexus_social_caption_pack",
           "gate_session_required": true
         },
         {
           "product_name": "Cover / Canvas Request",
-          "price_label": "$199 once",
+          "price_label": "$35 once",
           "lookup_key": "skyemusicnexus_cover_canvas_request",
           "gate_session_required": true
         },
         {
           "product_name": "Short-Form Clip Brief",
-          "price_label": "$249 once",
+          "price_label": "$35 once",
           "lookup_key": "skyemusicnexus_short_form_clip_brief",
           "gate_session_required": true
         },
         {
           "product_name": "Release Content Kit",
-          "price_label": "$499 once",
+          "price_label": "$79 once",
           "lookup_key": "skyemusicnexus_release_content_kit",
           "gate_session_required": true
         },
         {
           "product_name": "Community Campaign Sprint",
-          "price_label": "$899 once",
+          "price_label": "$149 once",
           "lookup_key": "skyemusicnexus_community_campaign_sprint",
           "gate_session_required": true
         },
         {
           "product_name": "Extra Artist Seat",
-          "price_label": "$29/mo",
+          "price_label": "$5/mo",
           "lookup_key": "skyemusicnexus_extra_artist_seat_monthly",
           "gate_session_required": true
         },
         {
           "product_name": "Extra Release Pack",
-          "price_label": "$99/mo",
+          "price_label": "$9/mo",
           "lookup_key": "skyemusicnexus_extra_release_pack_monthly",
           "gate_session_required": true
         },
         {
           "product_name": "White-Label Artist Portal",
-          "price_label": "$197/mo + $997 setup",
+          "price_label": "$19/mo + $99 setup",
           "lookup_key": "skyemusicnexus_white_label_artist_portal_monthly",
           "gate_session_required": true
         },
         {
           "product_name": "Gated Audio Vault Pack",
-          "price_label": "$79/mo",
+          "price_label": "$9/mo",
           "lookup_key": "skyemusicnexus_gated_audio_vault_pack_monthly",
           "gate_session_required": true
         },
         {
           "product_name": "Provider Integration Proof Lane",
-          "price_label": "Quote or owner-approved proof lane starting at $2,500",
+          "price_label": "Quote or owner-approved proof lane starting at $250",
           "lookup_key": "skyemusicnexus_provider_integration_proof_lane",
           "gate_session_required": true,
           "stripe_action": "Do not create checkout until owner approval and provider proof scope are written."

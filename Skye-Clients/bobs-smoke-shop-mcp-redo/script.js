@@ -4,12 +4,10 @@
   const no = document.querySelector('[data-age-no]');
   const intro = document.querySelector('[data-site-intro]');
   const heroVideo = document.querySelector('[data-hero-video]');
-  const heroYoutube = document.querySelector('[data-hero-youtube]');
   const previewWindow = document.querySelector('[data-preview-window]');
   const openPreviewButtons = document.querySelectorAll('[data-preview-open]');
   const minimizePreview = document.querySelector('[data-preview-minimize]');
   let introTimer;
-  let youtubePlayer;
 
   function setPreviewOpen(isOpen){
     if(!previewWindow) return;
@@ -34,7 +32,6 @@
       heroVideo.muted = true;
       heroVideo.play().catch(() => {});
     }
-    ensureHeroYoutube();
     window.setTimeout(() => document.body.classList.remove('app-video-reveal'), 1500);
     setPreviewOpen(false);
   }
@@ -58,52 +55,6 @@
     heroVideo.addEventListener('canplay', () => {
       if(document.body.classList.contains('app-ready')) heroVideo.play().catch(() => {});
     }, { once:true });
-  }
-  function createHeroYoutubePlayer(){
-    if(!heroYoutube || youtubePlayer || !window.YT || !window.YT.Player) return;
-    youtubePlayer = new window.YT.Player(heroYoutube, {
-      events: {
-        onReady: (event) => {
-          event.target.mute();
-          event.target.playVideo();
-        },
-        onStateChange: (event) => {
-          if(event.data === window.YT.PlayerState.PLAYING) {
-            document.body.classList.add('youtube-live-ready');
-          }
-        },
-        onError: () => {
-          document.body.classList.remove('youtube-live-ready');
-        }
-      }
-    });
-  }
-  function loadYoutubeApi(){
-    if(!heroYoutube) return;
-    if(window.YT && window.YT.Player) {
-      createHeroYoutubePlayer();
-      return;
-    }
-    if(document.querySelector('[data-youtube-api]')) return;
-    const previousReady = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = () => {
-      if(typeof previousReady === 'function') previousReady();
-      createHeroYoutubePlayer();
-    };
-    const api = document.createElement('script');
-    api.src = 'https://www.youtube.com/iframe_api';
-    api.async = true;
-    api.dataset.youtubeApi = 'true';
-    document.head.appendChild(api);
-  }
-  function ensureHeroYoutube(){
-    if(!heroYoutube || heroYoutube.dataset.loaded === 'true') return;
-    const src = new URL(heroYoutube.dataset.youtubeSrc, window.location.href);
-    src.searchParams.set('origin', window.location.origin);
-    heroYoutube.src = src.toString();
-    heroYoutube.dataset.loaded = 'true';
-    heroYoutube.addEventListener('load', loadYoutubeApi, { once:true });
-    loadYoutubeApi();
   }
 
   if(yes) yes.addEventListener('click', () => {
@@ -475,16 +426,6 @@
   });
   function mountWorkspaceChat(){
     const existing = window.MetrAIyuxWorkspaceChatConfig || {};
-    const workspacePath = /\/workspace-preview(?:\/|\.html)?$/.test(location.pathname);
-    const gateConfig = {
-      enabled: true,
-      password: 'bobs27',
-      storageKey: 'metraiyux.workspaceGate.bob-smoke-shop-preview-001',
-      storage: 'session',
-      title: "Bob's private workspace",
-      prompt: "Enter the workspace password to unlock Bob's preview room.",
-      chatButtonText: 'Send password through chat'
-    };
     window.MetrAIyuxWorkspaceChatConfig = {
       workspaceId: 'bob-smoke-shop-preview-001',
       workspaceSlug: 'bobs-smoke-shop',
@@ -502,12 +443,12 @@
         relay_bridge: 'relay13-client-workspace'
       },
       accountDisclaimer: "Messages are tied to Bob's workspace account and may be used for support, proof receipts, QA, and follow-up inside this client build lane.",
-      accessReply: 'Bob, your workspace popup password is bobs27.',
-      accessTriggers: ['password', 'access', 'code', 'unlock', 'bobs27', 'workspace'],
-      passwordGate: workspacePath ? gateConfig : null,
+      accessReply: 'Use the Open Workspace button or contact Skyes Over London for the shared 0S review handoff. No app-local password is issued from this page.',
+      accessTriggers: ['password', 'access', 'code', 'unlock', 'workspace'],
+      passwordGate: null,
       ...existing,
-      accessTriggers: existing.accessTriggers || ['password', 'access', 'code', 'unlock', 'bobs27', 'workspace'],
-      passwordGate: existing.passwordGate !== undefined ? existing.passwordGate : (workspacePath ? gateConfig : null)
+      accessTriggers: existing.accessTriggers || ['password', 'access', 'code', 'unlock', 'workspace'],
+      passwordGate: existing.passwordGate !== undefined ? existing.passwordGate : null
     };
     if (window.MetrAIyuxWorkspaceChat && window.MetrAIyuxWorkspaceChat.__mounted) return;
     if (document.querySelector('script[data-metraiyux-workspace-chat-script]')) return;

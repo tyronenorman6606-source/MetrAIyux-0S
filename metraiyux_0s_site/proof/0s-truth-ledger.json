@@ -1,0 +1,859 @@
+{
+  "ok": false,
+  "schema": "metraiyux.0s.truth-ledger.v1",
+  "generated_at": "2026-05-30T19:06:55.274Z",
+  "source_manifest": "metraiyux_0s_site/data/0s-closure-workflows.json",
+  "no_browser_proof_run": true,
+  "owner_manual_live_check": true,
+  "honesty_rule": "Do not call a lane built unless computed_truth is built. Partial, unproven, not_built_or_untracked, and provider_or_real_world_gated lanes must remain visible in sales, founder, and proof surfaces.",
+  "source_receipts": {
+    "operating_matrix": {
+      "path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+      "ok": true,
+      "generated_at": "2026-05-30T19:06:39.277Z",
+      "route_failures": 0,
+      "behavior_green": 22,
+      "behavior_yellow": 0,
+      "behavior_red": 0,
+      "app_behavior_state": "yellow",
+      "app_behavior_green": 23,
+      "app_behavior_yellow": 84,
+      "app_behavior_red": 0,
+      "literal_per_app_depth_closed": false
+    },
+    "live_capability_watch": {
+      "path": "test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json",
+      "ok": true,
+      "generated_at": "2026-05-30T19:04:38.724Z",
+      "summary": {
+        "total": 2,
+        "pass": 2,
+        "warn": 0,
+        "fail": 0,
+        "skipped": 0,
+        "blocked": 0,
+        "live_http_or_api": 0,
+        "local_behavior": 1,
+        "real_action_observed": 2,
+        "failed_ids": [],
+        "warning_ids": []
+      }
+    }
+  },
+  "summary": {
+    "total": 22,
+    "built": 20,
+    "partial": 1,
+    "failing_proof": 1,
+    "unproven": 0,
+    "not_built_or_untracked": 0,
+    "not_tracked": 0,
+    "provider_or_real_world_gated": 11,
+    "external_boundaries": 11,
+    "p0_not_built": [
+      "per-app-operating-proof-matrix"
+    ],
+    "p1_not_built": [
+      "command-bridge-all-lanes"
+    ]
+  },
+  "repair_queue": [
+    {
+      "id": "per-app-operating-proof-matrix",
+      "priority": "P0",
+      "computed_truth": "partial",
+      "gap_class": "none",
+      "proof_command": "npm run 0s:operating-proof-matrix",
+      "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+      "external_boundaries": [],
+      "next_step": "Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models."
+    },
+    {
+      "id": "command-bridge-all-lanes",
+      "priority": "P1",
+      "computed_truth": "failing_proof",
+      "gap_class": "none",
+      "proof_command": "node tools/proof-0s-command-bridge-live-direct.mjs",
+      "receipt_path": "test-artifacts/0s-command-bridge/live-direct-proof-latest.json",
+      "external_boundaries": [],
+      "next_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state."
+    }
+  ],
+  "workflows": [
+    {
+      "id": "shared-owner-gate",
+      "priority": "P0",
+      "surface": "FS27/SkyGate/Free99 shared owner lane",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:ai-gate-audit",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/ai-gate-audit/ai-gate-audit-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-28T22:49:53.058Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html"
+    },
+    {
+      "id": "founder-command-work-system",
+      "priority": "P0",
+      "surface": "Founder Command operations cockpit",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "node tools/proof-founder-command-work-system-live-http.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/founder-command-work-system/founder-command-work-system-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-28T06:12:25.691Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html"
+    },
+    {
+      "id": "founder-account-valley-crosswalk",
+      "priority": "P0",
+      "surface": "Founder client accounts, Valley Verified crosswalk, AE work orders",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "node tools/proof-founder-command-accounts-crosswalk-live-http.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-28T06:13:20.050Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations"
+    },
+    {
+      "id": "canonical-identity-spine",
+      "priority": "P0",
+      "surface": "Founder/org/workspace/client/actor/receipt identity graph",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:founder-command:identity-spine",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/founder-command-identity-spine/founder-command-identity-spine-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-30T05:03:26.774Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations"
+    },
+    {
+      "id": "founder-company-enrollment",
+      "priority": "P0",
+      "surface": "Enroll a company into the 0S from Founder Command",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:founder-company-enrollment",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/founder-company-enrollment-live-http/founder-company-enrollment-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:23:47.360Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations"
+    },
+    {
+      "id": "llc-to-0s-business-workflow",
+      "priority": "P0",
+      "surface": "SovereignDocs LLC formation prep into full 0S business workspace",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:llc-to-0s-business-workflow",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-30T19:01:53.391Z",
+      "evidence_receipts": [
+        {
+          "id": "llc-to-0s-business-workflow-live-http",
+          "path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Actual state filing, attorney review, EIN/tax setup, contractor completion/payout, and SkyeNet production publish remain external/provider-bound until real receipts are attached."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/business-formation/"
+    },
+    {
+      "id": "ae-flow-founder-crm",
+      "priority": "P0",
+      "surface": "AEFlow / Account Exec command lane",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:ae-flow-founder-crm",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/ae-flow-founder-crm-live-http/ae-flow-founder-crm-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:23:28.908Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/AE-FlowPro/"
+    },
+    {
+      "id": "nexus-ad-hire-workforce-job",
+      "priority": "P0",
+      "surface": "Nexus ad -> hire -> workforce enrollment -> test job claim",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "node tools/proof-founder-command-nexus-hire-workforce-live-http.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/founder-command-nexus-hire-workforce/founder-command-nexus-hire-workforce-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-28T06:22:34.715Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations"
+    },
+    {
+      "id": "admin-brain-automation",
+      "priority": "P0",
+      "surface": "Admin Brain / Approval Inbox / automation queue",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "node tools/proof-admin-brain-native-live-http.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T12:18:31.171Z",
+      "evidence_receipts": [
+        {
+          "id": "admin-brain-native-live-http",
+          "path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-smoke",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-report.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-receipts",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-receipts.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Twilio live SMS remains consent-gated; the current proof verifies refusal without explicit SMS opt-in and does not send an SMS."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Use the same owner-approved provider executor pattern for any additional provider lanes; do not add app-local auth.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html"
+    },
+    {
+      "id": "broad-real-user-saas-skymail-skynet",
+      "priority": "P0",
+      "surface": "New user signup -> zero-balance unlimited -> FS27 -> SkyeMail -> SkyeNet static publish",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "",
+      "proof_command": "npm run 0s:real-user-readiness",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-27T07:42:16.388Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.open_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/real-user/real-user-grayscape467-mpnr9tve/"
+    },
+    {
+      "id": "per-app-operating-proof-matrix",
+      "priority": "P0",
+      "surface": "Whole 0S mounted app behavior matrix",
+      "claimed_truth": "green",
+      "computed_truth": "partial",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:operating-proof-matrix",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-30T19:06:39.277Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models.",
+      "next_build_step": "Keep operating-depth receipts fresh when mounted surfaces change.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html"
+    },
+    {
+      "id": "command-bridge-all-lanes",
+      "priority": "P1",
+      "surface": "0S Command Bridge CRM/proof event spine",
+      "claimed_truth": "green",
+      "computed_truth": "failing_proof",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "node tools/proof-0s-command-bridge-live-direct.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-command-bridge/live-direct-proof-latest.json",
+      "receipt_ok": false,
+      "receipt_generated_at": "2026-05-30T19:04:14.820Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.",
+      "next_build_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-command-bridge/"
+    },
+    {
+      "id": "skyeroutex-workforce-depth",
+      "priority": "P1",
+      "surface": "SkyRouteX workforce operations",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skyeroutex-workforce-depth",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skyeroutex-workforce-depth-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:39:28.324Z",
+      "evidence_receipts": [
+        {
+          "id": "founder-command-live-record",
+          "path": "test-artifacts/founder-command-skyeroutex-live-record-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "platform-host-record",
+          "path": "test-artifacts/founder-command-skyeroutex-platform-host-record-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "operator-entry-live-http",
+          "path": "test-artifacts/skyeroutex-operator-entry-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "ae-workforce-lane",
+          "path": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/routex-ae-workforce-lane-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "mounted-worker-stress",
+          "path": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-mounted-worker-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "External notification, background-check, and payout provider execution remains owner-approved/credential-gated; the internal no-payout workforce lifecycle and legal-review job closeout are proven."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Attach owner-approved provider credentials before running live notifications, background checks, or external payout release.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/"
+    },
+    {
+      "id": "skymail-company-crm-lane",
+      "priority": "P1",
+      "surface": "SkyeMail company mail lane",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skymail-company-crm-lane",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skymail-company-crm-lane-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:39:28.362Z",
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness-skymail-slice",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "company-mailbox-provision",
+          "path": "test-artifacts/skyemail-skyeroutex-logistics-provision/provision-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "cloudflare-route-compat",
+          "path": "test-artifacts/skyemail-cloudflare-route-compat-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "live-production-stress",
+          "path": "test-artifacts/skyemail-live-production-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "enterprise-stress",
+          "path": "test-artifacts/skyemail-enterprise-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/SkyeMail-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Live external mailbox/provider sends, cooldowns, and delivery failures remain provider-credential-gated; the owner-gated handoff ledger and CRM closeout are proven without sending external email."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Use an owner-approved provider sandbox/live credential before claiming provider delivery execution.",
+      "owner_url": "https://skyemail-platform.graylondonskyes.workers.dev/"
+    },
+    {
+      "id": "skyenet-full-runtime",
+      "priority": "P1",
+      "surface": "SkyeNet deploy and app runtime lane",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skyenet-full-runtime",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skyenet-full-runtime-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:39:28.380Z",
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness-skynet-slice",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "public-guide-live-http",
+          "path": "test-artifacts/skyenet-public-guide/skyenet-public-guide-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "source-download-live-http",
+          "path": "test-artifacts/skyenet-source-download/skyenet-source-download-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "netlify-parity-live-http",
+          "path": "test-artifacts/skyenet-netlify-parity/skyenet-netlify-parity-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "netlify-parity-stress",
+          "path": "test-artifacts/skyenet-netlify-parity-stress/skyenet-netlify-parity-stress-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "source-transfer-stress",
+          "path": "test-artifacts/skyenet-source-transfer-stress/skyenet-source-transfer-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-skynet-backend",
+          "path": "test-artifacts/founder-command-skynet-backend/founder-command-skynet-backend-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Unrestricted arbitrary uploaded function execution remains capped/owner-approved; SkyeNet’s proven lane is static deploy, source custody, env registry, source transfer, observability/cost/status readback, and approved managed runtime controls."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Keep arbitrary runtime/function execution behind managed approvals and signed invocation receipts.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/index.html"
+    },
+    {
+      "id": "sovereigndocs-client-packet",
+      "priority": "P1",
+      "surface": "SovereignDocs client/case/document workflow",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=sovereigndocs-client-packet",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-workflow-rollups/sovereigndocs-client-packet-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:39:28.340Z",
+      "evidence_receipts": [
+        {
+          "id": "sovereigndocs-0s-lane-direct-upload",
+          "path": "test-artifacts/cloudflare-pages/sovereigndocs-0s-lane-direct-upload-receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "sovereigndocs-docxmax-lane-direct-upload",
+          "path": "test-artifacts/cloudflare-pages/sovereigndocs-docxmax-lane-direct-upload-receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/sovereigndocs-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "sovereigndocs-0s-lane-build-manifest",
+          "path": "test-artifacts/sovereigndocs-0s-lane/build-manifest.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "sovereigndocs-docxmax-lane-build-manifest",
+          "path": "test-artifacts/sovereigndocs-docxmax-lane/build-manifest.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Government filing and legal advice remain external/owner-approved boundaries; the 0S creates, reviews, queues, and tracks the client packet and legal review job without claiming official filing."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Attach official filing receipts only after an owner-approved filing/provider action happens.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/"
+    },
+    {
+      "id": "skyepay-commerce-financial-ops",
+      "priority": "P1",
+      "surface": "SkyeCommerce / SkyePay order, receivable, refund, payout review",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "node tools/proof-skyemusicnexus-skyepay-loop-live-direct.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/skyemusicnexus-skyepay-loop-live-direct/latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "",
+      "evidence_receipts": [
+        {
+          "id": "musicnexus-skyepay-loop",
+          "path": "test-artifacts/skyemusicnexus-skyepay-loop-live-direct/latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "skyecommerce-api-e2e",
+          "path": "test-artifacts/skyecommerce-e2e/api-e2e-receipt.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "skyecommerce-live-production-stress",
+          "path": "test-artifacts/skyecommerce-live-production-stress/latest.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "skyecommerce-production-direct-surfaces",
+          "path": "test-artifacts/skyecommerce-production-direct-surfaces/latest.json",
+          "mode": "ok_true",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "External payout and refund rails remain provider/credential/owner-approved boundaries; current proof closes internal order, receivable, split, settlement, and no-external-payout disbursement review."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Run live Stripe/payout/refund provider execution only with explicit owner approval and provider receipts.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/"
+    },
+    {
+      "id": "relay13-communications-center",
+      "priority": "P1",
+      "surface": "Relay13 / ConnectLog communications",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:connectlog-relay13:prod-proof",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/connectlog-relay13-production-proof.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "",
+      "evidence_receipts": [
+        {
+          "id": "connectlog-relay13-production-proof",
+          "path": "test-artifacts/connectlog-relay13-production-proof.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "relay13-chat-system-proof",
+          "path": "test-artifacts/relay13-chat-system-proof.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "connectlog-direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/connectlog-v7.7-relay13-operator-proof-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "relay13-direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/relay13-core-v1.7-connectlog-operator-proof-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "External Relay13 provider/admin bridge execution remains credential-gated where PLATFORM_ADMIN_TOKEN is absent; the shared-gate Founder Command conversation and CRM closeout are proven."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Use the shared admin bridge token only when owner-approved provider-side Relay13 admin execution is required.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?tab=inbox"
+    },
+    {
+      "id": "content-engine-provider-dispatch",
+      "priority": "P1",
+      "surface": "Content Engine / social/provider dispatch",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:content-engine:provider-dispatch",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T15:19:24.093Z",
+      "evidence_receipts": [
+        {
+          "id": "content-engine-provider-dispatch-live-http",
+          "path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "blog-content-engine-manifest",
+          "path": "metraiyux_0s_site/blog/content-engine.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "valley-verified-landing-content-proof",
+          "path": "test-artifacts/skyenet/valley-verified-landing-content-proof.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "External social/email/site provider publishing intentionally remains provider_call_made:false until owner-approved connector credentials and rollback receipts are attached."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Attach owner-approved connector credentials and provider rollback receipts before claiming live external publishing.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/content-engine-lane.html"
+    },
+    {
+      "id": "jobping-product-depth",
+      "priority": "P1",
+      "surface": "JobPing paid runtime and standalone product depth",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "node tools/proof-jobping-paid-runtime-live-http.mjs",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/jobping-paid-runtime/jobping-paid-runtime-live-http-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:05:56.065Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Track any future standalone JobPing import as a new enhancement lane instead of blocking the canonical 0S runtime.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/jobping/index.html"
+    },
+    {
+      "id": "external-provider-hardening",
+      "priority": "P2",
+      "surface": "Provider credentials, throttles, delivery, payout, calendar, social, background services",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=external-provider-hardening",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-workflow-rollups/external-provider-hardening-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T00:48:50.948Z",
+      "evidence_receipts": [
+        {
+          "id": "automation-provider-status",
+          "path": "test-artifacts/automation-provider-status/automation-provider-status-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "admin-brain-native-live-http",
+          "path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "content-engine-provider-dispatch-live-http",
+          "path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-smoke",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-report.json",
+          "mode": "ok_true",
+          "required": false
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Customer-impacting live sends, calls, payouts, refunds, social publishing, calendar actions, and background checks remain owner-approved/provider-credential-gated; provider runtime smoke/stress and admin/content receipts prove safe sandbox, retry, dead-letter, and boundary behavior."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Promote each provider to live execution only after owner-approved credentials, consent, and provider receipt capture exist.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations"
+    },
+    {
+      "id": "valuation-deck-alignment",
+      "priority": "P2",
+      "surface": "Valuation, deck, proof map, and diligence truth",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:valuation-deck-alignment",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-05-29T16:29:27.464Z",
+      "evidence_receipts": [
+        {
+          "id": "valuation-deck-alignment-status",
+          "path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "Valuation remains directional internal diligence, not a formal appraisal or ARR valuation; customer revenue, retention, churn, CAC, and paid-contract evidence remain commercial diligence boundaries."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Regenerate valuation claims whenever the operating matrix, truth ledger, Worker deploy version, or live capability watch changes.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/site-valuation.html"
+    }
+  ]
+}

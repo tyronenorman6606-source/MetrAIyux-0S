@@ -2,7 +2,7 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const json = (data, status=200) => new Response(JSON.stringify(data,null,2), {status, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type,authorization,x-admin-token'}});
+    const json = (data, status=200) => new Response(JSON.stringify(data,null,2), {status, headers:{'content-type':'application/json','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type,authorization,x-admin-token,x-0s-shared-gate,x-0s-internal-proxy-secret'}});
     if (request.method === 'OPTIONS') return json({ok:true});
     if (url.pathname === '/' || url.pathname === '/health' || url.pathname === '/api/nexus/status') return json({ok:true, service:'NEXUS Site Operator Brain', brains:16, persistence:{d1:!!env.NEXUS_DB, kv:!!env.NEXUS_KV, queue:!!env.NEXUS_QUEUE}, mode:'edge-ready'});
     if (url.pathname === '/api/nexus/intake' && request.method === 'POST') {
@@ -10,7 +10,7 @@ export default {
       const text = String(body.message || body.note || body.title || '');
       const lane = classify(text);
       const route = routeFor(lane);
-      const receipt = { id: crypto.randomUUID(), created_at: new Date().toISOString(), lane, primary_brain: route[0], secondary_review: route[1], status:'intake_pending_review', public_intake:true, message:text };
+      const receipt = { id: safeRandomUUID(), created_at: new Date().toISOString(), lane, primary_brain: route[0], secondary_review: route[1], status:'intake_pending_review', public_intake:true, message:text };
       if (env.NEXUS_KV) await env.NEXUS_KV.put(`intake:${receipt.id}`, JSON.stringify(receipt));
       if (env.NEXUS_DB) await env.NEXUS_DB.prepare('insert into nexus_events (id, created_at, lane, primary_brain, secondary_review, status, payload) values (?1,?2,?3,?4,?5,?6,?7)').bind(receipt.id,receipt.created_at,lane,route[0],route[1],receipt.status,JSON.stringify(body)).run();
       if (env.NEXUS_QUEUE) await env.NEXUS_QUEUE.send(receipt);
@@ -22,7 +22,7 @@ export default {
       const text = String(body.message || body.note || '');
       const lane = classify(text);
       const route = routeFor(lane);
-      const receipt = { id: crypto.randomUUID(), created_at: new Date().toISOString(), lane, primary_brain: route[0], secondary_review: route[1], status:'routed', message:text };
+      const receipt = { id: safeRandomUUID(), created_at: new Date().toISOString(), lane, primary_brain: route[0], secondary_review: route[1], status:'routed', message:text };
       if (env.NEXUS_KV) await env.NEXUS_KV.put(`event:${receipt.id}`, JSON.stringify(receipt));
       if (env.NEXUS_DB) await env.NEXUS_DB.prepare('insert into nexus_events (id, created_at, lane, primary_brain, secondary_review, status, payload) values (?1,?2,?3,?4,?5,?6,?7)').bind(receipt.id,receipt.created_at,lane,route[0],route[1],receipt.status,JSON.stringify(body)).run();
       if (env.NEXUS_QUEUE) await env.NEXUS_QUEUE.send(receipt);
@@ -31,7 +31,7 @@ export default {
     if (url.pathname === '/api/nexus/task' && request.method === 'POST') {
       if (!authorized(request, env)) return unauthorized(json);
       const body = await request.json().catch(()=>({}));
-      const task = { id: crypto.randomUUID(), created_at: new Date().toISOString(), title: body.title || 'Untitled NEXUS task', owner_brain: body.owner_brain || 'Site Operator Brain', status:'open', payload: body };
+      const task = { id: safeRandomUUID(), created_at: new Date().toISOString(), title: body.title || 'Untitled NEXUS task', owner_brain: body.owner_brain || 'Site Operator Brain', status:'open', payload: body };
       if (env.NEXUS_KV) await env.NEXUS_KV.put(`task:${task.id}`, JSON.stringify(task));
       if (env.NEXUS_DB) await env.NEXUS_DB.prepare('insert into nexus_tasks (id, created_at, title, owner_brain, status, payload) values (?1,?2,?3,?4,?5,?6)').bind(task.id,task.created_at,task.title,task.owner_brain,task.status,JSON.stringify(body)).run();
       if (env.NEXUS_QUEUE) await env.NEXUS_QUEUE.send(task);
@@ -50,6 +50,10 @@ export default {
   }
 };
 function authorized(request, env){
+  const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.NEXUS_INTERNAL_PROXY_SECRET || '').trim();
+  const sharedGate = String(request.headers.get('x-0s-shared-gate') || '').trim();
+  const presentedProxySecret = String(request.headers.get('x-0s-internal-proxy-secret') || '').trim();
+  if (proxySecret) return sharedGate === 'operator' && presentedProxySecret === proxySecret;
   const expected = String(env.NEXUS_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
   if (!expected) return false;
   const bearer = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i,'').trim();
@@ -61,3 +65,4 @@ function unauthorized(json){
 }
 function classify(t){t=(t||'').toLowerCase(); if(/lead|prospect|deal|quote|pipeline|proposal/.test(t))return'lead'; if(/client|renewal|onboard|complaint|launch/.test(t))return'client'; if(/candidate|resume|worker|staff|recruit/.test(t))return'candidate'; if(/vendor|partner|subcontractor/.test(t))return'vendor'; if(/legal|compliance|contract|risk|insurance/.test(t))return'compliance'; if(/proof|qa|receipt|audit|claim/.test(t))return'proof'; if(/invoice|billing|payroll|budget|margin/.test(t))return'finance'; if(/website|api|cloudflare|brain|database|worker/.test(t))return'technology'; if(/government|procurement|sam|rfp|bid/.test(t))return'government'; if(/founder|gray|approval|override/.test(t))return'founder'; return'general'}
 function routeFor(lane){return ({lead:['Celeste Monroe Revenue Brain','Marcus Vale Operations Review'],client:['Adrian Cross Client Success Brain','Victor Saint QA Review'],candidate:['Sienna Brooks Staffing Brain','Julian Mercer Compliance Review'],vendor:['Helena Ward Vendor Brain','Julian Mercer Compliance Review'],compliance:['Julian Mercer Compliance Brain','Gray London Skyes Founder Review'],proof:['Victor Saint QA Brain','Site Operator Brain'],finance:['Naomi Sterling Finance Brain','Marcus Vale Operations Review'],technology:['Orion Hayes Technology Brain','Site Operator Brain'],government:['Donovan Pierce Gov/Enterprise Brain','Julian Mercer Compliance Review'],founder:['Gray London Skyes Founder Brain','Site Operator Brain'],general:['Site Operator Brain','Central Company Command Brain']})[lane] || ['Site Operator Brain','Central Company Command Brain'];}
+function safeRandomUUID(){if(globalThis.crypto?.randomUUID)return globalThis.crypto.randomUUID();return `uuid_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;}

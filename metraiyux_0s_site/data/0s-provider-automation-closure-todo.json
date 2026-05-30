@@ -1,0 +1,173 @@
+{
+  "schema": "metraiyux.0s.provider-automation-closure-todo.v1",
+  "owner": {
+    "founder": "Gray Skyes",
+    "company": "Skyes Over London LC",
+    "system": "MetrAIyux 0S"
+  },
+  "rule": "The provider runtime belongs to the whole 0S. Founder Command is the owner cockpit over it, not the dependency that makes provider execution exist.",
+  "browser_proof_policy": "Owner handles browser proof. Codex closure uses code, API, smoke, stress, and receipts.",
+  "items": [
+    {
+      "id": "provider-registry",
+      "priority": "P0",
+      "status": "implemented_smoked_stressed",
+      "definition_of_done": "One shared 0S provider registry exposes configured/missing status for Twilio, Resend, Stripe, PayPal, UPS, Google Merchant, Meta Catalog, TikTok Catalog, Mapbox, R2/storage, Checkr, Certn, social/webhook, commerce HTTP, DNS, FS27, SkyeMail, SkyeNet, OpenAI, Relay13, Cloudflare, Netlify, and Google Calendar without printing secrets."
+    },
+    {
+      "id": "provider-execution-spine",
+      "priority": "P0",
+      "status": "core_provider_actions_implemented_smoked_stressed",
+      "definition_of_done": "All provider-backed actions can flow through a shared /api/0s/automation execution lane with shared FS27/SkyGate/Free99 auth, owner approvals, receipts, idempotency, and no app-local admin password."
+    },
+    {
+      "id": "owner-approval-grants",
+      "priority": "P0",
+      "status": "implemented_smoked_stressed",
+      "definition_of_done": "Owner can approve single actions or scoped automation windows up to 72 hours with provider/action/app/workspace/customer/spend/action-count caps and revoke support."
+    },
+    {
+      "id": "twilio-platform-runtime",
+      "priority": "P0",
+      "status": "sms_voice_and_status_implemented_smoked_stressed",
+      "definition_of_done": "Twilio SMS/voice status is read from provider vars, execution uses the shared provider spine, consent is enforced, provider IDs/statuses are receipted, and every action mirrors into FS27/Command Bridge."
+    },
+    {
+      "id": "fs27-metering-chargeback",
+      "priority": "P0",
+      "status": "implemented_static_checked",
+      "definition_of_done": "Every provider action carries customer_id, workspace_id, client_id, app_id, usage_lane, estimated_cost_cents, billable flag, and FS27 mirror metadata for client chargeback."
+    },
+    {
+      "id": "retry-dead-letter",
+      "priority": "P0",
+      "status": "implemented_smoked_stressed",
+      "definition_of_done": "Failed or blocked provider actions create durable dead-letter receipts; owner retry can execute or sandbox-execute with a readback receipt."
+    },
+    {
+      "id": "command-bridge-all-provider-events",
+      "priority": "P1",
+      "status": "implemented_smoked_stressed_for_provider_runtime",
+      "definition_of_done": "Every provider action writes a Command Bridge event visible by source app, workspace, client, provider, action, and receipt id."
+    },
+    {
+      "id": "app-lane-adoption",
+      "priority": "P1",
+      "status": "main_worker_routex_musicnexus_skyecommerce_edges_implemented_helper_coord_and_deploy_block_remaining",
+      "definition_of_done": "Admin Brain, Content Engine, RouteX, SkyeMail, Relay13, SkyeNet, SkyPay, SovereignDocs, MusicNexus, JobPing, Client App Factory, and SaaS provisioning call the shared provider runtime for external actions."
+    },
+    {
+      "id": "smoke-and-stress",
+      "priority": "P0",
+      "status": "implemented_smoked_stressed_for_current_runtime_slice",
+      "definition_of_done": "Non-browser smoke and stress prove provider registry, grants, sandbox execution, real-live gating, consent blocks, retry/dead-letter, FS27 mirror, Command Bridge mirror, and receipt readback."
+    },
+    {
+      "id": "valuation-truth-refresh",
+      "priority": "P2",
+      "status": "implemented_truth_and_valuation_green_production_deploy_blocked",
+      "definition_of_done": "Closure/truth/valuation artifacts are regenerated after provider runtime and app-lane adoption receipts are green."
+    }
+  ],
+  "implemented_lanes": [
+    "shared 0S provider registry and status",
+    "shared automation execute/grants/receipts/dead-letter/retry API",
+    "shared provider callback API for async downstream provider-call-made metering without double-sending provider work",
+    "Twilio SMS sandbox/live execution path with consent gate",
+    "Twilio voice sandbox/live execution path with consent gate",
+    "Twilio message status sandbox/live readback path through shared runtime receipts",
+    "Resend email sandbox/live execution path",
+    "Stripe account retrieve, balance retrieve, checkout create/retrieve, payment intent create/retrieve/capture, Terminal reader process-payment-intent, and refund create/retrieve sandbox/live execution paths",
+    "Resend domain-list provider-health primitive through shared runtime receipts",
+    "Stripe webhook lifecycle mirror action for SkyPay and top-up webhook events",
+    "Mapbox route enrichment sandbox/live execution path",
+    "Mapbox geocoding sandbox/live execution path",
+    "Checkr and Certn background-check sandbox/live execution paths",
+    "storage object receipt/put sandbox path, R2 binding path, and signed R2/S3 credential path",
+    "social/content webhook sandbox/live execution path",
+    "SkyeMail, Relay13, SkyeNet receipt, OpenAI image/chat, Anthropic chat, Gemini chat/embedding, Cloudflare token verify, SEMrush domain organic, and Google Search Console query provider primitives through the shared runtime",
+    "Google Calendar event create/list provider primitive through the shared runtime",
+    "Admin Brain approval grant/release and approval-email runtime receipts",
+    "kAIxu CodeStudio Twilio/Resend shared runtime execution",
+    "Content Engine per-asset shared runtime receipts",
+    "RouteX Twilio notification, Stripe payment intent, Mapbox route, and Checkr/Certn compliance dispatch through shared runtime receipts",
+    "RouteX Mapbox geocoding and proof/export object storage through shared runtime receipts",
+    "SaaS Stripe checkout session and billing webhook lifecycle mirror through shared runtime receipts",
+    "SaaS SkyeMail workspace mailbox provisioning plus SkyeMerit Resend, SkyeMail, and Relay13 delivery through shared runtime receipts",
+    "SkyPay checkout, refunds, admin top-up checkout, and user top-up checkout through shared runtime receipts",
+    "FS27 contact intake backup Resend notifications through shared runtime receipts",
+    "VantaCore CRM Twilio SMS and Resend email through shared runtime receipts",
+    "VantaCore CRM Google Calendar event creation through shared Google Calendar runtime receipts",
+    "FS27 auth, reset, recovery-code, provisioning, and client-intake Resend notifications through shared runtime receipts",
+    "Free99 demo-code rotation owner email prompts through shared Resend runtime receipts",
+    "Marketing Made Easy AE/vendor owner packet notifications through shared Resend runtime receipts",
+    "SkyeWebCreatorMax and Client App Factory Auren live OpenAI chat through shared runtime receipts",
+    "JobPing, BrandForge, Social Batch, Founder PWA Factory, and Business Card Factory paid AI chat through shared OpenAI runtime receipts",
+    "Founder Command and AE founder-access calendar scheduling through shared Google Calendar runtime receipts",
+    "JobPing paid-lane checkout status retrieve through shared runtime receipts",
+    "SovereignDocs legal review checkout create, payment confirmation retrieve, and dispute review calendar scheduling through shared runtime receipts",
+    "MusicNexus artist-store checkout create and SkyPay confirmation retrieve through shared runtime receipts",
+    "MusicNexus SkyeNet artist storefront/drop publish init, upload, complete, and route receipts through shared runtime sidecars",
+    "MusicNexus Netlify fallback deploy create and file upload through shared Netlify provider runtime receipts",
+    "SkyeGateFS27 Netlify push deploy create/status/file-upload helpers through shared Netlify provider runtime receipts",
+    "SkyeGateFS27 gateway OpenAI, Anthropic, Gemini chat, Gemini embedding, and stream-compatible adapters through shared model provider runtime receipts",
+    "SkyeCommerce provider health, Stripe checkout, Resend notification dispatch, PayPal checkout/refund/dispute/webhook, UPS health/rate/label, Google Merchant, Meta Catalog, TikTok Catalog, and POS Stripe Terminal initiation through shared provider runtime receipts",
+    "SkyeCommerce commerce webhooks, fulfillment sync, Routex handoff, warehouse work-order handoff, Shopify GraphQL import, donor/storefront HTML ingest, Cloudflare custom-hostname, and DNS TXT verification through shared provider runtime receipts",
+    "SkyeCommerce POS receipt printer jobs through shared commerce-http provider runtime signed JSON receipts",
+    "Founder Command SkyeMail stage-only handoff mode for provider-safe closeout without live mailbox provisioning",
+    "RouteX main Worker payment, notification, and background webhook dispatch through shared commerce-http provider runtime signed JSON receipts using the SkyeRouteX signature scheme",
+    "RouteX main Worker Twilio notification status refresh through shared Twilio provider runtime receipts",
+    "Valley Verified schedule publish webhook dispatch through shared commerce-http provider runtime receipts",
+    "MusicNexus main Worker ElevenLabs music generation and Stability audio generation through shared provider runtime receipts",
+    "MusicNexus main Worker Fediverse status publish and feed sync through shared provider runtime receipts",
+    "Key Gate 13 Stripe live credential probe through shared provider runtime receipts without returning raw key material",
+    "Key Gate 13 Cloudflare, SEMrush, and Google Search Console credential probes through shared provider runtime receipts",
+    "Agentic Growth SEMrush and Google Search Console source pulls through shared provider runtime receipts after Key Gate credential hydration",
+    "Client App Factory OpenAI identity image generation, R2 asset storage, and Relay13 intake handoff receipts through shared runtime",
+    "SkyeMail workspace handoff email through shared runtime receipts",
+    "Founder Command SkyeMail owner notification provisioning, workspace handoff provisioning, and mailbox offboarding through shared runtime receipts",
+    "Relay13 conversation/message actions linked to shared runtime receipts and callback-updated provider-call-made metering",
+    "SkyeNet deploy/source/env/route receipts linked to shared runtime receipts",
+    "FS27 provider_usage_events schema and platform-event ingest write path",
+    "admin usage provider chargeback rollup"
+  ],
+  "remaining_lanes": [
+    "helper-k4i deployed worker direct Resend and Cloudflare probe lanes require helper coordination, not local worker edits",
+    "Founder Command local drop-generation sidecar tools still contain direct ElevenLabs/Stability/OpenAI/Google Drive egress for operator-run media generation; these are not mounted 0S app API routes but remain sidecar parity migration candidates",
+    "production Worker deploy is blocked by Cloudflare Workers /versions API 10021 after assets upload; latest deploy attempt uploaded 187 changed assets from a 5125-file stage and failed at /workers/scripts/metraiyux-0s-full-system/versions; local Worker syntax, operating matrix, truth ledger, valuation alignment, and provider runtime receipts are green"
+  ],
+  "latest_receipts": {
+    "provider_runtime_proof": "npm run 0s:provider-runtime:proof",
+    "provider_runtime_smoke": "test-artifacts/0s-provider-runtime/0s-provider-runtime-smoke-latest.json",
+    "provider_runtime_stress": "test-artifacts/0s-provider-runtime/0s-provider-runtime-stress-latest.json",
+    "provider_runtime_latest_smoke": "72/72",
+    "provider_runtime_latest_stress": "40/40 p95=42ms",
+    "live_capability_watch_provider_runtime_helper": "test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json",
+    "external_provider_hardening_rollup": "test-artifacts/0s-workflow-rollups/external-provider-hardening/external-provider-hardening-latest.json",
+    "operating_matrix_latest": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+    "operating_matrix_latest_summary": "107 app routes, 22/22 behavior lanes green",
+    "truth_ledger_latest": "test-artifacts/0s-truth-ledger/0s-truth-ledger-latest.json",
+    "truth_ledger_latest_summary": "22/22 built, p0_not_built=[], p1_not_built=[]",
+    "valuation_deck_alignment_latest": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+    "production_closure_latest": "test-artifacts/0s-production-closure/0s-production-closure-latest.json",
+    "production_closure_latest_status": "closure_state green, production_ready_for_owner_manual_browser_check false because latest Worker deploy receipt is not ok after Cloudflare /versions API 10021",
+    "worker_deploy_blocker_latest": "test-artifacts/0s-worker-deploy/founder-command-full-worker-deploy-latest.json",
+    "worker_deploy_blocker_latest_summary": "2026-05-29T16:40:18.410Z attempt staged 5125 files, uploaded 187 changed assets, then Cloudflare /versions returned code 10021",
+    "valley_publish_webhook_provider_runtime": "node --experimental-global-webcrypto --test metraiyux_0s_site/tests/valley-provider-runtime-webhook.test.mjs",
+    "saas_provider_runtime_checkout_skymail": "node --test metraiyux_0s_site/tests/saas-provider-runtime-checkout.test.mjs",
+    "client_app_factory_provider_runtime": "node --test metraiyux_0s_site/tests/tenant-backbone-integration.test.mjs",
+    "musicnexus_skynet_provider_runtime": "node --test metraiyux_0s_site/tests/skyemusicnexus-skyenet-storefront-publish.test.mjs",
+    "musicnexus_skyepay_loop": "node --test metraiyux_0s_site/tests/skyemusicnexus-skyepay-loop-proof.mjs",
+    "stripe_webhook_lifecycle": "node --test metraiyux_0s_site/tests/stripe-webhook-provider-runtime.test.mjs",
+    "provider_callback_metering": "node --test metraiyux_0s_site/tests/zero-os-provider-runtime.test.mjs",
+    "founder_relay13_callback_metering": "node --test metraiyux_0s_site/tests/founder-command-relay13-inbox.test.mjs",
+    "jobping_paid_ai_provider_runtime": "node --test metraiyux_0s_site/tests/jobping-paid-runtime-proof.test.mjs",
+    "sovereigndocs_dispute_calendar_runtime": "node --test metraiyux_0s_site/tests/sovereigndocs-dispute-committee-proof.mjs",
+    "fs27_auth_email_provider_runtime": "ZERO_OS_PROVIDER_SANDBOX=1 RESEND_FROM_EMAIL='auth@example.com' node --input-type=module -e \"const m=await import('./metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/emailAuth.js'); const r=await m.sendRecoveryCodesEmail({email:'owner@example.com'}, {gateId:'gate-test', codes:['secret-code-1','secret-code-2']}); if(!r.delivered || r.mode!=='resend-provider-runtime' || r.provider_runtime?.provider_id!=='resend') throw new Error(JSON.stringify(r));\"",
+    "fs27_netlify_push_provider_runtime": "ZERO_OS_PROVIDER_SANDBOX=1 node --input-type=module -e \"const m=await import('./metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/pushNetlify.js'); const d=await m.createDigestDeploy({site_id:'site_test',files:{'index.html':'0123456789abcdef0123456789abcdef01234567'},netlify_token:'redacted'}); if(d.provider_runtime?.action!=='netlify.deploy.create') throw new Error(JSON.stringify(d));\"",
+    "skyecommerce_provider_runtime": "npm --prefix metraiyux_0s_site/SkyeCommerce test -- tests/provider-runtime.test.js tests/provider-adapters.test.js tests/platform-closure.test.js tests/full-platform.test.js tests/warehouse-ops.test.js tests/domain-certificates.test.js",
+    "key_gate_13_stripe_provider_runtime": "node --experimental-global-webcrypto --test metraiyux_0s_site/tests/key-gate-13th-adapter.test.mjs",
+    "fs27_gateway_openai_provider_runtime": "ZERO_OS_PROVIDER_SANDBOX=1 OPENAI_API_KEY=sk_test node --input-type=module -e \"const m=await import('./metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/providers.js'); const r=await m.callOpenAI({model:'gpt-4.1-mini',messages:[{role:'user',content:'hello'}]}); if(r.provider_runtime?.action!=='openai.chat.complete') throw new Error(JSON.stringify(r));\"",
+    "focused_app_lane_tests": "node --test metraiyux_0s_site/tests/admin-brain-native-persistence.test.mjs metraiyux_0s_site/tests/tenant-backbone-integration.test.mjs metraiyux_0s_site/tests/kaixu-codestudio-adapter.test.mjs metraiyux_0s_site/tests/routex-provider-runtime-notification.test.mjs metraiyux_0s_site/tests/routex-ae-workforce-lane-proof.mjs metraiyux_0s_site/tests/skyeroutex-mounted-worker-stress.mjs"
+  }
+}

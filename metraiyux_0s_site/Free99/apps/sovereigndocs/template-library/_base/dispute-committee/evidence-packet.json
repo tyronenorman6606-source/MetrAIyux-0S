@@ -1,0 +1,28 @@
+{
+  "base_id": "dispute-committee/evidence-packet",
+  "slug": "evidence-packet",
+  "title": "Dispute Committee Evidence Packet",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "medium",
+  "not_legal_advice": true,
+  "use_case": "Evidence cover sheet, exhibit list, authenticity statement, privacy redaction checklist, and chain-of-custody notes.",
+  "questionnaire": [
+    { "key": "case_id", "label": "Case ID", "type": "text", "required": true },
+    { "key": "exhibit_list", "label": "Exhibit List", "type": "textarea", "required": true },
+    { "key": "submitted_by", "label": "Submitted By", "type": "text", "required": true },
+    { "key": "authenticity_statement", "label": "Authenticity Statement", "type": "textarea", "required": true },
+    { "key": "redactions", "label": "Privacy Redactions", "type": "textarea", "required": false },
+    { "key": "chain_of_custody", "label": "Chain of Custody", "type": "textarea", "required": false }
+  ],
+  "sections": [
+    { "heading": "Evidence Cover Sheet", "body": "Case {{case_id}} evidence submitted by {{submitted_by}}." },
+    { "heading": "Exhibit List", "body": "{{exhibit_list}}" },
+    { "heading": "Authenticity Statement", "body": "{{authenticity_statement}}" },
+    { "heading": "Privacy Redaction Checklist", "body": "Redactions: {{redactions}}. Do not store private keys, passwords, full payment cards, unrelated personal data, or privileged materials unless owner/counsel approval exists." },
+    { "heading": "Chain of Custody", "body": "{{chain_of_custody}}" }
+  ],
+  "review": { "requires_attorney_review": false, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "evidence", "medium"]
+}

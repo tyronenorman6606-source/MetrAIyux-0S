@@ -5,7 +5,7 @@ import { spawnSync } from "child_process";
 import { inflateSync } from "zlib";
 import { chromium } from "playwright";
 
-const repoRoot = "/workspaces/MetrAIyux-0S";
+const repoRoot = fs.existsSync("/workspaces/MetrAIyux-0S") ? "/workspaces/MetrAIyux-0S" : process.cwd();
 const policyPath = path.join(repoRoot, ".agents/live-browser-verifier/browser-proof-policy.toml");
 
 function policyNumber(key, fallback) {
@@ -25,6 +25,7 @@ const browserPolicy = {
   minimumFormEditsPerViewport: policyNumber("minimum_form_edits_per_viewport", 3),
   minimumStateChangeAssertionsPerViewport: policyNumber("minimum_state_change_assertions_per_viewport", 8)
 };
+const navigationTimeoutMs = Number(process.env.LIVE_BROWSER_GOTO_TIMEOUT_MS || 45000);
 
 function relaunchWithXvfbWhenNeeded() {
   if (process.platform !== "linux") return;
@@ -698,7 +699,7 @@ async function verifyUrl(browser, url, expects, viewport, artifactDir) {
     });
   });
 
-  const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+  const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: navigationTimeoutMs });
   await page.waitForLoadState("networkidle", { timeout: 9000 }).catch(() => {});
   await page.waitForTimeout(900);
   await page
@@ -712,7 +713,7 @@ async function verifyUrl(browser, url, expects, viewport, artifactDir) {
   const urlAfterActions = page.url();
   if (comparableUrl(urlAfterActions) !== comparableUrl(url)) {
     actions.push(`returned to proof URL after navigation: ${urlAfterActions}`);
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: navigationTimeoutMs });
     await page.waitForLoadState("networkidle", { timeout: 9000 }).catch(() => {});
   }
   await page.waitForTimeout(700);
@@ -769,6 +770,7 @@ async function main() {
     mode: "headed-live-browser",
     headless: false,
     browserPolicy,
+    navigationTimeoutMs,
     urls: args.urls,
     expects: args.expects,
     artifactDir,
@@ -779,7 +781,13 @@ async function main() {
   try {
     browser = await chromium.launch({
       headless: false,
-      slowMo: Number(process.env.LIVE_BROWSER_SLOWMO || 120)
+      slowMo: Number(process.env.LIVE_BROWSER_SLOWMO || 120),
+      args: process.platform === "linux" ? [
+        "--ozone-platform=x11",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-features=VizDisplayCompositor"
+      ] : []
     });
   } catch (error) {
     report.failures.push(`Could not launch headed Chromium: ${error.message}`);
@@ -796,7 +804,32 @@ async function main() {
 
   for (const url of args.urls) {
     for (const viewport of viewports) {
-      const check = await verifyUrl(browser, url, args.expects, viewport, artifactDir);
+      let check;
+      try {
+        check = await verifyUrl(browser, url, args.expects, viewport, artifactDir);
+      } catch (error) {
+        check = {
+          url,
+          viewport,
+          status: 0,
+          okStatus: false,
+          initialTitle: "",
+          title: "",
+          urlAfterActions: "",
+          finalUrl: "",
+          actions: [],
+          humanActionCount: 0,
+          consoleErrors: [],
+          failedRequests: [],
+          missingText: args.expects,
+          horizontalOverflowPx: 0,
+          imageCount: 0,
+          visualScrollProof: { blankStops: [], brokenVisibleMediaStops: [], overlayStops: [] },
+          screenshot: "",
+          error: error?.stack || error?.message || String(error)
+        };
+        report.failures.push(`${url} ${viewport.width}x${viewport.height} verifier error: ${error?.message || String(error)}`);
+      }
       report.checks.push(check);
       if (!check.okStatus) report.failures.push(`${url} ${viewport.width}x${viewport.height} returned status ${check.status}`);
       if (check.consoleErrors.length) report.failures.push(`${url} ${viewport.width}x${viewport.height} console errors: ${check.consoleErrors.join(" | ")}`);

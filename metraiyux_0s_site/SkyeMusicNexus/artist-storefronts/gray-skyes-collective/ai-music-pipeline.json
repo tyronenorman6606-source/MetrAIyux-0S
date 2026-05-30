@@ -1,0 +1,67 @@
+{
+  "schema": "skyemusicnexus.ai-music-pipeline.v1",
+  "status": "provider_ready_not_auto_running",
+  "owner": {
+    "collectiveId": "gray-skyes-collective",
+    "ownerArtistId": "444666666666",
+    "ownerName": "Gray Skyes"
+  },
+  "workflow": [
+    {
+      "step": "generate_song",
+      "description": "Generate song audio from an approved artist/collective prompt through a paid music provider.",
+      "writes": [
+        "artist-storefronts/<artist>/releases/<release-id>/audio.mp3",
+        "release manifest",
+        "provider receipt"
+      ]
+    },
+    {
+      "step": "create_release",
+      "description": "Create a SkyeMusicNexus release with artistId, collectiveId, rights/AI disclosure, audio asset pointer, and review state.",
+      "api": "/api/skymusicnexus/music-releases"
+    },
+    {
+      "step": "create_content_pack",
+      "description": "Generate clean feed copy, caption hooks, artwork brief, short-form prompts, and storefront product copy.",
+      "api": "/api/skymusicnexus/music-brain"
+    },
+    {
+      "step": "post_to_feed",
+      "description": "Post the approved release/content to the Nexus feed as the artist, tagged with Gray Gang.",
+      "api": "/api/skymusicnexus/music-social"
+    },
+    {
+      "step": "publish_store_product",
+      "description": "Create a digital song product on the artist storefront with price, fulfillment type, and SkyePay checkout route.",
+      "api": "/api/skymusicnexus/music-store"
+    },
+    {
+      "step": "paperwork_gate",
+      "description": "Before payout release, require artist collective membership paperwork, AI music disclosure if applicable, revenue split, and owner approval.",
+      "systems": [
+        "SovereignDocs",
+        "SkyeRouteX Workforce Command",
+        "SkyePay"
+      ]
+    }
+  ],
+  "defaultProductPolicy": {
+    "currency": "USD",
+    "songPriceCents": 444,
+    "feeMode": "buyer_covered",
+    "fulfillmentType": "digital-link",
+    "requiresOwnerApprovalBeforePublicPublish": true
+  },
+  "collectivePolicy": {
+    "artistAttribution": true,
+    "collectiveAttribution": true,
+    "payoutRollup": "gray_skyes_collective_owner_until_member_has_approved_payout_profile",
+    "paperworkRequired": true
+  },
+  "requiredServices": {
+    "musicProvider": "ElevenLabs music generation provider configured in the 0S Worker environment",
+    "optionalMusicProvider": "Stability audio provider configured in the 0S Worker environment",
+    "copyAndPlanning": "0S language model provider configured in the root environment"
+  }
+}

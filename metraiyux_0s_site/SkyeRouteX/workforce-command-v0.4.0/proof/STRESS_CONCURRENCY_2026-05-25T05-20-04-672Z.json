@@ -1,0 +1,168 @@
+{
+  "ok": true,
+  "started_at": "2026-05-25T05:18:52.095Z",
+  "completed_at": "2026-05-25T05:20:04.671Z",
+  "shape": {
+    "providerCount": 8,
+    "contractorCount": 48,
+    "jobCount": 24,
+    "applicantsPerJob": 4,
+    "expectedAssignments": 32
+  },
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "server_booted",
+      "data": {
+        "version": "0.4.0",
+        "port": 5899
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "admin_market_seeded",
+      "data": {
+        "marketId": "mkt_b86a7dc988be00c020"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "providers_created_concurrently",
+      "data": {
+        "providerCount": 8
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "contractors_created_concurrently",
+      "data": {
+        "contractorCount": 48
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "jobs_created_concurrently",
+      "data": {
+        "jobCount": 24
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "applications_created_concurrently",
+      "data": {
+        "applicationCount": 96
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "concurrent_acceptance_locks_held",
+      "data": {
+        "assignments": 32,
+        "blocked_attempts": 64
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "assignment_state_transitions_completed_concurrently",
+      "data": {
+        "assignments": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "route_stops_completed_concurrently",
+      "data": {
+        "routeCount": 24,
+        "stopCount": 48
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "proof_media_submitted_concurrently",
+      "data": {
+        "expectedProofItems": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "provider_approvals_completed_concurrently",
+      "data": {
+        "assignments": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "export_packets_generated_concurrently",
+      "data": {
+        "expectedExports": 24
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "market_reports_generated_concurrently",
+      "data": {
+        "reports": 8
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "storage_counters_survived_concurrency",
+      "data": {
+        "driver": "local-json",
+        "database_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/data/stress-concurrency-mpkraif3.json",
+        "media_root": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/data/proof-media",
+        "export_root": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/data/exports",
+        "proof_media_count": 32,
+        "export_packet_count": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "payment_ledger_survived_concurrency",
+      "data": {
+        "payoutEligible": 32
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "audit_chain_valid_after_stress",
+      "data": {
+        "ok": true,
+        "event_count": 539,
+        "head_hash": "4f7aa7b92c4478a4ae0dae16cd9d9a3c7ff01e637bc8f31744c9bc404577c42d",
+        "failures": []
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "persisted_totals_match_stress_shape",
+      "data": {
+        "jobs": 24,
+        "assignments": 32,
+        "proof_items": 32,
+        "proof_media": 32,
+        "export_packets": 32,
+        "audit_events": 539,
+        "health_jobs_open": 24,
+        "health_assignments_open": 0,
+        "health_routes_open": 0
+      }
+    }
+  ],
+  "metrics": {
+    "requests": 608,
+    "status_counts": {
+      "200": 303,
+      "201": 241,
+      "409": 64
+    },
+    "min_ms": 18,
+    "max_ms": 16242,
+    "avg_ms": 3711.75,
+    "p50_ms": 2142,
+    "p95_ms": 13195,
+    "p99_ms": 13888
+  },
+  "dbPath": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/data/stress-concurrency-mpkraif3.json",
+  "server_log_excerpt": "SkyeRoutexFlow Workforce Command running on http://localhost:5899\n"
+}

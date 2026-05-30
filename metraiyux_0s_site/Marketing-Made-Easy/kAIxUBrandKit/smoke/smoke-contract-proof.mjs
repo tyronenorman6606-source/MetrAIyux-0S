@@ -7,7 +7,6 @@ const root = path.resolve(__dirname, "..");
 
 for (const rel of [
   "index.html",
-  "app.html",
   "netlify/functions/kaixu-generate.js",
   "netlify/functions/client-error-report.js",
 ]) {
@@ -20,8 +19,24 @@ const { handler: generate } = await import(path.join(root, "netlify/functions/ka
 const { handler: errorReport } = await import(path.join(root, "netlify/functions/client-error-report.js"));
 
 const originalEnv = { ...process.env };
+const originalFetch = globalThis.fetch;
+const authHeaders = { authorization: "Bearer brandkit-smoke-shared-gate" };
 
 try {
+  globalThis.fetch = async (url, init = {}) => {
+    const target = String(url || "");
+    if (target.includes("/auth-introspect")) {
+      return Response.json({
+        active: true,
+        email: "brandkit-smoke@solenterprises.org",
+        role: "operator",
+        scope: "admin.read admin.write",
+        source: "smoke-shared-gate"
+      });
+    }
+    return originalFetch(url, init);
+  };
+
   delete process.env.KAIXU_SERVER_LANE;
   delete process.env.KAIXU_API_KEY;
   delete process.env.KAIXU_GATEWAY_BASE;
@@ -32,19 +47,19 @@ try {
     throw new Error("BrandKit generate handler no longer rejects non-POST requests.");
   }
 
-  const missingLane = await generate({ httpMethod: "POST", headers: {}, body: JSON.stringify({ prompt: "hello" }) });
+  const missingLane = await generate({ httpMethod: "POST", headers: authHeaders, body: JSON.stringify({ prompt: "hello" }) });
   if (missingLane.statusCode !== 500 || !String(missingLane.body).includes("KAIXU_SERVER_LANE")) {
     throw new Error("BrandKit generate handler missing-lane contract drifted.");
   }
 
   process.env.KAIXU_SERVER_LANE = "lane-test";
-  const missingBase = await generate({ httpMethod: "POST", headers: {}, body: JSON.stringify({ prompt: "hello" }) });
+  const missingBase = await generate({ httpMethod: "POST", headers: authHeaders, body: JSON.stringify({ prompt: "hello" }) });
   if (missingBase.statusCode !== 500 || !String(missingBase.body).includes("KAIXU_GATEWAY_BASE")) {
     throw new Error("BrandKit generate handler missing-gateway-base contract drifted.");
   }
 
   process.env.KAIXU_GATEWAY_BASE = "https://runtime.example.invalid";
-  const missingPrompt = await generate({ httpMethod: "POST", headers: {}, body: JSON.stringify({}) });
+  const missingPrompt = await generate({ httpMethod: "POST", headers: authHeaders, body: JSON.stringify({}) });
   if (missingPrompt.statusCode !== 400 || !String(missingPrompt.body).includes("Missing prompt")) {
     throw new Error("BrandKit generate handler missing-prompt contract drifted.");
   }
@@ -55,14 +70,9 @@ try {
   }
 
   const indexHtml = readFileSync(path.join(root, "index.html"), "utf8");
-  const html = readFileSync(path.join(root, "app.html"), "utf8");
-  for (const needle of [
-    "kAIxU BrandKit now has routed surfaces",
-    'href="./app.html"',
-  ]) {
-    if (!indexHtml.includes(needle)) {
-      throw new Error(`BrandKit route shell is missing expected surface marker: ${needle}`);
-    }
+  const html = indexHtml;
+  if (existsSync(path.join(root, "app.html"))) {
+    throw new Error("app.html should not exist; kAIxU BrandKit must use one canonical root app");
   }
 
   for (const needle of [
@@ -98,4 +108,5 @@ try {
     if (!(key in originalEnv)) delete process.env[key];
   }
   Object.assign(process.env, originalEnv);
+  globalThis.fetch = originalFetch;
 }

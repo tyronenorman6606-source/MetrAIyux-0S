@@ -7,19 +7,49 @@ let SALES_OFFERS = null;
 let SKYEVAULT_MAP = null;
 let SKYERUNNERS_MAP = null;
 
-const TOTAL_BRAINS = 16;
+const localBrainScriptBase = (() => {
+  try {
+    return document.currentScript?.src ? new URL('.', document.currentScript.src).href : '';
+  } catch (e) {
+    return '';
+  }
+})();
+
+const TOTAL_BRAINS = 17;
 const BRAIN_ID_ALIASES = {
   'site-operator-autonomous-business-brain': 'site-operator-brain',
   'main-automation-brain': 'site-operator-brain',
   'central-command-brain': 'central-company-command-brain',
   '0meg4kai-brain': '0meg4kai-security-brain',
-  'omegakai-security-brain': '0meg4kai-security-brain'
+  'omegakai-security-brain': '0meg4kai-security-brain',
+  'helper-k4i-brain': 'helper-k4i-proof-ops-brain'
 };
 
 const stopwords = new Set('a an and are as at be by for from has have i in into is it its of on or our that the their this to with we what when where who why how which should about across all can does do if so than then there they through use using within without need needs needed want wants wanted give gives gave make makes made tell tells told ask asks asked'.split(' '));
 const shortTerms = new Set(['ae', 'qa', 'hr', 'ai', 'os', '0s']);
 
 const localRouteRules = [
+  {
+    intent: 'legalskyes_operator_identity',
+    route_to: 'gray-london-skyes-brain',
+    secondary: 'julian-mercer-brain',
+    create_task: 'Answer LegalSkyes operator/company identity from the deterministic legal sync lane and keep legal claims bounded',
+    triggers: ['legal skyes owner', 'who runs legal skyes', 'who owns legal skyes', 'gray skyes', 'gray london skyes', 'skyes over london lc', 'solenterprises', 'operator identity', 'company identity']
+  },
+  {
+    intent: 'legalskyes_purpose_lane_map',
+    route_to: 'julian-mercer-brain',
+    secondary: 'central-company-command-brain',
+    create_task: 'Explain the LegalSkyes public legal center purpose and map the request to the correct public policy lane',
+    triggers: ['legal skyes', 'legal center', 'legal brain', 'policy lane', 'business lanes', 'lane map', 'public legal front door', 'what does legal skyes cover', 'legal purpose']
+  },
+  {
+    intent: 'legalskyes_escalation_boundary',
+    route_to: 'julian-mercer-brain',
+    secondary: '0meg4kai-security-brain',
+    create_task: 'Escalate binding legal/security/admin questions and preserve shared 0S gate boundaries',
+    triggers: ['legal advice', 'attorney', 'lawyer', 'counsel', 'lawsuit', 'subpoena', 'counter notice', 'demand letter', 'regulated', 'binding approval', 'admin password', 'owner password', 'separate auth', 'bypass gate', 'shared gate']
+  },
   {
     intent: 'security_auth_gate',
     route_to: '0meg4kai-security-brain',
@@ -33,6 +63,13 @@ const localRouteRules = [
     secondary: '0meg4kai-security-brain',
     create_task: 'Treat SkyeVault as the Git/storage engine, Gate as the authority layer, and 0S as the neural-map operating layer',
     triggers: ['skyevault git', 'git remote', 'git clone', 'git push', 'git fetch', 'repo vault', 'bundle export', 'restore repo', 'git diff', 'branch protection', 'vault neural map', 'workspace brain map']
+  },
+  {
+    intent: 'helper_k4i_proof_ops',
+    route_to: 'helper-k4i-proof-ops-brain',
+    secondary: '0meg4kai-security-brain',
+    create_task: 'Run Helper K4i proof scans, record SkyErrors in CitadelDB, send Resend owner alerts when configured, and prepare a vault patch-plan handoff',
+    triggers: ['helper k4i', 'skyerrors', 'citadeldb developer', 'database url', 'proof scan', 'health scan', 'resend alert', 'patch plan', 'vault patch', 'minor bug']
   },
   {
     intent: 'brain_count_or_runtime',
@@ -75,6 +112,13 @@ const localRouteRules = [
     secondary: 'valentina-reyes-brain',
     create_task: 'Invoke the Artist Universe Builder Agent: unpack the artist reference, mine real assets and links, run MCP tooling, build a new artist-specific universe, serve locally, proof, and deploy through FS27 SkyeNet when approved',
     triggers: ['artist website', 'artist build', 'music artist', 'rapper site', 'singer site', 'band site', 'artist universe', 'rebuild artist zip', 'polished artist build', 'merser3.1 artist', 'skrucible artist', 'music landing page', 'release site', 'album rollout', 'artist press kit', 'booking site', 'supaboy style build', 'skynet artist build']
+  },
+  {
+    intent: 'platform_launcher_offer_hub',
+    route_to: 'celeste-monroe-brain',
+    secondary: 'site-operator-brain',
+    create_task: 'Use the SkyePay platform launcher to choose the correct platform lane, then open the matching offer, proof surface, or brain route before checkout',
+    triggers: ['platform launcher', 'hub launcher', 'interactive hub', 'which platform', 'offer cards', 'search platform', 'skyepay launcher', 'free99 stack', 'skyemerit launch merit', 'artist landing pricing', 'landing page price', 'media over london', 'platform sections', 'click into platform', 'buyer question', 'nexus marketing hub', 'nexus founder guide', 'artist shop', 'nexus shop', 'fan storefront', 'artist id hash', 'paid drop', 'private download', 'daw beta', 'sovereigndocs artist']
   },
   {
     intent: 'pricing_subscription',
@@ -204,7 +248,16 @@ function scoreText(query, haystack) {
     'submit review',
     'customer experience',
     'client feedback',
-    'social proof'
+    'social proof',
+    'legal skyes',
+    'legal center',
+    'business lanes',
+    'policy lane',
+    'operator identity',
+    'company identity',
+    'human review',
+    'legal advice',
+    'shared gate'
   ].forEach(phrase => {
     if ((query || '').toLowerCase().includes(phrase) && hay.includes(phrase)) score += 7;
   });
@@ -425,7 +478,23 @@ function smartDirectAnswer(query, route, surfaces) {
   const firstSurface = surfaces[0];
 
   if (hasAny(q, ['how many brains', 'brain count', 'total brains', '17 brains', 'cabinet brains'])) {
-    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
+    return `There are ${TOTAL_BRAINS} operating brains in this runtime: Site Operator, 0meg4kAI, Helper K4i, Central Company Command, and 13 cabinet executive brains. Site Operator handles routing, 0meg4kAI handles gate/security/tenant review, Helper K4i watches proof health and SkyErrors, Central Command handles cross-company questions, and the cabinet brains own their functional lanes.`;
+  }
+
+  if (hasAny(q, ['who runs', 'who owns', 'who operates', 'who is the owner', 'who is the founder', 'company owner', 'founder of the company', 'gray skyes', 'gray london skyes', 'skyes over london owner', 'legal skyes owner', 'operator identity', 'company identity'])) {
+    return `Skyes Over London LC is the company/operator identity for the public Legal Skyes center and the broader 0S ecosystem. Gray Skyes, also represented in this 0S brain as Gray London Skyes, is the founder and operator behind the company lanes. Main owner email: grayskyes@solenterprises.org. Company line: 1-(800)-484-4783. Legal Skyes is the public legal and communications center for MetrAIyux 0S, SkyeMail, SkyeRouteX Logistics, SkyeMusicNexus, SkyePay, SkyeVault, and related surfaces; it is not a law firm and binding legal decisions need human/professional review.`;
+  }
+
+  if (hasAny(q, ['what is legal skyes', 'legal skyes purpose', 'legal center purpose', 'public legal front door', 'legal brain', 'public legal brain', 'what does legal skyes do'])) {
+    return `Legal Skyes is the deterministic public legal center for Skyes Over London LC. Its job is to make the public rulebook inspectable while the private 0S command rooms stay protected: master terms, privacy, AI rules, SMS/Twilio consent, SaaS terms, commerce and payout boundaries, IP takedown routes, security reporting, and contact handling all get routed to public policy pages before an operator makes a private decision.`;
+  }
+
+  if (hasAny(q, ['business lanes', 'policy lane', 'lane map', 'which lane', 'what covers', 'coverage map', 'legal map'])) {
+    return `Legal Skyes answers by lane. 0S and mounted apps go to /legal/metraiyux-0s/ and the shared FS27/SkyGate/Free99/NorthStar gate rules. AI goes to AI Terms, AI Transparency, and AI Operators. Music Nexus goes to /legal/music-nexus/ plus creator/media, commerce, contractor/vendor, payout, and takedown terms. SaaS goes to SaaS Platform, Service Level, privacy, subscriptions, payments, and acceptable use. Communications go to SMS/Twilio consent and privacy. IP, abuse, child safety, and security go to DMCA/IP, acceptable use, child safety, and security reporting.`;
+  }
+
+  if (hasAny(q, ['legal advice', 'lawyer', 'attorney', 'counsel', 'escalate', 'escalation', 'human review', 'binding approval', 'subpoena', 'lawsuit', 'counter notice', 'demand letter', 'regulated', 'admin password', 'owner password', 'separate auth', 'bypass gate'])) {
+    return `Escalate this through ${primaryOwner}, with ${secondaryOwner} checking the boundary. The local brain can map policies, prepare issue lists, and point to public routes, but it cannot provide legal advice, approve regulated claims, file documents, promise outcomes, expose private admin setup, or create a separate owner/admin password. Subpoenas, lawsuits, counter-notices, child-safety matters, telecom compliance, security incidents, employment, finance/tax, enterprise commitments, and binding contract decisions need human owner review and licensed counsel where appropriate. Mounted 0S apps must stay on the shared FS27/SkyGate/Free99 auth lane.`;
   }
 
   if (hasAny(q, ['leave a review', 'submit review', 'write testimonial', 'send testimonial', 'give feedback', 'customer feedback', 'client feedback', 'talk about their experience', 'talk about our experience', 'share experience'])) {
@@ -433,11 +502,19 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['contact', 'request service', 'service request', 'start project', 'need help', 'talk to admin', 'private request', 'get in touch', 'inquiry'])) {
-    return `${primaryOwner} owns the intake conversation, with ${secondaryOwner} watching the client-success handoff. Send the person to https://skyes-over-london-reviews.pages.dev/request-service.html. That page posts to FS27 contact intake first, keeps the record private for admin triage, sends Resend/Gmail as backup notification, and only uses mailto:skyesoverlondon@gmail.com if the owned intake lane is unavailable.`;
+    return `${primaryOwner} owns the intake conversation, with ${secondaryOwner} watching the client-success handoff. Skyes Over London is part of SOLEnterprises International Nexus & Holdings. Use the specific lane: SkyeMusicNexus@solenterprises.org for music platform questions, metraiyux-0s@solenterprises.org for 0S support and enterprise activation, MediaOverLondon@solenterprises.org for marketing and advertising, skyemail@solenterprises.org for hosted email, connectedskyes@solenterprises.org for public relations/general queries, and grayskyes@solenterprises.org for Gray Skyes direct company email. Phone: 1-(800)-484-4783.`;
   }
 
   if (hasAny(q, ['proof wall', 'review wall', 'testimonials', 'client proof', 'customer proof', 'social proof', 'what do clients say', 'show reviews'])) {
     return `${primaryOwner} owns the buyer conversation, with ${secondaryOwner} keeping the public framing clean. Send proof-seeking prospects to the Skyes Over London Reviews Proof Wall at https://skyes-over-london-reviews.pages.dev/skyes-over-london-reviews-expanded.html. Use it when they ask for reviews, testimonials, client experience, or social proof, and avoid inventing client names, outcomes, or approval status.`;
+  }
+
+  if (hasAny(q, ['platform launcher', 'hub launcher', 'interactive hub', 'which platform', 'offer cards', 'search platform', 'skyepay launcher', 'artist landing pricing', 'landing page price', 'media over london', 'nexus founder guide', 'daw beta', 'sovereigndocs artist'])) {
+    return `${primaryOwner} owns the buyer fit conversation, with ${secondaryOwner} keeping the 0S route honest. Start at the SkyePay platform launcher on /saas/skyepay.html#platform-launcher, pick the platform lane first, then open the exact card: SkyeMusicNexus for artist landing pages and upload/release work, Free99 for no-charge gated tools, SkyePay + SkyeMerit for checkout and merit math, Relay13 + ConnectLog for inbox/relationship work, Sovereign Infrastructure for gate/vault/mail/database proof, and Marketing + Media Over London for campaign spectacle and content engines. Artist landing builds carry the $2,000 SkyeMerit launch merit through 2026-06-26 before checkout.`;
+  }
+
+  if (hasAny(q, ['nexus marketing hub', 'artist shop', 'nexus shop', 'fan storefront', 'artist id hash', 'artist payout', 'paid drop', 'private download', 'vendor artist', 'contractor artist', '13 percent', '13%', 'nexus founder guide'])) {
+    return `${primaryOwner} owns the artist monetization conversation, with ${secondaryOwner} keeping the route/proof language honest. Use the SkyeMusicNexus marketing hub and Founder Field Guide as public explainers: every artist page should support fan purchases, support/tips, merch or booking slots, preview-first paid access, hashed artist-ID checkout metadata, SkyePay/Stripe receipt trails, and biweekly payout-review batches. The DAW is beta and support should route through metraiyux-0s@solenterprises.org. The 13% platform fee is required; the artist can choose buyer-covered pricing or artist-absorbed pricing. Vendor/seller paperwork handles fan revenue, while independent-contractor paperwork handles company-paid work such as promotion, testing, content, or appearances, with SovereignDocs as the 0S paperwork route.`;
   }
 
   if (hasAny(q, ['houseoperations', 'house operations', 'house ops', 'owner alerts', 'vendor pressure', 'skye box', 'skyebox', 'authenticator vault', 'totp', '2fa vault'])) {
@@ -455,7 +532,7 @@ function smartDirectAnswer(query, route, surfaces) {
   }
 
   if (hasAny(q, ['price', 'pricing', 'stripe', 'subscription', 'billing', 'invoice', 'quote', 'package', 'cost', 'retainer'])) {
-    return `${primaryOwner} owns the pricing and margin lane, with ${secondaryOwner} packaging it for the buyer. Do not quote phantom prices from old page copy. Use the sales offer registry or Stripe catalog as the source of truth, then review margin, setup scope, monthly management, and any custom client risk before giving a number.`;
+    return `${primaryOwner} owns the pricing and margin lane, with ${secondaryOwner} packaging it for the buyer. Do not quote phantom prices from old page copy. Use the sales offer registry or Stripe catalog as the source of truth. For SkyeMusicNexus launch landing builds, show the premium listed value and the $2,000 SkyeMerit applied before checkout through 2026-06-26, then review margin, setup scope, monthly management, and any custom client risk before giving a number.`;
   }
 
   if (hasAny(q, ['government', 'enterprise', 'procurement', 'sam', 'naics', 'capability', 'rfp', 'bid'])) {
@@ -580,13 +657,31 @@ function renderSources(sources) {
 }
 
 async function fetchJson(path) {
-  try {
-    const res = await fetch(path);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (e) {
-    return null;
+  const candidates = [];
+  const addCandidate = (candidate) => {
+    if (candidate && !candidates.includes(candidate)) candidates.push(candidate);
+  };
+
+  if (/^https?:\/\//i.test(path) || path.startsWith('/')) {
+    addCandidate(path);
+  } else {
+    if (localBrainScriptBase && path.startsWith('brain/')) {
+      addCandidate(new URL(path.replace(/^brain\//, ''), localBrainScriptBase).href);
+    }
+    addCandidate(path);
+    addCandidate(`../${path}`);
   }
+
+  for (const candidate of candidates) {
+    try {
+      const res = await fetch(candidate);
+      if (!res.ok) continue;
+      return await res.json();
+    } catch (e) {
+      continue;
+    }
+  }
+  return null;
 }
 
 async function loadKB() {
@@ -765,7 +860,7 @@ document.getElementById('askBrain')?.addEventListener('click', () => {
 
 document.getElementById('exampleBrain')?.addEventListener('click', () => {
   const input = document.getElementById('brainQuestion');
-  if (input) input.value = 'A Phoenix buyer asks how this is more than a website and wants auth/proof. Which brain handles it and what link do I send?';
+  if (input) input.value = 'Which platform handles an artist landing page with a $2,000 SkyeMerit launch discount and what card should I open?';
 });
 
 document.getElementById('clearBrain')?.addEventListener('click', () => {

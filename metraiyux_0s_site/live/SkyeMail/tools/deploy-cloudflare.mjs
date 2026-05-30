@@ -47,7 +47,8 @@ for (const [canonical, names] of Object.entries(aliases)) {
   const match = names.find((name) => env[name]);
   if (match) env[canonical] = env[match];
 }
-const child = spawn("npx", ["wrangler", "deploy"], {
+const wranglerVersion = process.env.WRANGLER_VERSION || "4.14.0";
+const child = spawn("npx", ["-y", "-p", `wrangler@${wranglerVersion}`, "wrangler", "deploy"], {
   cwd: skymailRoot,
   env,
   stdio: ["ignore", "pipe", "pipe"],

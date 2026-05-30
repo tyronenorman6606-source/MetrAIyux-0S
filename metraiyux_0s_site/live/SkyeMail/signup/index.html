@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Create Vault — Skye Mail Vault</title>
+  <title>Activate Sovereign Mail Core - SkyeMail</title>
 
   <style>
 :root{
@@ -308,6 +308,7 @@ small{ color: var(--muted); }
 .msg .role{ font-size:11px; color: var(--muted); }
 .msg .content{ white-space:pre-wrap; font-size:13px; line-height:1.55; margin-top:4px; }
   </style>
+<script src="assets/js/0s-gate-card-bridge.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/skye0s-onboard-bridge.js"></script>
 </head>
@@ -318,13 +319,13 @@ small{ color: var(--muted); }
       <div class="brand">
         <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
         <div class="name">
-          <b>Skye Mail Vault</b>
-          <span>Encrypted business message center • Netlify + Neon</span>
+          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Citadel</b>
+          <span>Encrypted business message center • Citadel + SkyeNet</span>
         </div>
       </div>
       <div class="navlinks">
         <a class="pill" href="index.html">Home</a>
-        <a class="pill" href="signup.html">Sign up</a>
+        <a class="pill" href="signup.html">Citadel setup</a>
         <a class="pill" href="login.html">Login</a>
         <a class="pill" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
         <a class="pill" href="ai.html">AI</a>
@@ -334,26 +335,28 @@ small{ color: var(--muted); }
   </div>
   <div class="container">
 <div class="card">
-  <h1 class="h1" style="font-size:30px;">Create your Vault</h1>
+  <h1 class="h1" style="font-size:30px;">Activate your sovereign mail core</h1>
   <p class="sub">
-    This creates your public address and generates your encryption keys in your browser.
-    Your Vault Passphrase is never sent to the server.
+    SkyeMail uses the 0S Gate identity first. This page only creates local sovereign keys and binds the staged SkyEmail claim to your Gate session.
   </p>
+  <div class="notice" id="gateNotice" style="margin-bottom:12px;">
+    Checking for your 0S Gate session.
+  </div>
 
   <div class="split">
     <div>
-      <label>Handle (public address)</label>
+      <label>Gate SkyEmail handle</label>
       <input id="handle" placeholder="yourbrand" autocomplete="username" />
-      <small>Your public address becomes <span class="mono">/u/&lt;handle&gt;</span>. Letters/numbers/dash only.</small>
+      <small>Generated from the SkyEmail claim created during 0S Gate signup.</small>
 
-      <label>Email (for notifications & login)</label>
-      <input id="email" type="email" placeholder="you@domain.com" autocomplete="email" />
+      <label>Gate recovery email</label>
+      <input id="email" type="email" placeholder="you@domain.com" autocomplete="email" readonly />
 
-      <label>Password (login)</label>
-      <input id="password" type="password" placeholder="Create a strong password" autocomplete="new-password" />
+      <label>Gate session</label>
+      <input id="gateSessionState" value="Required from 0S Gate" disabled />
 
-      <label>Vault Passphrase (decrypts messages)</label>
-      <input id="vaultPass" type="password" placeholder="Vault passphrase (keep it safe)" autocomplete="new-password" />
+      <label>Citadel passphrase (decrypts messages)</label>
+      <input id="vaultPass" type="password" placeholder="Citadel passphrase (keep it safe)" autocomplete="new-password" />
       <small>This wraps your private key locally. Without it, you can’t decrypt messages.</small>
 
       <label>
@@ -363,8 +366,8 @@ small{ color: var(--muted); }
       <small id="recoveryNote">Checking recovery availability…</small>
 
       <div class="btnrow" style="margin-top:14px;">
-        <button class="btn gold" id="btnCreate">Create Vault</button>
-        <a class="btn" href="login.html">Already have one</a>
+        <button class="btn gold" id="btnCreate">Activate Citadel Mail</button>
+        <a class="btn" id="gateSignupLink" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/gate/signup/?return=%2Flive%2FSkyeMail%2Fsession-handoff.html%3Fnext%3Donboarding.html%26from%3Dskymail-signup-page">Open 0S Gate</a>
       </div>
 
       <div class="hr"></div>
@@ -378,8 +381,8 @@ small{ color: var(--muted); }
           1) You get a public address page.<br/>
           2) Senders fetch your public key from the server.<br/>
           3) Sender encrypts the message in their browser.<br/>
-          4) Server stores ciphertext in Neon.<br/>
-          5) You decrypt locally after unlocking with your Vault Passphrase.
+          4) Citadel stores ciphertext inside the SkyeNet sovereign lane.<br/>
+          5) You decrypt locally after unlocking with your Citadel passphrase.
         </div>
       </div>
 
@@ -392,11 +395,11 @@ small{ color: var(--muted); }
       </div>
 
       <div class="pane" style="margin-top:12px;">
-        <h3>After signup</h3>
+        <h3>Gate handoff</h3>
         <div class="notice">
-          - Log in and open your Inbox.<br/>
-          - Share your public address with clients.<br/>
-          - You will receive an email notification for each new message.
+          - The 0S Gate signs you in.<br/>
+          - Your Citadel passphrase unlocks encrypted content locally.<br/>
+          - Your SkyEmail address is provisioned from the Gate claim.
         </div>
       </div>
     </div>
@@ -410,6 +413,38 @@ small{ color: var(--muted); }
   const btn = qs("#btnCreate");
   const recoveryEnabledEl = qs("#recoveryEnabled");
   const recoveryNote = qs("#recoveryNote");
+  const gateNotice = qs("#gateNotice");
+  const gateState = qs("#gateSessionState");
+  const gateSignupLink = qs("#gateSignupLink");
+  if (location.origin.includes("metraiyux-0s-full-system")) {
+    gateSignupLink.href = "/gate/signup/?return=%2Flive%2FSkyeMail%2Fsession-handoff.html%3Fnext%3Donboarding.html%26from%3Dskymail-signup-page";
+  }
+
+  function bridgeClaim() {
+    return window.Skye0SSkyEmailBridge?.applyClaim?.() || window.Skye0SSkyEmailBridge?.firstClaim?.() || null;
+  }
+
+  function applyGateIdentity(session) {
+    const claims = session?.claims || {};
+    const skygate = claims.skygate || {};
+    const profile = claims.profile || skygate.profile || {};
+    const claim = bridgeClaim();
+    const skyemail = claims.skyemail || profile.skyemail_claim || profile.skyemail || {};
+    const mailbox = claim?.mailbox || skyemail.mailbox || {};
+    const mailboxEmail = mailbox.requested_email || skyemail.email || profile.skyemail || profile.skyemail_claim?.email || "";
+    const gateEmail = session?.email || claims.email || skygate.email || profile.user?.email || profile.skyemail_claim?.profile?.recovery_email || claim?.profile?.recovery_email || "";
+    const localPart = mailbox.local_part || String(mailboxEmail || "").split("@")[0] || String(gateEmail || "").split("@")[0] || "";
+    if (localPart && !qs("#handle").value) qs("#handle").value = localPart.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32);
+    if (gateEmail) qs("#email").value = gateEmail;
+    return { claim, mailboxEmail, gateEmail, localPart };
+  }
+
+  function sendToGateSoon() {
+    btn.disabled = true;
+    setTimeout(() => {
+      window.location.href = gateSignupLink.href;
+    }, 900);
+  }
 
   let adminPublicKeyPem = null;
   try{
@@ -417,7 +452,7 @@ small{ color: var(--muted); }
     if(r && r.enabled && r.public_key_pem){
       adminPublicKeyPem = r.public_key_pem;
       recoveryEnabledEl.disabled = false;
-      recoveryNote.textContent = "If enabled, an admin-encrypted recovery copy of your private key is stored. If not enabled, admin cannot recover your vault.";
+      recoveryNote.textContent = "If enabled, an admin-encrypted recovery copy of your private key is stored. If not enabled, admin cannot recover your sovereign mail core.";
     }else{
       recoveryEnabledEl.checked = false;
       recoveryEnabledEl.disabled = true;
@@ -433,21 +468,64 @@ small{ color: var(--muted); }
     return /^[a-z0-9][a-z0-9-]{2,31}$/i.test(h || "");
   }
 
-  btn.addEventListener("click", async () => {
-    setStatus(status, "Generating keys and creating your vault…", "");
+  function bridge(){
+    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  }
 
-    const handle = (qs("#handle").value || "").trim();
-    const email = (qs("#email").value || "").trim();
-    const password = qs("#password").value || "";
+  function gateSession(){
+    const b = bridge();
+    return b?.requireSession?.({ platformId:"skyemail", usageLane:"mail-vault-setup" }) || b?.current?.() || null;
+  }
+
+  async function createSkyeMailSession(fs27){
+    const b = bridge();
+    const headers = b?.headers?.({"x-skye-platform":"skyemail","x-skye-usage-lane":"mail-vault-setup"}) || {};
+    const claim = bridgeClaim();
+    const data = await apiFetch("/auth-fs27-session", {
+      method:"POST",
+      headers: { ...headers, Authorization: `Bearer ${fs27}` },
+      body: JSON.stringify({ source:"0s-gate-vault-setup", claim })
+    });
+    setToken(data.token);
+    setHandle(data.handle);
+    if(data.email) qs("#email").value = data.email;
+    if(data.handle) qs("#handle").value = data.handle;
+    return data;
+  }
+
+  const initialGate = gateSession();
+  if(initialGate?.token){
+    gateNotice.textContent = "0S Gate session found. Your sovereign key setup will bind to this identity.";
+    gateState.value = initialGate.email || initialGate.actor || "Gate session active";
+    applyGateIdentity(initialGate);
+    btn.disabled = false;
+  }else{
+    gateNotice.textContent = "SkyeMail requires the canonical 0S Gate signup first. Sending you to the Gate now.";
+    gateState.value = "No Gate session detected";
+    sendToGateSoon();
+  }
+
+  btn.addEventListener("click", async () => {
+    setStatus(status, "Checking Gate, generating keys, and activating Citadel Mail...", "");
+
     const vaultPass = qs("#vaultPass").value || "";
     const recoveryEnabled = !!recoveryEnabledEl.checked;
 
     try{
+      const session = gateSession();
+      const fs27 = (session?.token || "").trim().replace(/^Bearer\s+/i, "");
+      if(!fs27) {
+        sendToGateSoon();
+        throw new Error("Open 0S Gate first so SkyeMail can use the shared identity.");
+      }
+      applyGateIdentity(session);
+      const handle = (qs("#handle").value || "").trim();
+      const email = (qs("#email").value || "").trim();
       if(!validHandle(handle)) throw new Error("Handle must be 3–32 chars and use letters/numbers/dash only.");
       if(!email.includes("@")) throw new Error("Valid email required.");
-      if(password.length < 10) throw new Error("Password must be at least 10 characters.");
-      if(vaultPass.length < 10) throw new Error("Vault Passphrase must be at least 10 characters.");
+      if(vaultPass.length < 10) throw new Error("Citadel passphrase must be at least 10 characters.");
 
+      const skymail = await createSkyeMailSession(fs27);
       const kp = await CryptoVault.generateRecipientRsaKeypair();
       const vaultWrapJson = await CryptoVault.wrapPrivateKeyWithPassphrase(kp.privateKeyPem, vaultPass);
 
@@ -457,12 +535,10 @@ small{ color: var(--muted); }
         recoveryBlobJson = await CryptoVault.adminEncryptPrivateKey(adminPublicKeyPem, kp.privateKeyPem);
       }
 
-      await apiFetch("/auth-signup", {
+      await apiFetch("/sovereign-key-setup", {
         method:"POST",
+        headers: { Authorization: `Bearer ${skymail.token || getToken()}` },
         body: JSON.stringify({
-          handle,
-          email,
-          password,
           rsa_public_key_pem: kp.publicKeyPem,
           vault_wrap_json: vaultWrapJson,
           recovery_enabled: recoveryEnabled,
@@ -470,9 +546,25 @@ small{ color: var(--muted); }
         })
       });
 
+      const claim = bridgeClaim();
+      const mailbox = claim?.mailbox || {};
+      const localPart = mailbox.local_part || String(mailbox.requested_email || "").split("@")[0] || handle;
+      const domain = mailbox.domain || String(mailbox.requested_email || "").split("@").slice(1).join("@") || "";
+      if(localPart && domain){
+        try{
+          await apiFetch("/mailbox-provision", {
+            method:"POST",
+            headers: { Authorization: `Bearer ${skymail.token || getToken()}` },
+            body: JSON.stringify({ local_part: localPart, domain, source:"0s-gate-vault-setup", user_confirmed:true })
+          });
+        }catch(mailErr){
+          console.warn("Mailbox provision skipped:", mailErr);
+        }
+      }
+
       setHandle(handle);
-      setStatus(status, "Vault created. Redirecting to login…", "ok");
-      setTimeout(() => window.SMVRuntime.redirect("login.html"), 600);
+      setStatus(status, "Citadel Mail active. Redirecting to onboarding...", "ok");
+      setTimeout(() => window.SMVRuntime.redirect("onboarding.html"), 600);
 
     }catch(err){
       setStatus(status, err.message || "Failed.", "danger");

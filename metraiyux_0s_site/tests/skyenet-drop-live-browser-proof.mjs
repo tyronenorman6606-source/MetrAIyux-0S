@@ -106,6 +106,8 @@ function gateHeaders(token) {
 }
 
 async function resolveOwnerGate() {
+  const provided = cleanToken(process.env.PROOF_GATE_TOKEN || process.env.SKYENET_PROOF_GATE_TOKEN || '');
+  if (provided) return { token: provided, source: 'provided-gate-token' };
   for (const code of localSecrets) {
     const response = await fetch(urlFor('/api/owner/admin-login'), {
       method: 'POST',
@@ -275,8 +277,9 @@ async function clickControl(page, selector) {
     const node = document.querySelector(target);
     if (!node) throw new Error(`Missing clickable control: ${target}`);
     node.scrollIntoView?.({ block: 'center', inline: 'center' });
-    node.click();
+    setTimeout(() => node.click(), 0);
   }, selector);
+  await page.waitForTimeout(75);
 }
 
 async function runViewport(browser, owner, viewport, viewportLabel) {

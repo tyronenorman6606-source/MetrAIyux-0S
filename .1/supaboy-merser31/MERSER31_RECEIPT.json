@@ -1,0 +1,49 @@
+{
+  "target": ".1/supaboy-merser31",
+  "sourcePolicy": {
+    "newWebsite": true,
+    "usesOriginalZipSite": false,
+    "originalExtractedFolderRemoved": ".1/supaboy"
+  },
+  "merser": {
+    "package": "@skyes0verl0nd0n/merser",
+    "resolvedVersion": "1.0.1",
+    "commands": [
+      "npm exec --yes --package @skyes0verl0nd0n/merser@1.0.1 -- merser --health",
+      "npm exec --yes --package @skyes0verl0nd0n/merser@1.0.1 -- merser --tools"
+    ],
+    "mcpToolsUsed": [
+      "mcp4_build_plan",
+      "mcp4_room:barbershop",
+      "mcp4_packs",
+      "mcp4_component:route-selector-widget",
+      "mcp4_component:workspace-dock",
+      "mcp4_component:proof-receipt-rail"
+    ]
+  },
+  "implementation": {
+    "framework": "React",
+    "scene": "React Three Fiber / Three.js",
+    "motion": [
+      "Framer Motion",
+      "GSAP ScrollTrigger",
+      "Lenis"
+    ],
+    "lanes": [
+      "music",
+      "video",
+      "drops",
+      "live",
+      "booking"
+    ],
+    "clientFacingRule": "No visible MCP, source-room, proof-rail, or internal tooling language in the public page. The tooling is represented by the interactive stage, scroll motion, and runtime behavior."
+  },
+  "verification": {
+    "build": "npm run build",
+    "mcpMine": "npm run mcp:mine -- .1/supaboy-merser31",
+    "mcp5Tools": "mcp5_build_plan, mcp5_room:barbershop, route-selector-widget, workspace-dock, proof-receipt-rail, mcp5_packs",
+    "liveReferenceStudy": "test-artifacts/live-mcp-reference-study/reference-study.json",
+    "note": "Rebuilt after client-specific critique as a SupaBoy artist site: interactive sound stage, generated beat control, video wall, drop lane, booking flow, and no public MCP/internal tooling copy.",
+    "localBrowserProof": "test-artifacts/supaboy-merser31-local/browser-proof.json"
+  }
+}

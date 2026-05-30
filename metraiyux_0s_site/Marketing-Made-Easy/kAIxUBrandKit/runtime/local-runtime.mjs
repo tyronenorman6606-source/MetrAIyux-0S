@@ -83,6 +83,7 @@ function normalizeDispatch(dispatch = {}, fallbackOwner = "", fallbackSummary = 
       creativeLane: normalizeString(dispatch.handoffSummary?.creativeLane || fallbackSummary.creativeLane || "", 120),
       crmLane: normalizeString(dispatch.handoffSummary?.crmLane || fallbackSummary.crmLane || "", 120),
       activationLane: normalizeString(dispatch.handoffSummary?.activationLane || fallbackSummary.activationLane || "", 120),
+      mediaLane: normalizeString(dispatch.handoffSummary?.mediaLane || fallbackSummary.mediaLane || "", 120),
       opsLane: normalizeString(dispatch.handoffSummary?.opsLane || fallbackSummary.opsLane || "", 120),
     },
     updatedAt: normalizeString(dispatch.updatedAt || "", 80) || null
@@ -153,12 +154,16 @@ function inferTargets(packet) {
 
   addTarget("SkyeWebCreatorMax", "brand-launch", "Brand identity should feed website/storefront build work.");
   addTarget("AE-FlowPro", "sales-activation", "Brand state should stay attached to activation and launch readiness.");
+  addTarget("SkyeMediaCenter", "media-assets", "Brand source files and campaign assets should be searchable, reviewable, and publishable.");
 
   if (/\b(contact|lead|consult|book|signup|quote)\b/.test(blob)) {
     addTarget("SkyeLeadVault", "crm-intake", "Prompt and copy suggest lead capture or intake flow.");
   }
   if (/\b(menu|order|product|shop|buy|store|retail)\b/.test(blob)) {
     addTarget("MaggiesStore", "storefront-merch", "Brand output suggests a product/storefront merchandising lane.");
+  }
+  if (/\b(asset|media|logo|image|photo|video|cover|banner|social|upload|publish|delivery)\b/.test(blob)) {
+    addTarget("SkyeMediaCenter", "media-assets", "Brand output includes reusable media or publishing assets.");
   }
   if (/\b(job|dispatch|staff|worker|team|ops|route|delivery)\b/.test(blob)) {
     addTarget("skyeroutex-workforce-command-v0.4.0", "ops-handoff", "Prompt suggests staffing, dispatch, or operating workflow needs.");
@@ -182,6 +187,9 @@ function buildActionItems(packet) {
   if (targets.includes("AE-FlowPro")) {
     actions.push(`Attach ${brandName} positioning and launch notes to an AE-FlowPro activation pack.`);
   }
+  if (targets.includes("SkyeMediaCenter")) {
+    actions.push(`Archive ${brandName} source logos, campaign assets, and export proofs inside SkyeMediaCenter.`);
+  }
   if (targets.includes("MaggiesStore")) {
     actions.push(`Map ${brandName} identity into MaggiesStore menus, products, or ordering surfaces.`);
   }
@@ -200,6 +208,7 @@ function buildHandoffSummary(packet) {
     creativeLane: targets.includes("SkyeWebCreatorMax") ? "SkyeWebCreatorMax" : "manual-creative-handoff",
     crmLane: targets.includes("SkyeLeadVault") ? "SkyeLeadVault" : "manual-intake",
     activationLane: targets.includes("AE-FlowPro") ? "AE-FlowPro" : "manual-activation",
+    mediaLane: targets.includes("SkyeMediaCenter") ? "SkyeMediaCenter" : "manual-media-handoff",
     opsLane: targets.includes("skyeroutex-workforce-command-v0.4.0")
       ? "skyeroutex-workforce-command-v0.4.0"
       : "manual-ops-handoff"

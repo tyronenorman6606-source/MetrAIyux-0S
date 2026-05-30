@@ -13,6 +13,7 @@
   const META_RELAY_OUTBOX = 'relay13-local-outbox';
   const META_RELAY_REQUESTS = 'relay13-bridge-requests';
   const META_RELAY_STATS = 'relay13-bridge-stats';
+  const META_SKYES_CONTACT_PACKET = 'skyes-over-london-contact-packet-v1';
   const CONNECT_HASH_PREFIX = 'connect=';
   const MAX_PROFILE_PHOTO_BYTES = 8 * 1024 * 1024;
   const QR_PHOTO_MAX_CHARS = 1800;
@@ -65,6 +66,7 @@
     activeQrPayload: '',
     activeQrSvg: '',
     activeQrKind: '',
+    businessCardScan: null,
     deferredInstallPrompt: null,
     scanStream: null,
     scanLoop: null,
@@ -93,14 +95,14 @@
   }
 
   function relayOperatorToken(cfg = state.relayConfig || {}) {
-    return gateToken() || cfg.apiKey || '';
+    return gateToken();
   }
 
   function relayOperatorHeaders(cfg = state.relayConfig || {}, extra = {}) {
     const token = relayOperatorToken(cfg);
     return {
       ...(gateBridge()?.headers?.({ 'x-skye-platform': 'connectlog-relay13', 'x-skye-usage-lane': 'relationship-messaging' }) || {}),
-      ...(token ? { 'x-relay13-api-key': token, authorization: `Bearer ${token}` } : {}),
+      ...(token ? { authorization: `Bearer ${token}`, 'x-skye-gate-session': token, 'x-free99-gate-session': token } : {}),
       ...extra
     };
   }
@@ -116,6 +118,7 @@
     await loadContacts();
     await loadProfile();
     await loadRelayState();
+    await applySkyesContactPacket();
     await processIncomingConnectCard();
     await checkStorageHealth();
     setupServiceWorker();
@@ -615,6 +618,343 @@
     state.relayStatus = state.relayConfig.mode === 'relay13' ? 'Relay13 production bridge configured. Run health check from this browser.' : 'Production vault mode selected. Relay13 production bridge remains available.';
   }
 
+  function skyesContactPacketDefaults() {
+    return {
+      operator: 'Gray London Skyes',
+      company: 'Skyes Over London',
+      holdingCompany: 'SOLEnterprises International Nexus & Holdings',
+      phone: '1-(800)-484-4788',
+      companyMain: '1-(800)-484-4783',
+      email: 'grayskyes@solenterprises.org',
+      publicRelations: 'connectedskyes@solenterprises.org',
+      music: 'SkyeMusicNexus@solenterprises.org',
+      zeroOs: 'metraiyux-0s@solenterprises.org',
+      hostedEmail: 'skyemail@solenterprises.org',
+      media: 'MediaOverLondon@solenterprises.org',
+      legal: 'https://skyes-over-london-legal.pages.dev/legal/',
+      marketing: 'https://metraiyux-0s-marketing.pages.dev/',
+      mediaHub: 'https://metraiyux-0s-marketing.pages.dev/media-over-london',
+      musicHub: 'https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/nexus-marketing-hub.html',
+      zeroOsHub: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/'
+    };
+  }
+
+  async function applySkyesContactPacket() {
+    const params = new URLSearchParams(window.location.search || '');
+    const now = new Date().toISOString();
+    const contactPacket = skyesContactPacketDefaults();
+    await putMeta(META_SKYES_CONTACT_PACKET, { ...contactPacket, updatedAt: now });
+
+    const founderExisting = state.contacts.find((contact) => contact.id === 'sol-founder-gray-london-skyes' || detailValue(contact, 'email').toLowerCase() === contactPacket.email.toLowerCase());
+    const founder = normalizeContact({
+      ...(founderExisting || {}),
+      id: founderExisting?.id || 'sol-founder-gray-london-skyes',
+      name: 'Gray London Skyes',
+      company: contactPacket.company,
+      role: 'Founder / operator / direct company contact',
+      lane: 'partner',
+      status: founderExisting?.status || 'active',
+      priority: founderExisting?.priority || 'critical',
+      pinned: true,
+      tags: [...new Set([...(founderExisting?.tags || []), 'skyes-over-london', 'founder-contact', 'company-contact', 'business-card-factory'])],
+      details: mergeContactDetails(founderExisting?.details || [], [
+        { type: 'email', label: 'Gray direct email', value: contactPacket.email },
+        { type: 'phone', label: 'Gray direct phone', value: contactPacket.phone },
+        { type: 'phone', label: 'Company main', value: contactPacket.companyMain },
+        { type: 'email', label: 'Public relations', value: contactPacket.publicRelations },
+        { type: 'email', label: 'Media Over London', value: contactPacket.media },
+        { type: 'email', label: '0S support', value: contactPacket.zeroOs },
+        { type: 'email', label: 'SkyeMusicNexus', value: contactPacket.music },
+        { type: 'email', label: 'SkyEmail support', value: contactPacket.hostedEmail },
+        { type: 'website', label: 'Marketing hub', value: contactPacket.marketing },
+        { type: 'website', label: 'Legal surface', value: contactPacket.legal },
+        { type: 'website', label: 'Media Over London', value: contactPacket.mediaHub },
+        { type: 'website', label: 'MetrAIyux 0S', value: contactPacket.zeroOsHub }
+      ]),
+      notes: founderExisting?.notes || 'Formal company contact packet saved automatically from the Skyes Over London / MetrAIyux 0S business-card handoff.',
+      timeline: [
+        ...(founderExisting?.timeline || []),
+        { id: cryptoId(), type: 'note', text: 'Skyes Over London contact packet verified in ConnectLog.', date: todayInputDate(), createdAt: now }
+      ].slice(-40),
+      updatedAt: now,
+      createdAt: founderExisting?.createdAt || now
+    });
+    await putContact(founder);
+
+    const source = cleanInput(params.get('source') || '', 80);
+    const businessName = cleanInput(params.get('business') || '', 160);
+    const valleyUrl = cleanInput(params.get('valleyUrl') || '', 800);
+    const cardUrl = cleanInput(params.get('cardUrl') || params.get('url') || '', 800);
+    const cardKind = cleanInput(params.get('cardKind') || params.get('kind') || '', 80);
+    const cardTitle = cleanInput(params.get('cardTitle') || params.get('title') || '', 180);
+    const clientId = cleanInput(params.get('clientId') || '', 120);
+    const isBusinessCardLaunch = /business-card|business-cards|valley-verified-card|platform-card|founder-card/i.test(source) || Boolean(cardKind || businessName || clientId);
+    if (isBusinessCardLaunch) {
+      const expires = cleanInput(params.get('expires') || '', 20);
+      const skyemerit = cleanInput(params.get('skyemerit') || (valleyUrl ? '31' : ''), 8);
+      const city = cleanInput(params.get('city') || '', 120);
+      const category = cleanInput(params.get('category') || '', 160);
+      const priorityCode = cleanInput(params.get('priorityCode') || '', 80);
+      const cardPacket = {
+        source,
+        cardKind: cardKind || (valleyUrl ? 'valley-verified' : 'business-card'),
+        cardTitle: cardTitle || businessName || 'Skyes Over London business card',
+        businessName,
+        city,
+        category,
+        clientId,
+        priorityCode,
+        valleyUrl,
+        cardUrl: cardUrl || valleyUrl || contactPacket.marketing,
+        expires,
+        skyemerit,
+        contact: cleanInput(params.get('contact') || '', 140)
+      };
+      state.businessCardScan = cardPacket;
+      const clientContact = normalizeContact({
+        id: clientId ? `vv-${clientId}`.slice(0, 96) : cryptoId(),
+        name: businessName || 'Valley Verified client',
+        company: businessName || 'Valley Verified client',
+        role: [category, city].filter(Boolean).join(' / '),
+        lane: cardPacket.cardKind === 'platform' ? 'partner' : 'client',
+        status: 'warm',
+        priority: 'high',
+        pinned: true,
+        tags: [...new Set([valleyUrl ? 'valley-verified' : 'business-card', cardPacket.cardKind, source, 'connectlog-handoff', skyemerit ? `skyemerit-${skyemerit}` : 'scanned-card'].filter(Boolean))],
+        details: [
+          { id: cryptoId(), type: 'website', label: valleyUrl ? 'Valley Verified page' : 'Business card link', value: valleyUrl || cardPacket.cardUrl },
+          { id: cryptoId(), type: 'custom', label: 'Priority code', value: priorityCode },
+          { id: cryptoId(), type: 'custom', label: 'SkyeMerit activation', value: skyemerit ? `${skyemerit}% through ${expires || 'seven days from scan'}` : '' },
+          { id: cryptoId(), type: 'email', label: 'Gray direct email', value: contactPacket.email },
+          { id: cryptoId(), type: 'phone', label: 'Gray direct phone', value: contactPacket.phone }
+        ].filter((detail) => detail.value),
+        notes: [
+          `Opened from a Skyes Over London ${cardPacket.cardKind || 'business'} card.`,
+          valleyUrl ? 'The owner can use this record to inspect their live Valley Verified page, contact Gray, and activate the seven-day SkyeMerit offer.' : 'The scanner can use this record to inspect the card link and contact Gray.',
+          'All deeper 0S work remains gate-owned through FS27/SkyGate.'
+        ].join('\n\n'),
+        timeline: [{ id: cryptoId(), type: 'note', text: skyemerit ? `Business-card handoff opened. SkyeMerit ${skyemerit}% valid through ${expires || 'the scan window'}.` : 'Business-card handoff opened in ConnectLog.', date: todayInputDate(), createdAt: now }],
+        createdAt: now,
+        updatedAt: now
+      });
+      if (cardPacket.cardKind !== 'founder') {
+        const existingClient = state.contacts.find((contact) => contact.id === clientContact.id || normalizeText(contact.name) === normalizeText(clientContact.name));
+        await putContact(existingClient ? mergeImportedContact(existingClient, clientContact, now) : clientContact);
+      }
+      renderSkyesWelcomePanel({ contactPacket, ...cardPacket, businessName: businessName || clientContact.name, valleyUrl, expires, skyemerit, priorityCode });
+      recordBusinessCardScan({ contactPacket, ...cardPacket }).catch((error) => {
+        console.warn('ConnectLog scan record failed:', error);
+        setBusinessCardScanStatus('Scan opened locally. Relay13 scan record will retry from an operator session.');
+      });
+    } else {
+      renderSkyesWelcomePanel({ contactPacket });
+    }
+
+    await loadContacts();
+  }
+
+  function mergeContactDetails(existingDetails, incomingDetails) {
+    const normalized = [];
+    const seen = new Set();
+    [...existingDetails, ...incomingDetails].forEach((detail) => {
+      const type = detail.type || 'custom';
+      const value = cleanInput(detail.value || '', 800);
+      if (!value) return;
+      const key = `${type}:${normalizeText(value)}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      normalized.push({
+        id: detail.id || cryptoId(),
+        type,
+        label: detail.label || readableDetailType(type),
+        value
+      });
+    });
+    return normalized;
+  }
+
+  function renderSkyesWelcomePanel(packet = {}) {
+    const workspace = els.appShell?.querySelector?.('.workspace') || document.querySelector('.workspace');
+    if (!workspace) return;
+    packet = { ...packet, contactPacket: packet.contactPacket || skyesContactPacketDefaults() };
+    document.getElementById('skyesContactPacket')?.remove();
+    const section = document.createElement('section');
+    section.id = 'skyesContactPacket';
+    section.className = 'sol-welcome-panel page-active';
+    section.dataset.page = 'dashboard';
+
+    const copy = document.createElement('div');
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = 'Skyes Over London contact packet';
+    const title = document.createElement('h2');
+    title.textContent = packet.businessName ? `Welcome, ${packet.businessName}.` : 'Gray London Skyes is saved in this ConnectLog.';
+    const message = document.createElement('p');
+    message.className = 'panel-hint';
+    message.textContent = packet.businessName
+      ? `Thank you for working with Skyes Over London. This scanned card, the company contact lanes, and ${packet.valleyUrl ? 'the live Valley Verified page' : 'the card link'} are saved in this workspace.`
+      : 'Every ConnectLog workspace now starts with Gray London Skyes, company support lanes, legal surfaces, Media Over London, SkyeMusicNexus, SkyEmail, and the 0S support mailbox saved as a formal contact packet.';
+    copy.append(eyebrow, title, message);
+
+    const side = document.createElement('div');
+    side.className = 'sol-welcome-side';
+    const scannedCard = businessCardPreview(packet);
+    if (scannedCard) side.append(scannedCard);
+
+    const links = document.createElement('div');
+    links.className = 'sol-welcome-links';
+    [
+      ['Gray direct', `mailto:${packet.contactPacket.email}`],
+      ['Media Over London', `mailto:${packet.contactPacket.media}`],
+      ['0S support', `mailto:${packet.contactPacket.zeroOs}`],
+      ['SkyeMusicNexus', `mailto:${packet.contactPacket.music}`],
+      ['Legal', packet.contactPacket.legal],
+      packet.valleyUrl ? ['Valley page', packet.valleyUrl] : ['Card link', packet.cardUrl || packet.contactPacket.marketing]
+    ].forEach(([label, href]) => {
+      const link = document.createElement('a');
+      link.href = href;
+      link.target = href.startsWith('http') ? '_blank' : '';
+      if (link.target) link.rel = 'noopener';
+      link.textContent = label;
+      links.append(link);
+    });
+    if (packet.businessName || packet.cardTitle) {
+      const installButton = document.createElement('button');
+      installButton.type = 'button';
+      installButton.textContent = 'Install / Add ConnectLog';
+      installButton.addEventListener('click', installApp);
+      const downloadButton = document.createElement('button');
+      downloadButton.type = 'button';
+      downloadButton.textContent = 'Download contact';
+      downloadButton.addEventListener('click', () => downloadBusinessCardContact(packet));
+      links.append(installButton, downloadButton);
+    }
+
+    const offer = document.createElement('div');
+    offer.className = 'sol-welcome-offer';
+    const offerTitle = packet.skyemerit ? `${packet.skyemerit}% SkyeMerit` : 'ConnectLog card';
+    const offerCopy = packet.skyemerit
+      ? packet.expires ? `Valid through ${packet.expires}` : 'Activation credit attached to business-card handoffs'
+      : 'Saved on this device with the scanned card context';
+    const statusCopy = packet.businessName || packet.cardTitle ? '<small id="solScanStatus">Opening scan packet...</small>' : '';
+    offer.innerHTML = `<strong>${escapeHtml(offerTitle)}</strong><span>${escapeHtml(offerCopy)}</span>${statusCopy}`;
+    side.append(links, offer);
+    section.append(copy, side);
+    workspace.prepend(section);
+  }
+
+  function businessCardPreview(packet = {}) {
+    if (!packet.businessName && !packet.cardTitle) return null;
+    const card = document.createElement('article');
+    card.className = 'sol-scanned-card';
+    const eyebrow = document.createElement('span');
+    eyebrow.textContent = packet.cardKind || 'business card';
+    const title = document.createElement('h3');
+    title.textContent = packet.businessName || packet.cardTitle || 'Scanned card';
+    const meta = document.createElement('p');
+    meta.textContent = [packet.city, packet.category].filter(Boolean).join(' / ') || packet.cardTitle || 'ConnectLog handoff';
+    const code = document.createElement('code');
+    code.textContent = packet.priorityCode || packet.clientId || 'connectlog-scan';
+    card.append(eyebrow, title, meta, code);
+    return card;
+  }
+
+  function setBusinessCardScanStatus(text) {
+    const status = document.getElementById('solScanStatus');
+    if (status) status.textContent = text;
+  }
+
+  async function recordBusinessCardScan(packet = {}) {
+    if (!packet.businessName && !packet.cardTitle) return;
+    const cfg = state.relayConfig || defaultRelayConfig();
+    const origin = (cfg.origin || defaultRelayApiBase()).replace(/\/+$/, '');
+    const cardId = cleanInput(packet.clientId || packet.priorityCode || slugToken(packet.businessName || packet.cardTitle || 'business-card'), 120).toLowerCase();
+    const sessionKey = `connectlog-scan:${cardId}:${todayInputDate()}`;
+    let recordedInSession = false;
+    try {
+      recordedInSession = Boolean(sessionStorage.getItem(sessionKey));
+    } catch {
+      recordedInSession = false;
+    }
+    if (recordedInSession) {
+      setBusinessCardScanStatus('Scan already recorded in this browser session.');
+      return;
+    }
+    try {
+      sessionStorage.setItem(sessionKey, 'pending');
+    } catch {
+      // Private browser modes may block session storage; the scan can still post.
+    }
+    const body = packet.valleyUrl
+      ? `Business card scan opened for ${packet.businessName}. Valley Verified page: ${packet.valleyUrl}`
+      : `Business card scan opened for ${packet.businessName || packet.cardTitle}.`;
+    const response = await fetch(`${origin}/api/v1/connectlog/scan`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        workspace: cfg.workspace || 'connectlog-main',
+        channel: 'connectlog-card',
+        customer_name: packet.businessName || packet.cardTitle || 'Business card scanner',
+        customer_phone: '',
+        customer_email: '',
+        body,
+        source_url: window.location.href,
+        connectlog_bridge: true,
+        connectlog_card_id: cardId,
+        connectlog_card_label: packet.cardTitle || packet.businessName || 'Business card',
+        connectlog_campaign: packet.cardKind || packet.source || 'business-card-scan',
+        connectlog_owner_name: packet.contactPacket?.operator || 'Gray London Skyes',
+        connectlog_owner_company: packet.contactPacket?.company || 'Skyes Over London',
+        connectlog_owner_role: 'Founder / operator',
+        connectlog_welcome_message: packet.valleyUrl
+          ? `Your ConnectLog packet is open with the live Valley Verified page for ${packet.businessName}.`
+          : `Your ConnectLog packet is open for ${packet.businessName || packet.cardTitle}.`,
+        connectlog_tags: [...new Set(['business-card-scan', packet.cardKind, packet.source, packet.valleyUrl ? 'valley-verified' : ''].filter(Boolean))],
+        metadata: {
+          source_app: 'connectlog-business-card-scan',
+          card_kind: packet.cardKind || '',
+          priority_code: packet.priorityCode || '',
+          valley_url: packet.valleyUrl || '',
+          card_url: packet.cardUrl || ''
+        }
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    try {
+      sessionStorage.setItem(sessionKey, data.conversation_id || 'recorded');
+    } catch {
+      // Non-durable session storage should not block the handoff UX.
+    }
+    setBusinessCardScanStatus(`Relay13 scan recorded: ${data.conversation_id || 'ConnectLog request'}.`);
+  }
+
+  function downloadBusinessCardContact(packet = {}) {
+    const profile = {
+      name: packet.businessName || packet.cardTitle || 'Skyes Over London',
+      cardName: packet.cardTitle || packet.businessName || 'ConnectLog business card',
+      company: packet.businessName || packet.contactPacket?.company || 'Skyes Over London',
+      role: [packet.category, packet.city].filter(Boolean).join(' / ') || packet.cardKind || 'Business card',
+      phone: packet.contactPacket?.phone || '',
+      email: packet.contactPacket?.email || '',
+      website: packet.valleyUrl || packet.cardUrl || packet.contactPacket?.marketing || '',
+      location: packet.city || '',
+      note: packet.valleyUrl ? `Valley Verified page: ${packet.valleyUrl}` : 'Saved from a ConnectLog business card scan.',
+      audience: packet.cardKind || '',
+      welcomeMessage: packet.skyemerit ? `SkyeMerit ${packet.skyemerit}%${packet.expires ? ` through ${packet.expires}` : ''}` : '',
+      linkedin: '',
+      x: '',
+      github: '',
+      tags: ['connectlog', 'business-card', packet.cardKind || 'scan'].filter(Boolean)
+    };
+    downloadFile(`${safeFileName(profile.cardName || profile.name)}.vcf`, buildVCard(profile), 'text/vcard;charset=utf-8');
+    showToast('Phone contact downloaded.');
+  }
+
+  function slugToken(value) {
+    return String(value || 'card').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'card';
+  }
+
   function normalizeRelayConfig(raw = {}) {
     const mode = raw.mode === 'relay13' ? 'relay13' : 'local';
     return {
@@ -622,7 +962,7 @@
       origin: normalizeRelayOrigin(raw.origin || ''),
       workspace: cleanInput(raw.workspace || '', 80).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, ''),
       workspaceId: cleanInput(raw.workspaceId || raw.workspace_id || '', 120),
-      apiKey: cleanInput(raw.apiKey || raw.api_key || '', 260),
+      apiKey: '',
       operatorName: cleanInput(raw.operatorName || raw.operator_name || 'ConnectLog Operator', 140) || 'ConnectLog Operator',
       shareBridge: Boolean(raw.shareBridge),
       updatedAt: validIso(raw.updatedAt) || ''
@@ -1655,7 +1995,7 @@
     const photo = profile.photoData || profile.photoThumbData;
     const photoHtml = photo ? `<img class="photo" src="${escapeHtml(photo)}" alt="${escapeHtml(profile.name)} photo">` : '<div class="brand">CL</div>';
     const message = profile.welcomeMessage || profile.note || 'Scan this QR to save the card, then use the vCard download for phone contacts.';
-    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(profile.cardName || profile.name)} — ConnectLog Card</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 20% 0%,rgba(110,231,249,.20),transparent 38%),radial-gradient(circle at 86% 10%,rgba(255,106,0,.20),transparent 36%),#05070d;color:#f7fbff;font-family:Inter,system-ui,sans-serif}.card{position:relative;width:min(760px,calc(100vw - 28px));padding:34px;border:1px solid rgba(255,255,255,.16);border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045));box-shadow:0 24px 90px rgba(0,0,0,.45);overflow:hidden}.brand,.photo{display:inline-grid;place-items:center;width:92px;height:92px;margin-bottom:18px;border-radius:28px;background:linear-gradient(135deg,#10bfe0,#ff7a18 54%,#6948f4);font-weight:950;letter-spacing:-.12em;font-size:1.45rem;box-shadow:0 0 26px rgba(110,231,249,.30),0 0 30px rgba(255,106,0,.20);object-fit:cover}h1{margin:0;font-size:clamp(2rem,8vw,4.2rem);letter-spacing:-.08em;line-height:.9}p{color:#9fb0c7;line-height:1.55}.badge{display:inline-block;color:#6ee7f9;text-transform:uppercase;font-weight:900;font-size:.72rem;letter-spacing:.16em}.qr{background:white;border-radius:22px;padding:14px;margin:22px 0}.qr svg{width:100%;height:auto;display:block}.actions{display:flex;gap:10px;flex-wrap:wrap}a,button{border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:12px 16px;color:#f7fbff;background:rgba(255,255,255,.08);text-decoration:none}.primary{background:linear-gradient(135deg,#10bfe0,#ff7a18 54%,#6948f4);font-weight:800}</style></head><body><main class="card">${photoHtml}<p class="badge">${escapeHtml(profile.cardName || 'ConnectLog exchange card')}</p><h1>${escapeHtml(profile.name)}</h1><p>${escapeHtml([profile.audience, profile.role, profile.company].filter(Boolean).join(' · ') || 'Scan to save this connection.')}</p><div class="qr">${qrSvg}</div><p>${escapeHtml(message)}</p><div class="actions"><a class="primary" href="${escapeHtml(link)}">Open ConnectLog card</a><a download="${safeFileName(profile.cardName || profile.name)}.vcf" href="data:text/vcard;charset=utf-8,${encodeURIComponent(vcard)}">Download phone contact</a></div></main></body></html>`;
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(profile.cardName || profile.name)} — ConnectLog Card</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 20% 0%,rgba(110,231,249,.20),transparent 38%),radial-gradient(circle at 86% 10%,rgba(255,106,0,.20),transparent 36%),#05070d;color:#f7fbff;font-family:Inter,system-ui,sans-serif}.card{position:relative;width:min(760px,calc(100vw - 28px));padding:34px;border:1px solid rgba(255,255,255,.16);border-radius:34px;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045));box-shadow:0 24px 90px rgba(0,0,0,.45);overflow:hidden}.brand,.photo{display:inline-grid;place-items:center;width:92px;height:92px;margin-bottom:18px;border-radius:28px;background:linear-gradient(135deg,#10bfe0,#ff7a18 54%,#6948f4);font-weight:950;letter-spacing: 0;font-size:1.45rem;box-shadow:0 0 26px rgba(110,231,249,.30),0 0 30px rgba(255,106,0,.20);object-fit:cover}h1{margin:0;font-size:clamp(2rem,8vw,4.2rem);letter-spacing: 0;line-height:.9}p{color:#9fb0c7;line-height:1.55}.badge{display:inline-block;color:#6ee7f9;text-transform:uppercase;font-weight:900;font-size:.72rem;letter-spacing:.16em}.qr{background:white;border-radius:22px;padding:14px;margin:22px 0}.qr svg{width:100%;height:auto;display:block}.actions{display:flex;gap:10px;flex-wrap:wrap}a,button{border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:12px 16px;color:#f7fbff;background:rgba(255,255,255,.08);text-decoration:none}.primary{background:linear-gradient(135deg,#10bfe0,#ff7a18 54%,#6948f4);font-weight:800}</style></head><body><main class="card">${photoHtml}<p class="badge">${escapeHtml(profile.cardName || 'ConnectLog exchange card')}</p><h1>${escapeHtml(profile.name)}</h1><p>${escapeHtml([profile.audience, profile.role, profile.company].filter(Boolean).join(' · ') || 'Scan to save this connection.')}</p><div class="qr">${qrSvg}</div><p>${escapeHtml(message)}</p><div class="actions"><a class="primary" href="${escapeHtml(link)}">Open ConnectLog card</a><a download="${safeFileName(profile.cardName || profile.name)}.vcf" href="data:text/vcard;charset=utf-8,${encodeURIComponent(vcard)}">Download phone contact</a></div></main></body></html>`;
     downloadFile(`connectlog-card-${safeFileName(profile.cardName || profile.name)}.html`, html, 'text/html;charset=utf-8');
     showToast('Shareable HTML card downloaded.');
   }
@@ -2738,7 +3078,7 @@
 
   function exportRelayBridgeConfig() {
     const cfg = state.relayConfig || defaultRelayConfig();
-    const safe = { ...cfg, apiKey: cfg.apiKey ? '<redacted-private-operator-key>' : '' };
+    const safe = { ...cfg, apiKey: '', authMode: '0s-shared-gate' };
     const payload = JSON.stringify({ exported_at: new Date().toISOString(), app_version: APP_VERSION, relay13_bridge: safe }, null, 2);
     downloadBlob('connectlog-relay13-bridge-config.redacted.json', payload, 'application/json');
     writeOperatorOutput(payload);
@@ -2751,10 +3091,10 @@
     try {
       const payload = JSON.parse(await file.text());
       const raw = payload.relay13_bridge || payload;
-      state.relayConfig = normalizeRelayConfig({ ...raw, apiKey: raw.apiKey && !String(raw.apiKey).startsWith('<') ? raw.apiKey : (state.relayConfig?.apiKey || '') });
+      state.relayConfig = normalizeRelayConfig({ ...raw, apiKey: '' });
       await persistRelayState();
       renderAll();
-      writeOperatorOutput(JSON.stringify({ ok: true, imported_at: new Date().toISOString(), relay13_bridge: { ...state.relayConfig, apiKey: state.relayConfig.apiKey ? '<stored locally>' : '' } }, null, 2));
+      writeOperatorOutput(JSON.stringify({ ok: true, imported_at: new Date().toISOString(), relay13_bridge: { ...state.relayConfig, apiKey: '', authMode: '0s-shared-gate' } }, null, 2));
       showToast('Relay13 bridge config imported.');
     } catch (error) {
       writeOperatorOutput(JSON.stringify({ ok: false, error: error.message || 'Import failed' }, null, 2));
@@ -2856,7 +3196,8 @@
     els.relayOriginInput.value = cfg.origin;
     els.relayWorkspaceInput.value = cfg.workspace;
     els.relayWorkspaceIdInput.value = cfg.workspaceId;
-    els.relayApiKeyInput.value = cfg.apiKey;
+    els.relayApiKeyInput.value = '';
+    els.relayApiKeyInput.disabled = true;
     els.relayApiKeyInput.placeholder = relayOperatorToken(cfg) ? '0S/SkyGate session active' : 'Sign into 0S/SkyGate first';
     els.relayOperatorNameInput.value = cfg.operatorName;
     els.relayShareBridgeInput.checked = Boolean(cfg.shareBridge);
@@ -2908,7 +3249,7 @@
       origin: els.relayOriginInput.value,
       workspace: els.relayWorkspaceInput.value,
       workspaceId: els.relayWorkspaceIdInput.value,
-      apiKey: els.relayApiKeyInput.value,
+      apiKey: '',
       operatorName: els.relayOperatorNameInput.value,
       shareBridge: els.relayShareBridgeInput.checked,
       updatedAt: new Date().toISOString()
@@ -3083,9 +3424,10 @@
     const origin = (thread?.origin || cfg.origin || '').replace(/^http/, 'ws');
     const workspaceId = thread?.workspaceId || cfg.workspaceId || 'PASTE_WORKSPACE_ID';
     const conversationId = thread?.conversationId || 'PASTE_CONVERSATION_ID';
-    const token = relayOperatorToken(cfg) ? '0S_SKYGATE_SESSION_FOR_OPERATOR_WS' : (thread?.visitorToken || 'PASTE_VISITOR_TOKEN');
     const role = relayOperatorToken(cfg) ? 'operator' : 'customer';
-    const url = `${origin || 'wss://YOUR_RELAY13_WORKER.workers.dev'}/api/ws/${encodeURIComponent(conversationId)}?role=${role}&workspace_id=${encodeURIComponent(workspaceId)}&token=${encodeURIComponent(token)}&name=${encodeURIComponent(cfg.operatorName || 'ConnectLog Operator')}`;
+    const visitorToken = thread?.visitorToken || 'PASTE_VISITOR_TOKEN';
+    const tokenParam = role === 'customer' ? `&token=${encodeURIComponent(visitorToken)}` : '';
+    const url = `${origin || 'wss://YOUR_RELAY13_WORKER.workers.dev'}/api/ws/${encodeURIComponent(conversationId)}?role=${role}&workspace_id=${encodeURIComponent(workspaceId)}${tokenParam}&name=${encodeURIComponent(cfg.operatorName || 'ConnectLog Operator')}`;
     return `// Relay13 WebSocket browser proof block\n// Run only after Relay13 is deployed, D1 migrated, workspace bootstrapped, and a real conversation exists.\nconst socket = new WebSocket(${JSON.stringify(url)});\nsocket.onopen = () => {\n  console.log('Relay13 WS open');\n  socket.send(JSON.stringify({ type: 'message', body: 'ConnectLog live WebSocket proof ' + new Date().toISOString(), sender_name: ${JSON.stringify(cfg.operatorName || 'ConnectLog Operator')} }));\n};\nsocket.onmessage = (event) => console.log('Relay13 WS event', JSON.parse(event.data));\nsocket.onerror = (event) => console.error('Relay13 WS error', event);\nsocket.onclose = (event) => console.log('Relay13 WS closed', event.code, event.reason);`;
   }
 
@@ -3559,7 +3901,7 @@
 
   function sanitizeRelayConfigForExport(config = state.relayConfig || defaultRelayConfig()) {
     const clean = normalizeRelayConfig(config);
-    return { ...clean, apiKey: clean.apiKey ? '[stored-locally]' : '' };
+    return { ...clean, apiKey: '' };
   }
 
   function sanitizeRelayThreadForExport(thread) {
@@ -4081,6 +4423,23 @@
       history.replaceState(null, '', cleanUrl.toString());
       await loadContacts();
       renderAll();
+      const contactPacket = await getMeta(META_SKYES_CONTACT_PACKET);
+      const scanPacket = {
+        contactPacket,
+        source: 'connectlog-exchange',
+        cardKind: 'connectlog-exchange',
+        cardTitle: profile.cardName || 'ConnectLog exchange card',
+        businessName: profile.name,
+        city: profile.location || '',
+        category: [profile.audience, profile.role, profile.company].filter(Boolean).join(' / '),
+        cardUrl: profile.website || '',
+        clientId: profile.id || ''
+      };
+      renderSkyesWelcomePanel(scanPacket);
+      recordBusinessCardScan(scanPacket).catch((error) => {
+        console.warn('ConnectLog exchange scan record failed:', error);
+        setBusinessCardScanStatus('Card saved locally. Relay13 scan record will retry from an operator session.');
+      });
       showToast(result === 'updated' ? `${profile.name} was updated in ConnectLog.` : `${profile.name} was saved into ConnectLog.`);
     } catch (error) {
       console.error(error);

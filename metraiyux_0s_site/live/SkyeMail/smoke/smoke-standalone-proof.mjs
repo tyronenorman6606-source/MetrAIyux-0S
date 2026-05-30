@@ -114,9 +114,9 @@ for (const needle of [
 
 const loginPage = read("login.html");
 for (const needle of [
-  "Continue with 0S/SkyGate",
+  "Continue with 0S Gate",
   "/auth-fs27-session",
-  "Sign into 0S/SkyGate first."
+  "Open the 0S Gate first."
 ]) {
   if (!loginPage.includes(needle)) {
     throw new Error(`Expected FS27 login marker missing from login.html: ${needle}`);
@@ -126,6 +126,7 @@ for (const needle of [
 const schema = read("sql/schema.sql");
 for (const needle of [
   "create table if not exists skymail.hosted_mailboxes",
+  "create table if not exists skymail.mailbox_offboarding_events",
   "idx_hosted_mailboxes_user_created"
 ]) {
   if (!schema.includes(needle)) {
@@ -139,6 +140,10 @@ for (const needle of [
   "CITADEL_BACKUP_URL",
   "auth-fs27-session",
   "mailbox-provision",
+  "mailbox-offboarding",
+  "workspace-mailbox-summary",
+  "handleMailboxOffboarding",
+  "handleWorkspaceMailboxSummary",
   "mail-send",
   "inbound-resend",
   "ZOHO_REFRESH_TOKEN",
@@ -163,7 +168,7 @@ for (const needle of [
   "zohoGetMessage",
 ]) {
   if (!mailboxProvider.includes(needle)) {
-    throw new Error(`Expected Zoho provider marker missing from _mailbox-provider.js: ${needle}`);
+    throw new Error(`Expected Citadel/SkyeNet adapter marker missing from _mailbox-provider.js: ${needle}`);
   }
 }
 
@@ -386,7 +391,7 @@ console.log(JSON.stringify({
     "Root standalone pages exist",
     "Suite shell and app mounts exist",
     "Standalone Functions contract files exist",
-    "Zoho provider and inbox bridge markers exist without removing Stalwart, Resend, Gmail, or external-webhook lanes",
+    "Citadel/SkyeNet adapter and inbox bridge markers exist without removing Stalwart, Resend, Gmail, or external-webhook lanes",
     "Provider-required frontend mode fails loud when deployed backend functions are missing",
     "Inbox shell exposes same-folder mail handoff archive controls",
     "Mail runtime module and store exist for same-folder packet archiving",

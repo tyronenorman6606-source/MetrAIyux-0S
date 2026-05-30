@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Artist ID Upload Proof</title>
+  <link rel="stylesheet" href="./nexus.css" />
+  <style>
+    body { --hero-image: url("./SUPABOY/media/green-wall.webp"); }
+  </style>
+</head>
+<body>
+  <header class="topline">
+    <a class="mark" href="./index.html" aria-label="SkyeMusicNexus SupaBoy artist hub"><img src="./assets/skye-music-nexus-logo.png" alt="" /><span>SkyeMusicNexus</span></a>
+    <nav class="nav" aria-label="Proof pages">
+      <a href="./index.html">SupaBoy Hub</a>
+      <a class="active" href="./artist-id-upload.html">ID Upload Proof</a>
+      <a href="./SUPABOY/index.html#sound">SUPABOY</a>
+      <a href="./SUPABOY/index.html#sound">Music Hub</a>
+    </nav>
+    <div class="status-pill" id="dbStatus">IndexedDB loading</div>
+  </header>
+
+  <main>
+    <section class="shell hero">
+      <div>
+        <p class="eyebrow">Artist page binding</p>
+        <h1>Upload a song to an artist ID and watch the artist page populate.</h1>
+        <p class="lede">This page proves the core mechanic: artist ID, release ID, track ID, uploaded audio, uploaded media, a generated artist-page manifest, and real playback from stored browser media.</p>
+      </div>
+      <aside class="signal-panel">
+        <img src="./SUPABOY/media/houston-mart.webp" alt="SupaBoy street market proof image" />
+        <p class="receipt" id="proofReceipt">Waiting for an artist upload.</p>
+      </aside>
+    </section>
+
+    <section class="band">
+      <div class="shell section-grid">
+        <form id="artistForm" class="panel field-grid" style="padding: 18px;">
+          <label>Artist ID<input name="artistId" value="artist_supaboy_slb" required /></label>
+          <label>Release ID<input name="releaseId" value="slb-superboy" required /></label>
+          <label>Artist name<input name="artistName" value="SupaBoy" required /></label>
+          <label>Public slug<input name="slug" value="supaboy" required /></label>
+          <label class="wide">Track title<input name="trackTitle" value="Proof Upload" required /></label>
+          <label>Audio upload<input name="audioFile" type="file" accept="audio/*" /></label>
+          <label>Image or video upload<input name="mediaFile" type="file" accept="image/*,video/*" /></label>
+          <div class="actions wide">
+            <button class="primary" type="submit">Publish To Artist Page</button>
+            <button type="button" id="proofToneBtn">Generate Proof Tone</button>
+            <button type="button" id="exportBtn">Export Manifest</button>
+            <button type="button" id="clearBtn">Clear Local Proof</button>
+          </div>
+          <p class="helper wide">The browser writes media blobs to IndexedDB and renders them back into the artist page preview. Production can replace this local store with gated storage without changing the artist/release/track ID contract.</p>
+        </form>
+
+        <section class="panel landing-preview" aria-label="Generated artist landing page preview">
+          <div class="preview-head">
+            <img id="artistAvatar" class="avatar" src="./SUPABOY/media/slb-cover.webp" alt="Artist page avatar" />
+            <div>
+              <p class="micro">Generated Artist Page</p>
+              <h2 id="previewName">SupaBoy</h2>
+              <p class="helper" id="previewIds">artist_supaboy_slb / slb-superboy</p>
+            </div>
+          </div>
+          <div class="preview-body preview-grid">
+            <div>
+              <h3>Release Queue</h3>
+              <div id="trackList"></div>
+              <div class="player-strip">
+                <canvas id="waveCanvas" class="wave" width="900" height="160" aria-label="Playback visualizer"></canvas>
+                <audio id="audioPlayer" controls preload="metadata"></audio>
+              </div>
+            </div>
+            <div>
+              <h3>Artist Media</h3>
+              <div id="mediaWall" class="media-wall"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="band value-band">
+      <div class="shell section-grid">
+        <div>
+          <p class="eyebrow">Contract this proves</p>
+          <h2>Artist pages need durable IDs, not loose uploads.</h2>
+          <p class="lede">A serious artist surface can attach new music to the right artist, the right release, and the right landing page without rebuilding the whole site every time a song drops.</p>
+        </div>
+        <div class="proof-grid">
+          <div class="proof-item"><strong>Artist ID</strong><span>One stable artist node owns the page, media, releases, and booking lane.</span></div>
+          <div class="proof-item"><strong>Release ID</strong><span>Tracks attach to a release capsule instead of floating around as random files.</span></div>
+          <div class="proof-item"><strong>Track ID</strong><span>Each song gets a generated track key that can survive page refreshes and later storage handoff.</span></div>
+          <div class="proof-item"><strong>Media playback</strong><span>Uploaded audio plays from the stored blob; uploaded video plays in the preview wall.</span></div>
+          <div class="proof-item"><strong>Manifest export</strong><span>The artist page state can be exported as JSON for backend wiring or proof receipts.</span></div>
+          <div class="proof-item"><strong>Boundary</strong><span>Local proof here. Provider storage, rights gates, and distribution lanes stay separate until deployed.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>Boundary:</strong> This page proves artist ID binding and browser-local upload/playback. It is not a live DSP, royalty ledger, formal legal rights review, or production storage bucket by itself.
+  </footer>
+
+  <script src="./artist-upload-proof.js"></script>
+</body>
+</html>

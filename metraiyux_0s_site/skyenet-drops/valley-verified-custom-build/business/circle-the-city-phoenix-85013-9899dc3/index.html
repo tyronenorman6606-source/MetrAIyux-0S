@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circle the City | Community Health Nonprofit in Phoenix</title>
+  <meta name="description" content="Circle the City is a Phoenix community health nonprofit profile at 300 W. Clarendon Ave. with direct phone and Chamber health-care evidence.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14211f;
+      --muted: #697570;
+      --sage: #7a9b84;
+      --blue: #24697a;
+      --rose: #d47563;
+      --cream: #fffaf1;
+      --mint: #eaf4ed;
+      --line: rgba(20, 33, 31, .15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(122, 155, 132, .18) 0 18%, transparent 18%),
+        radial-gradient(circle at 82% 12%, rgba(212, 117, 99, .14) 0 15%, transparent 15%),
+        linear-gradient(180deg, var(--cream), #eef6f0);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .mast {
+      display: grid;
+      grid-profile-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 28px 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .identity img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: .92fr 1.08fr;
+      gap: 30px;
+      min-height: 72vh;
+      align-items: stretch;
+      padding: 24px 0 58px;
+    }
+
+    .portrait {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(145deg, rgba(36, 105, 122, .9), rgba(122, 155, 132, .92)),
+        var(--blue);
+      color: white;
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 470px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portrait::after {
+      content: "";
+      position: absolute;
+      inset: 14% auto auto 52%;
+      width: 310px;
+      height: 310px;
+      border: 28px solid rgba(255, 255, 255, .16);
+      border-radius: 50%;
+    }
+
+    .portrait img {
+      width: 86px;
+      height: 86px;
+      border-radius: 8px;
+      background: white;
+      padding: 9px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .portrait strong {
+      position: relative;
+      z-index: 1;
+      display: block;
+      max-width: 300px;
+      font-size: 2rem;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .content {
+      align-self: center;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .68);
+      color: var(--rose);
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      font-size: 4.15rem;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      color: #374b46;
+      font-size: 1.25rem;
+      line-height: 1.55;
+      max-width: 650px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+      background: white;
+      color: var(--blue);
+    }
+
+    .button.primary {
+      background: var(--blue);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 0 0 58px;
+    }
+
+    .tile {
+      min-height: 160px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      padding: 18px;
+    }
+
+    .tile.wide { grid-column: span 2; }
+
+    .label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .tile p {
+      margin: 0;
+      color: #3d514c;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .mast,
+      .hero,
+      .grid {
+        grid-profile-columns: 1fr;
+      }
+
+      .hero { min-height: auto; }
+      .portrait { min-height: 330px; }
+      .tile.wide { grid-column: auto; }
+      h1 { font-size: 3rem; }
+    }
+
+    @media (max-width: 520px) {
+      h1 { font-size: 2.35rem; }
+      .lead { font-size: 1.06rem; }
+      .portrait { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <header class="mast">
+        <div class="identity">
+          <img src="assets/logo.svg" alt="Circle the City mark">
+          <span>Circle the City</span>
+        </div>
+        <span>Valley Verified Network profile</span>
+      </header>
+
+      <section class="hero" aria-labelledby="business-name">
+        <aside class="portrait" aria-label="Community health listing">
+          <img src="assets/logo.svg" alt="">
+          <strong>Community health nonprofit listed in central Phoenix.</strong>
+        </aside>
+
+        <div class="content">
+          <div class="eyebrow">Health And Care / Community Health Nonprofit</div>
+          <h1 id="business-name">Circle the City</h1>
+          <p class="lead">Circle the City gives Phoenix patients, families, and community partners a community health nonprofit contact from its Clarendon Avenue office.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+16027760776">Call (602) 776-0776</a>
+            <a class="button" href="https://business.phoenixchamber.com/list/ql/health-care-11">Public profile</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="Profile facts">
+        <article class="tile wide">
+          <span class="label">Address</span>
+          <p>300 W. Clarendon Ave. Suite 200, Phoenix, AZ 85013</p>
+        </article>
+        <article class="tile">
+          <span class="label">Category</span>
+          <p>Health And Care</p>
+        </article>
+        <article class="tile">
+          <span class="label">Niche</span>
+          <p>Community Health Nonprofit</p>
+        </article>
+        <article class="tile">
+          <span class="label">Profile Date</span>
+          <p>May 19, 2026</p>
+        </article>
+        <article class="tile wide">
+          <span class="label">Profile Note</span>
+          <p>Public Chamber healthcare evidence supports this Phoenix community health profile.</p>
+        </article>
+        <article class="tile">
+          <span class="label">Website</span>
+          <p>Use the listed phone as the public contact route</p>
+        </article>
+      </section>
+    </div>
+      <section class="sky-vv" aria-labelledby="vv-circle-the-city-phoenix-85013-9899dc3" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-circle-the-city-phoenix-85013-9899dc3" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Circle the City is Valley Verified because the profile identifies a Phoenix community health nonprofit with a specific office, phone, and health-care category. The profile lists 300 W. Clarendon Ave. Suite 200, Phoenix, AZ 85013 and (602) 776-0776.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The Greater Phoenix Chamber health-care category supports Circle the City as a community health organization. Valley Verified frames the page around the solid public facts: nonprofit health focus, Phoenix address, direct phone, and patient/community audience.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Circle the City belongs in Valley Verified because local health nonprofits often serve people navigating urgent, complex, and practical needs; this profile makes the organization easier to recognize and reach.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Community health nonprofit profile for Phoenix healthcare and wellness support.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Patients, families, community partners, and Phoenix-area residents.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Chamber health-care category, Clarendon Avenue office, direct phone, and Valley Verified profile.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

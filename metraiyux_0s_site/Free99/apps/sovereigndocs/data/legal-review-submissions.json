@@ -1,5 +1,79 @@
 [
   {
+    "id": "e5bfa598-5504-4b2b-b345-c39e9be790b6",
+    "status": "submitted_pending_triage",
+    "templateId": "US-AZ-finance-lending-receipt-template",
+    "templateTitle": "Receipt Template",
+    "templateVersion": "1.0.0-seed",
+    "riskLevel": "low",
+    "sourcePath": "template-library/generated/US-AZ/finance-lending/receipt-template.json",
+    "gate": {
+      "templateId": "US-AZ-finance-lending-receipt-template",
+      "riskLevel": "low",
+      "lane": "public_draft",
+      "decision": null,
+      "exportAllowed": true,
+      "assemblyAllowed": true,
+      "exportClass": "public_draft",
+      "required": [
+        "not_legal_advice_boundary"
+      ],
+      "message": "Low-risk draft automation still requires the self-help boundary."
+    },
+    "reviewScope": "case_workflow_partner_review",
+    "servicePlanId": "basic_packet_review_request",
+    "submittedBy": {
+      "id": "local-operator",
+      "name": "Local Operator",
+      "email": null,
+      "orgId": "local",
+      "organization": "SovereignDocs Workspace",
+      "roles": [
+        "owner",
+        "operator",
+        "reviewer",
+        "admin"
+      ]
+    },
+    "contact": {},
+    "answers": {
+      "state_full_name": "Arizona",
+      "state_code": "AZ",
+      "document_title": "Receipt Template",
+      "payor_name": "Smoke Payor",
+      "payee_name": "Smoke Payee",
+      "payment_amount": "13.00",
+      "company_name": "Smoke LLC"
+    },
+    "packetMarkdown": "# SovereignDocs Partner Review Packet\n\nThis packet was prepared for routing to the configured legal partner network. SovereignDocs is not a law firm, does not provide legal advice, and does not guarantee that any partner will accept, approve, revise, validate, or complete a review.\n\n## Submission scope\n\n- Requested scope: case_workflow_partner_review\n- Template ID: US-AZ-finance-lending-receipt-template\n- Template title: Receipt Template\n- Template version: 1.0.0-seed\n- Risk level: low\n- Gate lane: public_draft\n- Export class: public_draft\n- Source path: template-library/generated/US-AZ/finance-lending/receipt-template.json\n\n## Submitter\n\n- Upstream subject: local-operator\n- Email: [not supplied]\n- Name: Local Operator\n- Organization: SovereignDocs Workspace\n\n## User facts / answers\n\n- state_full_name: Arizona\n- state_code: AZ\n- document_title: Receipt Template\n- payor_name: Smoke Payor\n- payee_name: Smoke Payee\n- payment_amount: 13.00\n- company_name: Smoke LLC\n\n## Draft or prep worksheet content\n\n# Receipt Template\n\nJurisdiction: Arizona\n\n## Important Notice\nThis template is an original SovereignDocs automation seed. It is not legal advice, is not a substitute for advice from a licensed attorney, and may require state, county, city, agency, court, industry, or transaction-specific review before use.\n\n## Parties and Effective Date\nThis Receipt Template is prepared as of [Effective Date] by and between [Party One Name] of [Party One Address].\n\n## Purpose\nThe purpose of this document is to create a clear written record for: Proof of payment receipt. The parties should complete every variable field accurately before signing or relying on this document.\n\n## Financial Terms\nAmount: [Amount]. Interest rate: [Interest Rate]. Payment schedule: [Payment Schedule]. Collateral: [Collateral]. Late fee terms: [Late Fee Terms].\n\n## Default and Remedies\nThe parties should define missed-payment handling, cure period, acceleration, collection costs, security interest steps, and whether prepayment is permitted.\n\n## Consumer, Usury, and Disclosure Review\nInterest limits, lending disclosures, debt collection, security interests, and consumer-credit rules can vary. This template requires current-law review before use.\n\n## Governing Law Placeholder\nUnless a qualified reviewer changes this section, the parties intend this document to be interpreted under the laws of Arizona, with any required venue, forum, notice, filing, consumer, court, agency, or local requirement reviewed before use.\n\n## Additional Terms\nAdditional custom terms: [Custom Terms].\n\n## Signatures\nThe parties sign below to confirm the information supplied in this document is accurate to the best of their knowledge and that they have had the opportunity to seek independent advice before signing.\n\n[Party One Name]\nSignature: ______________________________ Date: ______________\n\n\n\n\n## Required boundaries accepted\n\n- Not legal advice: true\n- Partner review terms: true\n- No guarantee: true\n- SovereignDocs not responsible for partner outcome: true\n- User fact accuracy responsibility: true\n\n## Partner review boundary\n\nAny attorney-client relationship, if one is created, is between the user and the reviewing legal professional or firm under that partner's own engagement terms. SovereignDocs is the document automation and routing platform only.\n",
+    "boundaries": {
+      "notLegalAdvice": true,
+      "noAttorneyClientWithSovereignDocs": true,
+      "partnerMayDecline": true,
+      "noOutcomeGuarantee": true,
+      "userResponsibleForFactsAndUse": true,
+      "sovereignDocsNotLawFirm": true,
+      "sovereignDocsNotResponsibleForPartnerOutcome": true
+    },
+    "events": [
+      {
+        "id": "f088c536-1d5a-417e-8019-2952b1e1c038",
+        "type": "submitted_pending_triage",
+        "actor": "local-operator",
+        "note": "Partner review request submitted to SovereignDocs triage queue.",
+        "createdAt": "2026-05-24T19:08:58.977Z"
+      }
+    ],
+    "createdAt": "2026-05-24T19:08:58.977Z",
+    "updatedAt": "2026-05-24T19:08:58.977Z",
+    "caseId": "sd_case_127e72ba-a1ac-4a06-9cd6-27cc261aee3c",
+    "documentIds": [
+      "baa160cf-57f8-4d78-90ef-d226d206bdca",
+      "6df6acf4-a5cd-4365-b0d3-c7fe0eccf824"
+    ],
+    "packetId": "packet_1779649738947_01cae55bfcd99"
+  },
+  {
     "id": "6d34ce1d-1cfa-4079-af3e-e638ba14fb11",
     "status": "partner_review_returned",
     "templateId": "US-AZ-business-formation-governance-single-member-llc-operating-agreement",

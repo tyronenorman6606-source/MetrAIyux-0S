@@ -1,0 +1,267 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "music4u-gray-skyline-service",
+  "title": "Skyline Service",
+  "project": "",
+  "createdAt": "2026-05-25T23:08:01.555Z",
+  "provider": {
+    "id": "elevenlabs",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 2399966,
+    "promptStored": true
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "legacy_music_4u",
+      "slug": "music-4u",
+      "stageName": "Music 4u"
+    },
+    {
+      "artistId": "444666666666",
+      "slug": "gray-skyes",
+      "stageName": "Gray Skyes"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "legacy_music_4u",
+    "slug": "music-4u",
+    "stageName": "Music 4u"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/audio/skyline-service.mp3",
+    "audioSha256": "3ad326b881a9ad54b7602ae3e4e9e58e9eb694919bc514a8f00a19d992302c4e",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/",
+    "productId": "prod_music_4u_skyline_service",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "legacy_music_4u",
+      "name": "Music 4u",
+      "shareBps": 5000,
+      "role": "collaborator"
+    },
+    {
+      "artistId": "444666666666",
+      "name": "Gray Skyes",
+      "shareBps": 5000,
+      "role": "collaborator"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_a60b620cc81acb5e",
+      "metadata": {
+        "artist_names": [
+          "Music 4u",
+          "Gray Skyes"
+        ],
+        "audio_sha256": "3ad326b881a9ad54b7602ae3e4e9e58e9eb694919bc514a8f00a19d992302c4e",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/singles/skyline-service",
+        "fs27_tracked": true,
+        "primary_artist": "Music 4u",
+        "product_id": "prod_music_4u_skyline_service",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/",
+        "release": "",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 2399966,
+      "package_name": "skyline-service.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/audio/skyline-service.mp3",
+      "package_sha256": "3ad326b881a9ad54b7602ae3e4e9e58e9eb694919bc514a8f00a19d992302c4e",
+      "schema": "skye.submission.job",
+      "slug": "skyline-service",
+      "title": "Skyline Service",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 2399966,
+      "package_name": "skyline-service.mp3",
+      "package_sha256": "3ad326b881a9ad54b7602ae3e4e9e58e9eb694919bc514a8f00a19d992302c4e",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "skyline-service",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Skyline Service",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_a60b620cc81acb5e",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_a60b620cc81acb5e",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "skyline-service:sub_a60b620cc81acb5e",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "skyline-service",
+      "submitted_at": "2026-05-25T23:08:01.555Z",
+      "title": "Skyline Service",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_3ad326b881a9ad54",
+      "upload_sha256": "3ad326b881a9ad54b7602ae3e4e9e58e9eb694919bc514a8f00a19d992302c4e",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/skyline-service/",
+    "productId": "prod_music_4u_skyline_service"
+  }
+}

@@ -6,7 +6,7 @@ Entity baseline: Skyes Over London LC
 
 Governing law baseline: Arizona, United States
 
-Contact: grayskyes@solenterprises.org
+Contact: legal-skyes@solenterprises.org
 
 
 ## Master Terms of Service
@@ -112,7 +112,7 @@ We retain information as needed for service delivery, business records, legal co
 
 ### Contact
 
-Privacy requests may be sent to grayskyes@solenterprises.org. Include the service, account, request type, and enough information for verification.
+Privacy requests may be sent to legal-skyes@solenterprises.org. Include the service, account, request type, and enough information for verification.
 
 
 ## SMS, Calls, and Communications Policy
@@ -579,7 +579,7 @@ Users retain ownership of their eligible content but grant us the licenses neede
 
 ### Copyright complaints
 
-Copyright owners may send notices of claimed infringement to grayskyes@solenterprises.org. Notices should identify the copyrighted work, the allegedly infringing material, contact information, a good-faith statement, an accuracy statement under penalty of perjury, and a physical or electronic signature.
+Copyright owners may send notices of claimed infringement to legal-skyes@solenterprises.org. Notices should identify the copyrighted work, the allegedly infringing material, contact information, a good-faith statement, an accuracy statement under penalty of perjury, and a physical or electronic signature.
 
 ### Counter-notices
 
@@ -608,7 +608,7 @@ We use reasonable administrative, technical, and organizational safeguards desig
 
 ### Report channels
 
-Security issues, suspected abuse, phishing, account compromise, exposed credentials, or vulnerability reports should be sent to grayskyes@solenterprises.org with sufficient detail to investigate.
+Security issues, suspected abuse, phishing, account compromise, exposed credentials, or vulnerability reports should be sent to legal-skyes@solenterprises.org with sufficient detail to investigate.
 
 ### No unauthorized testing
 
@@ -674,7 +674,7 @@ Unless a signed enterprise agreement states a specific service level, services a
 
 ### Support channels
 
-Support is available through the published contact methods, including grayskyes@solenterprises.org, and any product-specific support portals we provide.
+Support is available through the published contact methods, including legal-skyes@solenterprises.org, and any product-specific support portals we provide.
 
 ### Maintenance
 
@@ -802,7 +802,7 @@ Content involving child exploitation, sexualization of minors, grooming, traffic
 
 ### Parent requests
 
-Parents or guardians may contact grayskyes@solenterprises.org to request review or deletion of information submitted by a minor, subject to verification and legal requirements.
+Parents or guardians may contact legal-skyes@solenterprises.org to request review or deletion of information submitted by a minor, subject to verification and legal requirements.
 
 
 ## Accessibility Statement
@@ -819,7 +819,7 @@ Accessibility is an ongoing process. Some beta, experimental, third-party, legac
 
 ### Feedback
 
-Accessibility barriers can be reported to grayskyes@solenterprises.org. Include the page, issue, assistive technology used if relevant, and preferred contact method.
+Accessibility barriers can be reported to legal-skyes@solenterprises.org. Include the page, issue, assistive technology used if relevant, and preferred contact method.
 
 ### Alternatives
 
@@ -832,7 +832,7 @@ Escalation, informal negotiation, arbitration, class action waiver, venue, and a
 
 ### Informal resolution first
 
-Before filing a claim, you agree to send a written dispute notice to grayskyes@solenterprises.org with your name, account, contact information, issue, requested relief, and supporting facts. The parties will attempt informal resolution for thirty days.
+Before filing a claim, you agree to send a written dispute notice to legal-skyes@solenterprises.org with your name, account, contact information, issue, requested relief, and supporting facts. The parties will attempt informal resolution for thirty days.
 
 ### Binding arbitration
 

@@ -1,0 +1,30 @@
+# KP Staffing
+
+## Business Facts
+
+- ID: kp-staffing-peoria-85382-433f2cf
+- Category: Business Services
+- Niche: Staffing
+- Location: Peoria, AZ, 85382
+- Address: 8996 W Union Hills Dr Suite 104, Peoria, AZ 85382
+- Website: Not present in current data
+- Booking URL: Not present in current data
+- Phone: (623) 755-6619
+- Email: Not present in current data
+- Languages: English
+- Tags: Staffing, Business & Professional Services, Local SMB / service business, Public directory record, Business / Professional Services, Business & Professional Services / Staffing
+- Last verified: 2026-05-19
+- Verification score: 13
+
+## Current Description
+
+KP Staffing is listed in Valley Verified Network for Staffing • Staffing, Business & Professional Services, Local SMB / service business in Peoria. Contact the provider directly to confirm availability, scope, and pricing.
+
+## Landing Direction
+
+Lead with the actual business offer, proof, city/service area, and contact path. Do not center Valley Verified, SkyEmail, or platform explanation above the business. Use this folder's assets first. If the only logo is the working non-text mark, treat it as temporary until a real brand logo is supplied or built.
+
+## Assets In Folder
+
+- No existing real media found in the current repo scan for this business.
+- assets/logo-working-mark.svg: non-text working logo mark generated because a business-owned logo was not confirmed in this package.

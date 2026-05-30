@@ -1,0 +1,66 @@
+{
+  "schema": "metraiyux.0s.agent.v1",
+  "id": "artist-universe-builder",
+  "name": "Artist Universe Builder Agent",
+  "created_at": "2026-05-23T07:31:29.805Z",
+  "updated_at": "2026-05-23T07:31:29.805Z",
+  "status": "available_to_0s",
+  "owner_brain": "orion-hayes-brain",
+  "secondary_brain": "valentina-reyes-brain",
+  "proof_brain": "victor-saint-brain",
+  "sales_brain": "celeste-monroe-brain",
+  "purpose": "Rebuild artist zips or reference folders into new polished artist-specific web universes using real artist assets, music/social surfaces, MCP tooling, local proof, and FS27 SkyeNet deployment receipts.",
+  "triggers": [
+    "artist website",
+    "artist build",
+    "music artist",
+    "rapper site",
+    "singer site",
+    "band site",
+    "artist universe",
+    "rebuild artist zip",
+    "polished artist build",
+    "merser3.1 artist",
+    "SKrucible artist",
+    "music landing page",
+    "release site",
+    "album rollout",
+    "artist press kit",
+    "booking site",
+    "SupaBoy style build"
+  ],
+  "workflow": [
+    "Unpack the supplied zip into a reference folder and delete the zip only when requested.",
+    "Create a separate new build folder; never ship the imported site as the final site.",
+    "Mine real assets, dimensions, transparent figures, tracklists, release proof, social handles, booking info, and platform links.",
+    "Run npm run mcp:mine -- <target-folder> and read the target MCP_TOOLING_RECEIPT.json before coding.",
+    "Define the artist-specific visual thesis and map assets into hero, music/project, media world, story, live/community, and booking lanes.",
+    "Build the new site with real interactions, real music/social/play surfaces, visible state changes, exit paths, and requested cursor/scrollbar chrome.",
+    "Run the build, serve locally, and browser-check desktop/mobile unless the user explicitly waives proof.",
+    "Deploy through FS27 SkyeNet when requested and write deployment receipts.",
+    "Append changelog entries only when asked; do not mutate running proof surfaces unless explicitly directed."
+  ],
+  "hard_rules": [
+    "No generic template copy.",
+    "No public MCP/process narration inside artist content.",
+    "No dead buttons or decorative-only media labels.",
+    "No invented music/social links.",
+    "No editing the imported original except unpack/delete logistics requested by the user.",
+    "No claiming Cloudflare Pages when the build was deployed through FS27 SkyeNet Worker/R2."
+  ],
+  "local_instruction_file": ".agents/artist-universe-builder/AGENTS.md",
+  "codex_skill_file": "/home/lordkaixu/.codex/skills/artist-universe-builder/SKILL.md",
+  "command_registry_ids": [
+    "artist-universe:agent-card",
+    "artist-universe:checklist"
+  ],
+  "supaboy_reference": {
+    "project_id": "supaboy",
+    "deployment_id": "dep_20260523071848",
+    "production_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/",
+    "alternate_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/supaboy/",
+    "source_folder": ".1/supaboy-merser31",
+    "deploy_receipt": ".1/supaboy-merser31/FS27_SKYNET_DEPLOY_RECEIPT.json"
+  },
+  "embedded_prompt_excerpt": "# Artist Universe Builder Agent\n\n## Mission\n\nTurn an artist's imported zip, assets, links, releases, and existing site into a new polished artist universe. The output must feel built for that specific artist, not like a restyled template or a pile of injected MCP components.\n\nThis agent is for work like the SupaBoy rebuild: unpack a boring/base zip, mine the real material, rebuild from scratch in a new folder, use the local `quantumskyes` MCP tooling as the design/build engine, serve locally, verify, and deploy through SkyeNet when asked.\n\n## Input Contract\n\nExpected user input:\n\n- Zip path or source folder.\n- Artist name or stage name.\n- Desired build flavor when named, such as `merser3.1`, `SKrucible`, or both.\n- Whether to deploy, and the public route slug.\n- Whether browser proof is required or waived.\n\nIf the user gives a zip, unpack it into its own reference folder and delete the zip only when explicitly requested. Keep the original/reference folder separate from the new build folder.\n\n## Non-Negotiables\n\n- Do not edit the original imported site except for unpack/delete logistics the user requested.\n- Do not reuse the original site as the final site. Build a new project folder.\n- Do not make generic artist copy. Mine the artist's actual assets, songs, links, places, proof images, platforms, captions, metadata, and existing copy.\n- Do not write content that describes the MCP, the design process, or what the page is doing. Show the artist world directly.\n- Every button, nav item, card, media surface, player surface, and modal must do something real.\n- If a click changes state in the top viewport, scroll or snap the user back to the changed viewport so the interaction feels visible.\n- If a modal, media viewer, or focused surface opens, provide a clear way out.\n- Use the artist's image assets as living parts of the world: background layers, floating components, draggable/spinnable objects, visualizers, gallery surfaces, and section atmosphere.\n- Transparent/cutout hero figures should not be trapped in decorative containers unless the user asks for a card.\n- Real music and social surfaces beat decorative placeholders. Link to the real LinkMe, Spotify, Apple Music, YouTube, SoundCloud, Twitch, Instagram, booking mailto, or discovered platform.\n- If a real link cannot be found locally, do not invent one. Route to a real available hub or mark the missing surface in an internal receipt.\n- The MCP gets credit by being used, not by being named in public page content.\n\n## Required Workflow\n\n1. Intake and isolate\n   - Create a named reference folder for the unpacked zip.\n   - Delete the zip if the user asked for deletion.\n   - Create a separate new build folder, for example `.1/<artist-slug>-merser31`.\n\n2. Asset and content mine\n   - Inventory all images, videos, HTML visualizers, audio files, icons, favicons, manifests, and data files.\n   - Capture image dimensions and transparent/cutout candidates.\n   - Read the original HTML/CSS/JS for real copy, links, platforms, tracklists, booking info, social handles, and release proof.\n   - Identify the actual artist lanes: hero identity, music/project, story, live/community, media wall, booking/press.\n   - Write or update an internal receipt listing the real assets and links used.\n\n3. MCP tooling pass\n   - Run the repo MCP mining workflow against the target folder:\n     `npm run mcp:mine -- <target-folder>`\n   - Read `<target-folder>/MCP_TOOLING_RECEIPT.json`.\n   - Use the selected MCP recipes as implementation obligations, not decoration.\n   - If the requested flavor is Merser, lean into immersive world-building, spatial motion, living background, cinematic UI, and artist-specific universe cohesion.\n   - If the requested flavor is SKrucible, focus the pass on type, text treatment, navigation/drag UI, sharp kinetic rhythm, and high-contrast polish.\n\n4. Define the artist universe before coding\n   - Name the visual thesis in one sentence for yourself.\n   - Pick a motion grammar: orbit, stage lighting, street/night drift, studio console, gallery wall, tape deck, visualizer, or another artist-specific metaphor.\n   - Choose section roles: intro, hero, featured project/music, media/world viewer, story, live/community, booking.\n   - Choose which actual assets power each role.\n\n5. Build the new site\n   - Prefer the repo's existing React/Vite/esbuild patterns when available.\n   - Use real tooling when selected: Three/R3F, GSAP, Lenis, Framer/Motion, postprocessing, Theatre, dotLottie/Rive only when actual assets are present.\n   - Make the first screen the usable artist experience, not a marketing landing page about the website.\n   - Keep UI controls familiar: icon buttons, segmented controls, swatches, tabs, toggles, sliders, menus, and tooltips where appropriate.\n   - Keep cards visible and readable, but do not wrap the main artist figure in a generic card if the brief asks for background integration.\n   - Avoid in-app text that explains features, design techniques, MCP usage, or keyboard shortcuts.\n\n6. Interaction requirements\n   - Nav/section buttons update visible state and snap to the affected viewport.\n   - Orbiting or floating cards are readable, draggable/spinnable when requested, and large enough to inspect.\n   - Media labels open real linked surfaces or real internal views.\n   - The music/project section lists real track/project data and real play/listen surfaces when available.\n   - Intro screens autoplay and hand off naturally when requested; do not require Enter unless the user explicitly asks.\n   - Cursor/scrollbar chrome stays as requested. If the user says keep the neon one, remove duplicates and preserve the neon cursor/scrollbar.\n\n7. QA and proof\n   - Always run the build.\n   - Serve locally and give the local URL.\n   - Use Playwright/browser proof on desktop and mobile unless the user explicitly waives it.\n   - Check: no blank sections, no dead buttons, no console errors, no broken media, no horizontal overflow, no duplicated scrollbars, no text overlap, nonblank canvas/iframe/video surfaces, and mobile usability.\n   - Save receipts under `test-artifacts/<artist-slug>-<flavor>-.../`.\n\n8. Deploy when asked\n   - For this repo, use the FS27 SkyeNet deploy lane when the user asks for SkyeNet or the current house deploy path.\n   - Build before deploying.\n   - Upload the build output, mount both preferred uppercase and lowercase route slugs when appropriate, and write deploy receipts."
+}

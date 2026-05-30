@@ -49,60 +49,6 @@ async function call(env, method, path, {body, session, token, expectOk = true} =
   return {status: res.status, payload};
 }
 
-async function runLocalSessionProof() {
-  const env = {SKYEROUTEX_KV: memoryKv(), FREE99_ADMIN_CODE: 'local-smoke-admin'};
-  await call(env, 'POST', '/api/routex/auth/signup', {body: {email: 'admin@example.com', password: 'Admin12345', name: 'Admin', role: 'admin'}});
-  await call(env, 'POST', '/api/routex/auth/signup', {body: {email: 'provider@example.com', password: 'Provider12345', name: 'Provider', role: 'provider', company_name: 'Provider Co'}});
-  await call(env, 'POST', '/api/routex/auth/signup', {body: {email: 'worker@example.com', password: 'Worker12345', name: 'Worker', role: 'contractor', city: 'Phoenix', state: 'Arizona', skills: ['field']}});
-
-  const admin = (await call(env, 'POST', '/api/routex/auth/login', {body: {email: 'admin@example.com', password: 'Admin12345'}})).payload.session;
-  const provider = (await call(env, 'POST', '/api/routex/auth/login', {body: {email: 'provider@example.com', password: 'Provider12345'}})).payload.session;
-  const contractor = (await call(env, 'POST', '/api/routex/auth/login', {body: {email: 'worker@example.com', password: 'Worker12345'}})).payload.session;
-
-  const market = (await call(env, 'POST', '/api/routex/markets', {session: admin, body: {city: 'Phoenix', state: 'Arizona'}})).payload.market;
-  const job = (await call(env, 'POST', '/api/routex/jobs', {session: provider, body: {
-    market_id: market.id,
-    title: 'Route job',
-    category: 'field',
-    description: 'Route work',
-    location: 'Phoenix',
-    starts_at: new Date(Date.now() + 86400000).toISOString(),
-    pay_type: 'fixed',
-    pay_amount_cents: 2500,
-    slots: 1,
-    acceptance_mode: 'single',
-    route_required: true
-  }})).payload.job;
-
-  await call(env, 'POST', `/api/routex/jobs/${job.id}/apply`, {session: contractor, body: {note: 'ready'}});
-  const applicants = (await call(env, 'GET', `/api/routex/jobs/${job.id}/applicants`, {session: provider})).payload.applicants;
-  await call(env, 'POST', '/api/routex/provider/roster', {session: provider, body: {contractor_id: applicants[0].contractor_id}});
-  const accepted = (await call(env, 'POST', `/api/routex/jobs/${job.id}/accept-applicant`, {session: provider, body: {application_id: applicants[0].id}})).payload;
-  await call(env, 'POST', `/api/routex/assignments/${accepted.assignment.id}/confirm`, {session: contractor});
-  await call(env, 'POST', `/api/routex/assignments/${accepted.assignment.id}/proof`, {session: contractor, body: {proof_type: 'text', body: 'done'}});
-  await call(env, 'POST', `/api/routex/assignments/${accepted.assignment.id}/approve`, {session: provider});
-  await call(env, 'POST', `/api/routex/house-command/workflow-board/job/${job.id}`, {session: admin, body: {status: 'active', owner: 'Admin', checkpoint: 'checked', next_action: 'close'}});
-
-  const board = (await call(env, 'GET', '/api/routex/house-command/workflow-board', {session: admin})).payload;
-  const paymentLedger = (await call(env, 'GET', '/api/routex/payments/ledger', {session: admin})).payload;
-  const integrations = (await call(env, 'GET', '/api/routex/integrations/status', {session: admin})).payload;
-  const compliance = (await call(env, 'GET', '/api/routex/compliance/checks', {session: admin})).payload;
-  const packet = (await call(env, 'GET', `/api/routex/jobs/${job.id}/export-packet`, {session: admin})).payload;
-  const report = (await call(env, 'GET', '/api/routex/house-command/market-report?city=Phoenix&state=Arizona', {session: admin})).payload;
-
-  return {
-    mode: 'local-session-fallback',
-    job: job.id,
-    assignment: accepted.assignment.id,
-    boardItems: board.summary.total,
-    paymentRows: paymentLedger.payments.length,
-    integrations: integrations.integrations.length,
-    complianceRows: compliance.compliance_checks.length,
-    packetProofRows: packet.packet.proof_items.length,
-    reportJobs: report.report.totals.jobs
-  };
-}
-
 async function runSharedGateProof() {
   const env = {SKYEROUTEX_KV: memoryKv(), SKYGATEFS27_WORKER: fakeGateWorker()};
   const disabled = await call(env, 'POST', '/api/routex/auth/signup', {
@@ -110,7 +56,7 @@ async function runSharedGateProof() {
     body: {email: 'x@example.com', password: 'Password123', name: 'X', role: 'provider'},
     expectOk: false
   });
-  if (disabled.status !== 503 || disabled.payload.sharedAuth !== true) {
+  if (disabled.status !== 410 || disabled.payload.sharedAuth !== true) {
     throw new Error(`Expected app-local signup to be disabled in shared-gate mode, got ${disabled.status}: ${JSON.stringify(disabled.payload)}`);
   }
 
@@ -144,10 +90,9 @@ async function runSharedGateProof() {
   };
 }
 
-const local = await runLocalSessionProof();
 const shared = await runSharedGateProof();
 console.log(JSON.stringify({
   ok: true,
   checkedAt: new Date().toISOString(),
-  proofs: [local, shared]
+  proofs: [shared]
 }, null, 2));

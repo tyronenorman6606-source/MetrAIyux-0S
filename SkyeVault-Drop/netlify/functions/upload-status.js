@@ -49,6 +49,9 @@ function publicReceipt(receipt) {
     clientRequestId: entry.clientRequestId || '',
     workspaceId: entry.workspaceId || '',
     developerId: entry.developerId || '',
+    custodyScope: entry.custodyScope || '',
+    vaultVisibility: entry.vaultVisibility || '',
+    ownerAccountId: entry.ownerAccountId || '',
     destinationName: entry.destinationName || entry.destinationId || '',
     fileName: entry.fileName || '',
     fileSize: entry.fileSize || 0,
@@ -62,6 +65,24 @@ function publicReceipt(receipt) {
       webViewLink: entry.driveFile.webViewLink || ''
     } : null
   };
+}
+
+function isOwnerPrivateReceipt(receipt) {
+  const entry = receipt?.entry || receipt || {};
+  const explicit = String(entry.custodyScope || '').toLowerCase() === 'owner-private'
+    || String(entry.vaultVisibility || '').toLowerCase() === 'owner-only'
+    || entry.clientVaultVisible === false
+    || entry.clientVaultDownloadAllowed === false;
+  const combined = [
+    entry.workspaceId,
+    entry.accessType,
+    entry.assetType,
+    entry.projectName,
+    entry.fileName,
+    entry.clientReference
+  ].join(' ');
+  return explicit || (/\b(owner-admin|metraiyux-0s-owner)\b/i.test(combined)
+    && /(full[- ]repo|git vault|skydrive|sovereign source|restore pack|control pack|\.skyesecrets|\.tar\.zst\.enc)/i.test(combined));
 }
 
 export async function handler(event) {
@@ -95,6 +116,9 @@ export async function handler(event) {
       sessionId ? loadSessionManifest(sessionId) : Promise.resolve(null),
       receiptId ? loadReceipt(receiptId) : Promise.resolve(null)
     ]);
+    if (receiptRecord?.receipt && isOwnerPrivateReceipt(receiptRecord.receipt) && portalAccess.type !== 'owner-admin') {
+      return json(403, { ok: false, error: 'This vault receipt is owner-private. Use the shared owner/admin gate.' }, noStoreCors(event));
+    }
     const manifestWorkspace = manifestRecord?.manifest?.intake?.workspaceId || manifestRecord?.manifest?.access?.workspaceId || '';
     const receiptWorkspace = (receiptRecord?.receipt?.entry || receiptRecord?.receipt)?.workspaceId || '';
     if (portalAccess.type === 'developer-workspace') {

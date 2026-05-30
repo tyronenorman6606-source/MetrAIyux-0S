@@ -5,13 +5,13 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const REPO_ROOT = path.resolve(path.dirname(__filename), '..');
 const SOURCE = path.join(REPO_ROOT, 'metraiyux_0s_site/_platform-sources/valley-verified/dist');
-const DEST = path.join(REPO_ROOT, 'metraiyux_0s_site/valley-verified');
-const MOUNT_PATH = '/valley-verified';
-const SOURCE_ORIGIN = 'https://valley-verified.pages.dev';
+const DEST = path.resolve(REPO_ROOT, process.env.VALLEY_VERIFIED_SYNC_DEST || 'metraiyux_0s_site/valley-verified');
+const MOUNT_PATH = normalizeMountPath(process.env.VALLEY_VERIFIED_MOUNT_PATH || '/valley-verified');
+const SOURCE_ORIGIN = String(process.env.VALLEY_VERIFIED_SOURCE_ORIGIN || 'https://valley-verified.pages.dev').replace(/\/+$/, '');
 const TARGET_ORIGIN = String(process.env.VALLEY_VERIFIED_0S_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const TEXT_EXTENSIONS = new Set(['.html', '.css', '.js', '.json', '.webmanifest', '.xml', '.txt', '.svg']);
 const OPERATOR_WORKSPACE_SOURCE = path.join(REPO_ROOT, 'metraiyux_0s_site/_platform-sources/valley-verified/src/operator-workspace.js');
-const OPERATOR_WORKSPACE_SCRIPT = '<script type="module" src="/valley-verified/assets/operator-workspace.js"></script>';
+const OPERATOR_WORKSPACE_SCRIPT = `<script type="module" src="${MOUNT_PATH}/assets/operator-workspace.js"></script>`;
 const VALLEY_BRAIN_ASSETS = [
   ['assets/valley-brain.js', path.join(SOURCE, 'assets/valley-brain.js')],
   ['assets/valley-brain.css', path.join(SOURCE, 'assets/valley-brain.css')]
@@ -45,12 +45,6 @@ const OPERATOR_WORKSPACE_ROUTES = [
   'protected-admin',
   'operator'
 ];
-const PROFILE_FALLBACK_SLUGS = [
-  'fade-masters-phx',
-  'bobs-smoke-shop-litchfield-park',
-  'empire-pallets-phoenix',
-  'amazon-phoenix-major-employer-adc4ff0'
-];
 
 async function exists(file) {
   try {
@@ -59,6 +53,11 @@ async function exists(file) {
   } catch {
     return false;
   }
+}
+
+function normalizeMountPath(value) {
+  const clean = String(value || '/valley-verified').trim().replace(/^https?:\/\/[^/]+/i, '').replace(/\\/g, '/').replace(/\/+/g, '/').replace(/\/+$/, '');
+  return clean.startsWith('/') ? (clean || '/valley-verified') : `/${clean || 'valley-verified'}`;
 }
 
 async function walk(dir) {
@@ -97,30 +96,16 @@ function rewriteForMount(source, rel) {
   let body = source;
   body = body.replaceAll(`${SOURCE_ORIGIN}/`, `${TARGET_ORIGIN}${MOUNT_PATH}/`);
   body = body.replaceAll(SOURCE_ORIGIN, `${TARGET_ORIGIN}${mountedPath(rel)}`);
-  body = body.replace(/(["'=])\/(?!\/|>|valley-verified\/|workspaces\/|client-app-factory\/|northstar\/|api\/northstar)/g, `$1${MOUNT_PATH}/`);
-  body = body.replace(/url\(\s*\/(?!\/|valley-verified\/|workspaces\/|client-app-factory\/|northstar\/|api\/northstar)/g, `url(${MOUNT_PATH}/`);
+  body = body.replaceAll(`${TARGET_ORIGIN}/valley-verified/`, `${TARGET_ORIGIN}${MOUNT_PATH}/`);
+  body = body.replaceAll(`${TARGET_ORIGIN}/valley-verified`, `${TARGET_ORIGIN}${MOUNT_PATH}`);
+  if (MOUNT_PATH !== '/valley-verified') {
+    body = body.replace(/(["'=])\/valley-verified(?=\/|["'?#\s>])/g, `$1${MOUNT_PATH}`);
+    body = body.replace(/url\(\s*\/valley-verified(?=\/|\))/g, `url(${MOUNT_PATH}`);
+  }
+  body = body.replace(/(["'=])\/(?!\/|>|valley-verified\/|skyenet\/valley-verified\/|live\/SkyeMail\/|workspaces\/|client-app-factory\/|northstar\/|api\/northstar|api\/owner\/|api\/valley-verified\/)/g, `$1${MOUNT_PATH}/`);
+  body = body.replace(/url\(\s*\/(?!\/|valley-verified\/|skyenet\/valley-verified\/|live\/SkyeMail\/|workspaces\/|client-app-factory\/|northstar\/|api\/northstar|api\/owner\/|api\/valley-verified\/)/g, `url(${MOUNT_PATH}/`);
   body = body.replaceAll(`${MOUNT_PATH}//`, `${MOUNT_PATH}/`);
   return body;
-}
-
-async function createProfileFallbacks() {
-  const profilePage = path.join(DEST, 'business-profile/index.html');
-  if (!(await exists(profilePage))) return { created: [], skippedExisting: [] };
-
-  const created = [];
-  const skippedExisting = [];
-  for (const slug of PROFILE_FALLBACK_SLUGS) {
-    const targetDir = path.join(DEST, 'business', slug);
-    const targetFile = path.join(targetDir, 'index.html');
-    if (await exists(targetFile)) {
-      skippedExisting.push(`${MOUNT_PATH}/business/${slug}/`);
-      continue;
-    }
-    await fs.mkdir(targetDir, { recursive: true });
-    await fs.copyFile(profilePage, targetFile);
-    created.push(`${MOUNT_PATH}/business/${slug}/`);
-  }
-  return { created, skippedExisting };
 }
 
 async function rewriteFileIfExists(rel, transform) {
@@ -200,6 +185,10 @@ async function restoreRouteAwareBrainAssets() {
     const target = path.join(DEST, rel);
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.copyFile(source, target);
+    if (TEXT_EXTENSIONS.has(path.extname(rel))) {
+      const before = await fs.readFile(target, 'utf8').catch(() => null);
+      if (before != null) await fs.writeFile(target, rewriteForMount(before, rel));
+    }
     copied.push(`${MOUNT_PATH}/${rel}`);
   }
   return copied;
@@ -232,7 +221,6 @@ async function main() {
   const staticPolicyFiles = await applyStaticMountPolicy();
   const operatorWorkspace = await applyOperatorWorkspaceMount();
   const routeAwareBrainAssets = await restoreRouteAwareBrainAssets();
-  const profileFallbacks = await createProfileFallbacks();
 
   const receipt = {
     mounted_at: new Date().toISOString(),
@@ -248,8 +236,7 @@ async function main() {
     arclight_post: `${MOUNT_PATH}/business/arclight-pictures-tucson/`,
     gate_offer: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane',
     rewritten_text_files: rewritten,
-    profile_fallbacks: profileFallbacks.created,
-    profile_fallbacks_skipped_existing: profileFallbacks.skippedExisting,
+    profile_fallbacks: 'disabled',
     static_mount_policy_files: staticPolicyFiles,
     operator_workspace_asset: operatorWorkspace.copiedAsset ? `${MOUNT_PATH}/assets/operator-workspace.js` : null,
     operator_workspace_routes: operatorWorkspace.pagesWired,

@@ -9,7 +9,7 @@ The older 148-template seed has been replaced by the uploaded v2.1 confidence-re
 - `template-library/jurisdictions.json` — 51 U.S. jurisdictions including D.C.
 - `audit/publish-gates.json` — public claim and release gates
 - `official-source-library/official-workflows.json` — 37 official-source prep workflows
-- `review-workflow/review-queue-high-risk.json` — 6,069 high-risk records queued
+- `review-workflow/review-queue-high-risk.json` - elevated-review records stay guarded before completed export
 - `template-library/state-overlays-v2/US-AZ.json` — Arizona official-source overlay scaffold
 
 Safe: seed into Neon/Postgres, browse internally/admin-side, publish low/medium draft automation with warnings, and use official-source workflows as prep packets and routing.

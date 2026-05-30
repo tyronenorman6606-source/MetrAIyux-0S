@@ -12,10 +12,6 @@ const siteRoot = path.resolve(musicRoot, "..");
 const require = createRequire(import.meta.url);
 
 process.env.MUSIC_NEXUS_DATA_DIR ||= path.join(os.tmpdir(), "skye-musicnexus-local-dev");
-process.env.SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP ||= "1";
-process.env.SKYGATE_LOCAL_OPERATOR_EMAIL ||= "operator@internal.invalid";
-process.env.SKYGATE_LOCAL_OPERATOR_PASSWORD ||= "local-proof-password";
-process.env.SKYGATE_LOCAL_OPERATOR_ROLE ||= "admin";
 
 const types = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -40,6 +36,8 @@ const functionNames = new Set([
   "music-analytics",
   "music-artists",
   "music-assets",
+  "music-brain",
+  "music-gamify",
   "music-drops",
   "music-exchange",
   "music-payments",
@@ -47,6 +45,7 @@ const functionNames = new Set([
   "music-releases",
   "music-social",
   "music-studio",
+  "music-store",
   "skygate-session",
 ]);
 
@@ -120,8 +119,8 @@ function serveBrowserReset(res) {
 <body>
   <main>
     <h1>Resetting MusicNexus</h1>
-    <p>Clearing stale service workers, local caches, and old preview shells for this local origin. You will be redirected to the Drop Deploy Room.</p>
-    <p><a href="${target}">Open Drop Deploy Room now</a></p>
+    <p>Clearing stale service workers, local caches, and old preview shells for this local origin. You will be redirected to the Drop Room.</p>
+    <p><a href="${target}">Open Drop Room now</a></p>
   </main>
   <script>
     (async () => {
@@ -194,7 +193,7 @@ async function serveStatic(res, pathname) {
     const extraHeaders = clean === "SkyeMusicNexus/public/drops.html"
       ? {
           "clear-site-data": '"cache"',
-          "x-skye-surface": "SkyeMusicNexus Drop Deploy Room",
+          "x-skye-surface": "SkyeMusicNexus Drop Room",
         }
       : {};
     send(res, 200, { "content-type": types.get(path.extname(filePath)) || "application/octet-stream", ...extraHeaders }, body);
@@ -246,6 +245,8 @@ function listen(port) {
     console.log(`DAW Room: ${baseUrl}/SkyeMusicNexus/public/daw.html`);
     console.log(`Discover: ${baseUrl}/SkyeMusicNexus/public/discover.html`);
     console.log(`Feed: ${baseUrl}/SkyeMusicNexus/public/feed.html`);
+    console.log(`Store: ${baseUrl}/SkyeMusicNexus/public/store.html`);
+    console.log(`Artist Brain: ${baseUrl}/SkyeMusicNexus/public/brain.html`);
     console.log(`Drops: ${baseUrl}/SkyeMusicNexus/public/drops.html`);
     console.log(`Upload Studio: ${baseUrl}/SkyeMusicNexus/public/upload.html`);
     console.log(`Music Player: ${baseUrl}/SkyeMusicNexus/public/player.html`);

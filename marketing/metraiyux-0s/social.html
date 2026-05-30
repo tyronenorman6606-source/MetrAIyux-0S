@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -167,7 +167,7 @@ I built an operating system.
 
 Not a dashboard with a login screen. Not a "platform" that's really just Airtable + Zapier with a custom domain and a $99/mo price tag.
 
-An actual OS. 17 Cloudflare Workers wired via real service bindings. 17 AI brain personas with deterministic keyword routing. Real Git smart-HTTP protocol running inside a CF Worker. K8s HA Postgres with PITR and WAL streaming. 58 live Stripe products — cs_live, not cs_test. 875+ deployed HTML surfaces indexed and functional. 8 active D1 databases at the edge.
+An actual OS. 17 Cloudflare Workers wired via real service bindings. 17 AI brain personas with deterministic keyword routing. Real Git smart-HTTP protocol running inside a CF Worker. K8s HA Postgres with PITR and WAL streaming. 62 live Stripe products — cs_live, not cs_test. 875+ deployed HTML surfaces indexed and functional. 9 live SQL database lanes at the edge.
 
 Here's what most people miss when they hear those numbers:
 
@@ -197,7 +197,7 @@ Here's how I think about the valuation:
 
 A team starting from zero today — senior engineers, product architects, someone who's shipped Stripe integrations before, someone who's built K8s clusters, someone who understands Cloudflare Workers at a deep level — that team costs $3M–$5M over 18–24 months to get to this point. And that assumes they ship cleanly, which teams rarely do at this scale.
 
-We're already here. 17 Workers live. 23 lanes deployed. 58 products taking real money. 875+ surfaces functional.
+We're already here. 17 Workers live. 23 lanes deployed. 62 products taking real money. 875+ surfaces functional.
 
 Our ask: $2.0M–$2.5M.
 
@@ -216,7 +216,7 @@ Not because I haven't looked hard. I've gone through GoHighLevel's feature set i
 
 None of them ship this:
 
-Auth + Email + Database + Git Vault + Encrypted Secret Custody + Proprietary AI (5 variants) + Payments (58 products) + Realtime WebSocket + Music Platform + Staffing System + Legal Infrastructure + Business Directory + Content Management + Marketing Tools + SDK
+Auth + Email + Database + Git Vault + Encrypted Secret Custody + Proprietary AI (5 variants) + Payments (62 products) + Realtime WebSocket + Music Platform + Staffing System + Legal Infrastructure + Business Directory + Content Management + Marketing Tools + SDK
 
 ...as a single sovereign deployable package that goes into YOUR Cloudflare account.
 
@@ -249,7 +249,7 @@ Let me make that concrete. We're running SkyeVault — a real Git smart-HTTP ser
 
 Same for CitadelDB. K8s HA Postgres cluster, custom operator, PITR, WAL streaming — running on infrastructure that you control. DR drills completed on your deployment, not ours.
 
-Same for SkyePay. 58 Stripe products wired to your Stripe account. When a payment comes in, it hits your account, not ours.
+Same for SkyePay. 62 Stripe products wired to your Stripe account. When a payment comes in, it hits your account, not ours.
 
 This is what GoHighLevel can't do. They need your data on their servers to run their product. Their margins depend on you being locked in. MetrAIyux 0S hands you the deed on day one.
 
@@ -300,9 +300,9 @@ What's live anyway:
 → 17 Cloudflare Workers with real service bindings
 → 18 CF Pages projects deployed
 → 23 gated platform lanes
-→ 58 Stripe products (cs_live — not test mode)
+→ 62 Stripe products (cs_live — not test mode)
 → 875+ indexed HTML surfaces
-→ 8 active D1 databases
+→ 9 live SQL database lanes
 → 78 surfaces with verified CF-Ray proof on record
 → npm SDK published (@metraiyux/0s-sdk)
 → SkyeVault — real Git protocol (clone, push, fetch, snapshot, policy) — all checks passed
@@ -352,11 +352,11 @@ All 8 passed.
 The reason I built this instead of using GitHub: sovereignty. With SkyeVault, your repos live in D1 in your CF account. Nobody else's servers. Nobody else's terms of service. Your code. Your infrastructure. Your Git remote.
 
 graylondonskyes@gmail.com` },
-    { title: `58 Products. cs_live.`, tags: `#SkyePay #Stripe #PaymentOS #MetrAIyux #TechFounder #SovereignTech #Fintech`, body: `58 Stripe products. All live.
+    { title: `62 Products. cs_live.`, tags: `#SkyePay #Stripe #PaymentOS #MetrAIyux #TechFounder #SovereignTech #Fintech`, body: `62 Stripe products. All live.
 
 Not test mode. cs_live — meaning these are real Stripe session IDs that could take real money from real customers the moment the doors open.
 
-Let me break down what 58 products across a sovereign OS actually looks like:
+Let me break down what 62 products across a sovereign OS actually looks like:
 
 SkyeMusicNexus tier: Music drops, artist exchange listings, rights vault access, featured placement in the Drops Room, royalty split registrations. Different pricing for different catalog tiers.
 
@@ -560,7 +560,7 @@ What you get with a white-label license:
 → Full 28-lane OS deployment
 → 17 Workers and 17 AI brains
 → kAIxu 6.7 rebranded as YOUR AI
-→ 58 Stripe products already wired
+→ 62 Stripe products already wired
 → 28-lesson deployment tutorial — walks through every step
 → SDK contract for extensions
 → Client portal and admin OS
@@ -607,7 +607,7 @@ The DR drill: We simulate primary failure. We verify standby promotion. We verif
 
 Why does this matter vs. managed cloud: Enterprise operators who are serious about sovereignty can't give a managed cloud database provider admin access to their production data. Neon, Supabase, PlanetScale — these are excellent services, but they require you to accept their terms of service on data access. CitadelDB eliminates that dependency.
 
-The 8 D1 databases at the edge handle high-frequency transactional operations. CitadelDB handles the bulk data, analytics, and anything needing full ACID compliance.
+The 9 live SQL database lanes at the edge handle high-frequency transactional operations. CitadelDB handles the bulk data, analytics, and anything needing full ACID compliance.
 
 graylondonskyes@gmail.com` },
     { title: `What Pre-Revenue Really Means`, tags: `#BuiltInPublic #MetrAIyux #TechFounder #PreRevenue #SovereignTech #Infrastructure`, body: `Pre-revenue gets treated like a red flag in fundraising conversations.
@@ -665,7 +665,7 @@ graylondonskyes@gmail.com` }
 17 Cloudflare Workers.
 28 platform lanes.
 17 AI brains.
-58 live Stripe products.
+62 live Stripe products.
 875+ deployed surfaces.
 
 One founder. One year. Zero funding.
@@ -853,7 +853,7 @@ Not a sales deck. A real architectural map of a real deployed platform.` }
 
 17 Workers.
 23 lanes.
-58 live Stripe products.
+62 live Stripe products.
 875+ deployed surfaces.
 
 One OS. Zero competitors.
@@ -936,7 +936,7 @@ A full Git smart-HTTP protocol running at edge.
 Your repos.
 Your rules.
 Your infrastructure.` },
-    { title: `58 Products Live`, tags: `#SkyePay #Stripe #PaymentOS #MetrAIyux #TechFounder #SovereignTech #Fintech`, body: `58 Stripe products.
+    { title: `62 Products Live`, tags: `#SkyePay #Stripe #PaymentOS #MetrAIyux #TechFounder #SovereignTech #Fintech`, body: `62 Stripe products.
 
 cs_live.
 
@@ -999,7 +999,7 @@ Real Git protocol.
 Proprietary AI.
 Native DAW.
 Staffing OS.
-58 live Stripe products.
+62 live Stripe products.
 Legal platform with SDK.
 Central intelligence routing 17 brains.
 
@@ -1078,7 +1078,7 @@ SkyeWay shows you everything.` },
 
 17 Workers live.
 23 lanes deployed.
-58 Stripe products active.
+62 Stripe products active.
 875+ surfaces indexed.
 0 direct competitors.
 
@@ -1184,7 +1184,7 @@ Everything deploys into YOUR Cloudflare account. Not our servers. Your KV, your 
 - kAIxu 6.7 — 5-variant proprietary AI model family
 - 0meg4kAI — two-layer security scanner (edge + browser)
 - Relay13 + ConnectLog — Durable Objects realtime
-- SkyePay — 58 live Stripe products
+- SkyePay — 62 live Stripe products
 - SkyeRouteX — dispatch and logistics OS
 - Auren — central AI routing layer (17 brains, 725 knowledge chunks)
 - SkyeMusicNexus — native DAW + drops + exchange + rights vault
@@ -1242,9 +1242,9 @@ It means no customers yet. It doesn't mean nothing works. Here's the actual stat
 
 17 Cloudflare Workers deployed and live
 23 gated platform lanes
-58 Stripe products — cs_live session IDs confirmed
+62 Stripe products — cs_live session IDs confirmed
 875+ indexed HTML surfaces
-8 active D1 databases
+9 live SQL database lanes
 Real Git smart-HTTP server running in a CF Worker
 K8s HA Postgres (our own, not managed)
 Full staffing platform (89 pages, 10,270+ lines)
@@ -1291,7 +1291,7 @@ After deployment, we have no relationship with your client's data. None.
 Those aren't projections. Those are what the pricing table says. What you make depends on how many clients you close.
 
 **What's included:**
-Full 28-lane OS. 17 Workers. 17 AI brains. 58 Stripe products already wired. 28-lesson deployment tutorial. Under 30 minutes to deploy via wrangler.
+Full 28-lane OS. 17 Workers. 17 AI brains. 62 Stripe products already wired. 28-lesson deployment tutorial. Under 30 minutes to deploy via wrangler.
 
 **The infrastructure work:**
 Already done. You don't build anything. You deploy and sell.
@@ -1316,7 +1316,7 @@ Lane by lane:
 6. kAIxu 6.7 — 5-variant proprietary AI family
 7. 0meg4kAI — two-layer security scanner
 8. Relay13 + ConnectLog — Durable Objects realtime
-9. SkyePay — 58 live Stripe products
+9. SkyePay — 62 live Stripe products
 10. SkyeRouteX — dispatch and logistics OS
 11. Auren — central AI routing (17 brains, 725 chunks)
 12. SkyeMusicNexus — DAW + drops + exchange + rights
@@ -1529,7 +1529,7 @@ We run a full DR drill on a schedule: simulate primary failure, verify standby p
 All drills have passed. Drill results are logged.
 
 **Integration with the edge layer:**
-The 8 D1 databases at the CF edge handle high-frequency transactional data (auth tokens, realtime events, receipt logs). CitadelDB handles bulk data, analytics, and anything requiring ACID compliance with complex joins.
+The 9 live SQL database lanes at the CF edge handle high-frequency transactional data (auth tokens, realtime events, receipt logs). CitadelDB handles bulk data, analytics, and anything requiring ACID compliance with complex joins.
 
 Happy to discuss the operator architecture or the DR testing methodology.` }
   ]
@@ -1562,7 +1562,7 @@ That's where we are.
 graylondonskyes@gmail.com` }
     { title: `What Building MetrAIyux 0S Proves About Me`, tags: `#GraySkyes #MetrAIyux #TechFounder #Capabilities #BuiltInPublic #SovereignTech`, body: `I want to be direct about what the MetrAIyux 0S build proves — not as a pitch, but as a professional statement.
 
-Building 28 platform lanes, 17 Cloudflare Workers, a Git server in a CF Worker, K8s HA Postgres, 58 live Stripe products, 17 AI brains, a native browser DAW, a staffing platform, and a legal infrastructure system — alone, in a year, with no funding — proves specific things:
+Building 28 platform lanes, 17 Cloudflare Workers, a Git server in a CF Worker, K8s HA Postgres, 62 live Stripe products, 17 AI brains, a native browser DAW, a staffing platform, and a legal infrastructure system — alone, in a year, with no funding — proves specific things:
 
 System thinking at depth: I can hold 23 interconnected systems in my head simultaneously. I understand how auth connects to payments connects to AI routing connects to legal connects to realtime. I designed all of those interfaces. When one breaks, I trace it through the dependency chain.
 
@@ -1570,7 +1570,7 @@ Decision-making under uncertainty: I made hundreds of architectural decisions wi
 
 Execution without permission: No PM to approve the roadmap. No engineering manager to prioritize tickets. No "let's schedule a review." I decided what to build, I built it, I shipped it, I proved it with receipts. Pre-revenue doesn't mean I waited for approval to build.
 
-Full-stack depth without gaps: I wrote the auth platform (20,284 lines). I wrote the email platform (43,395 lines). I implemented Git smart-HTTP. I configured K8s operators. I wired 58 Stripe products. I built a native browser DAW. The full stack — not "I do frontend and I know a bit of backend."
+Full-stack depth without gaps: I wrote the auth platform (20,284 lines). I wrote the email platform (43,395 lines). I implemented Git smart-HTTP. I configured K8s operators. I wired 62 Stripe products. I built a native browser DAW. The full stack — not "I do frontend and I know a bit of backend."
 
 For any company that needs infrastructure built at this level: I know what I'm doing.
 
@@ -1604,7 +1604,7 @@ Cloudflare edge architecture: I live in CF Workers, D1, KV, R2, Durable Objects,
 
 AI that's actually yours: I don't bolt GPT-4 onto a dashboard and call it AI infrastructure. I design deterministic routing layers, sovereign model families, and on-device corpora. Your AI runs in your infrastructure, costs you nothing on routing decisions, and has a full audit trail.
 
-Payment systems: 58 live Stripe products across a dozen revenue types — subscriptions, one-time, owner-approval flows, royalty splits, API metered tiers. I've wired the full spectrum. If you have multiple revenue streams and a payment system that can't handle them cleanly, I can fix that.
+Payment systems: 62 live Stripe products across a dozen revenue types — subscriptions, one-time, owner-approval flows, royalty splits, API metered tiers. I've wired the full spectrum. If you have multiple revenue streams and a payment system that can't handle them cleanly, I can fix that.
 
 Vertical platforms: I built a full staffing system (89 pages, 10K+ lines), a full music platform (native DAW, rights vault, split engine), and a Phoenix business directory (875+ live listings). I can build the end-to-end vertical platform for your industry.
 
@@ -1625,7 +1625,7 @@ Here's what "receipts over pitches" looks like in practice for MetrAIyux 0S:
 
 Git server in a CF Worker? I don't describe it. I hand you a Git remote URL, you run \`git clone\`, it works, you have the pack. That's the receipt.
 
-58 live Stripe products? I don't say "we have a payment integration." I show you the cs_live session IDs in the Stripe dashboard. Real payments. Real accounts. Real money waiting.
+62 live Stripe products? I don't say "we have a payment integration." I show you the cs_live session IDs in the Stripe dashboard. Real payments. Real accounts. Real money waiting.
 
 K8s HA Postgres with DR? I don't describe the architecture. I show you the DR drill results — primary failure simulated, standby promoted, application reconnected, data integrity verified, table checksums match. Logged.
 
@@ -1644,7 +1644,7 @@ graylondonskyes@gmail.com` }
 
 Over the last year, I built MetrAIyux 0S — a sovereign business operating system — alone, with no funding, no team, and no external validation.
 
-17 Cloudflare Workers. 28 platform lanes. 17 AI brain personas. 58 live Stripe products. 875+ deployed HTML surfaces. A Git server running inside a CF Worker. K8s HA Postgres with DR drills. A native browser DAW. A staffing platform. A legal infrastructure system. An npm SDK.
+17 Cloudflare Workers. 28 platform lanes. 17 AI brain personas. 62 live Stripe products. 875+ deployed HTML surfaces. A Git server running inside a CF Worker. K8s HA Postgres with DR drills. A native browser DAW. A staffing platform. A legal infrastructure system. An npm SDK.
 
 One person. One year. Zero dollars in funding.
 
@@ -1755,7 +1755,7 @@ graylondonskyes@gmail.com` }
 I deploy, then I show the CF-Ray.
 
 Git server? Clone it.
-58 Stripe products? See the cs_live IDs.
+62 Stripe products? See the cs_live IDs.
 DR drill? Read the logs.
 Realtime? 18 proof checks, all green.
 
@@ -1848,7 +1848,7 @@ Full Git smart-HTTP protocol running inside a CF Worker. D1 as pack store. FS27 
 Durable Objects WebSocket rooms — one DO instance per workspace. AI policy enforcement on every outbound message. Cost ledger per session. DO hibernation API required specific handling to preserve WebSocket state across sleep/wake cycles. 18 proof checks — all passing.
 
 **Payments (SkyePay):**
-58 Stripe products, cs_live. Music drops, staffing fees, vault access, legal templates, white-label seats, API tiers, subscriptions, owner-approval flows, royalty splits. Every revenue type covered.
+62 Stripe products, cs_live. Music drops, staffing fees, vault access, legal templates, white-label seats, API tiers, subscriptions, owner-approval flows, royalty splits. Every revenue type covered.
 
 **Staffing (SOL Staffing — 89 pages, 10,270+ lines):**
 Full workforce management platform. Intake → Screening → Placement → Payment. Employer and job seeker portals. SkyePay integration for placement fees. Relay13 for realtime placement notifications.
@@ -2028,5 +2028,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btn && l) { btn.addEventListener('click', () => { const o = l.classList.toggle('is-open'); btn.setAttribute('aria-expanded', o); }); }
 </script>
 <script src="site-search.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>

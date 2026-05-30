@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script defer src="assets/app.js"></script>
   <script defer src="assets/mail-ui.js"></script>
+  <script defer src="assets/os-bridge.js"></script>
   <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Compose — SkyeMail Vault</title>
+  <title>Compose — SkyeMail Citadel</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Compose" data-page-hint="Send, draft, alias, and attachment lane">
 <div class="wrap">
@@ -19,7 +20,7 @@
         <section class="card">
           <div class="badge" id="mailboxBadge">Checking mailbox connection…</div>
           <h1 class="h1">Compose</h1>
-          <p class="sub">Send live Gmail mail, save a real draft, choose a verified alias, and attach files while staying inside the Skye <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span>.</p>
+          <p class="sub">Send live SkyeMail, save a real draft, choose a verified alias, and attach files while staying inside the Skye <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span>.</p>
           <div class="fieldgrid">
             <div><label for="from_alias">From alias</label><select id="from_alias"></select></div>
             <div><label for="subject">Subject</label><input id="subject" type="text" placeholder="Subject line" /></div>
@@ -45,13 +46,19 @@
           <input id="draft_id" type="hidden" />
           <input id="thread_id" type="hidden" />
           <input id="reply_message_id" type="hidden" />
-          <div class="btnrow"><button class="btn gold" id="sendBtn" type="button">Send Email</button><button class="btn" id="saveDraftBtn" type="button">Save Draft</button><button class="btn ok" id="signatureBtn" type="button">Insert Signature</button></div>
+          <div class="btnrow"><button class="btn gold" id="sendBtn" type="button">Send Email</button><button class="btn" id="saveDraftBtn" type="button">Save Draft</button><button class="btn ok" id="signatureBtn" type="button">Insert Signature</button><button class="btn" id="docxComposeBtn" type="button">Open SkyeDocxMax</button><a class="btn" id="workbenchComposeBtn" href="workspace.html">0S Workbench</a></div>
           <div class="mini" id="statusText" style="margin-top:12px">Waiting for compose state…</div>
         </section>
         <aside class="card">
           <div class="kicker">Quick Contacts</div>
           <div class="notice">Tap a saved or synced contact to add them to the recipient line.</div>
           <div class="btnrow" id="contactsQuick"></div>
+          <div class="hr"></div>
+          <div class="kicker">0S Compose</div>
+          <div class="btnrow">
+            <button class="btn small gold" id="docxComposeSideBtn" type="button">SkyeDocxMax</button>
+            <button class="btn small" id="packetComposeBtn" type="button">Archive Packet</button>
+          </div>
         </aside>
       </section>
 

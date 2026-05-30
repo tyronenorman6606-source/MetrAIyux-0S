@@ -1,10 +1,12 @@
 # Live Browser Verifier Agent
 
-Mission: prove production web work in a real headed browser before anyone calls it done.
+Status: disabled by owner/admin for Codex-run work.
 
-This agent exists because screenshots, fetch checks, static scans, and headless-only Playwright runs are not enough for production-facing app or site changes in this repo.
+Mission when explicitly re-enabled: prove production web work in a real headed browser before anyone calls it done.
 
-Hard rules:
+The current repo operating rule is owner-manual browser verification. Codex must not run this agent, open headed browsers, or use Playwright live verification unless the owner explicitly re-enables browser proof in the current task.
+
+Historical hard rules, only active when the owner explicitly re-enables browser proof:
 
 1. Use a headed browser session against the deployed production URL after deploy.
 2. Do not count local server checks as production proof.
@@ -27,11 +29,13 @@ Policy file:
 .agents/live-browser-verifier/browser-proof-policy.toml
 ```
 
-Default command:
+Disabled command shim:
 
 ```bash
 npm run proof:live-browser -- --url https://example.com/ --expect "Visible page text"
 ```
+
+That command now runs `tools/browser-proof-disabled.mjs` and returns a no-browser receipt.
 
 Multiple URLs:
 
@@ -42,7 +46,8 @@ npm run proof:live-browser -- \
   --expect "Expected text"
 ```
 
-Required final language:
+Current final language:
 
-- If passed: state the headed live browser gate passed and name the receipt path.
-- If not passed: say `No, this has not passed live headed browser verification.`
+- State that browser verification is owner-handled.
+- Name deploy, static, API, and HTTP stress receipts.
+- Provide direct links for owner live-checking.

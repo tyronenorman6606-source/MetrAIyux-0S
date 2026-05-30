@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KEO Marketing Inc | B2B Marketing Agency in Phoenix, AZ</title>
+  <meta name="description" content="KEO Marketing Inc contact details for B2B marketing services in Phoenix, Arizona.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d1c22;
+      --muted: #64636b;
+      --paper: #f8fbff;
+      --panel: #ffffff;
+      --accent: #b43b4a;
+      --accent-two: #27a8b2;
+      --soft: #f0e7e8;
+      --line: #dedde5;
+    }
+
+    * { box-sizing: border-box; letter-spacing: 0; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      background:
+        linear-gradient(140deg, var(--soft) 0 28%, transparent 28% 100%),
+        var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+    }
+
+    .mark {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+    }
+
+    .top-link,
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .top-link {
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 28px;
+      align-items: center;
+      min-height: 70vh;
+      padding: 34px 0 44px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: .95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: 4.8rem;
+      line-height: .96;
+      overflow-wrap: break-word;
+    }
+
+    .lead {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: #313038;
+      font-size: 1.2rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      padding: 0 18px;
+      border: 2px solid var(--ink);
+      background: var(--panel);
+    }
+
+    .button.primary {
+      background: var(--accent-two);
+      color: white;
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    .signal {
+      min-height: 380px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(150deg, var(--accent) 0 48%, transparent 48%),
+        linear-gradient(25deg, var(--accent-two) 0 54%, var(--panel) 54%);
+      box-shadow: 0 20px 60px rgba(29, 28, 34, .12);
+      display: grid;
+      align-content: end;
+      gap: 14px;
+    }
+
+    .signal span,
+    .signal strong {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      padding: 8px 10px;
+    }
+
+    .signal strong {
+      font-size: 2rem;
+      line-height: 1.05;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 0 0 46px;
+    }
+
+    article,
+    .note {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 12px 30px rgba(29, 28, 34, .08);
+    }
+
+    article {
+      min-height: 150px;
+      padding: 18px;
+    }
+
+    article strong,
+    .note strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: .82rem;
+      text-transform: uppercase;
+    }
+
+    article p,
+    .note p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-bottom: 42px;
+      padding: 20px;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 860px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .hero,
+      .facts { grid-template-columns: 1fr; }
+      h1 { font-size: 3rem; }
+      .signal { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <span class="mark">KEO</span>
+        <span>B2B Marketing Agency</span>
+      </div>
+      <a class="top-link" href="tel:+14804132090">(480) 413-2090</a>
+    </header>
+
+    <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Phoenix, AZ 85004 / Creative Services</p>
+          <h1 id="page-title">KEO Marketing Inc</h1>
+          <p class="lead">B2B marketing agency at 141 E Palm Ln, Suite 108 in Phoenix, with website and phone contact available for quote requests.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14804132090">Call (480) 413-2090</a>
+            <a class="button" href="https://keomarketing.com" target="_blank" rel="noreferrer">Website</a>
+          </div>
+        </div>
+        <aside class="signal" aria-label="Business summary">
+          <span>Business type</span>
+          <strong>B2B Marketing Agency</strong>
+          <span>Phoenix / English / Quote-based service</span>
+        </aside>
+      </section>
+
+      <section class="facts" id="facts" aria-label="Business facts">
+        <article>
+          <strong>Address</strong>
+          <p>141 E Palm Ln, Ste 108, Phoenix, AZ 85004</p>
+        </article>
+        <article>
+          <strong>Phone</strong>
+          <p>(480) 413-2090</p>
+        </article>
+        <article>
+          <strong>Category</strong>
+          <p>Creative Services / B2B Marketing Agency</p>
+        </article>
+        <article>
+          <strong>Website</strong>
+          <p>keomarketing.com</p>
+        </article>
+      </section>
+
+      <section class="note" aria-label="Service tags">
+        <strong>Service Tags</strong>
+        <p>B2B marketing agency, advertising and media, creative / media services.</p>
+      </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>KEO Marketing Inc is Valley Verified because it gives Phoenix companies a specific B2B marketing agency profile at 141 E. Palm Ln., Suite 108, supported by its official site and Chamber category evidence.</p>
+        <ul>
+          <li>The category is B2B marketing agency within advertising and media.</li>
+          <li>The official site positions KEO as a nationwide B2B marketing agency, while the local profile provides phone (480) 413-2090.</li>
+          <li>It belongs in Valley Verified for local businesses and professional teams comparing creative, media, and growth-marketing partners.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>

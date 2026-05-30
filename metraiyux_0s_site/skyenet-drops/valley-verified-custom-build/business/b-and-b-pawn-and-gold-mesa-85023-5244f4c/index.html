@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B and B Pawn and Gold | Valley Verified</title>
+  <meta name="description" content="Valley Verified profile for B and B Pawn and Gold, a pawn and gold buyer profile in Mesa, Arizona.">
+  <style>
+    :root {
+      --ink: #1d1a15;
+      --black: #161410;
+      --gold: #d5a338;
+      --red: #8e2f2c;
+      --paper: #fbf6e9;
+      --line: rgba(29, 26, 21, .18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(213, 163, 56, .13) 0 10px, transparent 10px 34px),
+        linear-gradient(#fffaf0, #efe4cb);
+    }
+
+    a { color: inherit; }
+
+    .shop {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .awning {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      min-height: 22px;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      overflow: hidden;
+    }
+
+    .awning span:nth-child(odd) { background: var(--black); }
+    .awning span:nth-child(even) { background: var(--gold); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      min-height: 560px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+    }
+
+    .main {
+      padding: 42px;
+      display: grid;
+      align-content: space-between;
+      gap: 34px;
+      border-right: 1px solid var(--line);
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--red);
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      margin: 22px 0 16px;
+      max-width: 760px;
+      color: var(--black);
+      font-size: clamp(44px, 7.5vw, 88px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 690px;
+      margin: 0;
+      color: #4f4535;
+      font-size: 19px;
+      line-height: 1.58;
+    }
+
+    .contacts {
+      display: grid;
+      grid-template-columns: minmax(220px, .7fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .contact {
+      min-height: 126px;
+      padding: 20px;
+      display: grid;
+      align-content: center;
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-style: normal;
+    }
+
+    .contact.primary {
+      background: var(--black);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--red);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .contact.primary b { color: var(--gold); }
+
+    .contact span {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .side {
+      display: grid;
+      grid-template-rows: 245px 1fr;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      background: #fffdf8;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mark img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }
+
+    .ledger {
+      padding: 24px;
+      background: var(--gold);
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    .ledger p {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .facts {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .fact {
+      min-height: 126px;
+      padding: 18px;
+      background: rgba(255,253,248,.88);
+      border: 1px solid var(--line);
+    }
+
+    .fact span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 880px) {
+      .hero, .contacts { grid-template-columns: 1fr; }
+      .main { border-right: 0; border-bottom: 1px solid var(--line); }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {
+      .shop { width: min(100% - 20px, 1100px); }
+      .main { padding: 28px; }
+      .facts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shop">
+    <div class="awning" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+    <section class="hero" aria-label="B and B Pawn and Gold profile">
+      <div class="main">
+        <div>
+          <span class="tag">Pawn / Gold Buyer</span>
+          <h1>B and B Pawn and Gold</h1>
+          <p class="summary">Mesa pawn and gold buying services with a Main Street address and direct phone route. Use the listed phone for item questions, service details, and pricing conversations.</p>
+        </div>
+
+        <div class="contacts" aria-label="B and B Pawn and Gold contact information">
+          <a class="contact primary" href="tel:+14806101240"><b>Phone</b><span>(480) 610-1240</span></a>
+          <address class="contact"><b>Address</b><span>1107 E. Main St.<br>Mesa, AZ 85023</span></address>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="B and B Pawn and Gold mark">
+        </div>
+        <div class="ledger">
+          <b>Valley Verified Network</b>
+          <p>Shopping/Retail / Pawn / Gold</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="B and B Pawn and Gold facts">
+      <div class="fact"><b>Category</b><span>Retail And Specialty</span></div>
+      <div class="fact"><b>Niche</b><span>Pawn / Gold Buyer</span></div>
+      <div class="fact"><b>Pricing</b><span>Quote-based service</span></div>
+      <div class="fact"><b>Profile date</b><span>May 19, 2026</span></div>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>B and B Pawn and Gold belongs in Valley Verified because it gives Mesa shoppers a specific pawn and gold-buyer profile at 1107 E. Main St. with a direct phone line.</p>
+        <ul>
+          <li>Services center on pawn, gold buying, and specialty retail.</li>
+          <li>The local profile includes phone (480) 610-1240 and a Main Street Mesa address, which are the practical facts customers need first.</li>
+          <li>Greater Phoenix Chamber shopping and specialty retail category evidence supports its local retail placement.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

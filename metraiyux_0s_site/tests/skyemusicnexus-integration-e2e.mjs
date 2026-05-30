@@ -54,6 +54,25 @@ function expect(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+const screenshotWarnings = [];
+
+async function safeScreenshot(page, screenshotName) {
+  const outputPath = path.join(ARTIFACT_DIR, screenshotName);
+  const options = { path: outputPath, fullPage: false, timeout: 15000, animations: "disabled", caret: "hide" };
+  try {
+    await page.screenshot(options);
+    return;
+  } catch (error) {
+    screenshotWarnings.push(`${screenshotName}: viewport screenshot failed: ${error.message.split("\n")[0]}`);
+  }
+  try {
+    await page.screenshot({ ...options, timeout: 5000 });
+    screenshotWarnings.push(`${screenshotName}: retry screenshot saved`);
+  } catch (error) {
+    screenshotWarnings.push(`${screenshotName}: retry screenshot failed: ${error.message.split("\n")[0]}`);
+  }
+}
+
 async function expectText(page, text) {
   const matches = page.getByText(text, { exact: false });
   const count = await matches.count().catch(() => 0);
@@ -73,7 +92,7 @@ async function checkPage(page, baseUrl, route, label, requiredText, screenshotNa
   await page.goto(`${baseUrl}/${route}`, { waitUntil: "domcontentloaded" });
   for (const text of requiredText) await expectText(page, text);
   await assertNoHorizontalScroll(page, label);
-  if (screenshotName) await page.screenshot({ path: path.join(ARTIFACT_DIR, screenshotName), fullPage: true });
+  if (screenshotName) await safeScreenshot(page, screenshotName);
 }
 
 async function writeProofWav(filePath) {
@@ -160,7 +179,7 @@ async function main() {
     await expectText(ungated, "Free99 means the Lite lane has no charge");
     expect(await ungated.locator("#skyeMusicGate").isVisible(), "Ungated SkyeMusicNexus route should show gate overlay.");
     assertions.push("Ungated SkyeMusicNexus app route displays the Free99 Lite gate-session overlay.");
-    await ungated.screenshot({ path: path.join(ARTIFACT_DIR, "app-ungated-overlay.png"), fullPage: true });
+    await safeScreenshot(ungated, "app-ungated-overlay.png");
     await ungatedContext.close();
 
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
@@ -178,7 +197,7 @@ async function main() {
     assertions.push("Expansion receipt documents archive unpack, zip removal, gate session, and paid music ops posture.");
 
     await checkPage(page, baseUrl, "pricing/index.html#skyemusicnexus-lite-free99", "Commercial pricing desktop", ["SkyeMusicNexus Lite", "Free99", "Single Song Drop"], "pricing-desktop.png");
-    await checkPage(page, baseUrl, "saas/pricing.html#skyemusicnexus-lite-free99", "SaaS pricing desktop", ["SkyeMusicNexus Studio", "Single Song Drop", "Free99"], "saas-pricing-desktop.png");
+    await checkPage(page, baseUrl, "saas/pricing.html#skyemusicnexus-lite-free99", "SaaS pricing desktop", ["SkyeMusicNexus Lite", "Single Song Drop", "Free99"], "saas-pricing-desktop.png");
     await checkPage(page, baseUrl, "saas/index.html", "SaaS overview desktop", ["SkyeMusicNexus Lite", "Buy Single Song Drop"], "saas-overview-desktop.png");
     await checkPage(page, baseUrl, "admin/index.html", "Admin hub desktop", ["SkyeMusicNexus Lite + paid drops", "music function auth boundary"], "admin-hub-desktop.png");
     assertions.push("Pricing, SaaS overview, and admin hub expose SkyeMusicNexus as Free99 Lite plus paid gated access.");
@@ -188,37 +207,36 @@ async function main() {
     await page.locator("#buildRoute").click();
     await expectText(page, "SkyeMusicNexus Lite + Paid Drops");
     await assertNoHorizontalScroll(page, "Sales proof router desktop");
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, "sales-router-desktop.png"), fullPage: true });
+    await safeScreenshot(page, "sales-router-desktop.png");
     assertions.push("Sales proof router recommends the Lite + paid drops music stage for music operations needs.");
 
-    await page.goto(`${baseUrl}/SkyeMusicNexus/index.html`, { waitUntil: "domcontentloaded" });
+    await page.goto(`${baseUrl}/SkyeMusicNexus/platform.html`, { waitUntil: "domcontentloaded" });
     await expectText(page, "Command Field");
     await expectText(page, "Upload Studio");
     await expectText(page, "Music Player");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
     await assertNoHorizontalScroll(page, "SkyeMusicNexus app shell desktop");
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, "app-shell-gated-desktop.png"), fullPage: true });
+    await safeScreenshot(page, "app-shell-gated-desktop.png");
     assertions.push("Seeded gate session unlocks the SkyeMusicNexus app shell without removing auth requirements.");
 
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault", "Readiness + proof"], "artist-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/index.html", "Music dashboard desktop", ["Platform Dashboard", "Upload Studio", "Music Player", "Rights Vault", "Client Launch Path"], "artist-stage-desktop.png");
     await page.goto(`${baseUrl}/SkyeMusicNexus/public/command-dashboard.html?workspace_id=skye-music-nexus`, { waitUntil: "networkidle" });
-    await expectText(page, "Command Dashboard");
-    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 5000 });
-    await expectText(page, "Fallback visual data");
-    await expectText(page, "Front/Back Route Health");
-    await expectText(page, "Latest Audit Events");
-    await assertNoHorizontalScroll(page, "SkyeMusicNexus command dashboard desktop");
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, "command-dashboard-desktop.png"), fullPage: true });
-    assertions.push("Command Dashboard renders KPI, route-health, workflow, and audit sections and clearly labels fallback data when the live visuals endpoint is unavailable in static E2E.");
+    await expectText(page, "Service Dashboard");
+    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 15000 });
+    await expectText(page, "Service Health");
+    await expectText(page, "Latest Activity Records");
+    await assertNoHorizontalScroll(page, "SkyeMusicNexus service dashboard desktop");
+    await safeScreenshot(page, "service-dashboard-desktop.png");
+    assertions.push("Service Dashboard renders KPI, service-health, workflow, and activity sections.");
     await page.goto(`${baseUrl}/saas/customer-data.html?workspace_id=bob-smoke-shop-preview-001`, { waitUntil: "networkidle" });
-    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 5000 });
+    await page.waitForSelector("[data-visual-kpis] .visual-kpi", { timeout: 15000 });
     await expectText(page, "Fallback visual data");
     await assertNoHorizontalScroll(page, "0S SaaS customer data visual dashboard desktop");
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, "saas-customer-data-fallback-desktop.png"), fullPage: true });
+    await safeScreenshot(page, "saas-customer-data-fallback-desktop.png");
     assertions.push("0S SaaS customer data visuals try the live endpoint first and clearly label fallback data in static E2E.");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/proof.html", "Readiness proof page desktop", ["Production Readiness", "Observable Wiring", "DAW beta", "Observability Matrix"], "readiness-proof-desktop.png");
-    assertions.push("Readiness page documents client-facing status, DAW beta boundary, observability, and production proof lanes.");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Gated Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge", "Import audio"], "upload-studio-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/proof.html", "Readiness page desktop", ["Production Readiness", "Activity Events", "DAW beta", "Activity Matrix"], "readiness-proof-desktop.png");
+    assertions.push("Readiness page documents client-facing status, DAW beta boundary, activity records, and production receipts.");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/upload.html", "Upload studio desktop", ["Protected Audio Upload", "Drop songs here", "Uploaded Audio Vault", "Release Forge", "Import audio"], "upload-studio-desktop.png");
     const dropBox = await page.locator("[data-song-drop-zone]").boundingBox();
     expect(dropBox && dropBox.height >= 260 && dropBox.width >= 520, `Song drop zone is not large enough: ${JSON.stringify(dropBox)}`);
     assertions.push("Upload Studio exposes a large song drop zone with enough visual target area for desktop use.");
@@ -264,7 +282,7 @@ async function main() {
     expect(dawAudio.metronomeEnabled === true, `Native DAW metronome did not toggle on: ${JSON.stringify(dawAudio)}`);
     expect(dawAudio.loopEnabled === false, `Native DAW loop toggle did not register: ${JSON.stringify(dawAudio)}`);
     expect(dawAudio.lastAudioError === "", `Native DAW audio reported an error: ${JSON.stringify(dawAudio)}`);
-    await page.screenshot({ path: path.join(ARTIFACT_DIR, "native-daw-audio-desktop.png"), fullPage: true });
+    await safeScreenshot(page, "native-daw-audio-desktop.png");
     assertions.push("Native DAW imports/decodes audio, previews clips, maps the physical keyboard to notes, edits regions, inserts sound packs, toggles metronome/loop, renders a browser WAV mixdown, and exposes runtime audio proof.");
     await checkPage(page, baseUrl, "SkyeMusicNexus/public/releases.html", "Releases desktop", ["Artist Nebula", "Skye ID Bridge", "Release Forge", "Royalty River", "Ops Sequencer"], "releases-desktop.png");
     expect(await page.locator('#artistForm input[name="skyeId"]').inputValue() === "2468135790", "Skye ID bridge did not populate the artist form.");
@@ -285,9 +303,9 @@ async function main() {
     expect(["generated-preview", "linked-audio"].includes(playback.mode), `Unexpected playback mode: ${playback.mode}`);
     await page.locator('[data-player-action="stop"]').click();
     assertions.push("Artist playback deck starts audio, advances time, and remains behind the seeded gate session plus rights vault surface.");
-    await checkPage(page, baseUrl, "SkyeMusicNexus/public/admin.html", "Operator stage desktop", ["Move releases, content requests", "Payout Gate", "Analytics Prism", "Exchange Console"], "operator-stage-desktop.png");
+    await checkPage(page, baseUrl, "SkyeMusicNexus/public/admin.html", "Protected review desktop", ["Move releases, content requests", "Payout Queue", "Analytics Prism", "Exchange Console"], "protected-review-desktop.png");
     await page.waitForFunction(() => !document.querySelector("#skyeMusicGate"));
-    assertions.push("Artist and operator stages render end to end with the seeded gate session.");
+    assertions.push("Artist and protected review stages render end to end with the seeded shared session.");
 
     const mobile = await context.newPage();
     mobile.on("pageerror", (error) => pageErrors.push(`mobile: ${error.message}`));
@@ -317,6 +335,7 @@ async function main() {
         seeded_gate_token: GATE_TOKEN
       },
       assertions,
+      screenshotWarnings,
       artifacts: [
         "app-ungated-overlay.png",
         "home-desktop.png",

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -214,6 +214,7 @@
     .bc-logo-watermark {
       object-fit: contain;
       opacity: .16;
+      background: transparent;
       filter: saturate(1.08) contrast(1.04);
     }
 
@@ -268,6 +269,7 @@
       height: 25px;
       object-fit: contain;
       flex: 0 0 auto;
+      background: transparent;
     }
 
     .bc-logo.logo-wide {
@@ -358,12 +360,12 @@
 
     .bc-contact span {
       display: block;
-      max-width: 210px;
+      max-width: 222px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       font-family: var(--font-mono);
-      font-size: 7px;
+      font-size: 6.7px;
       color: rgba(248,245,237,.78);
     }
 
@@ -475,10 +477,15 @@
 
     .bc--founder-night .bc-monogram {
       position: absolute;
-      left: 24px;
-      bottom: 13px;
+      left: 21px;
+      top: 106px;
+      width: 54px;
+      display: grid;
+      place-items: center;
+      padding-top: 4px;
+      border-top: 1px solid rgba(5,8,12,.34);
       font-family: var(--font-display);
-      font-size: 12px;
+      font-size: 13px;
       line-height: .9;
       font-weight: 900;
       color: rgba(5,8,12,.78);
@@ -642,7 +649,28 @@
       height: 48px;
       object-fit: contain;
       opacity: .84;
+      background: transparent;
       filter: drop-shadow(0 5px 10px rgba(5,8,12,.2));
+    }
+
+    .bc-company-contact-list {
+      display: grid;
+      gap: 5px;
+      margin-top: 4px;
+    }
+
+    .bc-company-contact-list a,
+    .bc-company-contact-list span {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+
+    .bc-company-contact-list a:first-child,
+    .bc-company-contact-list a:nth-child(2) {
+      color: var(--gold);
     }
 
     .vv-rail-text {
@@ -755,6 +783,59 @@
 
     .vv-field input:focus {
       border-color: rgba(244,199,91,.56);
+    }
+
+    .vv-directory-results {
+      display: grid;
+      gap: 8px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .vv-directory-count {
+      min-height: 18px;
+      color: var(--gold);
+      font-family: var(--font-label);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .vv-directory-card {
+      display: grid;
+      gap: 3px;
+      width: 100%;
+      min-height: 62px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 7px;
+      color: var(--ink);
+      background: rgba(255,255,255,.045);
+      text-align: left;
+    }
+
+    .vv-directory-card:hover,
+    .vv-directory-card.is-active {
+      border-color: rgba(244,199,91,.54);
+      background: rgba(244,199,91,.08);
+    }
+
+    .vv-directory-card strong {
+      font-size: 13px;
+      line-height: 1.15;
+    }
+
+    .vv-directory-card span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .vv-code-card strong.is-link {
+      overflow-wrap: anywhere;
+      font-size: 11px;
+      line-height: 1.45;
     }
 
     .vv-code-card {
@@ -885,6 +966,12 @@
     <aside class="bc-command" aria-label="Business card production state">
       <strong>Card Studio</strong>
       <span>16 cards loaded: 3 founder directions, 1 client access builder, 12 platform cards.</span>
+      <div class="bc-company-contact-list" aria-label="Skyes Over London card contact">
+        <a href="mailto:grayskyes@solenterprises.org">grayskyes@solenterprises.org</a>
+        <a href="tel:+18004844788">1-(800)-484-4788</a>
+        <a href="tel:+18004844783">Company main: 1-(800)-484-4783</a>
+        <span>Skyes Over London / SOLEnterprises International Nexus &amp; Holdings</span>
+      </div>
       <button class="bc-btn secondary" type="button" onclick="printCollection('.bc')">Print Full Set</button>
     </aside>
   </section>
@@ -903,11 +990,17 @@
     <div class="section-head">
       <div>
         <h2 id="clientCard">Valley Verified Priority Access Card</h2>
-        <p>Build a client-specific access card with their name, category, city, priority code, and a QR that opens a direct email to Gray London Skyes.</p>
+        <p>Search the Valley Verified directory, select the business in front of the owner, and generate a card whose QR opens a public-safe Valley Verified page. The operator buttons still keep the ConnectLog handoff available without putting a gated owner route in the printed scan.</p>
       </div>
     </div>
     <div class="vv-builder">
       <form class="vv-panel" onsubmit="event.preventDefault(); printCard('card-vv');">
+        <div class="vv-field">
+          <label for="vv-directory-search">Valley Verified directory</label>
+          <input id="vv-directory-search" type="search" placeholder="Search Bob, city, category, niche..." autocomplete="off">
+          <div class="vv-directory-count" id="vv-directory-count">Loading Valley directory...</div>
+          <div class="vv-directory-results" id="vv-directory-results" aria-live="polite"></div>
+        </div>
         <div class="vv-field">
           <label for="vv-biz">Business name</label>
           <input id="vv-biz" type="text" value="Bob's Smoke Shop" autocomplete="organization">
@@ -928,8 +1021,19 @@
           <span>Priority access code</span>
           <strong id="vv-code-control">VV-BOBS-LP</strong>
         </div>
+        <div class="vv-code-card">
+          <span>Public QR / operator handoff</span>
+          <strong class="is-link" id="vv-connectlog-control">Loading directory...</strong>
+        </div>
+        <div class="vv-code-card">
+          <span>SkyeMerit activation credit</span>
+          <strong id="vv-skyemerit-control">31% for 7 days</strong>
+        </div>
         <div class="bc-actions">
           <button class="bc-btn" type="submit" onclick="printCard('card-vv')">Save PDF</button>
+          <button class="bc-btn secondary" type="button" id="vv-open-connectlog">Open ConnectLog</button>
+          <button class="bc-btn secondary" type="button" id="vv-open-client">Open Client Page</button>
+          <button class="bc-btn secondary" type="button" id="vv-open-factory">Open 0S Factory</button>
           <button class="bc-btn secondary" type="button" onclick="resetVV()">Reset</button>
         </div>
       </form>
@@ -952,7 +1056,7 @@
                   <span class="bc-pill">Direct Access</span>
                 </div>
                 <div class="bc-qr">
-                  <canvas id="vv-qr" data-url="mailto:graylondonskyes@gmail.com?subject=Valley%20Verified%20Priority%20Access" data-fg="#f4c75b" data-bg="#09070c"></canvas>
+                  <canvas id="vv-qr" data-url="https://devooderator.pages.dev/valley-verified/" data-fg="#f4c75b" data-bg="#09070c"></canvas>
                 </div>
               </div>
               <div class="bc-title-block">
@@ -963,7 +1067,8 @@
               <div class="bc-bottom">
                 <div class="bc-contact">
                   <span id="vv-contact-display">Contact: Owner</span>
-                  <span>graylondonskyes@gmail.com</span>
+                  <span>grayskyes@solenterprises.org</span>
+                  <span>1-(800)-484-4788</span>
                   <span class="bc-url">Priority code: <b id="vv-code-display">VV-BOBS-LP</b></span>
                 </div>
                 <span class="bc-pill">Gray London Skyes</span>
@@ -973,7 +1078,7 @@
         </div>
         <div class="bc-actions">
           <button class="bc-btn" type="button" onclick="printCard('card-vv')">Save PDF</button>
-          <span class="bc-note">QR opens a prefilled priority email for the client.</span>
+          <span class="bc-note">QR opens a public Valley Verified priority page. Use Open ConnectLog when the operator needs the gated company contact packet and seven-day 31% SkyeMerit activation lane.</span>
         </div>
       </div>
     </div>
@@ -1012,14 +1117,87 @@
 </template>
 
 <script>
-const contactEmail = 'graylondonskyes@gmail.com';
-const founderUrl = 'https://metraiyux-0s-marketing.pages.dev/gray-skyes.html';
+const contactEmail = 'grayskyes@solenterprises.org';
+const contactPhone = '1-(800)-484-4788';
+const companyLine = 'Skyes Over London / SOLEnterprises International Nexus & Holdings';
+const marketingOrigin = 'https://metraiyux-0s-marketing.pages.dev';
+const devodeRatorOrigin = 'https://devooderator.pages.dev';
+const publicCardTargets = Object.freeze({
+  founderContact: `${marketingOrigin}/gray-skyes.html`,
+  founderVcard: `${devodeRatorOrigin}/assets/cards/gray-london-skyes.vcf`,
+  cardStudio: `${marketingOrigin}/business-cards.html`,
+  marketingHome: `${marketingOrigin}/`,
+  sellSheet: `${marketingOrigin}/sell-sheet.html`,
+  capabilities: `${marketingOrigin}/capabilities.html`,
+  pricing: `${marketingOrigin}/#pricing`,
+  freeBusinessStack: `${marketingOrigin}/business-owner-free-stack.html`,
+  whiteLabel: `${marketingOrigin}/white-label.html`,
+  liveProof: `${marketingOrigin}/proof.html`,
+  socialVault: `${marketingOrigin}/social.html`,
+  devodeRatorProofJournal: `${devodeRatorOrigin}/`,
+  valleyVerified: `${devodeRatorOrigin}/valley-verified/`,
+  skyeRouteX: `${marketingOrigin}/skyeroutex.html`,
+  skyeVaultProof: `${marketingOrigin}/proof-ecology.html`,
+  skyeMusicNexus: `${marketingOrigin}/skye-music-nexus/nexus-marketing-hub.html`,
+  quantumskyesMcp: 'https://skye-design-mcp.pages.dev/use-mcp.html',
+  merser: 'https://merser.pages.dev/',
+  agenticGrowthLayer: 'https://agentic-growth-layer.pages.dev/',
+  legalSkyes: 'https://skyes-over-london-legal.pages.dev/legal/'
+});
+const founderUrl = publicCardTargets.founderContact;
 const metraiyuxMarkUrl = '/assets/metraiyux-0s-emblem-transparent.png';
 const metraiyuxLogoUrl = '/assets/metraiyux-0s-logo-transparent.png';
 const skyesLogoUrl = '/assets/skyes-over-london-deity-logo.png';
 const founderHeadshotUrl = '/assets/gray-skyes-headshot.png';
 const founderPortraitUrl = '/assets/gray-skyes-portrait.jpg';
 const founderCutoutUrl = '/assets/founder-skyes-over-london.png';
+const zeroOsOrigin = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+const connectLogAppUrl = `${zeroOsOrigin}/connectlog-v7.7-relay13-operator-proof/app.html`;
+const factoryAppUrl = `${zeroOsOrigin}/business-card-factory/`;
+const valleyDirectoryUrl = '/assets/valley-verified/businesses-lite.json';
+let valleyBusinesses = [];
+let selectedValleyBusiness = null;
+let activeConnectLogUrl = connectLogAppUrl;
+let activeClientUrl = `${publicCardTargets.valleyVerified}?clientId=bobs-smoke-shop-litchfield-park`;
+let activeFactoryUrl = factoryAppUrl;
+
+function buildCardConnectLogUrl({
+  source = 'business-cards',
+  kind = 'business-card',
+  business = '',
+  city = '',
+  category = '',
+  clientId = '',
+  priorityCode = '',
+  cardTitle = '',
+  cardUrl = '',
+  valleyUrl = '',
+  contact = '',
+  skyemerit = '',
+  expires = ''
+} = {}) {
+  const url = new URL(connectLogAppUrl);
+  const targetUrl = valleyUrl || cardUrl;
+  url.searchParams.set('source', source);
+  url.searchParams.set('sourceLabel', 'Business Cards Studio');
+  url.searchParams.set('cardKind', kind);
+  url.searchParams.set('cardTitle', cardTitle || business || 'Skyes Over London business card');
+  if (clientId) url.searchParams.set('clientId', clientId);
+  if (business) url.searchParams.set('business', business);
+  if (city) url.searchParams.set('city', city);
+  if (category) url.searchParams.set('category', category);
+  if (contact) url.searchParams.set('contact', contact);
+  if (priorityCode) url.searchParams.set('priorityCode', priorityCode);
+  if (targetUrl) url.searchParams.set('cardUrl', targetUrl);
+  if (valleyUrl) url.searchParams.set('valleyUrl', valleyUrl);
+  if (skyemerit) url.searchParams.set('skyemerit', skyemerit);
+  if (expires) url.searchParams.set('expires', expires);
+  url.searchParams.set('install', '1');
+  url.searchParams.set('operator', 'Gray London Skyes');
+  url.searchParams.set('operatorEmail', contactEmail);
+  url.searchParams.set('operatorPhone', contactPhone);
+  return url.toString();
+}
 
 const founderCards = [
   {
@@ -1029,9 +1207,9 @@ const founderCards = [
     eyebrow: 'Skyes Over London',
     name: 'GRAY LONDON SKYES',
     title: 'Founder / Sole Operator',
-    tag: 'MetrAIyux 0S / Valley Verified / Live AI systems',
-    url: 'metraiyux-0s-marketing.pages.dev/gray-skyes',
-    qr: founderUrl,
+    tag: 'SOLEnterprises International Nexus & Holdings',
+    url: 'scan to save contact',
+    qr: publicCardTargets.founderVcard,
     fg: '#f4c75b',
     bg: '#07060a',
     badge: 'Founder Card',
@@ -1044,54 +1222,62 @@ const founderCards = [
     id: 'card-founder-paper',
     label: 'Executive Intro',
     theme: 'bc--founder-paper',
-    eyebrow: 'MetrAIyux 0S',
+    eyebrow: 'Skyes Over London',
     name: 'GRAY LONDON SKYES',
     title: 'Founder, builder, operator',
     tag: 'Business systems / client platforms / production proof',
-    url: 'metraiyux-0s-marketing.pages.dev',
+    url: 'metraiyux-0s-marketing.pages.dev/gray-skyes',
     qr: founderUrl,
     fg: '#1d5f74',
     bg: '#f5efe2',
     badge: 'Executive',
-    logo: metraiyuxLogoUrl,
-    logoClass: 'logo-wide',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
     photo: founderPortraitUrl,
-    watermark: metraiyuxLogoUrl
+    watermark: skyesLogoUrl
   },
   {
     id: 'card-personal-cyan',
     label: 'Systems Operator',
     theme: 'bc--founder-systems',
-    eyebrow: '17 Workers / 58 live products',
+    eyebrow: '17 Workers / 62 live products',
     name: 'GRAY LONDON SKYES',
     title: 'Cloudflare operator / AI platform builder',
     tag: 'One-person production stack with live receipts',
-    url: 'metraiyux-0s-marketing.pages.dev',
-    qr: founderUrl,
+    url: 'metraiyux-0s-marketing.pages.dev/social',
+    qr: publicCardTargets.socialVault,
     fg: '#64d9ff',
     bg: '#020811',
     badge: 'Operator',
-    logo: metraiyuxMarkUrl,
-    logoClass: '',
+    logo: skyesLogoUrl,
+    logoClass: 'logo-skyes',
     photo: founderCutoutUrl,
-    watermark: metraiyuxLogoUrl
+    watermark: skyesLogoUrl
   }
 ];
 
 const platformCards = [
-  ['card-0s', 'MetrAIyux 0S', 'Sovereign business operating system', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
-  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / July 2026 launch', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', 'https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/flyer-overview.html', 'platform-violet'],
-  ['card-srx', 'SkyeRouteX', 'Workforce command / IC routing / live jobs', 'metraiyux-0s-marketing.pages.dev/skyeroutex', 'https://metraiyux-0s-marketing.pages.dev/skyeroutex.html', 'platform-mint'],
-  ['card-phx', 'PHX Verified Network', 'Valley visibility network / local business proof', 'phx-verified-network.pages.dev', 'https://phx-verified-network.pages.dev', 'platform-gold'],
-  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate / workspace sessions', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
-  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-mint'],
-  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev/legal', 'https://skyes-over-london-legal.pages.dev/legal/', 'platform-gold'],
-  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev', 'https://skye-design-mcp.pages.dev/use-mcp.html', 'platform-violet'],
-  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / 0S cockpit / builder lane', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
+  ['card-0s', 'MetrAIyux 0S', 'Buyer-facing operating system overview', 'metraiyux-0s-marketing.pages.dev', publicCardTargets.marketingHome, 'platform-cyan'],
+  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / music business surface', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', publicCardTargets.skyeMusicNexus, 'platform-violet'],
+  ['card-srx', 'SkyeRouteX', 'Workforce command / dispatch OS', 'metraiyux-0s-marketing.pages.dev/skyeroutex', publicCardTargets.skyeRouteX, 'platform-mint'],
+  ['card-phx', 'Valley Verified', 'Local business proof / public owner handoff', 'devooderator.pages.dev/valley-verified', publicCardTargets.valleyVerified, 'platform-gold'],
+  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate context', 'metraiyux-0s-marketing.pages.dev/capabilities', publicCardTargets.capabilities, 'platform-cyan'],
+  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev/free-business-stack', publicCardTargets.freeBusinessStack, 'platform-mint'],
+  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev/legal', publicCardTargets.legalSkyes, 'platform-gold'],
+  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev/use-mcp.html', publicCardTargets.quantumskyesMcp, 'platform-violet'],
+  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / developer lane', 'metraiyux-0s-marketing.pages.dev/dev-free-sauce', `${marketingOrigin}/dev-free-sauce.html`, 'platform-cyan'],
   ['card-agl', 'Agentic Growth Layer', 'AI growth operations / starter to operator', 'agentic-growth-layer.pages.dev', 'https://agentic-growth-layer.pages.dev', 'platform-mint'],
-  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / secure receipts', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-rose'],
+  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / proof ecology', 'metraiyux-0s-marketing.pages.dev/proof-ecology', publicCardTargets.skyeVaultProof, 'platform-rose'],
   ['card-merser', 'Merser', 'World registry MCP / npm CLI / source packs', 'merser.pages.dev', 'https://merser.pages.dev', 'platform-violet']
-].map(([id, name, title, displayUrl, qr, theme], index) => ({ id, name, title, displayUrl, qr, theme, index: String(index + 1).padStart(2, '0') }));
+].map(([id, name, title, displayUrl, qr, theme], index) => ({
+  id,
+  name,
+  title,
+  displayUrl,
+  qr,
+  theme,
+  index: String(index + 1).padStart(2, '0')
+}));
 
 function cardShell(card, innerHtml) {
   return `
@@ -1131,6 +1317,7 @@ function founderCard(card) {
       <div class="bc-bottom">
         <div class="bc-contact">
           <span>${contactEmail}</span>
+          <span>${contactPhone}</span>
           <span class="bc-url">${card.url}</span>
         </div>
         <div class="bc-qr">
@@ -1151,15 +1338,15 @@ function platformCard(card) {
   };
   const colors = accentMap[card.theme] || accentMap['platform-cyan'];
   return cardShell({ id: card.id, theme: `bc--platform ${card.theme}` }, `
-    <img class="bc-logo-watermark" src="${metraiyuxLogoUrl}" alt="">
+    <img class="bc-logo-watermark" src="${skyesLogoUrl}" alt="">
     <span class="platform-index">${card.index}</span>
     <div class="bc-inner">
       <div class="bc-top">
         <div class="bc-brand">
-          <img class="bc-logo" src="${metraiyuxMarkUrl}" alt="">
+          <img class="bc-logo logo-skyes" src="${skyesLogoUrl}" alt="">
           <div class="bc-brand-text">
-            <strong>Platform Card</strong>
-            <span>MetrAIyux 0S live system</span>
+            <strong>Skyes Over London</strong>
+            <span>${companyLine}</span>
           </div>
         </div>
         <div class="bc-qr">
@@ -1174,6 +1361,7 @@ function platformCard(card) {
       <div class="bc-bottom">
         <div class="bc-contact">
           <span>${contactEmail}</span>
+          <span>${contactPhone}</span>
           <span class="bc-url">${card.displayUrl}</span>
         </div>
         <span class="bc-pill">Live QR</span>
@@ -1204,13 +1392,13 @@ function renderCardGroup(target, cards, renderer, wrapClass) {
 
 function genQR(canvas) {
   if (!canvas || !window.qrcode) return;
-  const url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
+  const url = canvas.dataset.url || publicCardTargets.marketingHome;
   const fg = canvas.dataset.fg || '#f4c75b';
   const bg = canvas.dataset.bg || '#07060a';
   const qr = qrcode(0, 'M');
   qr.addData(url);
   qr.make();
-  const size = 56;
+  const size = 224;
   const margin = 2;
   const count = qr.getModuleCount();
   const cell = size / (count + margin * 2);
@@ -1276,6 +1464,135 @@ function slugPart(value, fallback) {
     .join('');
 }
 
+function addDaysIso(days) {
+  const date = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+  return date.toISOString().slice(0, 10);
+}
+
+function titleText(value) {
+  return String(value || '').replace(/\bAnd\b/g, '&');
+}
+
+function buildValleyPublicUrl({ business, businessName, city, category, code, contact, expires }) {
+  const url = new URL(publicCardTargets.valleyVerified);
+  url.searchParams.set('source', 'business-card');
+  url.searchParams.set('priorityCode', code);
+  url.searchParams.set('expires', expires);
+  url.searchParams.set('business', businessName || business?.name || 'Valley Verified business');
+  url.searchParams.set('city', city || business?.city || 'Phoenix Metro');
+  url.searchParams.set('category', category || business?.category || business?.niche || 'Valley Verified');
+  if (business?.id) url.searchParams.set('clientId', business.id);
+  if (contact) url.searchParams.set('contact', contact);
+  return url.toString();
+}
+
+function directoryText(business) {
+  return [
+    business.name,
+    business.city,
+    business.category,
+    business.niche,
+    business.zip,
+    business.id
+  ].join(' ').toLowerCase();
+}
+
+function fallbackBusiness() {
+  return {
+    id: 'bobs-smoke-shop-litchfield-park',
+    name: "Bob's Smoke Shop",
+    city: 'Litchfield Park',
+    category: 'Retail & Specialty',
+    niche: 'Smoke Shop',
+    phone: '(623) 935-0786',
+    email: 'bobsmokeshopaz@gmail.com',
+    website: 'https://bobs-smoke-shop.pages.dev/',
+    booking_url: 'https://bobs-smoke-shop.pages.dev/contact',
+    url: '/valley-verified/business/bobs-smoke-shop-litchfield-park/'
+  };
+}
+
+function buildConnectLogHandoff({ business, code, contact, expires }) {
+  const biz = business || {};
+  const url = new URL(connectLogAppUrl);
+  url.searchParams.set('source', 'business-cards');
+  url.searchParams.set('sourceLabel', 'Business Cards Studio');
+  url.searchParams.set('cardKind', 'valley-verified');
+  url.searchParams.set('cardTitle', 'Valley Verified Priority Access');
+  url.searchParams.set('clientId', biz.id || code.toLowerCase());
+  url.searchParams.set('business', document.getElementById('vv-biz').value || biz.name || 'Valley Verified client');
+  url.searchParams.set('city', document.getElementById('vv-city').value || biz.city || 'Phoenix Metro');
+  url.searchParams.set('category', document.getElementById('vv-cat').value || biz.category || 'Valley Verified');
+  url.searchParams.set('contact', contact || 'Owner');
+  url.searchParams.set('priorityCode', code);
+  url.searchParams.set('valleyUrl', activeClientUrl);
+  url.searchParams.set('cardUrl', activeClientUrl);
+  url.searchParams.set('skyemerit', '31');
+  url.searchParams.set('expires', expires);
+  url.searchParams.set('install', '1');
+  url.searchParams.set('operator', 'Gray London Skyes');
+  url.searchParams.set('operatorEmail', contactEmail);
+  url.searchParams.set('operatorPhone', contactPhone);
+  return url.toString();
+}
+
+async function loadValleyDirectory() {
+  const results = document.getElementById('vv-directory-results');
+  try {
+    const response = await fetch(valleyDirectoryUrl, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Directory HTTP ${response.status}`);
+    const payload = await response.json();
+    valleyBusinesses = Array.isArray(payload) ? payload : Array.isArray(payload.businesses) ? payload.businesses : [];
+  } catch (error) {
+    console.warn('Valley directory load failed:', error);
+    valleyBusinesses = [fallbackBusiness()];
+    if (results) results.textContent = 'Directory fallback loaded. Bob is ready.';
+  }
+  const initial = resolveInitialValleyBusiness();
+  applyValleyBusiness(initial, { keepSearch: true });
+  renderValleyDirectory('');
+}
+
+function renderValleyDirectory(query = '') {
+  const results = document.getElementById('vv-directory-results');
+  const count = document.getElementById('vv-directory-count');
+  if (!results) return;
+  const q = query.trim().toLowerCase();
+  const matches = q ? valleyBusinesses.filter((item) => directoryText(item).includes(q)) : valleyBusinesses;
+  if (count) count.textContent = `Showing ${matches.length} of ${valleyBusinesses.length} unique Valley businesses`;
+  results.replaceChildren();
+  if (!matches.length) {
+    const empty = document.createElement('span');
+    empty.className = 'bc-note';
+    empty.textContent = 'No client match yet. Keep typing or use the fields below.';
+    results.append(empty);
+    return;
+  }
+  matches.forEach((business) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `vv-directory-card${selectedValleyBusiness?.id === business.id ? ' is-active' : ''}`;
+    const name = document.createElement('strong');
+    name.textContent = business.name || 'Unnamed business';
+    const meta = document.createElement('span');
+    meta.textContent = [business.city, titleText(business.category), business.niche].filter(Boolean).join(' / ');
+    button.append(name, meta);
+    button.addEventListener('click', () => applyValleyBusiness(business));
+    results.append(button);
+  });
+}
+
+function applyValleyBusiness(business, options = {}) {
+  selectedValleyBusiness = business || fallbackBusiness();
+  document.getElementById('vv-biz').value = selectedValleyBusiness.name || "Bob's Smoke Shop";
+  document.getElementById('vv-city').value = selectedValleyBusiness.city || 'Litchfield Park';
+  document.getElementById('vv-cat').value = titleText(selectedValleyBusiness.category || selectedValleyBusiness.niche || 'Retail & Specialty');
+  document.getElementById('vv-contact').value = selectedValleyBusiness.contact || 'Owner';
+  if (!options.keepSearch) document.getElementById('vv-directory-search').value = selectedValleyBusiness.name || '';
+  updateVV();
+  renderValleyDirectory(document.getElementById('vv-directory-search').value || '');
+}
+
 function updateVV() {
   const biz = document.getElementById('vv-biz').value || "Bob's Smoke Shop";
   const city = document.getElementById('vv-city').value || 'Litchfield Park';
@@ -1283,41 +1600,88 @@ function updateVV() {
   const contact = document.getElementById('vv-contact').value || 'Owner';
   const cityInitials = city.split(/\s+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 3).toUpperCase() || 'AZ';
   const code = `VV-${slugPart(biz, 'CLIENT')}-${cityInitials}`;
-  const subject = `Valley Verified Priority Access - ${biz}`;
-  const body = `Business: ${biz}\nCity: ${city}\nCategory: ${cat}\nPriority code: ${code}\n\nI scanned the client access card and need Gray London Skyes.`;
-  const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const matchedSelection = selectedValleyBusiness && (selectedValleyBusiness.name || '').toLowerCase() === biz.toLowerCase();
+  const expires = addDaysIso(7);
+  const publicValleyUrl = buildValleyPublicUrl({
+    business: matchedSelection ? selectedValleyBusiness : null,
+    businessName: biz,
+    city,
+    category: cat,
+    code,
+    contact,
+    expires
+  });
+  activeClientUrl = publicValleyUrl;
+  const handoff = buildConnectLogHandoff({ business: matchedSelection ? selectedValleyBusiness : null, code, contact, expires });
+  activeConnectLogUrl = handoff;
+  activeFactoryUrl = buildFactoryUrl({ business: matchedSelection ? selectedValleyBusiness : null, biz, city, cat, contact });
 
   document.getElementById('vv-biz-display').textContent = biz.toUpperCase();
   document.getElementById('vv-city-display').textContent = `${city} / ${cat}`;
   document.getElementById('vv-contact-display').textContent = `Contact: ${contact}`;
   document.getElementById('vv-code-display').textContent = code;
   document.getElementById('vv-code-control').textContent = code;
+  document.getElementById('vv-connectlog-control').textContent = handoff;
+  document.getElementById('vv-skyemerit-control').textContent = `31% through ${expires}`;
   const name = document.getElementById('vv-biz-display');
   name.style.fontSize = biz.length > 24 ? '13px' : biz.length > 18 ? '15px' : '17px';
   const qr = document.getElementById('vv-qr');
-  qr.dataset.url = mailto;
+  qr.dataset.url = publicValleyUrl;
   genQR(qr);
 }
 
+function resolveInitialValleyBusiness() {
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('clientId') || params.get('client') || params.get('id');
+  const businessName = params.get('business') || params.get('q');
+  const match = valleyBusinesses.find((item) => {
+    const id = String(item.id || '').toLowerCase();
+    const name = String(item.name || '').toLowerCase();
+    return (clientId && id === clientId.toLowerCase()) || (businessName && name === businessName.toLowerCase());
+  });
+  return match || valleyBusinesses.find((item) => item.id === 'bobs-smoke-shop-litchfield-park') || valleyBusinesses[0] || fallbackBusiness();
+}
+
+function buildFactoryUrl({ business, biz, city, cat, contact }) {
+  const url = new URL(factoryAppUrl);
+  url.searchParams.set('clientId', business?.id || slugPart(biz, 'client').toLowerCase());
+  url.searchParams.set('business', biz || business?.name || 'Valley Verified client');
+  url.searchParams.set('city', city || business?.city || 'Phoenix Metro');
+  url.searchParams.set('category', cat || business?.category || business?.niche || 'Valley Verified');
+  url.searchParams.set('contact', contact || 'Owner');
+  return url.toString();
+}
+
 function resetVV() {
-  document.getElementById('vv-biz').value = "Bob's Smoke Shop";
-  document.getElementById('vv-city').value = 'Litchfield Park';
-  document.getElementById('vv-cat').value = 'Retail & Specialty';
-  document.getElementById('vv-contact').value = 'Owner';
-  updateVV();
+  const bob = valleyBusinesses.find((item) => item.id === 'bobs-smoke-shop-litchfield-park') || fallbackBusiness();
+  document.getElementById('vv-directory-search').value = '';
+  applyValleyBusiness(bob, { keepSearch: true });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   renderCards();
   refreshQR();
   fitCardPreviews();
-  updateVV();
+  loadValleyDirectory();
   ['vv-biz', 'vv-city', 'vv-cat', 'vv-contact'].forEach((id) => {
     document.getElementById(id).addEventListener('input', updateVV);
+  });
+  document.getElementById('vv-directory-search').addEventListener('input', (event) => {
+    renderValleyDirectory(event.target.value);
+  });
+  document.getElementById('vv-open-connectlog').addEventListener('click', () => {
+    window.open(activeConnectLogUrl, '_blank', 'noopener');
+  });
+  document.getElementById('vv-open-client').addEventListener('click', () => {
+    window.open(activeClientUrl, '_blank', 'noopener');
+  });
+  document.getElementById('vv-open-factory').addEventListener('click', () => {
+    window.open(activeFactoryUrl, '_blank', 'noopener');
   });
 });
 
 window.addEventListener('resize', fitCardPreviews);
 </script>
+  <script src="/script.js"></script>
 </body>
 </html>

@@ -212,7 +212,7 @@
       excerpt: `${entry.to || "unknown"} · attempts=${entry.attempts || 1}${entry.last_error ? ` · ${entry.last_error}` : ""}`,
       source: entry.status || "queued",
       at: entry.at || "",
-    })), "Recent compose sends and retries from the standalone vault will surface here.");
+    })), "Recent compose sends and retries from the standalone Citadel will surface here.");
   }
 
   function downloadJson(filename, payload) {
@@ -241,11 +241,11 @@
         <span class="platform-kicker">Standalone runtime</span>
         <span class="mini-card runtime-pill">Workspace <strong>${escapeHtml(wsId)}</strong></span>
         <span class="mini-card runtime-pill" id="mailSyncStatus">Local state ready</span>
-        <span class="mini-card runtime-pill" id="mailVaultStatus">Vault bridge ready</span>
+        <span class="mini-card runtime-pill" id="mailCitadelStatus">Citadel bridge ready</span>
       </div>
       <div class="button-row">
-        <button class="platform-button ghost" id="mailPushVaultBtn" type="button">Export Suite State</button>
-        <button class="platform-button ghost" id="mailOpenVaultBtn" type="button">Open Vault</button>
+        <button class="platform-button ghost" id="mailPushCitadelBtn" type="button">Export Suite State</button>
+        <button class="platform-button ghost" id="mailOpenCitadelBtn" type="button">Open Citadel</button>
       </div>
     `;
     if (topbar && topbar.nextSibling) shell.insertBefore(bar, topbar.nextSibling);
@@ -255,19 +255,19 @@
   function createLocalStorageProtocol() {
     let saveTimer = null;
     let syncStatusEl = null;
-    let vaultStatusEl = null;
+    let citadelStatusEl = null;
 
     function setStatus(text) {
       if (syncStatusEl) syncStatusEl.textContent = text;
     }
 
-    function setVaultStatus(text) {
-      if (vaultStatusEl) vaultStatusEl.textContent = text;
+    function setCitadelStatus(text) {
+      if (citadelStatusEl) citadelStatusEl.textContent = text;
     }
 
     async function load() {
       setStatus("Local state ready");
-      setVaultStatus("Vault bridge ready");
+      setCitadelStatus("Citadel bridge ready");
       render();
       return {
         ok: true,
@@ -294,9 +294,9 @@
 
     function configure() {
       syncStatusEl = document.getElementById("mailSyncStatus");
-      vaultStatusEl = document.getElementById("mailVaultStatus");
-      const exportBtn = document.getElementById("mailPushVaultBtn");
-      const openBtn = document.getElementById("mailOpenVaultBtn");
+      citadelStatusEl = document.getElementById("mailCitadelStatus");
+      const exportBtn = document.getElementById("mailPushCitadelBtn");
+      const openBtn = document.getElementById("mailOpenCitadelBtn");
       if (exportBtn && !exportBtn.dataset.bound) {
         exportBtn.dataset.bound = "1";
         exportBtn.addEventListener("click", () => {
@@ -321,7 +321,7 @@
       save,
       debouncedSave,
       setStatus,
-      setVaultStatus,
+      setCitadelStatus,
     };
   }
 

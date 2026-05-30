@@ -20,12 +20,12 @@
           </span>
         </a>
         <div class="nav-actions">
-          <a href="/upload.html">Upload</a>
-          <a class="nav-cta" href="/vault.html">My Vault</a>
-          <a href="/repo.html">Repo Vault</a>
-          <a href="/agent-install.html">AI Install</a>
-          <a href="/process.html">Process</a>
-          <a href="/">Home</a>
+          <a href="/upload.html">Upload 🔐</a>
+          <a class="nav-cta" href="/vault.html">My Vault 🗃️</a>
+          <a href="/repo.html">Repo Vault 💻</a>
+          <a href="/agent-install.html">AI Install 🧠</a>
+          <a href="/process.html">Process 🧾</a>
+          <a href="/">Home ✨</a>
         </div>
       </nav>
 
@@ -34,14 +34,14 @@
           <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
           <div>
             <strong>Recovery Room</strong>
-            <span>Completed vault files</span>
+            <span>Completed vault files 🗃️</span>
           </div>
         </div>
-        <a href="/upload.html"><span>01</span> Secure intake</a>
-        <a href="/vault.html"><span>02</span> My vault files</a>
-        <a href="/repo.html"><span>03</span> Repo workspace</a>
-        <a href="/process.html"><span>04</span> Proof route</a>
-        <a href="/agent-install.html"><span>05</span> AI install guide</a>
+        <a href="/upload.html"><span>01</span> Secure intake 🔐</a>
+        <a href="/vault.html"><span>02</span> My vault files 🗃️</a>
+        <a href="/repo.html"><span>03</span> Repo workspace 💻</a>
+        <a href="/process.html"><span>04</span> Proof route 🧾</a>
+        <a href="/agent-install.html"><span>05</span> AI install guide 🧠</a>
         <div class="sidecar-proof">
           <strong>Receipt gate</strong>
           <p>Completed uploads can be listed by email and access code without loading the whole intake page.</p>
@@ -51,17 +51,17 @@
       <section class="page-hero compact-page-hero">
         <div>
           <p class="eyebrow">Client Vault</p>
-          <h1 class="page-title">Open my vault</h1>
+          <h1 class="page-title">Open my vault 🗃️</h1>
           <p class="lede">Use the email from your upload and your access code to retrieve completed receipt-backed files.</p>
         </div>
-        <a class="secondary-btn link-btn" href="/upload.html">Send another package</a>
+        <a class="secondary-btn link-btn" href="/upload.html">Send another package 🔐</a>
       </section>
 
       <section id="my-vault" class="client-vault-panel panel">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Vault Lookup</p>
-            <h2>Find and download stored files.</h2>
+          <h2>Find and download stored files. 🔎</h2>
           </div>
           <span id="clientVaultCount" class="queue-summary">Locked</span>
         </div>
@@ -77,8 +77,8 @@
             </label>
           </div>
           <div class="vault-actions-row">
-            <button class="primary-btn" type="submit">Open my vault</button>
-            <button id="clearClientVault" class="secondary-btn" type="button">Lock view</button>
+            <button class="primary-btn" type="submit">Open my vault 🔓</button>
+            <button id="clearClientVault" class="secondary-btn" type="button">Lock view 🔒</button>
           </div>
         </form>
         <div id="clientVaultList" class="client-vault-list" aria-live="polite"></div>
@@ -86,19 +86,19 @@
 
       <section class="surface-grid route-section vault-restore-help" aria-label="Encrypted repo restore help">
         <article class="panel route-card">
-          <span class="eyebrow">Repo Artifact</span>
-          <strong>`.zip.enc` means encrypted.</strong>
-          <p>Download it, but do not try to unzip it directly. It becomes a normal ZIP only after the matching restore kit decrypts it.</p>
+          <span class="eyebrow">Repo Artifact 🔐</span>
+          <strong>`.zip.enc` or `.tar.zst.enc` means encrypted.</strong>
+          <p>Download it, but do not try to unzip or extract it directly. The matching restore material decrypts it first.</p>
         </article>
         <article class="panel route-card">
-          <span class="eyebrow">Restore Kit</span>
-          <strong>Download the key kit too.</strong>
+          <span class="eyebrow">Restore Kit 🧰</span>
+          <strong>Download the control material too.</strong>
           <p>The direct restore kit is a small ZIP with the key material, restore guide, and helper command.</p>
         </article>
         <article class="panel route-card">
-          <span class="eyebrow">Final Output</span>
-          <strong>Real ZIP, then repo folder.</strong>
-          <p>The helper writes the real repo `.zip`, verifies it, and extracts the workspace into a restore folder.</p>
+          <span class="eyebrow">Final Output 💻</span>
+          <strong>Real archive, then repo folder.</strong>
+          <p>The helper writes the decrypted repo archive, verifies it, and extracts the workspace into a restore folder.</p>
         </article>
       </section>
     </main>

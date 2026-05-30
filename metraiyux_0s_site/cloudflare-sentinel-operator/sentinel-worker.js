@@ -1,7 +1,7 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const cors = {"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,authorization,x-admin-token"};
+    const cors = {"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,authorization,x-admin-token,x-0s-shared-gate,x-0s-internal-proxy-secret"};
     if (request.method === 'OPTIONS') return new Response(null,{headers:cors});
     const json = (data, status=200)=>new Response(JSON.stringify(data,null,2),{status,headers:{...cors,'content-type':'application/json'}});
     if (url.pathname === '/' || url.pathname === '/health' || url.pathname === '/api/sentinel/status') return json({ok:true, service:'Sentinel Site Operator Brain', brains:16, persistence:{d1:!!env.DB, kv:!!env.SENTINEL_LEDGER, queue:!!env.SENTINEL_QUEUE}, mode:'worker-ready', time:new Date().toISOString()});
@@ -9,7 +9,7 @@ export default {
       const body = await request.json().catch(()=>({}));
       const text = String(body.text || body.message || body.title || '').toLowerCase();
       const route = chooseRoute(text);
-      const receipt = {id: crypto.randomUUID(), type:'public_intake', created_at:new Date().toISOString(), input_excerpt:text.slice(0,500), ...route, status:'intake_pending_review', public_intake:true};
+      const receipt = {id: safeRandomUUID(), type:'public_intake', created_at:new Date().toISOString(), input_excerpt:text.slice(0,500), ...route, status:'intake_pending_review', public_intake:true};
       if (env.SENTINEL_LEDGER) await env.SENTINEL_LEDGER.put(`intake:${receipt.id}`, JSON.stringify(receipt));
       if (env.SENTINEL_QUEUE) await env.SENTINEL_QUEUE.send(receipt);
       if (env.DB) await env.DB.prepare('insert into events (id,type,payload,created_at) values (?1,?2,?3,?4)').bind(receipt.id,'public_intake',JSON.stringify(receipt),receipt.created_at).run();
@@ -20,7 +20,7 @@ export default {
       const body = await request.json().catch(()=>({}));
       const text = String(body.text || body.message || '').toLowerCase();
       const route = chooseRoute(text);
-      const receipt = {id: crypto.randomUUID(), type:'route', created_at:new Date().toISOString(), input_excerpt:text.slice(0,500), ...route, status:'queued_for_human_review'};
+      const receipt = {id: safeRandomUUID(), type:'route', created_at:new Date().toISOString(), input_excerpt:text.slice(0,500), ...route, status:'queued_for_human_review'};
       if (env.SENTINEL_LEDGER) await env.SENTINEL_LEDGER.put(`route:${receipt.id}`, JSON.stringify(receipt));
       if (env.SENTINEL_QUEUE) await env.SENTINEL_QUEUE.send(receipt);
       if (env.DB) await env.DB.prepare('insert into events (id,type,payload,created_at) values (?1,?2,?3,?4)').bind(receipt.id,'route',JSON.stringify(receipt),receipt.created_at).run();
@@ -29,7 +29,7 @@ export default {
     if (url.pathname === '/api/sentinel/task' && request.method === 'POST') {
       if (!authorized(request, env)) return unauthorized(json);
       const body = await request.json().catch(()=>({}));
-      const task = {id: crypto.randomUUID(), type:'task', title: body.title || 'Untitled task', cabinet: body.cabinet || 'Site Operator', owner_brain: body.owner_brain || 'Site Operator Brain', status:'pending_review', human_gate: !!body.human_gate, created_at:new Date().toISOString(), payload: body};
+      const task = {id: safeRandomUUID(), type:'task', title: body.title || 'Untitled task', cabinet: body.cabinet || 'Site Operator', owner_brain: body.owner_brain || 'Site Operator Brain', status:'pending_review', human_gate: !!body.human_gate, created_at:new Date().toISOString(), payload: body};
       if (env.SENTINEL_LEDGER) await env.SENTINEL_LEDGER.put(`task:${task.id}`, JSON.stringify(task));
       if (env.DB) await env.DB.prepare('insert into tasks (id,title,cabinet,owner_brain,status,human_gate,payload,created_at) values (?1,?2,?3,?4,?5,?6,?7,?8)').bind(task.id,task.title,task.cabinet,task.owner_brain,task.status,task.human_gate?1:0,JSON.stringify(task.payload),task.created_at).run();
       return json(task);
@@ -49,6 +49,11 @@ export default {
   }
 }
 function authorized(request, env){
+  const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.SENTINEL_INTERNAL_PROXY_SECRET || '').trim();
+  if (proxySecret) {
+    return String(request.headers.get('x-0s-shared-gate') || '').toLowerCase() === 'operator'
+      && String(request.headers.get('x-0s-internal-proxy-secret') || '').trim() === proxySecret;
+  }
   const expected = String(env.SENTINEL_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
   if (!expected) return false;
   const bearer = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i,'').trim();
@@ -73,4 +78,9 @@ function chooseRoute(text){
   ];
   for (const [rx,primary,secondary,cabinet] of rules) if (rx.test(text)) return {primary_brain:primary, secondary_brain:secondary, cabinet, human_gate:/contract|legal|payment|hire|fire|filing|tax|bank|compliance|government/.test(text)};
   return {primary_brain:'Site Operator Brain', secondary_brain:'Central Company Command Brain', cabinet:'Executive Command', human_gate:true};
+}
+
+function safeRandomUUID(){
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `uuid_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
 }

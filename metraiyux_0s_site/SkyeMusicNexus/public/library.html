@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeMusicNexus // Library</title>
+    <meta
+      name="description"
+      content="SkyeMusicNexus browser library for saved tracks, local playlists, imports, exports, and catalog playback."
+    />
+    <link rel="stylesheet" href="./nexus-player.css" />
+    <link rel="stylesheet" href="./library.css" />
+    <script defer src="./nexus-player.js"></script>
+    <script defer src="./library.js"></script>
+  </head>
+  <body data-sky-gate="public">
+    <header class="library-topbar">
+      <a class="library-brand" href="./index.html" aria-label="SkyeMusicNexus Home">
+        <img src="../assets/skye-music-nexus-logo.png" alt="" />
+        <span>SkyeMusicNexus</span>
+      </a>
+      <nav class="library-nav" aria-label="Music Nexus rooms">
+        <a href="./index.html">Home</a>
+        <a href="./discover.html">Discover</a>
+        <a href="./radio.html">Radio</a>
+        <a href="./stream-analytics.html">Artist Stats</a>
+        <a href="./store.html">Store</a>
+      </nav>
+    </header>
+
+    <main class="library-shell">
+      <section class="library-titlebar" aria-labelledby="library-title">
+        <div>
+          <p class="library-kicker">Browser Library</p>
+          <h1 id="library-title">Saved tracks and playlists.</h1>
+        </div>
+        <div class="library-statbar" aria-label="Library totals">
+          <article>
+            <strong id="stat-saved">0</strong>
+            <span>saved</span>
+          </article>
+          <article>
+            <strong id="stat-playlists">0</strong>
+            <span>playlists</span>
+          </article>
+          <article>
+            <strong id="stat-tracks">0</strong>
+            <span>tracks</span>
+          </article>
+          <article>
+            <strong id="stat-system">0</strong>
+            <span>sets</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="library-layout" aria-label="Music library">
+        <aside class="library-panel library-panel--rail" aria-labelledby="local-library-title">
+          <div class="library-panel__head">
+            <div>
+              <p class="library-kicker">Your Saves</p>
+              <h2 id="local-library-title">Local Library</h2>
+            </div>
+            <button class="library-button" type="button" data-action="select-view" data-view-type="liked">
+              Saved Tracks
+            </button>
+          </div>
+
+          <div id="saved-track-list" class="library-mini-list" aria-label="Saved tracks"></div>
+
+          <form id="create-form" class="library-form" autocomplete="off">
+            <label class="library-label" for="playlist-title">New Playlist</label>
+            <div class="library-inline">
+              <input id="playlist-title" class="library-input" type="text" maxlength="80" placeholder="Playlist title" />
+              <button class="library-button library-button--primary" type="submit">Create</button>
+            </div>
+          </form>
+
+          <label class="library-label" for="playlist-select">Add Target</label>
+          <select id="playlist-select" class="library-select"></select>
+
+          <div id="local-playlists" class="library-playlist-list" aria-label="Local playlists"></div>
+
+          <section class="library-import" aria-labelledby="library-import-title">
+            <div class="library-panel__head library-panel__head--tight">
+              <div>
+                <p class="library-kicker">Portable JSON</p>
+                <h2 id="library-import-title">Import / Export</h2>
+              </div>
+              <button class="library-button" type="button" data-action="export-library">Export</button>
+            </div>
+            <input id="import-file" class="library-file" type="file" accept="application/json,.json" />
+            <textarea id="import-json" class="library-textarea" spellcheck="false" placeholder="Paste library JSON"></textarea>
+            <button class="library-button" type="button" data-action="import-library">Import JSON</button>
+          </section>
+        </aside>
+
+        <section class="library-panel library-panel--catalog" aria-labelledby="catalog-title">
+          <div class="library-panel__head">
+            <div>
+              <p class="library-kicker">Catalog</p>
+              <h2 id="catalog-title">All Tracks</h2>
+            </div>
+            <input id="track-search" class="library-search" type="search" placeholder="Search music" />
+          </div>
+          <div id="system-playlists" class="library-system-grid" aria-label="System playlists"></div>
+          <div id="catalog-list" class="library-track-list" aria-label="Catalog tracks"></div>
+        </section>
+
+        <aside class="library-panel library-panel--active" aria-labelledby="active-title">
+          <div class="library-now">
+            <img id="now-art" src="../assets/og-card.svg" alt="" />
+            <div>
+              <p class="library-kicker">Now Selected</p>
+              <h2 id="now-title">Library ready</h2>
+              <p id="now-artist">Choose a track or playlist.</p>
+            </div>
+          </div>
+
+          <div class="library-panel__head">
+            <div>
+              <p id="active-kicker" class="library-kicker">Saved Tracks</p>
+              <h2 id="active-title">Saved Tracks</h2>
+              <p id="active-meta" class="library-muted">0 tracks</p>
+            </div>
+            <div class="library-actions">
+              <button id="active-play" class="library-button library-button--primary" type="button" data-action="play-active">
+                Play
+              </button>
+              <button id="active-delete" class="library-button library-button--danger" type="button" data-action="delete-active">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div id="active-track-list" class="library-track-list library-track-list--compact" aria-label="Selected playlist"></div>
+        </aside>
+      </section>
+
+      <audio id="fallback-audio" class="library-audio" controls></audio>
+      <div id="library-status" class="library-status" role="status" aria-live="polite" hidden></div>
+    </main>
+  </body>
+</html>

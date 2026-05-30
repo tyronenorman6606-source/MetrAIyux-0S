@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Advanced Spine &amp; Pain | Valley Verified</title>
+  <meta name="description" content="Advanced Spine &amp; Pain in Phoenix, Arizona. Spine and pain care public business profile with phone, address, category, tags, and Valley Verified evidence.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17312c;
+      --muted: #58736c;
+      --paper: #f7fbf8;
+      --mint: #dcefe8;
+      --teal: #1d6b62;
+      --blue: #dbe8f5;
+      --line: rgba(29, 107, 98, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(29, 107, 98, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(29, 107, 98, 0.06) 1px, transparent 1px),
+        var(--paper);
+      background-size: 42px 42px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 12px 0 28px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .mark {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      padding: 8px;
+      background: white;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .intro {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid var(--line);
+      padding: clamp(28px, 5vw, 58px);
+      box-shadow: 0 24px 70px rgba(35, 80, 75, 0.12);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--teal);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 5.7rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      margin: 24px 0 0;
+      max-width: 680px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .contact-card {
+      background: linear-gradient(145deg, var(--mint), var(--blue));
+      border: 1px solid var(--line);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 360px;
+    }
+
+    .phone {
+      display: block;
+      color: var(--ink);
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .address {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .fact {
+      background: white;
+      border: 1px solid var(--line);
+      padding: 18px;
+    }
+
+    .fact b {
+      display: block;
+      color: var(--teal);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .notes {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 0.75fr 1.25fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      padding: 22px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      background: #eef8f4;
+      color: var(--ink);
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    a.source {
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 780px) {
+      .hero,
+      .notes,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="topbar">
+      <span>Valley Verified / Health And Care</span>
+      <img class="mark" src="assets/logo.svg" alt="">
+    </div>
+
+    <section class="hero" aria-labelledby="business-name">
+      <div class="intro">
+        <p class="eyebrow">Spine / Pain Care in Phoenix</p>
+        <h1 id="business-name">Advanced Spine &amp; Pain</h1>
+        <p class="summary">Phoenix spine and pain care with a 95th Lane address, published phone, and minimally invasive treatment focus.</p>
+      </div>
+
+      <aside class="contact-card" aria-label="Contact facts">
+        <div>
+          <p class="eyebrow">Business Phone</p>
+          <a class="phone" href="tel:+14805730130">(480) 573-0130</a>
+          <p class="address">1695 N. 95th Lane<br>Phoenix, AZ 85037</p>
+        </div>
+        <p class="address">Scheduling, service scope, and quote details are handled through the listed phone.</p>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Business facts">
+      <div class="fact"><b>Category</b>Health And Care</div>
+      <div class="fact"><b>Niche</b>Spine / Pain Care</div>
+      <div class="fact"><b>Language</b>English</div>
+    </section>
+
+    <section class="notes">
+      <div class="panel">
+        <h2>Tags</h2>
+        <div class="tags">
+          <span class="tag">Spine / pain care</span>
+          <span class="tag">Health Care</span>
+          <span class="tag">Healthcare provider / business phone listed</span>
+          <span class="tag">Healthcare / Wellness</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Local Proof</h2>
+        <ul>
+          <li>Selected for Valley Verified because the business has clear local category, address, and phone details.</li>
+          <li>Published address, category, and contact details support the profile.</li>
+          <li>Local category, address, and phone evidence support this Valley Verified profile.</li>
+          <li><a class="source" href="https://business.phoenixchamber.com/list/ql/health-care-11">Phoenix Chamber health care directory</a></li>
+        </ul>
+      </div>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Advanced Spine &amp; Pain belongs in Valley Verified because the Phoenix practice has a precise West Valley location at 1695 N. 95th Lane and a documented focus on interventional, minimally invasive pain care for patients dealing with back, spine, nerve, and chronic pain concerns.</p>
+        <ul>
+          <li>Official and Chamber evidence supports services including spinal cord stimulation, biologics-based therapies, injections, and minimally invasive procedures.</li>
+          <li>The practice serves Phoenix and Arizona patients through multiple Arizona locations, with appointment routes by phone, text, email, and form.</li>
+          <li>The Greater Phoenix Chamber profile confirms the Phoenix address, phone number, and specialized health-care category.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

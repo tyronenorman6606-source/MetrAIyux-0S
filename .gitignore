@@ -18,6 +18,7 @@ node_modules
 !.env.*.example
 .secrets/
 **/.secrets/
+**/.dev.vars
 *.pem
 *.key
 *.p12
@@ -48,12 +49,23 @@ ADMIN_REFERENCE.md
 # Generated packages and local proof artifacts
 *.zip
 *.tar
+*.zst
+*.enc
+*.skyesecrets
 *.gz
 *.tgz
 *.7z
 *.rar
 test-artifacts/
 test-results/
+
+# Local staging, deployment handoff, and scratch output
+tmp/
+.tmp/
+output/
+download-handoffs/
+.venv*/
+**/.wrangler-dryrun-test/
 
 # Staged credential-scan exclusions
 SkyeGateFS27/env.template

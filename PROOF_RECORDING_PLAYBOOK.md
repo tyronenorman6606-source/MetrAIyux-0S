@@ -1,6 +1,10 @@
 # Proof Recording Playbook
 
-This repo now has a repeatable browser-proof recorder for public sites, client previews, and operating surfaces.
+Status: deprecated for Codex-run work.
+
+The owner/admin has disabled Codex browser proof and proof recording. Do not run these browser recorder commands unless the owner explicitly re-enables browser proof in the current task. Use deploy receipts, static checks, API smoke, and authenticated HTTP stress instead; the owner performs live browser verification manually.
+
+This historical playbook describes the old browser-proof recorder for public sites, client previews, and operating surfaces.
 
 ## What It Produces
 
@@ -15,6 +19,8 @@ This repo now has a repeatable browser-proof recorder for public sites, client p
 npm run proof:record:metraiyux
 ```
 
+Current behavior: this command returns a no-browser disabled receipt.
+
 Output:
 
 ```text
@@ -26,6 +32,8 @@ test-artifacts/proof-recordings/metraiyux-public-proof/
 ```bash
 npm run proof:record -- --config proof-recipes/your-site.json
 ```
+
+Current behavior: this command returns a no-browser disabled receipt.
 
 Recipes can point at a local static folder:
 

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desert Fleet Outfitters, LLC | Valley Verified</title>
+  <meta name="description" content="Desert Fleet Outfitters supplies oil, filters, custom filter service kits, and job-site delivery for Arizona fleet, construction, mining, and agricultural equipment teams.">
+  <style>
+    :root {
+      --ink: #18201d;
+      --paper: #f5f1e8;
+      --panel: #fffaf0;
+      --signal: #c35b2d;
+      --steel: #31535b;
+      --line: rgba(24, 32, 29, .18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(49,83,91,.08) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(180deg, #efe6d7 0%, #f8f5ec 58%, #d7e0de 100%);
+    }
+    a { color: inherit; }
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      grid-profile-columns: minmax(72px, 11vw) 1fr;
+    }
+    .rail {
+      background: var(--ink);
+      color: #fff7e8;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px 18px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+    }
+    .rail strong {
+      display: block;
+      font-size: 38px;
+      line-height: .9;
+      letter-spacing: 0;
+      color: #f0b867;
+    }
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 48px 0;
+    }
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+    .title {
+      border: 1px solid var(--line);
+      background: rgba(255,250,240,.88);
+      padding: clamp(28px, 6vw, 72px);
+      min-height: 470px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .eyebrow {
+      margin: 0 0 26px;
+      color: var(--steel);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 8vw, 92px);
+      line-height: .88;
+      letter-spacing: 0;
+      max-width: 760px;
+    }
+    .summary {
+      max-width: 620px;
+      margin: 28px 0 0;
+      color: #40504a;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.45;
+    }
+    .dispatch {
+      background: var(--steel);
+      color: #f9f2e5;
+      padding: 28px;
+      display: grid;
+      align-content: space-between;
+      min-height: 470px;
+      position: relative;
+      overflow: hidden;
+    }
+    .dispatch:before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px dashed rgba(255,255,255,.35);
+      pointer-events: none;
+    }
+    .dispatch h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+      position: relative;
+    }
+    .dispatch dl {
+      margin: 40px 0 0;
+      display: grid;
+      gap: 18px;
+      position: relative;
+    }
+    dt {
+      color: rgba(249,242,229,.72);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+    dd {
+      margin: 4px 0 0;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .cards {
+      margin-top: 28px;
+      display: grid;
+      grid-profile-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.72);
+      padding: 22px;
+      min-height: 150px;
+    }
+    .card b {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--signal);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+    }
+    .card p {
+      margin: 0;
+      line-height: 1.55;
+      color: #43524d;
+    }
+    .call {
+      margin-top: 18px;
+      display: inline-flex;
+      width: fit-content;
+      background: var(--signal);
+      color: #fff8ef;
+      padding: 14px 18px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    @media (max-width: 820px) {
+      .wrap { display: block; }
+      .rail { min-height: auto; flex-direction: row; align-items: center; gap: 16px; }
+      .rail strong { font-size: 28px; }
+      main { padding: 28px 0; }
+      .hero, .cards { grid-profile-columns: 1fr; }
+      .title, .dispatch { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="rail" aria-label="Valley Verified">
+      <span><strong>DFO</strong></span>
+      <span>Fleet outfitting<br>Phoenix 85040</span>
+    </aside>
+    <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+      <section class="hero" aria-labelledby="business-name">
+        <div class="title">
+          <div>
+            <p class="eyebrow">Valley Verified profile</p>
+            <h1 id="business-name">Desert Fleet Outfitters, LLC</h1>
+          </div>
+          <p class="summary">A Phoenix fleet outfitting business listed under Real Estate And Property with a public profile phone and South 33rd Street address.</p>
+        </div>
+        <div class="dispatch">
+          <h2>Contact profile</h2>
+          <dl>
+            <div>
+              <dt>Phone</dt>
+              <dd><a href="tel:+14802951676">(480) 295-1676</a></dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd>4635 S 33rd Street<br>Phoenix, AZ 85040</dd>
+            </div>
+            <div>
+              <dt>Language</dt>
+              <dd>English</dd>
+            </div>
+          </dl>
+          <a class="call" href="tel:+14802951676">Call Desert Fleet Outfitters</a>
+        </div>
+      </section>
+      <section class="cards" aria-label="Business facts">
+        <article class="card">
+          <b>Category</b>
+          <p>Real Estate And Property / Fleet Outfitting.</p>
+        </article>
+        <article class="card">
+          <b>Pricing</b>
+          <p>Use the listed DFO phone or email to discuss product availability, kit needs, and delivery timing.</p>
+        </article>
+        <article class="card">
+          <b>Profile date</b>
+          <p>Business profile last reviewed May 19, 2026 from a public Phoenix Chamber listing.</p>
+        </article>
+      </section>
+      <section class="sky-vv" aria-labelledby="vv-desert-fleet-outfitters-llc-phoenix-85040-c1e8ff4" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-desert-fleet-outfitters-llc-phoenix-85040-c1e8ff4" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Desert Fleet Outfitters, LLC is Valley Verified because the Phoenix company has a sharp industrial purpose: keeping medium- to heavy-duty equipment maintenance moving. The official site confirms 4635 S 33rd Street, Phoenix, AZ 85040, phone (480) 295-1676, weekday hours from 7:00 AM to 4:00 PM, and 24/7 service availability.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">DFO's differentiator is specificity. The official profile describes customized filter service kits ordered by asset ID and maintenance interval, just-in-time delivery, in-stock products, oil, filters, and supply support for construction, mining, agriculture, and fleet maintenance teams.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Desert Fleet Outfitters belongs in Valley Verified because Arizona job sites need suppliers that understand equipment uptime, parts timing, and field delivery, not generic retail supply language.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Oil, filters, heavy-equipment products, custom filter service kits, and job-site delivery.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Fleet maintenance managers, construction crews, mining teams, agricultural operators, and Arizona job-site buyers.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Official site, Phoenix address and phone, Chamber listing, weekday hours, 24/7 service availability, and custom kit evidence.</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

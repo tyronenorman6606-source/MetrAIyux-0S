@@ -1,0 +1,60 @@
+{
+  "ok": true,
+  "app": "SkyeMusicNexus DAW",
+  "scope": "DAW-owned closure pass only",
+  "createdAt": "2026-05-27T04:15:32.000Z",
+  "browserProof": {
+    "run": false,
+    "reason": "Owner/admin policy keeps browser verification owner-handled."
+  },
+  "implemented": [
+    "Project schema v2 stores clip restore metadata, content hashes, duration, sample rate, channel count, inline audio payloads for small clips, and asset-backed restore URLs.",
+    "Local project save now stores reconstructable small clip audio when browser storage allows and trims inline payloads with an explicit local receipt when quota requires asset-backed storage.",
+    "Restored projects rebuild AudioBuffers from project-inline audio or gated music-assets URLs through the shared SkyGate-aware fetch lane.",
+    "The topbar Export button now posts action queueExport to the studio route; JSON manifest download is a separate Manifest button.",
+    "kAIxU assistant UI exposes budget tier, credit cap, rate window, and a live daily credit meter.",
+    "kAIxU assistant output is sanitized to kAIxU-only aliases and strips private route fields before display.",
+    "Apply Diff now applies deterministic addRegionIfMissing operations with stable operation ids and skips already-applied operations."
+  ],
+  "externalDependencies": [
+    {
+      "area": "Large imported clips",
+      "status": "bounded",
+      "detail": "DAW inline project restore is capped at 4 MB per clip and DAW asset promotion is capped at the existing 18 MB inline upload lane. Larger clips need the existing Upload Studio/direct asset lane before they are reconstructable from a saved DAW project."
+    },
+    {
+      "area": "Paid export rendering",
+      "status": "backend-dependent",
+      "detail": "The DAW now queues a real studio export manifest through queueExport. Actual MP3/stem/master rendering still needs the existing external audio worker/transcode infrastructure."
+    }
+  ],
+  "verification": [
+    {
+      "command": "node --check public/nexus-daw.js",
+      "ok": true,
+      "result": "syntax check passed"
+    },
+    {
+      "command": "node smoke/native-daw-closure-smoke.mjs",
+      "ok": true,
+      "result": "verified durable project schema markers, clip restore functions, queueExport wiring, kAIxU budget controls, deterministic diff apply, and forbidden-string checks"
+    },
+    {
+      "command": "node smoke/open-source-studio-smoke.mjs",
+      "ok": true,
+      "result": "verified native DAW route, protected studio function, project ledger save, export queue, Release Forge handoff, and native module record"
+    }
+  ],
+  "changedFiles": [
+    "metraiyux_0s_site/SkyeMusicNexus/public/daw.html",
+    "metraiyux_0s_site/SkyeMusicNexus/public/nexus-daw.css",
+    "metraiyux_0s_site/SkyeMusicNexus/public/nexus-daw.js",
+    "metraiyux_0s_site/SkyeMusicNexus/smoke/native-daw-closure-smoke.mjs",
+    "metraiyux_0s_site/SkyeMusicNexus/docs/DAW_CLOSURE_2026-05-27.md",
+    "metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-daw-closure-2026-05-27.json"
+  ],
+  "sharedGate": {
+    "appSpecificPasswordAdded": false,
+    "authLane": "existing SkyGate-aware studio/assets fetch helpers"
+  }
+}

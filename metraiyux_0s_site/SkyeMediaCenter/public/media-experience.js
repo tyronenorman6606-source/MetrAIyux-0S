@@ -20,7 +20,7 @@ function mediaApiPath(name){
   return `${API}/${routes[functionName] || functionName}`;
 }
 const surface = document.body.dataset.appSurface;
-const storageKey = 'skye_media_center_token';
+const storageKey = 'MetrAIyuxGateBridge';
 const auth = createSkyGateAuth({ sessionPath: mediaApiPath('skygate-session'), storageKey });
 let pendingFiles = [];
 let adminFiles = [];
@@ -34,14 +34,14 @@ function getToken(){ return auth.getToken(); }
 async function requireGateSession(){ if(window.SkyeMediaGate?.requireSession){ const session=await window.SkyeMediaGate.requireSession(); if(session?.token) auth.setToken(session.token); return session; } return null; }
 function syncGate(source){ const token=getToken(); if(token && window.SkyeMediaGate?.persist) window.SkyeMediaGate.persist({token,source,client:'SkyeMediaCenter',status:'free99_gate_session'}); }
 function authHeaders(includeJson=true){ const headers=includeJson?{'Content-Type':'application/json'}:{}; Object.assign(headers, window.SkyeMediaGate?.headers?.() || {}); const token=getToken(); if(token)headers.authorization=`Bearer ${token}`; return headers; }
-async function updateAuthState(){ const el=document.getElementById('auth-state'); if(!el)return; const ready=!!getToken(); let label=surface==='admin'?'Admin Auth Missing':'Upload Auth Missing'; if(ready){ label=surface==='admin'?'Admin Auth Ready':'Upload Auth Ready'; try{ const info=await auth.getSessionInfo(); if(info?.activeSession){ const source=info.activeSession.source==='local-identity-session'?'local':info.activeSession.source; label += ` · ${source} ${info.activeSession.role||'session'}`; } }catch{} } el.textContent=label; el.classList.toggle('ready',ready); }
+async function updateAuthState(){ const el=document.getElementById('auth-state'); if(!el)return; const ready=!!getToken(); let label=surface==='admin'?'Operator access required':'Media access required'; if(ready){ label=surface==='admin'?'Operator session active':'Media session active'; try{ const info=await auth.getSessionInfo(); if(info?.activeSession?.email){ label += ` · ${info.activeSession.email}`; } }catch{} } el.textContent=label; el.classList.toggle('ready',ready); }
 async function requireOk(res,label){ if(res.ok)return res; let data={}; try{data=await res.json();}catch{} if(res.status===401){ await updateAuthState(); toast(`${label} requires operator auth.`); } throw new Error(data.error || `${label} failed with ${res.status}`); }
 function readAsBase64(file){ return new Promise((resolve,reject)=>{ const r=new FileReader(); r.onload=e=>resolve(String(e.target.result).split(',')[1]); r.onerror=reject; r.readAsDataURL(file); }); }
-async function configureSession(kind){ const email=prompt('Local operator email. Leave blank if you want to paste a SkyGate bearer token instead.',''); if(email===null)return; if(email.trim()){ const password=prompt('Local operator password. The issued session stays only in this browser session.',''); if(password===null)return; await auth.loginLocalOperator({ email, password, subject:`mediacenter-${kind}-operator`, role:'admin' }); await updateAuthState(); toast('Operator session active.'); return; } const pasted=prompt('Paste a SkyGate bearer token for protected Media Center controls.', getToken() || ''); if(pasted===null)return; auth.setToken(pasted); await updateAuthState(); toast('Bearer session stored for this browser tab.'); }
-async function configureUploadAuth(){ try{await configureSession('upload'); syncGate('media-upload-login')}catch(e){alert('Error: '+e.message)} }
-async function configureAdminAuth(){ try{await configureSession('admin'); syncGate('media-admin-login'); await loadAdminEverything();}catch(e){alert('Error: '+e.message)} }
-async function bootstrapUploadAuth(){ try{const result=await auth.bootstrapLocalProof({subject:'mediacenter-browser-upload'}); syncGate(result.source || 'local-proof-bootstrap'); await updateAuthState(); toast('Proof Session active.');}catch(e){alert('Error: '+e.message)} }
-async function bootstrapAdminAuth(){ try{const result=await auth.bootstrapLocalProof({subject:'mediacenter-browser-admin'}); syncGate(result.source || 'local-proof-bootstrap'); await updateAuthState(); await loadAdminEverything(); toast('Proof Session active.');}catch(e){alert('Error: '+e.message)} }
+async function configureSession(kind){ const session=await requireGateSession(); if(!session?.token){ toast('Open 0S Signup first, then return to use this surface.'); return; } auth.setToken(session.token); await updateAuthState(); toast(`${kind === 'admin' ? 'Operator' : 'Upload'} gate session connected through 0S.`); }
+async function configureUploadAuth(){ try{await configureSession('upload'); syncGate('media-upload-gate-session')}catch(e){alert('Error: '+e.message)} }
+async function configureAdminAuth(){ try{await configureSession('admin'); syncGate('media-admin-gate-session'); await loadAdminEverything();}catch(e){alert('Error: '+e.message)} }
+async function bootstrapUploadAuth(){ try{ await configureSession('upload'); syncGate('media-upload-gate-session'); await updateAuthState(); }catch(e){alert('Error: '+e.message)} }
+async function bootstrapAdminAuth(){ try{ await configureSession('admin'); syncGate('media-admin-gate-session'); await updateAuthState(); await loadAdminEverything(); }catch(e){alert('Error: '+e.message)} }
 async function disconnectUploadAuth(){ try{await auth.logoutSession();}catch{} auth.clearToken(); window.SkyeMediaGate?.clear?.(); await updateAuthState(); toast('Upload session disconnected.'); location.reload(); }
 async function disconnectAdminAuth(){ try{await auth.logoutSession();}catch{} auth.clearToken(); window.SkyeMediaGate?.clear?.(); await updateAuthState(); await loadAdminEverything(); toast('Admin session disconnected.'); location.reload(); }
 function handleDragOver(e){ e.preventDefault(); document.getElementById('upload-zone')?.classList.add('drag-over'); }

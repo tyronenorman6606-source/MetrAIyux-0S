@@ -3,12 +3,10 @@ import { q } from "./_lib/db.js";
 import { getBearer, monthKeyUTC, sleep } from "./_lib/http.js";
 import { requireGateAuth } from "./_lib/authz.js";
 import { normalizePath } from "./_lib/pushPathNormalize.js";
-import { encodeURIComponentSafePath } from "./_lib/pushPath.js";
 import { audit } from "./_lib/audit.js";
 import { getNetlifyTokenForCustomer } from "./_lib/netlifyTokens.js";
 import { enforcePushCap } from "./_lib/pushCaps.js";
-
-const API = "https://api.netlify.com/api/v1";
+import { putDeployFile } from "./_lib/pushNetlify.js";
 
 function intEnv(name, dflt) {
   const n = parseInt(String(process.env[name] ?? ""), 10);
@@ -23,35 +21,28 @@ function jitter(ms) {
   return ms + Math.floor(Math.random() * 200);
 }
 
-function parseRetryAfterMs(res) {
-  const ra = res.headers.get("retry-after");
-  if (!ra) return 0;
-  const sec = parseInt(ra, 10);
-  if (Number.isFinite(sec) && sec >= 0) return Math.min(60000, sec * 1000);
-  return 0;
-}
-
 function chunkStore() {
   return getStore({ name: "kaixu_push_chunks", consistency: "strong" });
 }
 
 async function putDeployFileStream({ deploy_id, deploy_path, bodyStream, netlify_token }) {
-  const encoded = encodeURIComponentSafePath(deploy_path);
-  const url = `${API}/deploys/${encodeURIComponent(deploy_id)}/files/${encoded}`;
-
-  const res = await fetch(url, {
-    method: "PUT",
-    headers: {
-      authorization: `Bearer ${netlify_token}`,
-      "content-type": "application/octet-stream"
-    },
-    body: bodyStream,
-    duplex: "half"
-  });
-
-  if (res.ok) return { ok: true, status: res.status };
-  const text = await res.text().catch(() => "");
-  return { ok: false, status: res.status, retryAfterMs: parseRetryAfterMs(res), detail: text };
+  const reader = bodyStream.getReader();
+  const chunks = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = value instanceof Uint8Array ? value : new Uint8Array(value || []);
+    chunks.push(chunk);
+    total += chunk.byteLength;
+  }
+  const body = Buffer.concat(chunks.map((chunk) => Buffer.from(chunk)), total);
+  try {
+    await putDeployFile({ deploy_id, deploy_path, body, netlify_token });
+    return { ok: true, status: 200 };
+  } catch (e) {
+    return { ok: false, status: e?.status || 502, retryAfterMs: 0, detail: e?.detail?.error || e?.message || String(e) };
+  }
 }
 
 /**

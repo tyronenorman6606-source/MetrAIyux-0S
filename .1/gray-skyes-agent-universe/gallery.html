@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes black room gallery with portraits, cutout, 0S marks, and dropped stills.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Gallery</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="room-page">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes gallery">
+      <a href="index.html">Hub</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="video-rooms.html">Videos</a>
+      <a href="release.html">Release</a>
+      <a href="zero-os.html">0S</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="room-hero gallery-hero">
+      <img src="media/images/gray-room-02.jpg" alt="Gray Skyes black room frame">
+      <div>
+        <p class="eyebrow">black room gallery</p>
+        <h1>Still pressure</h1>
+        <p class="lede">The stills are treated like rooms too: cutout, red portraits, black-room frames, founder portrait, and 0S marks all stay inside the same visual world.</p>
+        <div class="button-row">
+          <a class="button primary" href="#gallery-wall" data-scroll-target="#gallery-wall">Open wall</a>
+          <a class="button" href="video-rooms.html">Open video rooms</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallery-wall">
+      <div class="gallery">
+        <button type="button" data-gallery-src="media/images/gray-cutout.png" data-gallery-title="Transparent cutout"><img src="media/images/gray-cutout.png" alt="Gray Skyes transparent cutout"><span>Transparent cutout</span></button>
+        <button type="button" data-gallery-src="media/images/gray-red-portrait.jpg" data-gallery-title="Red portrait"><img src="media/images/gray-red-portrait.jpg" alt="Gray Skyes red portrait"><span>Red portrait</span></button>
+        <button type="button" data-gallery-src="media/images/gray-shadow-portrait.jpg" data-gallery-title="Shadow portrait"><img src="media/images/gray-shadow-portrait.jpg" alt="Gray Skyes shadow portrait"><span>Shadow portrait</span></button>
+        <button type="button" data-gallery-src="media/images/gray-ritual-portrait.jpg" data-gallery-title="Ritual portrait"><img src="media/images/gray-ritual-portrait.jpg" alt="Gray Skyes ritual portrait"><span>Ritual portrait</span></button>
+        <button type="button" data-gallery-src="media/images/gray-room-01.jpg" data-gallery-title="Chicago room 01"><img src="media/images/gray-room-01.jpg" alt="Gray Skyes Chicago room frame"><span>Chicago room 01</span></button>
+        <button type="button" data-gallery-src="media/images/gray-room-02.jpg" data-gallery-title="Chicago room 02"><img src="media/images/gray-room-02.jpg" alt="Gray Skyes Chicago room frame"><span>Chicago room 02</span></button>
+        <button type="button" data-gallery-src="media/images/gray-room-03.jpg" data-gallery-title="Chicago room 03"><img src="media/images/gray-room-03.jpg" alt="Gray Skyes Chicago room frame"><span>Chicago room 03</span></button>
+        <button type="button" data-gallery-src="media/images/gray-room-04.jpg" data-gallery-title="Chicago room 04"><img src="media/images/gray-room-04.jpg" alt="Gray Skyes Chicago room frame"><span>Chicago room 04</span></button>
+        <button type="button" data-gallery-src="media/images/gray-founder-portrait.jpg" data-gallery-title="Founder portrait"><img src="media/images/gray-founder-portrait.jpg" alt="Gray Skyes founder portrait"><span>Founder portrait</span></button>
+        <button type="button" data-gallery-src="media/images/metraiyux-0s-emblem.png" data-gallery-title="0S emblem"><img src="media/images/metraiyux-0s-emblem.png" alt="MetrAIyux 0S emblem"><span>0S emblem</span></button>
+        <button type="button" data-gallery-src="media/images/skyes-over-london-logo.png" data-gallery-title="Skyes Over London"><img src="media/images/skyes-over-london-logo.png" alt="Skyes Over London logo"><span>Skyes Over London</span></button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Gray Skyes gallery. Click a frame, open the room, close it, and keep moving through the universe.</p>
+  </footer>
+
+  <div class="modal" id="mediaModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div id="modalMount"></div>
+      <div class="modal-body">
+        <p class="eyebrow" id="modalLane">selected room</p>
+        <h3 id="modalTitle">Media</h3>
+        <div class="button-row">
+          <button type="button" id="modalClose">Close</button>
+          <a class="button" id="modalOpenLink" href="#" target="_blank" rel="noreferrer">Open file</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

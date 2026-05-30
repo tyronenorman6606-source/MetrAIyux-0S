@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Westgate | Valley Verified</title>
+  <meta name="description" content="Valley Verified landing page for Westgate, an entertainment district and destination at 6770 N Sunrise Blvd in Glendale, Arizona.">
+  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/westgate-entertainment-district/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --westgate-ink: #17212b;
+      --westgate-muted: #5c6875;
+      --westgate-red: #b4282d;
+      --westgate-gold: #d89b32;
+      --westgate-mint: #2f8f83;
+      --westgate-sky: #eaf6f8;
+      --westgate-paper: #fffdf9;
+      --westgate-line: rgba(23, 33, 43, .15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body[data-static-hand-page="true"] {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(120deg, rgba(180, 40, 45, .12), rgba(47, 143, 131, .13) 52%, rgba(216, 155, 50, .18)),
+        var(--westgate-paper);
+      color: var(--westgate-ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .westgate-page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0 22px;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark span:first-child {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--westgate-red);
+      color: #fff;
+      box-shadow: 0 10px 28px rgba(180, 40, 45, .24);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 7px 12px;
+      border: 1px solid rgba(47, 143, 131, .28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .72);
+      color: #1e685f;
+      font-size: .88rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.22fr) minmax(300px, .78fr);
+      gap: 28px;
+      align-items: stretch;
+      padding: 34px;
+      border: 1px solid rgba(255, 255, 255, .74);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(255, 255, 255, .72)),
+        radial-gradient(circle at 20% 0%, rgba(216, 155, 50, .28), transparent 38%);
+      box-shadow: 0 26px 70px rgba(23, 33, 43, .12);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--westgate-red);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(2.35rem, 7vw, 5.75rem);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      margin: 22px 0 0;
+      max-width: 720px;
+      color: var(--westgate-muted);
+      font-size: clamp(1.02rem, 2vw, 1.22rem);
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--westgate-line);
+      background: #fff;
+      color: var(--westgate-ink);
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .button-link.primary {
+      border-color: var(--westgate-red);
+      background: var(--westgate-red);
+      color: #fff;
+    }
+
+    .quick-facts {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .fact-tile {
+      padding: 16px;
+      border: 1px solid var(--westgate-line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .8);
+    }
+
+    .fact-tile b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--westgate-red);
+    }
+
+    .fact-tile span {
+      display: block;
+      color: var(--westgate-muted);
+      line-height: 1.45;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .82fr);
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    .panel {
+      border: 1px solid var(--westgate-line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 18px 54px rgba(23, 33, 43, .08);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 19px 20px 0;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 17px 20px 20px;
+    }
+
+    .data-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0;
+    }
+
+    .data-list div {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(234, 246, 248, .78);
+    }
+
+    .data-list dt {
+      margin: 0 0 4px;
+      color: #245d58;
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .data-list dd {
+      margin: 0;
+      color: var(--westgate-ink);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .acceptance {
+      background:
+        linear-gradient(135deg, rgba(23, 33, 43, .96), rgba(27, 70, 67, .94)),
+        #17212b;
+      color: #fff;
+    }
+
+    .acceptance .panel-header p,
+    .acceptance .panel-body {
+      color: rgba(255, 255, 255, .78);
+    }
+
+    .acceptance ol {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    .acceptance li {
+      padding-left: 4px;
+      line-height: 1.5;
+    }
+
+    .seat-meter {
+      display: grid;
+      gap: 9px;
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .seat-meter strong {
+      color: #ffd88c;
+      font-size: 1.1rem;
+    }
+
+    .source-note {
+      margin: 16px 0 0;
+      color: var(--westgate-muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 820px) {
+      .topbar,
+      .hero,
+      .section-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+        align-items: start;
+      }
+
+      .hero {
+        padding: 24px;
+      }
+
+      .data-list {
+        grid-template-columns: 1fr;
+      }
+
+      .status-pill {
+        width: fit-content;
+        white-space: normal;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Westgate",
+    "url": "https://westgateaz.com/",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "6770 N Sunrise Blvd",
+      "addressLocality": "Glendale",
+      "addressRegion": "AZ",
+      "postalCode": "85305"
+    },
+    "description": "Westgate is listed by Valley Verified as a featured entertainment district and destination in Glendale, Arizona."
+  }
+  </script>
+</head>
+<body data-static-hand-page="true">
+  <main class="westgate-page">
+    <nav class="topbar" aria-label="Page">
+      <a class="brand-mark" href="/valley-verified/">
+        <span>VV</span>
+        <span>Valley Verified</span>
+      </a>
+      <span class="status-pill">owner-researched verified status: business verified</span>
+    </nav>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Glendale entertainment district</p>
+        <h1 id="page-title">Westgate</h1>
+        <p class="lede">A featured Valley Verified destination record for Westgate at 6770 N Sunrise Blvd, built around discovery, guest-flow handoff, arrivals, group intake, and event traffic capture through the shared NorthStar SignInPro lane.</p>
+        <div class="hero-actions" aria-label="Primary links">
+          <a class="button-link primary" href="https://westgateaz.com/">Open Westgate site</a>
+          <a class="button-link" href="/admin/login.html?return=/valley-verified/business/westgate-entertainment-district/">Sign in through shared 0S/SkyGate</a>
+        </div>
+      </div>
+      <aside class="quick-facts" aria-label="Westgate snapshot">
+        <div class="fact-tile">
+          <b>Category</b>
+          <span>Food And Events, Entertainment District</span>
+        </div>
+        <div class="fact-tile">
+          <b>Niche</b>
+          <span>Entertainment District / Destination</span>
+        </div>
+        <div class="fact-tile">
+          <b>Record Type</b>
+          <span>Featured Valley Verified client, unclaimed profile status</span>
+        </div>
+        <div class="fact-tile">
+          <b>Hours</b>
+          <span>See website for hours</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section-grid" aria-label="Business details and SkyEmail acceptance">
+      <article class="panel">
+        <div class="panel-header">
+          <h2>Business facts/contact/source</h2>
+        </div>
+        <div class="panel-body">
+          <dl class="data-list">
+            <div>
+              <dt>Business</dt>
+              <dd>Westgate</dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd>6770 N Sunrise Blvd, Glendale, AZ 85305</dd>
+            </div>
+            <div>
+              <dt>Website</dt>
+              <dd><a href="https://westgateaz.com/">westgateaz.com</a></dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd>Not published in the Valley Verified record</dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd>Not published in the Valley Verified record</dd>
+            </div>
+            <div>
+              <dt>License Type</dt>
+              <dd>Business license</dd>
+            </div>
+            <div>
+              <dt>Last Verified</dt>
+              <dd>2026-05-26</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd><a href="https://westgateaz.com/">Official site</a>, source hash c2b1e433f6be</dd>
+            </div>
+            <div>
+              <dt>Source File</dt>
+              <dd>seed/businesses/northstar-clients.json</dd>
+            </div>
+            <div>
+              <dt>Canonical URL</dt>
+              <dd><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/westgate-entertainment-district/">/valley-verified/business/westgate-entertainment-district/</a></dd>
+            </div>
+          </dl>
+          <p class="source-note">owner-researched verified status: Valley Verified marks this record as business verified, featured, accepting requests, and priced as FREE99 platform included. Venue schedules, reservations, classes, event timing, tickets, memberships, and policies should be confirmed on the main Westgate site.</p>
+        </div>
+      </article>
+
+      <article class="panel acceptance">
+        <div class="panel-header">
+          <h2>SkyEmail Acceptance</h2>
+          <p>Use the shared 0S lane for workspace access and team setup.</p>
+        </div>
+        <div class="panel-body">
+          <ol>
+            <li>Next step: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=westgate-entertainment-district">Accept SkyEmail</a> for the Westgate workspace invite.</li>
+            <li>Required access: sign in through shared 0S/SkyGate before any owner or team surface opens.</li>
+            <li>Action: notify owner to provision workspace after acceptance.</li>
+            <li>Target: team activation within 24 hours after provisioning.</li>
+            <li>Escalation: K4i escalation after 24 hours if activation is not complete.</li>
+          </ol>
+          <div class="seat-meter" aria-label="SkyEmail seats">
+            <strong>9 seats left</strong>
+            <span>warn at 2 remaining seats.</span>
+            <span>buy in groups of 5 for additional team access.</span>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

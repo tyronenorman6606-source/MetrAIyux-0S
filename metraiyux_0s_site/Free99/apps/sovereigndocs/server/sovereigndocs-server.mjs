@@ -1262,7 +1262,12 @@ async function handleAPI(req, res, url){
   if(method === 'GET' && url.pathname === '/api/template-health') return sendJSON(res, 200, await loadDataFile('template-quality-report.json', {}));
   if(method === 'POST' && url.pathname === '/api/billing/checkout-intent'){
     const body = await readBody(req);
-    const result = await createCheckoutIntent({ planId:body.planId, orderId:body.orderId, customerEmail:body.customerEmail || session.user?.email, successUrl:body.successUrl, cancelUrl:body.cancelUrl });
+    let result;
+    try {
+      result = await createCheckoutIntent({ planId:body.planId, orderId:body.orderId, customerEmail:body.customerEmail || session.user?.email, successUrl:body.successUrl, cancelUrl:body.cancelUrl, legalAcceptance:body.legal_acceptance || body.legalAcceptance || body });
+    } catch(error) {
+      return sendJSON(res, error.status || 500, { ok:false, error:error.message, code:error.code || 'CHECKOUT_INTENT_FAILED', missing:error.missing || [], legal_urls:error.legal_urls || undefined });
+    }
     const auditEvent = await audit('billing_checkout_intent_created', { planId:body.planId, orderId:body.orderId || null, provider:result.provider, live:!!result.checkoutUrl }, req);
     return sendJSON(res, 200, { ok:true, ...result, auditId:auditEvent.id });
   }

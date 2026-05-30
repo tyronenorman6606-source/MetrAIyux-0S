@@ -15,7 +15,7 @@ This mode supports the landing page, template library, builder, exports, local v
 Use when you want local API persistence and server endpoints.
 
 ```bash
-npm start
+npm run 0s:worker:dev
 ```
 
 Open:

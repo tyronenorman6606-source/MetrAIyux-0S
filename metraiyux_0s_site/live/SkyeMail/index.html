@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMail Vault — Business Email Center</title>
+  <title>SkyeMail Citadel — Business Email Center</title>
   <script type="importmap">
     {
       "imports": {
@@ -37,9 +37,15 @@
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+html{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
 body{
   margin:0;
   font-family: var(--sans);
+  font-weight: 400;
   color: var(--text);
   background:
     radial-gradient(1200px 600px at 20% 10%, rgba(212,175,55,.22), transparent 60%),
@@ -120,7 +126,8 @@ a:hover{ text-decoration:underline; }
   width:100%;
   max-width:1150px;
   margin:0 auto;
-  padding:26px 16px 30px;
+  padding-block:26px 30px;
+  padding-inline:16px;
   flex:1;
 }
 
@@ -129,6 +136,8 @@ a:hover{ text-decoration:underline; }
   grid-template-columns: 1.2fr .8fr;
   gap:18px;
   align-items:stretch;
+  padding-block:6px;
+  padding-inline:0;
 }
 @media (max-width: 940px){
   .hero{ grid-template-columns:1fr; }
@@ -143,7 +152,7 @@ a:hover{ text-decoration:underline; }
 }
 
 .h1{
-  font-size: 38px;
+  font-size: clamp(2.75rem, 5.4vw, 5.125rem);
   line-height:1.05;
   margin:0 0 10px;
   letter-spacing: .2px;
@@ -348,14 +357,24 @@ body.motion-chrome{
 .btn.gold{color:#120b02;background:linear-gradient(135deg,var(--neon-gold),var(--neon-cyan));box-shadow:0 0 24px rgba(97,246,255,.28);}
 .hero{position:relative;isolation:isolate;min-height:calc(100svh - 96px);align-items:center;}
 .skymail-webgl{position:absolute;inset:0;z-index:-1;width:100%;height:100%;display:block;opacity:.76;}
-.h1.glow-text{font-size:clamp(42px,6.2vw,82px);line-height:.96;color:var(--neon-ink);background:linear-gradient(90deg,#fff8e7 0%,var(--neon-gold) 28%,var(--neon-cyan) 58%,var(--neon-pink) 100%);-webkit-background-clip:text;background-clip:text;text-shadow:0 0 18px rgba(97,246,255,.18),0 0 30px rgba(255,215,106,.12);}
+.h1.glow-text{font-size:clamp(2.75rem,6.2vw,5.5rem);line-height:.96;color:var(--neon-ink);background:linear-gradient(90deg,#fff8e7 0%,var(--neon-gold) 28%,var(--neon-cyan) 58%,var(--neon-pink) 100%);-webkit-background-clip:text;background-clip:text;text-shadow:0 0 18px rgba(97,246,255,.18),0 0 30px rgba(255,215,106,.12);}
 .mail-command-preview{display:grid;gap:12px;}
 .mail-command-row{display:flex;justify-content:space-between;gap:14px;padding:13px;border:1px solid var(--neon-line);border-radius:12px;background:rgba(255,255,255,.055);}
 .mail-command-row b,.mail-command-row span{display:block;}
 .mail-command-row span{color:var(--neon-muted);font-size:13px;line-height:1.4;}
+.skyemerit-card{margin-top:16px;padding:16px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:linear-gradient(135deg,rgba(228,184,78,.2),rgba(99,200,220,.12));}
+.skyemerit-card b,.skyemerit-card span{display:block;}
+.skyemerit-card span{color:var(--neon-muted);line-height:1.5;}
+.spark-meter{height:10px;margin:12px 0;border:1px solid rgba(255,255,255,.18);border-radius:999px;overflow:hidden;background:rgba(0,0,0,.25);}
+.spark-meter i{display:block;width:64%;height:100%;background:linear-gradient(90deg,#e4b84e,#63c8dc);}
+.welcome-toast{position:fixed;right:18px;bottom:18px;z-index:40;max-width:340px;padding:16px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(7,9,13,.94);box-shadow:0 20px 80px rgba(0,0,0,.4);}
+.welcome-toast[hidden]{display:none;}
+.welcome-toast button{margin-top:10px;}
 .status-light{width:11px;height:11px;border-radius:999px;background:var(--neon-cyan);box-shadow:0 0 18px rgba(97,246,255,.72);flex:0 0 auto;margin-top:4px;}
 @media (pointer:coarse),(prefers-reduced-motion:reduce){.cursor-trail,.scanline{display:none}.skymail-webgl{opacity:.4}}
+@media (max-width:700px){.mcp-neon-scroll-rail-x,.mcp-neon-scroll-corner{display:none!important}}
   </style>
+  <link rel="stylesheet" href="assets/mail-ui.css" />
 <script src="assets/app.js"></script>
 <script src="assets/skye0s-onboard-bridge.js"></script>
 <script type="module" src="assets/spectacle-motion.js"></script>
@@ -372,14 +391,16 @@ body.motion-chrome{
       <div class="brand">
         <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
         <div class="name">
-          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Vault</b>
-          <span>Encrypted business message center • Cloudflare + Neon</span>
+          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Citadel</b>
+          <span>Encrypted business message center • Citadel + SkyeNet</span>
         </div>
       </div>
       <div class="navlinks">
         <a class="pill" href="index.html">Home</a>
         <a class="pill" href="marketing.html">Marketing</a>
         <a class="pill" href="live-proof.html">Live Proof</a>
+        <a class="pill" href="security.html">Security</a>
+        <a class="pill" href="tech-stack.html">Tech Stack</a>
         <a class="pill" href="changelog.html">Changelog</a>
         <a class="pill" href="pricing.html">Pricing</a>
         <a class="pill" href="suite/index.html">Platform</a>
@@ -397,23 +418,32 @@ body.motion-chrome{
   <div class="card">
     <h1 class="h1 glow-text neon-gradient-text">A secure email workspace for every client room.</h1>
     <p class="sub">
-      SkyeMail Vault is a secure “public inbox” for your brand: anyone can send you a message from your public page,
-      you get an instant email alert, and the full message content stays end-to-end encrypted in your vault.
+      SkyeMail Citadel is a secure “public inbox” for your brand: anyone can send you a message from your public page,
+      you get an instant email alert, and the full message content stays end-to-end encrypted in your sovereign mail core.
       Only the unlocked workspace can read it, unless recovery is explicitly enabled during setup.
     </p>
 
     <div class="grid2">
       <div class="kpi"><b>End‑to‑end encrypted</b><div>Sender encrypts subject + body in their browser using your public key. Server stores ciphertext only.</div></div>
-      <div class="kpi"><b>Inbox + notification</b><div>Neon stores encrypted vault data while SkyeMail powers the hosted inbox, send lane, and delivery receipts.</div></div>
-      <div class="kpi"><b>Recovery is opt‑in</b><div>At signup you can allow admin recovery. If you don’t, nobody can recover the vault.</div></div>
+      <div class="kpi"><b>Inbox + notification</b><div>Citadel stores encrypted sovereign mail data while SkyeNet serves the hosted inbox, send lane, and delivery receipts.</div></div>
+      <div class="kpi"><b>Recovery is opt‑in</b><div>At signup you can allow admin recovery. If you don’t, nobody can recover the sovereign mail core.</div></div>
       <div class="kpi"><b>kAIxuGateway13 ready</b><div>Optional AI assistant panel uses only kAIxuGateway13 endpoints and fetch+ReadableStream SSE parsing.</div></div>
     </div>
 
+    <div class="skyemerit-card" id="launchSpark">
+      <b>SkyeMail Launch Spark</b>
+      <span>Real inbox actions build operator progress: first send, proof run, watch enable, cleanup, contacts, and handoff packets all count inside the mailbox game board.</span>
+      <div class="spark-meter" aria-hidden="true"><i></i></div>
+      <span>Open the gated app, run the inbox, and the progress engine follows the actual work instead of awarding empty badges.</span>
+    </div>
+
     <div class="btnrow">
-      <a class="btn gold" id="skyegateStartLink" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card.html?return_to=https%3A%2F%2Fskyemail-platform.graylondonskyes.workers.dev%2Fgate-return.html">Start With Skyegate FS27</a>
-      <a class="btn" href="signup.html">Create local Vault</a>
+      <a class="btn gold" id="skyegateStartLink" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=%2Flive%2FSkyeMail%2Fsession-handoff.html%3Fnext%3Ddashboard.html%26from%3Dskymail-index-start">Start With Skyegate FS27</a>
+      <a class="btn" href="signup.html">Create Citadel Mail Core</a>
       <a class="btn" href="marketing.html">See SkyeMail</a>
       <a class="btn" href="live-proof.html">Live Proof</a>
+      <a class="btn" href="security.html">Security</a>
+      <a class="btn" href="tech-stack.html">Tech Stack</a>
       <a class="btn" href="changelog.html">Changelog</a>
       <a class="btn" href="pricing.html">Pricing</a>
       <a class="btn" href="suite/index.html">Open Platform</a>
@@ -427,15 +457,15 @@ body.motion-chrome{
     <div class="notice">
       Public address format: <span class="mono">/u/&lt;handle&gt;</span><br/>
       Example: <span class="mono">https://your-site.netlify.app/u/yourbrand</span><br/>
-      Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your Vault Passphrase.
+      Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your Citadel passphrase.
     </div>
 
     <div class="hr"></div>
 
     <div class="grid2">
-      <div class="kpi"><b>What is the vault key?</b><div>Your workspace creates a public/private key pair. The public key receives encrypted mail. The private key is what opens it.</div></div>
-      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your Vault Passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
-      <div class="kpi"><b>What Resend does</b><div>Resend delivers inbound and outbound email events. SkyeMail then encrypts inbound content into the vault before saving the inbox record.</div></div>
+      <div class="kpi"><b>What is the sovereign key?</b><div>Your workspace creates a public/private key pair. The public key receives encrypted mail. The private key is what opens it.</div></div>
+      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your Citadel passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
+      <div class="kpi"><b>What the sovereign mail lane does</b><div>Citadel and SkyeNet carry inbound and outbound mail events. SkyeMail then encrypts inbound content into Citadel before saving the inbox record.</div></div>
       <div class="kpi"><b>What recovery means</b><div>If recovery is off and you lose the passphrase, encrypted content may be unrecoverable. If recovery is on, a separate admin-recovery copy is stored encrypted.</div></div>
     </div>
   </div>
@@ -445,11 +475,11 @@ body.motion-chrome{
       <div class="badge">Powered by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">Skyes Over London LC</span> • Execution-first systems</div>
       <div class="tagline" style="margin-top:10px;">
         Use this as your “public email front door” — without turning your inbox into a spam landfill.
-        Your vault becomes the place where messages are accountable, searchable, and private.
+        Your sovereign mail core becomes the place where messages are accountable, searchable, and private.
       </div>
       <div class="mail-command-row"><div><b>Inbox lane</b><span>Client replies land as encrypted workspace records.</span></div><i class="status-light"></i></div>
       <div class="mail-command-row"><div><b>Compose lane</b><span>Outbound mail runs through the verified send path.</span></div><i class="status-light"></i></div>
-      <div class="mail-command-row"><div><b>Vault key card</b><span>Setup, recovery policy, and mailbox identity travel together.</span></div><i class="status-light"></i></div>
+      <div class="mail-command-row"><div><b>Sovereign key card</b><span>Setup, recovery policy, and mailbox identity travel together.</span></div><i class="status-light"></i></div>
       <div class="mail-command-row"><div><b>0S handoff</b><span>The workspace can connect back into the client <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span>.</span></div><i class="status-light"></i></div>
       <div class="btnrow" style="margin-top:12px;">
         <a class="btn" href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
@@ -479,20 +509,39 @@ body.motion-chrome{
         <a href="https://skyesoverlondon.netlify.app/" target="_blank" rel="noopener">SkyesOverLondon</a>
         <a href="https://solenterprises.org/pages/skyeweb" target="_blank" rel="noopener">SkyeWeb</a>
         <a href="changelog.html">SkyeMail Changelog</a>
+        <a href="security.html">SkyeMail Security</a>
+        <a href="tech-stack.html">SkyeMail Tech Stack</a>
         <a href="pricing.html">SkyeMail Pricing</a>
       </p>
     </div>
   </div>
 </div>
 
+<div class="welcome-toast" id="handoffWelcomeToast" hidden>
+  <b>Welcome to your SkyeMail workspace.</b>
+  <span id="handoffWelcomeText">Open the inbox to start earning progress from real mailbox actions.</span>
+  <button class="btn gold" id="handoffWelcomeClose" type="button">Start running the inbox</button>
+</div>
+
 <script>
 (function(){
   const link = document.getElementById('skyegateStartLink');
   if(!link) return;
-  const returnTo = new URL('gate-return.html', location.href).toString();
-  const gate = new URL('https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyemail-gate-card.html');
-  gate.searchParams.set('return_to', returnTo);
+  const gate = new URL('https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html');
+  gate.searchParams.set('return', '/live/SkyeMail/session-handoff.html?next=dashboard.html&from=skymail-index-start');
   link.href = gate.toString();
+})();
+(function(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('welcome') !== '1') return;
+  const toast = document.getElementById('handoffWelcomeToast');
+  const text = document.getElementById('handoffWelcomeText');
+  const close = document.getElementById('handoffWelcomeClose');
+  const mailbox = params.get('mailbox') || '';
+  const workspace = params.get('workspace') || params.get('workspace_id') || '';
+  if(text) text.textContent = `${workspace || 'Your workspace'} is ready${mailbox ? ` at ${mailbox}` : ''}. Open the inbox to start the SkyeMail Launch Spark.`;
+  if(toast) toast.hidden = false;
+  if(close) close.addEventListener('click', () => { if(toast) toast.hidden = true; location.href = 'dashboard.html'; });
 })();
 </script>
 </body>

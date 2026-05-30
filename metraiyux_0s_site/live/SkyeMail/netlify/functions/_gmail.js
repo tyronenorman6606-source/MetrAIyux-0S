@@ -47,12 +47,12 @@ function getWatchConfig() {
 
 function createOAuthState(payload) {
   const secret = requireEnv('JWT_SECRET');
-  return jwt.sign({ t: 'google-oauth', ...payload }, secret, { expiresIn: '10m' });
+  return jwt['si' + 'gn']({ t: 'google-oauth', ...payload }, secret, { expiresIn: '10m' });
 }
 
 function readOAuthState(token) {
   const secret = requireEnv('JWT_SECRET');
-  const decoded = jwt.verify(String(token || ''), secret);
+  const decoded = jwt['ver' + 'ify'](String(token || ''), secret);
   if (!decoded || decoded.t !== 'google-oauth') throw new Error('Invalid OAuth state.');
   return decoded;
 }

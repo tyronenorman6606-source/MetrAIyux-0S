@@ -126,6 +126,54 @@ function linkedPreviewAllowed(release) {
   return rights.ownershipAttested === true && rights.previewUseAuthorized === true && rights.playbackBlocked !== true && rights.takedownHold !== true;
 }
 
+const PUBLIC_PLAY_COUNT_THRESHOLD = 1000;
+
+function metricCount(value) {
+  const next = Number(value || 0);
+  return Number.isFinite(next) && next > 0 ? next : 0;
+}
+
+function publicMetricLabel(value, noun) {
+  const total = metricCount(value);
+  const formattedThreshold = new Intl.NumberFormat('en-US').format(PUBLIC_PLAY_COUNT_THRESHOLD);
+  if (total >= PUBLIC_PLAY_COUNT_THRESHOLD) {
+    return `${new Intl.NumberFormat('en-US').format(total)} ${noun}`;
+  }
+  return `building toward first ${formattedThreshold} ${noun}`;
+}
+
+function publicMetricsForRelease(release) {
+  const analytics = release.analytics || {};
+  const streams = metricCount(analytics.streams);
+  const plays = metricCount(analytics.plays);
+  const trackStats = analytics.trackStats && typeof analytics.trackStats === 'object' ? analytics.trackStats : {};
+  const tracks = normalizeTracks(release.tracks).map((track, index) => {
+    const stat = trackStats[String(index)] || {};
+    const trackPlays = Math.max(metricCount(track.plays), metricCount(stat.plays));
+    return {
+      trackIndex: index,
+      title: track.title,
+      playsVisible: trackPlays >= PUBLIC_PLAY_COUNT_THRESHOLD,
+      playsLabel: publicMetricLabel(trackPlays, 'plays'),
+    };
+  });
+
+  return {
+    playCountThreshold: PUBLIC_PLAY_COUNT_THRESHOLD,
+    streamsVisible: streams >= PUBLIC_PLAY_COUNT_THRESHOLD,
+    streamsLabel: publicMetricLabel(streams, 'streams'),
+    playsVisible: plays >= PUBLIC_PLAY_COUNT_THRESHOLD,
+    playsLabel: publicMetricLabel(plays, 'plays'),
+    tracks,
+  };
+}
+
+function withPublicMetrics(release) {
+  return release && typeof release === 'object'
+    ? { ...release, publicMetrics: publicMetricsForRelease(release) }
+    : release;
+}
+
 function distributionGateAllowed(release) {
   const rights = release.rights || {};
   const tracks = normalizeTracks(release.tracks);
@@ -358,7 +406,7 @@ function handleSubmit(payload) {
   releases.push(release);
   saveReleases(releases);
 
-  return respond(201, { ok: true, release });
+  return respond(201, { ok: true, release: withPublicMetrics(release) });
 }
 
 // ---------------------------------------------------------------------------
@@ -379,7 +427,7 @@ function handleList(params) {
     releases = releases.filter((r) => r.status === status);
   }
 
-  return respond(200, { ok: true, releases, total: releases.length });
+  return respond(200, { ok: true, releases: releases.map(withPublicMetrics), total: releases.length });
 }
 
 // ---------------------------------------------------------------------------
@@ -398,7 +446,7 @@ function handleGet(params) {
     return respond(404, { ok: false, error: 'Release not found' });
   }
 
-  return respond(200, { ok: true, release });
+  return respond(200, { ok: true, release: withPublicMetrics(release) });
 }
 
 // ---------------------------------------------------------------------------
@@ -435,7 +483,7 @@ function handleReview(payload, params) {
 
   saveReleases(releases);
 
-  return respond(200, { ok: true, release: releases[idx] });
+  return respond(200, { ok: true, release: withPublicMetrics(releases[idx]) });
 }
 
 function handleUpdateRights(payload, params) {
@@ -463,7 +511,7 @@ function handleUpdateRights(payload, params) {
   releases[idx] = release;
   saveReleases(releases);
 
-  return respond(200, { ok: true, release, rights: release.rights, summary: rightsSummary(release) });
+  return respond(200, { ok: true, release: withPublicMetrics(release), rights: release.rights, summary: rightsSummary(release) });
 }
 
 function handleTakedownRequest(payload, params) {
@@ -501,7 +549,7 @@ function handleTakedownRequest(payload, params) {
   releases[idx] = release;
   saveReleases(releases);
 
-  return respond(202, { ok: true, release, request, rights: release.rights });
+  return respond(202, { ok: true, release: withPublicMetrics(release), request, rights: release.rights });
 }
 
 function handleRightsAudit(params) {
@@ -564,7 +612,7 @@ function handlePublish(payload, params) {
 
   saveReleases(releases);
 
-  return respond(200, { ok: true, release: releases[idx] });
+  return respond(200, { ok: true, release: withPublicMetrics(releases[idx]) });
 }
 
 // ---------------------------------------------------------------------------
@@ -615,7 +663,7 @@ function handleReportStreams(payload, params) {
 
   saveReleases(releases);
 
-  return respond(200, { ok: true, release: releases[idx] });
+  return respond(200, { ok: true, release: withPublicMetrics(releases[idx]) });
 }
 
 function handlePlaybackStream(payload, params) {
@@ -698,13 +746,16 @@ function handlePlaybackStream(payload, params) {
 
   return respond(200, {
     ok: true,
-    release,
+    release: withPublicMetrics(release),
     playback: {
       ...playback,
       streams: analytics.streams,
       proofPlays: analytics.proofPlays || 0,
       plays: analytics.plays,
       trackPlays: stat.plays,
+      playCountThreshold: PUBLIC_PLAY_COUNT_THRESHOLD,
+      trackPlaysVisible: metricCount(stat.plays) >= PUBLIC_PLAY_COUNT_THRESHOLD,
+      trackPlaysLabel: publicMetricLabel(stat.plays, 'plays'),
     },
   });
 }
@@ -757,7 +808,7 @@ function handleQueueOperations(payload, params) {
   releases[idx] = release;
   saveReleases(releases);
 
-  return respond(201, { ok: true, release, workflow: release.operationsWorkflow });
+  return respond(201, { ok: true, release: withPublicMetrics(release), workflow: release.operationsWorkflow });
 }
 
 function handleUpdateOperations(payload, params) {
@@ -805,7 +856,7 @@ function handleUpdateOperations(payload, params) {
   releases[idx] = release;
   saveReleases(releases);
 
-  return respond(200, { ok: true, release, workflow });
+  return respond(200, { ok: true, release: withPublicMetrics(release), workflow });
 }
 
 // ---------------------------------------------------------------------------

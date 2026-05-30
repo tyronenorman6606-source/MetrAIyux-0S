@@ -85,17 +85,20 @@ export default `<!doctype html>
     const returnLink = document.getElementById('direct-return-link');
     const unlockButton = document.getElementById('unlock-button');
     let ownerToken = '';
-    const returnTo = safeReturnPath(new URLSearchParams(location.search).get('return') || '');
+    const returnParams = new URLSearchParams(location.search);
+    const pendingReturnKey = 'FREE99_PENDING_APP_RETURN';
+    const returnState = resolveReturnPath();
+    const returnTo = returnState.path;
 
     if (returnTo) {
       returnPath.textContent = returnTo;
       returnLink.href = returnTo;
-      returnLink.textContent = 'Open ' + returnTo;
+      returnLink.textContent = 'Open requested app';
       unlockButton.textContent = 'Unlock This App';
     } else {
-      returnPath.textContent = 'No app return was supplied. Unlocking here will open the 0S admin session.';
-      returnLink.href = '/Free99/index.html';
-      returnLink.textContent = 'Open Free99 App Hub';
+      returnPath.textContent = 'No app return was supplied. Free99 can unlock the shared 0S session, but no app told the gate where to return.';
+      returnLink.href = '/founder-command/?view=core#pocket-skyemail';
+      returnLink.textContent = 'Open Pocket SkyeMail';
       unlockButton.textContent = 'Unlock 0S';
     }
 
@@ -114,6 +117,40 @@ export default `<!doctype html>
       if (!text || !text.startsWith('/') || text.startsWith('//')) return '';
       if (/^\\/api\\/owner\\/admin-login/i.test(text) || /^\\/admin\\/login(?:\\/|\\.html)?/i.test(text)) return '';
       return text;
+    }
+
+    function pendingReturnPath() {
+      try {
+        return sessionStorage.getItem(pendingReturnKey) || '';
+      } catch (error) {
+        return '';
+      }
+    }
+
+    function referrerReturnPath() {
+      try {
+        const referrer = new URL(document.referrer || '');
+        if (referrer.origin !== location.origin) return '';
+        return referrer.pathname + referrer.search + referrer.hash;
+      } catch (error) {
+        return '';
+      }
+    }
+
+    function resolveReturnPath() {
+      const candidates = [
+        returnParams.get('return'),
+        returnParams.get('return_to'),
+        returnParams.get('returnTo'),
+        returnParams.get('next'),
+        pendingReturnPath(),
+        referrerReturnPath()
+      ];
+      for (const candidate of candidates) {
+        const safe = safeReturnPath(candidate || '');
+        if (safe) return { path: safe };
+      }
+      return { path: '' };
     }
 
     function persistSharedGateToken(token, source) {
@@ -166,6 +203,7 @@ export default `<!doctype html>
         tokenPreview.textContent = maskToken(ownerToken);
         if (returnTo) {
           setStatus('Free99 admin code accepted. Opening this app...', 'ok');
+          try { sessionStorage.removeItem(pendingReturnKey); } catch (error) {}
           setTimeout(() => location.assign(returnTo), 250);
         } else {
           tokenPanel.classList.add('active');

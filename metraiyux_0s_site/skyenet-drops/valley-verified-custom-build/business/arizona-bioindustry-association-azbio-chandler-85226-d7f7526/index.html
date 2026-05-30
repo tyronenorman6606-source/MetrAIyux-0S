@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Bioindustry Association (AZBio) | Valley Verified</title>
+  <meta name="description" content="Arizona Bioindustry Association (AZBio) in Chandler, AZ: bioscience association listed in Valley Verified.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #101816;
+      --paper: #f7fff9;
+      --green: #1b8f68;
+      --lime: #b8e65b;
+      --aqua: #a7ede7;
+      --violet: #6e5ad8;
+      --line: rgba(16, 24, 22, .18);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(27,143,104,.1) 0 2px, transparent 2px 50px),
+        linear-gradient(180deg, #ffffff 0%, var(--paper) 100%);
+      overflow-wrap: anywhere;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { background: var(--ink); color: #fff; }
+    .bar {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand, .place { font-weight: 900; text-transform: uppercase; letter-spacing: .1em; font-size: .78rem; }
+    .place { color: var(--aqua); }
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      align-items: center;
+      padding: 58px 0 36px;
+    }
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--green);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .82rem;
+    }
+    h1 { margin: 0; font-size: 3.55rem; line-height: 1; letter-spacing: 0; }
+    .lead { margin: 22px 0 0; max-width: 660px; font-size: 1.12rem; line-height: 1.75; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      text-decoration: none;
+      background: var(--green);
+      color: #fff;
+      border: 2px solid var(--ink);
+      font-weight: 900;
+    }
+    .button.alt { background: #fff; color: var(--ink); }
+    .lab {
+      min-height: 420px;
+      border: 2px solid var(--ink);
+      background:
+        linear-gradient(90deg, transparent 0 18%, rgba(110,90,216,.92) 18% 23%, transparent 23% 48%, rgba(184,230,91,.95) 48% 55%, transparent 55%),
+        repeating-linear-gradient(0deg, rgba(16,24,22,.12) 0 1px, transparent 1px 42px),
+        #e9fff5;
+      position: relative;
+    }
+    .lab::before {
+      content: "AZBIO";
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      right: 28px;
+      padding: 22px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      color: var(--green);
+      font-size: 2.4rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    .lab::after {
+      content: "Bioscience Association / Chandler";
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      right: 28px;
+      padding: 16px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 900;
+      text-align: center;
+    }
+    .facts {
+      margin: 20px 0 42px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .fact { padding: 20px; background: #fff; border-top: 5px solid var(--green); box-shadow: 0 0 0 1px var(--line); }
+    .label { margin: 0 0 8px; color: #60716b; font-size: .74rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .value { margin: 0; line-height: 1.48; font-weight: 800; }
+    .section {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 34px;
+      padding: 40px 0 60px;
+      border-top: 1px solid var(--line);
+    }
+    h2 { margin: 0; font-size: 2rem; line-height: 1.05; }
+    .copy { margin: 0; line-height: 1.78; font-size: 1.02rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .tag { background: var(--aqua); border: 1px solid var(--ink); padding: 9px 11px; font-weight: 900; }
+    footer { background: var(--ink); color: #fff; padding: 24px 0; }
+    @media (max-width: 840px) {
+      .hero, .section { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2.6rem; }
+      .lab { min-height: 310px; }
+    }
+    @media (max-width: 520px) {
+      .bar, .actions { align-items: stretch; flex-direction: column; }
+      .facts { grid-template-columns: 1fr; }
+      h1 { font-size: 2.1rem; }
+      .lab::before { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <div class="brand">Valley Verified</div>
+      <div class="place">Chandler, AZ 85226</div>
+    </div>
+  </header>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Health Care / Bioscience Association</p>
+        <h1>Arizona Bioindustry Association (AZBio)</h1>
+        <p class="lead">Arizona Bioindustry Association (AZBio) represents the bioscience lane in Chandler, giving Arizona health, research, and bioindustry stakeholders a public association contact at Southgate Drive.</p>
+        <div class="actions">
+          <a class="button" href="tel:+14807798101">Call (480) 779-8101</a>
+          <a class="button alt" href="https://business.phoenixchamber.com/list/ql/health-care-11">Chamber health profile</a>
+        </div>
+      </div>
+      <div class="lab" aria-hidden="true"></div>
+    </section>
+    <section class="wrap facts" aria-label="Business facts">
+      <div class="fact"><p class="label">Category</p><p class="value">Health And Care</p></div>
+      <div class="fact"><p class="label">Niche</p><p class="value">Bioscience Association</p></div>
+      <div class="fact"><p class="label">Address</p><p class="value">107 S. Southgate Dr., Chandler, AZ 85226</p></div>
+      <div class="fact"><p class="label">Audience</p><p class="value">Bioscience and health-care organizations</p></div>
+    </section>
+    <section class="wrap section">
+      <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <div>
+        <p class="copy">AZBio belongs in Valley Verified because the research identifies a specific Chandler association, a public phone number, a Southgate Drive address, and a health-care/bioscience category that matters to Arizona's innovation economy. It is useful for local founders, care organizations, workforce partners, and business groups looking for Arizona's bioindustry network.</p>
+        <div class="tags" aria-label="Business tags">
+          <span class="tag">Bioscience organization</span>
+          <span class="tag">Healthcare / Wellness</span>
+          <span class="tag">English</span>
+          <span class="tag">Chandler association</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap">Valley Verified profile for Arizona Bioindustry Association (AZBio) in Chandler.</div>
+  </footer>
+</body>
+</html>

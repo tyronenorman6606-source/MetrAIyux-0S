@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const failures = [];
-const generatedPages = ["index.html","dashboard.html","workflows.html","records.html","proof.html","runtime.html","settings.html"];
+const generatedPages = ["index.html"];
 
 async function exists(filePath) {
   try {
@@ -28,12 +28,14 @@ async function walk(dir, files = []) {
 
 const allFiles = await walk(root);
 const htmlPages = allFiles.filter((file) => file.endsWith('.html')).map((file) => path.relative(root, file).replaceAll(path.sep, '/'));
-if (htmlPages.length < 8) failures.push('expected at least 8 html routes, found ' + htmlPages.length);
+if (htmlPages.length !== 2) failures.push('expected canonical app plus gate-readiness support html, found ' + htmlPages.length);
 
 for (const page of generatedPages) {
   if (true) {
     const html = await fs.readFile(path.join(root, page), 'utf8').catch(() => '');
-    if (!html.includes("data-platform-hardening=\"p1-routed\"")) failures.push(page + ' missing routed platform marker');
+    if (!html.includes('id="provider-panel"')) failures.push(page + ' missing canonical provider command panel');
+    if (!html.includes('src="./public/app.js"')) failures.push(page + ' missing canonical public app module link');
+    if (html.includes("Imported App") || html.includes('href="./app.html"') || html.includes('public/index.html')) failures.push(page + ' still references nested imported app shell');
   }
 }
 

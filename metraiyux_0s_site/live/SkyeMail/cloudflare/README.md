@@ -10,6 +10,8 @@ The Worker serves static SkyeMail assets through the `ASSETS` binding and implem
 - `/.netlify/functions/mailbox-domains`
 - `/.netlify/functions/mail-status`
 - `/.netlify/functions/mailbox-provision`
+- `/.netlify/functions/workspace-provision`
+- `/.netlify/functions/workspace-mailbox-summary`
 - `/.netlify/functions/mail-send`
 - `/.netlify/functions/gmail-list`, `gmail-labels`, `gmail-get`, and `gmail-thread-get`
 - `/.netlify/functions/inbound-resend`

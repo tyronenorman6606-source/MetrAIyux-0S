@@ -21,7 +21,7 @@ Key proof points:
 - v9 legal partner review workflow still passes.
 - v10 competitive-core workflow still passes.
 - v13 workflow surfaces still pass.
-- SkyeDocxMax bundled app serves at `/skye-docx-max/app/`.
+- SkyeDocxMax now serves as the canonical 0S editor at `/Marketing-Made-Easy/SkyeDocxMax/editor.html`.
 - SkyeDocxMax bridge imports `sd_handoff` payloads.
 - Full handoff payloads are persisted/retrievable.
 - Handoff-open audit events are recorded.

@@ -1,0 +1,46 @@
+{
+  "target": ".1/supaboy-skrucible",
+  "sourcePolicy": {
+    "newWebsite": true,
+    "usesMerserBuild": false,
+    "usesOriginalZipSite": false
+  },
+  "skrucible": {
+    "localTooling": ".vscode/MCP3-SKRUCIBLE/npm-pkg/skrucible.js",
+    "version": "1.0.3",
+    "mcpToolsUsed": [
+      "forge_index",
+      "forge_stack",
+      "forge_palette",
+      "forge_shader",
+      "forge_mode",
+      "forge_component:glass",
+      "forge_component:crystal",
+      "forge_component:floor",
+      "forge_component:chrome",
+      "forge_animation:gsap-scroll",
+      "forge_animation:lenis",
+      "forge_animation:kinetic-wordmark",
+      "forge_animation:glitch-text"
+    ]
+  },
+  "implementation": {
+    "framework": "React",
+    "scene": "React Three Fiber / Three.js",
+    "identity": "SKrucible raw/refined forge",
+    "patterns": [
+      "plasma shader backdrop",
+      "glass core",
+      "crystal tool triggers",
+      "mirror-forge floor",
+      "chrome scroll/cursor shell",
+      "kinetic wordmark",
+      "glitch text"
+    ]
+  },
+  "verification": {
+    "build": "npm run build",
+    "localPort": 4182,
+    "localBrowserProof": "test-artifacts/supaboy-skrucible-local/browser-proof.json"
+  }
+}

@@ -1013,10 +1013,10 @@
       ☣️ DevodeRator ☣️
     </a>
     <div class="nav-links">
-      <a href="/gray-skyes.html">Gray Skyes</a>
+      <a href="/cards.html">Gray Skyes</a>
       <a href="/social.html">Social</a>
-      <a href="/founder-drops.html">Founder Drops</a>
-      <a href="/ecosystem.html">Ecosystem</a>
+      <a href="/mirrors/founder-drops.html">Founder Drops</a>
+      <a href="/money-paths/">Money Paths</a>
       <a href="/" class="nav-cta">Marketing Hub</a>
     </div>
   </nav>
@@ -1031,7 +1031,7 @@
     </div>
     <aside class="bc-command" aria-label="Business card production state">
       <strong>Card Studio</strong>
-      <span>16 cards loaded: 3 founder directions, 1 client access builder, 12 platform cards.</span>
+      <span>16 cards loaded with real public QR targets: 3 founder directions, 1 client access builder, 12 platform cards.</span>
       <div class="bc-company-contact-list" aria-label="Skyes Over London card contact">
         <a href="mailto:grayskyes@solenterprises.org">grayskyes@solenterprises.org</a>
         <a href="tel:+18004844788">1-(800)-484-4788</a>
@@ -1056,7 +1056,7 @@
     <div class="section-head">
       <div>
         <h2 id="clientCard">Valley Verified Priority Access Card</h2>
-        <p>Search the Valley Verified directory, select the business in front of the owner, and generate a card whose QR opens the gated ConnectLog handoff with the client page, company contact packet, and 31% SkyeMerit activation credit.</p>
+        <p>Search the Valley Verified directory, select the business in front of the owner, and generate a card whose QR opens a public-safe Valley Verified page. The operator buttons still keep the ConnectLog handoff available without putting a gated owner route in the printed scan.</p>
       </div>
     </div>
     <div class="vv-builder">
@@ -1087,7 +1087,7 @@
           <strong id="vv-code-control">VV-BOBS-LP</strong>
         </div>
         <div class="vv-code-card">
-          <span>ConnectLog handoff QR</span>
+          <span>Public QR / operator handoff</span>
           <strong class="is-link" id="vv-connectlog-control">Loading directory...</strong>
         </div>
         <div class="vv-code-card">
@@ -1121,7 +1121,7 @@
                   <span class="bc-pill">Direct Access</span>
                 </div>
                 <div class="bc-qr">
-                  <canvas id="vv-qr" data-url="mailto:grayskyes@solenterprises.org?subject=Valley%20Verified%20Priority%20Access" data-fg="#f4c75b" data-bg="#09070c"></canvas>
+                  <canvas id="vv-qr" data-url="https://devooderator.pages.dev/valley-verified/" data-fg="#f4c75b" data-bg="#09070c"></canvas>
                 </div>
               </div>
               <div class="bc-title-block">
@@ -1143,7 +1143,7 @@
         </div>
         <div class="bc-actions">
           <button class="bc-btn" type="button" onclick="printCard('card-vv')">Save PDF</button>
-          <span class="bc-note">QR opens the ConnectLog handoff with Gray's company contact packet, the selected Valley page, and the seven-day 31% SkyeMerit activation lane.</span>
+          <span class="bc-note">QR opens a public Valley Verified priority page. Use Open ConnectLog when the operator needs the gated company contact packet and seven-day 31% SkyeMerit activation lane.</span>
         </div>
       </div>
     </div>
@@ -1185,7 +1185,31 @@
 const contactEmail = 'grayskyes@solenterprises.org';
 const contactPhone = '1-(800)-484-4788';
 const companyLine = 'Skyes Over London / SOLEnterprises International Nexus & Holdings';
-const founderUrl = 'https://metraiyux-0s-marketing.pages.dev/gray-skyes.html';
+const marketingOrigin = 'https://metraiyux-0s-marketing.pages.dev';
+const devodeRatorOrigin = 'https://devooderator.pages.dev';
+const publicCardTargets = Object.freeze({
+  founderContact: `${marketingOrigin}/gray-skyes.html`,
+  founderVcard: `${devodeRatorOrigin}/assets/cards/gray-london-skyes.vcf`,
+  cardStudio: `${marketingOrigin}/business-cards.html`,
+  marketingHome: `${marketingOrigin}/`,
+  sellSheet: `${marketingOrigin}/sell-sheet.html`,
+  capabilities: `${marketingOrigin}/capabilities.html`,
+  pricing: `${marketingOrigin}/#pricing`,
+  freeBusinessStack: `${marketingOrigin}/business-owner-free-stack.html`,
+  whiteLabel: `${marketingOrigin}/white-label.html`,
+  liveProof: `${marketingOrigin}/proof.html`,
+  socialVault: `${marketingOrigin}/social.html`,
+  devodeRatorProofJournal: `${devodeRatorOrigin}/`,
+  valleyVerified: `${devodeRatorOrigin}/valley-verified/`,
+  skyeRouteX: `${marketingOrigin}/skyeroutex.html`,
+  skyeVaultProof: `${marketingOrigin}/proof-ecology.html`,
+  skyeMusicNexus: `${marketingOrigin}/skye-music-nexus/nexus-marketing-hub.html`,
+  quantumskyesMcp: 'https://skye-design-mcp.pages.dev/use-mcp.html',
+  merser: 'https://merser.pages.dev/',
+  agenticGrowthLayer: 'https://agentic-growth-layer.pages.dev/',
+  legalSkyes: 'https://skyes-over-london-legal.pages.dev/legal/'
+});
+const founderUrl = publicCardTargets.founderContact;
 const devodeRatorLogoUrl = '/assets/DevodeRator-logo.png';
 const metraiyuxMarkUrl = devodeRatorLogoUrl;
 const metraiyuxLogoUrl = devodeRatorLogoUrl;
@@ -1199,7 +1223,7 @@ const valleyDirectoryUrl = '/assets/valley-verified/businesses-lite.json';
 let valleyBusinesses = [];
 let selectedValleyBusiness = null;
 let activeConnectLogUrl = connectLogAppUrl;
-let activeClientUrl = `${zeroOsOrigin}/valley-verified/business/bobs-smoke-shop-litchfield-park/`;
+let activeClientUrl = `${publicCardTargets.valleyVerified}?clientId=bobs-smoke-shop-litchfield-park`;
 
 function buildCardConnectLogUrl({
   source = 'business-cards',
@@ -1248,16 +1272,8 @@ const founderCards = [
     name: 'GRAY LONDON SKYES',
     title: 'Founder / Sole Operator',
     tag: 'SOLEnterprises International Nexus & Holdings',
-    url: 'metraiyux-0s-marketing.pages.dev/gray-skyes',
-    qr: buildCardConnectLogUrl({
-      kind: 'founder',
-      business: 'Gray London Skyes',
-      category: 'Skyes Over London founder card',
-      clientId: 'gray-london-skyes-founder-signature',
-      cardTitle: 'Founder Signature',
-      cardUrl: founderUrl,
-      contact: 'Gray London Skyes'
-    }),
+    url: 'scan to save contact',
+    qr: publicCardTargets.founderVcard,
     fg: '#f4c75b',
     bg: '#07060a',
     badge: 'Founder Card',
@@ -1274,16 +1290,8 @@ const founderCards = [
     name: 'GRAY LONDON SKYES',
     title: 'Founder, builder, operator',
     tag: 'Business systems / client platforms / production proof',
-    url: 'metraiyux-0s-marketing.pages.dev',
-    qr: buildCardConnectLogUrl({
-      kind: 'founder',
-      business: 'Gray London Skyes',
-      category: 'Skyes Over London executive intro',
-      clientId: 'gray-london-skyes-executive-intro',
-      cardTitle: 'Executive Intro',
-      cardUrl: founderUrl,
-      contact: 'Gray London Skyes'
-    }),
+    url: 'devooderator.pages.dev/cards',
+    qr: founderUrl,
     fg: '#1d5f74',
     bg: '#f5efe2',
     badge: 'Executive',
@@ -1300,16 +1308,8 @@ const founderCards = [
     name: 'GRAY LONDON SKYES',
     title: 'Cloudflare operator / AI platform builder',
     tag: 'One-person production stack with live receipts',
-    url: 'metraiyux-0s-marketing.pages.dev',
-    qr: buildCardConnectLogUrl({
-      kind: 'founder',
-      business: 'Gray London Skyes',
-      category: 'Cloudflare operator / AI platform builder',
-      clientId: 'gray-london-skyes-systems-operator',
-      cardTitle: 'Systems Operator',
-      cardUrl: founderUrl,
-      contact: 'Gray London Skyes'
-    }),
+    url: 'metraiyux-0s-marketing.pages.dev/social',
+    qr: publicCardTargets.socialVault,
     fg: '#64d9ff',
     bg: '#020811',
     badge: 'Operator',
@@ -1321,32 +1321,24 @@ const founderCards = [
 ];
 
 const platformCards = [
-  ['card-0s', 'MetrAIyux 0S', 'Sovereign business operating system', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
-  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / July 2026 launch', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', 'https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/flyer-overview.html', 'platform-violet'],
-  ['card-srx', 'SkyeRouteX', 'Workforce command / IC routing / live jobs', 'metraiyux-0s-marketing.pages.dev/skyeroutex', 'https://metraiyux-0s-marketing.pages.dev/skyeroutex.html', 'platform-mint'],
-  ['card-phx', 'PHX Verified Network', 'Valley visibility network / local business proof', 'phx-verified-network.pages.dev', 'https://phx-verified-network.pages.dev', 'platform-gold'],
-  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate / workspace sessions', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
-  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-mint'],
-  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev/legal', 'https://skyes-over-london-legal.pages.dev/legal/', 'platform-gold'],
-  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev', 'https://skye-design-mcp.pages.dev/use-mcp.html', 'platform-violet'],
-  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / 0S cockpit / builder lane', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-cyan'],
-  ['card-agl', 'Agentic Growth Layer', 'AI growth operations / starter to operator', 'agentic-growth-layer.pages.dev', 'https://agentic-growth-layer.pages.dev', 'platform-mint'],
-  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / secure receipts', 'metraiyux-0s-marketing.pages.dev', 'https://metraiyux-0s-marketing.pages.dev', 'platform-rose'],
-  ['card-merser', 'Merser', 'World registry MCP / npm CLI / source packs', 'merser.pages.dev', 'https://merser.pages.dev', 'platform-violet']
+  ['card-0s', 'MetrAIyux 0S', 'Buyer-facing operating system overview', 'metraiyux-0s-marketing.pages.dev', publicCardTargets.marketingHome, 'platform-cyan'],
+  ['card-smn', 'SkyeMusicNexus', 'Artist label platform / music business surface', 'metraiyux-0s-marketing.pages.dev/skye-music-nexus', publicCardTargets.skyeMusicNexus, 'platform-violet'],
+  ['card-srx', 'SkyeRouteX', 'Workforce command / dispatch OS', 'metraiyux-0s-marketing.pages.dev/skyeroutex', publicCardTargets.skyeRouteX, 'platform-mint'],
+  ['card-phx', 'Valley Verified', 'Local business proof / public owner handoff', 'devooderator.pages.dev/valley-verified', publicCardTargets.valleyVerified, 'platform-gold'],
+  ['card-northstar', 'NorthStar SignInPro', 'Shared identity / FS27 gate context', 'metraiyux-0s-marketing.pages.dev/capabilities', publicCardTargets.capabilities, 'platform-cyan'],
+  ['card-free99', 'Free99 Suite', 'Operator tools / creative systems / client helpers', 'metraiyux-0s-marketing.pages.dev/free-business-stack', publicCardTargets.freeBusinessStack, 'platform-mint'],
+  ['card-legal', 'LegalSkyes', 'Legal ops lane / policies / AI operator notice', 'skyes-over-london-legal.pages.dev/legal', publicCardTargets.legalSkyes, 'platform-gold'],
+  ['card-quantum', 'QuantumSkyes MCP', 'Design MCP / gate-owned remote tooling', 'skye-design-mcp.pages.dev/use-mcp.html', publicCardTargets.quantumskyesMcp, 'platform-violet'],
+  ['card-kaixu', 'kAIxu 6.7 CodeStudio', 'AI code studio / developer lane', 'metraiyux-0s-marketing.pages.dev/dev-free-sauce', `${marketingOrigin}/dev-free-sauce.html`, 'platform-cyan'],
+  ['card-agl', 'Agentic Growth Layer', 'AI growth operations / starter to operator', 'agentic-growth-layer.pages.dev', publicCardTargets.agenticGrowthLayer, 'platform-mint'],
+  ['card-vault', 'Skye Vault OS', 'Encrypted vault / restore lanes / proof ecology', 'metraiyux-0s-marketing.pages.dev/proof-ecology', publicCardTargets.skyeVaultProof, 'platform-rose'],
+  ['card-merser', 'Merser', 'World registry MCP / npm CLI / source packs', 'merser.pages.dev', publicCardTargets.merser, 'platform-violet']
 ].map(([id, name, title, displayUrl, qr, theme], index) => ({
   id,
   name,
   title,
   displayUrl,
-  qr: buildCardConnectLogUrl({
-    kind: 'platform',
-    business: name,
-    category: title,
-    clientId: id,
-    cardTitle: `${name} platform card`,
-    cardUrl: qr,
-    contact: 'Gray London Skyes'
-  }),
+  qr,
   theme,
   index: String(index + 1).padStart(2, '0')
 }));
@@ -1464,7 +1456,7 @@ function renderCardGroup(target, cards, renderer, wrapClass) {
 
 function genQR(canvas) {
   if (!canvas || !window.qrcode) return;
-  const url = canvas.dataset.url || 'https://metraiyux-0s-marketing.pages.dev';
+  const url = canvas.dataset.url || publicCardTargets.marketingHome;
   const fg = canvas.dataset.fg || '#f4c75b';
   const bg = canvas.dataset.bg || '#07060a';
   const qr = qrcode(0, 'M');
@@ -1545,11 +1537,17 @@ function titleText(value) {
   return String(value || '').replace(/\bAnd\b/g, '&');
 }
 
-function valleyBusinessUrl(business) {
-  const raw = business?.landing_page_url || business?.url || '';
-  if (!raw) return `${zeroOsOrigin}/valley-verified/`;
-  if (/^https?:\/\//i.test(raw)) return raw;
-  return `${zeroOsOrigin}${raw.startsWith('/') ? raw : `/${raw}`}`;
+function buildValleyPublicUrl({ business, businessName, city, category, code, contact, expires }) {
+  const url = new URL(publicCardTargets.valleyVerified);
+  url.searchParams.set('source', 'business-card');
+  url.searchParams.set('priorityCode', code);
+  url.searchParams.set('expires', expires);
+  url.searchParams.set('business', businessName || business?.name || 'Valley Verified business');
+  url.searchParams.set('city', city || business?.city || 'Phoenix Metro');
+  url.searchParams.set('category', category || business?.category || business?.niche || 'Valley Verified');
+  if (business?.id) url.searchParams.set('clientId', business.id);
+  if (contact) url.searchParams.set('contact', contact);
+  return url.toString();
 }
 
 function directoryText(business) {
@@ -1572,6 +1570,8 @@ function fallbackBusiness() {
     niche: 'Smoke Shop',
     phone: '(623) 935-0786',
     email: 'bobsmokeshopaz@gmail.com',
+    website: 'https://bobs-smoke-shop.pages.dev/',
+    booking_url: 'https://bobs-smoke-shop.pages.dev/contact',
     url: '/valley-verified/business/bobs-smoke-shop-litchfield-park/'
   };
 }
@@ -1664,8 +1664,17 @@ function updateVV() {
   const cityInitials = city.split(/\s+/).filter(Boolean).map((part) => part[0]).join('').slice(0, 3).toUpperCase() || 'AZ';
   const code = `VV-${slugPart(biz, 'CLIENT')}-${cityInitials}`;
   const matchedSelection = selectedValleyBusiness && (selectedValleyBusiness.name || '').toLowerCase() === biz.toLowerCase();
-  activeClientUrl = matchedSelection ? valleyBusinessUrl(selectedValleyBusiness) : `${zeroOsOrigin}/valley-verified/?q=${encodeURIComponent(biz)}`;
   const expires = addDaysIso(7);
+  const publicValleyUrl = buildValleyPublicUrl({
+    business: matchedSelection ? selectedValleyBusiness : null,
+    businessName: biz,
+    city,
+    category: cat,
+    code,
+    contact,
+    expires
+  });
+  activeClientUrl = publicValleyUrl;
   const handoff = buildConnectLogHandoff({ business: matchedSelection ? selectedValleyBusiness : null, code, contact, expires });
   activeConnectLogUrl = handoff;
 
@@ -1679,7 +1688,7 @@ function updateVV() {
   const name = document.getElementById('vv-biz-display');
   name.style.fontSize = biz.length > 24 ? '13px' : biz.length > 18 ? '15px' : '17px';
   const qr = document.getElementById('vv-qr');
-  qr.dataset.url = handoff;
+  qr.dataset.url = publicValleyUrl;
   genQR(qr);
 }
 

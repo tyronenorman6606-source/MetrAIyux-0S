@@ -108,8 +108,8 @@ function buildAnalytics() {
     .sort((a, b) => b.streams - a.streams)
     .slice(0, 5);
 
-  // Pending payouts
-  const pendingPayoutsList = payouts.filter((p) => p.status === 'pending');
+  // Payouts remain open while pending, owner-review, or paperwork-held.
+  const pendingPayoutsList = payouts.filter((p) => p.status !== 'completed');
   const pendingPayouts = pendingPayoutsList.length;
   const totalPayoutAmount = pendingPayoutsList.reduce(
     (sum, p) => sum + Number(p.amount || 0),

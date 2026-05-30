@@ -60,6 +60,14 @@
 .daw-brand img {
   width: 2.15rem;
   height: 2.15rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(88,245,255,.48)) drop-shadow(0 0 24px rgba(255,209,102,.2));
+  animation: dawNexusLogoPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes dawNexusLogoPulse {
+  0%, 100% { opacity: .92; transform: translateY(-1px); }
+  50% { opacity: 1; transform: translateY(2px); }
 }
 
 .daw-beta-pill {
@@ -295,7 +303,9 @@
   line-height: 1.25;
 }
 
-.daw-browser input {
+.daw-browser input,
+.daw-browser select,
+.daw-browser textarea {
   width: 100%;
   min-height: 2.4rem;
   border: 1px solid rgba(255,255,255,.14);
@@ -303,6 +313,14 @@
   background: rgba(255,255,255,.08);
   color: #fff;
   padding: 0 .65rem;
+}
+
+.daw-browser textarea {
+  min-height: 5.4rem;
+  padding: .6rem .65rem;
+  resize: vertical;
+  font: inherit;
+  text-transform: none;
 }
 
 .daw-browser-list {
@@ -432,6 +450,54 @@
   opacity: .45;
 }
 
+.daw-clip-card small {
+  color: rgba(157,255,189,.72);
+  font-size: .68rem;
+}
+
+.daw-cloud-actions,
+.daw-export-targets {
+  display: grid;
+  gap: .45rem;
+}
+
+.daw-cloud-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.daw-cloud-actions button,
+.daw-export-targets label,
+.daw-kaixu-actions button {
+  min-height: 2.1rem;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.07);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 950;
+}
+
+.daw-export-targets {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: .55rem;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(0,0,0,.18);
+}
+
+.daw-export-targets label {
+  display: flex;
+  align-items: center;
+  gap: .42rem;
+  padding: 0 .5rem;
+  text-transform: none;
+}
+
+.daw-export-targets input {
+  width: auto;
+  min-height: auto;
+}
+
 .daw-edit-tools {
   position: relative;
   z-index: 4;
@@ -473,6 +539,121 @@
   border-radius: 8px;
   background: rgba(255,255,255,.05);
   overflow: hidden;
+}
+
+.daw-kaixu-assist,
+.daw-cloud-projects {
+  display: grid;
+  gap: .58rem;
+  border: 1px solid rgba(88,245,255,.2);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(88,245,255,.08), rgba(255,143,112,.06)), rgba(255,255,255,.04);
+  overflow: hidden;
+}
+
+.daw-kaixu-assist {
+  padding-bottom: .65rem;
+}
+
+.daw-kaixu-assist > label,
+.daw-kaixu-grid,
+.daw-kaixu-budget-panel,
+.daw-kaixu-actions,
+.daw-kaixu-assist > output {
+  margin-inline: .65rem;
+}
+
+.daw-kaixu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .45rem;
+}
+
+.daw-kaixu-budget-panel {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, .8fr) minmax(0, 1.4fr);
+  gap: .45rem;
+  align-items: end;
+  padding: .55rem;
+  border: 1px solid rgba(245,199,107,.18);
+  border-radius: 8px;
+  background: rgba(245,199,107,.06);
+}
+
+.daw-kaixu-budget-panel output {
+  min-height: 2.4rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: 0 .65rem;
+  background: rgba(0,0,0,.24);
+  color: #f5c76b;
+  font-size: .68rem;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daw-kaixu-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: .45rem;
+  align-items: center;
+}
+
+.daw-kaixu-actions a {
+  min-height: 2.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px;
+  padding: 0 .65rem;
+  color: rgba(255,255,255,.78);
+  text-decoration: none;
+  font-size: .68rem;
+  font-weight: 950;
+}
+
+.daw-kaixu-assist > output {
+  min-height: 5.5rem;
+  display: block;
+  overflow: auto;
+  white-space: pre-wrap;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  padding: .65rem;
+  background: rgba(0,0,0,.28);
+  color: rgba(255,255,255,.76);
+  font-size: .72rem;
+  line-height: 1.45;
+}
+
+.daw-cloud-projects:empty {
+  display: none;
+}
+
+.daw-cloud-projects button {
+  display: grid;
+  gap: .25rem;
+  margin: 0 .6rem .6rem;
+  padding: .6rem;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  background: rgba(0,0,0,.2);
+  color: #fff;
+  text-align: left;
+}
+
+.daw-cloud-projects button:first-of-type {
+  margin-top: .6rem;
+}
+
+.daw-cloud-projects span {
+  color: rgba(255,255,255,.56);
+  font-size: .68rem;
 }
 
 .daw-sound-grid {
@@ -521,7 +702,6 @@
 
 .daw-ruler {
   display: grid;
-  grid-template-columns: repeat(16, minmax(4rem, 1fr));
   border-bottom: 1px solid rgba(255,255,255,.12);
   background: rgba(255,255,255,.04);
   color: rgba(255,255,255,.58);
@@ -581,12 +761,12 @@
 
 .daw-lane {
   position: relative;
-  min-width: 48rem;
+  min-width: max(48rem, calc(var(--daw-beats, 16) * 3.25rem));
   margin: .6rem .6rem .6rem 0;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 8px;
   background:
-    repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px calc(100% / 16)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.08) 0 1px, transparent 1px calc(100% / var(--daw-beats, 16))),
     rgba(0,0,0,.25);
 }
 
@@ -640,6 +820,23 @@
 
 .daw-channel input {
   width: 100%;
+}
+
+.daw-pan-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 2.5rem;
+  gap: .35rem;
+  align-items: center;
+  margin-top: .42rem;
+  color: rgba(255,255,255,.58);
+  font-size: .66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.daw-pan-row small {
+  color: #66e5ff;
+  text-align: right;
 }
 
 .daw-channel meter {
@@ -784,6 +981,14 @@
 
   .daw-track-row {
     grid-template-columns: 8.5rem minmax(36rem, 1fr);
+  }
+
+  .daw-kaixu-grid,
+  .daw-kaixu-budget-panel,
+  .daw-kaixu-actions,
+  .daw-cloud-actions,
+  .daw-export-targets {
+    grid-template-columns: 1fr;
   }
 
   .daw-bottom-deck {

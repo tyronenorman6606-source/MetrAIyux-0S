@@ -1,8 +1,30 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
+import path from 'node:path';
 
 const wranglerVersion = process.env.WRANGLER_VERSION || '4.14.0';
-const envFile = process.env.ROOT_ENV_FILE || '.env';
+const requestedEnvFile = process.env.ROOT_ENV_FILE || process.env.METRAIYUX_ROOT_ENV || '.env';
+
+function resolveEnvFile(requested) {
+  const candidates = [
+    requested,
+    path.join(path.dirname(requested), 'env.txt'),
+    path.join(process.cwd(), 'env.txt'),
+    path.resolve(process.cwd(), '..', 'env.txt'),
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '..', '.env')
+  ];
+  const seen = new Set();
+  for (const candidate of candidates) {
+    const resolved = path.resolve(process.cwd(), candidate);
+    if (seen.has(resolved)) continue;
+    seen.add(resolved);
+    if (fs.existsSync(resolved)) return resolved;
+  }
+  return requested;
+}
+
+const envFile = resolveEnvFile(requestedEnvFile);
 
 function parseEnvRows(file) {
   if (!fs.existsSync(file)) return [];
@@ -20,12 +42,26 @@ function parseEnvRows(file) {
 }
 
 const rows = parseEnvRows(envFile);
+function parseProseCloudflareRows(file) {
+  if (!fs.existsSync(file)) return [];
+  const lines = fs.readFileSync(file, 'utf8').split(/\r?\n/);
+  const found = [];
+  lines.forEach((raw, index) => {
+    const token = raw.match(/Your API Token\s*=\s*"([^"]+)"/i);
+    if (!token) return;
+    found.push({ key: 'CLOUDFLARE_API_TOKEN', value: token[1], line: index + 1, source: 'root-env-prose' });
+  });
+  return found;
+}
+
+const proseRows = parseProseCloudflareRows(envFile);
+const allRows = [...rows, ...proseRows];
 const rootEnv = {};
 for (const row of rows) rootEnv[row.key] = row.value;
 
 function valuesFor(pattern) {
   const seen = new Set();
-  return rows
+  return allRows
     .filter((row) => pattern.test(row.key) && row.value)
     .filter((row) => {
       if (seen.has(row.value)) return false;
@@ -53,11 +89,37 @@ function preferredTokenProbes(args) {
       { label: 'd1', path: 'd1/database', query: { per_page: '1' } }
     ];
   }
+  if (/^d1(\s|$)/.test(command)) {
+    return [
+      { label: 'd1', path: 'd1/database', query: { per_page: '1' } },
+      { label: 'workers', path: 'workers/services', query: { per_page: '1' } },
+      { label: 'pages', path: 'pages/projects', query: { per_page: '1' } }
+    ];
+  }
+  const workerName = workerNameFromArgs(args);
+  if (/^deploy(\s|$)/.test(command) && workerName) {
+    return [
+      { label: `worker:${workerName}`, path: `workers/services/${workerName}` },
+      { label: 'workers', path: 'workers/services', query: { per_page: '1' } },
+      { label: 'd1', path: 'd1/database', query: { per_page: '1' } },
+      { label: 'pages', path: 'pages/projects', query: { per_page: '1' } }
+    ];
+  }
   return [
     { label: 'workers', path: 'workers/services', query: { per_page: '1' } },
     { label: 'd1', path: 'd1/database', query: { per_page: '1' } },
     { label: 'pages', path: 'pages/projects', query: { per_page: '1' } }
   ];
+}
+
+function workerNameFromArgs(args) {
+  const configIndex = args.findIndex((arg) => arg === '--config' || arg === '-c');
+  const configPath = configIndex >= 0 ? args[configIndex + 1] : 'wrangler.toml';
+  if (!configPath) return '';
+  const resolved = path.resolve(process.cwd(), configPath);
+  if (!fs.existsSync(resolved)) return '';
+  const match = fs.readFileSync(resolved, 'utf8').match(/^\s*name\s*=\s*"([^"]+)"/m);
+  return match?.[1] || '';
 }
 
 async function chooseCloudflareToken(accountId, args) {
@@ -72,8 +134,8 @@ async function chooseCloudflareToken(accountId, args) {
   }
 
   const probes = preferredTokenProbes(args);
-  for (const candidate of candidates) {
-    for (const probe of probes) {
+  for (const probe of probes) {
+    for (const candidate of candidates) {
       try {
         if (await probeToken(accountId, candidate.value, probe)) {
           return { value: candidate.value, label: `${candidate.key}@line${candidate.line}:${probe.label}` };
@@ -87,7 +149,8 @@ async function chooseCloudflareToken(accountId, args) {
   return { value: explicit || rootEnv.CLOUDFLARE_API_TOKEN || '', label: 'fallback-no-d1-probe-pass' };
 }
 
-const accountId = rootEnv.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID || rootEnv.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || '';
+const accountFromRows = rows.find((row) => /^(METRAIYUX_0S_)?CLOUDFLARE_ACCOUNT_ID$/i.test(row.key) || /^CF_ACCOUNT_ID$/i.test(row.key))?.value || '';
+const accountId = rootEnv.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID || rootEnv.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || accountFromRows;
 const wranglerArgs = process.argv.slice(2);
 const selected = await chooseCloudflareToken(accountId, wranglerArgs);
 const childEnv = {
@@ -108,7 +171,7 @@ if (!childEnv.CLOUDFLARE_ACCOUNT_ID || !childEnv.CLOUDFLARE_API_TOKEN) {
 
 console.error(`run-root-wrangler: using ${selected.label}`);
 
-const args = ['-y', `wrangler@${wranglerVersion}`, ...wranglerArgs];
+const args = ['-y', '-p', `wrangler@${wranglerVersion}`, 'wrangler', ...wranglerArgs];
 const child = spawn('npx', args, { env: childEnv, stdio: 'inherit' });
 child.on('exit', (code, signal) => {
   if (signal) {

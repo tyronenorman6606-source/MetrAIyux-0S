@@ -1,0 +1,60 @@
+{
+  "schema": "metraiyux-0s.founder-command.pwa-drop-factory.v2",
+  "appId": "founder-command-pwa-drop-factory",
+  "name": "PWA Drop Factory",
+  "visibility": "founder_command_private",
+  "route": "/founder-command/apps/pwa-factory-v213/",
+  "runtimeIndependentOfDonorZip": true,
+  "sourceCustody": {
+    "originalZip": "/founder-command/imports/pwafactoryv213.zip",
+    "usage": "custody only; runtime does not import, fetch, or execute donor zip contents"
+  },
+  "purpose": "Founder-only 0S app for packaging local audio uploads, Nexus singles, artist albums, and Gray Gang collective drops as installable Skye Radio PWAs.",
+  "dataSources": {
+    "artistRegistry": "/SkyeMusicNexus/artist-storefronts/artist-apps/artist-apps.json",
+    "collective": "/SkyeMusicNexus/artist-storefronts/gray-skyes-collective/collective.json",
+    "musicStore": "/api/skymusicnexus/music-store",
+    "musicAssets": "/api/skymusicnexus/music-assets",
+    "gateAiManifest": "/api/founder-command/pwa-factory/analyze"
+  },
+  "authPolicy": {
+    "owner": "shared FS27/SkyGate/Free99 0S gate",
+    "browserProviderKeys": false,
+    "appLocalPasswords": false,
+    "directBrowserProviderCalls": false,
+    "requiredBoundary": "enforceZeroOsGate plus Founder Command operator API helpers"
+  },
+  "runtimeFiles": [
+    "index.html",
+    "assets/pwa-factory.css",
+    "assets/pwa-factory.js",
+    "assets/skyes-over-london-deity-logo.png",
+    "assets/metraiyux-0s-logo-transparent.png",
+    "assets/skye-music-nexus-logo.png",
+    "manifest.json",
+    "sw.js"
+  ],
+  "dropModes": [
+    "local_audio_upload_bundled",
+    "nexus_single",
+    "nexus_artist_album",
+    "gray_gang_collective"
+  ],
+  "pwaOutputContract": {
+    "entry": "index.html",
+    "manifest": "manifest.json",
+    "serviceWorker": "sw.js",
+    "icons": [
+      "icon-16.png",
+      "icon-32.png",
+      "icon-180.png",
+      "icon-192.png",
+      "icon-512.png",
+      "icon-maskable-192.png",
+      "icon-maskable-512.png"
+    ],
+    "player": "Skye Radio embedded audio player with track list, storefront purchase links, local bundled audio for uploads, and same-origin Nexus audio bundling when gate fetch succeeds."
+  },
+  "operatorScript": "tools/founder-command/run-pwa-factory-debut-song-batch.mjs",
+  "status": "0s_owned_gate_auth_runtime_self_contained"
+}

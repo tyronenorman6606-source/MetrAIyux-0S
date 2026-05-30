@@ -1,5 +1,253 @@
 {
-  "version": "2026-05-18-drop-policy",
+  "version": "2026-05-27-pricing-realms-song-creation",
+  "simplePricing": "./skyemusicnexus-simple-pricing.json",
+  "pricingPrinciple": "Solo artists stay cheap by default. Charge more only for real provider cost, storage/bandwidth pressure, payment/provider work, or hands-on custom build labor.",
+  "storefrontPolicy": {
+    "principle": "Let artists start tiny so adoption compounds, but cap free usage before it can become spam or provider-cost bleed.",
+    "plans": {
+      "free99-lite": {
+        "label": "Free99 Lite storefront preview",
+        "monthly": 0,
+        "maxActiveProducts": 3,
+        "monthlyOrderIntents": 25,
+        "monthlySkyeNetPublishes": 0,
+        "skyePayCheckout": true
+      },
+      "storefront-starter": {
+        "label": "Nexus Storefront Starter",
+        "monthly": 5,
+        "maxActiveProducts": 10,
+        "monthlyOrderIntents": 150,
+        "monthlySkyeNetPublishes": 2,
+        "skyePayCheckout": true
+      },
+      "artist-host": {
+        "label": "Artist Host",
+        "monthly": 9,
+        "maxActiveProducts": 25,
+        "monthlyOrderIntents": 500,
+        "monthlySkyeNetPublishes": 6,
+        "skyePayCheckout": true
+      },
+      "artist-collective": {
+        "label": "Artist Collective",
+        "monthly": 29,
+        "setup": 99,
+        "maxActiveProducts": 150,
+        "monthlyOrderIntents": 2500,
+        "monthlySkyeNetPublishes": 20,
+        "skyePayCheckout": true
+      }
+    }
+  },
+  "foundingCoreMonth": {
+    "id": "skyemusicnexus-founding-core-2026-05",
+    "label": "Founding Core Artist Month",
+    "availableThrough": "2026-05-31",
+    "setup": 0,
+    "monthly": 0,
+    "launchSongPackageLimit": 5,
+    "summary": "Selected May 2026 core artists receive a no-charge artist universe/platform build, up to five launch songs packaged into their surfaces, hosting/maintenance, and platform-testing access in exchange for promotion and feedback."
+  },
+  "artistLandingLaunchWindow": {
+    "availableThrough": "2026-06-26",
+    "skyemeritCode": "SKYEMUSICNEXUS-LAUNCH-2000",
+    "skyemeritValue": 2000,
+    "offers": [
+      {
+        "id": "skyemusicnexus-single-drop-landing-page",
+        "listed": 2239,
+        "due": 239
+      },
+      {
+        "id": "skyemusicnexus-artist-page-epk",
+        "listed": 2444,
+        "due": 444
+      },
+      {
+        "id": "skyemusicnexus-animated-visualizer-page",
+        "listed": 2796,
+        "due": 796
+      },
+      {
+        "id": "skyemusicnexus-artist-app-pwa-drop",
+        "listed": 2996,
+        "due": 996
+      },
+      {
+        "id": "skyemusicnexus-custom-artist-universe",
+        "listed": 3197,
+        "due": 1197,
+        "quotedManually": true
+      }
+    ],
+    "delivery": [
+      "Relay13 inbox",
+      "SkyeMail",
+      "ConnectLog",
+      "FS27 event mirror"
+    ]
+  },
+  "artistManagementLane": {
+    "id": "skyemusicnexus-artist-management-2026",
+    "available": true,
+    "agreementRequired": true,
+    "exclusivePossible": true,
+    "defaultOwnerBoundary": "Artist keeps masters, compositions, public likeness, and uploaded media unless a separate signed agreement says otherwise.",
+    "notIncludedByDefault": [
+      "music distribution",
+      "publishing administration",
+      "sync licensing",
+      "royalty collection",
+      "master ownership transfer",
+      "company ownership of artist media"
+    ],
+    "includedWhenScoped": [
+      "Account Executive assignment",
+      "biweekly artist/business meeting",
+      "SkyeNet artist site deployment",
+      "longform blog base",
+      "content engine and campaign calendar",
+      "Media Over London creative routing",
+      "SkyePay checkout and proof receipts"
+    ],
+    "marketingLicenseBoundary": "Uploaded artist media may be used to operate, display, preview, package, and promote the artist's services and platform surfaces, but not to create unrelated company profit outside the agreed service lane."
+  },
+  "artistReferralProgram": {
+    "id": "skyemusicnexus-artist-referral-40",
+    "status": "active_policy_pending_owner_payout_approval",
+    "qualifiedPayoutRateBps": 4000,
+    "eligibleRevenueBasis": "onboarded spend actually received after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval",
+    "noSelfReferrals": true,
+    "examples": [
+      { "offer": "Artist Host", "basis": "$9/mo", "referralPayout": "$3.60/mo" },
+      { "offer": "Artist Collective", "basis": "$99 setup + $29/mo", "referralPayout": "$39.60 setup + $11.60/mo" },
+      { "offer": "Managed Music Ops", "basis": "$499 setup + $99/mo", "referralPayout": "$199.60 setup + $39.60/mo" },
+      { "offer": "Single / Drop Landing Page", "basis": "$239 launch due", "referralPayout": "$95.60" },
+      { "offer": "Artist Page + EPK", "basis": "$444 launch due", "referralPayout": "$177.60" },
+      { "offer": "Custom Artist Universe", "basis": "$1,197+ starting floor", "referralPayout": "$478.80+" }
+    ]
+  },
+  "pricingRealms": [
+    {
+      "id": "drops",
+      "name": "Drop Packaging",
+      "route": "/SkyeMusicNexus/public/pricing-drops.html",
+      "boundary": "Existing owned/approved songs only. AI generation is sold under Song Creation.",
+      "summary": "Release capsules, metadata, preview/full package settings, store/product shell, proof receipt, and campaign add-ons."
+    },
+    {
+      "id": "artist-apps",
+      "name": "Artist Apps",
+      "route": "/SkyeMusicNexus/public/pricing-artist-apps.html",
+      "boundary": "Design/build/media scope, not AI song generation.",
+      "summary": "Artist pages, EPKs, visualizer pages, installable PWA drops, and custom artist universes."
+    },
+    {
+      "id": "song-creation",
+      "name": "Song Creation",
+      "route": "/SkyeMusicNexus/public/pricing-song-creation.html",
+      "boundary": "Paid provider-backed song generation with custom prompt, duration, structure, lyric, vocal, and collaborator control.",
+      "summary": "Song Draft starts at $23; larger cinematic suites and label/brain packs require owner-approved provider budget."
+    },
+    {
+      "id": "daw-beta",
+      "name": "DAW Beta",
+      "route": "/SkyeMusicNexus/public/pricing-daw.html",
+      "boundary": "Free through 2026 while beta-labeled.",
+      "summary": "First-party browser DAW for creation, import, arrangement, mixdown, save/export, and release handoff."
+    }
+  ],
+  "songCreationPricing": [
+    {
+      "id": "skyemusicnexus-song-draft",
+      "name": "Song Draft",
+      "amount": 23,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_song_draft",
+      "durationSecondsIncluded": 180,
+      "generationIncluded": true,
+      "summary": "One AI-generated private song draft up to 3 minutes, custom prompt, lyric/vocal direction, provider receipt, private playback, and creation-bin proof."
+    },
+    {
+      "id": "skyemusicnexus-artist-cut",
+      "name": "Artist Cut",
+      "amount": 49,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_artist_cut",
+      "durationSecondsIncluded": 240,
+      "generationIncluded": true,
+      "summary": "One artist-ready song run up to 4 minutes with deeper prompt form, up to 2 generation attempts when provider budget allows, private share page, and basic cover direction."
+    },
+    {
+      "id": "skyemusicnexus-song-release-pack",
+      "name": "Release Pack",
+      "amount": 99,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_song_release_pack",
+      "generationIncluded": true,
+      "summary": "One generated song plus release metadata, cover/canvas request lane, rights checklist, Nexus drop page, product shell, and proof receipt."
+    },
+    {
+      "id": "skyemusicnexus-five-song-local-artist-bundle",
+      "name": "5-Song Local Artist Bundle",
+      "amount": 249,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_five_song_local_artist_bundle",
+      "generationIncluded": true,
+      "summary": "Five generated song drafts for one artist lane, batch workspace, basic artist profile, creation receipts, and release-package upgrade path."
+    },
+    {
+      "id": "skyemusicnexus-brain-label-pack",
+      "name": "Brain / Label Pack",
+      "amount": 497,
+      "billing": "quote_starting_at",
+      "lookup_key": "skyemusicnexus_brain_label_pack",
+      "generationIncluded": true,
+      "owner_approval_required": true,
+      "summary": "Multi-artist or brain/label creation run with roster setup, longer-form structures, collaborator planning, release rooms, social/content workflow, and owner-approved provider budget."
+    },
+    {
+      "id": "skyemusicnexus-cinematic-suite",
+      "name": "Cinematic Suite",
+      "amount": 199,
+      "billing": "quote_starting_at",
+      "lookup_key": "skyemusicnexus_cinematic_suite",
+      "generationIncluded": true,
+      "owner_approval_required": true,
+      "summary": "Everything Movie-style long-form suite with multiple acts, longer runtime, cast/collaborator planning, transitions, release page, Pics2Vid/Still2Vid handoffs, and advanced packaging."
+    }
+  ],
+  "dawBetaAccess": {
+    "id": "skyemusicnexus-daw-beta-free-2026",
+    "name": "DAW Beta",
+    "amount": 0,
+    "billing": "free_through_2026",
+    "availableThrough": "2026-12-31",
+    "summary": "DAW access is free for every user through 2026 while the room remains beta-labeled."
+  },
+  "agenticMarketingPush": {
+    "id": "skyenet-365-content-push",
+    "status": "sellable_when_scope_and_publish_authority_are_written",
+    "canTruthfullySell": true,
+    "baseDeliverable": "365-day content calendar with longform blog base, SkyeNet site publishing lane, Nexus feature slots, proof receipts, and approval workflow.",
+    "requires": [
+      "approved source material",
+      "human/content review policy",
+      "publishing credentials or owned SkyeNet surface",
+      "client approvals",
+      "provider budget for automation and media",
+      "separate social account credentials before social publishing claims"
+    ],
+    "claimBoundary": "The platform can sell and operate a proof-backed content production/publishing push; it cannot guarantee reach, virality, press, sales, playlisting, or social-platform acceptance."
+  },
+  "release_package_policy": {
+    "artistSetsFanPrice": true,
+    "previewRequiredBeforePaidFullAccess": true,
+    "privateFullSongDelivery": "gated-stream-or-signed-package",
+    "staticHiddenUrlsArePrivate": false,
+    "uploadFailureFounderFallback": true
+  },
   "drop_limits": {
     "free99-lite": {
       "label": "Free99 Lite",
@@ -9,7 +257,12 @@
       "privateDeliveriesPerMonth": 0,
       "maxPublicPreviewBytes": 12582912,
       "maxPrivateFileBytes": 0,
-      "publicPreviewFormats": ["mp3", "mpeg", "aac", "m4a"],
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a"
+      ],
       "wavUploads": "admin_only",
       "flacUploads": "admin_only",
       "stemsMasters": false,
@@ -17,75 +270,198 @@
       "monthlyBandwidthWarningGb": 3,
       "monthlyDeployWarningThreshold": 1
     },
-    "creator": {
-      "label": "Creator",
+    "founding-core-2026-05": {
+      "label": "Founding Core Artist Month",
       "singleDropsPerMonth": 5,
-      "releaseDropsPerMonth": 1,
-      "campaignDropsPerMonth": 1,
-      "privateDeliveriesPerMonth": 0,
-      "maxPublicPreviewBytes": 18874368,
-      "maxPrivateFileBytes": 0,
-      "publicPreviewFormats": ["mp3", "mpeg", "aac", "m4a", "ogg", "webm"],
-      "wavUploads": "admin_only",
-      "flacUploads": "admin_only",
-      "stemsMasters": false,
-      "priorityDeploy": false,
-      "monthlyBandwidthWarningGb": 12,
-      "monthlyDeployWarningThreshold": 5
-    },
-    "pro-artist": {
-      "label": "Pro Artist",
-      "singleDropsPerMonth": 12,
-      "releaseDropsPerMonth": 3,
-      "campaignDropsPerMonth": 3,
-      "privateDeliveriesPerMonth": 4,
+      "releaseDropsPerMonth": 5,
+      "campaignDropsPerMonth": 5,
+      "privateDeliveriesPerMonth": 5,
       "maxPublicPreviewBytes": 31457280,
       "maxPrivateFileBytes": 2147483648,
-      "publicPreviewFormats": ["mp3", "mpeg", "aac", "m4a", "ogg", "webm"],
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a",
+        "ogg",
+        "webm"
+      ],
+      "wavUploads": "allowed",
+      "flacUploads": "allowed",
+      "stemsMasters": true,
+      "priorityDeploy": true,
+      "monthlyBandwidthWarningGb": 15,
+      "monthlyDeployWarningThreshold": 5,
+      "foundingCoreGrant": true
+    },
+    "creator": {
+      "label": "Artist Host",
+      "singleDropsPerMonth": 999,
+      "releaseDropsPerMonth": 999,
+      "campaignDropsPerMonth": 999,
+      "privateDeliveriesPerMonth": 25,
+      "maxPublicPreviewBytes": 31457280,
+      "maxPrivateFileBytes": 1073741824,
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a",
+        "ogg",
+        "webm"
+      ],
+      "wavUploads": "allowed",
+      "flacUploads": "allowed",
+      "stemsMasters": false,
+      "priorityDeploy": false,
+      "monthlyBandwidthWarningGb": 10,
+      "monthlyDeployWarningThreshold": 30,
+      "fairUseAfterLaunch": true
+    },
+    "pro-artist": {
+      "label": "Artist Plus",
+      "singleDropsPerMonth": 999,
+      "releaseDropsPerMonth": 999,
+      "campaignDropsPerMonth": 999,
+      "privateDeliveriesPerMonth": 75,
+      "maxPublicPreviewBytes": 31457280,
+      "maxPrivateFileBytes": 2147483648,
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a",
+        "ogg",
+        "webm"
+      ],
       "wavUploads": "allowed",
       "flacUploads": "allowed",
       "stemsMasters": true,
       "priorityDeploy": true,
       "monthlyBandwidthWarningGb": 35,
-      "monthlyDeployWarningThreshold": 12
+      "monthlyDeployWarningThreshold": 75
     },
     "label-command": {
-      "label": "Label Command",
-      "singleDropsPerMonth": 50,
-      "releaseDropsPerMonth": 12,
-      "campaignDropsPerMonth": 12,
+      "label": "Artist Collective",
+      "singleDropsPerMonth": 9999,
+      "releaseDropsPerMonth": 9999,
+      "campaignDropsPerMonth": 9999,
       "privateDeliveriesPerMonth": 25,
       "maxPublicPreviewBytes": 41943040,
       "maxPrivateFileBytes": 5368709120,
-      "publicPreviewFormats": ["mp3", "mpeg", "aac", "m4a", "ogg", "webm"],
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a",
+        "ogg",
+        "webm"
+      ],
       "wavUploads": "allowed",
       "flacUploads": "allowed",
       "stemsMasters": true,
       "priorityDeploy": true,
       "monthlyBandwidthWarningGb": 90,
-      "monthlyDeployWarningThreshold": 24
+      "monthlyDeployWarningThreshold": 150
     },
     "managed-music-ops": {
       "label": "Managed Music Ops",
-      "singleDropsPerMonth": 200,
-      "releaseDropsPerMonth": 50,
-      "campaignDropsPerMonth": 50,
+      "singleDropsPerMonth": 9999,
+      "releaseDropsPerMonth": 9999,
+      "campaignDropsPerMonth": 9999,
       "privateDeliveriesPerMonth": 100,
       "maxPublicPreviewBytes": 52428800,
       "maxPrivateFileBytes": 10737418240,
-      "publicPreviewFormats": ["mp3", "mpeg", "aac", "m4a", "ogg", "webm"],
+      "publicPreviewFormats": [
+        "mp3",
+        "mpeg",
+        "aac",
+        "m4a",
+        "ogg",
+        "webm"
+      ],
       "wavUploads": "allowed",
       "flacUploads": "allowed",
       "stemsMasters": true,
       "priorityDeploy": true,
       "monthlyBandwidthWarningGb": 140,
-      "monthlyDeployWarningThreshold": 30
+      "monthlyDeployWarningThreshold": 300
     }
   },
   "aliases": {
     "skyemusicnexus-lite-free99": "free99-lite",
+    "founding-core": "founding-core-2026-05",
+    "core-member": "founding-core-2026-05",
+    "may-2026-core": "founding-core-2026-05",
     "studio": "creator",
+    "artist-host": "creator",
     "label": "label-command",
     "managed": "managed-music-ops"
-  }
+  },
+  "fan_commerce_model": {
+    "updated_at": "2026-05-23",
+    "public_page": "https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/nexus-marketing-hub.html",
+    "principle": "Every artist page should be able to sell, collect support, prove fulfillment, and trail revenue back to a hashed artist ID.",
+    "fan_surfaces": [
+      "single, EP, album, bundle, or private full-song package after preview playback",
+      "support/tip payments; do not call them charitable donations unless the legal/tax entity supports that claim",
+      "merch, tickets, meet-and-greet slots, fan passes, and behind-the-drop access",
+      "booking, media, feature, interview, or collaboration request cards",
+      "email/SMS capture routed into the 0S campaign engines"
+    ],
+    "stripe_skyepay_tracking": {
+      "artist_id_strategy": "Store artist IDs internally and send a non-reversible HMAC/hash or opaque artist reference through checkout metadata.",
+      "required_metadata": [
+        "artist_id_hash",
+        "drop_id",
+        "sku_id",
+        "fee_policy",
+        "artist_price_cents",
+        "platform_fee_bps",
+        "stripe_payment_intent",
+        "stripe_checkout_session",
+        "fulfillment_route",
+        "payout_batch_id"
+      ],
+      "settlement_holder": "Company Stripe/SkyePay lane collects fan payments first, then approved artist payouts are reviewed and batched.",
+      "payout_cadence": "biweekly after refunds, disputes, rights holds, paperwork, and provider costs are reviewed"
+    },
+    "platform_fee_policy": {
+      "platform_fee_bps": 1300,
+      "default_mode": "buyer_covers_platform_and_processing",
+      "artist_options": [
+        "buyer_covers_platform_and_processing: fan pays artist price plus 13% platform fee plus estimated processing",
+        "platform_fee_on_top: fan pays artist price plus 13%; processing is deducted from settlement unless separately passed through",
+        "artist_absorbs: fan pays artist price; artist payout is artist price minus 13% platform fee minus Stripe/payment processing"
+      ],
+      "example_199_single": {
+        "artist_price_cents": 199,
+        "platform_fee_cents": 26,
+        "estimated_us_domestic_card_fee_cents_on_buyer_protect": 38,
+        "estimated_customer_price_cents_buyer_protect": 263,
+        "note": "Stripe domestic card pricing is commonly 2.9% + 30c in the US. Low-ticket drops should show the artist that the fixed 30c fee is material before launch."
+      }
+    },
+    "legal_onboarding_lanes": {
+      "vendor_seller": "Use when the artist is selling music, merch, fan support, downloads, booking/media offers, or access products through the Nexus Shop.",
+      "independent_contractor": "Use when Skyes Over London pays the artist for company-requested services such as founding-core promotion, testing, content, appearances, consulting, or deliverables.",
+      "both_possible": "Some artists should complete both. Keep fan revenue/vendor payouts separate from company-paid contractor compensation.",
+      "paperwork_before_real_payout": [
+        "vendor/seller agreement or independent contractor agreement as applicable",
+        "W-9 or business tax profile",
+        "rights attestation for paid releases",
+        "payout profile or Stripe Connect account when automated transfers are used"
+      ]
+    },
+    "business_growth_lane": "Founding Nexus artists can be routed into the greater 0S business setup, docs, campaigns, email, and incorporation-support surfaces with a 67% eligible-feature discount where approved."
+  },
+  "truth_rules": [
+    "Every artist page should include a Nexus Shop lane for purchases, support/tips, private full access, merch/booking, and fan capture where the artist scope supports it.",
+    "Fan checkout metadata should trail to an artist ID hash, drop ID, SKU ID, fee policy, Stripe/SkyePay IDs, fulfillment route, and payout batch state.",
+    "The default platform fee is 13%; artists can choose buyer-covered or artist-absorbed pricing, but the 13% company fee must be respected.",
+    "Company-held fan payments should settle through payout review with paperwork, rights, disputes, refunds, provider costs, and owner approval before artist payout release.",
+    "Artist vendor/seller paperwork and independent-contractor paperwork are separate lanes; some artists may need both depending on whether they sell through the platform and also perform services for the company.",
+    "Artist management/exclusive lanes do not transfer music ownership, distribution authority, royalty collection, or licensing authority unless a separate signed agreement says so.",
+    "Qualified SkyeMusicNexus artist referrals use a 40% payout policy against onboarded spend after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval."
+  ]
 }

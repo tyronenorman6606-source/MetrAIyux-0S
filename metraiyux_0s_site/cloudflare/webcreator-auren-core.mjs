@@ -1,9 +1,40 @@
+import { executeZeroOsAutomationAction } from './zero-os-automation-spine.mjs';
+
 function text(value, max = 400) {
   return String(value ?? "").trim().slice(0, max);
 }
 
 function array(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function envFlag(env, names = []) {
+  return names.some((name) => /^(1|true|yes|on)$/i.test(String(env?.[name] || '').trim()));
+}
+
+async function runOpenAiChatRuntime(env, payload = {}) {
+  const sandbox = envFlag(env, ['WEB_CREATOR_PROVIDER_RUNTIME_SANDBOX', 'MARKETING_MADE_EASY_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX', '0S_PROVIDER_SANDBOX']);
+  const execution = await executeZeroOsAutomationAction(env, {}, {
+    app_id: 'skyewebcreatormax',
+    provider_id: 'openai',
+    action: 'openai.chat.complete',
+    workspace_id: payload.workspace_id || 'marketing-made-easy',
+    customer_id: payload.customer_id || 'webcreator-auren',
+    client_id: payload.client_id || 'auren',
+    usage_lane: 'skyewebcreatormax:auren-chat',
+    owner_approved: true,
+    live: !sandbox,
+    sandbox,
+    payload
+  }, {
+    actor: 'skyewebcreatormax-auren',
+    identity: { role: 'system', email: 'auren@metraiyux.local' }
+  }, { operator_ok: true });
+  const receipt = execution?.response?.receipt || null;
+  if (execution?.response?.ok !== true) {
+    throw new Error(receipt?.error || execution?.response?.error || 'openai_chat_runtime_failed');
+  }
+  return receipt?.provider_result || {};
 }
 
 function buildContext(brief = {}, runtime = {}, room = "builder") {
@@ -106,12 +137,10 @@ function deterministicReply(message = "", brief = {}, runtime = {}, room = "buil
 
 async function maybeCallOpenAI({ message = "", brief = {}, runtime = {}, room = "builder", env = {}, allowLiveAi = false } = {}) {
   if (!allowLiveAi) return null;
-  const apiKey = env.OPENAI_API_KEY || "";
   const allow = String(env.VANTA_ALLOW_LIVE_AI ?? "0") === "1" || Boolean(env.forceLiveAi);
   const disable = String(env.VANTA_DISABLE_LIVE_AI ?? "0") === "1";
-  if (!apiKey || !allow || disable) return null;
+  if (!allow || disable) return null;
 
-  const baseUrl = String(env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
   const model = String(env.OPENAI_MODEL || "gpt-4.1-mini");
   const draft = deterministicReply(message, brief, runtime, room);
   const system = [
@@ -131,35 +160,21 @@ async function maybeCallOpenAI({ message = "", brief = {}, runtime = {}, room = 
     draft
   };
 
-  const response = await fetch(`${baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.35,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: JSON.stringify(payload) }
-      ]
-    })
+  const result = await runOpenAiChatRuntime(env, {
+    model,
+    temperature: 0.35,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: JSON.stringify(payload) }
+    ]
   });
-
-  if (!response.ok) {
-    const error = await response.text().catch(() => "");
-    throw new Error(`OpenAI ${response.status}: ${error || response.statusText}`);
-  }
-
-  const json = await response.json();
-  const content = json.choices?.[0]?.message?.content || "{}";
+  const content = result.message_content || "{}";
   const parsed = JSON.parse(content);
   return {
     ok: true,
     assistant: "Auren",
-    engine: `openai:${model}`,
+    engine: `0s-provider-runtime:openai:${result.model || model}`,
     reply: text(parsed.reply, 2800) || draft.reply,
     context: draft.context,
     issues: array(parsed.issues).map((issue) => ({

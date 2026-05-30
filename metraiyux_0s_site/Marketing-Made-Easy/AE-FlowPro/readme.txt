@@ -15,6 +15,7 @@ Files:
 - icons (.png)
 - _headers (prevents stale SW/manifest caching)
 - runtime/local-runtime.mjs (same-folder local runtime lane for recovery journal + backup snapshots)
+- smoke/smoke-proof.mjs (proves index.html is the only app entrypoint)
 
 3D Cosmos Background:
 - Uses Three.js for a vibrant animated cosmos behind the UI.
@@ -30,9 +31,14 @@ v1.2 Offline Upgrade:
 - Still static + Netlify Drop ready. No backend required.
 
 
-Version 1.3 hotfix: restored summary/share handler, repaired import boot path, and added backward-compatible backup normalization for older AE FLOW exports.
+Version 1.3 hotfix: restored summary/share handler, repaired import boot path, and added backup normalization for older AE FLOW exports.
 
 Version 1.4 local runtime lane:
 - Added a same-folder runtime at runtime/local-runtime.mjs so the browser app can persist recovery journal history and backup snapshots into this folder on the same origin.
 - The Settings tab now exposes runtime lane status, manual runtime snapshot capture, recovery journal export, and journal clearing.
 - Smoke proof now exercises the real runtime endpoints instead of only checking static strings.
+
+Version 1.5 canonical platform:
+- Promoted the real AE FLOW CRM/PWA into index.html.
+- Removed the old docked/routed shell pages and app.html duplicate entrypoint.
+- Added the root platform command strip directly on top of the real CRM tabs and runtime actions.

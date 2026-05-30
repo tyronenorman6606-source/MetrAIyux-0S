@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
 const fullSecretScan = args.has('--full-secret-scan');
+const GIT_MAX_BUFFER = 64 * 1024 * 1024;
 
 const secretPatterns = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |)?PRIVATE KEY-----/],
@@ -20,7 +21,7 @@ const secretPatterns = [
 
 function git(args, fallback = '') {
   try {
-    return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: GIT_MAX_BUFFER }).trim();
   } catch {
     return fallback;
   }
@@ -40,7 +41,7 @@ function readJson(file) {
 }
 
 function scanTrackedFiles() {
-  const output = execFileSync('git', ['ls-files', '-z'], { cwd: root });
+  const output = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: GIT_MAX_BUFFER });
   const files = output.toString('utf8').split('\0').filter(Boolean);
   const findings = [];
 
@@ -70,7 +71,7 @@ function scanTrackedFiles() {
 }
 
 function scanRiskyTrackedFiles() {
-  const output = execFileSync('git', ['ls-files', '-z'], { cwd: root });
+  const output = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: GIT_MAX_BUFFER });
   const files = output.toString('utf8').split('\0').filter(Boolean);
   const riskyName = /(^|\/)(\.env($|\.)|id_rsa|.*credentials.*\.json$|.*service-account.*\.json$|.*\.pem$|.*\.key$|.*\.p12$|.*\.pfx$)/i;
   const allowedTemplate = /(^|\/)\.env(?:\.[^/]*)?\.example$/i;

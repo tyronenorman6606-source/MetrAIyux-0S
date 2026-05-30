@@ -1,6 +1,6 @@
 {
   "id": "metraiyux-0s-cohesion",
-  "updated_at": "2026-05-20T00:00:00.000Z",
+  "updated_at": "2026-05-26T00:00:00.000Z",
   "canonical_auth_layer": {
     "name": "0S SkyGate",
     "surface": "../skyegate/index.html",
@@ -30,6 +30,32 @@
       "skyerunner_run_started",
       "skyerunner_task_queued"
     ]
+  },
+  "customer_front_door": {
+    "name": "Start Here",
+    "surface": "./index.html",
+    "panels": [
+      "customer-path",
+      "offer-engine",
+      "browser"
+    ],
+    "free_stack": [
+      "landing/app experience",
+      "ConnectLog + Relay13 workspace",
+      "SkyeMail inbox/outbox lane",
+      "AE-FlowPro CRM",
+      "biweekly CitadelDB backup posture"
+    ],
+    "upgrade_posture": "Free value appears first. Ads, managed workspaces, custom mail domains, higher limits, commerce, video, content, and operator support appear as opt-in upgrade lanes."
+  },
+  "browser_layer": {
+    "name": "0S Browser",
+    "surface": "./index.html",
+    "manifest": "./manifest.webmanifest",
+    "service_worker": "./service-worker.js",
+    "role": "fullscreen installable browser shell for owned 0S apps, customer workspaces, offer lanes, and routed business tools",
+    "install_affordance": "top-menu PWA button captures the browser install prompt and falls back to fullscreen when the prompt is unavailable",
+    "default_entry": "after the logo entry, the launcher opens Start Here and the 0S Browser so customers land in a guided path instead of a raw app grid"
   },
   "capability_layer": {
     "name": "SkyeAPI + AegisCore",

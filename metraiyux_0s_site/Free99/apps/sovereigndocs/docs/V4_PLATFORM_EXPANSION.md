@@ -8,7 +8,7 @@ This pass adds real page families and data-backed navigation layers.
 - `12` industry workspaces from `data/industries.json`
 - `51` state/jurisdiction workspaces from `data/jurisdictions.json`
 - Feature pages: `/features/`, `/exports/`, `/signing/`, `/integrations/`, `/compliance/`, `/operator-manual/`
-- Optional Node API endpoints for packets, industries, and jurisdictions
+- Shared 0S Worker API endpoints for packets, industries, and jurisdictions
 - Stronger multipage and dataset smoke tests
 
 ## Boundary

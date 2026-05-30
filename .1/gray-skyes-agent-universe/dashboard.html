@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes artist dashboard for editing public song display names.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Artist Dashboard</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes dashboard">
+      <a href="index.html">Hub</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="video-rooms.html">Videos</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="release.html">Release</a>
+      <a href="zero-os.html">0S</a>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <section class="dashboard-shell">
+      <p class="eyebrow">artist dashboard</p>
+      <h1>Song names</h1>
+      <p class="lede">Change the public titles for the catalog player. The files stay untouched; the artist session controls the visible catalog names across this browser.</p>
+      <div class="button-row">
+        <button type="button" class="primary" id="saveTitles">Save titles</button>
+        <button type="button" id="resetTitles">Reset titles</button>
+        <a class="button" href="catalog.html">View catalog</a>
+      </div>
+      <p class="notice" id="dashboardNotice" hidden></p>
+      <table class="edit-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Public title</th>
+            <th>Lane</th>
+            <th>Source file</th>
+          </tr>
+        </thead>
+        <tbody id="trackEditorRows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>Gray Skyes dashboard. Saved titles reflect in the catalog player for this browser session.</p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

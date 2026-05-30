@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes music catalog with sixteen kept drops, Blades added, and editable public titles.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Catalog</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="room-page">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes catalog">
+      <a href="index.html">Hub</a>
+      <a href="video-rooms.html">Videos</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="release.html">Release</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="room-hero catalog-hero">
+      <img src="media/images/gray-shadow-portrait.jpg" alt="Gray Skyes shadow portrait">
+      <div>
+        <p class="eyebrow">catalog room</p>
+        <h1>Sixteen kept drops</h1>
+        <p class="lede">Every unique audio file from the drop stays playable here. The exact Hands Up duplicate is removed, Blades is added from the intake drop, and both You're Never Alone mixes remain because they are different files.</p>
+        <div class="button-row">
+          <a class="button primary" href="#player" data-scroll-target="#player">Open player</a>
+          <a class="button" href="dashboard.html">Edit song names</a>
+          <a class="button" href="release.html">Package release</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="player">
+      <div class="music-grid">
+        <aside class="player">
+          <img src="media/images/gray-red-portrait.jpg" alt="Gray Skyes red portrait">
+          <p class="eyebrow" id="currentTrackLane">catalog loaded</p>
+          <h3 id="currentTrackTitle">Loading</h3>
+          <p id="currentTrackSource" class="lede"></p>
+          <audio id="mainAudio" controls preload="metadata"></audio>
+          <div class="button-row">
+            <a class="button" href="dashboard.html">Edit titles</a>
+            <a class="button" href="video-rooms.html">Open video rooms</a>
+          </div>
+        </aside>
+        <div class="track-list" id="trackList" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">Back to Gray Skyes hub</a></p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -39,6 +39,7 @@ const required = [
 
 const missing = required.filter((file) => !fs.existsSync(path.join(ROOT, file)));
 const index = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const builder = fs.readFileSync(path.join(ROOT, 'builder.html'), 'utf8');
 const landing = fs.readFileSync(path.join(ROOT, 'landing.html'), 'utf8');
 const landingScene = fs.readFileSync(path.join(ROOT, 'js/landing-scene.js'), 'utf8');
 const donorLibrary = fs.readFileSync(path.join(ROOT, 'js/donor-template-library.js'), 'utf8');
@@ -51,18 +52,19 @@ const checks = {
   indexNamesProduct: index.includes('SkyeWebCreatorMax'),
   landingNamesProduct: landing.includes('SkyeWebCreatorMax') && landing.includes('./index.html'),
   landingLoadsThreeScene: landing.includes('./js/landing-scene.js') && landingScene.includes('three.module.js'),
-  indexLoadsRuntime: index.includes('./js/webcreator.js'),
-  indexLoadsDonorTemplates: index.includes('./js/donor-template-library.js') && runtime.includes('SkyeWebCreatorTemplates'),
-  indexLoadsGateClient: index.includes('./js/skygate-client.js'),
+  indexRoutesToBuilder: index.includes('./builder.html') && index.includes('data-view="builder"'),
+  builderProvidesRuntimeLane: builder.includes('webcreator-runtime') || builder.includes('/api/runtime/'),
+  builderProvidesGateClient: builder.includes('MetrAIyuxGateBridge') || gateClient.includes('MetrAIyuxGateBridge'),
+  runtimeLoadsDonorTemplates: runtime.includes('SkyeWebCreatorTemplates'),
   donorLibraryReferencesImports: donorLibrary.includes('design-vault/sources/shadcn-ui') && donorLibrary.includes('design-vault/sources/tailgrids') && donorLibrary.includes('design-vault/sources/react-three-fiber') && donorLibrary.includes('design-vault/sources/drei') && donorLibrary.includes('design-vault/sources/triplex'),
   runtimePersistsProjects: runtime.includes('skyewebcreatormax.projects.v1'),
-  runtimeHasSourceEditor: runtime.includes('applyEditor') && index.includes('codeEditor'),
-  runtimeHasLivePreview: runtime.includes('preview.srcdoc') && index.includes('previewFrame'),
+  runtimeHasSourceEditor: runtime.includes('applyEditor') && runtime.includes('codeEditor'),
+  runtimeHasLivePreview: runtime.includes('preview.srcdoc') && runtime.includes('previewFrame'),
   runtimeQueuesAeDelivery: runtime.includes('queued-for-ae-delivery'),
-  gateClientTargetsSkyeGate: gateClient.includes('platform-event-ingest') && gateClient.includes('gateway-chat'),
+  gateClientTargetsSkyeGate: gateClient.includes('/api/skygate/platform-event') && gateClient.includes('/api/marketing-made-easy/webcreator-runtime/auren'),
   manifestReferencesBridge: manifest.connectedBridge === 'skyehands_runtime_control/core/webcreator/skyewebcreator-bridge.mjs',
   manifestReferencesDesignVault: manifest.designVault === 'design-vault/library',
-  manifestReferencesGateway: manifest.gateway?.canonical === 'AbovetheSkye-Platforms/SkyeGateFS13',
+  manifestReferencesGateway: manifest.gateway?.canonical === 'FS27/SkyGate/Free99 shared 0S gate',
   manifestReferencesProductionSmoke: manifest.smoke.includes('smoke/smoke-production-readiness.mjs'),
 };
 

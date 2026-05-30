@@ -28,7 +28,7 @@
   };
 
   const auth = window.createSkyGateAuth
-    ? window.createSkyGateAuth({ storageKey: "skye_music_nexus_session" })
+    ? window.createSkyGateAuth({ storageKey: "MetrAIyuxGateBridge" })
     : null;
 
   const nativeModules = [
@@ -102,24 +102,14 @@
     const activeToken = auth && typeof auth.getToken === "function" ? auth.getToken() : "";
     if (activeToken) return activeToken;
 
-    const candidates = [
-      "skye_music_nexus_session",
-      "SKYE_MUSIC_NEXUS_GATE_SESSION",
-      "skyeGateToken",
-      "skyeGateSession",
-      "SKYEGATE_SESSION",
-      "FS27_SESSION",
-      "metraiyuxSession",
-      "musicNexusSession"
-    ];
+    const musicGateSession = window.SkyeMusicGate && typeof window.SkyeMusicGate.session === "function"
+      ? window.SkyeMusicGate.session()
+      : null;
+    if (musicGateSession && musicGateSession.token) return musicGateSession.token;
 
-    for (const key of candidates) {
-      const value = window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
-      if (value) return value;
-    }
-
-    const local = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.session) || "null");
-    return local && local.token ? local.token : "";
+    const gateBridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    const bridgeSession = gateBridge && typeof gateBridge.current === "function" ? gateBridge.current() : null;
+    return bridgeSession && bridgeSession.token ? bridgeSession.token : "";
   }
 
   function authHeaders(extra) {
@@ -361,21 +351,17 @@
   }
 
   async function proofSession() {
-    if (auth && typeof auth.bootstrapLocalProof === "function") {
-      try {
-        const session = await auth.bootstrapLocalProof({
-        subject: "native-creation-studio",
-          role: "admin"
-        });
-        alert(`Local SkyGate proof session created for ${session.subject || "studio lane"}.`);
-        return;
-      } catch (error) {
-        alert(error.message || "Local proof session failed.");
+    const gate = window.SkyeMusicGate;
+    if (auth && gate && typeof gate.requireSession === "function") {
+      const session = gate.session() || await gate.requireSession();
+      if (session?.token) {
+        auth.setToken(session.token);
+        alert("0S session connected for the creation studio.");
         return;
       }
     }
 
-    alert("SkyGate browser helper is not loaded on this page.");
+    alert("Open Client Login first, then return to connect your 0S session.");
   }
 
   function formatBytes(bytes) {

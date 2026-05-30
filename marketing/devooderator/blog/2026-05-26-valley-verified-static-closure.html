@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valley Verified Got Closed The Right Way | DevodeRator</title>
+  <meta name="description" content="Gray London Skyes writes the Valley Verified closure receipt: no generated business pages, no fallback renderer, SkyEmail acceptance, SkyeNet deployment, CitadelDB mirror proof, and why kAIxU has to own workflow scope.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .receipt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0}
+    .receipt-grid span,.receipt-card{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.045);padding:12px}
+    .receipt-grid b{display:block;color:#f4c95d;font-size:1.65rem;line-height:1}
+    .receipt-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.95rem}
+    .receipt-table th,.receipt-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:10px;text-align:left;vertical-align:top}
+    .receipt-table th{color:#f4c95d;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    .callout{border:1px solid rgba(244,201,93,.28);border-radius:8px;background:rgba(244,201,93,.07);padding:16px;margin:18px 0}
+    .ok-note{border-color:rgba(125,211,252,.28);background:rgba(125,211,252,.06)}
+    code{white-space:normal;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-26-valley-verified-static-closure.html">Valley Closure</a>
+        <a href="2026-05-25-kaixu-workflow-before-external-models.html">kAIxU Workflow</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 27, 2026 · Valley Verified closure receipt · SkyeNet + CitadelDB proof · kAIxU workflow discipline</p>
+    <h1>I closed Valley Verified and backed the deployment with live proof.</h1>
+    <p class="lede">
+      Yesterday I wrote down the failure plainly: the work looked active, but it was pointed at the wrong Valley Verified pages. Today the correction is also plain. The active Valley Verified build no longer has generated business pages, the old fallback renderer is gone, SkyEmail acceptance is the owner action, and production has receipts instead of vibes. The same artifact is now also routed through SkyeNet and mirrored into live CitadelDB proof.
+    </p>
+
+    <article class="post-body">
+      <section>
+        <h2>The final count.</h2>
+        <div class="receipt-grid">
+          <span><b>339</b>Valley Verified businesses</span>
+          <span><b>339</b>published static business pages</span>
+          <span><b>0</b>generated business pages remaining</span>
+          <span><b>0</b>fallback artifacts remaining</span>
+          <span><b>48</b>SkyeNet live stress reads passed</span>
+        </div>
+        <div class="callout ok-note">
+          <strong>Acceptance rule:</strong> a Valley business page does not count as done unless it has the static hand-page marker, SkyEmail acceptance, request action, save action, compare action, and no generated business-page fallback behind it.
+        </div>
+        <p>
+          The important distinction is active source versus stale artifact. The current build and the 0S mount both had 339 business pages and no missing mounted pages. The stale <code>dist-cloudflare-pages</code> artifact still had the old <code>business-profile</code> fallback path and only a partial business set, so it was removed as a deploy target instead of being allowed to confuse the production story.
+        </p>
+      </section>
+
+      <section>
+        <h2>What changed.</h2>
+        <table class="receipt-table">
+          <thead><tr><th>Area</th><th>Final behavior</th><th>Proof</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Business pages</td>
+              <td>Business routes publish from <code>src/handbuilt-pages/&lt;business-id&gt;/index.html</code>. Missing pages fail the build instead of falling back to a generated company page.</td>
+              <td><code>metraiyux_0s_site/_platform-sources/valley-verified/proof/no-generated-business-pages.json</code></td>
+            </tr>
+            <tr>
+              <td>Fallback renderer</td>
+              <td><code>/business-profile/</code>, <code>/profile-template-preview/</code>, and <code>/data/profile-template-options.json</code> are not published.</td>
+              <td>Live Pages HTTP checks returned <code>404</code> for all three removed fallback routes.</td>
+            </tr>
+            <tr>
+              <td>Owner action</td>
+              <td>Businesses accept a free SkyEmail account with shared 0S/SkyGate sign-in and a 24-hour workspace activation window.</td>
+              <td>Business-page proof checks require <code>Accept SkyEmail</code>.</td>
+            </tr>
+            <tr>
+              <td>0S mount</td>
+              <td>Valley Verified is mounted in the 0S and still protected by the shared FS27/Free99 gate.</td>
+              <td>Unauthenticated <code>/valley-verified/</code> and sample business routes redirect to <code>/admin/login.html</code>.</td>
+            </tr>
+            <tr>
+              <td>SkyeNet route</td>
+              <td>The Valley artifact is deployed through SkyeNet at <code>/skyenet/valley-verified/</code> with a public route record and project headers.</td>
+              <td><code>test-artifacts/skyenet/valley-verified-skynet-deploy-receipt.json</code></td>
+            </tr>
+            <tr>
+              <td>CitadelDB mirror</td>
+              <td>The SkyeNet deployment claim writes a live CitadelDB row and reads it back through the safe SQL adapter.</td>
+              <td><code>test-artifacts/skyenet/valley-verified-skynet-citadeldb-live-proof-latest.json</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Why kAIxU had to own the workflow.</h2>
+        <p>
+          The lesson did not change just because the closure is clean now. External models can write code, but the workflow is the intelligence. If the model does not check which businesses were already hand-built, which pages are still generated, which route is active, and which artifact is stale, it can ship effort in the wrong place.
+        </p>
+        <p>
+          kAIxU has to own the acceptance criteria because my system is not a generic repo. There is a shared 0S gate, no local app-specific admin password lane, no Codex-run browser proof unless I re-enable it, MCP mining receipts, Cloudflare Pages receipts, 0S Worker receipts, and a hard line between public proof and private authority. A model that is not trained on that workflow needs a smaller lane and a stricter checklist.
+        </p>
+        <p>
+          The corrected workflow was simple: count first, assign agents to audit the real state, patch the build so generated business pages cannot return, prove the active dist and mounted 0S copy, deploy, then live-check with HTTP. No hand-waving.
+        </p>
+      </section>
+
+      <section>
+        <h2>Production receipt.</h2>
+        <ul>
+          <li>Cloudflare Pages canonical: <a href="https://valley-verified.pages.dev/">https://valley-verified.pages.dev/</a></li>
+          <li>Cloudflare Pages deployment: <a href="https://675d22f9.valley-verified.pages.dev">https://675d22f9.valley-verified.pages.dev</a></li>
+          <li>Deployment ID: <code>675d22f9-84cb-4ada-97df-e7238355fb0b</code></li>
+          <li>0S Worker version: <code>afc3d848-7325-4d8d-8155-2118fc00f0da</code></li>
+          <li>0S gated mount: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/">https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/</a></li>
+          <li>SkyeNet live route: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/valley-verified/">https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/valley-verified/</a></li>
+          <li>SkyeNet deployment ID: <code>dep_valley_verified_20260527_1709</code></li>
+          <li>Pages upload receipt: <code>test-artifacts/cloudflare-pages/valley-verified-no-generated-business-pages-receipt.json</code></li>
+          <li>HTTP smoke receipt: <code>test-artifacts/cloudflare-pages/valley-verified-no-generated-business-pages-http-smoke.json</code></li>
+          <li>0S Worker receipt: <code>test-artifacts/0s-browser-end-to-end/valley-verified-worker-deploy-receipt.json</code></li>
+          <li>SkyeNet deploy receipt: <code>test-artifacts/skyenet/valley-verified-skynet-deploy-receipt.json</code></li>
+          <li>SkyeNet + CitadelDB proof: <code>test-artifacts/skyenet/valley-verified-skynet-citadeldb-live-proof-latest.json</code></li>
+          <li>CitadelDB standalone live proof: <code>test-artifacts/citadeldb-live-d1-sync-latest.json</code></li>
+          <li>Helper K4i live API proof: <code>test-artifacts/citadeldb-helper-k4i-live-api-latest.json</code></li>
+          <li>Valley smoke suite: <code>1039 checks passed</code></li>
+          <li>Valley v23 smoke suite: <code>101 checks passed</code></li>
+        </ul>
+        <p>
+          Browser proof was not run because this repo's owner policy disables Codex-run browser proof. That is not a failure. That is the boundary. The live production evidence for this pass is build proof, smoke proof, direct Pages upload receipt, 0S Worker deploy, SkyeNet route proof, CitadelDB write/readback proof, and non-browser HTTP checks.
+        </p>
+      </section>
+
+      <section>
+        <h2>The rule going forward.</h2>
+        <blockquote>
+          A page is not finished because a model touched it. A page is finished when the count moves, the route is active, the fallback is gone, the owner action is correct, and production proof says the same thing.
+        </blockquote>
+      </section>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · public proof journal for the 0S build room.</footer>
+</body>
+</html>

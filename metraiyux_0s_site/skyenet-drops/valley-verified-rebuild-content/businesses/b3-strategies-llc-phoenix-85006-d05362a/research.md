@@ -1,0 +1,26 @@
+# B3 Strategies, LLC Research
+
+Status: limited
+Researched: 2026-05-28T06:04:27.742Z
+
+## Confirmed Facts
+- Services: Strategy / Public Affairs, Advertising & Media / Strategy / Public Affairs, Strategy / public affairs, Advertising & Media, Local SMB / service business, Public directory record, Creative / Media Services
+- Audience: homeowners, property managers, local service callers
+- Service area: Phoenix, AZ, 85006
+- Address: 1642 E. Culver St., Phoenix, AZ 85006
+- Phone: (602) 687-9017
+- Pricing: Pricing not confirmed in available sources; contact business for current scope and quote.
+
+## Landing Page Use
+- B3 Strategies, LLC serves Phoenix with Strategy / Public Affairs.
+- Phoenix Strategy / Public Affairs details, contact routes, and verified public-source facts.
+- A local landing page centered on what B3 Strategies, LLC actually offers.
+
+## Source URLs
+- Advertising & Media QuickLink Category | Greater Phoenix Chamber: https://business.phoenixchamber.com/list/ql/advertising-media-1
+
+## Warnings
+- No official website was present in the local business record.
+- No confirmed official website source was found during this pass.
+- Hours were not confirmed in the local business record.
+- Pricing was not confirmed; landing copy should ask visitors to contact the business.

@@ -3,741 +3,448 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SkyeWebCreatorMax full routed platform shell for VantaCore and QuantumSkyes.">
+  <meta name="description" content="SkyeWebCreatorMax production creator for brief intake, template selection, source editing, live preview, quality checks, and delivery handoff.">
   <title>SkyeWebCreatorMax</title>
   <style>
-    :root{color-scheme:dark;--bg:#05070d;--panel:rgba(16,21,32,.88);--panel2:rgba(24,32,47,.76);--line:rgba(255,255,255,.13);--text:#f5f8ff;--muted:rgba(245,248,255,.66);--a:#5ad7ff;--b:#a7f06a;}
-    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 12% 10%,color-mix(in srgb,var(--a) 18%,transparent),transparent 28%),linear-gradient(135deg,#05070d,#10141f 56%,#070910);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    a{color:inherit;text-decoration:none} button,input,textarea{font:inherit;color:inherit} button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.06);padding:10px 12px;font-weight:800;cursor:pointer} button:hover,a:hover{border-color:color-mix(in srgb,var(--a) 55%,white 0%)}
-    .app{min-height:100vh;display:grid;grid-template-columns:300px minmax(0,1fr)} .side{border-right:1px solid var(--line);background:rgba(5,7,13,.82);padding:18px;display:grid;grid-template-rows:auto auto 1fr auto;gap:16px;position:sticky;top:0;height:100vh}
-    .brand{display:flex;gap:12px;align-items:center}.mark{width:44px;height:44px;display:grid;place-items:center;border-radius:8px;border:1px solid color-mix(in srgb,var(--a) 42%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--a) 20%,transparent),color-mix(in srgb,var(--b) 14%,transparent));overflow:hidden}.mark img{width:78%;height:78%;object-fit:contain}.brand h1{font-size:17px;line-height:1.05;margin:0}.brand p{font-size:12px;color:var(--muted);margin:4px 0 0}
-    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.045);padding:10px}.metric strong{display:block;font-size:24px}.metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-    nav{display:grid;gap:7px;overflow:auto}.side nav a{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;border:1px solid transparent;border-radius:8px;padding:10px;color:rgba(245,248,255,.78)}.side nav a span{display:grid;place-items:center;width:34px;height:28px;border-radius:6px;background:rgba(255,255,255,.06);font-size:11px;color:var(--muted)}.side nav a.active{background:color-mix(in srgb,var(--a) 12%,transparent);border-color:color-mix(in srgb,var(--a) 34%,transparent);color:#fff}
-    .sidefoot{display:grid;gap:8px}.sidefoot a{display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-weight:800}.primary{border:0;background:linear-gradient(135deg,var(--a),var(--b));color:#041017}.main{min-width:0}.top{min-height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;background:rgba(5,7,13,.58);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}.top h2{margin:0;font-size:clamp(24px,3vw,40px);letter-spacing:0}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}.content{padding:24px}.view{display:none}.view.active{display:block}
-    .hero{border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 12%,transparent),rgba(255,255,255,.035));padding:20px;margin-bottom:16px}.hero h2{font-size:clamp(42px,7vw,88px);line-height:.9;letter-spacing:0;margin:0}.hero p{color:var(--muted);max-width:820px;line-height:1.6}.kicker{color:var(--a);text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:1000;margin:0 0 8px}
-    .section-head{margin-bottom:14px}.section-head h2{font-size:clamp(32px,5vw,64px);line-height:.95;letter-spacing:0;margin:0}.section-head p{color:var(--muted);line-height:1.55;max-width:780px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card,.panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:16px;box-shadow:0 22px 70px rgba(0,0,0,.3)}.card h3,.panel h3{margin:8px 0}.card p,.muted{color:var(--muted);line-height:1.55}.badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted);font-size:11px}.small{margin-top:12px;padding:8px 10px;font-size:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.rows{display:grid;gap:8px}.row,.rowlink{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);padding:10px}.rowlink{grid-template-columns:1fr auto}.dot{width:10px;height:10px;border-radius:50%;background:var(--b);box-shadow:0 0 16px var(--b)}.console{min-height:240px;white-space:pre-wrap;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#02040a;color:#b8f4ff;padding:14px;overflow:auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.form-grid label,.auren-shell label{display:grid;gap:6px;font-size:12px;color:var(--muted)}.form-grid input,.form-grid textarea,.auren-shell textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.22);padding:10px;color:var(--text)}.form-grid textarea,.auren-shell textarea{min-height:96px;resize:vertical}.form-grid .full{grid-column:1 / -1}
-    .auren-shell{display:grid;gap:12px}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.toggle-row input{width:auto}.auren-log{display:grid;gap:10px;max-height:340px;overflow:auto;padding-right:4px}.auren-bubble{border:1px solid var(--line);border-radius:8px;padding:12px;background:rgba(255,255,255,.05)}.auren-bubble.assistant{background:rgba(93,215,255,.08);border-color:rgba(93,215,255,.28)}.auren-bubble.user{background:rgba(167,240,106,.08);border-color:rgba(167,240,106,.26)}.auren-bubble-meta{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}.auren-stack{display:grid;gap:8px}.auren-chip{border:1px solid var(--line);border-radius:8px;padding:10px;background:rgba(255,255,255,.04)}.prompt-row{display:flex;flex-wrap:wrap;gap:8px}.prompt-row button{text-align:left}
-    @media(max-width:980px){.app{grid-template-columns:1fr}.side{position:static;height:auto}.grid,.split{grid-template-columns:1fr}.top{position:static;align-items:flex-start;flex-direction:column}}
+    :root{
+      color-scheme:dark;
+      --bg:#050806;
+      --panel:rgba(9,18,18,.78);
+      --panel-strong:rgba(11,22,24,.92);
+      --ink:#f6fff8;
+      --muted:#a6bdb2;
+      --line:rgba(151,255,204,.18);
+      --green:#42ff9c;
+      --cyan:#62e8ff;
+      --rose:#ff5f9e;
+      --gold:#ffd36d;
+      --shadow:0 24px 82px rgba(0,0,0,.38);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 16% 8%,rgba(66,255,156,.18),transparent 28%),
+        radial-gradient(circle at 78% 10%,rgba(255,95,158,.14),transparent 26%),
+        linear-gradient(145deg,#050806 0%,#071513 48%,#11121f 100%);
+      color:var(--ink);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      overflow-x:hidden;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(98,232,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(66,255,156,.028) 1px,transparent 1px);
+      background-size:46px 46px;
+      mask-image:linear-gradient(to bottom,rgba(0,0,0,.82),transparent 82%);
+      animation:gridDrift 16s linear infinite;
+    }
+    @keyframes gridDrift{to{background-position:92px 46px}}
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button,.button{
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.065);
+      padding:10px 13px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    button:hover,.button:hover{border-color:rgba(98,232,255,.44);transform:translateY(-1px)}
+    .primary{
+      border:0;
+      background:linear-gradient(135deg,var(--green),var(--cyan));
+      color:#04100a;
+      box-shadow:0 0 34px rgba(66,255,156,.2);
+    }
+    .shell{position:relative;z-index:1;min-height:100vh}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:18px;
+      padding:14px clamp(16px,3vw,34px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(5,8,6,.72);
+      backdrop-filter:blur(20px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .mark{
+      width:42px;
+      height:42px;
+      border-radius:8px;
+      display:grid;
+      place-items:center;
+      background:conic-gradient(from 180deg,var(--green),var(--cyan),var(--rose),var(--green));
+      box-shadow:0 0 36px rgba(66,255,156,.25);
+      overflow:hidden;
+    }
+    .mark img{width:76%;height:76%;object-fit:contain}
+    .brand h1{margin:0;font-size:18px;letter-spacing:0;line-height:1.05}
+    .brand p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .nav{display:flex;flex-wrap:wrap;gap:8px}
+    .nav button{
+      min-height:36px;
+      padding:8px 10px;
+      color:var(--muted);
+      background:rgba(255,255,255,.04);
+    }
+    .nav button.active,.nav button:hover{color:var(--green);border-color:rgba(66,255,156,.36);background:rgba(66,255,156,.08)}
+    .hero{
+      min-height:46vh;
+      display:grid;
+      grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
+      gap:clamp(18px,4vw,46px);
+      align-items:end;
+      padding:clamp(28px,5vw,68px) clamp(16px,4vw,44px) 22px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      color:var(--green);
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      font-size:12px;
+      font-weight:1000;
+      margin:0 0 12px;
+    }
+    h2,h3{letter-spacing:0}
+    .hero h2{
+      max-width:1050px;
+      margin:0;
+      font-size:clamp(46px,8vw,118px);
+      line-height:.84;
+      letter-spacing:0;
+    }
+    .hero p.lede{
+      max-width:760px;
+      margin:18px 0 0;
+      color:var(--muted);
+      font-size:clamp(17px,2vw,23px);
+      line-height:1.42;
+    }
+    .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .pulse-board{
+      display:grid;
+      gap:10px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.035));
+      box-shadow:var(--shadow);
+    }
+    .pulse-board article{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:8px;
+      background:rgba(0,0,0,.18);
+    }
+    .pulse-board b{font-size:22px}
+    .pulse-board span{color:var(--muted);font-size:12px;font-weight:800}
+    .workspace{
+      display:grid;
+      grid-template-columns:minmax(280px,360px) minmax(0,1.18fr) minmax(320px,.86fr);
+      gap:14px;
+      padding:0 clamp(16px,4vw,44px) 38px;
+      align-items:start;
+    }
+    .panel{
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:var(--panel);
+      box-shadow:var(--shadow);
+      padding:16px;
+      backdrop-filter:blur(18px);
+    }
+    .panel h3{margin:0 0 10px;font-size:22px}
+    .panel p,.muted{color:var(--muted);line-height:1.5}
+    .form-grid{display:grid;gap:10px}
+    label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:850}
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(0,0,0,.28);
+      padding:10px 11px;
+      outline:none;
+    }
+    textarea{min-height:92px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(66,255,156,.48);box-shadow:0 0 0 4px rgba(66,255,156,.08)}
+    select option{background:#081211;color:#fff}
+    .button-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .template-tools{display:grid;gap:10px}
+    .template-list{display:grid;gap:8px;max-height:250px;overflow:auto;padding-right:3px}
+    .template-option{
+      width:100%;
+      display:grid;
+      gap:4px;
+      text-align:left;
+      border-color:rgba(255,255,255,.1);
+      background:rgba(255,255,255,.04);
+    }
+    .template-option.active{border-color:rgba(66,255,156,.5);background:rgba(66,255,156,.08)}
+    .template-option small{color:var(--muted);line-height:1.35}
+    .source-refs{display:grid;gap:6px;margin-top:8px;color:var(--muted);font-size:12px}
+    .source-refs code{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px;background:rgba(255,255,255,.04)}
+    .editor-shell{padding:0;overflow:hidden}
+    .editor-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,.09);
+      background:rgba(0,0,0,.18);
+    }
+    .tabs{display:flex;gap:7px;flex-wrap:wrap}
+    .tabs button{min-height:34px;padding:7px 9px;color:var(--muted)}
+    .tabs button.active{background:rgba(98,232,255,.11);border-color:rgba(98,232,255,.42);color:#dffbff}
+    #codeEditor{
+      min-height:520px;
+      border:0;
+      border-radius:0;
+      background:#05090b;
+      color:#d9ffe9;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      line-height:1.45;
+      padding:16px;
+    }
+    .preview-panel{display:grid;gap:12px}
+    .preview-frame{
+      width:100%;
+      height:520px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;
+      background:white;
+    }
+    .quality-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+    }
+    .quality-grid article,.card{
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:8px;
+      background:rgba(255,255,255,.045);
+      padding:11px;
+    }
+    .quality-grid b{display:block;color:var(--green);font-size:18px}
+    .quality-grid span,.card small{display:block;color:var(--muted);font-size:12px;line-height:1.35;margin-top:4px}
+    .boards{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      padding:0 clamp(16px,4vw,44px) 44px;
+    }
+    .board-card{
+      min-height:150px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:14px;
+      background:rgba(255,255,255,.05);
+      box-shadow:var(--shadow);
+    }
+    .board-card h3{margin:0 0 8px}
+    .board-card p{color:var(--muted);line-height:1.45}
+    .lists{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      padding:0 clamp(16px,4vw,44px) 58px;
+    }
+    .list-stack{display:grid;gap:8px;max-height:300px;overflow:auto;padding-right:3px}
+    .log{
+      white-space:pre-wrap;
+      min-height:260px;
+      max-height:360px;
+      overflow:auto;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      color:#c8ffe5;
+      background:#05090b;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:8px;
+      padding:12px;
+    }
+    .status-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .pill{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:7px 9px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:850;
+      background:rgba(255,255,255,.04);
+    }
+    @media(max-width:1180px){
+      .workspace{grid-template-columns:1fr 1fr}
+      .preview-panel{grid-column:1 / -1}
+      .boards{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:780px){
+      .topbar{position:relative;align-items:flex-start;flex-direction:column}
+      .hero,.workspace,.lists{grid-template-columns:1fr}
+      .hero h2{font-size:48px}
+      .boards{grid-template-columns:1fr}
+      #codeEditor,.preview-frame{height:430px;min-height:430px}
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="side">
-      <div class="brand"><div class="mark"><img src="../../assets/metraiyux-0s-emblem-transparent.png" alt="" aria-hidden="true"></div><div><h1>SkyeWebCreatorMax</h1><p>Full platform shell · v3.0.0</p></div></div>
-      <div class="metrics"><div class="metric"><strong>8</strong><span>Pages</span></div><div class="metric"><strong id="queueCount">0</strong><span>Queue</span></div><div class="metric"><strong id="sessionCount">0</strong><span>Sessions</span></div><div class="metric"><strong>9</strong><span>Endpoints</span></div></div>
-      <nav><a href="./dashboard.html" data-view="dashboard"><span>live</span><strong>Dashboard</strong></a>
-<a href="./briefs.html" data-view="briefs"><span>intake</span><strong>Briefs</strong></a>
-<a href="./builder.html" data-view="builder"><span>editor</span><strong>Builder</strong></a>
-<a href="./templates.html" data-view="templates"><span>donors</span><strong>Templates</strong></a>
-<a href="./preview.html" data-view="preview"><span>iframe</span><strong>Preview</strong></a>
-<a href="./delivery.html" data-view="delivery"><span>handoff</span><strong>Delivery</strong></a>
-<a href="./runtime.html" data-view="runtime"><span>api</span><strong>Runtime</strong></a>
-<a href="./settings.html" data-view="settings"><span>local</span><strong>Settings</strong></a></nav>
-      <div class="sidefoot"><button class="primary" id="quickRuntime">Ping Runtime</button><button id="quickMediaForge">Media Forge</button><button id="quickQueue">Queue Proof</button></div>
-    </aside>
-    <main class="main">
-      <header class="top"><div><h2 id="viewTitle">Dashboard</h2><p id="viewSubtitle">Routed production platform for SkyeWebCreatorMax.</p></div><div class="actions"><a class="button" href="./health">Health</a><a class="button" href="./v1/runtime-summary">Summary</a></div></header>
-      <div class="content">
-        <section class="view active" id="view-home">
-          <div class="hero"><p class="kicker">VantaCore production platform</p><h2>SkyeWebCreatorMax</h2><p>This entry is a routed platform shell, not a single landing page. Every lane has a direct URL, stateful controls, runtime proof endpoints, and legacy links where older full consoles are preserved.</p></div>
-        </section>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html">
+        <span class="mark"><img src="../../assets/metraiyux-0s-emblem-transparent.png" alt="" aria-hidden="true"></span>
+        <span><h1>SkyeWebCreatorMax</h1><p>Production web creator</p></span>
+      </a>
+      <nav class="nav" aria-label="Creator sections">
+        <button class="active" type="button" data-scroll="brief">Brief</button>
+        <button type="button" data-scroll="editor">Editor</button>
+        <button type="button" data-scroll="preview">Preview</button>
+        <button type="button" data-scroll="delivery">Delivery</button>
+      </nav>
+    </header>
 
-        <section class="view" id="view-dashboard">
-          <div class="section-head">
-            <p class="kicker">live lane</p>
-            <h2>Dashboard</h2>
-            <p>Project command, build readiness, runtime status, and delivery queue.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Dashboard 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="dashboard-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="dashboard-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="dashboard-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="dashboard-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="dashboard-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="dashboard-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Live Platform Proof</h3>
-              <div class="rows" id="proofRows"></div>
-            </div>
-            <div class="panel">
-              <h3>Local Operator Queue</h3>
-              <div class="rows" id="queueRows"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-briefs">
-          <div class="section-head">
-            <p class="kicker">intake lane</p>
-            <h2>Briefs</h2>
-            <p>Structured client brief capture, offer map, audience, and required pages.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Briefs 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="briefs-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Briefs 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="briefs-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Briefs 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="briefs-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Briefs 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="briefs-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Briefs 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="briefs-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Briefs 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="briefs-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-builder">
-          <div class="section-head">
-            <p class="kicker">editor lane</p>
-            <h2>Builder</h2>
-            <p>Editor lane with HTML, CSS, copy blocks, and preview packaging.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Builder 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="builder-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Builder 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="builder-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Builder 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="builder-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Builder 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="builder-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Builder 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="builder-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Builder 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="builder-5">Queue Check</button>
-            </article>
-          </div>
-          <div class="split">
-            <div class="panel">
-              <h3>Builder Brief</h3>
-              <p class="muted">Feed this with enough signal and the assistant can guide structure, conversion, and handoff instead of guessing.</p>
-              <div class="form-grid">
-                <label>Project name<input id="briefProjectName" placeholder="West Valley Martial Arts"></label>
-                <label>Business type<input id="briefBusinessType" placeholder="service, retail, venue, SaaS"></label>
-                <label class="full">Offer<textarea id="briefOffer" placeholder="What is the site actually selling or driving?"></textarea></label>
-                <label class="full">Audience<textarea id="briefAudience" placeholder="Who is this for and what matters to them first?"></textarea></label>
-                <label class="full">Pages<textarea id="briefPages" placeholder="home, services, pricing, gallery, FAQ, contact"></textarea></label>
-                <label>Template lane<input id="briefTemplateId" value="starter-fallback" placeholder="donor template id"></label>
-                <label>Current route<input id="briefCurrentRoute" value="builder" placeholder="builder, preview, delivery"></label>
-              </div>
-            </div>
-            <div class="panel auren-shell">
-              <div>
-                <p class="kicker">embedded operator</p>
-                <h3>Auren</h3>
-                <p class="muted">Ask for structure, polish, proof priorities, or what still needs to be fixed before delivery.</p>
-              </div>
-              <div class="toggle-row">
-                <span class="muted" id="aurenStatus">Auren ready in fallback mode.</span>
-                <label><input type="checkbox" id="aurenLiveAi"> use live model</label>
-              </div>
-              <div class="prompt-row" id="aurenPrompts"></div>
-              <div class="auren-log" id="aurenLog"></div>
-              <div class="split" style="margin-top:0">
-                <div class="auren-stack" id="aurenIssues"></div>
-                <div class="auren-stack" id="aurenActions"></div>
-              </div>
-              <label>Ask Auren<textarea id="aurenInput" placeholder="How do we make this site feel premium without slowing delivery?"></textarea></label>
-              <div class="actions">
-                <button id="askAuren">Ask Auren</button>
-                <button id="clearAuren">Clear Thread</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-templates">
-          <div class="section-head">
-            <p class="kicker">donors lane</p>
-            <h2>Templates</h2>
-            <p>Donor template library, section packs, and style recipes.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Templates 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="templates-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Templates 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="templates-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Templates 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="templates-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Templates 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="templates-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Templates 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="templates-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Templates 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="templates-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-preview">
-          <div class="section-head">
-            <p class="kicker">iframe lane</p>
-            <h2>Preview</h2>
-            <p>Generated site preview with quality checks and export actions.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Preview 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="preview-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Preview 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="preview-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Preview 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="preview-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Preview 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="preview-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Preview 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="preview-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Preview 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="preview-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-delivery">
-          <div class="section-head">
-            <p class="kicker">handoff lane</p>
-            <h2>Delivery</h2>
-            <p>AE review, execution, dispatch, and client-ready packages.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Delivery 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="delivery-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Delivery 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="delivery-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Delivery 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="delivery-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Delivery 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="delivery-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Delivery 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="delivery-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Delivery 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="delivery-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-runtime">
-          <div class="section-head">
-            <p class="kicker">api lane</p>
-            <h2>Runtime</h2>
-            <p>Same-origin static runtime contract plus local worker settings.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Runtime 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="runtime-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="runtime-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="runtime-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="runtime-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="runtime-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="runtime-5">Queue Check</button>
-            </article>
-          </div>
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Runtime Contract</h3>
-              <p class="muted">These buttons hit same-origin production URLs, so the platform has a testable contract even before a provider-backed worker is attached.</p>
-              <div class="actions">
-                <button id="pingRuntime">Ping Health</button>
-                <button id="loadSummary">Load Summary</button>
-                <button id="saveSession">Record Session</button>
-              </div>
-            </div>
-            <pre class="console" id="runtimeConsole">Runtime console ready.</pre>
-          </div>
-          
-          
-        </section>
-
-        <section class="view" id="view-settings">
-          <div class="section-head">
-            <p class="kicker">local lane</p>
-            <h2>Settings</h2>
-            <p>Local state, links, and platform environment notes.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Settings 1</span>
-              <h3>Brief Engine</h3>
-              <p>Capture industry, offer, tone, pages, proof assets, and conversion path.</p>
-              <button class="small" data-action="settings-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 2</span>
-              <h3>Template Library</h3>
-              <p>Search donor templates, apply section packs, and preserve source references.</p>
-              <button class="small" data-action="settings-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 3</span>
-              <h3>Builder Workspace</h3>
-              <p>Edit generated HTML/CSS/copy, preview locally, and package artifacts.</p>
-              <button class="small" data-action="settings-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 4</span>
-              <h3>AE Delivery Flow</h3>
-              <p>Queue review packs, advance execution, and dispatch client-ready handoffs.</p>
-              <button class="small" data-action="settings-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 5</span>
-              <h3>Runtime Contract</h3>
-              <p>Same-origin health, summary, queue, board, and session endpoints.</p>
-              <button class="small" data-action="settings-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 6</span>
-              <h3>Export Surface</h3>
-              <p>Download project JSON, preview HTML, and delivery notes from browser state.</p>
-              <button class="small" data-action="settings-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Legacy and Deep Tools</h3>
-              <div class="rows"><a class="rowlink" href="builder-workspace.html"><strong>Builder Workspace</strong><span>Open</span></a><a class="rowlink" href="legacy-landing.html"><strong>Original Landing</strong><span>Open</span></a></div>
-            </div>
-            <div class="panel">
-              <h3>Local State</h3>
-              <p class="muted">Queue and sessions are stored in this browser for static production mode.</p>
-              <div class="actions"><button id="exportState">Export State</button><button id="clearState">Clear State</button></div>
-            </div>
-          </div>
-          
-        </section>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">AI web foundry</p>
+        <h2>Build the site, inspect the source, ship the package.</h2>
+        <p class="lede">A full creator workspace with intake, donor-backed templates, editable files, instant preview, quality gates, and AE delivery handoff on one surface.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#brief">Start Build</a>
+          <a class="button" href="./landing.html">Open Showcase</a>
+          <a class="button" href="#preview">Generated Preview Lane</a>
+        </div>
       </div>
-    </main>
-  </div>
-  <script>
-    const platform = {"slug":"skyewebcreator","title":"SkyeWebCreatorMax","pages":[["dashboard","Dashboard","live","Project command, build readiness, runtime status, and delivery queue."],["briefs","Briefs","intake","Structured client brief capture, offer map, audience, and required pages."],["builder","Builder","editor","Editor lane with HTML, CSS, copy blocks, and preview packaging."],["templates","Templates","donors","Donor template library, section packs, and style recipes."],["preview","Preview","iframe","Generated site preview with quality checks and export actions."],["delivery","Delivery","handoff","AE review, execution, dispatch, and client-ready packages."],["runtime","Runtime","api","Same-origin static runtime contract plus local worker settings."],["settings","Settings","local","Local state, links, and platform environment notes."]],"endpoints":["health","status","v1/runtime-summary","v1/sessions","queue","handoff-packs","review-board","execution-board","dispatch-board"]};
-    const stateKey = 'vanta.platform.' + platform.slug + '.v1';
-    const mediaHandoffKey = 'METRAIYUX_MEDIA_HANDOFF';
-    const still2vidUrl = '../../Free99/apps/still2vid-forge/index.html';
-    const state = JSON.parse(localStorage.getItem(stateKey) || '{"queue":[],"sessions":[]}');
-    const briefKey = stateKey + '.brief';
-    const aurenKey = stateKey + '.auren';
-    const brief = JSON.parse(localStorage.getItem(briefKey) || '{"projectName":"","businessType":"","offer":"","audience":"","pages":"home, services, pricing, contact","templateId":"starter-fallback","currentRoute":"builder"}');
-    let aurenThread = JSON.parse(localStorage.getItem(aurenKey) || '[]');
-    let runtimeSnapshot = null;
-    const $ = s => document.querySelector(s);
-    const $$ = s => [...document.querySelectorAll(s)];
-    const save = () => localStorage.setItem(stateKey, JSON.stringify(state));
-    const saveBrief = () => localStorage.setItem(briefKey, JSON.stringify(brief));
-    const saveAuren = () => localStorage.setItem(aurenKey, JSON.stringify(aurenThread));
-    const log = msg => { const el = $('#runtimeConsole'); if (el) el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n' + el.textContent; };
-    const pageIds = new Set(platform.pages.map(p => p[0]));
-    function pageFromPath(){ const last = location.pathname.split('/').pop().replace(/\.html$/,'') || 'dashboard'; return pageIds.has(last) ? last : 'dashboard'; }
-    function row(title, sub, tag){ return '<div class="row"><span class="dot"></span><strong>' + title + '<br><small class="muted">' + sub + '</small></strong><span class="badge">' + tag + '</span></div>'; }
-    function syncBriefForm(){
-      $('#briefProjectName') && ($('#briefProjectName').value = brief.projectName || '');
-      $('#briefBusinessType') && ($('#briefBusinessType').value = brief.businessType || '');
-      $('#briefOffer') && ($('#briefOffer').value = brief.offer || '');
-      $('#briefAudience') && ($('#briefAudience').value = brief.audience || '');
-      $('#briefPages') && ($('#briefPages').value = brief.pages || '');
-      $('#briefTemplateId') && ($('#briefTemplateId').value = brief.templateId || 'starter-fallback');
-      $('#briefCurrentRoute') && ($('#briefCurrentRoute').value = brief.currentRoute || 'builder');
-    }
-    function bindBriefInputs(){
-      ['ProjectName','BusinessType','Offer','Audience','Pages','TemplateId','CurrentRoute'].forEach(key => {
-        const node = $('#brief' + key);
-        if (!node) return;
-        node.addEventListener('input', () => {
-          const prop = key.charAt(0).toLowerCase() + key.slice(1);
-          brief[prop] = node.value;
-          saveBrief();
-        });
-      });
-    }
-    function briefPayload() {
-      return {
-        projectName: brief.projectName || 'Untitled website',
-        businessType: brief.businessType || 'general',
-        offer: brief.offer || '',
-        audience: brief.audience || '',
-        pages: String(brief.pages || '').split(',').map(v => v.trim()).filter(Boolean),
-        templateId: brief.templateId || 'starter-fallback',
-        currentRoute: brief.currentRoute || 'builder',
-        metrics: {
-          htmlChars: document.documentElement.outerHTML.length,
-          cssChars: [...document.querySelectorAll('style')].map(node => node.textContent || '').join('\n').length,
-          jsChars: [...document.querySelectorAll('script')].map(node => node.textContent || '').join('\n').length,
-        }
-      };
-    }
-    function renderAuren() {
-      const logNode = $('#aurenLog');
-      if (logNode) {
-        logNode.innerHTML = aurenThread.length ? aurenThread.map(entry => `
-          <article class="auren-bubble ${entry.role}">
-            <div class="auren-bubble-meta"><span>${entry.role === 'assistant' ? 'Auren' : 'Operator'}</span><span>${entry.engine || 'local'}</span></div>
-            <div>${entry.message || ''}</div>
-            ${entry.note ? `<small class="muted">${entry.note}</small>` : ''}
-          </article>
-        `).join('') : '<article class="auren-bubble assistant"><div class="auren-bubble-meta"><span>Auren</span><span>ready</span></div><div>Give me the brief and I will help shape structure, quality, and handoff.</div></article>';
-      }
-      const latest = [...aurenThread].reverse().find(entry => entry.role === 'assistant') || {};
-      $('#aurenStatus') && ($('#aurenStatus').textContent = latest.engine ? `Auren active · ${latest.engine}` : 'Auren ready in fallback mode.');
-      $('#aurenIssues') && ($('#aurenIssues').innerHTML = (latest.issues || []).map(issue => `<article class="auren-chip"><strong>${issue.title}</strong><div class="muted">${issue.detail}</div></article>`).join('') || '<article class="auren-chip"><strong>No urgent issues</strong><div class="muted">Auren will surface weak spots after a prompt.</div></article>');
-      $('#aurenActions') && ($('#aurenActions').innerHTML = (latest.actions || []).map(action => `<article class="auren-chip"><strong>${action.label}</strong><div class="muted">${action.reason}</div></article>`).join('') || '<article class="auren-chip"><strong>No actions queued</strong><div class="muted">Ask Auren what to fix or expand next.</div></article>');
-      const prompts = latest.prompts || [
-        'What should we add next to make this website feel premium and complete?',
-        'How should the homepage convert better?',
-        'What is still missing before this is safe to deliver?'
-      ];
-      $('#aurenPrompts') && ($('#aurenPrompts').innerHTML = prompts.map(prompt => `<button type="button" data-auren-prompt="${prompt.replace(/"/g, '&quot;')}">${prompt}</button>`).join(''));
-    }
-    function render(){
-      $('#queueCount').textContent = state.queue.length;
-      $('#sessionCount').textContent = state.sessions.length;
-      const proof = $('#proofRows'); if (proof) proof.innerHTML = platform.endpoints.slice(0,6).map(e => row(e, 'Same-origin production contract route.', '200')).join('');
-      const queue = $('#queueRows'); if (queue) queue.innerHTML = state.queue.length ? state.queue.map(q => row(q.title, q.note, q.at)).join('') : '<p class="muted">No queued proof items yet.</p>';
-    }
-    function switchView(id){
-      if (!pageIds.has(id)) id = 'dashboard';
-      $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + id));
-      $$('nav a').forEach(a => a.classList.toggle('active', a.dataset.view === id));
-      const def = platform.pages.find(p => p[0] === id);
-      $('#viewTitle').textContent = def ? def[1] : 'Dashboard';
-      $('#viewSubtitle').textContent = def ? def[3] : '';
-      render();
-    }
-    async function pingRuntime(){
-      switchView('runtime');
-      history.replaceState({}, '', './runtime.html');
-      log('GET ./health');
-      try { const res = await fetch('./health'); const data = await res.json(); log('Health OK: ' + JSON.stringify(data).slice(0,260)); }
-      catch(err){ log('Health failed: ' + err.message); }
-    }
-    async function loadSummary(){
-      log('GET ./v1/runtime-summary');
-      try { const res = await fetch('./v1/runtime-summary'); const data = await res.json(); log('Summary OK: ' + JSON.stringify(data, null, 2)); }
-      catch(err){ log('Summary failed: ' + err.message); }
-    }
-    function runtimeApiBase() {
-      const hostLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
-      if (hostLocal && location.port === '4396') return '/api/runtime';
-      if (location.pathname.includes('/Marketing-Made-Easy/')) return '/api/marketing-made-easy/webcreator-runtime';
-      return '/api/runtime';
-    }
-    async function runtimeFetch(path, options = {}) {
-      const target = path.startsWith('http')
-        ? path
-        : `${runtimeApiBase()}${path.startsWith('/') ? path : `/${path}`}`;
-      const res = await fetch(target, { ...options, headers: { 'content-type': 'application/json', ...(options.headers || {}) } });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || res.statusText);
-      return data;
-    }
-    async function refreshRuntimeSnapshot() {
-      try {
-        runtimeSnapshot = await runtimeFetch('/status');
-        const liveToggle = $('#aurenLiveAi');
-        if (liveToggle && runtimeSnapshot.ai) {
-          liveToggle.checked = Boolean(runtimeSnapshot.ai.liveAvailable);
-          liveToggle.disabled = !runtimeSnapshot.ai.configured;
-          liveToggle.title = runtimeSnapshot.ai.configured
-            ? runtimeSnapshot.ai.liveAvailable
-              ? `Live Auren is enabled with ${runtimeSnapshot.ai.model}`
-              : 'AI is configured, but live Auren is disabled in env.'
-            : 'OpenAI env not configured on this runtime.';
-        }
-      } catch {
-        runtimeSnapshot = { ok: false, deliveryPacks: 0 };
-      }
-    }
-    async function askAuren(message) {
-      const clean = String(message || '').trim();
-      if (!clean) return;
-      aurenThread.push({ role: 'user', message: clean, engine: 'operator' });
-      saveAuren();
-      renderAuren();
-      try {
-        if (!runtimeSnapshot) await refreshRuntimeSnapshot();
-        const response = await runtimeFetch('/auren', {
-          method: 'POST',
-          body: JSON.stringify({
-            room: 'builder',
-            message: clean,
-            allowLiveAi: Boolean($('#aurenLiveAi')?.checked),
-            brief: briefPayload(),
-            runtime: runtimeSnapshot,
-          })
-        });
-        aurenThread.push({
-          role: 'assistant',
-          message: response.reply,
-          engine: response.engine,
-          note: response.note || '',
-          issues: response.issues || [],
-          actions: response.actions || [],
-          prompts: response.prompts || [],
-        });
-      } catch (error) {
-        aurenThread.push({
-          role: 'assistant',
-          message: `I hit a runtime issue: ${error.message}`,
-          engine: 'webcreator-context-fallback',
-          note: 'Check the local runtime and try again.'
-        });
-      }
-      saveAuren();
-      renderAuren();
-    }
-    function queueProof(){
-      state.queue.unshift({ title: 'Operator proof check', note: 'Queued from ' + platform.title, at: new Date().toLocaleString() });
-      save(); render();
-    }
-    function recordSession(){
-      state.sessions.unshift({ title: 'Local production session', note: platform.title + ' session recorded in browser.', at: new Date().toLocaleString() });
-      save(); render(); log('Local session recorded.');
-    }
-    function openMediaForge(){
-      const projectName = $('#briefProjectName')?.value || 'SkyeWebCreatorMax project';
-      localStorage.setItem(mediaHandoffKey, JSON.stringify({
-        sourceApp: 'skyewebcreator',
-        client: projectName,
-        sourceName: projectName + ' media handoff',
-        sourceType: 'operator-upload',
-        receipt: 'SkyeWebCreatorMax handoff: upload or select a real image/logo in Still2Vid before export.',
-        returnTo: location.href
-      }));
-      const url = new URL(still2vidUrl, location.href);
-      url.searchParams.set('source', 'skyewebcreator');
-      url.searchParams.set('return', location.href);
-      location.href = url.toString();
-    }
-    document.addEventListener('click', e => {
-      const nav = e.target.closest('nav a[data-view]');
-      if (nav) { e.preventDefault(); history.pushState({}, '', nav.href); switchView(nav.dataset.view); }
-      const action = e.target.closest('[data-action]');
-      if (action) queueProof();
-    });
-    window.addEventListener('popstate', () => switchView(pageFromPath()));
-    $('#quickRuntime').addEventListener('click', pingRuntime);
-    $('#quickMediaForge').addEventListener('click', openMediaForge);
-    $('#quickQueue').addEventListener('click', queueProof);
-    $('#askAuren')?.addEventListener('click', () => askAuren($('#aurenInput')?.value || ''));
-    $('#clearAuren')?.addEventListener('click', () => { aurenThread = []; saveAuren(); renderAuren(); });
-    $('#pingRuntime')?.addEventListener('click', pingRuntime);
-    $('#loadSummary')?.addEventListener('click', loadSummary);
-    $('#saveSession')?.addEventListener('click', recordSession);
-    document.addEventListener('click', e => {
-      const prompt = e.target.closest('[data-auren-prompt]')?.dataset.aurenPrompt;
-      if (prompt) {
-        $('#aurenInput').value = prompt;
-        askAuren(prompt);
-      }
-    });
-    $('#exportState')?.addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = platform.slug + '-state.json'; a.click(); URL.revokeObjectURL(a.href);
-    });
-    $('#clearState')?.addEventListener('click', () => { localStorage.removeItem(stateKey); location.reload(); });
-    render(); syncBriefForm(); bindBriefInputs(); renderAuren(); switchView(pageFromPath()); refreshRuntimeSnapshot();
-  </script>
+      <aside class="pulse-board" aria-label="Workspace status">
+        <article><span>Workspace</span><b id="connectionState">Gateway warming</b></article>
+        <article><span>Gate</span><b id="gatePill">GateFS13 ready</b></article>
+        <article><span>Delivery</span><b id="runtimeState">Checking board</b></article>
+      </aside>
+    </section>
+
+    <section class="workspace" id="brief">
+      <section class="panel">
+        <h3>Client Brief</h3>
+        <form id="projectForm" class="form-grid">
+          <label>Project name<input name="name" value="Premium client platform" autocomplete="off"></label>
+          <label>Build type
+            <select name="buildType">
+              <option value="enterprise-admin">Enterprise dashboard</option>
+              <option value="landing-page">Conversion landing</option>
+              <option value="3d-product-showcase">3D product showcase</option>
+              <option value="saas-dashboard">SaaS workspace</option>
+            </select>
+          </label>
+          <label>AI lane
+            <select name="aiLane">
+              <option value="skydexia">SkyDexia design vault</option>
+              <option value="auren">Auren creator review</option>
+              <option value="gatefs13">GateFS13 handoff</option>
+            </select>
+          </label>
+          <label>Pages<input name="pages" value="home, services, pricing, proof, contact"></label>
+          <label>Features<input name="features" value="hero motion, intake form, proof cards, preview, delivery pack"></label>
+          <label>Brief<textarea name="brief">Create a premium, client-facing website with strong motion, clean conversion sections, and a delivery-ready source package.</textarea></label>
+          <div class="button-row">
+            <button class="primary" type="submit">Create Project</button>
+            <button type="button" id="askAI">Ask AI</button>
+            <button type="button" id="mirrorGate">Sync Gate</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel template-tools">
+        <h3>Template Vault</h3>
+        <input id="templateSearch" placeholder="Search donor-backed templates">
+        <div id="templateList" class="template-list"></div>
+        <div class="button-row">
+          <button class="primary" type="button" id="applyTemplate">Apply Template</button>
+          <button type="button" id="exportState">Export State</button>
+          <button type="button" id="clearState">Clear Workspace</button>
+        </div>
+        <div id="templateSourceRefs" class="source-refs"></div>
+      </section>
+
+      <section class="panel preview-panel" id="preview">
+        <h3>Live Preview</h3>
+        <iframe id="previewFrame" class="preview-frame" title="Generated website preview"></iframe>
+        <div id="qualityGrid" class="quality-grid"></div>
+      </section>
+    </section>
+
+    <section class="workspace" id="editor">
+      <section class="panel editor-shell">
+        <div class="editor-head">
+          <div id="editorTabs" class="tabs"></div>
+          <button class="primary" type="button" id="applyEditor">Apply To Preview</button>
+        </div>
+        <textarea id="codeEditor" spellcheck="false"></textarea>
+      </section>
+
+      <section class="panel" id="delivery">
+        <h3>Delivery Package</h3>
+        <div class="form-grid">
+          <label>Package label<input id="deliveryLabel" value="Client launch package"></label>
+          <label>Reviewer<input id="reviewOwner" value="AE Review"></label>
+          <label>Review status
+            <select id="reviewStatus">
+              <option value="draft">Draft</option>
+              <option value="ready">Ready</option>
+              <option value="approved">Approved</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </label>
+          <label>Checkpoint<input id="reviewCheckpoint" value="Source, preview, and package review"></label>
+          <label>Delivery notes<textarea id="deliveryNotes">Package source, preview, quality checks, and handoff metadata for AE review.</textarea></label>
+        </div>
+        <div class="button-row">
+          <button class="primary" type="button" id="packageArtifact">Package Artifact</button>
+          <button type="button" id="refreshDeliveryBoard">Refresh Board</button>
+          <button type="button" id="advanceLatestDelivery">Advance Review</button>
+          <button type="button" id="queueLatestExecution">Queue Execution</button>
+          <button type="button" id="dispatchLatestDelivery">Dispatch</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>Event Log</h3>
+        <pre id="eventLog" class="log">Booting SkyeWebCreatorMax...</pre>
+      </section>
+    </section>
+
+    <section class="boards">
+      <article class="board-card"><h3>Review</h3><p id="reviewCounts">draft 0 · ready 0 · approved 0 · blocked 0 · dispatched 0</p></article>
+      <article class="board-card"><h3>Execution</h3><p id="executionCounts">queued 0 · active 0 · fulfilled 0 · blocked 0</p></article>
+      <article class="board-card"><h3>Dispatch</h3><p id="dispatchCounts">queued 0 · active 0 · delivered 0 · blocked 0</p></article>
+      <article class="board-card"><h3>Workflow</h3><p id="workflowCounts">archive 0 · review 0 · execution 0 · dispatch 0</p></article>
+    </section>
+
+    <section class="lists">
+      <section class="panel">
+        <h3>Projects</h3>
+        <div id="projectList" class="list-stack"></div>
+      </section>
+      <section class="panel">
+        <h3>Delivery Queue</h3>
+        <div id="deliveryList" class="list-stack"></div>
+      </section>
+    </section>
+  </main>
+  <script src="./js/donor-template-library.js"></script>
+  <script src="./js/skygate-client.js"></script>
+  <script src="./js/webcreator.js"></script>
 </body>
 </html>

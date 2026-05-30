@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CrossCountry Mortgage- The Araiza Team | Scottsdale Mortgage Team</title>
+  <meta name="description" content="CrossCountry Mortgage- The Araiza Team is a Valley Verified mortgage team profile at 15551 N. Greenway Hayden Loop #205 D, Scottsdale, AZ 85260.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17211f;
+      --paper: #f6f4ed;
+      --nav: #153b45;
+      --sage: #8fab82;
+      --coral: #c96b51;
+      --cream: #fffdf7;
+      --line: rgba(23, 33, 31, .16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      letter-spacing: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(201,107,81,.14) 0 25%, transparent 25% 100%),
+        linear-gradient(#fbfaf5, var(--paper));
+    }
+    a { color: inherit; }
+    main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 46px; }
+    .roof {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+      align-items: stretch;
+      min-height: 600px;
+    }
+    .hero {
+      position: relative;
+      padding: 42px;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .hero:before {
+      content: "";
+      position: absolute;
+      top: 92px;
+      left: 42px;
+      right: 42px;
+      height: 170px;
+      border-top: 22px solid var(--nav);
+      border-left: 22px solid var(--sage);
+      transform: skewY(-9deg);
+      opacity: .18;
+    }
+    .eyebrow {
+      position: relative;
+      z-index: 1;
+      color: var(--coral);
+      font-weight: 900;
+    }
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 158px 0 18px;
+      font-size: 4.6rem;
+      line-height: .96;
+    }
+    .lede {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0;
+      color: #3b4d49;
+      font-size: 1.14rem;
+      line-height: 1.65;
+    }
+    .panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+    }
+    .mark, .contact {
+      background: var(--nav);
+      color: #f8fbf8;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+    .mark {
+      display: grid;
+      place-items: center;
+      min-height: 204px;
+    }
+    .mark img { width: 132px; height: 132px; background: #fff; }
+    .contact {
+      display: grid;
+      align-content: space-between;
+      gap: 20px;
+      padding: 24px;
+    }
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbdcc6;
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .phone {
+      display: inline-block;
+      color: #ffffff;
+      font-size: 1.55rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    address { font-style: normal; line-height: 1.55; color: #edf5eb; }
+    .ledger {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .entry {
+      min-height: 138px;
+      padding: 18px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-bottom: 6px solid var(--sage);
+    }
+    .entry strong { display: block; margin-bottom: 10px; color: var(--coral); }
+    .entry span { font-size: 1.1rem; line-height: 1.35; font-weight: 800; }
+    .evidence {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .evidence div {
+      padding: 22px;
+      background: rgba(143,171,130,.18);
+      border: 1px solid rgba(23,33,31,.12);
+    }
+    .evidence p { margin: 0; line-height: 1.6; color: #3c4d48; }
+    .evidence a { color: var(--nav); font-weight: 900; }
+    @media (max-width: 880px) {
+      .roof, .evidence { grid-template-columns: 1fr; }
+      h1 { margin-top: 96px; font-size: 3.25rem; }
+      .ledger { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 540px) {
+      main { width: min(100% - 22px, 1120px); }
+      .hero, .contact, .evidence div { padding: 20px; }
+      h1 { font-size: 2.45rem; }
+      .ledger { grid-template-columns: 1fr; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="roof">
+      <div class="hero">
+        <span class="eyebrow">Finance &amp; Insurance / Mortgage Team</span>
+        <h1>CrossCountry Mortgage - The Araiza Team</h1>
+        <p class="lede">CrossCountry Mortgage- The Araiza Team gives homeowners, buyers, and rental owners a practical Scottsdale connection for Mortgage Team, Finance &amp; Insurance / Mortgage Team, Finance &amp; Insurance, and Property / Real Estate. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+      </div>
+      <aside class="panel">
+        <div class="mark"><img src="assets/logo.svg" alt="Directory mark for CrossCountry Mortgage - The Araiza Team"></div>
+        <div class="contact">
+          <div><span class="label">Valley Verified</span><strong>Scottsdale mortgage team</strong></div>
+          <div><span class="label">Phone</span><a class="phone" href="tel:+16023347871">(602) 334-7871</a></div>
+          <div><span class="label">Address</span><address>15551 N. Greenway Hayden Loop #205 D<br>Scottsdale, AZ 85260</address></div>
+        </div>
+      </aside>
+    </section>
+    <section class="ledger" aria-label="Local details">
+      <div class="entry"><strong>Category</strong><span>Real Estate And Property</span></div>
+      <div class="entry"><strong>Niche</strong><span>Mortgage Team</span></div>
+      <div class="entry"><strong>Language</strong><span>English</span></div>
+      <div class="entry"><strong>Pricing</strong><span>Contact for quote</span></div>
+    </section>
+    <section class="evidence">
+      <div><span class="label">Profile date</span><p>May 19, 2026. Prepared from a public Valley lead build.</p></div>
+      <div><span class="label">Public evidence</span><p><a href="https://business.phoenixchamber.com/list/ql/finance-insurance-10">Phoenix Chamber finance and insurance directory</a></p></div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-crosscountry-mortgage-the-araiza-team-scottsdale-85260-3882d9d">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-crosscountry-mortgage-the-araiza-team-scottsdale-85260-3882d9d">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>CrossCountry Mortgage- The Araiza Team earns this Valley Verified placement because public business evidence connects a real mortgage team operation to 15551 N. Greenway Hayden Loop #205 D, Scottsdale, AZ 85260 and (602) 334-7871. Greater Phoenix Chamber directory evidence supports this local profile. For homeowners, buyers, and rental owners, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Mortgage Team, Finance &amp; Insurance / Mortgage Team, Finance &amp; Insurance, and Property / Real Estate</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>homeowners, buyers, and rental owners</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>15551 N. Greenway Hayden Loop #205 D, Scottsdale, AZ 85260; (602) 334-7871</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

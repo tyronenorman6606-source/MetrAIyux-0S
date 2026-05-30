@@ -8,22 +8,22 @@
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
   <script defer src="../../assets/js/skye-id-bridge.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="./neo-nexus.js"></script>
 </head>
 <body data-app="skye-music-nexus" data-mode="artist">
   <canvas id="pulse-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
   <header class="nexus-topline">
-    <a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a>
-    <div class="top-title"><p class="micro">SkyeMusicNexus // Upload Studio</p><h1>Upload owned audio and turn it into a gated release preview.</h1></div>
-    <div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div>
+    <a class="sigil" href="./index.html"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
+    <div class="top-title"><p class="micro">SkyeMusicNexus // Upload Studio</p><h1>Upload owned audio and turn it into a protected release preview.</h1></div>
+    <div class="session-rack"><span id="sessionChip" class="chip chip-hot">Client access required</span><button class="ghost" data-action="proof-session">Use Session</button><button class="ghost" data-action="logout">Disconnect</button></div>
   </header>
-  <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a class="active" href="./upload.html">Upload Studio</a><a href="./player.html">Music Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a></nav>
+  <nav class="nexus-nav"><a href="./index.html">Workspace</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a class="active" href="./upload.html">Upload Studio</a><a href="./player.html">Music Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a></nav>
   <main class="nexus-shell">
     <section class="upload-grid">
       <article class="panel-xl upload-studio">
         <div class="section-head">
-          <div><p class="micro">Gated Audio Upload</p><h3>Drop songs here.</h3></div>
+          <div><p class="micro">Protected Audio Upload</p><h3>Drop songs here.</h3></div>
           <span class="tag">mp3 / wav / ogg / webm / m4a / flac</span>
         </div>
         <form id="assetUploadForm" class="field-grid upload-command-form">
@@ -34,17 +34,17 @@
             <input id="audioFileInput" name="audioFile" type="file" accept="audio/*" required />
             <span class="drop-mark" aria-hidden="true">Audio</span>
             <strong>Drop songs here</strong>
-            <small>WAV, MP3, FLAC, M4A, OGG, and WebM previews stay behind the gate session.</small>
+            <small>WAV, MP3, FLAC, M4A, OGG, and WebM previews stay behind the client session. Failed uploads can open a support review.</small>
             <span id="songDropFileName" class="drop-file-name">No song selected yet</span>
           </label>
           <button class="primary wide" type="submit">Upload Gated Audio</button>
         </form>
         <div id="assetUploadResult" class="result-card compact">No upload yet.</div>
-        <div id="storageReadiness" class="result-card compact">Storage readiness loads after the gate session connects.</div>
+        <div id="storageReadiness" class="result-card compact">Storage status loads after the client session connects.</div>
         <label class="wide generated-line">Generated track line<input id="uploadedTrackLine" readonly placeholder="Upload audio to generate a release track line" /></label>
       </article>
       <article class="panel-xl">
-        <div class="section-head"><div><p class="micro">Uploaded Audio Vault</p><h3>Files in gated storage</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <div class="section-head"><div><p class="micro">Uploaded Audio Vault</p><h3>Files in protected storage</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
         <div id="assetList" class="asset-list"></div>
       </article>
     </section>
@@ -56,14 +56,13 @@
         <label>Title<input name="title" required placeholder="Neon Weather" /></label>
         <label>Type<select name="type"><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></select></label>
         <label>Release date<input name="releaseDate" type="date" /></label>
-        <label class="wide">Distribution targets<input name="distributionTargets" placeholder="SkyeMusicNexus Player, Spotify handoff boundary" /></label>
-        <label class="wide">Tracks<textarea name="tracks" rows="5" placeholder="One track per line. Example: Night Signal | 181 | /.netlify/functions/music-assets?action=stream&id=aud_..."></textarea></label>
+        <label class="wide">Distribution targets<input name="distributionTargets" placeholder="SkyeMusicNexus Player, release review" /></label>
+        <label class="wide">Tracks<textarea name="tracks" rows="5" placeholder="One track per line. Example: Night Signal | 181 | audio asset id or private preview URL"></textarea></label>
         <button class="primary wide" type="submit">Forge Release</button>
       </form>
       <div id="releaseResult" class="result-card compact">No release forged yet.</div>
     </section>
   </main>
-  <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

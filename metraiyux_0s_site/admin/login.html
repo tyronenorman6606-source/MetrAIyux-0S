@@ -56,7 +56,9 @@
     const tokenPanel = document.getElementById('token-panel');
     const tokenPreview = document.getElementById('token-preview');
     let ownerToken = '';
-    const returnTo = safeReturnPath(new URLSearchParams(location.search).get('return') || '');
+    const returnParams = new URLSearchParams(location.search);
+    const pendingReturnKey = 'FREE99_PENDING_APP_RETURN';
+    const returnTo = resolveReturnPath();
 
     function setStatus(message, kind) {
       statusBox.textContent = message;
@@ -73,6 +75,40 @@
       if (!text || !text.startsWith('/') || text.startsWith('//')) return '';
       if (/^\/api\/owner\/admin-login/i.test(text) || /^\/admin\/login(?:\/|\.html)?/i.test(text)) return '';
       return text;
+    }
+
+    function pendingReturnPath() {
+      try {
+        return sessionStorage.getItem(pendingReturnKey) || '';
+      } catch (error) {
+        return '';
+      }
+    }
+
+    function referrerReturnPath() {
+      try {
+        const referrer = new URL(document.referrer || '');
+        if (referrer.origin !== location.origin) return '';
+        return referrer.pathname + referrer.search + referrer.hash;
+      } catch (error) {
+        return '';
+      }
+    }
+
+    function resolveReturnPath() {
+      const candidates = [
+        returnParams.get('return'),
+        returnParams.get('return_to'),
+        returnParams.get('returnTo'),
+        returnParams.get('next'),
+        pendingReturnPath(),
+        referrerReturnPath()
+      ];
+      for (const candidate of candidates) {
+        const safe = safeReturnPath(candidate || '');
+        if (safe) return safe;
+      }
+      return '';
     }
 
     function persistSharedGateToken(token, source) {
@@ -127,6 +163,7 @@
         tokenPanel.classList.add('active');
         if (returnTo) {
           setStatus('Owner session unlocked. Opening requested 0S surface...', 'ok');
+          try { sessionStorage.removeItem(pendingReturnKey); } catch (error) {}
           setTimeout(() => location.assign(returnTo), 450);
         } else {
           setStatus('Owner session unlocked. 0S cookie set and gate bearer active.', 'ok');

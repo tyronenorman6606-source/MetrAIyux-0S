@@ -209,6 +209,7 @@ function normalizeLaunchPlan(plan = {}) {
 
 function inferHandoffTargets(inputs, checklist, progress) {
   const targets = [];
+  targets.push("SkyeMediaCenter");
   if (!checklist.website_core) targets.push("SkyeWebCreatorMax");
   if (!checklist.intake) targets.push("SkyeLeadVault");
   if (!checklist.invoice_flow || !checklist.bookkeeping) targets.push("Skye Profit Console");
@@ -220,6 +221,9 @@ function inferHandoffTargets(inputs, checklist, progress) {
 
 function buildHandoffActions(inputs, checklist, progress, targets) {
   const actions = [];
+  if (targets.includes("SkyeMediaCenter")) {
+    actions.push(`Archive ${inputs.businessName || "the business"} launch logos, photos, proof files, and campaign media in SkyeMediaCenter.`);
+  }
   if (!checklist.website_core) {
     actions.push(`Stand up a contact-ready web presence for ${inputs.businessName || "the business"}.`);
   }

@@ -1,0 +1,257 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "roman-glass-glass-at-the-line",
+  "title": "Glass At The Line",
+  "project": "",
+  "createdAt": "2026-05-25T23:35:32.618Z",
+  "provider": {
+    "id": "openai-tts",
+    "model": "gpt-4o-mini-tts",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 1692288,
+    "promptStored": true,
+    "generatedText": ""
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "artist_live_browser_20260524113443",
+      "slug": "artist-live-browser-20260524113443",
+      "stageName": "Roman Glass"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "artist_live_browser_20260524113443",
+    "slug": "artist-live-browser-20260524113443",
+    "stageName": "Roman Glass"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/audio/glass-at-the-line.mp3",
+    "audioSha256": "65fa142a1724b2a47bd00656115cae3030f277cc4127e6b55ad74f3f02b044b3",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/",
+    "productId": "prod_artist_live_browser_20260524113443_glass_at_the_line",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "artist_live_browser_20260524113443",
+      "name": "Roman Glass",
+      "shareBps": 10000,
+      "role": "primary artist"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_e25a2b2c6ebaae75",
+      "metadata": {
+        "artist_names": [
+          "Roman Glass"
+        ],
+        "audio_sha256": "65fa142a1724b2a47bd00656115cae3030f277cc4127e6b55ad74f3f02b044b3",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/singles/glass-at-the-line",
+        "fs27_tracked": true,
+        "primary_artist": "Roman Glass",
+        "product_id": "prod_artist_live_browser_20260524113443_glass_at_the_line",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/",
+        "release": "",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 1692288,
+      "package_name": "glass-at-the-line.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/audio/glass-at-the-line.mp3",
+      "package_sha256": "65fa142a1724b2a47bd00656115cae3030f277cc4127e6b55ad74f3f02b044b3",
+      "schema": "skye.submission.job",
+      "slug": "glass-at-the-line",
+      "title": "Glass At The Line",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 1692288,
+      "package_name": "glass-at-the-line.mp3",
+      "package_sha256": "65fa142a1724b2a47bd00656115cae3030f277cc4127e6b55ad74f3f02b044b3",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "glass-at-the-line",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Glass At The Line",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_e25a2b2c6ebaae75",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_e25a2b2c6ebaae75",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "glass-at-the-line:sub_e25a2b2c6ebaae75",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "glass-at-the-line",
+      "submitted_at": "2026-05-25T23:35:32.618Z",
+      "title": "Glass At The Line",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_65fa142a1724b2a4",
+      "upload_sha256": "65fa142a1724b2a47bd00656115cae3030f277cc4127e6b55ad74f3f02b044b3",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/glass-at-the-line/",
+    "productId": "prod_artist_live_browser_20260524113443_glass_at_the_line"
+  }
+}

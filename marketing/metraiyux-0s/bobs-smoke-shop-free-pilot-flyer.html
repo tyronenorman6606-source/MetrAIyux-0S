@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bob's Smoke Shop - Free Workspace Pilot Flyer</title>
+  <meta name="description" content="Printable Bob's Smoke Shop flyer with two QR codes: review the free workspace pilot and open Bob's live app.">
+  <link rel="canonical" href="https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot-flyer">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --ink: #160f0a;
+      --muted: #59493c;
+      --amber: #dd7100;
+      --gold: #f2ba42;
+      --blue: #007da4;
+      --paper: #fff8ef;
+      --panel: #fff1de;
+      --line: #dbc3a3;
+      --dark: #120b08;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #d8d2c9;
+      font-family: Inter, system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    .actions {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(18,11,8,0.94);
+    }
+    .actions a,
+    .actions button {
+      min-height: 38px;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 8px;
+      padding: 8px 13px;
+      color: #fff;
+      background: transparent;
+      font: 800 13px Inter, system-ui, sans-serif;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .actions button {
+      color: var(--dark);
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+    }
+    .sheet {
+      width: min(8.5in, calc(100vw - 20px));
+      min-height: 11in;
+      margin: 18px auto;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(221,113,0,0.18), transparent 30%),
+        radial-gradient(circle at 92% 20%, rgba(0,125,164,0.13), transparent 28%),
+        var(--paper);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+    }
+    .hero {
+      position: relative;
+      min-height: 2.75in;
+      display: grid;
+      align-items: end;
+      padding: 0.34in;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(18,11,8,0.12), rgba(18,11,8,0.92)),
+        url("assets/media-over-london/bobs-storefront-hero-banner.png") center/cover;
+    }
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,0.36);
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.34);
+      font: 900 12px Oswald, system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 6.8in;
+      margin: 0;
+      font: 700 clamp(36px, 6vw, 58px)/0.95 Oswald, system-ui, sans-serif;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      text-shadow: 0 16px 40px rgba(0,0,0,0.58);
+    }
+    .hero p {
+      max-width: 6.8in;
+      margin: 10px 0 0;
+      color: #f8ead6;
+      font-size: 16px;
+      line-height: 1.42;
+    }
+    .body {
+      padding: 0.3in 0.34in 0.34in;
+    }
+    .offer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .box,
+    .qr-card,
+    .contact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.72);
+    }
+    .box {
+      min-height: 1.2in;
+      padding: 13px;
+    }
+    .box b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--dark);
+      font: 800 16px Oswald, system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    .box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .qr-card {
+      display: grid;
+      grid-template-columns: 1.38in 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      min-height: 1.72in;
+    }
+    .qr-box {
+      width: 1.32in;
+      height: 1.32in;
+      display: grid;
+      place-items: center;
+      border: 7px solid #fff;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .qr-box svg { width: 100%; height: 100%; display: block; }
+    .qr-card b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--dark);
+      font: 900 18px Oswald, system-ui, sans-serif;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .qr-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.36;
+    }
+    .url {
+      margin-top: 7px;
+      color: var(--blue);
+      font-size: 10.5px;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+    .contact {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      background: var(--panel);
+    }
+    .contact small {
+      display: block;
+      color: var(--amber);
+      font: 900 11px Oswald, system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    .contact strong {
+      display: block;
+      color: var(--dark);
+      font-size: 15px;
+    }
+    .stamp {
+      min-width: 1.35in;
+      border: 2px solid var(--dark);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      color: var(--dark);
+      background: #fff;
+      font: 900 13px Oswald, system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    .fine {
+      margin: 12px 0 0;
+      color: #776555;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    @page { size: letter; margin: 0.25in; }
+    @media print {
+      body { background: #fff; }
+      .actions { display: none; }
+      .sheet {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        box-shadow: none;
+      }
+      a { text-decoration: none; }
+    }
+    @media (max-width: 760px) {
+      .offer,
+      .qr-grid,
+      .contact { grid-template-columns: 1fr; }
+      .qr-card { grid-template-columns: 1fr; }
+      .sheet { width: calc(100vw - 14px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="actions" aria-label="Flyer actions">
+    <button type="button" onclick="window.print()">Print / Save PDF</button>
+    <a href="bobs-smoke-shop-free-pilot.html">Open Bob Review Page</a>
+    <a href="https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/" target="_blank" rel="noopener">Open Sovereign App</a>
+  </div>
+
+  <main class="sheet">
+    <section class="hero">
+      <div>
+        <span class="badge">Built for Bob's Smoke Shop</span>
+        <h1>Your live app and free workspace pilot are ready to review.</h1>
+        <p>Scan the review QR to see what is included. Scan the app QR to open Bob's live customer-facing app. Keep it, edit it, expand it, or ask for it to be removed.</p>
+      </div>
+    </section>
+
+    <section class="body">
+      <div class="offer">
+        <div class="box">
+          <b>Live customer app</b>
+          <p>Bob's Smoke Shop has a mobile-ready app with age gate, store details, categories, gallery, contact, and local pages hosted on the standalone SkyeNet edge.</p>
+        </div>
+        <div class="box">
+          <b>Free workspace pilot</b>
+          <p>Active ConnectLog/Relay13 workspace preview for intake, assisted chat, owner notes, CRM-ready follow-up, and proof exports. Starter SkyEmail: bobs-smokeshop@skyemail.solenterprises.org. Bob can change this handle before activation, and the saved request notifies Gray by system email.</p>
+        </div>
+        <div class="box">
+          <b>Review first</b>
+          <p>No credit card needed to inspect the pilot. Confirm what fits, what needs edits, and what should go live.</p>
+        </div>
+        <div class="box">
+          <b>Built on 0S</b>
+          <p>Hosted by Gray Skyes on first-party sovereign infrastructure: the 0S controls the workflow, and standalone SkyeNet serves the app.</p>
+        </div>
+      </div>
+
+      <div class="qr-grid">
+        <article class="qr-card">
+          <div class="qr-box" data-qr="https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot"></div>
+          <div>
+            <b>Review pilot</b>
+            <p>Bob-specific page with the free workspace offer, included lanes, limits, access path, and SkyEmail handle-change request.</p>
+            <div class="url">metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot</div>
+          </div>
+        </article>
+        <article class="qr-card">
+          <div class="qr-box" data-qr="https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/"></div>
+          <div>
+            <b>Open live app</b>
+            <p>Customer-facing Bob's Smoke Shop app hosted on the standalone SkyeNet edge, connected back to the 0S and Gate.</p>
+            <div class="url">skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="contact">
+        <div>
+          <small>Bob's Smoke Shop</small>
+          <strong>5115 N Dysart Rd, Unit 214</strong>
+          <span>Litchfield Park, AZ 85340</span>
+        </div>
+        <div>
+          <small>Review access</small>
+          <strong>MediaOverLondon@solenterprises.org</strong>
+          <span>1-(800)-484-4783</span>
+        </div>
+        <div class="stamp">21+ only<br>review first</div>
+      </div>
+
+      <p class="fine">21+ only. Product availability, pricing, and brands may vary. Regulated product claims and content updates require business owner review. The free pilot is a starter review lane; SkyEmail, managed CRM operations, recurring backups, expanded automation, more users, and custom email activate after owner approval and shared-gate handoff. Bob can change the SkyEmail handle before activation from the review page; the request is saved and Gray is notified by system email.</p>
+    </section>
+  </main>
+
+  <script src="assets/vendor/qrcode-generator.js"></script>
+  <script>
+    (function () {
+      if (typeof qrcode !== 'function') return;
+      document.querySelectorAll('[data-qr]').forEach(function (node, index) {
+        var qr = qrcode(0, 'M');
+        qr.addData(node.getAttribute('data-qr'));
+        qr.make();
+        node.innerHTML = qr.createSvgTag({
+          scalable: true,
+          margin: 2,
+          title: { text: index === 0 ? 'Bob workspace pilot QR code' : 'Bob live app QR code' },
+          alt: { text: index === 0 ? 'QR code for Bob workspace pilot review page' : 'QR code for Bob live app' }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

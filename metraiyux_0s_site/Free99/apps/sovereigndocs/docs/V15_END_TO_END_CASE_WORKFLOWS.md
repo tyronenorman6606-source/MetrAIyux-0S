@@ -28,7 +28,7 @@ v15 adds a case workflow engine on top of the v14 SkyeDocxMax integration. The g
 
 `POST /api/cases/start` accepts one or more template IDs, builds document lifecycle records, creates a packet when needed, creates a SkyeDocxMax handoff, and optionally creates a legal partner-review submission.
 
-The returned `launchUrl` opens the bundled SkyeDocxMax runtime with the stored handoff token.
+The returned `launchUrl` opens the canonical 0S SkyeDocxMax editor with the stored handoff token.
 
 When SkyeDocxMax opens the handoff, SovereignDocs advances the case to `opened_in_skye_docx_max`.
 

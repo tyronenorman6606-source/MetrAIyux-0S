@@ -1,0 +1,129 @@
+{
+  "schema": "skyevault.autosync-public-proof.v1",
+  "generatedAt": "2026-05-29T16:29:54.182Z",
+  "repo": {
+    "name": "MetrAIyux-0S",
+    "root": "local-dev-workspace",
+    "rootHash": "68d628eb2112",
+    "branch": "main",
+    "shortHead": "6336a975e",
+    "upstream": "origin/main",
+    "ahead": 13,
+    "behind": 0
+  },
+  "currentStatus": {
+    "ok": true,
+    "checkedAt": "2026-05-29T16:29:54.020Z",
+    "dirty": false,
+    "statusCounts": {
+      "modified": 0,
+      "deleted": 0,
+      "untracked": 0
+    },
+    "digest": "5ea2960f5186756d46853d223c1e5ddedf32bb033314b6423f05eee8022f3e94",
+    "scanMode": "fast",
+    "scannedFiles": 45,
+    "localOnlyCriticalCount": 45,
+    "secretLikeTotal": 11
+  },
+  "latestSuccess": null,
+  "latestUpload": {
+    "receiptId": "cdv_f4973647019072d97eb62f11",
+    "artifactBytes": 15660995840,
+    "artifactSha256": "a02e131bef14a87d965a6e8cfb201dfab0130a37e7f0613f4373ce08658c85ca",
+    "recoveryUrl": "https://skyevault-drop.graylondonskyes.workers.dev/#client-vault",
+    "downloadUrlAvailable": false,
+    "controlUploadStatus": "uploaded",
+    "controlReceiptId": "cdv_654dcc3550c042e62d041617",
+    "controlDownloadUrlAvailable": false,
+    "controlBytes": 61737,
+    "ledgerEntryCount": 121
+  },
+  "latestDeltaJournal": {
+    "ok": true,
+    "action": "delta-packed",
+    "completedAt": "2026-05-29T15:54:48.922Z",
+    "digest": "4c839a292c403fc0bbf33a1879c7ad1d0480987c69287c3ae7726182767af7ff",
+    "branch": "main",
+    "shortHead": "6336a975e",
+    "changedFileCount": 7,
+    "tombstoneCount": 0,
+    "skippedCount": 0,
+    "packBytes": 775626,
+    "packSha256": "33e795e454789f90e436d5636517bae6082939ccae117b203e2e81f3e33be6d8",
+    "uploadReceiptId": "cdv_0a80fdb535ae11328deb6f09",
+    "uploadReceiptAvailable": true,
+    "downloadUrlAvailable": true
+  },
+  "daemon": {
+    "watchPid": null,
+    "watchRunning": false,
+    "activeLock": {
+      "pid": 24929,
+      "running": true,
+      "command": "watch",
+      "startedAt": "2026-05-29T15:54:34.728Z",
+      "host": "penguin"
+    },
+    "lastDaemonLine": "[autosync-daemon] 2026-05-29T11:59:06Z"
+  },
+  "parity": {
+    "latestSuccessExists": false,
+    "currentDigestMatchesLatestSuccess": false,
+    "nextDaemonTickRequired": false,
+    "intervalSeconds": 600,
+    "fastDeltaJournalEnabled": true
+  },
+  "custodyContract": {
+    "mode": "encrypted literal full-repo custody by default",
+    "archiveDefault": "tar.zst.enc",
+    "deltaCommand": "npm run vault:delta:upload -- --env-file=env.txt",
+    "fullCommand": "npm run vault:repo:full -- --env-file=env.txt --archive-format=tar.zst --literal-full --direct-r2",
+    "sourceCustodyOptInCommand": "SKYEVAULT_AUTOSYNC_FULL_SOURCE_CUSTODY=1 npm run vault:autosync:dry-run -- --env-file=env.txt --mode=full --source-custody",
+    "fastLane": "encrypted delta journal runs before the heavier full snapshot to seal changed/untracked/local-critical files and tombstones faster",
+    "includes": [
+      "literal repo tree under workspace root",
+      ".git",
+      "tracked source",
+      "untracked source",
+      "ignored dependency/build/media/state folders that live inside the repo",
+      "root env/config files",
+      "local-only critical files",
+      "secret-like files inside encrypted artifact"
+    ],
+    "sourceCustodyFilteredModeExcludes": [
+      "node_modules",
+      "build outputs",
+      "wrangler/netlify caches",
+      "test artifacts",
+      "large production media extensions",
+      "self-generated autosync proof files from the digest trigger"
+    ],
+    "encryption": "openssl aes-256-cbc pbkdf2 before Cloudflare R2 upload",
+    "publicProofBoundary": "This file publishes counts, digests, receipt IDs, and status only; it never publishes bearer tokens, passphrases, peppers, file bodies, or signed download URLs."
+  },
+  "notifications": {
+    "enabled": false,
+    "throttleMinutes": 10,
+    "settingsPath": ".skyevault-out/autosync-notify-settings.json",
+    "lastResult": {
+      "ok": true,
+      "skipped": true,
+      "status": null,
+      "id": "",
+      "reason": "notifications disabled",
+      "toCount": 0,
+      "dryRun": false
+    }
+  },
+  "projectManifest": {
+    "ok": true,
+    "status": 0,
+    "outputPath": "metraiyux_0s_site/proof/repo-vault-project-manifest.json",
+    "safe_browser_entry_count": 125600,
+    "private_entry_count": 44,
+    "skipped_entry_count": 53377,
+    "directory_count": 79603,
+    "error": ""
+  }
+}

@@ -13,6 +13,17 @@ async function read(rel){ return fs.readFile(path.join(DIST, rel), 'utf8'); }
 async function exists(rel){ try{ await fs.access(path.join(DIST, rel)); return true; }catch{ return false; } }
 function ok(condition, label){ if(condition){ console.log(`✅ ${label}`); pass++; } else { console.error(`☐ ${label}`); fail++; } }
 function has(body, needle){ return body.includes(needle); }
+function visibleText(body){
+  return String(body || '')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function hasVisibleName(body, name){ return visibleText(body).includes(visibleText(name)); }
 function parseJson(body, label){ try{ const out = JSON.parse(body); ok(true, `${label} parses as JSON`); return out; } catch(error){ ok(false, `${label} parses as JSON: ${error.message}`); return {}; } }
 
 const report = parseJson(await read('seed-report.json'), 'seed report');
@@ -168,8 +179,6 @@ const fraudDefensePage = await read('fraud-defense/index.html');
 const duplicatesPage = await read('duplicates/index.html');
 const apiPage = await read('api/index.html');
 const embedPage = await read('embed/index.html');
-const profileRenderer = await read('business-profile/index.html');
-const redirects = await read('_redirects');
 const embedJs = await read('embed/businesses.js');
 const sitemap = await read('sitemap.xml');
 const robotsTxt = await read('robots.txt');
@@ -243,8 +252,6 @@ const requiredFiles = [
   ['duplicates/index.html', 'duplicate scanner exists'],
   ['api/index.html', 'static API page exists'],
   ['embed/index.html', 'embed kit page exists'],
-  ['business-profile/index.html', 'scalable business profile renderer exists'],
-  ['_redirects', 'static redirect file exists'],
   ['platform/index.html', 'platform status page exists'],
   ['data/index.html', 'data pipeline page exists'],
   ['operator/index.html', 'operator import console exists'],
@@ -371,8 +378,9 @@ ok(Array.isArray(taxonomyData.niches) && taxonomyData.niches.length >= 50, 'taxo
 ok(Array.isArray(duplicateReport.exact_merges), 'duplicate report contains exact merge ledger');
 ok(duplicateReport.stats?.exact_merges === report.records.exact_merges, 'duplicate merge count matches seed report');
 ok(report.records.raw >= report.records.published, 'raw imports do not create extra published listings');
-ok(report.records.static_business_pages >= 1, 'static profile sample pages are generated');
-ok(['hybrid-static-plus-renderer','full-static'].includes(report.records.profile_mode), 'profile publishing mode is recorded');
+ok(report.records.static_business_pages === data.businesses.length, 'all business pages are static hand-authored pages');
+ok(report.records.missing_static_business_pages === 0, 'no business is missing a static hand-authored page');
+ok(report.records.profile_mode === 'static-hand-pages-required', 'profile publishing mode forbids generated business pages');
 ok(Array.isArray(moderationData.records), 'moderation queue is generated');
 ok(Array.isArray(identityData.records) && identityData.records.length === data.businesses.length, 'identity index matches business count');
 ok(seedSchema.properties?.businesses?.type === 'array', 'seed schema documents business array');
@@ -418,7 +426,7 @@ ok(adminBatchActions.batches?.owner_claims && adminBatchActions.suppression_patc
 ok(Array.isArray(serviceLaneCatalog.lanes) && serviceLaneCatalog.lanes.length === categoriesData.categories.length, 'service lane catalog matches category count');
 ok(ownerFollowupCalendarCsv.startsWith('due_date,rank,business_id'), 'owner follow-up calendar CSV has expected header');
 
-ok(has(home, 'A free public business page as our gift') && has(home, 'See live client builds'), 'home is a platform landing page, not bare directory');
+ok(has(home, 'Free SkyEmail acceptance') && has(home, 'See live client builds'), 'home is a platform landing page, not bare directory');
 ok(has(home, '/assets/valley-verified-logo.png'), 'home uses supplied Valley Verified logo asset');
 ok(has(stylesCss, 'brand-logo'), 'stylesheet styles the supplied Valley Verified logo');
 ok(has(home, 'Buyer and operator workflows'), 'home links platform workflows');
@@ -442,15 +450,15 @@ ok(has(dataPage, 'Duplicate report'), 'data page links duplicate report');
 ok(has(dataPage, 'Moderation queue'), 'data page links moderation queue');
 ok(has(dataPage, 'Taxonomy'), 'data page links taxonomy export');
 ok(has(operator, 'Scrape Import Console'), 'operator page has scrape import tooling');
-ok(has(operator, 'seed/businesses/inbox/'), 'operator explains seed inbox workflow');
+ok(has(operator, 'public business review/'), 'operator explains public business review workflow');
 ok(has(businessIndex, 'Business Profiles'), 'business index has profile content');
 ok(has(categoryIndex, 'Service lanes and category hubs'), 'category index has hub content');
 ok(has(cityIndex, 'City hubs across the Phoenix market'), 'city index has hub content');
 ok(has(nicheIndex, 'Service niches ready for live business seeding'), 'niche index has taxonomy lane content');
 ok(has(marketIndex, 'City + category pages for local intent'), 'market index has city/category matrix content');
 ok(has(collectionIndex, 'Curated buyer paths from seed signals'), 'collection index has generated collection content');
-ok(has(joinPage, 'Claim the free landing') && has(joinPage, 'Upgrade only if you want more reach'), 'join page has business-owner no-obligation claim path');
-ok(has(pricingPage, 'Our gift is the free landing') && has(pricingPage, 'Upgrades are optional'), 'pricing page has optional exposure product model');
+ok(has(joinPage, 'Accept the free SkyEmail account') && has(joinPage, 'Upgrade only if you want more reach'), 'join page has business-owner SkyEmail acceptance path');
+ok(has(pricingPage, 'Free SkyEmail acceptance is included') && has(pricingPage, 'Upgrades are optional'), 'pricing page has optional exposure product model');
 ok(has(aeCommandPage, 'Give sales reps a real activation queue'), 'AE command page has real rep queue content');
 ok(has(accountsPage, 'Ranked AE account targets'), 'account workbench has ranked AE account content');
 ok(has(pipelinePage, 'Stage-based sales board'), 'pipeline page has stage board content');
@@ -491,7 +499,7 @@ ok(has(mapPage, 'data-map-board'), 'map page has interactive map board mount');
 ok(has(submitPage, 'data-seed-builder'), 'submit page has seed builder form');
 ok(has(requestPage, 'data-request-builder'), 'request page has buyer request builder');
 ok(has(claimPage, 'data-claim-builder'), 'claim page has owner update builder');
-ok(has(ownerVerificationPage, 'Claim packets without adding local auth'), 'owner verification page has claim packet workflow');
+ok(has(ownerVerificationPage, 'SkyEmail acceptance packets without adding local auth'), 'owner verification page has SkyEmail provisioning workflow');
 ok(has(lifecyclePage, 'Every listing gets an operator next step'), 'lifecycle page has operator next-step queue');
 ok(has(insightsPage, 'Data health and growth signals'), 'insights page has marketplace intelligence');
 ok(has(auditPage, 'Data quality queue for marketplace growth'), 'audit page has operator queue');
@@ -522,13 +530,8 @@ ok(has(adminReviewPage, 'suppression'), 'admin review page explains suppression 
 ok(has(duplicatesPage, 'One real business, one posting'), 'duplicates page states one-posting policy');
 ok(has(duplicatesPage, 'Auto merge ledger'), 'duplicates page shows auto merge ledger');
 ok(has(embedPage, 'Portable business widgets'), 'embed page has widget installation content');
-ok(has(profileRenderer, 'scalable profile renderer'), 'profile renderer explains scalable route rendering');
-ok(has(profileRenderer, '/data/profiles/'), 'profile renderer loads sharded generated business data');
-if(report.records?.profile_mode === 'full-static'){
-  ok(!has(redirects, '/business/* /business-profile/ 200'), 'full-static business pages are not shadowed by renderer redirects');
-} else {
-  ok(has(redirects, '/business/* /business-profile/ 200'), 'redirects support business profile fallback routes');
-}
+ok(!(await exists('business-profile/index.html')), 'fallback business profile renderer is not published');
+ok(!(await exists('_redirects')), 'business fallback redirects are not published');
 ok(has(embedJs, 'data-phx-verified-widget'), 'embed script targets widget mounts');
 try{ new vm.Script(embedJs); ok(true, 'embed widget JavaScript is syntactically valid'); }catch(error){ ok(false, `embed widget JavaScript is syntactically valid: ${error.message}`); }
 try{ new vm.Script(appJs); ok(true, 'app JavaScript is syntactically valid'); }catch(error){ ok(false, `app JavaScript is syntactically valid: ${error.message}`); }
@@ -585,13 +588,13 @@ for(const b of businessSamples){
   cities.add(b.city_slug);
   const rel = `business/${b.id}/index.html`;
   const staticExists = await exists(rel);
-  const body = staticExists ? await read(rel) : profileRenderer;
-  ok(staticExists || has(profileRenderer, '/data/businesses.json'), `business route is supported by static page or renderer: ${b.id}`);
-  ok(staticExists ? has(body, b.name) : has(body, 'Loading profile'), `business page/render shell resolves: ${b.name}`);
-  ok(has(body, 'application/ld+json') || has(body, 'profile renderer'), `business route has structured data or renderer: ${b.name}`);
-  ok(has(body, 'Claim / update') || has(body, '/claim/?business='), `business route has claim action: ${b.name}`);
+  const body = staticExists ? await read(rel) : '';
+  ok(staticExists, `business route is a static hand-authored page: ${b.id}`);
+  ok(hasVisibleName(body, b.name), `business page resolves: ${b.name}`);
+  ok(has(body, 'data-static-hand-page="true"'), `business page has static hand-page marker: ${b.name}`);
+  ok(has(body, 'Accept SkyEmail') || has(body, '/live/SkyeMail/login.html?workspace=valley-verified'), `business route has SkyEmail acceptance action: ${b.name}`);
   ok(has(body, 'Request quote') || has(body, '/request/?business='), `business route has request action: ${b.name}`);
-  ok(staticExists ? has(body, 'Save shortlist') : true, `business static page has shortlist action when pre-rendered: ${b.name}`);
+  ok(has(body, 'Save shortlist'), `business static page has shortlist action: ${b.name}`);
   ok(staticExists ? has(body, '/compare/?ids=') : true, `business static page has compare action when pre-rendered: ${b.name}`);
   ok(b.identity?.primary_key, `business has canonical identity key: ${b.id}`);
   ok(canonicalRouting.records.some(r => r.id === b.id && r.canonical_url === `/business/${b.id}/`), `canonical routing has business route: ${b.id}`);

@@ -4,7 +4,7 @@
    - Precache critical external deps (CDNs) with no-cors so they are available offline after first load
    - Cache-first for static assets; network-first for navigations with offline fallback
 */
-const CACHE_VERSION = "skyedocxmax-v1.0.0";
+const CACHE_VERSION = "skyedocxmax-v1.0.1";
 const SHELL_CACHE = "shell-" + CACHE_VERSION;
 const RUNTIME_CACHE = "runtime-" + CACHE_VERSION;
 const OLD_CACHE_PREFIXES = ["skye-docx", "skyedocxmax-pwa", "shell-skyedocxmax-pwa", "runtime-skyedocxmax-pwa"];
@@ -97,7 +97,7 @@ self.addEventListener("fetch", (event) => {
       try {
         const fresh = await fetch(req);
         const cache = await caches.open(SHELL_CACHE);
-        cache.put("./index.html", fresh.clone());
+        cache.put(req, fresh.clone());
         return fresh;
       } catch (e) {
         const cached = await caches.match("./index.html");

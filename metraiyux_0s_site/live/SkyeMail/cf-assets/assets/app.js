@@ -8,6 +8,7 @@ const API_BASES = [...new Set([
 const API_BASE = API_BASES[0] || "/.netlify/functions";
 const API_FUNCTION_PREFIX = "skymail-standalone-";
 const APP_ROOT_URL = new URL(SMV_RUNTIME_CONFIG.appRoot || "/", window.location.origin);
+const ACTIVE_MAILBOX_KEY = "SMV_ACTIVE_MAILBOX";
 const HOSTED_API_BASE = (() => {
   const pathname = window.location.pathname || "";
   return ["/dashboard/skyemail", "/platform-host/skyemail"]
@@ -22,7 +23,9 @@ function qs(sel){ return document.querySelector(sel); }
 function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
 
 function smvHref(path = "", searchParams){
-  const normalized = String(path || "").replace(/^\/+/, "");
+  const normalized = String(path || "")
+    .replace(/^\/+/, "")
+    .replace(/^([a-z0-9-]+)\.html$/i, "$1/");
   const next = new URL(normalized || "./", APP_ROOT_URL);
   if(searchParams && typeof searchParams === "object"){
     Object.entries(searchParams).forEach(([key, value]) => {
@@ -45,12 +48,81 @@ function setStatus(el, msg, kind=""){
     : "var(--muted)";
 }
 
-function getToken(){ return localStorage.getItem("SMV_TOKEN") || ""; }
-function setToken(t){ localStorage.setItem("SMV_TOKEN", t); }
-function clearToken(){ localStorage.removeItem("SMV_TOKEN"); }
+function readGateSession(){
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  try{
+    const current = bridge?.current?.();
+    if(current?.token) return current;
+  }catch(_err){}
+  const keys = ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYGATE_USER_TOKEN","SKYE_GATE_SESSION","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"];
+  for(const key of keys){
+    for(const store of [sessionStorage, localStorage]){
+      try{
+        const raw = store.getItem(key);
+        if(!raw) continue;
+        let parsed = null;
+        try{ parsed = raw.startsWith("{") ? JSON.parse(raw) : null; }catch(_err){}
+        const token = parsed?.token || parsed?.session || parsed?.sessionToken || raw;
+        if(token) return { token, source:key };
+      }catch(_err){}
+    }
+  }
+  return null;
+}
+function getToken(){ return readGateSession()?.token || ""; }
+function setToken(t){
+  const token = String(t || "").trim();
+  if(!token) return "";
+  const session = { token, source:"skymail-fs27-session", platform_id:"skymail", usage_lane:"mail", issued_at:new Date().toISOString() };
+  try{
+    sessionStorage.setItem("SMV_SKYEMAIL_SESSION", JSON.stringify(session));
+    localStorage.setItem("SMV_SKYEMAIL_SESSION", JSON.stringify(session));
+    sessionStorage.setItem("SMV_AUTH_TOKEN", token);
+    localStorage.setItem("SMV_AUTH_TOKEN", token);
+  }catch(_err){}
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  bridge?.persist?.(session, { silent:true });
+  return token;
+}
+function clearToken(){
+  try{
+    ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN"].forEach((key) => {
+      sessionStorage.removeItem(key);
+      localStorage.removeItem(key);
+    });
+  }catch(_err){}
+  return "";
+}
 
 function getHandle(){ return localStorage.getItem("SMV_HANDLE") || ""; }
 function setHandle(h){ localStorage.setItem("SMV_HANDLE", h); }
+
+function normalizeMailboxEmail(value){
+  return String(value || "").trim().toLowerCase();
+}
+
+function getActiveMailbox(){
+  try{ return normalizeMailboxEmail(localStorage.getItem(ACTIVE_MAILBOX_KEY) || sessionStorage.getItem(ACTIVE_MAILBOX_KEY) || ""); }
+  catch(_err){ return ""; }
+}
+
+function setActiveMailbox(email){
+  const value = normalizeMailboxEmail(email);
+  try{
+    if(value){
+      localStorage.setItem(ACTIVE_MAILBOX_KEY, value);
+      sessionStorage.setItem(ACTIVE_MAILBOX_KEY, value);
+    }else{
+      localStorage.removeItem(ACTIVE_MAILBOX_KEY);
+      sessionStorage.removeItem(ACTIVE_MAILBOX_KEY);
+    }
+  }catch(_err){}
+  return value;
+}
+
+function clearActiveMailbox(){
+  return setActiveMailbox("");
+}
 
 function smvApiUrl(path = "", functionPrefix = API_FUNCTION_PREFIX, apiBase = API_BASE){
   const normalized = String(path || "");
@@ -79,6 +151,8 @@ async function apiFetch(path, opts = {}){
   const headers = Object.assign({ "Content-Type":"application/json" }, opts.headers || {});
   const token = getToken();
   if(token) headers.Authorization = "Bearer " + token;
+  const activeMailbox = getActiveMailbox();
+  if(activeMailbox && !headers["x-skymail-mailbox-email"]) headers["x-skymail-mailbox-email"] = activeMailbox;
 
   const requestOptions = Object.assign({ credentials: "include" }, opts, { headers });
   let lastRes = null;
@@ -186,7 +260,59 @@ window.SMVRuntime = {
   appRoot: APP_ROOT_URL.pathname,
   href: smvHref,
   redirect: smvRedirect,
+  getActiveMailbox,
+  setActiveMailbox,
+  clearActiveMailbox,
 };
+
+function smvAssetUrl(path = ""){
+  return new URL(String(path || "").replace(/^\/+/, ""), APP_ROOT_URL).toString();
+}
+
+function mountSkyEmailBackgroundPartial(){
+  if(window.__skyemailBackgroundPartialMounted) return;
+  window.__skyemailBackgroundPartialMounted = true;
+  const partialUrl = smvAssetUrl("partials/skyemail-background.html");
+
+  fetch(partialUrl, { credentials:"same-origin", cache:"no-store" })
+    .then((res) => {
+      if(!res.ok) throw new Error(`SkyEmail background partial ${res.status}`);
+      return res.text();
+    })
+    .then((html) => {
+      if(!html || document.querySelector("[data-skyemail-background-partial]")) return;
+      const template = document.createElement("template");
+      template.innerHTML = html.trim();
+      const nodes = Array.from(template.content.childNodes);
+      nodes.forEach((node) => document.body.prepend(node));
+      document.querySelectorAll("[data-skyemail-src]").forEach((node) => {
+        const src = node.getAttribute("data-skyemail-src");
+        if(src) node.setAttribute("src", smvAssetUrl(src));
+      });
+      document.querySelectorAll("[data-skyemail-poster]").forEach((node) => {
+        const poster = node.getAttribute("data-skyemail-poster");
+        if(poster) node.setAttribute("poster", smvAssetUrl(poster));
+      });
+      document.documentElement.setAttribute("data-skyemail-bg", "partial");
+      document.body.classList.add("skyemail-partial-bg-active");
+      document.querySelectorAll("[data-skyemail-background-partial] video").forEach((video) => {
+        try{
+          video.load();
+          const play = video.play?.();
+          if(play && typeof play.catch === "function") play.catch(() => {});
+        }catch(_err){}
+      });
+    })
+    .catch((err) => {
+      console.warn("SkyeMail background partial unavailable", err);
+    });
+}
+
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", mountSkyEmailBackgroundPartial, { once:true });
+}else{
+  mountSkyEmailBackgroundPartial();
+}
 
 import("./skyesol-living-background.js").catch(() => {});
 

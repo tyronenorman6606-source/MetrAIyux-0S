@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="S2RC is a Valley Verified tech / ai / training solutions profile at 11811 N. Tatum Blvd. Suite 1075, Phoenix, AZ 85028, highlighting Tech / AI / Training.">
+  <title>S2RC | Phoenix Tech / AI / Training Solutions</title>
+  <style>
+    :root { color-scheme: light; --ink:#17202a; --muted:#5d6873; --line:#d8ded8; --paper:#fffaf0; --panel:#fff; --deep:#20384f; --accent:#3f7b68; --wash:#eef5f1; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial, Helvetica, sans-serif; color:var(--ink); background:linear-gradient(90deg, rgba(32,56,79,.05) 1px, transparent 1px), linear-gradient(180deg,#f6f1e8,#fff 48%,var(--wash)); background-size:42px 42px, auto; }
+    a { color:inherit; }
+    .page { width:min(1080px, calc(100% - 32px)); margin:0 auto; padding:24px 0 48px; }
+    .topline { display:flex; justify-content:space-between; gap:16px; padding-bottom:16px; border-bottom:1px solid var(--line); color:var(--muted); font-size:13px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .hero { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr); gap:20px; padding:28px 0 20px; }
+    .hero-main { position:relative; min-height:390px; display:grid; align-content:end; overflow:hidden; padding:34px; border:1px solid rgba(255,255,255,.25); border-radius:8px; color:#fff; background:linear-gradient(135deg, rgba(63,123,104,.9), transparent 34%), linear-gradient(180deg,var(--deep),#102033); }
+    .hero-main:after { content:""; position:absolute; inset:24px 24px auto auto; width:42%; height:70%; border-top:1px solid rgba(255,255,255,.24); border-right:1px solid rgba(255,255,255,.24); transform:skewX(-10deg); }
+    .hero-main > * { position:relative; z-index:1; }
+    .kicker { width:fit-content; margin:0 0 18px; padding:7px 10px; border:1px solid rgba(255,255,255,.36); border-radius:8px; color:#d9fff0; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { margin:0; max-width:760px; font-size:clamp(48px,8vw,88px); line-height:.95; letter-spacing:0; }
+    .lead { max-width:690px; margin:18px 0 0; color:#e9f0f3; font-size:18px; line-height:1.6; }
+    .panel { display:grid; gap:18px; padding:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); box-shadow:0 16px 32px rgba(23,32,42,.08); }
+    .label { display:block; margin-bottom:6px; color:var(--muted); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .value { margin:0; font-size:20px; line-height:1.42; font-weight:800; overflow-wrap:anywhere; }
+    .value a { text-decoration-thickness:1px; text-underline-offset:4px; }
+    .button { display:block; padding:14px 16px; border:1px solid var(--deep); border-radius:8px; background:var(--deep); color:#fff; text-align:center; text-decoration:none; font-weight:800; }
+    .facts { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin:8px 0 24px; border:1px solid var(--line); background:var(--line); }
+    .fact { min-height:126px; padding:19px; background:var(--panel); }
+    .fact strong { display:block; margin-top:8px; font-size:18px; line-height:1.35; overflow-wrap:anywhere; }
+    .section { display:grid; grid-template-columns:.85fr 1.15fr; gap:22px; padding:24px 0; border-top:1px solid var(--line); }
+    h2 { margin:0; font-size:26px; line-height:1.1; }
+    .section p, li { color:#33414d; line-height:1.65; }
+    ul { margin:0; padding-left:20px; }
+    @media (max-width:780px) { .hero,.section{grid-template-columns:1fr;} .facts{grid-template-columns:1fr;} .topline{display:grid;} .hero-main{min-height:340px; padding:26px;} }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <div class="topline"><span>Business fact sheet</span><span>Phoenix, AZ 85028</span></div>
+    <section class="hero" aria-label="S2RC facts">
+      <div class="hero-main">
+        <p class="kicker">Creative Services - Tech / AI / Training Solutions</p>
+        <h1>S2RC</h1>
+        <p class="lead">S2RC gives local customers, Valley residents, and business clients a practical Phoenix connection for Tech / AI / Training Solutions, Computers/Telecom / Tech / AI / Training Solutions, Computers/Telecom, and Phoenix-based tech firm / public phone listed. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+      </div>
+      <aside class="panel" aria-label="Contact facts">
+        <div><span class="label">Phone</span><p class="value"><a href="tel:+16027088450">(602) 708-8450</a></p></div>
+        <div><span class="label">Address</span><p class="value">11811 N. Tatum Blvd. Suite 1075, Phoenix, AZ 85028</p></div>
+        <div><span class="label">Website</span><p class="value">Not listed in current local profile</p></div>
+        <a class="button" href="tel:+16027088450">Call S2RC</a>
+      </aside>
+    </section>
+    <section class="facts" aria-label="Core facts">
+      <div class="fact"><span class="label">Category</span><strong>Creative Services</strong></div>
+      <div class="fact"><span class="label">Niche</span><strong>Tech / AI / Training Solutions</strong></div>
+      <div class="fact"><span class="label">License Type</span><strong>Computers/Telecom / Tech / AI / Training Solutions</strong></div>
+      <div class="fact"><span class="label">Pricing</span><strong>Contact for quote</strong></div>
+      <div class="fact"><span class="label">Language</span><strong>English</strong></div>
+      <div class="fact"><span class="label">Last Checked</span><strong>2026-05-19</strong></div>
+    </section>
+    <section class="section"><div><h2>Service Focus</h2></div><div><ul><li>Tech / AI / training solutions</li><li>Computers and telecom category</li><li>Immersive training also appears in the evidence category notes</li></ul></div></section>
+    <section class="section"><div><h2>Verified Local Details</h2></div><div><ul><li>Public directory status listed in the evidence notes.</li><li>Business category: Phoenix Chamber computers and telecommunications directory.</li><li><a href="https://business.phoenixchamber.com/list/ql/computers-telecommunications-6" rel="noopener">Evidence URL</a></li><li>Hours were not present in the current local profile.</li></ul></div></section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-s2rc-phoenix-85028-5cbbb77">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-s2rc-phoenix-85028-5cbbb77">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>S2RC earns this Valley Verified placement because public business evidence connects a real tech / ai / training solutions operation to 11811 N. Tatum Blvd. Suite 1075, Phoenix, AZ 85028 and (602) 708-8450. Greater Phoenix Chamber directory evidence supports this local profile. For local customers, Valley residents, and business clients, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Tech / AI / Training Solutions, Computers/Telecom / Tech / AI / Training Solutions, Computers/Telecom, and Phoenix-based tech firm / public phone listed</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>local customers, Valley residents, and business clients</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>11811 N. Tatum Blvd. Suite 1075, Phoenix, AZ 85028; (602) 708-8450</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

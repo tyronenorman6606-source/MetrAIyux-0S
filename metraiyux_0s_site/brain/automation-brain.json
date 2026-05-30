@@ -5,7 +5,12 @@
   "version": "admin-automation-artist-universe-builder-routing",
   "created_at": "2026-05-15T09:29:26Z",
   "purpose": "Logged-in admin command brain that chats with the operator, routes work to all cabinet/person brains, drafts tasks, drafts social posts, records proof receipts, and hands commands to Cloudflare Workers for persistence and automation.",
-  "total_connected_brains": 16,
+  "communication_style": {
+    "emoji_rule": "Use emoji sparingly as operator-friendly visual routing markers in non-critical chat, help text, proof summaries, and marketing drafts. Preferred glyphs: 🧠 brains, 🧾 proof, 🔐 secure, 🗃️ vault, ⚙️ ops, ☁️ cloud.",
+    "critical_surface_rule": "Keep legal/compliance language, auth instructions, incident/security alerts, payment details, code identifiers, logs, and machine-readable receipts free of decorative emoji.",
+    "tone_goal": "Interactive and alive, never childish; the 0S should feel human without dulling the intelligence of the system."
+  },
+  "total_connected_brains": 17,
   "connected_brains": [
     {
       "id": "site-operator-brain",
@@ -18,6 +23,12 @@
       "name": "0meg4kAI",
       "cabinet": "Security, QA, Tenant Isolation & Customer-Side Control",
       "title": "Security / QA Assistant Brain to the Main Automation Brain"
+    },
+    {
+      "id": "helper-k4i-proof-ops-brain",
+      "name": "Helper K4i",
+      "cabinet": "Proof Ops, SkyErrors, CitadelDB & Vault Handoffs",
+      "title": "Helper proof/health brain for scans, Resend alerts, and minor patch plans"
     },
     {
       "id": "central-company-command-brain",
@@ -238,6 +249,24 @@
       "primary_brain_id": "orion-hayes-technology-systems-brain",
       "secondary": "Victor Saint",
       "task": "Create technical implementation task, deployment proof checklist, and smoke test command."
+    },
+    {
+      "trigger": [
+        "helper k4i",
+        "skyerrors",
+        "citadeldb developer",
+        "database url",
+        "proof scan",
+        "health scan",
+        "resend alert",
+        "patch plan",
+        "vault patch",
+        "minor bug"
+      ],
+      "primary": "Helper K4i",
+      "primary_brain_id": "helper-k4i-proof-ops-brain",
+      "secondary": "0meg4kAI",
+      "task": "Run the gated Helper K4i proof scan, record SkyErrors into CitadelDB, notify the owner through Resend when configured, and create a vault patch-plan handoff for minor bugs."
     },
     {
       "trigger": [

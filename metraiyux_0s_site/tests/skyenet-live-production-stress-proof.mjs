@@ -173,6 +173,9 @@ const stripeReceipt = verifyStripeReceipt();
 
 const gatedRoutes = [
   "/api/skyenet/status",
+  "/api/skyenet/workspace",
+  "/api/skyenet/dashboard",
+  "/api/skyenet/receipts",
   "/api/skyenet/routes",
   "/api/skyenet/observability",
   "/api/skyenet/cost-model",

@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Benchmark | Tempe Engineering / Manufacturing Services</title>
+  <meta name="description" content="Benchmark is a Valley Verified engineering / manufacturing services profile at 56 S. Rockford Dr., Tempe, AZ 85281, highlighting Engineering /.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #13211c;
+      --muted: #5c6861;
+      --line: rgba(19, 33, 28, .16);
+      --green: #4d7c0f;
+      --copper: #c2410c;
+      --mist: #eef4ec;
+      --paper: #fbfbf6;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(77, 124, 15, .13) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(77, 124, 15, .13) 1px, transparent 1px),
+        linear-gradient(135deg, #fbfbf6 0%, #eef4ec 70%, #fff7ef 100%);
+      background-size: 42px 42px, 42px 42px, auto;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 0;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    header img {
+      width: 52px;
+      height: 52px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr);
+      gap: 34px;
+      align-items: stretch;
+      padding: 42px 0 52px;
+      min-height: 72vh;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--copper);
+      font-size: .88rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 720px;
+      font-size: 4.8rem;
+      line-height: .94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 710px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.15rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      background: var(--white);
+      color: var(--green);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .spec-board {
+      display: grid;
+      gap: 14px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: 0 22px 70px rgba(19, 33, 28, .11);
+    }
+
+    .mark-shell {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      border: 1px dashed rgba(19, 33, 28, .32);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(77, 124, 15, .12), rgba(194, 65, 12, .11));
+    }
+
+    .mark-shell img {
+      width: 118px;
+      height: 118px;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 8px 0 0;
+    }
+
+    .datum,
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .74);
+      padding: 18px;
+    }
+
+    .label {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .value {
+      margin: 0;
+      font-weight: 900;
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      padding: 18px 0 54px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.55rem;
+      letter-spacing: 0;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    li + li {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 760px) {
+      .hero,
+      .sections,
+      .data-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap" aria-label="Benchmark Valley Verified profile header">
+    <img src="assets/logo.svg" alt="Benchmark mark">
+    <span>Valley Verified Network</span>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Engineering / Manufacturing Services - Tempe, AZ 85281</p>
+        <h1>Benchmark</h1>
+        <p class="lead">Benchmark gives local customers, Valley residents, and business clients a practical Tempe connection for Engineering / Manufacturing Services, Business &amp; Professional Services / Engineering / Manufacturing Services, and Business &amp; Professional Services. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+        <div class="actions">
+          <a class="button primary" href="tel:+16233007000">Call (623) 300-7000</a>
+          <a class="button" href="https://business.phoenixchamber.com/list/ql/business-professional-services-5">Public category</a>
+        </div>
+      </div>
+
+      <aside class="spec-board" aria-label="Benchmark listing facts">
+        <div class="mark-shell">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="data-grid">
+          <div class="datum">
+            <p class="label">Category</p>
+            <p class="value">Local Services</p>
+          </div>
+          <div class="datum">
+            <p class="label">Pricing</p>
+            <p class="value">Contact for quote</p>
+          </div>
+          <div class="datum">
+            <p class="label">Language</p>
+            <p class="value">English</p>
+          </div>
+          <div class="datum">
+            <p class="label">Profile date</p>
+            <p class="value">May 19, 2026</p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="sections" aria-label="Benchmark details">
+      <article class="panel">
+        <h2>Directory Snapshot</h2>
+        <ul>
+          <li>Business &amp; Professional Services / Engineering / Manufacturing Services</li>
+          <li>public business profile prepared from the Valley Verified Valley Verified business review.</li>
+          <li>Listed tags include engineering / manufacturing services, Business &amp; Professional Services, and local SMB / service business.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h2>Contact Line</h2>
+        <p class="label">Address</p>
+        <p class="value">56 S. Rockford Dr., Tempe, AZ 85281</p>
+        <p class="label" style="margin-top:16px;">Phone</p>
+        <p class="value">(623) 300-7000</p>
+      </article>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-benchmark-tempe-85281-3a6afc2">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-benchmark-tempe-85281-3a6afc2">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Benchmark earns this Valley Verified placement because public business evidence connects a real engineering / manufacturing services operation to 56 S. Rockford Dr., Tempe, AZ 85281 and (623) 300-7000. Greater Phoenix Chamber directory evidence supports this local profile. For local customers, Valley residents, and business clients, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Engineering / Manufacturing Services, Business &amp; Professional Services / Engineering / Manufacturing Services, and Business &amp; Professional Services</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>local customers, Valley residents, and business clients</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>56 S. Rockford Dr., Tempe, AZ 85281; (623) 300-7000</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

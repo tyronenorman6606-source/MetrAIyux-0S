@@ -1,0 +1,27 @@
+{
+  "base_id": "dispute-committee/refund-calculation",
+  "slug": "refund-calculation",
+  "title": "Refund Calculation Worksheet",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "medium",
+  "not_legal_advice": true,
+  "use_case": "Legal Skyes 67 percent after-overhead discretionary refund-cap worksheet.",
+  "questionnaire": [
+    { "key": "case_id", "label": "Case ID", "type": "text", "required": true },
+    { "key": "purchase_amount_cents", "label": "Purchase Amount, Cents", "type": "number", "required": true },
+    { "key": "documented_overhead_cents", "label": "Documented Overhead, Cents", "type": "number", "required": true },
+    { "key": "eligible_refund_base_cents", "label": "Eligible Refund Base, Cents", "type": "number", "required": true },
+    { "key": "max_refund_cents", "label": "Maximum Refund, Cents", "type": "number", "required": true },
+    { "key": "proposed_refund_cents", "label": "Proposed Refund, Cents", "type": "number", "required": false },
+    { "key": "basis", "label": "Basis", "type": "textarea", "required": true }
+  ],
+  "sections": [
+    { "heading": "Refund Cap Formula", "body": "Case {{case_id}}. Purchase amount: {{purchase_amount_cents}} cents. Documented overhead: {{documented_overhead_cents}} cents. Eligible refund base: {{eligible_refund_base_cents}} cents. Maximum discretionary refund: {{max_refund_cents}} cents, calculated as up to 67 percent of purchase amount after documented overhead unless signed agreement or mandatory law requires a different result." },
+    { "heading": "Proposed Refund", "body": "Proposed refund: {{proposed_refund_cents}} cents. Basis: {{basis}}" },
+    { "heading": "Owner Release Boundary", "body": "Committee refund proposals require owner/admin review before money movement. This worksheet is an internal business record, not legal advice or an external award." }
+  ],
+  "review": { "requires_attorney_review": false, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "refund", "cap", "medium"]
+}

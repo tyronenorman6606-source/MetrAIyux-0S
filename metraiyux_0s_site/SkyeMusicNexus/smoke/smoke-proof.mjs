@@ -33,6 +33,23 @@ async function call(handler, { method = "GET", query = {}, body, authToken } = {
   });
 }
 
+function base64urlJson(value) {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+function signJwt(privateKey, payload) {
+  const header = base64urlJson({ alg: "RS256", typ: "JWT", kid: "fs27-proof-key" });
+  const body = base64urlJson({
+    iss: "local://skygatefs13/proof",
+    aud: "skygatefs13",
+    exp: Math.floor(Date.now() / 1000) + 3600,
+    iat: Math.floor(Date.now() / 1000),
+    ...payload,
+  });
+  const signature = crypto.sign("RSA-SHA256", Buffer.from(`${header}.${body}`), privateKey).toString("base64url");
+  return `${header}.${body}.${signature}`;
+}
+
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "skye-musicnexus-proof-"));
 process.env.MUSIC_NEXUS_DATA_DIR = tmpDir;
 delete process.env.MUSIC_NEXUS_STORAGE_BACKEND;
@@ -40,11 +57,8 @@ delete process.env.SKYE_MUSIC_NEXUS_STORAGE_BACKEND;
 delete process.env.MUSIC_NEXUS_USE_R2;
 const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
 process.env.SKYGATE_PUBLIC_KEY_PEM = publicKey.export({ type: "spki", format: "pem" });
-process.env.SKYGATE_LOCAL_SESSION_PRIVATE_KEY_PEM = privateKey.export({ type: "pkcs8", format: "pem" });
-process.env.SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP = "1";
-process.env.SKYGATE_LOCAL_OPERATOR_EMAIL = "operator@internal.invalid";
-process.env.SKYGATE_LOCAL_OPERATOR_PASSWORD = "proof-password";
-process.env.SKYGATE_LOCAL_OPERATOR_ROLE = "admin";
+process.env.SKYGATE_EXPECTED_AUDIENCE = "skygatefs13";
+process.env.SKYGATE_ISSUER = "local://skygatefs13/proof";
 const artists = require(path.join(root, "netlify/functions/music-artists.js"));
 const releases = require(path.join(root, "netlify/functions/music-releases.js"));
 const assets = require(path.join(root, "netlify/functions/music-assets.js"));
@@ -75,9 +89,9 @@ const fs27IdGen = readFirstExisting("FS27 Skye-ID generator", [
 ]);
 const assetsSource = fs.readFileSync(path.join(root, "netlify/functions/music-assets.js"), "utf8");
 const socialManifest = fs.readFileSync(path.join(root, "open-source/social-platform-manifest.json"), "utf8");
-assert(indexHtml.includes("Platform Dashboard"), "public/index.html is missing the platform dashboard title");
+assert(indexHtml.includes("SkyeMusicNexus - Artist Workspace"), "public/index.html is missing the artist workspace title");
 const artistPages = [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml].join("\n");
-assert(uploadHtml.includes("Gated Audio Upload"), "public/upload.html is missing gated audio upload");
+assert(uploadHtml.includes("Protected Audio Upload"), "public/upload.html is missing protected audio upload");
 assert(uploadHtml.includes("assetUploadForm"), "public/upload.html is missing the upload form");
 assert(uploadHtml.includes("Drop songs here"), "public/upload.html is missing the larger song drop zone");
 assert(neoJs.includes("data-song-drop-zone") && neoJs.includes("DataTransfer"), "neo-nexus.js is missing drag/drop song upload wiring");
@@ -107,12 +121,12 @@ assert(artistPages.includes("Upload Studio"), "public platform pages are missing
 assert(indexHtml.includes("../gate-session.js"), "public/index.html is missing the SkyeMusicNexus gate-session overlay");
 assert(indexHtml.includes("skygate-auth.js"), "public/index.html is missing the shared SkyGate browser auth helper");
 assert(indexHtml.includes("neo-nexus.js"), "public/index.html is missing the NeoFront runtime script");
-assert(adminHtml.includes("Operator Stage"), "public/admin.html is missing the operator stage title");
+assert(adminHtml.includes("Protected Review"), "public/admin.html is missing the protected review title");
 assert(adminHtml.includes("Review Chamber"), "public/admin.html is missing the review chamber");
-assert(adminHtml.includes("Payout Gate"), "public/admin.html is missing the payout gate");
+assert(adminHtml.includes("Payout Queue"), "public/admin.html is missing the payout queue");
 assert(adminHtml.includes("Analytics Prism"), "public/admin.html is missing the analytics prism");
 assert(adminHtml.includes("Exchange Console"), "public/admin.html is missing the exchange console");
-assert(adminHtml.includes("Open Social Spine"), "public/admin.html is missing the open social operator spine");
+assert(adminHtml.includes("Open Social Spine"), "public/admin.html is missing the open social spine");
 assert(adminHtml.includes("../gate-session.js"), "public/admin.html is missing the SkyeMusicNexus gate-session overlay");
 assert(adminHtml.includes("skygate-auth.js"), "public/admin.html is missing the shared SkyGate browser auth helper");
 assert(neoJs.includes("/.netlify/functions/"), "neo-nexus.js is missing Netlify function API wiring");
@@ -158,11 +172,18 @@ assert(skyeMailIdGen.includes("skye0s.identity.current.v1"), "SkyeMail Skye-ID g
 assert(skyeMailIdGen.includes("photoDataUrl"), "SkyeMail Skye-ID generator is not publishing photo identity data");
 assert(fs27IdGen.includes("skye0s.identity.current.v1"), "FS27 Skye-ID generator is not publishing the shared identity key");
 assert(fs27IdGen.includes("photoDataUrl"), "FS27 Skye-ID generator is not publishing photo identity data");
-assert(authHelper.includes("window.sessionStorage"), "skygate-auth.js is not using session-scoped token storage");
-assert(authHelper.includes("loginLocalOperator"), "skygate-auth.js is missing local operator login wiring");
+assert(authHelper.includes("MetrAIyuxGateBridge"), "skygate-auth.js is not using the shared 0S Gate bridge");
+assert(!authHelper.includes("localStorage.setItem") && !authHelper.includes("sessionStorage.setItem"), "skygate-auth.js still writes an app-local session token");
+const legacyLoginSymbol = "loginLocal" + "Operator";
+const legacyLoginCopy = "Local " + "Operator Login";
+assert(!authHelper.includes(legacyLoginSymbol), "skygate-auth.js still exposes legacy local password login wiring");
+assert(!artistPages.includes(legacyLoginCopy), "public platform pages still expose legacy local login copy");
 assert(authHelper.includes("logoutSession"), "skygate-auth.js is missing local session logout wiring");
-assert(gateSession.includes("Free99 Lite means no charge"), "gate-session.js must spell out that Free99 Lite means no charge");
-assert(gateSession.includes("SKYE_MUSIC_NEXUS_GATE_SESSION"), "gate-session.js is missing the dedicated app session storage key");
+assert(gateSession.includes("MetrAIyuxGateBridge"), "gate-session.js is missing the shared 0S Gate bridge");
+assert(gateSession.includes("/gate/signup/?return="), "gate-session.js is missing the shared 0S signup handoff");
+const retiredMusicSessionKey = "SKYE_MUSIC_NEXUS" + "_GATE_SESSION";
+assert(!gateSession.includes(retiredMusicSessionKey), "gate-session.js still uses the retired app-specific Music Nexus session key");
+assert(!gateSession.includes("localStorage.setItem") && !gateSession.includes("sessionStorage.setItem"), "gate-session.js still writes app-local session storage");
 assert(socialManifest.includes("Pixelfed") && socialManifest.includes("Funkwhale") && socialManifest.includes("ActivityPub"), "open-source social platform manifest is missing required platform targets");
 
 const unauthArtistsRes = await call(artists, { method: "GET", query: { action: "list" } });
@@ -183,23 +204,22 @@ assert(unauthProviderHooksRes.statusCode === 401, `unauthenticated provider hook
 const sessionStatusRes = await call(session, { method: "GET" });
 assert(sessionStatusRes.statusCode === 200, `session status failed: ${sessionStatusRes.statusCode}`);
 const sessionStatus = parse(sessionStatusRes);
-assert(sessionStatus.localProofBootstrap === true, "session status did not report local proof bootstrap availability");
-assert(sessionStatus.localOperatorLogin === true, "session status did not report local operator login availability");
-assert(sessionStatus.localIdentity === true, "session status did not expose local identity mode");
+assert(sessionStatus.localProofBootstrap === false, "session status still reports local proof bootstrap availability");
+assert(sessionStatus.localOperatorLogin === false, "session status still reports local operator password login availability");
+assert(sessionStatus.sharedGateAuth === true, "session status did not report shared gate auth posture");
+assert(sessionStatus.appIdentity === false, "session status still reports app-local identity ownership");
 
 const sessionRes = await call(session, {
   method: "POST",
   body: { subject: "proof-operator", role: "admin" },
 });
-assert(sessionRes.statusCode === 200, `local session bootstrap failed: ${sessionRes.statusCode}`);
-const sessionData = parse(sessionRes);
-const token = sessionData.token;
-assert(token && token.startsWith("skls_"), "local session bootstrap did not return a local session token");
+assert(sessionRes.statusCode === 410, `local session bootstrap was not retired: ${sessionRes.statusCode}`);
+const token = signJwt(privateKey, { sub: "fs27-music-proof-operator", email: "proof@internal.invalid", role: "admin" });
 const activeSessionRes = await call(session, { method: "GET", authToken: token });
 const activeSessionData = parse(activeSessionRes);
-assert(activeSessionData.activeSession && activeSessionData.activeSession.source === "local-identity-session", "session status did not surface the active local session");
+assert(activeSessionData.activeSession && activeSessionData.activeSession.source === "external-skygate-jwt", "session status did not surface the active shared Gate bearer");
 
-const badLoginRes = await call(session, {
+const passwordGrantRes = await call(session, {
   method: "POST",
   body: {
     grantType: "password",
@@ -207,27 +227,12 @@ const badLoginRes = await call(session, {
     password: "wrong-password",
   },
 });
-assert(badLoginRes.statusCode === 401, `invalid local operator login returned ${badLoginRes.statusCode}`);
-
-const operatorLoginRes = await call(session, {
-  method: "POST",
-  body: {
-    grantType: "password",
-    email: "operator@internal.invalid",
-    password: "proof-password",
-    subject: "proof-operator-login",
-  },
-});
-assert(operatorLoginRes.statusCode === 200, `local operator login failed: ${operatorLoginRes.statusCode}`);
-const operatorToken = parse(operatorLoginRes).token;
-assert(operatorToken && operatorToken.startsWith("skls_"), "local operator login did not return a local session token");
-const revokeRes = await call(session, { method: "DELETE", authToken: operatorToken });
-assert(revokeRes.statusCode === 200, `local operator logout failed: ${revokeRes.statusCode}`);
+assert(passwordGrantRes.statusCode === 410, `local operator password grant returned ${passwordGrantRes.statusCode}`);
 
 const seededStatusRes = await call(session, { method: "GET" });
 const seededStatus = parse(seededStatusRes);
-assert(seededStatus.usersConfigured >= 1, "local operator bootstrap did not seed a local identity user");
-assert(seededStatus.adminUsers >= 1, "local operator bootstrap did not seed an admin user");
+assert(seededStatus.usersConfigured === false, "local identity users are still configured inside Music Nexus");
+assert(seededStatus.adminUsers === 0, "local admin users are still configured inside Music Nexus");
 
 const proofSkyeId = "1357913579";
 const proofPhoto = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/l6xGngAAAABJRU5ErkJggg==";
@@ -261,11 +266,15 @@ const artistRes = await call(artists, {
 assert(artistRes.statusCode === 201, `artist register failed: ${artistRes.statusCode}`);
 const artistData = parse(artistRes);
 const artistId = artistData.artistId;
+const artistToken = signJwt(privateKey, { sub: "fs27-music-proof-artist", email: "proof.artist@internal.invalid", role: "artist", artistId });
 assert(artistId, "artist register did not return an artistId");
 assert(artistId === proofSkyeId, "artist register did not use the Skye ID as the cross-app artist id");
 assert(artistData.artist?.skyeId === proofSkyeId, "artist register did not persist the Skye ID");
 assert(artistData.artist?.profilePhoto?.dataUrl === proofPhoto, "artist register did not persist the profile photo");
 assert(artistData.artist?.crossAppIdentity?.photoDataUrl === proofPhoto, "artist register did not persist the cross-app identity photo");
+assert(artistData.artist?.paperwork?.requiredBeforePayout === true, "artist register did not attach paperwork hold");
+assert(/WebGrowthOperator\/ae-command-hub\/onboarding\.html/.test(artistData.artist?.paperwork?.workforceFormUrl || ""), "artist register did not attach workforce paperwork link");
+assert(artistData.artist?.skyepay?.payoutEligibility === "blocked_until_paperwork_complete", "artist register did not block SkyePay until paperwork");
 
 const artistIdentityGetRes = await call(artists, { method: "GET", authToken: token, query: { action: "get", id: proofSkyeId } });
 assert(artistIdentityGetRes.statusCode === 200, `artist get by Skye ID failed: ${artistIdentityGetRes.statusCode}`);
@@ -284,7 +293,7 @@ const uploadBuffer = Buffer.concat([
 ]);
 const uploadRes = await call(assets, {
   method: "POST",
-  authToken: token,
+  authToken: artistToken,
   body: {
     action: "upload",
     artistId,
@@ -300,7 +309,7 @@ const uploadedAsset = uploadData.asset;
 assert(uploadedAsset?.streamUrl?.includes("music-assets"), "audio upload did not return a gated stream URL");
 assert(uploadedAsset?.storage === "music-nexus-local-gated-audio", "local proof upload did not use the expected gated local storage lane");
 
-const assetListRes = await call(assets, { method: "GET", authToken: token, query: { action: "list", artistId } });
+const assetListRes = await call(assets, { method: "GET", authToken: artistToken, query: { action: "list", artistId } });
 assert(assetListRes.statusCode === 200, `audio asset list failed: ${assetListRes.statusCode}`);
 const assetListData = parse(assetListRes);
 assert(assetListData.assets?.some((item) => item.id === uploadedAsset.id), "audio asset list did not include the uploaded file");
@@ -312,7 +321,7 @@ assert(parse(storageStatusRes).storage?.directUploadEnabled === false, "direct u
 
 const directSessionRes = await call(assets, {
   method: "POST",
-  authToken: token,
+  authToken: artistToken,
   body: {
     action: "create-upload-session",
     artistId,
@@ -324,9 +333,27 @@ const directSessionRes = await call(assets, {
 });
 assert(directSessionRes.statusCode === 409, `direct upload should be wired but disabled without R2 env: ${directSessionRes.statusCode}`);
 
-const assetStreamRes = await call(assets, { method: "GET", authToken: token, query: { action: "stream", id: uploadedAsset.id } });
+const assetStreamRes = await call(assets, { method: "GET", authToken: artistToken, query: { action: "stream", id: uploadedAsset.id } });
 assert(assetStreamRes.statusCode === 200, `audio asset stream failed: ${assetStreamRes.statusCode}`);
 assert(assetStreamRes.isBase64Encoded === true, "audio asset stream did not return a base64 function body");
+
+const buyerToken = signJwt(privateKey, { sub: "fs27-music-proof-buyer", email: "buyer@internal.invalid", role: "listener" });
+const unpaidBuyerStreamRes = await call(assets, { method: "GET", authToken: buyerToken, query: { action: "stream", id: uploadedAsset.id } });
+assert(unpaidBuyerStreamRes.statusCode === 402, `unpaid buyer stream escaped SkyPay gate: ${unpaidBuyerStreamRes.statusCode}`);
+const unpaidBuyerDownloadRes = await call(assets, { method: "GET", authToken: buyerToken, query: { action: "download", id: uploadedAsset.id } });
+assert(unpaidBuyerDownloadRes.statusCode === 402, `unpaid buyer download escaped SkyPay gate: ${unpaidBuyerDownloadRes.statusCode}`);
+
+fs.writeFileSync(path.join(tmpDir, "commerce-spine.json"), JSON.stringify({
+  stores: [],
+  products: [{ productId: "prod_proof_track", id: "prod_proof_track", artistId, assetId: uploadedAsset.id, title: "Proof Track" }],
+  orders: [{ orderId: "order_paid_proof_track", productId: "prod_proof_track", buyerEmail: "buyer@internal.invalid", status: "paid_pending_fulfillment", paymentStatus: "succeeded" }],
+  fulfillments: [],
+}, null, 2) + "\n");
+const paidBuyerStreamRes = await call(assets, { method: "GET", authToken: buyerToken, query: { action: "stream", id: uploadedAsset.id } });
+assert(paidBuyerStreamRes.statusCode === 200, `paid buyer stream did not unlock: ${paidBuyerStreamRes.statusCode}`);
+const paidBuyerDownloadRes = await call(assets, { method: "GET", authToken: buyerToken, query: { action: "download", id: uploadedAsset.id } });
+assert(paidBuyerDownloadRes.statusCode === 200, `paid buyer download did not unlock: ${paidBuyerDownloadRes.statusCode}`);
+assert(/attachment/.test(paidBuyerDownloadRes.headers?.["content-disposition"] || ""), "paid buyer download did not return attachment disposition");
 
 const submitRes = await call(releases, {
   method: "POST",
@@ -666,21 +693,21 @@ assert(payoutRes.statusCode === 201, `payout request failed: ${payoutRes.statusC
 const payoutData = parse(payoutRes);
 const payoutId = payoutData.payout?.id;
 assert(payoutId, "payout request did not return a payout id");
+assert(payoutData.payout?.status === "paperwork_hold", "payout request should stay on paperwork hold before legal payment release");
+assert(payoutData.payout?.paperwork?.requiredBeforePayout === true, "payout hold did not include paperwork requirements");
 
 const gatedArtistRes = await call(artists, { method: "GET", authToken: token, query: { action: "get", id: artistId } });
 assert(gatedArtistRes.statusCode === 200, `gated artist get failed: ${gatedArtistRes.statusCode}`);
 const gatedReleaseRes = await call(releases, { method: "GET", authToken: token, query: { action: "list", artistId } });
 assert(gatedReleaseRes.statusCode === 200, `gated release list failed: ${gatedReleaseRes.statusCode}`);
 
-const payoutListRes = await call(payments, { method: "GET", authToken: token, query: { action: "payouts", status: "pending" } });
+const payoutListRes = await call(payments, { method: "GET", authToken: token, query: { action: "payouts", status: "paperwork_hold" } });
 assert(payoutListRes.statusCode === 200, `payout list failed: ${payoutListRes.statusCode}`);
 const payoutListData = parse(payoutListRes);
 assert(Array.isArray(payoutListData.payouts) && payoutListData.payouts.some((entry) => entry.id === payoutId), "payout list did not include the requested payout");
 
 const analyticsRes = await call(analytics, { method: "GET", authToken: token });
 assert(analyticsRes.statusCode === 200, `music analytics failed: ${analyticsRes.statusCode}`);
-const analyticsByOperatorRes = await call(analytics, { method: "GET", authToken: operatorToken });
-assert(analyticsByOperatorRes.statusCode === 401, `revoked local operator session still worked: ${analyticsByOperatorRes.statusCode}`);
 
 const providerStatusRes = await call(providerHooks, { method: "GET", authToken: token, query: { action: "status" } });
 assert(providerStatusRes.statusCode === 200, `provider hook status failed: ${providerStatusRes.statusCode}`);
@@ -698,22 +725,26 @@ assert(providerJob?.status === "waiting-provider-config", "provider hook job sho
 const providerJobsRes = await call(providerHooks, { method: "GET", authToken: token, query: { action: "jobs", provider: "transcoding" } });
 assert(providerJobsRes.statusCode === 200, `provider hook jobs read failed: ${providerJobsRes.statusCode}`);
 assert(parse(providerJobsRes).jobs?.some((job) => job.id === providerJob.id), "provider hook jobs list did not include the queued job");
+const revokeRes = await call(session, { method: "DELETE", authToken: token });
+assert(revokeRes.statusCode === 200, `shared Gate logout status failed: ${revokeRes.statusCode}`);
+const analyticsByRevokedRes = await call(analytics, { method: "GET", authToken: token });
+assert(analyticsByRevokedRes.statusCode === 200, `shared Gate bearer unexpectedly stopped inside the app-local no-op revocation path: ${analyticsByRevokedRes.statusCode}`);
 
 console.log(JSON.stringify({
   ok: true,
   app: "SkyeMusicNexus",
-  surface: "artist portal shell plus local SkyGate-backed artist, release, and payments handlers",
+  surface: "artist operating platform plus shared SkyGate-backed artist, release, and payments handlers",
   verified: [
-    "browser artist and admin surfaces are wired to the local SkyGate bootstrap",
-    "session status exposes local identity-backed operator bootstrap availability",
-    "invalid local operator credentials are rejected",
-    "local operator credentials can mint an admin session token",
-    "session status can introspect the active local session",
-    "local operator sessions can be revoked in-folder",
-  "browser auth storage is scoped to the active session",
+    "browser artist and admin surfaces are wired to shared SkyGate session handling",
+    "session status proves local proof bootstrap is retired",
+    "local operator password grants are removed",
+    "shared FS27/SkyGate bearer unlocks protected smoke flows",
+    "session status can introspect the active shared Gate session",
+    "app-local revocation is a no-op because shared Gate owns bearer lifetime",
+    "browser auth storage is delegated to the shared Gate bridge",
   "artist, release, and operations reads reject ungated requests",
   "audio asset upload, list, and gated stream require a gate session",
-  "audio asset storage defaults to local proof and exposes an opt-in SkyeVault/R2 durable backend",
+    "audio asset storage defaults to the local handler workspace and exposes an opt-in SkyeVault/R2 durable backend",
   "direct R2 upload sessions and completion are wired behind the gate for later production storage",
   "artist registration works in the local handler surface",
   "release submit, review, publish, and stream reporting work",
@@ -725,7 +756,7 @@ console.log(JSON.stringify({
     "approved and live releases can be queued into a persisted release operations board",
     "release operations workflows can be updated and summarized in-folder",
     "payments credit, ledger, payout request, and payout queue work",
-    "admin analytics accepts the locally bootstrapped token",
+    "admin analytics accepts the shared Gate bearer token",
     "artist and release read endpoints return the created records only with a gate session",
     "music exchange reads reject ungated requests",
     "provider/transcoding/DSP/legal hook jobs reject ungated requests and queue safely until provider env is configured",

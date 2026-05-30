@@ -14,6 +14,13 @@ This closes the specific platform gap where vault exports existed as upload arti
 6. SkyeVault writes audit events with `actor`, `authType`, `workspaceId`, `customerId`, and `gateCardId`.
 7. `.skyesecrets` receipts expose an `Unlock` action into the 0S SkyeSecure secret-pack console.
 
+## Login Truth
+
+- The shared 0S/FS27/SkyGate/Free99 gate session is the owner/admin login.
+- `/api/admin-vault-download` returns a signed object URL only after that gate session passes. That URL is a temporary file ticket, not a new login.
+- SkyeSecure passphrases and peppers unlock encrypted `.skyesecrets` packs. They are encryption material, not a vault/admin login.
+- Legacy admin/operator tokens remain only as an emergency fallback when the shared gate is unavailable. Gate bearer headers win when both are present.
+
 ## Checklist
 
 - [✓] Add FS27 bearer introspection to SkyeVault Drop admin APIs.

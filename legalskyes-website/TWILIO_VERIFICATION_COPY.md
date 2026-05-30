@@ -29,7 +29,7 @@ Messages are sent only to customers, leads, or business contacts who request com
 You’re subscribed to receive SMS updates from Skyes Over London / SOLEnterprises. Reply HELP for help or STOP to unsubscribe. Msg & data rates may apply.
 
 ## Help message sample
-Skyes Over London / SOLEnterprises support: reply with your question or contact grayskyes@solenterprises.org. Reply STOP to unsubscribe.
+Skyes Over London / SOLEnterprises support: reply with your question or contact legal-skyes@solenterprises.org. Reply STOP to unsubscribe.
 
 ## Opt-out message sample
 You have been unsubscribed from Skyes Over London / SOLEnterprises SMS messages. You will no longer receive texts from us. Reply START to resubscribe.

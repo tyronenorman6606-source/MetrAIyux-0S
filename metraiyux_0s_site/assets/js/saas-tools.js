@@ -154,8 +154,30 @@
     form.addEventListener('change', render);
     render();
   }
-  function getActiveSession(){ return read('saas_client_session', null); }
-  function renderSession(){
+	  function getActiveSession(){ return read('saas_client_session', null); }
+	  function htmlEscape(value){ return String(value ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+	  function linkButton(label, href){ return href ? `<a class='saas-btn' href='${htmlEscape(href)}'>${htmlEscape(label)}</a>` : ''; }
+	  async function loadLlcWorkflowStatus(){
+	    const target=$('llcWorkflowStatus');
+	    if(!target) return;
+	    const workflowId=query.get('workflow') || query.get('workflowId') || query.get('llc_workflow') || read('saas_llc_workflow_id','');
+	    if(!workflowId){
+	      target.innerHTML = '<p>No LLC workflow is linked to this dashboard yet.</p><div class="button-row"><a class="saas-btn" href="../Free99/apps/sovereigndocs/business-formation/">Start LLC to 0S</a><a class="saas-btn" href="../Free99/apps/sovereigndocs/customer-dashboard/">SovereignDocs dashboard</a></div>';
+	      return;
+	    }
+	    try{
+	      const res=await fetch(`/api/sovereigndocs/business-formation/workflows/${encodeURIComponent(workflowId)}/client-dashboard`,{headers:{accept:'application/json'}});
+	      const data=await res.json().catch(()=>({ok:false,error:'invalid_json_response'}));
+	      if(!res.ok || data.ok===false) throw new Error(data.error || `Workflow status failed: ${res.status}`);
+	      write('saas_llc_workflow_id', workflowId);
+	      target.innerHTML = `<span class='status-pill'>${data.status || 'pending'}</span><h3>${data.businessName || workflowId}</h3><p><strong>Workflow:</strong> ${workflowId}</p><div class='button-row'>${(data.nextActions||[]).map(a=>linkButton(a.label,a.href)).join('')}</div><p>${data.boundary || ''}</p>`;
+	      output('llcWorkflowReceipt', data);
+	    }catch(error){
+	      target.innerHTML = `<span class='danger-pill'>Workflow unavailable</span><p>${error.message}</p>`;
+	      output('llcWorkflowReceipt',{ok:false,error:error.message,workflowId});
+	    }
+	  }
+	  function renderSession(){
     const session = getActiveSession();
     document.querySelectorAll('[data-client-session]').forEach((el)=>{
       if(!session) {
@@ -239,9 +261,10 @@
     exportAll(){ const keys=['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands']; const bundle={exported_at:now()}; keys.forEach(k=>bundle[k]=read(k, null)); output('exportReceipt',bundle); const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='saas-customer-portal-export.json'; a.click(); },
     clearAll(){ ['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands'].forEach(k=>localStorage.removeItem(k)); output('exportReceipt',{cleared_at:now()}); }
   }
-  document.addEventListener('DOMContentLoaded', ()=>{
-    renderSession();
-    wirePlanLinks();
+	  document.addEventListener('DOMContentLoaded', ()=>{
+	    renderSession();
+	    loadLlcWorkflowStatus();
+	    wirePlanLinks();
     ensureIdentityPreview('signupForm','signup');
     ensureIdentityPreview('onboardingForm','onboarding');
   });

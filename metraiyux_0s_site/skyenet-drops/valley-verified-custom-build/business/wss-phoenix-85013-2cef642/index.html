@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WSS | Phoenix Shoe And Apparel Retail</title>
+  <meta name="description" content="WSS business facts for Phoenix, Arizona: shoe and apparel retail, phone, address, category, and last verified date.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17161f;
+      --muted: #666273;
+      --paper: #f7f5fb;
+      --panel: #ffffff;
+      --accent: #4338ca;
+      --accent-2: #db2777;
+      --line: rgba(23, 22, 31, .16);
+      --shadow: 0 24px 70px rgba(23, 22, 31, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(67, 56, 202, .08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(219, 39, 119, .07) 1px, transparent 1px),
+        linear-gradient(135deg, #fffaff 0%, #f0efff 52%, #fff0f6 100%);
+      background-size: 42px 42px, 42px 42px, auto;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .top strong {
+      color: var(--accent);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+      gap: 32px;
+      align-items: center;
+      min-height: 68vh;
+      padding: 52px 0 62px;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      margin: 0 0 18px;
+      padding: 8px 12px;
+      border: 1px solid rgba(67, 56, 202, .28);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .72);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(56px, 10vw, 124px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 690px;
+      margin: 24px 0 0;
+      color: #334155;
+      font-size: clamp(18px, 2.1vw, 24px);
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 13px 18px;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 16px 34px rgba(67, 56, 202, .2);
+    }
+
+    .button.secondary {
+      color: var(--accent);
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .panel,
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: var(--shadow);
+    }
+
+    .panel { padding: 24px; }
+
+    .panel h2,
+    .fact h2 {
+      margin: 0 0 18px;
+      font-size: 18px;
+    }
+
+    dl {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+    }
+
+    dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 4px 0 0;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .section {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 0 56px;
+    }
+
+    .fact { padding: 22px; }
+
+    .fact p {
+      margin: 0;
+      color: #334155;
+      line-height: 1.55;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      padding: 7px 10px;
+      border: 1px solid rgba(219, 39, 119, .24);
+      border-radius: 6px;
+      color: var(--accent-2);
+      background: rgba(219, 39, 119, .07);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    footer {
+      padding: 24px 0 34px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+      .top,
+      .hero { display: block; }
+
+      .top span { display: block; margin-top: 8px; }
+
+      .hero { min-height: auto; padding: 38px 0 44px; }
+
+      .panel { margin-top: 28px; }
+
+      .section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="top wrap">
+      <strong>Retail And Specialty</strong>
+      <span>Phoenix, Arizona 85013</span>
+    </header>
+
+    <section class="hero wrap">
+      <div>
+        <p class="eyebrow">Shoe / Apparel Retail</p>
+        <h1>WSS</h1>
+        <p class="lead">WSS gives Phoenix shoppers a shoe and apparel retail contact at 620 W. Osborn Rd., with a direct phone route and specialty retail category.</p>
+        <div class="actions">
+          <a class="button primary" href="tel:+16232810618">(623) 281-0618</a>
+          <a class="button secondary" href="#facts">Business Facts</a>
+        </div>
+      </div>
+
+      <aside class="panel" aria-label="WSS contact facts">
+        <h2>Contact</h2>
+        <dl>
+          <div>
+            <dt>Address</dt>
+            <dd>620 W. Osborn Rd., Phoenix, AZ 85013</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd><a href="tel:+16232810618">(623) 281-0618</a></dd>
+          </div>
+          <div>
+            <dt>Language</dt>
+            <dd>English</dd>
+          </div>
+          <div>
+            <dt>Audience</dt>
+            <dd>Local customers, Valley residents, and business clients</dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="section wrap" id="facts">
+      <article class="fact">
+        <h2>Category</h2>
+        <p>Retail And Specialty / Shoe Apparel Retail.</p>
+      </article>
+      <article class="fact">
+        <h2>Focus</h2>
+        <p>Shopping and retail category profile for shoes and apparel.</p>
+        <div class="chips">
+          <span class="chip">Shoe / Apparel Retail</span>
+          <span class="chip">Shopping/Retail</span>
+          <span class="chip">Retail / Specialty Store</span>
+        </div>
+      </article>
+      <article class="fact">
+        <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>WSS belongs in Valley Verified because the research anchors a Phoenix shoe and apparel retail location to an Osborn Road address, public phone number, shopping/retail category, and Greater Phoenix Chamber shopping and specialty retail source. It is a useful local profile for shoppers comparing footwear and apparel options.</p>
+      </article>
+    </section>
+
+    <footer class="wrap">WSS business facts for Phoenix, AZ.</footer>
+  </main>
+</body>
+</html>

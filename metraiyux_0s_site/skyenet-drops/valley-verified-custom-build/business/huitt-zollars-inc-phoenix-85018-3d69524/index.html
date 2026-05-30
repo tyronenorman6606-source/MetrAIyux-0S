@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Huitt-Zollars, Inc. is a Phoenix engineering and architecture profile at 5050 N. 40th St., Suite 100 with official website and Chamber evidence.">
+  <title>Huitt-Zollars, Inc. | Phoenix AZ 85018</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202b;
+      --muted: #5d6a73;
+      --line: rgba(23, 32, 43, .14);
+      --paper: #fffdf8;
+      --primary: #214b64;
+      --accent: #be5f3b;
+      --wash: #f1f7f8;
+      --warm: #f6eee9;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(23, 32, 43, .05) 1px, transparent 1px),
+        linear-gradient(180deg, var(--wash), #fffaf1 58%, #f4f6f3);
+      background-size: 44px 44px, auto;
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 0 0 16px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+      gap: 24px;
+      align-items: stretch;
+      padding: 28px 0;
+    }
+
+    .hero-main {
+      position: relative;
+      min-height: 430px;
+      display: grid;
+      align-content: end;
+      padding: 38px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.06), transparent 45%),
+        linear-gradient(180deg, var(--primary), #14202d);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.26);
+      overflow: hidden;
+    }
+
+    .hero-main:before {
+      content: "";
+      position: absolute;
+      inset: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      pointer-events: none;
+    }
+
+    .hero-main:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 36%;
+      height: 100%;
+      background:
+        linear-gradient(150deg, transparent 0 38%, rgba(255,255,255,.12) 38% 40%, transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,.12), transparent);
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    .hero-main > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      width: fit-content;
+      margin: 0 0 22px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.34);
+      color: #ffe0b9;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(40px, 7.5vw, 86px);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 720px;
+      margin: 22px 0 0;
+      color: #e7edf2;
+      font-size: 18px;
+      line-height: 1.62;
+    }
+
+    .contact-panel {
+      display: grid;
+      gap: 18px;
+      align-content: stretch;
+    }
+
+    .quick-contact,
+    .address-panel {
+      display: grid;
+      gap: 18px;
+      padding: 24px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 16px 34px rgba(23, 32, 43, .08);
+    }
+
+    .quick-contact { align-content: start; }
+
+    .label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .action {
+      display: block;
+      width: 100%;
+      padding: 15px 16px;
+      text-decoration: none;
+      text-align: center;
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .action.secondary {
+      background: #fff;
+      color: var(--primary);
+      border-color: var(--line);
+    }
+
+    address {
+      margin: 0;
+      color: #26323d;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .facts {
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .fact {
+      min-height: 150px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .fact span,
+    .fact a {
+      display: block;
+      color: var(--ink);
+      font-size: 19px;
+      line-height: 1.28;
+      font-weight: 800;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .details {
+      display: grid;
+      grid-profile-columns: .9fr 1.1fr;
+      gap: 24px;
+      padding: 28px 0 0;
+    }
+
+    .note,
+    .tag-panel {
+      padding: 24px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .note {
+      border-left: 7px solid var(--accent);
+    }
+
+    .note p {
+      margin: 0;
+      color: #31404d;
+      line-height: 1.64;
+    }
+
+    .note p + p { margin-top: 12px; }
+
+    .service signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .service signals span {
+      padding: 8px 10px;
+      background: var(--warm);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #2f3a43;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .details { grid-profile-columns: 1fr; }
+      .facts { grid-profile-columns: repeat(2, 1fr); }
+      .hero-main { min-height: 380px; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 22px, 1120px); }
+      .topline { align-items: flex-start; flex-direction: column; }
+      .hero-main { min-height: 340px; padding: 28px; }
+      .hero-main:before { inset: 14px; }
+      .facts { grid-profile-columns: 1fr; }
+      .fact { min-height: 128px; }
+      address { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <div class="topline">
+      <span>Local Services</span>
+      <span>Phoenix AZ 85018</span>
+    </div>
+
+    <section class="hero" aria-label="Huitt-Zollars, Inc. business facts">
+      <div class="hero-main">
+        <p class="eyebrow">Engineering / Architecture</p>
+        <h1>Huitt-Zollars, Inc.</h1>
+        <p class="summary">Engineering / Architecture in Phoenix, AZ under Local Services. Contact details include phone, huitt-zollars.com website, and address.</p>
+      </div>
+
+      <aside class="contact-panel" aria-label="Contact information">
+        <div class="quick-contact">
+          <div>
+            <span class="label">Contact</span>
+            <a class="action" href="tel:+16022528384">(602) 252-8384</a>
+          <a class="action secondary" href="https://huitt-zollars.com">huitt-zollars.com</a>
+          </div>
+          <div>
+            <span class="label">Website</span>
+            <span class="muted"><a href="https://huitt-zollars.com">huitt-zollars.com</a></span>
+          </div>
+        </div>
+
+        <div class="address-panel">
+          <div>
+            <span class="label">Address</span>
+            <address>5050 N. 40th St., Ste. 100, Phoenix, AZ 85018</address>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Profile facts">
+      <div class="fact">
+        <span class="label">Category</span>
+        <span>Local Services</span>
+      </div>
+      <div class="fact">
+        <span class="label">Service Focus</span>
+        <span>Engineering / Architecture</span>
+      </div>
+      <div class="fact">
+        <span class="label">Business Type</span>
+        <span>Business &amp; Professional Services / Engineering / Architecture</span>
+      </div>
+      <div class="fact">
+        <span class="label">Language</span>
+        <span>English</span>
+      </div>
+    </section>
+
+    <section class="details" aria-label="Profile details">
+      <div class="note">
+        <span class="label">Profile Details</span>
+        <p>Last verified: May 19, 2026.</p>
+        <p>Profile: <a href="https://business.phoenixchamber.com/list/ql/business-professional-services-5">Phoenix Chamber public profile</a>.</p>
+      </div>
+      <div class="tag-panel">
+        <span class="label">Service Signals</span>
+        <div class="service signals">
+          <span>Engineering / architecture</span>
+          <span>Business &amp; Professional Services</span>
+          <span>Local SMB / service business</span>
+          <span>Business &amp; Professional Services / Engineering / Architecture</span>
+        </div>
+      </div>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-huitt-zollars-inc-phoenix-85018-3d69524" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-huitt-zollars-inc-phoenix-85018-3d69524" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Huitt-Zollars, Inc. is Valley Verified because the profile identifies a Phoenix engineering and architecture business with both official web presence and local Chamber evidence. The profile lists 5050 N. 40th St., Ste. 100, Phoenix, AZ 85018 and phone (602) 252-8384.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The official Huitt-Zollars website supports the company identity, and the Greater Phoenix Chamber category confirms the local engineering and architecture lane. Valley Verified presents the firm for project owners, business clients, and Valley residents looking for a Phoenix office contact.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Huitt-Zollars belongs in Valley Verified because built-environment work depends on discoverable professional teams with clear location and contact details.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Engineering and architecture profile for Phoenix project needs.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Project owners, business clients, local customers, and Valley residents.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Official website, Chamber category, N. 40th Street office, direct phone, and Valley Verified profile.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legal Skyes Dispute Committee | SovereignDocs</title>
+<meta name="robots" content="noindex,nofollow" />
+<link rel="stylesheet" href="/Free99/apps/sovereigndocs/assets/styles.css" />
+<script src="../../../free99-gate.js" data-platform-id="sovereigndocs" data-platform-name="SovereignDocs v20" data-billing-mode="paid_pending_sku" data-price-label="Legal Skyes dispute committee is owner-gated" data-app-root="/Free99/apps/sovereigndocs/dispute-committee/"></script>
+<style>
+  body { background:#09060f; color:#f6f1ff; }
+  .committee-shell { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:92px 0 48px; }
+  .committee-grid { display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(320px, .9fr); gap:16px; align-items:start; }
+  .committee-panel { border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.055); padding:18px; border-radius:8px; }
+  .metric-row { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; margin:16px 0; }
+  .metric-row div { border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.25); padding:12px; border-radius:8px; min-height:82px; }
+  .metric-row b { display:block; font-size:26px; color:#f6c14b; }
+  .committee-form { display:grid; gap:10px; }
+  .committee-form label { display:grid; gap:6px; color:#d8cfff; font-weight:800; font-size:13px; }
+  .committee-form input, .committee-form textarea { width:100%; border:1px solid rgba(255,255,255,.16); background:rgba(0,0,0,.28); color:#fff; padding:11px; border-radius:6px; font:inherit; }
+  .committee-form textarea { min-height:96px; resize:vertical; }
+  .acceptance-grid { display:grid; gap:8px; }
+  .acceptance-grid label { grid-template-columns:18px minmax(0, 1fr); align-items:start; text-transform:none; line-height:1.4; }
+  .acceptance-grid input { width:18px; min-height:18px; margin-top:2px; accent-color:#27f2ff; }
+  .queue-list { display:grid; gap:10px; max-height:520px; overflow:auto; }
+  .queue-card { border:1px solid rgba(255,255,255,.12); background:rgba(0,0,0,.22); padding:12px; border-radius:8px; }
+  .queue-card h3 { margin:0 0 6px; font-size:15px; }
+  .queue-card p { margin:0; color:#c9bee0; font-size:13px; line-height:1.45; }
+  .button-row { display:flex; flex-wrap:wrap; gap:8px; }
+  .status-json { max-height:260px; overflow:auto; white-space:pre-wrap; font-size:12px; color:#c9f7ff; background:#050308; border:1px solid rgba(39,242,255,.18); padding:12px; border-radius:8px; }
+  .action-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; margin-top:10px; }
+  .action-grid button { min-height:46px; }
+  @media (max-width: 880px) { .committee-grid, .metric-row { grid-template-columns:1fr; } .committee-shell { width:min(100% - 20px, 1180px); padding-top:72px; } }
+  @media (max-width: 880px) { .action-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="sd-public-site">
+<div class="committee-shell">
+  <header class="sd-section-head">
+    <span class="eyebrow">Legal Skyes arbitration lane</span>
+    <h1>In-house dispute committee</h1>
+    <p>Shared FS27/SkyGate access only. SovereignDocs stores the acceptance receipt, case file, panel assignment, refund-cap math, recommendation, decision, and audit trail.</p>
+  </header>
+
+  <section class="metric-row" aria-label="Committee metrics">
+    <div><span>Open cases</span><b id="metricOpen">0</b></div>
+    <div><span>Refund proposals</span><b id="metricRefunds">0</b></div>
+    <div><span>Committee AEs</span><b id="metricMembers">0</b></div>
+    <div><span>Policy cap</span><b>67%</b></div>
+  </section>
+
+  <main class="committee-grid">
+    <section class="committee-panel">
+      <span class="eyebrow">New intake</span>
+      <h2>Accepted transaction dispute</h2>
+      <form id="intakeForm" class="committee-form">
+        <label>Customer name <input name="customer_name" autocomplete="name" required /></label>
+        <label>Customer email <input name="customer_email" type="email" autocomplete="email" required /></label>
+        <label>Order ID <input name="order_id" required /></label>
+        <label>Offer or product <input name="offer_id" /></label>
+        <label>Purchase amount, cents <input name="purchase_amount_cents" type="number" min="0" step="1" required /></label>
+        <label>Documented overhead, cents <input name="overhead_cents" type="number" min="0" step="1" value="0" /></label>
+        <label>Issue <textarea name="issue" required></textarea></label>
+        <label>Requested relief <input name="requested_relief" value="committee review" /></label>
+        <div class="acceptance-grid">
+          <label><input name="accept_legal_terms" type="checkbox" required /> <span>Legal Skyes transaction terms accepted.</span></label>
+          <label><input name="accept_in_house_arbitration" type="checkbox" required /> <span>In-house arbitration/dispute committee accepted.</span></label>
+          <label><input name="accept_payments_refunds" type="checkbox" required /> <span>Payment/refund policy and 67% after-overhead cap accepted.</span></label>
+          <label><input name="accept_no_outcome_guarantee" type="checkbox" required /> <span>No 100% technology, SaaS, valuation, or customer outcome guarantee accepted.</span></label>
+          <label><input name="accept_truthful_review_boundary" type="checkbox" required /> <span>Truthful lawful review boundary accepted.</span></label>
+        </div>
+        <div class="button-row">
+          <button class="button gold" type="submit">Create Case</button>
+          <button class="button" type="button" id="refreshBtn">Refresh Queue</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="committee-panel">
+      <span class="eyebrow">Work queue</span>
+      <h2>Committee cases</h2>
+      <div id="queueList" class="queue-list"></div>
+    </section>
+  </main>
+
+  <section class="committee-panel" style="margin-top:16px">
+    <span class="eyebrow">Case actions</span>
+    <h2>Committee workflow controls</h2>
+    <form id="caseActionForm" class="committee-form">
+      <label>Case ID <input name="case_id" id="caseIdInput" placeholder="Select a queue case or paste case ID" /></label>
+      <label>Action note <textarea name="note" id="caseActionNote">Legal Skyes committee workflow update.</textarea></label>
+      <label>Refund amount, cents <input name="refund_cents" id="refundCentsInput" type="number" min="0" step="1" value="0" /></label>
+      <div class="action-grid">
+        <button class="button" type="button" data-case-action="evidence">Log Evidence</button>
+        <button class="button" type="button" data-case-action="assign-panel">Assign Panel</button>
+        <button class="button" type="button" data-case-action="schedule-review">Schedule Review</button>
+        <button class="button" type="button" data-case-action="recommendation">Recommendation</button>
+        <button class="button" type="button" data-case-action="refund-proposal">Refund Proposal</button>
+        <button class="button" type="button" data-case-action="decision">Decision</button>
+        <button class="button gold" type="button" data-case-action="paperwork-packet">Generate Packet</button>
+        <button class="button" type="button" data-case-action="close">Close Case</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="committee-panel" style="margin-top:16px">
+    <span class="eyebrow">Receipt</span>
+    <pre id="status" class="status-json">Loading dispute committee queue...</pre>
+  </section>
+</div>
+
+<script>
+(function () {
+  const $ = (sel) => document.querySelector(sel);
+  const status = $("#status");
+  function show(value) { status.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2); }
+  async function api(path, options = {}) {
+    const res = await fetch(path, {
+      ...options,
+      headers: {"content-type":"application/json", ...(options.headers || {})}
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  }
+  function renderQueues(data) {
+    const q = data.queues || {};
+    $("#metricOpen").textContent = q.cases?.open || 0;
+    $("#metricRefunds").textContent = q.refund_proposals?.count || 0;
+    $("#metricMembers").textContent = q.committee_members?.count || 0;
+    const cases = q.cases?.items || [];
+    $("#queueList").innerHTML = cases.length ? cases.map((item) => `
+      <article class="queue-card">
+        <h3>${item.title || item.id}</h3>
+        <p>Status: ${item.status || "open"}</p>
+        <p>Customer: ${item.customer?.email || "not recorded"}</p>
+        <p>Refund cap: $${Math.round((item.refundCap?.maxRefundCents || 0) / 100).toLocaleString()}</p>
+        <div class="button-row" style="margin-top:8px"><button type="button" class="button" data-select-case="${item.id}">Select</button></div>
+      </article>
+    `).join("") : '<article class="queue-card"><h3>No open dispute cases</h3><p>The committee queue is clear.</p></article>';
+    document.querySelectorAll("[data-select-case]").forEach((button) => {
+      button.addEventListener("click", () => { $("#caseIdInput").value = button.dataset.selectCase || ""; });
+    });
+    show(data);
+  }
+  async function runCaseAction(action) {
+    const caseId = $("#caseIdInput").value.trim();
+    if (!caseId) throw new Error("Select or paste a case ID first.");
+    const note = $("#caseActionNote").value;
+    const refundCents = Number($("#refundCentsInput").value || 0);
+    const base = `/api/sovereigndocs/dispute-committee/cases/${encodeURIComponent(caseId)}/${action}`;
+    const payloads = {
+      evidence:{title:"Committee evidence note", note},
+      "assign-panel":{members:[{name:"Certified Legal Skyes AE pending verification", email:"legal-skyes@solenterprises.org", credentialStatus:"legal_certification_verification_required", conflictsStatus:"pending_disclosure"}]},
+      "schedule-review":{title:"Legal Skyes committee review", scheduledFor:new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), notes:note},
+      recommendation:{recommendedOutcome:"owner_review", summary:note, refundAmountCents:refundCents},
+      "refund-proposal":{proposedRefundCents:refundCents, basis:note},
+      decision:{finalOutcome:"owner_decision_recorded", authorizedRefundCents:refundCents, notes:note},
+      "paperwork-packet":{title:"Legal Skyes dispute paperwork packet"},
+      close:{note}
+    };
+    return api(base, {method:"POST", body:JSON.stringify(payloads[action] || {note})});
+  }
+  async function load() {
+    try { renderQueues(await api("/api/sovereigndocs/dispute-committee/work-queues")); }
+    catch (error) { show(error.message); }
+  }
+  $("#refreshBtn").addEventListener("click", load);
+  document.querySelectorAll("[data-case-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      try {
+        const data = await runCaseAction(button.dataset.caseAction);
+        show(data);
+        await load();
+      } catch (error) {
+        show(error.message);
+      }
+    });
+  });
+  $("#intakeForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const payload = {
+      customer:{name:form.customer_name.value, email:form.customer_email.value},
+      transaction:{
+        orderId:form.order_id.value,
+        offerId:form.offer_id.value,
+        purchaseAmountCents:Number(form.purchase_amount_cents.value || 0),
+        overheadCents:Number(form.overhead_cents.value || 0),
+        currency:"usd"
+      },
+      issue:form.issue.value,
+      requestedRelief:form.requested_relief.value,
+      acceptLegalTerms:form.accept_legal_terms.checked,
+      acceptInHouseArbitration:form.accept_in_house_arbitration.checked,
+      acceptPaymentsRefunds:form.accept_payments_refunds.checked,
+      acceptNoOutcomeGuarantee:form.accept_no_outcome_guarantee.checked,
+      acceptTruthfulReviewBoundary:form.accept_truthful_review_boundary.checked
+    };
+    try {
+      const created = await api("/api/sovereigndocs/dispute-committee/intakes", {method:"POST", body:JSON.stringify(payload)});
+      form.reset();
+      show(created);
+      await load();
+    } catch (error) {
+      show(error.message);
+    }
+  });
+  load();
+})();
+</script>
+</body>
+</html>

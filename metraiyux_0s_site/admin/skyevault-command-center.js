@@ -4,6 +4,8 @@ const SkyeVaultCommandCenter = (() => {
     ledger: [],
     events: [],
     sessions: [],
+    autosyncProof: null,
+    autosyncNotify: null,
     actor: null,
     filters: {
       query: '',
@@ -37,7 +39,13 @@ const SkyeVaultCommandCenter = (() => {
     secretHandoffTitle: $('secretPackHandoffTitle'),
     secretHandoffDetail: $('secretPackHandoffDetail'),
     secretUnlockLink: $('secretPackUnlockLink'),
-    secretHandoffDismiss: $('secretPackHandoffDismiss')
+    secretHandoffDismiss: $('secretPackHandoffDismiss'),
+    autosyncProofCards: $('autosyncProofCards'),
+    autosyncNotifyEnabled: $('autosyncNotifyEnabled'),
+    autosyncNotifyTo: $('autosyncNotifyTo'),
+    autosyncNotifyThrottle: $('autosyncNotifyThrottle'),
+    saveAutosyncNotify: $('saveAutosyncNotify'),
+    autosyncNotifyStatus: $('autosyncNotifyStatus')
   };
 
   function cleanOrigin(value) {
@@ -64,6 +72,12 @@ const SkyeVaultCommandCenter = (() => {
     els.status.style.borderColor = ok ? 'rgba(143,255,210,.45)' : 'rgba(255,138,138,.55)';
   }
 
+  function setAutosyncNotifyStatus(message, ok = true) {
+    if (!els.autosyncNotifyStatus) return;
+    els.autosyncNotifyStatus.textContent = message;
+    els.autosyncNotifyStatus.style.borderColor = ok ? 'rgba(143,255,210,.45)' : 'rgba(255,138,138,.55)';
+  }
+
   function activeBearer() {
     const direct = window.SkygateAuthBridge?.token?.() || sessionStorage.getItem('adminBrainToken') || '';
     if (direct) return direct;
@@ -80,6 +94,8 @@ const SkyeVaultCommandCenter = (() => {
     const headers = { ...extra };
     if (bearer) {
       headers.authorization = `Bearer ${bearer}`;
+      headers['x-free99-gate-session'] = bearer;
+      headers['x-skye-gate-session'] = bearer;
       headers['x-skye-platform'] = 'metraiyux-0s-admin';
       headers['x-skye-usage-lane'] = 'skyevault-command-center';
     } else if (legacy) {
@@ -179,6 +195,130 @@ const SkyeVaultCommandCenter = (() => {
     els.bytes.textContent = formatBytes(total);
     els.secrets.textContent = `${secretCount}`;
     els.latest.textContent = latest?.completedAt ? new Date(latest.completedAt).toLocaleDateString() : 'None';
+  }
+
+  function compactHash(value) {
+    const text = String(value || '');
+    return text.length > 18 ? `${text.slice(0, 18)}...` : text;
+  }
+
+  function renderAutosyncProof(proof = {}) {
+    if (!els.autosyncProofCards) return;
+    const latest = proof.latestSuccess || {};
+    const current = proof.currentStatus || {};
+    const upload = proof.latestUpload || {};
+    const parity = proof.parity || {};
+    const daemon = proof.daemon || {};
+    const notifications = proof.notifications || {};
+    const cards = [
+      ['Latest vault success', latest.completedAt || 'No success yet', `${latest.mode || 'mode unknown'} · digest ${compactHash(latest.digest) || 'not recorded'}`],
+      ['Current repo digest', compactHash(current.digest) || 'Unknown', parity.currentDigestMatchesLatestSuccess ? 'Covered by latest encrypted artifact.' : 'Pending the next autosync tick.'],
+      ['Encrypted artifact', upload.receiptId || 'Not parsed', `${formatBytes(upload.artifactBytes || 0)} · sha ${compactHash(upload.artifactSha256) || 'not recorded'}`],
+      ['Daemon', daemon.watchRunning ? 'Running' : 'Not running', daemon.lastDaemonLine || 'No daemon heartbeat parsed.'],
+      ['Local-only critical', `${current.localOnlyCriticalCount ?? 0}`, `${current.secretLikeTotal ?? 0} secret-like markers counted; values are not published.`],
+      ['Email notices', notifications.enabled ? 'Enabled' : 'Disabled', notifications.lastResult?.reason || notifications.lastResult?.id || `Throttle ${notifications.throttleMinutes || 10} minutes.`]
+    ];
+    els.autosyncProofCards.innerHTML = cards.map(([title, value, detail]) => `
+      <article class="autosync-proof-card">
+        <span>${escapeHtml(title)}</span>
+        <b>${escapeHtml(value)}</b>
+        <span>${escapeHtml(detail)}</span>
+      </article>
+    `).join('');
+  }
+
+  async function loadAutosyncProof() {
+    if (!els.autosyncProofCards) return;
+    try {
+      const response = await fetch('../proof/skyevault-autosync-proof.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Proof JSON returned ${response.status}.`);
+      state.autosyncProof = await response.json();
+      renderAutosyncProof(state.autosyncProof);
+    } catch (error) {
+      els.autosyncProofCards.innerHTML = `
+        <article class="autosync-proof-card">
+          <span>Proof unavailable</span>
+          <b>Run build proof</b>
+          <span>${escapeHtml(error.message)} Use npm run vault:autosync:proof to refresh the published files.</span>
+        </article>
+      `;
+    }
+  }
+
+  function applyAutosyncNotifySettings(settings = {}) {
+    state.autosyncNotify = settings;
+    if (els.autosyncNotifyEnabled) els.autosyncNotifyEnabled.checked = Boolean(settings.enabled);
+    if (els.autosyncNotifyTo) els.autosyncNotifyTo.value = settings.notifyTo || '';
+    if (els.autosyncNotifyThrottle) els.autosyncNotifyThrottle.value = settings.throttleMinutes || 10;
+  }
+
+  function autosyncNotifyPayload() {
+    return {
+      enabled: Boolean(els.autosyncNotifyEnabled?.checked),
+      notifyTo: String(els.autosyncNotifyTo?.value || '').trim(),
+      throttleMinutes: Math.max(1, Math.min(1440, Number(els.autosyncNotifyThrottle?.value || 10) || 10))
+    };
+  }
+
+  function loadLocalAutosyncNotifyDraft() {
+    try {
+      return JSON.parse(localStorage.getItem('skyevault.autosyncNotifyDraft') || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  async function loadAutosyncNotifySettings() {
+    if (!els.autosyncNotifyStatus) return;
+    try {
+      const response = await fetch('/api/skyevault/autosync-notify-settings', {
+        cache: 'no-store',
+        headers: authHeaders()
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok === false) throw new Error(data.error || `Settings returned ${response.status}.`);
+      applyAutosyncNotifySettings(data.settings || {});
+      setAutosyncNotifyStatus(`Loaded autosync notification setting from ${data.storage || '0S Worker'}.
+Local daemon commands:
+${data.localCli?.enable || 'npm run vault:autosync:notify:on -- --to=you@example.com'}
+${data.localCli?.disable || 'npm run vault:autosync:notify:off'}
+${data.localCli?.status || 'npm run vault:autosync:notify:status'}`);
+    } catch (error) {
+      const draft = loadLocalAutosyncNotifyDraft();
+      applyAutosyncNotifySettings({ enabled: false, throttleMinutes: 10, ...draft });
+      setAutosyncNotifyStatus(`0S Worker setting is not reachable from this browser session: ${error.message}
+This panel saved a local browser draft only until the deployed Worker endpoint is available.
+Active local daemon commands:
+npm run vault:autosync:notify:on -- --to=you@example.com
+npm run vault:autosync:notify:off
+npm run vault:autosync:notify:status`, false);
+    }
+  }
+
+  async function saveAutosyncNotifySettings() {
+    if (!els.saveAutosyncNotify) return;
+    const payload = autosyncNotifyPayload();
+    els.saveAutosyncNotify.disabled = true;
+    try {
+      const response = await fetch('/api/skyevault/autosync-notify-settings', {
+        method: 'POST',
+        headers: authHeaders({ 'content-type': 'application/json' }),
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.ok === false) throw new Error(data.error || `Save returned ${response.status}.`);
+      applyAutosyncNotifySettings(data.settings || payload);
+      localStorage.setItem('skyevault.autosyncNotifyDraft', JSON.stringify(payload));
+      setAutosyncNotifyStatus(`Saved autosync email notifications: ${payload.enabled ? 'enabled' : 'disabled'}.
+The active local daemon also honors .skyevault-out/autosync-notify-settings.json; mirror this locally with npm run vault:autosync:notify:${payload.enabled ? 'on -- --to=' + (payload.notifyTo || 'you@example.com') : 'off'}.`);
+    } catch (error) {
+      localStorage.setItem('skyevault.autosyncNotifyDraft', JSON.stringify(payload));
+      setAutosyncNotifyStatus(`Could not save through the Worker endpoint: ${error.message}
+Saved a local browser draft. To affect the running local daemon now, run:
+npm run vault:autosync:notify:${payload.enabled ? 'on -- --to=' + (payload.notifyTo || 'you@example.com') : 'off'}`, false);
+    } finally {
+      els.saveAutosyncNotify.disabled = false;
+    }
   }
 
   function renderActor() {
@@ -290,9 +430,9 @@ const SkyeVaultCommandCenter = (() => {
       });
       window.open(data.downloadUrl, '_blank', 'noopener');
       const nextStep = securePack
-        ? '\nNext: open the decrypt console, choose the downloaded .skyesecrets file, inspect it, then enter the recipient passphrase and pepper if the pack requires one.'
+        ? '\nNext: open the decrypt console, choose the downloaded .skyesecrets file, inspect it, then enter the recipient passphrase and pepper if the pack requires one. That unlock material is encryption, not another login.'
         : '';
-      setStatus(`Signed download created for ${data.item?.fileName || entry.fileName || entry.id}.\nActor: ${data.actor?.actor || state.actor?.actor || 'admin'}\nExpires: ${data.expiresAt || 'unknown'}${nextStep}`);
+      setStatus(`Gate session accepted. Signed download ticket created for ${data.item?.fileName || entry.fileName || entry.id}.\nActor: ${data.actor?.actor || state.actor?.actor || 'admin'}\nExpires: ${data.expiresAt || 'unknown'}\nThis URL is a temporary file ticket, not a separate login.${nextStep}`);
       if (securePack) renderSecretPackHandoff(entry, data);
       await window.SkygateAuthBridge?.mirrorEvent?.('skyevault.receipt.download_link_created', {
         receipt_id: entry.id,
@@ -319,9 +459,9 @@ const SkyeVaultCommandCenter = (() => {
     localStorage.setItem('skyevault.commandCenter.origin', state.origin);
     if (els.legacy.value.trim()) localStorage.setItem('skyevault.legacyAdminToken', els.legacy.value.trim());
 
-    setStatus('Checking session and loading SkyeVault receipts...');
+    setStatus('Checking shared gate session and loading SkyeVault receipts...');
     const gate = await saveBearerIfPresent();
-    if (gate && gate.ok === false) throw new Error(gate.error || 'FS27 bearer was rejected.');
+    if (gate && gate.ok === false) throw new Error(gate.error || 'Shared gate bearer was rejected.');
 
     const data = await vaultApi('/api/admin-config?ledger=true&sessions=true&events=true');
     state.actor = data.actor || null;
@@ -380,6 +520,9 @@ const SkyeVaultCommandCenter = (() => {
     els.exportLedger.addEventListener('click', () => downloadExport('ledger').catch((error) => setStatus(error.message, false)));
     els.exportAll.addEventListener('click', () => downloadExport('all').catch((error) => setStatus(error.message, false)));
     els.secretHandoffDismiss?.addEventListener('click', () => els.secretHandoff?.classList.add('hidden'));
+    els.saveAutosyncNotify?.addEventListener('click', () => saveAutosyncNotifySettings());
+    loadAutosyncProof();
+    loadAutosyncNotifySettings();
     if (activeBearer()) loadVault().catch((error) => setStatus(error.message, false));
   }
 

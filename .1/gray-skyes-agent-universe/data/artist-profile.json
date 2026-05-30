@@ -1,0 +1,99 @@
+{
+  "schema": "gray-skyes.artist-profile.v1",
+  "generatedAt": "2026-05-23T16:28:07Z",
+  "artist": {
+    "id": "444666666666",
+    "slug": "gray-skyes",
+    "name": "Gray Skyes",
+    "legalWorkspaceName": "Gray Skyes 0S Founder Workspace",
+    "tagline": "SOLE Boosted, reaching Over every Skye.",
+    "role": "president-founder-artist",
+    "tier": "unlimited",
+    "platformLimits": {
+      "songs": "unlimited",
+      "videos": "unlimited",
+      "visuals": "unlimited",
+      "storage": "founder-unlimited",
+      "releaseBuilds": "founder-unlimited"
+    }
+  },
+  "workspace": {
+    "id": "gray-skyes-0s-founder-workspace",
+    "slug": "gray-skyes-founder",
+    "authLane": "FS27/SkyGate/Free99 shared gate",
+    "ownerAccess": "all-0s-admin",
+    "operatorScopes": [
+      "0s.admin",
+      "skye-music-nexus.admin",
+      "artist.release.write",
+      "artist.visuals.write",
+      "artist.dashboard.write",
+      "artist.analytics.read",
+      "relay13.inbox.write",
+      "skyenet.deploy.write"
+    ],
+    "appSpecificPasswordCreated": false
+  },
+  "artistIdPolicy": {
+    "selectionMode": "founder-selected",
+    "selectedId": "444666666666",
+    "immutableAfterReserve": true,
+    "collisionCheck": {
+      "status": "reserved-for-gray-skyes",
+      "registryFile": "metraiyux_0s_site/SkyeMusicNexus/data/gray-skyes-founder-provision.json"
+    },
+    "futureGeneration": {
+      "source": "0S artist ID generator",
+      "format": "12 digit numeric artist ID",
+      "rules": [
+        "artist may choose an available ID once",
+        "chosen IDs are reserved before first release publish",
+        "reserved IDs are immutable after workspace provision",
+        "collisions must block the claim and return alternate suggestions"
+      ]
+    }
+  },
+  "surfaces": {
+    "hub": "index.html",
+    "landingHero": "index.html",
+    "songOrbit": "orbit.html",
+    "heroRoom": "hero-video-universe.html",
+    "fieldNotes": "field-notes.html",
+    "artistCard": "founder-storyscape.html",
+    "dashboard": "dashboard.html",
+    "catalog": "catalog.html",
+    "releaseConsole": "release.html",
+    "videoRooms": "video-rooms.html"
+  },
+  "notificationQueue": [
+    {
+      "channel": "0s-inbox",
+      "recipient": "gray-skyes-founder-workspace",
+      "subject": "Gray Skyes founder artist workspace provisioned",
+      "status": "queued"
+    },
+    {
+      "channel": "email",
+      "recipient": "graylondonskyes@gmail.com",
+      "subject": "Gray Skyes paperwork and payments setup",
+      "status": "queued"
+    }
+  ],
+  "paperworkTasks": [
+    {
+      "id": "gray-payments-paperwork",
+      "title": "Complete artist payment paperwork",
+      "href": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/public/settings.html"
+    },
+    {
+      "id": "gray-contractor-packet",
+      "title": "Review contractor and release packet",
+      "href": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/"
+    },
+    {
+      "id": "gray-release-tracking",
+      "title": "Track visuals, uploads, releases, and fan access",
+      "href": "dashboard.html"
+    }
+  ]
+}

@@ -34,6 +34,6 @@ This pass turns PHX Verified from a seeded directory into a more complete verifi
 
 - Historical v12 proof was superseded by the May 19, 2026 seed cleanup.
 - Current active package: 19 published records, 0 blank phone/email/website records, and 0 active demo seed rows.
-- Current proof: `npm run smoke`, `npm run v21-smoke`, `npm run v22-smoke`, and `npm run v23-smoke` pass against the cleaned dataset.
+- Current proof: `npm run smoke`, `npm run v22-smoke`, and `npm run v23-smoke` pass against the cleaned dataset.
 
 No auth was added. Upstream auth should gate admin/operator/AE/revenue surfaces.

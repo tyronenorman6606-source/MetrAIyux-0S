@@ -1,193 +1,1345 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Founder Command | MetrAIyux 0S</title>
-  <meta name="theme-color" content="#080b0f" />
-  <link rel="icon" href="data:," />
+  <title>0meg4Command 6.7 | Founder Command</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#07090d" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="apple-touch-icon" href="/assets/metraiyux-0s-emblem-transparent.png" />
+  <link rel="preload" as="image" href="/assets/gray-london-skyes-founder-actual-source.png" />
+  <link rel="stylesheet" href="omega-command.css" />
 </head>
-<body>
-  <main class="phone-shell">
-    <header class="command-top">
-      <div>
-        <p class="eyebrow">MetrAIyux 0S</p>
-        <h1>Founder Command</h1>
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <div class="command-shell">
+    <div class="media-backdrop" aria-hidden="true">
+      <img class="backdrop-founder" src="/assets/gray-london-skyes-founder-actual-source.png" alt="" />
+      <img class="backdrop-logo backdrop-logo-sol" src="/assets/skyes-over-london-deity-logo.png" alt="" />
+      <img class="backdrop-logo backdrop-logo-zero" src="/assets/metraiyux-0s-logo-transparent.png" alt="" />
+      <img class="backdrop-proof" src="/client-app-factory/assets/proof/client-app-factory-workflow-poster.png" alt="" />
+    </div>
+
+    <header class="experience-header" aria-label="Founder command navigation">
+      <a class="brand-lockup" href="/founder-command/" aria-label="0meg4Command home">
+        <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London" />
+        <span>
+          <strong>0meg4Command 6.7</strong>
+          <small>Founder Command / 0S Source</small>
+        </span>
+      </a>
+
+      <div class="command-menu" id="commandMenu">
+        <button class="menu-trigger" id="commandMenuToggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="commandMenuPanel">
+          <span>Menu</span>
+          <strong id="commandMenuLabel">Command</strong>
+          <small aria-hidden="true">v</small>
+        </button>
+        <nav class="rail-nav dropdown-nav" id="commandMenuPanel" aria-label="Command workflow" hidden>
+          <label class="menu-search-wrap" for="commandMenuSearch">
+            <span>Find</span>
+            <input id="commandMenuSearch" type="search" placeholder="Search command, repo, songs..." autocomplete="off" />
+          </label>
+          <span class="menu-section-label">Operate</span>
+          <button class="nav-button active" data-view="command" type="button">Command</button>
+          <button class="nav-button" data-view="operations" type="button">Operations</button>
+          <button class="nav-button" data-view="core" type="button">Core Apps</button>
+          <button class="nav-button" data-view="calendar" type="button">Calendar</button>
+          <button class="nav-button" data-view="mailboxes" type="button">Mailboxes</button>
+          <button class="nav-button" data-view="clients" type="button">Clients</button>
+          <span class="menu-section-label">Vault</span>
+          <button class="nav-button" data-view="indexing" type="button">Indexing</button>
+          <button class="nav-button" data-view="assets" type="button">Real Assets</button>
+          <button class="nav-button" data-view="songs" type="button">Songs</button>
+          <button class="nav-button" data-view="repo-vault" type="button">Repo Vault</button>
+          <button class="nav-button" data-view="repo" type="button">Repo Memory</button>
+          <span class="menu-section-label">Build</span>
+          <button class="nav-button" data-view="skyenet" type="button">SkyeNet Backend</button>
+          <button class="nav-button" data-view="projects" type="button">Projects</button>
+          <button class="nav-button" data-view="founder" type="button">Founder Layer</button>
+          <button class="nav-button" data-view="templates" type="button">Intros</button>
+          <button class="nav-button" data-view="blocks" type="button">Blocks</button>
+          <button class="nav-button" data-view="backup" type="button">Backup</button>
+        </nav>
       </div>
-      <span id="gateState" class="state-pill">Locked</span>
+
+      <div class="rail-footer" aria-label="Gate status">
+        <span class="status-dot" id="railGateDot"></span>
+        <span id="railGateText">Checking gate</span>
+      </div>
     </header>
 
-    <section class="login-card" id="loginCard">
-      <p class="eyebrow">Owner gate</p>
-      <h2>Unlock mobile command.</h2>
-      <form id="loginForm">
-        <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Free99 / 0S gate code" required />
-        <button type="submit">Unlock</button>
-      </form>
-      <p id="loginStatus" class="muted"></p>
-    </section>
-
-    <section class="dash-grid" id="dashGrid">
-      <article class="status-card">
-        <span>Gate</span>
-        <strong id="gateConfigured">Locked</strong>
-      </article>
-      <article class="status-card">
-        <span>Queue</span>
-        <strong id="queueConfigured">Login</strong>
-      </article>
-      <article class="status-card">
-        <span>Storage</span>
-        <strong id="kvConfigured">Login</strong>
-      </article>
-    </section>
-
-    <nav class="tabbar" id="tabbar">
-      <button type="button" data-tab="command" aria-pressed="true">Command</button>
-      <button type="button" data-tab="inbox">Inbox</button>
-      <button type="button" data-tab="codes">Codes</button>
-      <button type="button" data-tab="recovery">Recovery</button>
-      <button type="button" data-tab="routes">Routes</button>
-    </nav>
-
-    <section class="panel active" data-panel="command">
-      <div class="panel-head">
-        <p class="eyebrow">Chat command</p>
-        <h2>Check live status and open controls.</h2>
-      </div>
-      <div id="chatFeed" class="chat-feed"></div>
-      <form id="commandForm" class="command-form">
-        <textarea id="commandInput" placeholder="Ask for status, open a route, or prepare a recovery/code action."></textarea>
-        <button type="submit">Send</button>
-      </form>
-    </section>
-
-    <section class="panel" data-panel="inbox">
-      <div class="panel-head">
-        <p class="eyebrow">Relay13 inbox</p>
-        <h2>Open and answer live site conversations.</h2>
-      </div>
-      <form id="inboxForm" class="code-form">
-        <label>Workspace
-          <input name="workspace" value="connectlog-main" />
-        </label>
-        <label>Subject
-          <input name="subject" placeholder="What should the Worker open?" />
-        </label>
-        <label>Contact name
-          <input name="customer_name" value="Founder Command" />
-        </label>
-        <label>Contact email
-          <input name="customer_email" type="email" placeholder="optional" />
-        </label>
-        <label>Message
-          <textarea name="message" placeholder="Tell Relay13 what this thread is for." required></textarea>
-        </label>
-        <button type="submit">Create Relay13 conversation</button>
-      </form>
-      <div id="inboxOutput" class="code-output"></div>
-      <div id="inboxList" class="conversation-list"></div>
-      <form id="inboxMessageForm" class="code-form compact-form">
-        <label>Conversation ID
-          <input name="conversation_id" id="inboxConversationId" placeholder="Select a thread below" />
-        </label>
-        <label>Workspace ID
-          <input name="workspace_id" id="inboxWorkspaceId" placeholder="Loaded from Relay13" />
-        </label>
-        <label>Reply as
-          <select name="sender_role">
-            <option value="operator" selected>Operator</option>
-            <option value="system">System</option>
-          </select>
-        </label>
-        <label>Reply
-          <textarea name="message" placeholder="Send an operator reply into Relay13."></textarea>
-        </label>
-        <button type="submit">Send Relay13 reply</button>
-      </form>
-      <div id="messageList" class="message-list"></div>
-    </section>
-
-    <section class="panel" data-panel="codes">
-      <div class="panel-head">
-        <p class="eyebrow">Gate codes</p>
-        <h2>Provision access with limits.</h2>
-      </div>
-      <form id="codeForm" class="code-form">
-        <label>Preset
-          <select name="code_type">
-            <option value="emergency">Emergency</option>
-            <option value="client" selected>Client</option>
-            <option value="operator">Operator</option>
-            <option value="prospect">Prospect</option>
-          </select>
-        </label>
-        <label>Client or workspace
-          <input name="client" placeholder="Valley Verified, Bob's, new client..." />
-        </label>
-        <div class="mini-grid">
-          <label>Uses <input name="max_uses" type="number" min="1" max="500" value="3" /></label>
-          <label>TTL min <input name="ttl_minutes" type="number" min="5" max="43200" value="1440" /></label>
-          <label>Seats <input name="seats" type="number" min="1" max="250" value="3" /></label>
-          <label>Actions/mo <input name="monthly_actions" type="number" min="1" max="100000" value="250" /></label>
+    <main class="command-main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Shared FS27 / SkyGate / Free99 owner lane</p>
+          <h1 class="neon-gradient-text">0meg4Command 6.7</h1>
         </div>
-        <label>Scope
-          <input name="scope" value="gate.login provision emergency" />
-        </label>
-        <label>Custom rules
-          <textarea name="custom_rules" placeholder="One rule per line"></textarea>
-        </label>
-        <button type="submit">Generate reveal-once code</button>
-      </form>
-      <div id="codeOutput" class="code-output"></div>
-      <div id="codeList" class="code-list"></div>
-    </section>
-
-    <section class="panel" data-panel="recovery">
-      <div class="panel-head">
-        <p class="eyebrow">Lockout recovery</p>
-        <h2>Issue restore keys and backup codes.</h2>
-      </div>
-      <form id="recoveryForm" class="code-form">
-        <label>Locked surface
-          <select name="surface">
-            <option value="skyebox">SkyeBox Authenticator</option>
-            <option value="gate">0S / Free99 Gate</option>
-            <option value="customer-onboarding">Customer onboarding</option>
-            <option value="founder-admin">Founder admin</option>
-          </select>
-        </label>
-        <label>Client, workspace, or company
-          <input name="client" placeholder="Valley Verified, Bob's, new client..." />
-        </label>
-        <label>Owner email
-          <input name="email" type="email" placeholder="owner@example.com" />
-        </label>
-        <div class="mini-grid">
-          <label>Backup codes <input name="backup_count" type="number" min="2" max="20" value="8" /></label>
-          <label>TTL min <input name="ttl_minutes" type="number" min="5" max="43200" value="1440" /></label>
-          <label>Uses <input name="max_uses" type="number" min="1" max="500" value="1" /></label>
-          <label>Seats <input name="seats" type="number" min="1" max="250" value="1" /></label>
+        <div class="top-actions">
+          <a class="button secondary" href="/admin/login.html?return=%2Ffounder-command%2F%3Fview%3Dcore%23pocket-skyemail">Owner Login</a>
+          <button class="button secondary" id="installFounderPwaBtn" type="button">Install PWA</button>
+          <button class="button secondary nav-button" data-view="repo-vault" type="button">Repo Drive</button>
+          <button class="button" id="exportWorkspaceBtn" type="button">Export Workspace</button>
         </div>
-        <label>Reason
-          <textarea name="notes" placeholder="Forgot SkyeBox password, locked client out, lost device, new owner handoff..."></textarea>
-        </label>
-        <button type="submit">Generate reveal-once recovery packet</button>
-      </form>
-      <div id="recoveryOutput" class="code-output"></div>
-      <div id="recoveryList" class="code-list"></div>
-    </section>
+      </header>
 
-    <section class="panel" data-panel="routes">
-      <div class="panel-head">
-        <p class="eyebrow">Direct controls</p>
-        <h2>Open the live 0S surfaces.</h2>
-      </div>
-      <div id="routeList" class="route-list"></div>
-    </section>
-  </main>
-  <script src="app.js" defer></script>
+      <section class="hero-console">
+        <div class="hero-copy">
+          <p class="eyebrow">Canonical command room</p>
+          <h2>Operate the 0S from one living founder surface.</h2>
+          <p class="muted">Route into the private consoles, carry the repo memory, use only real 0S assets, and package client work from one gate-owned surface.</p>
+          <div class="hero-actions">
+            <button class="button" id="refreshStatusBtn" type="button">Refresh Status</button>
+            <button class="button secondary" id="quickIndexingBtn" type="button">Indexing Pack</button>
+            <button class="button secondary" id="quickUploadBtn" type="button">Add Files</button>
+            <button class="button secondary" id="quickProjectBtn" type="button">New Project</button>
+          </div>
+          <div class="journey-grid" aria-label="Primary workflows">
+            <button class="journey-card nav-button" data-view="command" type="button">
+              <span>01</span><strong>Run owner controls</strong><small>Gate status, chat, Relay13, recovery</small>
+            </button>
+            <button class="journey-card nav-button" data-view="operations" type="button">
+              <span>00</span><strong>Run the company</strong><small>Founder account, Valley clients, AE, money, deploys</small>
+            </button>
+            <button class="journey-card nav-button" data-view="core" type="button">
+              <span>02</span><strong>Open pocket 0S</strong><small>SkyeMail, FS27, SkyePay, cards, builders</small>
+            </button>
+            <button class="journey-card nav-button" data-view="assets" type="button">
+              <span>03</span><strong>Use real assets</strong><small>0S files and local uploads only</small>
+            </button>
+            <button class="journey-card nav-button" data-view="songs" type="button">
+              <span>04</span><strong>Save song vault</strong><small>Copied masters and generated songs</small>
+            </button>
+            <button class="journey-card nav-button" data-view="repo" type="button">
+              <span>05</span><strong>Carry repo memory</strong><small>Agents, MCP, scripts, routes</small>
+            </button>
+            <button class="journey-card nav-button" data-view="repo-vault" type="button">
+              <span>06</span><strong>Stream repo vault</strong><small>Daemon proof, drive links, custody receipts</small>
+            </button>
+            <button class="journey-card nav-button" data-view="projects" type="button">
+              <span>07</span><strong>Package projects</strong><small>Intros, blocks, founder layer</small>
+            </button>
+            <button class="journey-card nav-button" data-view="calendar" type="button">
+              <span>08</span><strong>Schedule founder access</strong><small>SuperIDE SkyeCalendar, AE requests, SkyEmail alerts</small>
+            </button>
+            <button class="journey-card nav-button" data-view="mailboxes" type="button">
+              <span>09</span><strong>Manage mailbox seats</strong><small>Offboarding packets, provider release, tutorials</small>
+            </button>
+            <button class="journey-card nav-button" data-view="clients" type="button">
+              <span>10</span><strong>Open client credentials</strong><small>Bob, SupaBoy, Relay13, SkyEmail, QR links</small>
+            </button>
+            <button class="journey-card nav-button" data-view="indexing" type="button">
+              <span>11</span><strong>Submit index surfaces</strong><small>Sitemaps, Search Console, public crawl links</small>
+            </button>
+            <button class="journey-card nav-button" data-view="skyenet" type="button">
+              <span>12</span><strong>Fulfill SkyeNet backend</strong><small>Pricing, approval, deploy, functions, proof</small>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="metric-grid" aria-label="Workspace metrics">
+        <article class="metric-card"><span>Gate</span><strong id="metricGate">Checking</strong></article>
+        <article class="metric-card"><span>Company Ops</span><strong id="metricCompanyOps">Checking</strong></article>
+        <article class="metric-card"><span>Core Apps</span><strong id="metricCoreApps">0</strong></article>
+        <article class="metric-card"><span>Real Assets</span><strong id="metricAssets">0</strong></article>
+        <article class="metric-card"><span>Song Vault</span><strong id="metricSongVault">0</strong></article>
+        <article class="metric-card"><span>Repo Memory</span><strong id="metricRepo">0</strong></article>
+        <article class="metric-card"><span>Projects</span><strong id="metricProjects">0</strong></article>
+        <article class="metric-card"><span>Templates / Blocks</span><strong id="metricPieces">0</strong></article>
+        <article class="metric-card"><span>Calendar</span><strong id="metricCalendar">Checking</strong></article>
+        <article class="metric-card"><span>Mailbox Seats</span><strong id="metricMailboxes">Checking</strong></article>
+        <article class="metric-card"><span>Client Vault</span><strong id="metricClientVault">0</strong></article>
+        <article class="metric-card"><span>Indexing Pack</span><strong id="metricIndexing">0</strong></article>
+        <article class="metric-card"><span>Repo Vault</span><strong id="metricRepoVault">Checking</strong></article>
+        <article class="metric-card"><span>SkyeMerit</span><strong id="metricSkyemerit">Loaded</strong></article>
+      </section>
+
+      <section class="view active" id="view-command">
+        <section class="command-band">
+          <div>
+            <p class="eyebrow">Open now</p>
+            <h2>Founder surfaces</h2>
+          </div>
+          <div class="priority-grid" id="priorityGrid"></div>
+        </section>
+
+        <div class="split-grid pocket-os-grid">
+          <section class="panel" id="pocket-skyemail">
+            <div class="panel-head">
+              <p class="eyebrow">Synced pocket mail</p>
+              <h2>SkyeMail mini console</h2>
+            </div>
+            <p class="muted">The 0S main mailbox lives here as a compact owner lane. Full inbox actions still open the real SkyeMail app so the source system stays truthful.</p>
+            <div class="status-grid">
+              <div><span>Mailbox</span><strong id="pocketSkyEmailMailbox">Checking</strong></div>
+              <div><span>Unread</span><strong id="pocketSkyEmailUnread">Checking</strong></div>
+              <div><span>Sync</span><strong id="pocketSkyEmailSync">Checking</strong></div>
+            </div>
+            <div class="tool-row">
+              <button class="button" id="refreshPocketSkyEmailBtn" type="button">Refresh SkyeMail</button>
+              <a class="button secondary" id="pocketSkyEmailInboxLink" href="/live/SkyeMail/session-handoff.html?next=dashboard.html&from=founder-command" target="_blank" rel="noopener">Open Inbox</a>
+              <a class="button secondary" id="pocketSkyEmailComposeLink" href="/live/SkyeMail/session-handoff.html?next=compose.html&from=founder-command" target="_blank" rel="noopener">Compose</a>
+            </div>
+            <div class="pocket-message-list" id="pocketSkyEmailMessages"></div>
+            <pre class="output-box" id="pocketSkyEmailOutput">Pocket SkyeMail not synced yet.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Phone dock</p>
+              <h2>Core 0S shortcuts</h2>
+            </div>
+            <p class="muted">Launch the real deployed apps from this command room, including FS27, SkyePay, SkyeNet, business cards, and the card generators.</p>
+            <div class="app-dock compact" id="pocketCoreAppDock"></div>
+            <div class="tool-row">
+              <button class="button nav-button" data-view="core" type="button">Open Core Apps</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Live 0S controls</p>
+              <h2>Owner APIs</h2>
+            </div>
+            <p class="muted">Every request stays on the shared gate. No app-local admin credential exists here.</p>
+            <div class="status-grid">
+              <div><span>Storage</span><strong id="cmdStorageState">Checking</strong></div>
+              <div><span>Queue</span><strong id="cmdQueueState">Checking</strong></div>
+              <div><span>Actor</span><strong id="cmdActorState">Owner</strong></div>
+            </div>
+            <form class="stack-form" id="cmdChatForm">
+              <label for="cmdChatInput">Command Chat</label>
+              <textarea id="cmdChatInput" placeholder="Ask for routes, system status, recovery, Relay13 setup, or client app links."></textarea>
+              <button class="button" type="submit">Send Command</button>
+            </form>
+            <pre class="output-box" id="cmdChatOutput">Waiting for gate status.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Route access</p>
+              <h2>Consoles</h2>
+            </div>
+            <div class="route-grid" id="routeGrid"></div>
+          </section>
+        </div>
+
+        <div class="split-grid">
+          <section class="panel founder-skyemerit-panel" id="founderSkyemeritPanel">
+            <div class="panel-head">
+              <p class="eyebrow">Free99 / SkyeMerit pocket</p>
+              <h2>Founder no-charge code</h2>
+            </div>
+            <p class="muted">Stored behind Founder Command and the shared 0S gate so you do not have to remember another password. This is a gated SkyeMerit/Free99 lane, not anonymous access.</p>
+            <div class="skyemerit-code-card">
+              <span>SkyeMerit code</span>
+              <code id="founderSkyemeritCode">SKYEMUSICNEXUS-LAUNCH-2000</code>
+            </div>
+            <div class="status-grid skyemerit-status-grid">
+              <div><span>Pack</span><strong>SKYEMUSICNEXUS-LAUNCH-MERIT-PACK</strong></div>
+              <div><span>Value</span><strong>$2,000</strong></div>
+              <div><span>Auth</span><strong>Shared Gate</strong></div>
+            </div>
+            <div class="tool-row">
+              <button class="button" id="copyFounderSkyemeritBtn" type="button">Copy Code</button>
+              <a class="button secondary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;skyemerit_code=SKYEMUSICNEXUS-LAUNCH-2000" target="_blank" rel="noopener">Open SkyePay</a>
+              <a class="button secondary" href="/data/skyemusicnexus-pricing.json">Pricing Registry</a>
+              <a class="button secondary" href="/data/free99-entitlements.json">Free99 Rules</a>
+            </div>
+            <pre class="output-box" id="founderSkyemeritOutput">SkyeMerit ready: SKYEMUSICNEXUS-LAUNCH-2000</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Relay13</p>
+              <h2>Open a live inbox thread</h2>
+            </div>
+            <form class="stack-form" id="cmdInboxForm">
+              <div class="form-grid">
+                <label>Workspace<input name="workspace" value="connectlog-main" /></label>
+                <label>Subject<input name="subject" placeholder="Founder command thread" /></label>
+                <label>Name<input name="customer_name" value="Founder Command" /></label>
+                <label>Email<input name="customer_email" type="email" placeholder="optional" /></label>
+              </div>
+              <label>Message<textarea name="message" placeholder="Open this live lane for..."></textarea></label>
+              <button class="button secondary" type="submit">Create Conversation</button>
+            </form>
+            <pre class="output-box" id="cmdInboxOutput">No inbox action yet.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Recovery</p>
+              <h2>Gate material</h2>
+            </div>
+            <form class="stack-form" id="cmdRecoveryForm">
+              <div class="form-grid">
+                <label>Surface
+                  <select name="surface">
+                    <option value="gate">0S / Free99 Gate</option>
+                    <option value="skyebox">SkyeBox Authenticator</option>
+                    <option value="customer-onboarding">Customer onboarding</option>
+                    <option value="founder-admin">Founder admin</option>
+                  </select>
+                </label>
+                <label>Client<input name="client" placeholder="client / workspace" /></label>
+                <label>Owner email<input name="email" type="email" placeholder="owner@example.com" /></label>
+                <label>Backup codes<input name="backup_count" type="number" min="2" max="20" value="8" /></label>
+              </div>
+              <button class="button secondary" type="submit">Generate Recovery Packet</button>
+            </form>
+            <pre class="output-box" id="cmdRecoveryOutput">No recovery packet generated.</pre>
+          </section>
+        </div>
+
+        <section class="command-band">
+          <div>
+            <p class="eyebrow">Production lane</p>
+            <h2>Receipts and proof routes</h2>
+          </div>
+          <div class="priority-grid compact" id="productionGrid"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-operations">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Skyes Over London LC</p>
+            <h2>Founder work system</h2>
+          </div>
+          <div class="status-grid">
+            <div><span>Founder Account</span><strong id="companyOpsFounderState">Checking</strong></div>
+            <div><span>Valley Clients</span><strong id="companyOpsClientState">Checking</strong></div>
+            <div><span>Operating Lanes</span><strong id="companyOpsLaneState">Checking</strong></div>
+            <div><span>AE / Workforce</span><strong id="companyOpsAeState">Checking</strong></div>
+            <div><span>Money</span><strong id="companyOpsMoneyState">Checking</strong></div>
+            <div><span>Boundaries</span><strong id="companyOpsBoundaryState">Checking</strong></div>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="refreshCompanyOpsBtn" type="button">Refresh Operations</button>
+            <a class="button secondary" href="/Marketing-Made-Easy/AE-FlowPro/">AE FlowPro</a>
+            <a class="button secondary" href="/ae-command/">AE Command</a>
+            <a class="button secondary" href="/founder-command/apps/0s-command-bridge/">Command Bridge</a>
+            <a class="button secondary" href="/valley-verified/owner-crm/">Valley CRM</a>
+          </div>
+          <pre class="output-box" id="companyOpsOutput">Company work system not loaded yet.</pre>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Owner action router</p>
+            <h2>Run the 0S from Founder Command</h2>
+          </div>
+          <div class="status-grid">
+            <div><span>Catalog</span><strong id="founderActionCatalogState">Checking</strong></div>
+            <div><span>Executable</span><strong id="founderActionExecutableState">Checking</strong></div>
+            <div><span>Queue Only</span><strong id="founderActionQueueState">Checking</strong></div>
+            <div><span>High Risk</span><strong id="founderActionRiskState">Checking</strong></div>
+          </div>
+          <div class="code-form">
+            <label>Action<select id="founderActionSelect"></select></label>
+            <label>Params JSON<textarea id="founderActionParams" placeholder='{"summary":"Founder review","source_app":"founder-command"}'></textarea></label>
+            <label>Idempotency key<input id="founderActionIdempotency" placeholder="required for high-risk execution"></label>
+            <label><input id="founderActionConfirm" type="checkbox"> Confirm owner execution</label>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="refreshFounderActionsBtn" type="button">Refresh Actions</button>
+            <button class="button secondary" id="planFounderActionBtn" type="button">Plan</button>
+            <button class="button" id="executeFounderActionBtn" type="button">Execute</button>
+          </div>
+          <pre class="output-box" id="founderActionOutput">Founder action catalog not loaded yet.</pre>
+          <div class="route-grid" id="founderActionGrid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Nexus to Workforce</p>
+            <h2>Hire from an ad and claim a test job</h2>
+          </div>
+          <div class="status-grid">
+            <div><span>Nexus Ad</span><strong id="nexusHireAdState">Ready</strong></div>
+            <div><span>AEFlow Hire</span><strong id="nexusHireAeState">Ready</strong></div>
+            <div><span>Workforce</span><strong id="nexusHireWorkforceState">Ready</strong></div>
+            <div><span>Job Claim</span><strong id="nexusHireJobState">Ready</strong></div>
+          </div>
+          <div class="code-form">
+            <label>Candidate name<input id="nexusHireName" placeholder="Nexus hire candidate"></label>
+            <label>Candidate email<input id="nexusHireEmail" placeholder="candidate@example.com"></label>
+            <label>Candidate phone<input id="nexusHirePhone" placeholder="+15550100333"></label>
+            <label>Campaign id<input id="nexusHireCampaignId" placeholder="auto-generated if blank"></label>
+            <label>Job title<input id="nexusHireJobTitle" placeholder="Nexus hire workforce test job"></label>
+            <label>Idempotency key<input id="nexusHireIdempotency" placeholder="auto-generated if blank"></label>
+            <label>Notes<textarea id="nexusHireNotes" placeholder="Owner-reviewed hire proof notes"></textarea></label>
+          </div>
+          <div class="tool-row">
+            <button class="button secondary" id="nexusHirePlanBtn" type="button">Plan Hire Chain</button>
+            <button class="button" id="nexusHireRunBtn" type="button">Run Hire Chain</button>
+            <button class="button secondary" id="nexusHireRetryBtn" type="button">Retry Same Chain</button>
+            <button class="button secondary" id="nexusHirePrefillActionBtn" type="button">Prefill Router</button>
+            <a class="button secondary" href="/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel">Workforce</a>
+          </div>
+          <pre class="output-box" id="nexusHireOutput">Nexus ad hire to Workforce claim lane is ready for shared-gate owner execution.</pre>
+          <div class="route-grid" id="nexusHireChecklist"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Company enrollment</p>
+            <h2>Enroll a company across the 0S</h2>
+          </div>
+          <div class="status-grid">
+            <div><span>Account</span><strong id="companyEnrollAccountState">Ready</strong></div>
+            <div><span>Operations</span><strong id="companyEnrollOperationsState">9 lanes</strong></div>
+            <div><span>Identity</span><strong id="companyEnrollIdentityState">12 links</strong></div>
+            <div><span>Handoffs</span><strong id="companyEnrollHandoffState">Staged</strong></div>
+          </div>
+          <div class="code-form">
+            <label>Company<input id="companyEnrollName" placeholder="Client company"></label>
+            <label>Client id<input id="companyEnrollClientId" placeholder="auto-generated if blank"></label>
+            <label>Owner email<input id="companyEnrollOwnerEmail" placeholder="owner@example.com"></label>
+            <label>Workspace id<input id="companyEnrollWorkspaceId" placeholder="auto-generated if blank"></label>
+            <label>SkyeMail<input id="companyEnrollSkyEmail" placeholder="auto-generated if blank"></label>
+            <label>Notes<textarea id="companyEnrollNotes" placeholder="Owner-reviewed enrollment notes"></textarea></label>
+          </div>
+          <div class="tool-row">
+            <button class="button secondary" id="companyEnrollPlanBtn" type="button">Plan Enrollment</button>
+            <button class="button" id="companyEnrollRunBtn" type="button">Run Enrollment</button>
+            <button class="button secondary" id="companyEnrollRetryBtn" type="button">Retry Same Company</button>
+            <a class="button secondary" href="/api/founder-command/work-system" target="_blank" rel="noopener">Work System</a>
+          </div>
+          <pre class="output-box" id="companyEnrollOutput">Company enrollment is ready for shared-gate owner execution.</pre>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">AEFlow command lane</p>
+            <h2>Assign and close AE work</h2>
+          </div>
+          <div class="code-form">
+            <label>AE name<input id="aeCommandName" placeholder="Account Executive"></label>
+            <label>AE email<input id="aeCommandEmail" placeholder="ae@example.com"></label>
+            <label>Client / company<input id="aeCommandClient" placeholder="Client account"></label>
+            <label>Work item<input id="aeCommandTask" placeholder="Review lead, assign package, close next action"></label>
+            <label>Workflow id<input id="aeCommandWorkflowId" placeholder="auto-generated if blank"></label>
+            <label>Notes<textarea id="aeCommandNotes" placeholder="Owner-reviewed assignment notes"></textarea></label>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="aeCommandAssignBtn" type="button">Assign AE Work</button>
+            <button class="button secondary" id="aeCommandCloseBtn" type="button">Close Out</button>
+            <a class="button secondary" href="/api/founder-command/ae-flow/runtime/status" target="_blank" rel="noopener">Runtime Status</a>
+          </div>
+          <pre class="output-box" id="aeCommandOutput">AEFlow command lane is ready for shared-gate assignment.</pre>
+        </section>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Owner account</p>
+              <h2>Founder authority</h2>
+            </div>
+            <div class="route-grid" id="companyOpsFounderGrid"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Action queues</p>
+              <h2>Company command</h2>
+            </div>
+            <div class="route-grid" id="companyOpsQueueGrid"></div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Valley Verified</p>
+            <h2>Client accounts behind Founder Command</h2>
+          </div>
+          <div class="route-grid" id="companyOpsClientGrid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">0S lanes</p>
+            <h2>Core plus expansion operating map</h2>
+          </div>
+          <div class="route-grid" id="companyOpsLaneGrid"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-core">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">0S in your pocket</p>
+            <h2>Core apps launcher</h2>
+          </div>
+          <p class="muted">This tab is the deluxe Founder Command shell: launch the real 0S apps, keep the phone dock editable, and preview same-origin tools without rebuilding their logic inside this page.</p>
+          <div class="tool-row">
+            <button class="button" id="refreshCoreAppsBtn" type="button">Refresh Core Apps</button>
+            <button class="button secondary" id="openActiveCoreAppBtn" type="button">Open Selected Full App</button>
+            <button class="button secondary" id="coreAppFullscreenBtn" type="button">Full Screen Preview</button>
+            <button class="button secondary" id="resetCoreAppsBtn" type="button">Reset Defaults</button>
+            <button class="button secondary" id="copyCoreAppsBtn" type="button">Copy App Map</button>
+          </div>
+        </section>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Editable dock</p>
+              <h2>App shortcuts</h2>
+            </div>
+            <div class="app-dock" id="coreAppsGrid"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Partial launcher</p>
+              <h2 id="coreAppPreviewTitle">Choose an app</h2>
+            </div>
+            <p class="muted" id="coreAppPreviewMeta">Same-origin apps can be previewed here. External production apps open in a new tab when the browser blocks framing.</p>
+            <div class="phone-frame">
+              <iframe id="coreAppFrame" title="Core app preview" loading="lazy"></iframe>
+            </div>
+            <pre class="output-box" id="coreAppsOutput">No core app selected yet.</pre>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Change the dock</p>
+            <h2>Add or edit a core app</h2>
+          </div>
+          <form class="stack-form" id="coreAppForm">
+            <input id="coreAppId" type="hidden" />
+            <div class="form-grid">
+              <label>Name<input id="coreAppName" placeholder="Example: Business Card Factory" /></label>
+              <label>Category<input id="coreAppCategory" placeholder="business-cards" /></label>
+              <label>Route / URL<input id="coreAppHref" placeholder="/business-card-factory/" /></label>
+              <label>Mode
+                <select id="coreAppMode">
+                  <option value="embed">Preview inside Founder Command</option>
+                  <option value="new-tab">Open as full app</option>
+                </select>
+              </label>
+            </div>
+            <label>Notes<textarea id="coreAppNotes" placeholder="What this shortcut does and when to use it."></textarea></label>
+            <div class="tool-row">
+              <button class="button" type="submit">Save App</button>
+              <button class="button secondary" id="resetCoreAppFormBtn" type="button">Clear Form</button>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <section class="view" id="view-calendar">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Founder calendar</p>
+              <h2>Schedule owner time</h2>
+            </div>
+            <p class="muted">This is the source calendar lane for Founder Command. AE founder-access requests, artist drop checkpoints, publishing work, and owner notices write into the native 0S ledger first; provider mirror events are only claimed when the Worker gets a provider receipt.</p>
+            <div class="status-grid">
+              <div><span>Provider Mirror</span><strong id="calendarProviderState">Checking</strong></div>
+              <div><span>SkyEmail</span><strong id="skyEmailState">Checking</strong></div>
+              <div><span>Ledger</span><strong id="calendarLedgerState">Checking</strong></div>
+            </div>
+            <form class="stack-form" id="calendarForm">
+              <div class="form-grid">
+                <label>Topic<input name="topic" value="Founder access session" required /></label>
+                <label>Attendee email<input name="attendee_email" type="email" placeholder="ae@example.com" /></label>
+                <label>Start<input name="start_at" type="datetime-local" /></label>
+                <label>End<input name="end_at" type="datetime-local" /></label>
+                <label>Timezone<input name="timezone" value="America/Phoenix" /></label>
+                <label>Source
+                  <select name="source">
+                    <option value="founder-command-calendar">Founder Command</option>
+                    <option value="music-nexus-drop">Music Nexus drop</option>
+                    <option value="artist-founder-access">Artist founder access</option>
+                    <option value="routex-ae-founder-access">RouteX AE founder access</option>
+                    <option value="devisional-riftx-publication">DeVisional publication</option>
+                    <option value="skyedocx-blog-release">SkyeDocx Blog release</option>
+                    <option value="owner-office-hours">Owner office hours</option>
+                  </select>
+                </label>
+              </div>
+              <label>Notes<textarea name="description" placeholder="What this time is for."></textarea></label>
+              <div class="check-grid">
+                <label><input name="create_live" type="checkbox" /> Mirror to provider when configured</label>
+              </div>
+              <div class="tool-row">
+                <button class="button" type="submit">Save Calendar Item</button>
+                <button class="button secondary" id="refreshCalendarBtn" type="button">Refresh Calendar</button>
+                <a class="button secondary" href="/founder-command/apps/0s-calendar/">Open SuperIDE SkyeCalendar</a>
+              </div>
+            </form>
+            <pre class="output-box" id="calendarOutput">Calendar not loaded yet.</pre>
+          </section>
+
+          <section class="panel" id="skyemail">
+            <div class="panel-head">
+              <p class="eyebrow">0S notifications</p>
+              <h2>SkyEmail mailbox</h2>
+            </div>
+            <p class="muted">Provision the 0S notification mailbox here so calendar, AE, packet, and owner-system notices have a house inbox instead of scattering.</p>
+            <form class="stack-form" id="skyEmailForm">
+              <label>Mailbox<input name="skyemail" id="skyEmailInput" placeholder="metraiyux-0s@solenterprises.org" /></label>
+              <button class="button secondary" type="submit">Provision / Bind SkyEmail</button>
+            </form>
+            <pre class="output-box" id="skyEmailOutput">SkyEmail status not loaded yet.</pre>
+            <div class="list" id="calendarList"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-indexing">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Google indexing</p>
+            <h2>Submit pack</h2>
+          </div>
+          <div class="tool-row">
+            <a class="button" href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console</a>
+            <a class="button secondary" href="/founder-command/sitemap-indexing-agent.html">Indexing Agent</a>
+            <a class="button secondary" href="/seo/google-indexing-submission-links.html">Submission Links</a>
+            <button class="button secondary" id="copyIndexingLinksBtn" type="button">Copy Submit Pack</button>
+          </div>
+        </section>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Surfaces</p>
+              <h2>What to submit</h2>
+            </div>
+            <div class="list" id="indexingSurfaceGrid"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Copy block</p>
+              <h2>Indexing links</h2>
+            </div>
+            <pre class="output-box submit-pack" id="indexingSubmitPack">Loading submit links.</pre>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-clients">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Founder-only client vault</p>
+            <h2>Client and artist credentials and handoff maps</h2>
+          </div>
+          <p class="muted">This stores live URLs, Relay13/ConnectLog identifiers, reserved SkyEmail handoffs, QR destinations, email drafts, artist IDs, and activation boundaries. It does not create or expose an app-local password; access stays on the shared 0S/SkyGate lane.</p>
+	          <div class="status-grid">
+	            <div><span>SkyeRouteX</span><strong id="clientVaultSkyeRouteXState">Company ready</strong></div>
+	            <div><span>Bob app</span><strong id="clientVaultBobState">Live</strong></div>
+	            <div><span>SupaBoy</span><strong id="clientVaultSupaBoyState">Artist ready</strong></div>
+	            <div><span>Relay13</span><strong>Configured</strong></div>
+            <div><span>SkyEmail</span><strong>Reserved / changeable</strong></div>
+            <div><span>Auth</span><strong>Shared gate</strong></div>
+          </div>
+	          <div class="tool-row">
+	            <button class="button" data-client-copy="skyeroutex-logistics" type="button">Copy SkyeRouteX Company Map</button>
+	            <button class="button secondary" data-client-export="skyeroutex-logistics" type="button">Export SkyeRouteX JSON</button>
+	            <button class="button secondary" data-client-prefill="skyeroutex-logistics" type="button">Prefill SkyeRouteX Mail</button>
+	            <button class="button" data-client-copy="supaboy" type="button">Copy SupaBoy Internal Handoff</button>
+            <button class="button secondary" data-client-export="supaboy" type="button">Export SupaBoy Internal JSON</button>
+            <button class="button secondary" data-client-prefill="supaboy" type="button">Prefill SupaBoy Handoff</button>
+            <button class="button" id="copyBobCredentialPackBtn" type="button">Copy Bob Internal Handoff</button>
+            <button class="button secondary" id="exportBobCredentialPackBtn" type="button">Export Bob Internal JSON</button>
+	            <button class="button secondary" id="prefillBobHandoffBtn" type="button">Prefill SkyeMail Handoff</button>
+	            <a class="button secondary" href="/SkyeRouteX/" target="_blank" rel="noopener">Open SkyeRouteX Company Site</a>
+	            <a class="button secondary" href="/SkyeRouteX/dashboard.html" target="_blank" rel="noopener">Open Dispatch Dashboard</a>
+	            <a class="button secondary" href="/SkyeRouteX/routes.html" target="_blank" rel="noopener">Open Routes</a>
+	            <a class="button secondary" href="/SkyeRouteX/stops.html" target="_blank" rel="noopener">Open Stops</a>
+	            <a class="button secondary" href="/SkyeRouteX/runtime.html" target="_blank" rel="noopener">Open Runtime Map</a>
+	            <a class="button secondary" href="/docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md" target="_blank" rel="noopener">Open Operating Map</a>
+	            <a class="button secondary" href="/founder-command/client-credentials/skyeroutex-logistics.json" target="_blank" rel="noopener">Open SkyeRouteX Internal JSON</a>
+	            <a class="button secondary" href="/founder-command/client-credentials/supaboy.json" target="_blank" rel="noopener">Open SupaBoy Internal JSON</a>
+            <a class="button secondary" href="/founder-command/client-credentials/bobs-smoke-shop.json" target="_blank" rel="noopener">Open Bob Internal JSON</a>
+          </div>
+          <pre class="output-box" id="clientCredentialOutput">Founder-only handoff map ready. Client-facing links are the review page, flyer, and live app.</pre>
+        </section>
+        <section class="list" id="clientCredentialGrid"></section>
+      </section>
+
+      <section class="view" id="view-mailboxes">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">SkyeMail provider seats</p>
+              <h2>Mailbox offboarding</h2>
+            </div>
+            <p class="muted">Prepare offboarding first, archive the mailbox, release the provider seat, then confirm release here so SkyeMail logs the receipt and stops routing through the old mailbox.</p>
+            <div class="status-grid">
+              <div><span>Offboarding API</span><strong id="mailboxOffboardingState">Checking</strong></div>
+              <div><span>Service token</span><strong id="mailboxOffboardingServiceState">Checking</strong></div>
+              <div><span>Handoffs</span><strong id="mailboxHandoffState">Checking</strong></div>
+            </div>
+            <form class="stack-form" id="mailboxOffboardingForm">
+              <div class="form-grid">
+                <label>Mailbox email<input name="mailbox_email" id="mailboxOffboardingEmail" type="email" placeholder="client@solenterprises.org" /></label>
+                <label>Workspace / client<input name="workspace_id" id="mailboxOffboardingWorkspace" placeholder="workspace id or client slug" /></label>
+              </div>
+              <label>Reason / notes<textarea name="reason" id="mailboxOffboardingReason" placeholder="Why this mailbox is being released or reassigned."></textarea></label>
+              <div class="check-grid">
+                <label><input name="confirm_archive_exported" type="checkbox" /> Archive/export complete</label>
+                <label><input name="confirm_client_notified" type="checkbox" /> Client/operator notified</label>
+                <label><input name="confirm_provider_released" type="checkbox" /> Provider seat released</label>
+              </div>
+              <div class="tool-row">
+                <button class="button secondary" id="refreshMailboxOffboardingBtn" type="button">Check Status</button>
+                <button class="button" type="submit">Prepare Packet</button>
+                <button class="button secondary" id="releaseMailboxOffboardingBtn" type="button">Confirm Seat Released</button>
+                <button class="button danger" id="cancelMailboxOffboardingBtn" type="button">Cancel Offboarding</button>
+              </div>
+            </form>
+            <pre class="output-box" id="mailboxOffboardingOutput">Mailbox offboarding not loaded yet.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Never get lost</p>
+              <h2>Mailbox runbook</h2>
+            </div>
+            <div class="list">
+              <article class="route-card">
+                <strong>1. Prepare the packet</strong>
+                <span>Enter mailbox or workspace, then prepare. This creates the receipt and marks the mailbox as offboarding pending.</span>
+              </article>
+              <article class="route-card">
+                <strong>2. Export mail first</strong>
+                <span>Use the provider admin console to archive/export the mailbox before you delete, disable, or reassign it.</span>
+              </article>
+              <article class="route-card">
+                <strong>3. Release the provider seat</strong>
+                <span>After the provider console shows the license/seat is free, confirm release here. SkyeMail disables aliases and logs Citadel/FS27 proof.</span>
+              </article>
+              <a class="route-card" href="/admin/tutorial/29-skyemail-mailbox-offboarding.html">
+                <strong>Open full tutorial</strong>
+                <span>/admin/tutorial/29-skyemail-mailbox-offboarding.html</span>
+              </a>
+              <a class="route-card" href="/api/founder-command/skyemail/offboarding">
+                <strong>Open API status route</strong>
+                <span>/api/founder-command/skyemail/offboarding</span>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <div class="split-grid" id="workspace-handoffs">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Client workspace handoff</p>
+              <h2>QR welcome card</h2>
+            </div>
+            <p class="muted">Create a SkyeMail workspace packet, hand the owner a QR/link, and keep the backup receipt in Founder Command. Owners claim through the shared 0S Gate and set/change their own password/vault key.</p>
+            <form class="stack-form" id="skyEmailHandoffForm">
+              <div class="form-grid">
+                <label>Business / workspace<input name="company_name" placeholder="Example: Empire Pallets" /></label>
+                <label>Owner email<input name="owner_email" type="email" placeholder="owner@example.com" /></label>
+                <label>Workspace handle<input name="workspace_handle" placeholder="business-handle" /></label>
+                <label>Mailbox local<input name="mailbox_local" placeholder="business" /></label>
+                <label>Domain<input name="domain" placeholder="solenterprises.org" /></label>
+                <label>Plan<input name="plan_id" value="client-skymail-launch" /></label>
+              </div>
+              <label>Welcome message<textarea name="welcome_message" placeholder="Your SkyeMail workspace is ready. Scan, claim, and start running the inbox."></textarea></label>
+              <label>Welcome video URL<input name="welcome_video_url" value="https://skyemail-platform.graylondonskyes.workers.dev/proof/videos/skymail-live-proof-browser.webm" /></label>
+              <div class="check-grid">
+                <label><input name="send_email" type="checkbox" /> Send welcome email when created</label>
+                <label><input name="main_0s" type="checkbox" /> Make this the 0S main contact lane</label>
+              </div>
+              <div class="tool-row">
+                <button class="button" type="submit">Create Handoff</button>
+                <button class="button secondary" id="createMainSkyEmailWorkspaceBtn" type="button">Create 0S Main Workspace</button>
+                <button class="button secondary" id="refreshSkyEmailHandoffsBtn" type="button">Refresh Handoffs</button>
+              </div>
+            </form>
+            <pre class="output-box" id="skyEmailHandoffOutput">No SkyeMail workspace handoff created yet.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Animated welcome</p>
+              <h2>Client owner packet</h2>
+            </div>
+            <div class="handoff-preview" id="skyEmailHandoffPreview">
+              <div class="handoff-video">
+                <video src="https://skyemail-platform.graylondonskyes.workers.dev/proof/videos/skymail-live-proof-browser.webm" muted autoplay loop playsinline></video>
+              </div>
+              <div class="handoff-card">
+                <div class="qr-box" id="skyEmailHandoffQr"><span>QR appears after handoff.</span></div>
+                <div>
+                  <strong id="skyEmailHandoffTitle">SkyeMail Launch Spark</strong>
+                  <p id="skyEmailHandoffText">Business owners get a claim link, mailbox, welcome message, and a SkyeMerit offer after their first inbox action.</p>
+                  <a class="button secondary" id="skyEmailHandoffLink" href="https://skyemail-platform.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Open SkyeMail</a>
+                </div>
+              </div>
+            </div>
+            <div class="list" id="skyEmailHandoffList"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-assets">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Real 0S assets</p>
+            <h2>Repo-backed files only</h2>
+          </div>
+          <p class="muted">These are actual files available in the 0S surface or uploads stored in your browser. The asset lane now shows repo-backed media and your own local additions.</p>
+          <div class="tool-row">
+            <input id="assetSearch" placeholder="Search files, notes, paths..." />
+            <select id="assetCategoryFilter"><option value="all">All categories</option></select>
+            <button class="button secondary" id="assetUploadBtn" type="button">Add Files</button>
+            <input id="assetFileInput" type="file" multiple hidden />
+          </div>
+          <div class="dropzone" id="assetDropzone">
+            <strong>Drop real files here</strong>
+            <span>Uploads stay local in this browser until you export a workspace JSON.</span>
+          </div>
+        </section>
+        <section class="asset-grid" id="assetGrid"></section>
+      </section>
+
+      <section class="view" id="view-songs">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Founder song vault</p>
+            <h2>Browser-downloadable music copies</h2>
+          </div>
+          <p class="muted">These audio files are copied into Founder Command at <code>metraiyux_0s_site/founder-command/song-vault/</code>. Exact duplicate sources are deduped by hash and recorded in the manifest.</p>
+          <div class="status-grid">
+            <div><span>Songs</span><strong id="songVaultCount">0</strong></div>
+            <div><span>Storage</span><strong id="songVaultSize">0 MB</strong></div>
+            <div><span>Generated</span><strong id="songVaultGenerated">Loading</strong></div>
+            <div><span>Root</span><strong id="songVaultRoot">song-vault</strong></div>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="songRadioPlayBtn" type="button">Play Vault</button>
+            <button class="button secondary" id="songRadioPrevBtn" type="button">Prev</button>
+            <button class="button secondary" id="songRadioNextBtn" type="button">Next</button>
+            <input id="songSearch" placeholder="Search songs, sources, hashes..." />
+            <select id="songCollectionFilter"><option value="all">All collections</option></select>
+            <button class="button" id="downloadAllSongsBtn" type="button">Download All Songs</button>
+            <button class="button secondary" id="downloadSongVaultManifestBtn" type="button">Download Manifest</button>
+            <button class="button secondary" id="copySongVaultSummaryBtn" type="button">Copy Summary</button>
+          </div>
+          <div class="song-radio-player">
+            <div>
+              <span>Now playing</span>
+              <strong id="songRadioTitle">Choose a song or press Play Vault.</strong>
+              <small id="songRadioMeta">Audio loads through the shared 0S owner gate.</small>
+            </div>
+            <div class="song-radio-controls">
+              <audio id="songRadioAudio" controls preload="metadata" playsinline></audio>
+              <a class="button secondary song-radio-open-link" id="songRadioOpenLink" href="" target="_blank" rel="noopener" hidden>Open Audio</a>
+            </div>
+          </div>
+        </section>
+        <section class="song-vault-grid" id="songVaultGrid"></section>
+      </section>
+
+      <section class="view" id="view-repo-vault">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">SkyeVault repo drive</p>
+            <h2>Daemon proof streamed into Founder Command</h2>
+          </div>
+          <p class="muted">This lane reads the deployed SkyeVault autosync proof, proof log, and redacted vault map through the shared 0S gate. It does not expose raw repo file bodies or secret values in the browser.</p>
+          <div class="status-grid">
+            <div><span>Daemon</span><strong id="repoVaultDaemonState">Checking</strong></div>
+            <div><span>Repo head</span><strong id="repoVaultHeadState">Checking</strong></div>
+            <div><span>Latest upload</span><strong id="repoVaultUploadState">Checking</strong></div>
+            <div><span>Delta</span><strong id="repoVaultDeltaState">Checking</strong></div>
+            <div><span>Proof</span><strong id="repoVaultProofState">Checking</strong></div>
+            <div><span>Safety</span><strong id="repoVaultSafetyState">Checking</strong></div>
+            <div><span>Project paths</span><strong id="repoVaultProjectState">Checking</strong></div>
+            <div><span>Manifest chunks</span><strong id="repoVaultChunkState">Checking</strong></div>
+            <div><span>Loaded drive</span><strong id="repoVaultLoadedState">0 paths</strong></div>
+            <div><span>Download</span><strong id="repoVaultDownloadState">Checking</strong></div>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="refreshRepoVaultBtn" type="button">Refresh Repo Vault</button>
+            <button class="button" id="downloadFullRepoBackupBtn" type="button">Download Full Backup</button>
+            <button class="button" id="loadFullRepoDriveBtn" type="button">Load Full Drive</button>
+            <button class="button secondary" id="downloadRepoVaultDriveBtn" type="button">Download Loaded Index</button>
+            <button class="button secondary" id="copyRepoVaultSummaryBtn" type="button">Copy Summary</button>
+            <a class="button secondary" id="repoVaultLatestBackupLink" href="/proof/skyevault-autosync-proof.json">Latest Backup Receipt</a>
+            <a class="button secondary" href="/admin/skyevault-command-center.html">Open Command Center</a>
+            <a class="button secondary" href="/Free99/apps/skyevaultpro/drive/index.html">Open Drive</a>
+          </div>
+          <pre class="output-box" id="repoVaultOutput">Repo vault not streamed yet.</pre>
+        </section>
+
+        <section class="panel repo-vault-drive-panel">
+          <div class="panel-head">
+            <p class="eyebrow">Whole repo backup</p>
+            <h2>Full drive and custody lanes</h2>
+          </div>
+          <p class="muted">Load the chunked manifest to browse the whole repo index from 0meg4Command. Raw private bodies and secret values stay in encrypted SkyeVault custody.</p>
+          <div class="repo-vault-download-strip">
+            <div>
+              <strong id="repoVaultFullBackupName">Encrypted full backup</strong>
+              <span id="repoVaultFullBackupMeta">Waiting for the latest SkyeVault receipt.</span>
+            </div>
+            <div class="tool-row">
+              <button class="button" id="downloadFullRepoBackupPanelBtn" type="button">Download Encrypted Repo Backup</button>
+              <a class="button secondary" id="repoVaultSignedDownloadLink" href="" target="_blank" rel="noopener" hidden>Open Minted Link</a>
+              <a class="button secondary" id="repoVaultRecoveryPortalLink" href="/proof/skyevault-autosync-proof.json">Recovery Portal</a>
+            </div>
+          </div>
+          <div class="drive-command-grid" id="repoVaultBackupGrid"></div>
+        </section>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Full project map</p>
+              <h2>MetrAIyux-0S tree</h2>
+            </div>
+            <p class="muted">Top-level directories are pulled from the repo vault manifest so this view shows the real project, not only embedded agent notes.</p>
+            <div class="list" id="repoVaultProjectTopLevel"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Path browser</p>
+              <h2>Project files</h2>
+            </div>
+            <p class="muted" id="repoVaultProjectTreeMeta">Load a chunk, or load the full drive, then search here.</p>
+            <div class="tool-row">
+              <input id="repoVaultProjectSearch" placeholder="Search metraiyux_0s_site, SkyeMusicNexus, SovereignDocs, worker.js..." />
+            </div>
+            <div class="list repo-vault-project-tree" id="repoVaultProjectTree"></div>
+          </section>
+        </div>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Drive routes</p>
+              <h2>Vault surfaces</h2>
+            </div>
+            <div class="list" id="repoVaultLinkGrid"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Safe streams</p>
+              <h2>Files available here</h2>
+            </div>
+            <div class="list" id="repoVaultStreamGrid"></div>
+          </section>
+        </div>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Vault map</p>
+              <h2>Receipt custody</h2>
+            </div>
+            <pre class="output-box" id="repoVaultMapSummary">Vault map not loaded.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Daemon commands</p>
+              <h2>Operator runners</h2>
+            </div>
+            <div class="list" id="repoVaultCommandList"></div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Chunked full manifest</p>
+            <h2>Load any part of the full project</h2>
+          </div>
+          <p class="muted">The full project is split into chunks so the phone command center stays fast. Load a chunk, then search within it above.</p>
+          <div class="list" id="repoVaultChunkGrid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Recent autosync proof log</p>
+            <h2>Heartbeat history</h2>
+          </div>
+          <div class="list" id="repoVaultRecentLog"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-repo">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Repo memory</p>
+            <h2>Safe copies loaded from this workspace</h2>
+          </div>
+          <p class="muted">Agent instructions, MCP usage, route links, package scripts, and a redacted root env key inventory are embedded here. Secret values are not copied into the browser app.</p>
+          <div class="tool-row">
+            <input id="repoSearch" placeholder="Search repo memory..." />
+            <button class="button secondary" id="copyRepoMemoryBtn" type="button">Copy Selected</button>
+            <button class="button secondary" id="downloadRepoMemoryBtn" type="button">Download Selected</button>
+          </div>
+        </section>
+        <div class="repo-layout">
+          <section class="panel"><div class="memory-list" id="repoMemoryList"></div></section>
+          <section class="panel repo-reader">
+            <div class="panel-head">
+              <p class="eyebrow" id="repoReaderKind">Memory</p>
+              <h2 id="repoReaderTitle">Choose a file</h2>
+            </div>
+            <p class="muted" id="repoReaderPath"></p>
+            <pre id="repoReaderText">Choose a repo memory item on the left.</pre>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-projects">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Project kits</p>
+              <h2>Create or update</h2>
+            </div>
+            <form class="stack-form" id="projectForm">
+              <input id="projectId" type="hidden" />
+              <label>Project name<input id="projectName" required placeholder="Example: Media Over London integration" /></label>
+              <label>Slug<input id="projectSlug" placeholder="auto-generated" /></label>
+              <label>Description<textarea id="projectDescription" placeholder="What this project needs to carry."></textarea></label>
+              <label>Intro template<select id="projectIntroTemplate"></select></label>
+              <label>Notes<textarea id="projectNotes" placeholder="Routes, handoff notes, build rules."></textarea></label>
+              <div class="check-grid">
+                <label><input id="includeFounderPage" type="checkbox" /> Founder page</label>
+                <label><input id="includeFounderSection" type="checkbox" /> Founder block</label>
+                <label><input id="includeFooterSnippet" type="checkbox" /> Footer block</label>
+              </div>
+              <div class="tool-row">
+                <button class="button" type="submit">Save Project</button>
+                <button class="button secondary" id="resetProjectFormBtn" type="button">Reset</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Assignments</p>
+              <h2>Assets and blocks</h2>
+            </div>
+            <div id="projectAssignmentPanel" class="empty-state">Choose a project from the list below.</div>
+          </section>
+        </div>
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Saved manifests</p>
+            <h2>Projects</h2>
+          </div>
+          <div class="list" id="projectList"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-skyenet">
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">SkyeNet backend fulfillment</p>
+            <h2>When a client buys backend functions, follow this lane.</h2>
+          </div>
+          <p class="muted">This page keeps the sales promise clean: SkyeNet is live for static apps and approved managed functions. Unlimited arbitrary customer code is not sold until the isolated SkyeNet Sovereign Runtime is fully proven.</p>
+          <div class="status-grid">
+            <div><span>Platform</span><strong>SkyeNet live</strong></div>
+            <div><span>Static deploys</span><strong>Ready now</strong></div>
+            <div><span>Managed functions</span><strong>Owner approved</strong></div>
+            <div><span>Untrusted code</span><strong>Runtime reserve only</strong></div>
+          </div>
+          <div class="tool-row">
+            <a class="button" href="https://skyenet.graylondonskyes.workers.dev/console" target="_blank" rel="noopener">Open SkyeNet Console</a>
+            <a class="button secondary" href="https://skyenet.graylondonskyes.workers.dev/publish/" target="_blank" rel="noopener">Open Publish Guide</a>
+            <a class="button secondary" href="/docs/SKYENET_FUNCTIONS_NETLIFY_PARITY.md" target="_blank" rel="noopener">Functions Doc</a>
+            <a class="button secondary" href="/docs/SKYENET_HYBRID_RELEASE_ARCHITECTURE.md" target="_blank" rel="noopener">Runtime Map</a>
+          </div>
+          <div class="list">
+            <article class="route-card"><strong>1. Review</strong><span>Confirm the paid plan, endpoint list, auth shape, body limits, timeout expectations, secrets, and outbound fetch needs before promising execution.</span></article>
+            <article class="route-card"><strong>2. Package</strong><span>Convert Netlify-style functions into the SkyeNet managed bundle lane, keep source custody founder/account scoped, and attach the private full source package.</span></article>
+            <article class="route-card"><strong>3. Sign</strong><span>Run the approved function proof, require the managed signature lane, and keep untrusted customer code out of production unless a runtime reserve has been approved.</span></article>
+            <article class="route-card"><strong>4. Manage</strong><span>Deploy, verify public routes, redacted env variables, source download gating, source transfer receipts, and the client-facing live handoff.</span></article>
+          </div>
+        </section>
+
+        <section class="skyenet-plan-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Backend review</p>
+              <h2>Edge Growth</h2>
+            </div>
+            <div class="price-line">$997 setup + $297/mo</div>
+            <p class="muted">Use when the client may need light backend work, one approved custom domain, or a managed review before real functions are activated.</p>
+            <ul class="runbook-list">
+              <li>100 deployments per month</li>
+              <li>5 public routes</li>
+              <li>1 approved custom domain</li>
+              <li>Managed function review, not automatic execution</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Main backend offer</p>
+              <h2>Functions Managed</h2>
+            </div>
+            <div class="price-line">$1,500 setup + $497/mo</div>
+            <p class="muted">Use when they bought real approved backend behavior: lead APIs, forms, webhooks, protected admin actions, signed integrations, or small app backends.</p>
+            <ul class="runbook-list">
+              <li>150 deployments per month</li>
+              <li>8 public routes</li>
+              <li>2 approved custom domains</li>
+              <li>Owner-reviewed, signed, managed function bundles</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Dedicated runtime</p>
+              <h2>Sovereign Runtime Reserve</h2>
+            </div>
+            <div class="price-line">$5,000 setup + $997/mo</div>
+            <p class="muted">Use when they need heavier backend scope, dedicated runtime capacity, stronger isolation, higher retention, or deeper platform ownership.</p>
+            <ul class="runbook-list">
+              <li>300 deployments per month</li>
+              <li>20 public routes</li>
+              <li>5 approved custom domains</li>
+              <li>Reserved isolated runtime lane</li>
+            </ul>
+          </article>
+        </section>
+
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Fulfillment generator</p>
+              <h2>Build the runbook for this client</h2>
+            </div>
+            <form class="stack-form" id="skyenetBackendForm">
+              <div class="form-grid">
+                <label>Client name<input name="client_name" value="New SkyeNet client" /></label>
+                <label>Company slug<input name="company_slug" value="client-company" /></label>
+                <label>Project slug<input name="project_slug" value="client-app" /></label>
+                <label>Workspace slug<input name="workspace_slug" value="client-company" /></label>
+                <label>Build folder<input name="build_dir" value="dist" /></label>
+                <label>Plan
+                  <select name="plan_id">
+                    <option value="skyenet-functions-managed">Functions Managed - $1,500 setup + $497/mo</option>
+                    <option value="skyenet-edge-growth">Edge Growth - $997 setup + $297/mo</option>
+                    <option value="skyenet-sovereign-runtime-reserve">Sovereign Runtime Reserve - $5,000 setup + $997/mo</option>
+                  </select>
+                </label>
+                <label>Function folder<input name="function_root" value="netlify/functions" /></label>
+                <label>First function to test<input name="test_function" value="hello" /></label>
+              </div>
+              <label>Backend scope<textarea name="backend_scope" placeholder="Example: contact form API, lead notification webhook, protected admin update route, Stripe webhook, CRM sync."></textarea></label>
+              <div class="check-grid">
+                <label><input name="has_functions" type="checkbox" checked /> Client bought approved backend functions</label>
+                <label><input name="needs_runtime_reserve" type="checkbox" /> Needs isolated runtime reserve</label>
+                <label><input name="has_custom_domain" type="checkbox" /> Has approved custom domain</label>
+              </div>
+              <div class="tool-row">
+                <button class="button" type="submit">Generate Runbook</button>
+                <button class="button secondary" id="copySkyeNetBackendRunbookBtn" type="button">Copy Runbook</button>
+                <button class="button secondary" id="downloadSkyeNetBackendRunbookBtn" type="button">Download Runbook</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Client intake</p>
+              <h2>Do not start without these.</h2>
+            </div>
+            <div class="list">
+              <article class="route-card"><strong>1. Paid plan and receipt</strong><span>Confirm which SkyeNet plan they bought and whether backend functions are included.</span></article>
+              <article class="route-card"><strong>2. Endpoint list</strong><span>Write every route they need, the method, input, output, and who may call it.</span></article>
+              <article class="route-card"><strong>3. Secrets and integrations</strong><span>Collect only the integrations needed. Store secrets as owner-managed grants, never in the frontend bundle.</span></article>
+              <article class="route-card"><strong>4. Test payloads</strong><span>Get sample form submits, webhook bodies, CRM fields, email recipients, and expected success/error behavior.</span></article>
+              <article class="route-card"><strong>5. Proof and handoff</strong><span>Save static deploy proof, function proof, source custody status, and the client-facing live route.</span></article>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Generated operator steps</p>
+            <h2>Copy this when it is time to produce.</h2>
+          </div>
+          <pre class="output-box skynet-runbook-output" id="skyenetBackendRunbookOutput">Fill the client fields, then press Generate Runbook.</pre>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">Sales boundary</p>
+            <h2>What to say and what not to say.</h2>
+          </div>
+          <div class="split-grid">
+            <article class="route-card">
+              <strong>Say this</strong>
+              <span>SkyeNet supports approved managed backend functions. We review, package, sign, run, and prove them through our SkyeNet function lane.</span>
+            </article>
+            <article class="route-card">
+              <strong>Do not say this yet</strong>
+              <span>Any customer can upload unlimited arbitrary backend code with no review. That waits for the isolated Sovereign Runtime proof lane.</span>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section class="view" id="view-founder">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Founder source</p>
+              <h2>Global founder layer</h2>
+            </div>
+            <form class="stack-form" id="founderForm">
+              <div class="form-grid">
+                <label>Company<input id="companyName" /></label>
+                <label>Founder<input id="founderName" /></label>
+                <label>Title<input id="founderTitle" /></label>
+                <label>Email<input id="founderEmail" /></label>
+                <label>Phone<input id="founderPhone" /></label>
+                <label>Website<input id="founderWebsite" /></label>
+              </div>
+              <label>Logo URL<input id="founderLogoUrl" /></label>
+              <label>Founder image URL<input id="founderHeroImageUrl" /></label>
+              <label>Headline<input id="founderHeadline" /></label>
+              <label>Bio<textarea id="founderBio"></textarea></label>
+              <label>Story<textarea id="founderStory"></textarea></label>
+              <div class="form-grid">
+                <label>CTA label<input id="founderCtaLabel" /></label>
+                <label>CTA link<input id="founderCtaHref" /></label>
+              </div>
+              <label>Footer blurb<textarea id="founderFooterBlurb"></textarea></label>
+              <div class="tool-row">
+                <button class="button" type="submit">Save Founder Layer</button>
+                <button class="button secondary" id="copyFounderSectionBtn" type="button">Copy Founder Block</button>
+                <button class="button secondary" id="downloadFounderPageBtn" type="button">Download Page</button>
+              </div>
+            </form>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Preview</p>
+              <h2>Founder export</h2>
+            </div>
+            <iframe class="preview-frame" id="founderPreview" title="Founder page preview"></iframe>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-templates">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Intros</p>
+              <h2>Real local templates</h2>
+            </div>
+            <div class="list" id="templateList"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow" id="templateEditorMeta">Editor</p>
+              <h2>Template HTML</h2>
+            </div>
+            <textarea class="code-editor" id="templateEditor"></textarea>
+            <div class="tool-row">
+              <button class="button" id="saveTemplateEditsBtn" type="button">Save Template</button>
+              <button class="button secondary" id="copyTemplateBtn" type="button">Copy HTML</button>
+              <button class="button secondary" id="downloadTemplateBtn" type="button">Download HTML</button>
+            </div>
+            <iframe class="preview-frame" id="templatePreview" title="Intro template preview"></iframe>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-blocks">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Reusable blocks</p>
+              <h2>Stored HTML</h2>
+            </div>
+            <div class="list" id="snippetList"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Block editor</p>
+              <h2>HTML block</h2>
+            </div>
+            <form class="stack-form" id="snippetForm">
+              <input id="snippetId" type="hidden" />
+              <div class="form-grid">
+                <label>Name<input id="snippetName" placeholder="Example: Founder CTA Strip" /></label>
+                <label>Type
+                  <select id="snippetType">
+                    <option value="other">Other</option>
+                    <option value="footer">Footer</option>
+                    <option value="nav">Navigation</option>
+                    <option value="founder">Founder</option>
+                    <option value="visual">Visual</option>
+                    <option value="cta">CTA</option>
+                  </select>
+                </label>
+              </div>
+              <label>HTML<textarea class="code-editor short" id="snippetCode"></textarea></label>
+              <div class="tool-row">
+                <button class="button" type="submit">Save Block</button>
+                <button class="button secondary" id="copySnippetBtn" type="button">Copy Block</button>
+                <button class="button secondary" id="downloadSnippetBtn" type="button">Download Block</button>
+                <button class="button secondary" id="resetSnippetBtn" type="button">Reset</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-backup">
+        <div class="split-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Backup</p>
+              <h2>Portable workspace JSON</h2>
+            </div>
+            <p class="muted">The exporter includes inline repo memory, real static asset references, project manifests, templates, blocks, founder details, and any local upload payloads you added.</p>
+            <div class="tool-row">
+              <button class="button" id="backupExportBtn" type="button">Export Workspace</button>
+              <button class="button secondary" id="backupImportBtn" type="button">Import Workspace</button>
+              <button class="button secondary nav-button" data-view="repo-vault" type="button">Open Full Repo Drive</button>
+              <a class="button secondary" href="/admin/skyevault-command-center.html">SkyeVault Command Center</a>
+              <button class="button danger" id="clearLocalCacheBtn" type="button">Clear Local Uploads</button>
+              <input id="workspaceImportInput" type="file" accept="application/json" hidden />
+            </div>
+            <pre class="output-box" id="statusBox">Ready.</pre>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <p class="eyebrow">Surface</p>
+              <h2>Current workspace</h2>
+            </div>
+            <pre class="output-box" id="backupSummary">Loading.</pre>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" aria-live="polite"></div>
+  <script src="/assets/vendor/qrcode-generator.js"></script>
+  <script src="repo-memory.js"></script>
+  <script src="song-vault/manifest.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

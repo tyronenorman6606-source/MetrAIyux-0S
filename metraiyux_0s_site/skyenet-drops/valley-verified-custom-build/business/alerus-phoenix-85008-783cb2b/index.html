@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alerus | Valley Verified</title>
+  <meta name="description" content="Alerus in Phoenix, Arizona. Small business banking and SBA lending profile with phone, address, website, tags, and public Valley Verified evidence.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #16202a;
+      --muted: #69737d;
+      --slate: #243342;
+      --amber: #d8a13d;
+      --blue: #dce8f2;
+      --paper: #f8fafb;
+      --line: rgba(22, 32, 42, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.5;
+    }
+
+    main {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 46px;
+    }
+
+    header {
+      background:
+        linear-gradient(90deg, rgba(36, 51, 66, 0.98) 0%, rgba(36, 51, 66, 0.98) 44%, transparent 44%),
+        linear-gradient(140deg, #edf4f8, #ffffff);
+      border: 1px solid var(--line);
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: 0.78fr 1.22fr;
+      box-shadow: 0 28px 90px rgba(22, 32, 42, 0.12);
+    }
+
+    .dark {
+      color: white;
+      padding: clamp(28px, 4vw, 52px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 34px;
+    }
+
+    .dark img {
+      width: 58px;
+      height: 58px;
+      border-radius: 10px;
+      background: white;
+      padding: 10px;
+    }
+
+    .dark p {
+      color: #d9e4ec;
+    }
+
+    .phone {
+      color: white;
+      display: block;
+      text-decoration: none;
+      font-weight: 900;
+      font-size: clamp(2rem, 4.4vw, 4rem);
+      line-height: 1;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .light {
+      padding: clamp(30px, 6vw, 70px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .kicker {
+      margin: 0 0 18px;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(4rem, 11vw, 9.5rem);
+      line-height: 0.84;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 650px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      background: var(--slate);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: white;
+      color: var(--slate);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    section {
+      background: white;
+      border: 1px solid var(--line);
+      padding: 22px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.9rem;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: var(--blue);
+      border: 1px solid rgba(36, 51, 66, 0.14);
+      color: var(--ink);
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+
+    a {
+      color: var(--slate);
+      font-weight: 800;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 860px) {
+      header,
+      .board {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        background: linear-gradient(180deg, var(--slate) 0 42%, #f6fafc 42% 100%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <aside class="dark" aria-label="Contact facts">
+        <img src="assets/logo.svg" alt="">
+        <div>
+          <p>Business Phone</p>
+          <a class="phone" href="tel:+16023461800">(602) 346-1800</a>
+        </div>
+        <p>4686 E. Van Buren St., Ste. 150<br>Phoenix, AZ 85008</p>
+      </aside>
+
+      <div class="light">
+        <p class="kicker">Valley Verified / Legal And Financial</p>
+        <h1>Alerus</h1>
+        <p class="lead">A Phoenix profile for small business banking and SBA lending, with a public website and phone in the local profile.</p>
+        <div class="actions">
+          <a class="button" href="https://alerus.com">alerus.com</a>
+          <a class="button secondary" href="tel:+16023461800">Call Phoenix office</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="board">
+      <section aria-labelledby="facts-heading">
+        <h2 id="facts-heading">Business Facts</h2>
+        <p>Category: Legal And Financial<br>Niche: Small Business Banking / SBA Lending<br>Language: English<br>Featured: true</p>
+      </section>
+
+      <section aria-labelledby="tags-heading">
+        <h2 id="tags-heading">Tags</h2>
+        <div class="tags">
+          <span class="tag">Small business banking / SBA lending</span>
+          <span class="tag">Finance &amp; Insurance</span>
+          <span class="tag">Local SMB / service business</span>
+          <span class="tag">Legal / Financial Services</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="local-proof-heading">
+        <h2 id="local-proof-heading">Local Proof</h2>
+        <p>Selected for Valley Verified because the business has clear local category, address, and phone details. Local category, address, and phone evidence support this Valley Verified profile. <a href="https://business.phoenixchamber.com/list/ql/finance-insurance-10">Phoenix Chamber finance and insurance directory</a>.</p>
+      </section>
+    </div>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Alerus is Valley Verified for its East Phoenix branch presence at 4686 E. Van Buren St., Suite 150 and its broad financial-service mix for businesses, employers, mortgage borrowers, and personal banking clients.</p>
+        <ul>
+          <li>The official location page lists business banking, mortgage, personal banking, retirement and benefits, ATM access, and ADA accessibility.</li>
+          <li>The Greater Phoenix Chamber describes Alerus as a commercial wealth bank, national retirement services provider, and SBA Preferred Lender.</li>
+          <li>Additional banking evidence lists the Phoenix branch as a full-service branch with FDIC certificate #3931.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

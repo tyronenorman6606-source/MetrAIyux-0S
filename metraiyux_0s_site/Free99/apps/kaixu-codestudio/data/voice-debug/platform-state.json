@@ -1,0 +1,104 @@
+{
+  "schema": "kaixu-codestudio-platform-store-v1",
+  "createdAt": "2026-05-28T00:18:52.448Z",
+  "updatedAt": "2026-05-28T00:18:52.657Z",
+  "projects": [
+    {
+      "id": "default",
+      "name": "Default Workspace",
+      "slug": "default",
+      "status": "active",
+      "ownerRef": "upstream:owner",
+      "budget": {
+        "monthlyCapCents": 50000,
+        "hardStop": true
+      },
+      "roles": {
+        "owner": [
+          "owner"
+        ],
+        "admin": [
+          "admin"
+        ],
+        "operator": [
+          "operator"
+        ],
+        "viewer": [
+          "viewer"
+        ]
+      },
+      "createdAt": "2026-05-28T00:18:52.448Z",
+      "updatedAt": "2026-05-28T00:18:52.448Z"
+    }
+  ],
+  "providerInstalls": [
+    {
+      "id": "prov_mpoqw9xj_38d81a4345",
+      "projectId": "default",
+      "providerId": "twilio",
+      "createdAt": "2026-05-28T00:18:52.616Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:twilio:smoke",
+      "routes": [
+        "sms.send",
+        "voice.call",
+        "webhook.message"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-28T00:18:52.616Z"
+    }
+  ],
+  "workflowRuns": [
+    {
+      "id": "run_mpoqw9ym_07bfb1a811",
+      "ts": "2026-05-28T00:18:52.654Z",
+      "status": "error",
+      "projectId": "default",
+      "templateId": "provider_pack_action",
+      "requestedBy": null,
+      "input": {
+        "to": "+15550100000",
+        "body": "Voice should not masquerade as SMS.",
+        "projectId": "default"
+      },
+      "mode": "fixture",
+      "providerId": "twilio",
+      "route": "voice.call",
+      "engine": "provider_pack_action",
+      "ok": false,
+      "error": "twilio voice.call blocked: voice_call_not_implemented",
+      "steps": [
+        {
+          "step": "voice.call",
+          "providerId": "twilio",
+          "action": "voice.call",
+          "result": {
+            "ok": false,
+            "provider": "twilio",
+            "action": "voice.call",
+            "reason": "voice_call_not_implemented"
+          }
+        }
+      ],
+      "receiptId": "rcpt_mpoqw9yo_2e928f7a99",
+      "updatedAt": "2026-05-28T00:18:52.657Z"
+    }
+  ],
+  "webhookEvents": [],
+  "approvals": [],
+  "jobs": [],
+  "deadLetters": [],
+  "schedules": [],
+  "meterEvents": [],
+  "workflowGraphs": [],
+  "routeDecisions": [],
+  "invoices": [],
+  "bundles": [],
+  "imports": [],
+  "auditEvents": [],
+  "incidents": [],
+  "entitlements": [],
+  "records": [],
+  "forms": []
+}

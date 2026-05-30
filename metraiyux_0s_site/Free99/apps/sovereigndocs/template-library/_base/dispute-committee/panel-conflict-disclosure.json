@@ -1,0 +1,29 @@
+{
+  "base_id": "dispute-committee/panel-conflict-disclosure",
+  "slug": "panel-conflict-disclosure",
+  "title": "Panel Conflict Disclosure",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "high",
+  "not_legal_advice": true,
+  "use_case": "Conflict, authority, and mandatory legal certification disclosure for Legal Skyes AE committee members before panel assignment.",
+  "questionnaire": [
+    { "key": "member_name", "label": "Member Name", "type": "text", "required": true },
+    { "key": "member_email", "label": "Member Email", "type": "email", "required": true },
+    { "key": "credential_status", "label": "Verified Legal Certification or Licensure Status", "type": "text", "required": true },
+    { "key": "financial_interest", "label": "Financial Interest", "type": "textarea", "required": false },
+    { "key": "prior_relationships", "label": "Prior Relationships", "type": "textarea", "required": false },
+    { "key": "confidentiality_acknowledgment", "label": "Confidentiality Acknowledgment", "type": "textarea", "required": true },
+    { "key": "upl_acknowledgment", "label": "UPL Acknowledgment", "type": "textarea", "required": true }
+  ],
+  "sections": [
+    { "heading": "Member Disclosure", "body": "{{member_name}} / {{member_email}}. Verified legal certification or licensure status: {{credential_status}}. Legal Skyes AE committee case assignment is not permitted until this status is verified." },
+    { "heading": "Conflict Review", "body": "Financial interest: {{financial_interest}}. Prior customer, affiliate, referral, commission, personal, vendor, employment, public-statement, or competitive relationships: {{prior_relationships}}." },
+    { "heading": "Confidentiality", "body": "{{confidentiality_acknowledgment}}" },
+    { "heading": "No Unauthorized Practice", "body": "{{upl_acknowledgment}} Legal Skyes AEs may organize facts, evidence, timelines, and internal recommendation packets. They may not provide legal advice, interpret legal rights, represent any party, threaten legal action, draft individualized legal strategy, or present themselves as attorneys, arbitrators, mediators, or legal document preparers unless properly licensed or certified and separately authorized." },
+    { "heading": "Owner Approval", "body": "Owner/admin approval is required before recommendation reliance or payout release." }
+  ],
+  "review": { "requires_attorney_review": true, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "conflicts", "ae", "high"]
+}

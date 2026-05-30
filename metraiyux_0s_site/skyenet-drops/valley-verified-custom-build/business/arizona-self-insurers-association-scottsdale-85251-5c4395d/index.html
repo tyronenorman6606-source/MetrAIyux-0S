@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Self-Insurers Association | Scottsdale Professional development and networking for self-insured entities.</title>
+  <meta name="description" content="Arizona Self-Insurers Association is a Valley Verified professional development and networking for self-insured entities profile at Official current.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18202a;
+      --muted: #526070;
+      --navy: #102a43;
+      --teal: #1f7a7a;
+      --amber: #d79a2b;
+      --paper: #ffffff;
+      --wash: #eef5f3;
+      --line: rgba(24, 32, 42, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(160deg, rgba(16, 42, 67, .14), transparent 42%),
+        linear-gradient(20deg, rgba(215, 154, 43, .14), transparent 48%),
+        #f8faf8;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 50px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding-bottom: 18px;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(320px, .7fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .statement {
+      min-height: 560px;
+      display: grid;
+      align-content: end;
+      gap: 24px;
+      padding: clamp(28px, 5vw, 58px);
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(16, 42, 67, .95), rgba(31, 122, 122, .84)),
+        var(--navy);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .statement::before {
+      content: "";
+      position: absolute;
+      inset: 24px 24px auto auto;
+      width: 170px;
+      height: 170px;
+      border: 18px solid rgba(255, 255, 255, .14);
+      border-radius: 50%;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      padding: 8px 11px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 7px;
+      color: #f9d38a;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: .96;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 0;
+      color: #dfecef;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.5;
+    }
+
+    .docket {
+      display: grid;
+      gap: 14px;
+    }
+
+    .docket-panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .docket-panel.main {
+      min-height: 240px;
+      background: var(--wash);
+    }
+
+    .docket-panel img {
+      width: 118px;
+      height: 118px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .docket-panel b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .docket-panel a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 15px;
+      border-radius: 7px;
+      background: var(--navy);
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    address {
+      font-style: normal;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .cell {
+      min-height: 118px;
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .82);
+    }
+
+    .cell b {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .cell span {
+      display: block;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .statement {
+        min-height: 440px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .header { align-items: flex-start; flex-direction: column; }
+      .statement { padding: 26px; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <div class="brand">
+        <img src="assets/logo.svg" alt="Arizona Self-Insurers Association profile mark">
+        <span>Valley Verified Network</span>
+      </div>
+      <span>Scottsdale, AZ 85251</span>
+    </header>
+
+    <section class="hero">
+      <div class="statement">
+        <div class="eyebrow">Insurance / employer association</div>
+        <h1>Arizona Self-Insurers Association</h1>
+        <p class="lead">Arizona Self-Insurers Association serves Arizona self-insured and large-deductible employers with workers’ compensation education, professional development, advocacy, member committees, monthly lunches, annual conference programming, and statewide issue tracking.</p>
+      </div>
+
+      <aside class="docket" aria-label="Contact details">
+        <div class="docket-panel main">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="docket-panel">
+          <b>Phone</b>
+          <a href="tel:+14807065762">(480) 706-5762</a>
+        </div>
+        <div class="docket-panel">
+          <b>Office</b>
+          <address>7375 E. 6th Ave., Ste. 9<br>Scottsdale, AZ 85251</address>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid" aria-label="Local details">
+      <div class="cell">
+        <b>Category</b>
+        <span>Legal And Financial</span>
+      </div>
+      <div class="cell">
+        <b>Niche</b>
+        <span>Insurance / Employer Association</span>
+      </div>
+      <div class="cell">
+        <b>Language</b>
+        <span>English</span>
+      </div>
+      <div class="cell">
+        <b>Profile Date</b>
+        <span>May 19, 2026</span>
+      </div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-arizona-self-insurers-association-scottsdale-85251-5c4395d">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-arizona-self-insurers-association-scottsdale-85251-5c4395d">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says Arizona Self-Insurers Association is Valley Verified because official association pages show an Arizona workers’ compensation organization established in 1983, serving self-insured employers, government agencies, and compatible professionals. Its National Council of Self-Insurers affiliation, event calendar, membership structure, and Chamber support make it a real statewide knowledge hub for employer-side workers’ compensation issues.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Professional development and networking for self-insured entities, Education and training through monthly meetings and annual conference, Workers' compensation policy and regulatory advocacy, and Member committee identification and tracking of legislative and regulatory activity</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>Qualified self-insured employers in Arizona, Government agencies in Arizona, and Large deductible employers</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>Official current contact page lists Arizona Self Insurers Association, Attn: Karolyn Kiburz, CMP, Meetings &amp; Concierges Evidence, 4300 N. Miller Rd. #141, Scottsdale, AZ 85251; Official current contact phone: 480-941-3125</span></div>
+      </div>
+      <p class="vv-note-text">Official site publishes current phone and contact address.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

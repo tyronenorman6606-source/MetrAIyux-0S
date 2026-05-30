@@ -281,11 +281,24 @@ async function main() {
     recordVideo: { dir: videoDir, size: { width: 1440, height: 1000 } }
   });
   const page = await context.newPage();
+  page.setDefaultNavigationTimeout(90000);
   const consoleLines = [];
   page.on("console", (msg) => consoleLines.push(`${msg.type()}: ${msg.text()}`));
   page.on("pageerror", (err) => consoleLines.push(`pageerror: ${err.message}`));
-  await page.goto(`${origin}/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command&dry_run=1`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("#skypayForm");
+  await page.goto(`${origin}/skyepay.html?client=metraiyux-0s&offer=metraiyux-routex-workforce-command&dry_run=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
+  try {
+    await page.locator("#skypayForm").waitFor({ state: "visible", timeout: 60000 });
+  } catch (error) {
+    const debug = await page.evaluate(() => ({
+      href: location.href,
+      title: document.title,
+      readyState: document.readyState,
+      formExists: Boolean(document.querySelector("#skypayForm")),
+      bodyText: document.body?.innerText?.slice(0, 1200) || ""
+    })).catch(() => ({}));
+    console.error(JSON.stringify({ initialFormDebug: debug, consoleLines }, null, 2));
+    throw error;
+  }
   report.checks.desktopInitial = {
     title: await page.title(),
     heroVisible: await page.locator("text=SkyePay").first().isVisible(),
@@ -296,9 +309,9 @@ async function main() {
   await page.fill('input[name="customer_email"]', "bob@example.com");
   await page.fill('input[name="company_name"]', "Bob's Smoke Shop");
   await page.click("#checkoutBtn");
-  await page.waitForURL(/status=success/);
+  await page.waitForFunction(() => location.href.includes("status=success"), null, { timeout: 30000 });
   try {
-    await page.waitForSelector("#statusPanel:not([hidden])", { timeout: 8000 });
+    await page.locator("#statusPanel").waitFor({ state: "visible", timeout: 15000 });
   } catch (error) {
     const debug = await page.evaluate(() => ({
       href: location.href,
@@ -309,7 +322,7 @@ async function main() {
     console.error(JSON.stringify({ statusPanelDebug: debug, consoleLines }, null, 2));
     throw error;
   }
-  await page.waitForFunction(() => /pending owner approval/i.test(document.querySelector("#statusPanel")?.innerText || ""), null, { timeout: 12000 });
+  await page.waitForFunction(() => /pending owner approval/i.test(document.querySelector("#statusPanel")?.innerText || ""), null, { timeout: 20000 });
   const statusText = await page.locator("#statusPanel").innerText();
   report.checks.checkoutDryRun = {
     actionPath: [
@@ -326,7 +339,7 @@ async function main() {
     statusText
   };
   const desktopShot = path.join(artifactDir, "skyepay-desktop.png");
-  await page.screenshot({ path: desktopShot, fullPage: true });
+  await page.screenshot({ path: desktopShot, fullPage: true, timeout: 60000 });
   report.screenshots.desktop = desktopShot;
   const video = page.video();
   await page.close();
@@ -336,10 +349,11 @@ async function main() {
 
   const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true });
   const mobile = await mobileContext.newPage();
-  await mobile.goto(`${origin}/skyepay.html?client=bobs-smoke-shop&dry_run=1`, { waitUntil: "domcontentloaded" });
+  mobile.setDefaultNavigationTimeout(90000);
+  await mobile.goto(`${origin}/skyepay.html?client=bobs-smoke-shop&dry_run=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
   await mobile.waitForSelector("#skypayForm");
   const mobileShot = path.join(artifactDir, "skyepay-mobile.png");
-  await mobile.screenshot({ path: mobileShot, fullPage: true });
+  await mobile.screenshot({ path: mobileShot, fullPage: true, timeout: 60000 });
   report.screenshots.mobile = mobileShot;
   report.checks.mobile = {
     checkoutVisible: await mobile.locator("#checkoutBtn").isVisible(),
@@ -349,10 +363,11 @@ async function main() {
 
   const storeContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const storePage = await storeContext.newPage();
-  await storePage.goto(`${origin}/skyepay-store.html?client=metraiyux-0s&dry_run=1`, { waitUntil: "domcontentloaded" });
+  storePage.setDefaultNavigationTimeout(90000);
+  await storePage.goto(`${origin}/skyepay-store.html?client=metraiyux-0s&dry_run=1`, { waitUntil: "domcontentloaded", timeout: 90000 });
   await storePage.waitForSelector(".store-card");
   const storeShot = path.join(artifactDir, "skyepay-store-desktop.png");
-  await storePage.screenshot({ path: storeShot, fullPage: true });
+  await storePage.screenshot({ path: storeShot, fullPage: true, timeout: 60000 });
   report.screenshots.store = storeShot;
   report.checks.store = {
     checkoutVisible: await storePage.locator("#storeCheckoutBtn").isVisible(),

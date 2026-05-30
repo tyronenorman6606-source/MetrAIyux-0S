@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>West Valley Pawn and Gold | Valley Verified</title>
+  <meta name="description" content="Owner-researched Valley Verified business record for West Valley Pawn and Gold in Avondale, Arizona.">
+  <link rel="canonical" href="https://valleyverified.com/business/west-valley-pawn-and-gold-avondale-85323-968d882/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #fffaf0;
+      --muted: #d5c6a8;
+      --coal: #0b0d0e;
+      --panel: rgba(18, 17, 14, 0.88);
+      --line: rgba(255, 224, 147, 0.22);
+      --gold: #ffd36a;
+      --red: #e24b3f;
+      --teal: #54d7c7;
+      --cream: #fff2d1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, rgba(226, 75, 63, 0.22), transparent 28%),
+        radial-gradient(circle at 72% 8%, rgba(255, 211, 106, 0.28), transparent 26rem),
+        radial-gradient(circle at 18% 78%, rgba(84, 215, 199, 0.2), transparent 23rem),
+        #070808;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .wrap {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+    .bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0 24px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--cream);
+      font-weight: 900;
+    }
+    .coin-stack {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      background:
+        linear-gradient(90deg, transparent 45%, rgba(0, 0, 0, 0.26) 45% 55%, transparent 55%),
+        radial-gradient(circle at 35% 30%, #fff6cf, var(--gold) 44%, #8f5f16 100%);
+      box-shadow: 9px 4px 0 rgba(255, 211, 106, 0.3), 18px 8px 0 rgba(255, 211, 106, 0.16);
+    }
+    .verified {
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      background: rgba(255, 211, 106, 0.08);
+      white-space: nowrap;
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.1fr);
+      gap: 24px;
+      min-height: 610px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, rgba(255, 211, 106, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 211, 106, 0.08) 1px, transparent 1px),
+        rgba(11, 12, 12, 0.72);
+      background-size: 38px 38px;
+      box-shadow: 0 34px 92px rgba(0, 0, 0, 0.46);
+      padding: clamp(20px, 4vw, 50px);
+    }
+    .vault {
+      position: relative;
+      min-height: 510px;
+      align-self: stretch;
+      border: 1px solid rgba(255, 211, 106, 0.28);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 211, 106, 0.22), transparent 13rem),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+      overflow: hidden;
+    }
+    .vault-door {
+      position: absolute;
+      width: min(80%, 390px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border: 18px solid rgba(255, 211, 106, 0.32);
+      background:
+        radial-gradient(circle, transparent 0 22%, rgba(255, 211, 106, 0.84) 23% 25%, transparent 26% 46%, rgba(255, 211, 106, 0.48) 47% 50%, transparent 51%),
+        repeating-conic-gradient(from 0deg, rgba(255, 211, 106, 0.28) 0 10deg, rgba(255, 255, 255, 0.04) 10deg 22deg),
+        #101113;
+      box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.86), 0 0 42px rgba(255, 211, 106, 0.28);
+    }
+    .vault-door::before {
+      content: "";
+      position: absolute;
+      inset: 31%;
+      border-radius: 50%;
+      border: 12px solid var(--gold);
+      background: #080909;
+    }
+    .vault-door::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 68%;
+      height: 12px;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(90deg, transparent, var(--cream), transparent);
+      box-shadow: 0 0 0 999px transparent;
+    }
+    .price-ticks {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 8%;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+    }
+    .price-ticks span {
+      display: block;
+      height: 48px;
+      border: 1px solid rgba(255, 211, 106, 0.3);
+      background: linear-gradient(180deg, rgba(255, 211, 106, 0.78), rgba(226, 75, 63, 0.32));
+    }
+    .price-ticks span:nth-child(even) {
+      height: 74px;
+      background: linear-gradient(180deg, rgba(84, 215, 199, 0.72), rgba(255, 211, 106, 0.3));
+    }
+    .copy {
+      display: grid;
+      align-content: center;
+      position: relative;
+      z-index: 1;
+      min-height: 510px;
+    }
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      font-size: 0.82rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(3rem, 7.4vw, 7rem);
+      line-height: 0.88;
+      letter-spacing: 0;
+      max-width: 760px;
+    }
+    .lead {
+      max-width: 680px;
+      color: #f1dfbd;
+      font-size: clamp(1.04rem, 1.55vw, 1.32rem);
+      line-height: 1.58;
+      margin: 24px 0 0;
+    }
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .quick div {
+      min-height: 90px;
+      border: 1px solid rgba(255, 211, 106, 0.2);
+      padding: 14px;
+      background: rgba(255, 211, 106, 0.07);
+    }
+    .quick b {
+      display: block;
+      font-size: 1.28rem;
+      line-height: 1;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .quick span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(305px, 0.82fr);
+      gap: 22px;
+      margin-top: 22px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: clamp(20px, 3vw, 34px);
+    }
+    .panel h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.45rem, 2.4vw, 2.3rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .fact {
+      border: 1px solid rgba(255, 211, 106, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 14px;
+      min-height: 96px;
+    }
+    .fact b {
+      display: block;
+      color: var(--gold);
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .fact span {
+      color: var(--cream);
+      line-height: 1.45;
+    }
+    .sky {
+      background:
+        linear-gradient(135deg, rgba(255, 211, 106, 0.14), rgba(84, 215, 199, 0.12)),
+        rgba(11, 12, 12, 0.92);
+    }
+    .step-list {
+      display: grid;
+      gap: 12px;
+    }
+    .step {
+      border-left: 4px solid var(--teal);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 11px 12px;
+      color: #fff2d1;
+      line-height: 1.45;
+    }
+    .seats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .seats div {
+      border: 1px solid rgba(255, 211, 106, 0.18);
+      background: rgba(0, 0, 0, 0.22);
+      padding: 12px;
+    }
+    .seats b {
+      display: block;
+      color: var(--gold);
+      font-size: 1.72rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .seats span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      margin-top: 18px;
+      padding: 0 18px;
+      background: var(--gold);
+      color: #090909;
+      text-decoration: none;
+      font-weight: 900;
+    }
+    .source-list {
+      display: grid;
+      gap: 10px;
+      color: #f1dfbd;
+      line-height: 1.55;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    @media (max-width: 880px) {
+      .hero, .grid {
+        grid-template-columns: 1fr;
+      }
+      .vault, .copy {
+        min-height: 420px;
+      }
+      .facts, .quick, .seats {
+        grid-template-columns: 1fr;
+      }
+      .bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body data-static-hand-page="true">
+  <main class="wrap">
+    <nav class="bar" aria-label="Valley Verified record">
+      <div class="brand"><span class="coin-stack" aria-hidden="true"></span><span>Valley Verified</span></div>
+      <div class="verified">Owner-researched verified record</div>
+    </nav>
+
+    <section class="hero" aria-labelledby="business-name">
+      <div class="vault" aria-label="Pawn and gold vault visual">
+        <div class="vault-door"></div>
+        <div class="price-ticks" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="copy">
+        <p class="eyebrow">Retail And Specialty / Pawn / Gold</p>
+        <h1 id="business-name">West Valley Pawn and Gold</h1>
+        <p class="lead">Avondale retail pawn and gold listing with a public directory record, direct phone contact, and a Dysart Road storefront address.</p>
+        <div class="quick" aria-label="Business summary">
+          <div><b>Avondale</b><span>611 N. Dysart Rd., Avondale, AZ 85323</span></div>
+          <div><b>Retail</b><span>Shopping/Retail / Pawn / Gold</span></div>
+          <div><b>May 19</b><span>Last checked in the Valley Verified dataset</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Business facts and SkyEmail access">
+      <article class="panel">
+        <h2>Business Facts</h2>
+        <div class="facts">
+          <div class="fact"><b>Business</b><span>West Valley Pawn and Gold</span></div>
+          <div class="fact"><b>Phone</b><span><a href="tel:+16239329364">(623) 932-9364</a></span></div>
+          <div class="fact"><b>Address</b><span>611 N. Dysart Rd., Avondale, AZ 85323</span></div>
+          <div class="fact"><b>Category</b><span>Retail And Specialty</span></div>
+          <div class="fact"><b>Niche</b><span>Pawn / Gold</span></div>
+          <div class="fact"><b>Pricing</b><span>Contact provider directly for availability, item terms, and quote.</span></div>
+        </div>
+      </article>
+
+      <aside class="panel sky" aria-label="SkyEmail acceptance">
+        <h2>SkyEmail Access</h2>
+        <div class="step-list">
+          <div class="step">Accept the free SkyEmail account for West Valley Pawn and Gold.</div>
+          <div class="step">Sign in through the shared 0S/SkyGate lane; no separate business password is issued here.</div>
+          <div class="step">Owner gets notified to provision the workspace after acceptance.</div>
+          <div class="step">Team activation window is within 24 hours after provisioning.</div>
+          <div class="step">If activation is still pending after 24 hours, K4i alerts the owner.</div>
+        </div>
+        <div class="seats" aria-label="SkyEmail seat ledger">
+          <div><b>9</b><span>seats left</span></div>
+          <div><b>2</b><span>warn at 2 seats remaining</span></div>
+          <div><b>5</b><span>buy seats only in groups of 5</span></div>
+        </div>
+        <a class="cta" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&business=west-valley-pawn-and-gold-avondale-85323-968d882">Accept SkyEmail</a>
+      </aside>
+    </section>
+
+    <section class="grid" aria-label="Verification source">
+      <article class="panel">
+        <h2>Owner Status</h2>
+        <ul class="source-list">
+          <li>Valley Verified status: owner-researched and verified from a public directory source.</li>
+          <li>Last verified: 2026-05-19.</li>
+          <li>Identity signal: public phone record ending in 9364.</li>
+          <li>Source hash: 968d8824c9d7.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h2>Source</h2>
+        <ul class="source-list">
+          <li>Source file: public business profile review.</li>
+          <li>Source lines: L491-L495.</li>
+          <li><a href="https://business.phoenixchamber.com/list/ql/shopping-specialty-retail-23">Phoenix Chamber shopping and specialty retail listing</a></li>
+          <li>Policy: public directory/company listing only; no synthetic contacts or guessed emails.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -7,8 +7,9 @@ const root = path.resolve(__dirname, "..");
 const out = path.join(root, "cf-assets");
 
 const pages = [
-  "ai",
-  "changelog",
+	  "ai",
+	  "brain",
+	  "changelog",
   "compose",
   "contacts",
   "dashboard",
@@ -23,14 +24,19 @@ const pages = [
   "message",
   "monitoring",
   "onboarding",
+  "pocket",
   "pricing",
+  "security",
   "send",
   "sent",
+  "session-handoff",
   "settings",
   "signup",
   "spam",
+  "tech-stack",
   "thread",
   "trash",
+  "workspace",
 ];
 
 function copyFile(src, dest) {
@@ -79,10 +85,16 @@ for (const page of pages) {
 }
 
 copyDir(path.join(root, "assets"), path.join(out, "assets"));
+copyDir(path.join(root, "partials"), path.join(out, "partials"));
 copyDir(path.join(root, "suite"), path.join(out, "suite"));
 copyDir(path.join(root, "dist"), path.join(out, "dist"));
+copyFile(path.join(root, "robots.txt"), path.join(out, "robots.txt"));
+copyFile(path.join(root, "sitemap.xml"), path.join(out, "sitemap.xml"));
 copyOptionalProofFile("live-email-proof.json");
+copyOptionalProofFile("skymail-mcp-proof.json");
 copyOptionalProofFile("videos/skymail-live-proof-browser.webm");
+copyOptionalProofFile("videos/skymail-mcp-proof-browser.webm");
 copyOptionalProofFile("screenshots/skymail-live-proof-video-frame.png");
+copyOptionalProofFile("screenshots/mcp-proof-desktop-mcp-logo.png");
 
 console.log(`Built Cloudflare assets in ${path.relative(root, out)}.`);

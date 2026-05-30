@@ -1,25 +1,1229 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyeMusicNexus // Discover</title>
-  <meta name="description" content="SkyeMusicNexus Discover exposes listener-facing playlist rails, proof-safe previews, release lanes, and player handoff inside the gated music operating surface." />
-  <link rel="stylesheet" href="./neo-nexus.css" />
-  <link rel="stylesheet" href="./open-source-studio.css" />
-  <script defer src="../gate-session.js"></script><script defer src="./skygate-auth.js"></script><script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script><script defer src="./neo-nexus.js"></script>
-</head>
-<body data-app="skye-music-nexus" data-mode="artist" data-room="discover">
-  <canvas id="pulse-field" class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
-  <main class="nexus-shell open-source-studio-shell">
-    <header class="nexus-topline"><a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a><div><p class="micro">SkyeMusicNexus // Discover</p><h1>Spotify-style listening lanes for gated releases.</h1></div><div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div></header>
-    <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a class="active" href="./discover.html" aria-current="page">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a></nav>
-    <section class="hero-panel studio-hero"><div><p class="eyebrow">discovery graph</p><h2>Playlists, live drops, and release lanes without losing rights control.</h2><p>Discovery is a surface, not a hidden player card. It routes listeners into the Stream Deck while keeping preview rights attached.</p></div><div class="engine-status-card"><strong>24</strong><span>proof-safe preview slots ready for playlist curation</span><a class="ghost-link" href="./player.html">Open Player</a></div></section>
-    <section class="discovery-shell">
-      <article class="panel glass-panel"><p class="eyebrow">playlist rail</p><h3>Release rooms people can browse.</h3><div class="playlist-rail"><article class="playlist-card"><strong>Night Signal</strong><span>late R&B / chrome drums</span></article><article class="playlist-card"><strong>Proof Drops</strong><span>new gated previews</span></article><article class="playlist-card"><strong>Creator Heat</strong><span>community-picked releases</span></article><article class="playlist-card"><strong>Operator Ready</strong><span>cleared for review</span></article></div></article>
-      <article class="panel glass-panel"><p class="eyebrow">track queue</p><h3>Spotify-shaped, rights-aware playback queue.</h3><div class="track-stack"><article class="track-card"><span class="track-number">01</span><div><strong>Midnight Pressure</strong><span>Proof Artist / preview-use required</span></div><a class="ghost-link" href="./player.html">Play</a></article><article class="track-card"><span class="track-number">02</span><div><strong>Chrome Choir</strong><span>release draft / rights pending</span></div><a class="ghost-link" href="./rights.html">Rights</a></article><article class="track-card"><span class="track-number">03</span><div><strong>Signal Run</strong><span>campaign-ready drop</span></div><a class="ghost-link" href="./releases.html">Release</a></article></div></article>
-    </section>
-    <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog><div id="toast" role="status" aria-live="polite"></div>
-  </main>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeMusicNexus // Playlists + Charts</title>
+    <link rel="stylesheet" href="./neo-nexus.css" />
+    <link rel="stylesheet" href="./open-source-studio.css" />
+    <link rel="stylesheet" href="./nexus-player.css" />
+    <script src="../gate-session.js" defer></script>
+    <script src="./skygate-auth.js" defer></script>
+    <style>
+      :root {
+        color-scheme: dark;
+        --playlist-ink: #f7f5ea;
+        --playlist-muted: rgba(247, 245, 234, 0.68);
+        --playlist-line: rgba(247, 245, 234, 0.16);
+        --playlist-panel: rgba(12, 16, 20, 0.86);
+        --playlist-panel-strong: rgba(22, 29, 35, 0.94);
+        --playlist-cyan: #6ee7f8;
+        --playlist-green: #a4f08a;
+        --playlist-pink: #ff75b7;
+        --playlist-gold: #ffd166;
+        --playlist-red: #ff8a7a;
+      }
+
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 16% 12%, rgba(110, 231, 248, 0.2), transparent 28rem),
+          radial-gradient(circle at 84% 18%, rgba(255, 117, 183, 0.18), transparent 30rem),
+          linear-gradient(135deg, #05070a 0%, #10151a 48%, #0b0f12 100%);
+      }
+
+      .playlist-shell {
+        width: min(1440px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 24px 0 56px;
+      }
+
+      .playlist-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0 24px;
+      }
+
+      .playlist-nav a {
+        color: var(--playlist-muted);
+        text-decoration: none;
+      }
+
+      .playlist-nav strong {
+        color: var(--playlist-ink);
+        font-size: 0.95rem;
+      }
+
+      .playlist-nav__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .playlist-nav__links a {
+        border: 1px solid var(--playlist-line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .playlist-nav__links a[aria-current='page'] {
+        color: #081013;
+        background: var(--playlist-cyan);
+        border-color: var(--playlist-cyan);
+      }
+
+      .playlist-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .playlist-hero__copy,
+      .playlist-now,
+      .playlist-panel {
+        border: 1px solid var(--playlist-line);
+        background: var(--playlist-panel);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(18px);
+      }
+
+      .playlist-hero__copy {
+        padding: clamp(24px, 4vw, 42px);
+        min-height: 320px;
+        display: grid;
+        align-content: end;
+      }
+
+      .playlist-eyebrow,
+      .playlist-kicker {
+        color: var(--playlist-cyan);
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .playlist-hero h1 {
+        margin: 10px 0 14px;
+        color: var(--playlist-ink);
+        font-size: clamp(2.3rem, 6vw, 5.8rem);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .playlist-hero p {
+        max-width: 760px;
+        margin: 0;
+        color: var(--playlist-muted);
+        font-size: clamp(1rem, 1.6vw, 1.2rem);
+        line-height: 1.65;
+      }
+
+      .playlist-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .playlist-stat {
+        min-height: 84px;
+        border: 1px solid var(--playlist-line);
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .playlist-stat strong {
+        display: block;
+        color: var(--playlist-ink);
+        font-size: 1.7rem;
+        line-height: 1;
+      }
+
+      .playlist-stat span {
+        display: block;
+        margin-top: 8px;
+        color: var(--playlist-muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+      }
+
+      .playlist-now {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .now-art {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--playlist-line);
+      }
+
+      .playlist-now h2 {
+        margin: 0;
+        color: var(--playlist-ink);
+        font-size: 1.35rem;
+        letter-spacing: 0;
+      }
+
+      .playlist-now p {
+        margin: 5px 0 0;
+        color: var(--playlist-muted);
+      }
+
+      .playlist-now audio {
+        width: 100%;
+      }
+
+      .playlist-grid {
+        display: grid;
+        grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.5fr) minmax(300px, 0.9fr);
+        gap: 18px;
+        align-items: start;
+        margin-top: 18px;
+      }
+
+      .playlist-panel {
+        padding: 18px;
+      }
+
+      .playlist-panel h2,
+      .playlist-panel h3 {
+        margin: 0;
+        color: var(--playlist-ink);
+        letter-spacing: 0;
+      }
+
+      .playlist-panel h2 {
+        font-size: 1.2rem;
+      }
+
+      .playlist-panel h3 {
+        font-size: 1rem;
+      }
+
+      .playlist-panel__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .playlist-panel__head--tight {
+        margin: 10px 0 8px;
+      }
+
+      .playlist-panel__head a {
+        color: var(--playlist-cyan);
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .playlist-search,
+      .playlist-input,
+      .playlist-select,
+      .playlist-import {
+        width: 100%;
+        border: 1px solid var(--playlist-line);
+        border-radius: 0;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--playlist-ink);
+        padding: 11px 12px;
+        font: inherit;
+      }
+
+      .playlist-import {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .playlist-button,
+      .playlist-icon-button {
+        border: 1px solid var(--playlist-line);
+        color: var(--playlist-ink);
+        background: rgba(255, 255, 255, 0.07);
+        min-height: 40px;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .playlist-button {
+        padding: 10px 13px;
+      }
+
+      .playlist-icon-button {
+        width: 40px;
+        display: inline-grid;
+        place-items: center;
+        flex: 0 0 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .playlist-button:hover,
+      .playlist-icon-button:hover {
+        border-color: var(--playlist-cyan);
+        color: #081013;
+        background: var(--playlist-cyan);
+      }
+
+      .playlist-button--primary {
+        color: #081013;
+        border-color: var(--playlist-green);
+        background: var(--playlist-green);
+        font-weight: 800;
+      }
+
+      .playlist-button--danger:hover {
+        border-color: var(--playlist-red);
+        background: var(--playlist-red);
+      }
+
+      .playlist-stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .playlist-chip-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .playlist-radio-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .playlist-chip {
+        border: 1px solid var(--playlist-line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--playlist-muted);
+        padding: 8px 10px;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .playlist-chip.is-active {
+        border-color: var(--playlist-pink);
+        color: #16050e;
+        background: var(--playlist-pink);
+      }
+
+      .system-playlist {
+        display: grid;
+        gap: 7px;
+        border: 1px solid var(--playlist-line);
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .system-playlist strong {
+        color: var(--playlist-ink);
+      }
+
+      .system-playlist span {
+        color: var(--playlist-muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .sponsor-stack {
+        border-top: 1px solid var(--playlist-line);
+        margin-top: 4px;
+        padding-top: 8px;
+      }
+
+      .sponsor-placement {
+        display: grid;
+        gap: 8px;
+        border: 1px solid rgba(255, 209, 102, 0.28);
+        padding: 12px;
+        background: rgba(255, 209, 102, 0.07);
+      }
+
+      .sponsor-placement strong {
+        color: var(--playlist-ink);
+      }
+
+      .sponsor-placement span,
+      .sponsor-placement p {
+        margin: 0;
+        color: var(--playlist-muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .track-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .track-row {
+        display: grid;
+        grid-template-columns: 70px minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--playlist-line);
+        background: rgba(255, 255, 255, 0.045);
+        padding: 10px;
+      }
+
+      .track-row img {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .track-row__meta {
+        min-width: 0;
+      }
+
+      .track-row__meta strong,
+      .artist-chart strong {
+        display: block;
+        color: var(--playlist-ink);
+        overflow-wrap: anywhere;
+      }
+
+      .track-row__meta span,
+      .track-row__meta small,
+      .artist-chart span,
+      .draft-track span,
+      .user-playlist span {
+        display: block;
+        color: var(--playlist-muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .track-row__actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .playlist-split {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .artist-chart,
+      .draft-track,
+      .user-playlist {
+        border: 1px solid var(--playlist-line);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px;
+      }
+
+      .artist-chart {
+        display: grid;
+        grid-template-columns: 54px minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+      }
+
+      .artist-chart img {
+        width: 54px;
+        height: 54px;
+        object-fit: cover;
+      }
+
+      .draft-track,
+      .user-playlist {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .playlist-empty,
+      .playlist-status {
+        color: var(--playlist-muted);
+        border: 1px dashed var(--playlist-line);
+        padding: 14px;
+        margin: 0;
+      }
+
+      .playlist-status {
+        border-style: solid;
+        color: var(--playlist-gold);
+        background: rgba(255, 209, 102, 0.08);
+      }
+
+      @media (max-width: 1120px) {
+        .playlist-hero,
+        .playlist-grid,
+        .playlist-split {
+          grid-template-columns: 1fr;
+        }
+
+        .playlist-now {
+          grid-template-columns: 150px minmax(0, 1fr);
+          align-items: center;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .playlist-shell {
+          width: min(100% - 20px, 1440px);
+          padding-top: 12px;
+        }
+
+        .playlist-nav,
+        .playlist-panel__head,
+        .draft-track,
+        .user-playlist {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .playlist-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .playlist-now {
+          grid-template-columns: 1fr;
+        }
+
+        .track-row {
+          grid-template-columns: 56px minmax(0, 1fr);
+        }
+
+        .track-row img {
+          width: 56px;
+          height: 56px;
+        }
+
+        .track-row__actions {
+          grid-column: 1 / -1;
+          justify-content: stretch;
+        }
+
+        .track-row__actions .playlist-button,
+        .track-row__actions .playlist-icon-button {
+          flex: 1 1 40px;
+        }
+      }
+    </style>
+  </head>
+  <body data-sky-gate="public">
+    <main class="playlist-shell">
+      <nav class="playlist-nav" aria-label="Music Nexus">
+        <a href="../index.html"><strong>SkyeMusicNexus</strong></a>
+        <div class="playlist-nav__links">
+          <a href="../index.html">Home</a>
+          <a href="./create.html">Create</a>
+          <a href="./feed.html">Feed</a>
+          <a href="./discover.html" aria-current="page">Playlists</a>
+          <a href="./radio.html">Radio</a>
+          <a href="./walkthrough.html">Walkthroughs</a>
+          <a href="./stream-analytics.html">Streams</a>
+          <a href="./achievements.html">Awards</a>
+          <a href="./store.html">Store</a>
+          <a href="./ads.html">Ads</a>
+        </div>
+      </nav>
+
+      <section class="playlist-hero" aria-labelledby="playlist-title">
+        <div class="playlist-hero__copy">
+          <span class="playlist-eyebrow">Playlist Command</span>
+          <h1 id="playlist-title">Charts, drops, and custom queues.</h1>
+          <p>
+            Music Nexus playlists now pull Spotify-style discovery cues from active artist storefront products, package status, genre tags,
+            collaboration signals, and release readiness so the network feels alive without pretending the data is external.
+          </p>
+          <div class="playlist-radio-actions">
+            <button class="playlist-button playlist-button--primary" type="button" data-action="start-radio">Start All-Nexus Radio</button>
+            <button class="playlist-button" type="button" data-action="shuffle-radio">Shuffle Every Song</button>
+            <a class="playlist-button" href="./radio.html">Open Radio</a>
+            <a class="playlist-button" href="./stream-analytics.html">Open Live Stats</a>
+          </div>
+          <div class="playlist-stats" aria-label="Playlist totals">
+            <div class="playlist-stat"><strong id="stat-tracks">0</strong><span>Tracks</span></div>
+            <div class="playlist-stat"><strong id="stat-artists">0</strong><span>Artists</span></div>
+            <div class="playlist-stat"><strong id="stat-genres">0</strong><span>Genres</span></div>
+            <div class="playlist-stat"><strong id="stat-playlists">0</strong><span>Playlists</span></div>
+          </div>
+        </div>
+
+        <aside class="playlist-now" aria-label="Now playing">
+          <img id="now-art" class="now-art" src="../assets/og-card.svg" alt="" />
+          <div>
+            <span class="playlist-kicker">Now Playing</span>
+            <h2 id="now-title">Select a track</h2>
+            <p id="now-artist">The queue is ready.</p>
+          </div>
+          <audio id="nexus-player" controls preload="none" hidden></audio>
+        </aside>
+      </section>
+
+      <section class="playlist-grid" aria-label="Playlist workbench">
+        <aside class="playlist-panel">
+          <div class="playlist-panel__head">
+            <h2>System Playlists</h2>
+          </div>
+          <div class="playlist-stack">
+            <input id="track-search" class="playlist-search" type="search" placeholder="Search tracks, artists, genres" />
+            <div id="system-playlists" class="playlist-stack"></div>
+            <div class="sponsor-stack" aria-label="Sponsored placements">
+              <div class="playlist-panel__head playlist-panel__head--tight">
+                <h3>Sponsored Slots</h3>
+                <a href="./ads.html">Book</a>
+              </div>
+              <div id="ad-placements" class="playlist-stack"></div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="playlist-panel">
+          <div class="playlist-panel__head">
+            <div>
+              <span class="playlist-kicker" id="queue-kicker">Overall</span>
+              <h2 id="queue-title">Nexus Overall</h2>
+            </div>
+            <button class="playlist-button playlist-button--primary" data-action="play-queue">Play Queue</button>
+          </div>
+          <div id="queue-list" class="track-list"></div>
+        </section>
+
+        <aside class="playlist-panel">
+          <div class="playlist-panel__head">
+            <h2>Create Playlist</h2>
+          </div>
+          <div class="playlist-stack">
+            <input id="playlist-name" class="playlist-input" type="text" maxlength="80" placeholder="Playlist name" />
+            <div id="draft-list" class="playlist-stack"></div>
+            <button class="playlist-button playlist-button--primary" data-action="save-playlist">Save Playlist</button>
+            <button class="playlist-button" data-action="export-playlists">Export JSON</button>
+            <textarea id="playlist-import" class="playlist-import" placeholder="Paste exported playlist JSON"></textarea>
+            <button class="playlist-button" data-action="import-playlists">Import JSON</button>
+            <div id="playlist-status" class="playlist-status" hidden></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="playlist-split" aria-label="Charts and saved playlists">
+        <section class="playlist-panel">
+          <div class="playlist-panel__head">
+            <div>
+              <span class="playlist-kicker">Genre Charts</span>
+              <h2 id="genre-title">All Genres</h2>
+            </div>
+          </div>
+          <div id="genre-tabs" class="playlist-chip-grid"></div>
+          <div id="genre-chart-list" class="track-list" style="margin-top: 14px"></div>
+        </section>
+
+        <section class="playlist-panel">
+          <div class="playlist-panel__head">
+            <div>
+              <span class="playlist-kicker">My Library</span>
+              <h2>Saved Playlists</h2>
+            </div>
+            <button class="playlist-button playlist-button--danger" data-action="clear-user-playlists">Clear</button>
+          </div>
+          <div id="user-playlists" class="playlist-stack"></div>
+        </section>
+      </section>
+
+      <section class="playlist-panel" style="margin-top: 18px" aria-label="Artist charts">
+        <div class="playlist-panel__head">
+          <div>
+            <span class="playlist-kicker">Artist Charts</span>
+            <h2>Nexus Artist Movement</h2>
+          </div>
+        </div>
+        <div id="artist-charts" class="playlist-chip-grid"></div>
+      </section>
+    </main>
+
+    <script src="./nexus-player.js"></script>
+    <script>
+      (() => {
+        const PLAYER_LIBRARY_KEY = 'skymusicnexus.playerLibrary.v1';
+        const WORKER_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+        const state = {
+          catalog: null,
+          tracks: [],
+          trackById: new Map(),
+          activeQueueIds: [],
+          activeGenre: '',
+          draftTrackIds: [],
+          userPlaylists: [],
+          adPlacements: [],
+          remoteTraffic: null,
+          liveOverallIds: [],
+        };
+
+        const el = {
+          stats: {
+            tracks: document.getElementById('stat-tracks'),
+            artists: document.getElementById('stat-artists'),
+            genres: document.getElementById('stat-genres'),
+            playlists: document.getElementById('stat-playlists'),
+          },
+          nowArt: document.getElementById('now-art'),
+          nowTitle: document.getElementById('now-title'),
+          nowArtist: document.getElementById('now-artist'),
+          player: document.getElementById('nexus-player'),
+          search: document.getElementById('track-search'),
+          systemPlaylists: document.getElementById('system-playlists'),
+          queueKicker: document.getElementById('queue-kicker'),
+          queueTitle: document.getElementById('queue-title'),
+          queueList: document.getElementById('queue-list'),
+          genreTabs: document.getElementById('genre-tabs'),
+          genreTitle: document.getElementById('genre-title'),
+          genreChartList: document.getElementById('genre-chart-list'),
+          playlistName: document.getElementById('playlist-name'),
+          draftList: document.getElementById('draft-list'),
+          userPlaylists: document.getElementById('user-playlists'),
+          playlistImport: document.getElementById('playlist-import'),
+          status: document.getElementById('playlist-status'),
+          artistCharts: document.getElementById('artist-charts'),
+          adPlacements: document.getElementById('ad-placements'),
+        };
+
+        function escapeHtml(value) {
+          return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+        }
+
+        function trackUrl(track, key) {
+          return track?.[key] || '#';
+        }
+
+        function showStatus(message) {
+          el.status.hidden = false;
+          el.status.textContent = message;
+          window.setTimeout(() => {
+            el.status.hidden = true;
+          }, 3400);
+        }
+
+        function loadLibrary() {
+          try {
+            const raw = window.localStorage.getItem(PLAYER_LIBRARY_KEY);
+            const parsed = raw ? JSON.parse(raw) : {};
+            return parsed && typeof parsed === 'object' ? parsed : { likedTrackIds: [], playlists: [] };
+          } catch {
+            return { likedTrackIds: [], playlists: [] };
+          }
+        }
+
+        function loadUserPlaylists() {
+          const library = loadLibrary();
+          return Array.isArray(library.playlists) ? library.playlists : [];
+        }
+
+        function saveUserPlaylists() {
+          const library = loadLibrary();
+          window.localStorage.setItem(PLAYER_LIBRARY_KEY, JSON.stringify({
+            ...library,
+            likedTrackIds: Array.isArray(library.likedTrackIds) ? library.likedTrackIds : [],
+            playlists: state.userPlaylists,
+            updatedAt: new Date().toISOString(),
+          }, null, 2));
+          window.dispatchEvent(new CustomEvent('skymusicnexus:library-change', { detail: { playlists: state.userPlaylists } }));
+        }
+
+        function tracksFromIds(trackIds) {
+          return (trackIds || []).map((trackId) => state.trackById.get(trackId)).filter(Boolean);
+        }
+
+        function mergeTrafficSummary(summary) {
+          if (!summary?.tracks) return;
+          for (const [trackId, stats] of Object.entries(summary.tracks)) {
+            const track = state.trackById.get(trackId) || state.tracks.find((item) => item.productId === trackId);
+            if (!track) continue;
+            track.streamStats = {
+              ...(track.streamStats || {}),
+              ...stats,
+              nexusStreams: Number(stats.nexusStreams || 0),
+              completePlays: Number(stats.completePlays || 0),
+              playStarts: Number(stats.playStarts || 0),
+              listenSeconds: Number(stats.listenSeconds || 0),
+            };
+          }
+        }
+
+        function mergeLocalStreamEvent(event) {
+          if (!event?.trackId || !state.trackById.has(event.trackId)) return;
+          const track = state.trackById.get(event.trackId);
+          const stats = track.streamStats || {};
+          const isQualified = event.eventType === 'qualified_stream';
+          track.streamStats = {
+            ...stats,
+            playStarts: Number(stats.playStarts || 0) + (event.eventType === 'play_start' ? 1 : 0),
+            completePlays: Number(stats.completePlays || 0) + (event.eventType === 'complete_play' ? 1 : 0),
+            nexusStreams: Number(stats.nexusStreams || 0) + (isQualified ? 1 : 0),
+            listenSeconds: Number(stats.listenSeconds || 0) + Number(event.listenSeconds || 0),
+          };
+        }
+
+        function trackRankScore(track) {
+          const stats = track.streamStats || {};
+          const nexusStreams = Number(stats.nexusStreams || 0);
+          const completePlays = Number(stats.completePlays || 0);
+          const playStarts = Number(stats.playStarts || 0);
+          const listenSeconds = Number(stats.listenSeconds || 0);
+          return nexusStreams * 1000 + completePlays * 60 + playStarts * 12 + listenSeconds * .04 + Number(track.score || 0);
+        }
+
+        function rankedTracks(source = state.tracks) {
+          return [...source].sort((a, b) => trackRankScore(b) - trackRankScore(a) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')) || a.title.localeCompare(b.title));
+        }
+
+        function rebuildLiveCharts() {
+          const ranked = rankedTracks();
+          state.liveOverallIds = ranked.map((track) => track.trackId);
+          state.catalog.charts = state.catalog.charts || {};
+          state.catalog.charts.overall = state.liveOverallIds;
+          const genreMap = new Map();
+          for (const track of state.tracks) {
+            const genres = [...new Set([track.genre, ...(track.genres || [])].filter(Boolean))].slice(0, 6);
+            for (const genre of genres) {
+              if (!genreMap.has(genre)) genreMap.set(genre, []);
+              genreMap.get(genre).push(track);
+            }
+          }
+          state.catalog.charts.genreCharts = [...genreMap.entries()]
+            .map(([genre, tracks]) => ({
+              genre,
+              liveRanked:true,
+              trackIds:rankedTracks(tracks).map((track) => track.trackId),
+              nexusStreams:tracks.reduce((sum, track) => sum + Number(track.streamStats?.nexusStreams || 0), 0),
+            }))
+            .sort((a, b) => Number(b.nexusStreams || 0) - Number(a.nexusStreams || 0) || a.genre.localeCompare(b.genre));
+          const artistMap = new Map();
+          for (const track of state.tracks) {
+            const key = track.artistSlug || track.artistId || track.artistName;
+            if (!artistMap.has(key)) artistMap.set(key, {artistSlug:track.artistSlug, artistId:track.artistId, artistName:track.artistName, artistImage:track.artistImage, productRoomUrl:track.storeUrl, trackIds:[], score:0, nexusStreams:0});
+            const artist = artistMap.get(key);
+            artist.trackIds.push(track.trackId);
+            artist.score += trackRankScore(track);
+            artist.nexusStreams += Number(track.streamStats?.nexusStreams || 0);
+          }
+          state.catalog.charts.artistCharts = [...artistMap.values()].sort((a, b) => b.score - a.score || a.artistName.localeCompare(b.artistName));
+          const livePlaylist = {
+            playlistId:'live-nexus-trending',
+            title:'Live Nexus Trending',
+            description:'Real MusicNexus chart order from one unified Nexus stream count plus player movement receipts.',
+            trackIds:state.liveOverallIds,
+            liveRanked:true,
+          };
+          const existing = (state.catalog.systemPlaylists || []).filter((playlist) => playlist.playlistId !== livePlaylist.playlistId);
+          state.catalog.systemPlaylists = [livePlaylist, ...existing];
+        }
+
+        function filteredTracks(trackIds) {
+          const query = el.search.value.trim().toLowerCase();
+          const tracks = tracksFromIds(trackIds);
+          if (!query) return tracks;
+          return tracks.filter((track) => {
+            const source = `${track.title} ${track.artistName} ${(track.genres || []).join(' ')}`.toLowerCase();
+            return source.includes(query);
+          });
+        }
+
+        function trackRow(track, options = {}) {
+          const visualButton = track.visualPackage?.href
+            ? `<a class="playlist-button" href="${escapeHtml(track.visualPackage.href)}">Visual</a>`
+            : '';
+          const addButton = options.noAdd
+            ? ''
+            : `<button class="playlist-icon-button" title="Add to playlist" data-action="add-track" data-track-id="${escapeHtml(track.trackId)}">+</button>`;
+          const removeButton = options.removeDraft
+            ? `<button class="playlist-icon-button playlist-button--danger" title="Remove" data-action="remove-draft-track" data-track-id="${escapeHtml(track.trackId)}">x</button>`
+            : '';
+          const image = track.coverImage || track.artistImage;
+          const streamStats = track.streamStats || {};
+          const nexusStreams = Number(streamStats.nexusStreams || streamStats.streams || 0);
+          return `
+            <article class="track-row">
+              <img src="${escapeHtml(image)}" alt="" loading="lazy" />
+              <div class="track-row__meta">
+                <strong>${escapeHtml(track.title)}</strong>
+                <span>${escapeHtml(track.artistName)} - ${escapeHtml(track.genre)}</span>
+                <small>Live rank ${Math.round(trackRankScore(track))} - ${escapeHtml(nexusStreams)} Nexus streams - ${(track.genres || []).slice(0, 3).map(escapeHtml).join(' / ')}</small>
+              </div>
+              <div class="track-row__actions">
+                <button class="playlist-icon-button" title="Play" data-action="play-track" data-nexus-track-id="${escapeHtml(track.trackId)}" data-track-id="${escapeHtml(track.trackId)}">Play</button>
+                ${addButton}
+                ${removeButton}
+                <a class="playlist-button" href="${escapeHtml(trackUrl(track, 'dropUrl'))}">Drop</a>
+                <a class="playlist-button" href="${escapeHtml(trackUrl(track, 'storeUrl'))}">Store</a>
+                ${visualButton}
+              </div>
+            </article>
+          `;
+        }
+
+        function renderSystemPlaylists() {
+          el.systemPlaylists.innerHTML = state.catalog.systemPlaylists
+            .map(
+              (playlist) => `
+                <button class="system-playlist" data-action="select-system-playlist" data-playlist-id="${escapeHtml(playlist.playlistId)}">
+                  <strong>${escapeHtml(playlist.title)}</strong>
+                  <span>${escapeHtml(playlist.description || '')}</span>
+                  <span>${playlist.trackIds.length} tracks</span>
+                </button>
+              `,
+            )
+            .join('');
+        }
+
+        function renderAdPlacements() {
+          const placements = state.adPlacements.filter((placement) => (
+            placement.status === 'active' &&
+            (placement.surface === 'discover' || placement.slotId === 'discover_chart_rail')
+          ));
+          el.adPlacements.innerHTML = placements.length
+            ? placements
+                .map((placement) => {
+                  const creative = placement.creative || {};
+                  return `
+                    <article class="sponsor-placement">
+                      <span>${escapeHtml(placement.disclosure || 'Sponsored')}</span>
+                      <strong>${escapeHtml(creative.title || placement.businessName || 'Music Nexus sponsor')}</strong>
+                      <p>${escapeHtml(creative.body || '')}</p>
+                      ${creative.ctaUrl ? `<a class="playlist-button" href="${escapeHtml(creative.ctaUrl)}">${escapeHtml(creative.ctaLabel || 'Open')}</a>` : ''}
+                    </article>
+                  `;
+                })
+                .join('')
+            : '<p class="playlist-empty">Sponsor slots are ready.</p>';
+        }
+
+        function setQueue(title, kicker, trackIds) {
+          state.activeQueueIds = trackIds || [];
+          el.queueTitle.textContent = title || 'Nexus Overall';
+          el.queueKicker.textContent = kicker || 'Overall';
+          renderQueue();
+        }
+
+        function renderQueue() {
+          const tracks = filteredTracks(state.activeQueueIds);
+          el.queueList.innerHTML = tracks.length
+            ? tracks.map((track) => trackRow(track)).join('')
+            : '<p class="playlist-empty">No matching tracks.</p>';
+        }
+
+        function renderGenreTabs() {
+          const charts = state.catalog.charts.genreCharts || [];
+          el.genreTabs.innerHTML = [
+            `<button class="playlist-chip ${state.activeGenre ? '' : 'is-active'}" data-action="select-genre" data-genre="">All</button>`,
+            ...charts.map((chart) => {
+              const active = chart.genre === state.activeGenre ? 'is-active' : '';
+              return `<button class="playlist-chip ${active}" data-action="select-genre" data-genre="${escapeHtml(chart.genre)}">${escapeHtml(chart.genre)}</button>`;
+            }),
+          ].join('');
+        }
+
+        function renderGenreChart() {
+          const charts = state.catalog.charts.genreCharts || [];
+          const chart = state.activeGenre ? charts.find((item) => item.genre === state.activeGenre) : charts[0];
+          const tracks = chart ? tracksFromIds(chart.trackIds).slice(0, 12) : state.tracks.slice(0, 12);
+          el.genreTitle.textContent = chart ? chart.genre : 'All Genres';
+          el.genreChartList.innerHTML = tracks.length
+            ? tracks.map((track) => trackRow(track)).join('')
+            : '<p class="playlist-empty">No chart records yet.</p>';
+          renderGenreTabs();
+        }
+
+        function renderDraft() {
+          const tracks = tracksFromIds(state.draftTrackIds);
+          el.draftList.innerHTML = tracks.length
+            ? tracks
+                .map(
+                  (track) => `
+                    <div class="draft-track">
+                      <span>${escapeHtml(track.title)} - ${escapeHtml(track.artistName)}</span>
+                      <button class="playlist-icon-button playlist-button--danger" title="Remove" data-action="remove-draft-track" data-track-id="${escapeHtml(track.trackId)}">x</button>
+                    </div>
+                  `,
+                )
+                .join('')
+            : '<p class="playlist-empty">Add tracks from the queue or charts.</p>';
+        }
+
+        function renderUserPlaylists() {
+          el.userPlaylists.innerHTML = state.userPlaylists.length
+            ? state.userPlaylists
+                .map(
+                  (playlist) => `
+                    <article class="user-playlist">
+                      <div>
+                        <strong>${escapeHtml(playlist.title)}</strong>
+                        <span>${playlist.trackIds.length} tracks - saved ${escapeHtml(playlist.updatedAt || '')}</span>
+                      </div>
+                      <div class="track-row__actions">
+                        <button class="playlist-button playlist-button--primary" data-action="play-user-playlist" data-playlist-id="${escapeHtml(playlist.playlistId)}">Play</button>
+                        <button class="playlist-button" data-action="load-user-playlist" data-playlist-id="${escapeHtml(playlist.playlistId)}">Load</button>
+                        <button class="playlist-icon-button playlist-button--danger" title="Delete" data-action="delete-user-playlist" data-playlist-id="${escapeHtml(playlist.playlistId)}">x</button>
+                      </div>
+                    </article>
+                  `,
+                )
+                .join('')
+            : '<p class="playlist-empty">Saved playlists appear here.</p>';
+        }
+
+        function renderArtistCharts() {
+          const charts = state.catalog.charts.artistCharts || [];
+          el.artistCharts.innerHTML = charts
+            .slice(0, 18)
+            .map(
+              (artist, index) => `
+                <a class="artist-chart" href="${escapeHtml(artist.productRoomUrl)}">
+                  <img src="${escapeHtml(artist.artistImage)}" alt="" loading="lazy" />
+                  <span>
+                    <strong>${index + 1}. ${escapeHtml(artist.artistName)}</strong>
+                    <span>${artist.trackIds.length} tracks - ${Number(artist.nexusStreams || 0)} Nexus streams</span>
+                  </span>
+                </a>
+              `,
+            )
+            .join('');
+        }
+
+        function playTrack(trackId) {
+          const track = state.trackById.get(trackId);
+          if (!track) return;
+          el.nowArt.src = track.coverImage || track.artistImage;
+          el.nowTitle.textContent = track.title;
+          el.nowArtist.textContent = `${track.artistName} - ${track.genre}`;
+          if (window.SkyeNexusPlayer?.playTrack) {
+            window.SkyeNexusPlayer.playTrack(trackId, state.activeQueueIds);
+          } else {
+            el.player.src = track.audioUrl;
+            el.player.play().catch(() => {});
+          }
+        }
+
+        function playQueue() {
+          const tracks = filteredTracks(state.activeQueueIds);
+          if (tracks.length && window.SkyeNexusPlayer?.playQueue) window.SkyeNexusPlayer.playQueue(tracks.map((track) => track.trackId));
+          else if (tracks.length) playTrack(tracks[0].trackId);
+        }
+
+        function startRadio(shuffle = true) {
+          const ids = state.tracks.map((track) => track.trackId);
+          const queue = shuffle
+            ? ids.map((id) => ({ id, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map((row) => row.id)
+            : ids;
+          setQueue('All-Nexus Radio', 'Every Song', queue);
+          if (window.SkyeNexusPlayer?.playRadio) window.SkyeNexusPlayer.playRadio();
+          else playQueue();
+        }
+
+        function addTrack(trackId) {
+          if (!state.trackById.has(trackId)) return;
+          if (!state.draftTrackIds.includes(trackId)) state.draftTrackIds.push(trackId);
+          renderDraft();
+        }
+
+        function removeDraftTrack(trackId) {
+          state.draftTrackIds = state.draftTrackIds.filter((id) => id !== trackId);
+          renderDraft();
+        }
+
+        function saveDraftPlaylist() {
+          const title = el.playlistName.value.trim() || `Nexus Playlist ${state.userPlaylists.length + 1}`;
+          if (!state.draftTrackIds.length) {
+            showStatus('Add at least one track first.');
+            return;
+          }
+          const playlist = {
+            playlistId: `user-${Date.now()}`,
+            title,
+            kind: 'user',
+            trackIds: [...state.draftTrackIds],
+            updatedAt: new Date().toISOString(),
+          };
+          state.userPlaylists.unshift(playlist);
+          state.draftTrackIds = [];
+          el.playlistName.value = '';
+          saveUserPlaylists();
+          renderDraft();
+          renderUserPlaylists();
+          showStatus('Playlist saved to this browser.');
+        }
+
+        function exportPlaylists() {
+          const payload = {
+            schema: 'skyemusicnexus.libraryExport.v1',
+            exportedAt: new Date().toISOString(),
+            likedTrackIds: loadLibrary().likedTrackIds || [],
+            playlists: state.userPlaylists,
+          };
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = 'skyemusicnexus-playlists.json';
+          anchor.click();
+          URL.revokeObjectURL(url);
+        }
+
+        function importPlaylists() {
+          try {
+            const parsed = JSON.parse(el.playlistImport.value);
+            const playlists = Array.isArray(parsed) ? parsed : parsed.playlists;
+            if (!Array.isArray(playlists)) throw new Error('No playlists');
+            const cleaned = playlists
+              .map((playlist) => ({
+                playlistId: playlist.playlistId || `user-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                title: String(playlist.title || 'Imported Playlist').slice(0, 80),
+                kind: 'user',
+                trackIds: [...new Set((playlist.trackIds || []).filter((id) => state.trackById.has(id)))],
+                updatedAt: new Date().toISOString(),
+              }))
+              .filter((playlist) => playlist.trackIds.length);
+            state.userPlaylists = [...cleaned, ...state.userPlaylists];
+            saveUserPlaylists();
+            renderUserPlaylists();
+            el.playlistImport.value = '';
+            showStatus(`${cleaned.length} playlist records imported.`);
+          } catch {
+            showStatus('Import needs valid SkyeMusicNexus playlist JSON.');
+          }
+        }
+
+        function handleAction(target) {
+          const action = target.dataset.action;
+          if (action === 'select-system-playlist') {
+            const playlist = state.catalog.systemPlaylists.find((item) => item.playlistId === target.dataset.playlistId);
+            if (playlist) setQueue(playlist.title, 'System Playlist', playlist.trackIds);
+          }
+          if (action === 'select-genre') {
+            state.activeGenre = target.dataset.genre || '';
+            renderGenreChart();
+          }
+          if (action === 'play-track') playTrack(target.dataset.trackId);
+          if (action === 'add-track') addTrack(target.dataset.trackId);
+          if (action === 'remove-draft-track') removeDraftTrack(target.dataset.trackId);
+          if (action === 'play-queue') playQueue();
+          if (action === 'start-radio') startRadio(false);
+          if (action === 'shuffle-radio') startRadio(true);
+          if (action === 'save-playlist') saveDraftPlaylist();
+          if (action === 'export-playlists') exportPlaylists();
+          if (action === 'import-playlists') importPlaylists();
+          if (action === 'clear-user-playlists') {
+            state.userPlaylists = [];
+            saveUserPlaylists();
+            renderUserPlaylists();
+            showStatus('Saved playlists cleared.');
+          }
+          if (action === 'play-user-playlist') {
+            const playlist = state.userPlaylists.find((item) => item.playlistId === target.dataset.playlistId);
+            if (playlist) {
+              setQueue(playlist.title, 'Saved Playlist', playlist.trackIds);
+              const first = tracksFromIds(playlist.trackIds)[0];
+              if (first) playTrack(first.trackId);
+            }
+          }
+          if (action === 'load-user-playlist') {
+            const playlist = state.userPlaylists.find((item) => item.playlistId === target.dataset.playlistId);
+            if (playlist) {
+              state.draftTrackIds = [...playlist.trackIds];
+              el.playlistName.value = playlist.title;
+              renderDraft();
+            }
+          }
+          if (action === 'delete-user-playlist') {
+            state.userPlaylists = state.userPlaylists.filter((item) => item.playlistId !== target.dataset.playlistId);
+            saveUserPlaylists();
+            renderUserPlaylists();
+          }
+        }
+
+        async function init() {
+          const [response, adResponse] = await Promise.all([
+            fetch('./data/playlists.json', { cache: 'no-store' }),
+            fetch('./data/ad-placements.json', { cache: 'no-store' }).catch(() => null),
+          ]);
+          if (!response.ok) throw new Error(`Playlist catalog failed: ${response.status}`);
+          const catalog = await response.json();
+          const adCatalog = adResponse?.ok ? await adResponse.json().catch(() => ({})) : {};
+          state.catalog = catalog;
+          state.tracks = catalog.tracks || [];
+          state.trackById = new Map(state.tracks.map((track) => [track.trackId, track]));
+          state.userPlaylists = loadUserPlaylists();
+          state.adPlacements = Array.isArray(adCatalog.placements) ? adCatalog.placements : [];
+          state.remoteTraffic = await fetch(`${WORKER_ORIGIN}/api/skymusicnexus/music-drops?action=traffic-summary`, { cache: 'no-store' }).then((res) => res.ok ? res.json() : null).catch(() => null);
+          mergeTrafficSummary(state.remoteTraffic?.trafficSummary);
+          rebuildLiveCharts();
+
+          el.stats.tracks.textContent = catalog.totals?.tracks || state.tracks.length;
+          el.stats.artists.textContent = catalog.totals?.artists || 0;
+          el.stats.genres.textContent = catalog.totals?.genres || 0;
+          el.stats.playlists.textContent = catalog.totals?.systemPlaylists || (catalog.systemPlaylists || []).length;
+
+          renderSystemPlaylists();
+          renderGenreChart();
+          renderDraft();
+          renderUserPlaylists();
+          renderArtistCharts();
+          renderAdPlacements();
+
+          const firstPlaylist = state.catalog.systemPlaylists?.[0];
+          setQueue(firstPlaylist?.title, 'Live Worker Chart', firstPlaylist?.trackIds || state.catalog.charts?.overall || []);
+        }
+
+        document.addEventListener('click', (event) => {
+          const target = event.target.closest('[data-action]');
+          if (target) handleAction(target);
+        });
+
+        el.search.addEventListener('input', () => {
+          renderQueue();
+        });
+
+        window.addEventListener('skymusicnexus:stream-event', (event) => {
+          mergeLocalStreamEvent(event.detail || {});
+          rebuildLiveCharts();
+          renderSystemPlaylists();
+          renderQueue();
+          renderGenreChart();
+          renderArtistCharts();
+          window.setTimeout(async () => {
+            state.remoteTraffic = await fetch(`${WORKER_ORIGIN}/api/skymusicnexus/music-drops?action=traffic-summary`, { cache: 'no-store' }).then((res) => res.ok ? res.json() : null).catch(() => null);
+            mergeTrafficSummary(state.remoteTraffic?.trafficSummary);
+            rebuildLiveCharts();
+            renderSystemPlaylists();
+            renderQueue();
+            renderGenreChart();
+            renderArtistCharts();
+          }, 900);
+        });
+
+        init().catch((error) => {
+          el.queueList.innerHTML = `<p class="playlist-empty">${escapeHtml(error.message)}</p>`;
+        });
+      })();
+    </script>
+  </body>
 </html>

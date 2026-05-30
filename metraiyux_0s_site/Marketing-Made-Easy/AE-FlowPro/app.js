@@ -265,9 +265,12 @@
       storageKey: "ae_flow_v1_state",
       storageKeySecure: "ae_flow_v1_secure_mirror",
       storageKeySecureMeta: "ae_flow_v1_secure_meta",
+      storageKeyRuntime: "ae_flow_v1_0s_workspace_runtime",
       runtime: {
-        basePath: "./api/runtime",
+        basePath: "/api/founder-command/ae-flow/runtime",
+        founderApiPath: "/api/founder-command/ae-flow",
         available: false,
+        storageMode: "browser-workspace",
         checking: false,
         checkedAt: null,
         journalTotal: 0,
@@ -316,6 +319,32 @@ Aggressive | 0.50 | 0.25`,
     };
 
     const $ = (id) => document.getElementById(id);
+    const GATE_SESSION_KEYS = [
+      "FREE99_PLATFORM_GATE_SESSION",
+      "FREE99_PLATFORM_GATE_SESSION_FOUNDER_COMMAND",
+      "METRAIYUX_GATE_SESSION",
+      "SKYGATEFS27_GATE_SESSION",
+      "SKYGATE_USER_TOKEN",
+      "skye_gate_session",
+      "skygate_session",
+      "metraiyux_gate_session"
+    ];
+
+    function gateSessionHeaders(){
+      let token = "";
+      try{
+        for(const key of GATE_SESSION_KEYS){
+          const value = localStorage.getItem(key) || sessionStorage.getItem(key);
+          if(value && value.length > 12){ token = value; break; }
+        }
+      }catch(e){}
+      if(!token) return {};
+      return {
+        authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,
+        "x-skye-gate-session": token.replace(/^Bearer\s+/i, ""),
+        "x-free99-gate-session": token.replace(/^Bearer\s+/i, "")
+      };
+    }
 
     const nowISO = () => new Date().toISOString();
     const todayKey = (d=new Date()) => {
@@ -536,12 +565,241 @@ Aggressive | 0.50 | 0.25`,
       el.textContent = bits.join(" ");
     }
 
+    function browserRuntimeBlankState(){
+      return {
+        snapshots: [],
+        activationPacks: [],
+        activationWorkflows: [],
+        executionBoard: [],
+        dispatchBoard: [],
+        workflowTimeline: []
+      };
+    }
+
+    function browserRuntimeRead(){
+      let state = browserRuntimeBlankState();
+      try{
+        state = Object.assign(state, JSON.parse(localStorage.getItem(APP.storageKeyRuntime) || "{}"));
+      }catch(e){}
+      Object.keys(browserRuntimeBlankState()).forEach(key => {
+        if(!Array.isArray(state[key])) state[key] = [];
+      });
+      return state;
+    }
+
+    function browserRuntimeWrite(state){
+      localStorage.setItem(APP.storageKeyRuntime, JSON.stringify(Object.assign({
+        platformId: "ae-flowpro",
+        storageMode: "browser-workspace",
+        updatedAt: nowISO()
+      }, state)));
+    }
+
+    function browserRuntimeId(prefix){
+      const suffix = Math.random().toString(36).slice(2, 8);
+      return `${prefix}_${Date.now()}_${suffix}`;
+    }
+
+    function browserRuntimeLatestAt(rows){
+      const first = Array.isArray(rows) ? rows[0] : null;
+      return first?.createdAt || first?.queuedAt || first?.updatedAt || first?.at || null;
+    }
+
+    function browserRuntimeStatus(state=browserRuntimeRead()){
+      const journalSummary = OpsJournal.summarize(listRecoveryJournal());
+      return {
+        ok: true,
+        storage: "browser-workspace",
+        journal: { total: Number(journalSummary.total || 0), latestAt: journalSummary.latestAt || null },
+        snapshots: { total: state.snapshots.length, latestAt: browserRuntimeLatestAt(state.snapshots) },
+        activationPacks: { total: state.activationPacks.length, latestAt: browserRuntimeLatestAt(state.activationPacks) },
+        activationWorkflows: { total: state.activationWorkflows.length, latestAt: browserRuntimeLatestAt(state.activationWorkflows) },
+        executionBoard: { total: state.executionBoard.length, latestAt: browserRuntimeLatestAt(state.executionBoard) },
+        dispatchBoard: { total: state.dispatchBoard.length, latestAt: browserRuntimeLatestAt(state.dispatchBoard) },
+        workflowTimeline: { total: state.workflowTimeline.length, latestAt: browserRuntimeLatestAt(state.workflowTimeline) }
+      };
+    }
+
+    function applyRuntimeStatus(status, storageMode="worker-runtime"){
+      APP.runtime.storageMode = storageMode;
+      APP.runtime.journalTotal = Number(status.journal?.total || 0);
+      APP.runtime.snapshotTotal = Number(status.snapshots?.total || 0);
+      APP.runtime.activationPackTotal = Number(status.activationPacks?.total || 0);
+      APP.runtime.activationWorkflowTotal = Number(status.activationWorkflows?.total || 0);
+      APP.runtime.executionBoardTotal = Number(status.executionBoard?.total || 0);
+      APP.runtime.dispatchBoardTotal = Number(status.dispatchBoard?.total || 0);
+      APP.runtime.latestJournalAt = status.journal?.latestAt || null;
+      APP.runtime.latestSnapshotAt = status.snapshots?.latestAt || null;
+      APP.runtime.latestActivationPackAt = status.activationPacks?.latestAt || null;
+      APP.runtime.latestActivationWorkflowAt = status.activationWorkflows?.latestAt || null;
+      APP.runtime.latestExecutionBoardAt = status.executionBoard?.latestAt || null;
+      APP.runtime.latestDispatchBoardAt = status.dispatchBoard?.latestAt || null;
+      APP.runtime.workflowTimelineTotal = Number(status.workflowTimeline?.total || 0);
+      return status;
+    }
+
+    function applyBrowserRuntimeStatus(state=browserRuntimeRead()){
+      return applyRuntimeStatus(browserRuntimeStatus(state), "browser-workspace");
+    }
+
+    function finalizeBrowserRuntimeState(state){
+      browserRuntimeWrite(state);
+      const status = applyBrowserRuntimeStatus(state);
+      renderRuntimeLaneStatus();
+      renderActivationPackStatus();
+      renderActivationWorkflowStatus();
+      renderExecutionBoardStatus();
+      renderDispatchBoardStatus();
+      renderWorkflowTimelineStatus();
+      return status;
+    }
+
+    function saveBrowserRuntimeSnapshot(reason, options={}){
+      const state = browserRuntimeRead();
+      const snapshot = {
+        snapshotId: browserRuntimeId("snap"),
+        reason,
+        createdAt: nowISO(),
+        meta: Object.assign({ source: "0s-browser-workspace" }, options.meta || {}),
+        payload: options.payload || buildBackupPayload(!!options.todayOnly)
+      };
+      state.snapshots.unshift(snapshot);
+      state.snapshots = state.snapshots.slice(0, 150);
+      const status = finalizeBrowserRuntimeState(state);
+      return { ok:true, storage:"browser-workspace", snapshot, status };
+    }
+
+    function saveBrowserRuntimeActivationPack(options={}){
+      const state = browserRuntimeRead();
+      const snapshot = saveBrowserRuntimeSnapshot(options.reason || "activation-pack-source", {
+        meta: Object.assign({ source: "browser-activation-pack" }, options.meta || {}),
+        payload: options.payload || buildBackupPayload(false)
+      }).snapshot;
+      const analytics = computeAnalytics();
+      const activationPack = {
+        activationPackId: browserRuntimeId("act"),
+        snapshotId: snapshot.snapshotId,
+        createdAt: nowISO(),
+        scope: options.scope || "system-handoff",
+        sourceApp: APP.name,
+        owner: options.owner || (($("aeName")?.value || "").trim() || "activation-ops"),
+        summaryText: buildInsightsText(analytics),
+        maxAccounts: options.maxAccounts || 8
+      };
+      const nextState = browserRuntimeRead();
+      nextState.activationPacks.unshift(activationPack);
+      nextState.activationPacks = nextState.activationPacks.slice(0, 150);
+      const status = finalizeBrowserRuntimeState(nextState);
+      return { ok:true, storage:"browser-workspace", snapshot, activationPack, status };
+    }
+
+    function saveBrowserRuntimeActivationWorkflow(options={}){
+      const activation = options.activationPack ? { activationPack: options.activationPack } : saveBrowserRuntimeActivationPack({
+        reason: options.reason || "activation-workflow-source",
+        scope: options.scope || "system-handoff",
+        meta: Object.assign({ source: "browser-activation-workflow" }, options.meta || {}),
+        owner: options.owner,
+        maxAccounts: options.maxAccounts || 8,
+        payload: options.payload
+      });
+      const activationPackId = activation?.activationPack?.activationPackId;
+      if(!activationPackId) throw new Error("activation-pack-not-created");
+      const state = browserRuntimeRead();
+      const activationWorkflow = {
+        workflowId: browserRuntimeId("wf"),
+        activationPackId,
+        owner: options.owner || activation?.activationPack?.owner || (($("aeName")?.value || "").trim() || "activation-ops"),
+        stage: options.stage || "handoff-review",
+        status: options.status || "queued",
+        label: options.label || `Workflow for ${activationPackId}`,
+        notes: options.notes || "Generated from the AE FlowPro 0S workspace lane.",
+        createdAt: nowISO()
+      };
+      state.activationWorkflows.unshift(activationWorkflow);
+      state.workflowTimeline.unshift({ id:browserRuntimeId("evt"), workflowId:activationWorkflow.workflowId, type:"activation-workflow-created", at:activationWorkflow.createdAt });
+      state.activationWorkflows = state.activationWorkflows.slice(0, 150);
+      state.workflowTimeline = state.workflowTimeline.slice(0, 300);
+      const status = finalizeBrowserRuntimeState(state);
+      return { ok:true, storage:"browser-workspace", activationPack:activation.activationPack, activationWorkflow, status };
+    }
+
+    function saveBrowserRuntimeExecutionBoardItem(options={}){
+      const workflow = options.activationWorkflow ? { activationWorkflow: options.activationWorkflow } : saveBrowserRuntimeActivationWorkflow({
+        reason: options.reason || "execution-board-source",
+        scope: options.scope || "system-handoff",
+        meta: Object.assign({ source: "browser-execution-board" }, options.meta || {}),
+        owner: options.owner,
+        status: options.workflowStatus || "queued",
+        stage: options.stage || "handoff-review",
+        label: options.label,
+        notes: options.workflowNotes,
+        payload: options.payload
+      });
+      const workflowId = workflow?.activationWorkflow?.workflowId;
+      if(!workflowId) throw new Error("activation-workflow-not-created");
+      const state = browserRuntimeRead();
+      const executionItem = {
+        executionItemId: browserRuntimeId("exec"),
+        workflowId,
+        owner: options.owner || workflow?.activationWorkflow?.owner || (($("aeName")?.value || "").trim() || "activation-ops"),
+        status: options.executionStatus || "queued",
+        checkpoint: options.checkpoint || "activation-queue",
+        dueAt: options.dueAt || "",
+        notes: options.notes || "Queued from the AE FlowPro 0S execution board lane.",
+        nextAction: options.nextAction || "Assign the CRM lane and start the first ready downstream step.",
+        createdAt: nowISO()
+      };
+      state.executionBoard.unshift(executionItem);
+      state.workflowTimeline.unshift({ id:browserRuntimeId("evt"), workflowId, type:"execution-board-queued", at:executionItem.createdAt });
+      state.executionBoard = state.executionBoard.slice(0, 150);
+      state.workflowTimeline = state.workflowTimeline.slice(0, 300);
+      const status = finalizeBrowserRuntimeState(state);
+      return { ok:true, storage:"browser-workspace", activationWorkflow:workflow.activationWorkflow, executionItem, status };
+    }
+
+    function saveBrowserRuntimeDispatchBoardItem(options={}){
+      const execution = options.executionItem ? { executionItem: options.executionItem } : saveBrowserRuntimeExecutionBoardItem({
+        reason: options.reason || "dispatch-board-source",
+        scope: options.scope || "system-handoff",
+        meta: Object.assign({ source: "browser-dispatch-board" }, options.meta || {}),
+        owner: options.owner,
+        workflowStatus: options.workflowStatus,
+        stage: options.stage,
+        label: options.label,
+        payload: options.payload
+      });
+      const executionItemId = execution?.executionItem?.executionItemId;
+      if(!executionItemId) throw new Error("execution-item-not-created");
+      const state = browserRuntimeRead();
+      const dispatch = {
+        dispatchId: browserRuntimeId("dispatch"),
+        executionItemId,
+        workflowId: execution?.executionItem?.workflowId || null,
+        owner: options.owner || execution?.executionItem?.owner || (($("aeName")?.value || "").trim() || "activation-ops"),
+        status: options.dispatchStatus || "queued",
+        checkpoint: options.checkpoint || "dispatch-queued",
+        channel: options.channel || "downstream-activation-dispatch",
+        target: options.target || (execution?.executionItem?.targets?.[0] || "crm"),
+        dueAt: options.dueAt || "",
+        notes: options.notes || "Queued from the AE FlowPro 0S dispatch board lane.",
+        nextAction: options.nextAction || "Confirm downstream owner and send the activation handoff.",
+        createdAt: nowISO()
+      };
+      const executionItem = Object.assign({}, execution.executionItem, { dispatch });
+      state.dispatchBoard.unshift(dispatch);
+      state.workflowTimeline.unshift({ id:browserRuntimeId("evt"), workflowId:dispatch.workflowId, type:"dispatch-board-queued", at:dispatch.createdAt });
+      state.dispatchBoard = state.dispatchBoard.slice(0, 150);
+      state.workflowTimeline = state.workflowTimeline.slice(0, 300);
+      const status = finalizeBrowserRuntimeState(state);
+      return { ok:true, storage:"browser-workspace", executionItem, status };
+    }
+
     function renderRuntimeLaneStatus(message=""){
       const el = $("runtimeLaneStatus");
       if(!el) return;
       const bits = [];
       if(APP.runtime.available){
-        bits.push("Same-folder runtime lane ready.");
+        bits.push("0S Worker runtime bridge ready.");
         bits.push(`Journal rows: ${APP.runtime.journalTotal}.`);
         bits.push(`Snapshots: ${APP.runtime.snapshotTotal}.`);
         bits.push(`Activation packs: ${APP.runtime.activationPackTotal}.`);
@@ -555,12 +813,17 @@ Aggressive | 0.50 | 0.25`,
         if(APP.runtime.latestExecutionBoardAt) bits.push(`Latest execution item: ${fmtTime(APP.runtime.latestExecutionBoardAt)}`);
         if(APP.runtime.latestDispatchBoardAt) bits.push(`Latest dispatch item: ${fmtTime(APP.runtime.latestDispatchBoardAt)}`);
       }else if(APP.runtime.checking){
-        bits.push("Checking same-folder runtime lane...");
+        bits.push("Checking 0S workspace bridge...");
       }else{
-        bits.push("Same-folder runtime lane not detected on this origin.");
-        bits.push("Serve this folder with runtime/local-runtime.mjs to persist journal history, snapshots, activation packs, and activation workflows into AE-FlowPro/runtime/.");
+        bits.push("0S browser workspace active on this production origin.");
+        bits.push(`Journal rows: ${APP.runtime.journalTotal}.`);
+        bits.push(`Snapshots: ${APP.runtime.snapshotTotal}.`);
+        bits.push(`Activation packs: ${APP.runtime.activationPackTotal}.`);
+        bits.push(`Activation workflows: ${APP.runtime.activationWorkflowTotal}.`);
+        bits.push(`Execution board: ${APP.runtime.executionBoardTotal}.`);
+        bits.push(`Dispatch board: ${APP.runtime.dispatchBoardTotal}.`);
       }
-      if(APP.runtime.error) bits.push(`Status: ${APP.runtime.error}`);
+      if(APP.runtime.available && APP.runtime.error) bits.push(`Status: ${APP.runtime.error}`);
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
     }
@@ -571,13 +834,13 @@ Aggressive | 0.50 | 0.25`,
       const bits = [];
       if(APP.runtime.available){
         if(APP.runtime.activationPackTotal){
-          bits.push(`${APP.runtime.activationPackTotal} activation pack(s) archived in the same-folder runtime.`);
+          bits.push(`${APP.runtime.activationPackTotal} activation pack(s) archived in the 0S Worker runtime.`);
         }else{
           bits.push("No activation packs archived yet.");
         }
         bits.push("Use activation packs to hand off owned accounts, deal economics, and downstream launch needs into the wider SkyeHands stack.");
       }else{
-        bits.push("Activation packs require the same-folder runtime lane.");
+        bits.push(APP.runtime.activationPackTotal ? `${APP.runtime.activationPackTotal} activation pack(s) prepared in this browser workspace.` : "Activation packs can be prepared from this 0S browser workspace.");
       }
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
@@ -589,13 +852,13 @@ Aggressive | 0.50 | 0.25`,
       const bits = [];
       if(APP.runtime.available){
         if(APP.runtime.activationWorkflowTotal){
-          bits.push(`${APP.runtime.activationWorkflowTotal} activation workflow(s) queued in the same-folder runtime.`);
+          bits.push(`${APP.runtime.activationWorkflowTotal} activation workflow(s) queued in the 0S Worker runtime.`);
         }else{
           bits.push("No activation workflows queued yet.");
         }
         bits.push("Use workflows to turn an activation pack into owned next-step execution across CRM, billing, web launch, and handoff lanes.");
       }else{
-        bits.push("Activation workflows require the same-folder runtime lane.");
+        bits.push(APP.runtime.activationWorkflowTotal ? `${APP.runtime.activationWorkflowTotal} activation workflow(s) queued in this browser workspace.` : "Activation workflows can be queued from this 0S browser workspace.");
       }
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
@@ -607,14 +870,14 @@ Aggressive | 0.50 | 0.25`,
       const bits = [];
       if(APP.runtime.available){
         if(APP.runtime.executionBoardTotal){
-          bits.push(`${APP.runtime.executionBoardTotal} execution board item(s) persisted in the same-folder runtime.`);
+          bits.push(`${APP.runtime.executionBoardTotal} execution board item(s) persisted in the 0S Worker runtime.`);
         }else{
           bits.push("No execution board items queued yet.");
         }
         bits.push("Use the execution board to turn activation workflows into owned downstream launch work.");
         if(APP.runtime.latestExecutionBoardAt) bits.push(`Latest execution item: ${fmtTime(APP.runtime.latestExecutionBoardAt)}`);
       }else{
-        bits.push("Execution board requires the same-folder runtime lane.");
+        bits.push(APP.runtime.executionBoardTotal ? `${APP.runtime.executionBoardTotal} execution board item(s) queued in this browser workspace.` : "Execution board items can be queued from this 0S browser workspace.");
       }
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
@@ -626,14 +889,14 @@ Aggressive | 0.50 | 0.25`,
       const bits = [];
       if(APP.runtime.available){
         if(APP.runtime.dispatchBoardTotal){
-          bits.push(`${APP.runtime.dispatchBoardTotal} dispatch board item(s) persisted in the same-folder runtime.`);
+          bits.push(`${APP.runtime.dispatchBoardTotal} dispatch board item(s) persisted in the 0S Worker runtime.`);
         }else{
           bits.push("No dispatch board items queued yet.");
         }
         bits.push("Use the dispatch board to hand activation execution into the next owned downstream lane.");
         if(APP.runtime.latestDispatchBoardAt) bits.push(`Latest dispatch item: ${fmtTime(APP.runtime.latestDispatchBoardAt)}`);
       }else{
-        bits.push("Dispatch board requires the same-folder runtime lane.");
+        bits.push(APP.runtime.dispatchBoardTotal ? `${APP.runtime.dispatchBoardTotal} dispatch board item(s) queued in this browser workspace.` : "Dispatch board items can be queued from this 0S browser workspace.");
       }
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
@@ -644,20 +907,64 @@ Aggressive | 0.50 | 0.25`,
       if(!el) return;
       const bits = [];
       if(APP.runtime.available){
-        bits.push(APP.runtime.workflowTimelineTotal ? `${APP.runtime.workflowTimelineTotal} workflow event(s) logged in the same-folder runtime.` : "No workflow timeline events recorded yet.");
+        bits.push(APP.runtime.workflowTimelineTotal ? `${APP.runtime.workflowTimelineTotal} workflow event(s) logged in the 0S Worker runtime.` : "No workflow timeline events recorded yet.");
         bits.push("Timeline tracks activation pack, workflow, execution, and dispatch transitions for this folder.");
       }else{
-        bits.push("Workflow timeline requires the same-folder runtime lane.");
+        bits.push(APP.runtime.workflowTimelineTotal ? `${APP.runtime.workflowTimelineTotal} workflow event(s) logged in this browser workspace.` : "Workflow timeline events will appear here as this browser workspace queues work.");
       }
       if(message) bits.push(message);
       el.textContent = bits.join(" ");
     }
 
+    async function requestFounderCrm(pathname="/status", options={}){
+      const headers = Object.assign(
+        { "content-type": "application/json" },
+        gateSessionHeaders(),
+        options.headers || {}
+      );
+      const res = await fetch(`${APP.runtime.founderApiPath}${pathname}`, Object.assign({
+        cache: "no-store"
+      }, options, { headers }));
+      const payload = await res.json().catch(()=>({ ok:false, error:`HTTP ${res.status}` }));
+      if(!res.ok || payload.ok === false) throw new Error(payload.error || `HTTP ${res.status}`);
+      return payload;
+    }
+
+    async function refreshFounderCrmStatus(){
+      const el = $("founderCrmStatus");
+      if(el) el.textContent = "Checking private founder CRM...";
+      try{
+        const payload = await requestFounderCrm("/status");
+        const summary = payload.summary || {};
+        const storage = payload.storage || {};
+        const tables = summary.tables || {};
+        const products = Array.isArray(payload.products) ? payload.products : [];
+        const productText = products.map(item => `${item.name}: ${item.price}`).join(" • ");
+        if(el){
+          el.textContent = [
+            `Private workspace: ${payload.workspace_id || "founder"}.`,
+            `Contacts captured: ${summary.contact_events || tables.contacts || 0}.`,
+            `Storage: ${storage.primary || "unconfigured"}.`,
+            storage.neonFallback ? "Neon fallback configured." : "Neon fallback waits for production ingest binding.",
+            productText
+          ].filter(Boolean).join(" ");
+        }
+        return payload;
+      }catch(e){
+        if(el) el.textContent = `Founder CRM status needs the owner gate session: ${e && e.message ? e.message : "unavailable"}`;
+        return null;
+      }
+    }
+
     async function requestRuntime(pathname, options={}){
+      const headers = Object.assign(
+        { "content-type": "application/json" },
+        gateSessionHeaders(),
+        options.headers || {}
+      );
       const res = await fetch(`${APP.runtime.basePath}${pathname}`, Object.assign({
-        cache: "no-store",
-        headers: { "content-type": "application/json" }
-      }, options));
+        cache: "no-store"
+      }, options, { headers }));
       if(!res.ok){
         let detail = `HTTP ${res.status}`;
         try{
@@ -677,35 +984,11 @@ Aggressive | 0.50 | 0.25`,
       try{
         const status = await requestRuntime("/status");
         APP.runtime.available = !!status.ok;
-        APP.runtime.journalTotal = Number(status.journal?.total || 0);
-        APP.runtime.snapshotTotal = Number(status.snapshots?.total || 0);
-        APP.runtime.activationPackTotal = Number(status.activationPacks?.total || 0);
-        APP.runtime.activationWorkflowTotal = Number(status.activationWorkflows?.total || 0);
-        APP.runtime.executionBoardTotal = Number(status.executionBoard?.total || 0);
-        APP.runtime.dispatchBoardTotal = Number(status.dispatchBoard?.total || 0);
-        APP.runtime.latestJournalAt = status.journal?.latestAt || null;
-        APP.runtime.latestSnapshotAt = status.snapshots?.latestAt || null;
-        APP.runtime.latestActivationPackAt = status.activationPacks?.latestAt || null;
-        APP.runtime.latestActivationWorkflowAt = status.activationWorkflows?.latestAt || null;
-        APP.runtime.latestExecutionBoardAt = status.executionBoard?.latestAt || null;
-        APP.runtime.latestDispatchBoardAt = status.dispatchBoard?.latestAt || null;
-        APP.runtime.workflowTimelineTotal = Number(status.workflowTimeline?.total || 0);
+        applyRuntimeStatus(status, "worker-runtime");
       }catch(e){
         APP.runtime.available = false;
-        APP.runtime.journalTotal = 0;
-        APP.runtime.snapshotTotal = 0;
-        APP.runtime.activationPackTotal = 0;
-        APP.runtime.activationWorkflowTotal = 0;
-        APP.runtime.executionBoardTotal = 0;
-        APP.runtime.dispatchBoardTotal = 0;
-        APP.runtime.latestJournalAt = null;
-        APP.runtime.latestSnapshotAt = null;
-        APP.runtime.latestActivationPackAt = null;
-        APP.runtime.latestActivationWorkflowAt = null;
-        APP.runtime.latestExecutionBoardAt = null;
-        APP.runtime.latestDispatchBoardAt = null;
-        APP.runtime.workflowTimelineTotal = 0;
-        APP.runtime.error = e && e.message ? e.message : "runtime unavailable";
+        APP.runtime.error = "";
+        applyBrowserRuntimeStatus();
       }finally{
         APP.runtime.checking = false;
         APP.runtime.checkedAt = nowISO();
@@ -751,7 +1034,7 @@ Aggressive | 0.50 | 0.25`,
 
     async function saveRuntimeSnapshot(reason, options={}){
       const live = await probeRuntimeLane();
-      if(!live) throw new Error("runtime unavailable");
+      if(!live) return saveBrowserRuntimeSnapshot(reason, options);
       const payload = await requestRuntime("/snapshots", {
         method: "POST",
         body: JSON.stringify({
@@ -787,7 +1070,7 @@ Aggressive | 0.50 | 0.25`,
 
     async function saveRuntimeActivationPack(options={}){
       const live = await probeRuntimeLane();
-      if(!live) throw new Error("runtime unavailable");
+      if(!live) return saveBrowserRuntimeActivationPack(options);
       const snapshotResponse = await saveRuntimeSnapshot(options.reason || "activation-pack-source", {
         meta: Object.assign({ source: "browser-activation-pack" }, options.meta || {}),
         payload: options.payload || buildBackupPayload(false)
@@ -829,7 +1112,7 @@ Aggressive | 0.50 | 0.25`,
 
     async function saveRuntimeActivationWorkflow(options={}){
       const live = await probeRuntimeLane();
-      if(!live) throw new Error("runtime unavailable");
+      if(!live) return saveBrowserRuntimeActivationWorkflow(options);
       const activation = options.activationPack ? { activationPack: options.activationPack } : await saveRuntimeActivationPack({
         reason: options.reason || "activation-workflow-source",
         scope: options.scope || "system-handoff",
@@ -876,7 +1159,7 @@ Aggressive | 0.50 | 0.25`,
 
     async function saveRuntimeExecutionBoardItem(options={}){
       const live = await probeRuntimeLane();
-      if(!live) throw new Error("runtime unavailable");
+      if(!live) return saveBrowserRuntimeExecutionBoardItem(options);
       const workflow = options.activationWorkflow ? { activationWorkflow: options.activationWorkflow } : await saveRuntimeActivationWorkflow({
         reason: options.reason || "execution-board-source",
         scope: options.scope || "system-handoff",
@@ -929,7 +1212,7 @@ Aggressive | 0.50 | 0.25`,
 
     async function saveRuntimeDispatchBoardItem(options={}){
       const live = await probeRuntimeLane();
-      if(!live) throw new Error("runtime unavailable");
+      if(!live) return saveBrowserRuntimeDispatchBoardItem(options);
       const execution = options.executionItem ? { executionItem: options.executionItem } : await saveRuntimeExecutionBoardItem({
         reason: options.reason || "dispatch-board-source",
         scope: options.scope || "system-handoff",
@@ -3092,12 +3375,91 @@ Aggressive | 0.50 | 0.25`;
       toast("Device wiped");
     }
 
+    // ---- Canonical platform command strip ----
+    const PLATFORM_STATE_KEY = "p1-platform-state:ae-flowpro";
+
+    function recordPlatformCommand(action, meta={}){
+      let current = { events: [] };
+      try{
+        current = JSON.parse(localStorage.getItem(PLATFORM_STATE_KEY) || '{"events":[]}');
+      }catch(e){
+        current = { events: [] };
+      }
+      const event = {
+        action,
+        at: nowISO(),
+        page: "index.html",
+        meta: meta && typeof meta === "object" ? meta : {}
+      };
+      const events = Array.isArray(current.events) ? current.events : [];
+      localStorage.setItem(PLATFORM_STATE_KEY, JSON.stringify({
+        platformId: "ae-flowpro",
+        canonicalEntry: "index.html",
+        updatedAt: event.at,
+        events: [event, ...events].slice(0, 50)
+      }));
+      return event;
+    }
+
+    async function handlePlatformRuntimeAction(action, command){
+      if(action === "refresh"){
+        await probeRuntimeLane({ force:true });
+        toast(APP.runtime.available ? "0S Worker workspace refreshed" : "0S browser workspace refreshed");
+        return APP.runtime.available ? "0S Worker workspace refreshed." : "0S browser workspace refreshed.";
+      }
+      if(action === "activation"){
+        try{
+          const activation = await saveRuntimeActivationPack({
+            reason: "canonical-platform-command",
+            scope: "system-handoff",
+            meta: { triggeredBy: "platform-command", command }
+          });
+          await recordRecoveryEvent("platform-activation-pack-generated", "Prepared an activation pack from the canonical AE FlowPro platform.", {
+            activationPackId: activation?.activationPack?.activationPackId || null,
+            owner: activation?.activationPack?.owner || null,
+            snapshotId: activation?.activationPack?.snapshotId || null
+          });
+          renderActivationPackStatus(`Latest pack: ${activation?.activationPack?.activationPackId || "saved"}.`);
+          toast("Activation pack prepared");
+          return "Activation pack prepared.";
+        }catch(e){
+          toast("Activation pack stayed in the 0S browser workspace");
+          return "Activation pack stayed in the 0S browser workspace.";
+        }
+      }
+      return "Platform command opened.";
+    }
+
+    function bindPlatformCommandStrip(){
+      const status = document.getElementById("platformCommandStatus");
+      document.querySelectorAll(".platformCommand").forEach((button)=>{
+        button.addEventListener("click", async ()=>{
+          const command = button.getAttribute("data-platform-command") || "platform";
+          const tab = button.getAttribute("data-tab-target") || "intake";
+          const runtimeAction = button.getAttribute("data-runtime-action") || "";
+          document.querySelectorAll(".platformCommand").forEach((item)=> item.classList.toggle("active", item === button));
+          switchTab(tab);
+          recordPlatformCommand(command, { tab, runtimeAction });
+          try{
+            await recordRecoveryEvent("platform-command", `Opened ${command} from the canonical AE FlowPro platform.`, {
+              command,
+              tab,
+              runtimeAction: runtimeAction || null
+            });
+          }catch(e){}
+          const result = runtimeAction ? await handlePlatformRuntimeAction(runtimeAction, command) : "Platform command opened.";
+          if(status) status.textContent = `${button.querySelector("strong")?.textContent || "Command"}: ${result}`;
+        });
+      });
+    }
+
     // ---- UI bind ----
     function bindUI(){
       document.querySelectorAll(".tab").forEach(t=>{
         t.addEventListener("click", ()=> switchTab(t.getAttribute("data-tab")));
       });
 
+      bindPlatformCommandStrip();
       bindCopyButtons();
 
       document.getElementById("intakeForm").addEventListener("submit", onVisitSubmit);
@@ -3211,19 +3573,25 @@ Aggressive | 0.50 | 0.25`;
       });
       document.getElementById("refreshRuntimeLaneBtn").addEventListener("click", async ()=> {
         await probeRuntimeLane({ force:true });
-        toast(APP.runtime.available ? "Runtime lane refreshed ✅" : "Runtime lane not available on this origin");
+        await refreshFounderCrmStatus();
+        toast(APP.runtime.available ? "0S Worker workspace refreshed" : "0S browser workspace refreshed");
+      });
+      const refreshFounderCrmBtn = document.getElementById("refreshFounderCrmBtn");
+      if(refreshFounderCrmBtn) refreshFounderCrmBtn.addEventListener("click", async ()=>{
+        await refreshFounderCrmStatus();
+        toast("Founder CRM status refreshed");
       });
       document.getElementById("saveRuntimeSnapshotBtn").addEventListener("click", async ()=> {
         try{
           const snap = await saveRuntimeSnapshot("manual-browser-snapshot", {
             meta: { triggeredBy: "settings-button" }
           });
-          await recordRecoveryEvent("manual-runtime-snapshot", "Saved manual same-folder runtime snapshot.", {
+          await recordRecoveryEvent("manual-runtime-snapshot", "Saved manual 0S workspace snapshot.", {
             snapshotId: snap?.snapshot?.snapshotId || null
           });
-          toast("Runtime snapshot saved ✅");
+          toast("0S workspace snapshot saved");
         }catch(e){
-          toast("Runtime snapshot needs the local runtime lane");
+          toast("0S workspace snapshot stayed local");
         }
       });
       document.getElementById("saveActivationPackBtn").addEventListener("click", async ()=> {
@@ -3233,15 +3601,15 @@ Aggressive | 0.50 | 0.25`;
             scope: "system-handoff",
             meta: { triggeredBy: "runtime-button" }
           });
-          await recordRecoveryEvent("activation-pack-generated", "Prepared a same-folder activation pack for downstream ops lanes.", {
+          await recordRecoveryEvent("activation-pack-generated", "Prepared a 0S workspace activation pack for downstream ops lanes.", {
             activationPackId: activation?.activationPack?.activationPackId || null,
             owner: activation?.activationPack?.owner || null,
             snapshotId: activation?.activationPack?.snapshotId || null
           });
           renderActivationPackStatus(`Latest pack: ${activation?.activationPack?.activationPackId || "saved"}.`);
-          toast("Activation pack prepared ✅");
+          toast("Activation pack prepared");
         }catch(e){
-          toast("Activation pack needs the local runtime lane");
+          toast("Activation pack stayed in the 0S browser workspace");
         }
       });
       document.getElementById("queueActivationWorkflowBtn").addEventListener("click", async ()=> {
@@ -3251,15 +3619,15 @@ Aggressive | 0.50 | 0.25`;
             scope: "system-handoff",
             meta: { triggeredBy: "runtime-workflow-button" }
           });
-          await recordRecoveryEvent("activation-workflow-generated", "Queued a same-folder activation workflow for downstream execution lanes.", {
+          await recordRecoveryEvent("activation-workflow-generated", "Queued a 0S workspace activation workflow for downstream execution lanes.", {
             workflowId: workflow?.activationWorkflow?.workflowId || null,
             activationPackId: workflow?.activationWorkflow?.activationPackId || null,
             owner: workflow?.activationWorkflow?.owner || null
           });
           renderActivationWorkflowStatus(`Latest workflow: ${workflow?.activationWorkflow?.workflowId || "saved"}.`);
-          toast("Activation workflow queued ✅");
+          toast("Activation workflow queued");
         }catch(e){
-          toast("Activation workflow needs the local runtime lane");
+          toast("Activation workflow stayed in the 0S browser workspace");
         }
       });
       document.getElementById("queueExecutionBoardBtn").addEventListener("click", async ()=> {
@@ -3269,15 +3637,15 @@ Aggressive | 0.50 | 0.25`;
             scope: "system-handoff",
             meta: { triggeredBy: "runtime-execution-button" }
           });
-          await recordRecoveryEvent("execution-board-queued", "Queued a same-folder execution board item for downstream activation delivery.", {
+          await recordRecoveryEvent("execution-board-queued", "Queued a 0S workspace execution board item for downstream activation delivery.", {
             executionItemId: execution?.executionItem?.executionItemId || null,
             workflowId: execution?.executionItem?.workflowId || null,
             owner: execution?.executionItem?.owner || null
           });
           renderExecutionBoardStatus(`Latest execution item: ${execution?.executionItem?.executionItemId || "saved"}.`);
-          toast("Execution board item queued ✅");
+          toast("Execution board item queued");
         }catch(e){
-          toast("Execution board needs the local runtime lane");
+          toast("Execution board stayed in the 0S browser workspace");
         }
       });
       document.getElementById("queueDispatchBoardBtn").addEventListener("click", async ()=> {
@@ -3287,7 +3655,7 @@ Aggressive | 0.50 | 0.25`;
             scope: "system-handoff",
             meta: { triggeredBy: "runtime-dispatch-button" }
           });
-          await recordRecoveryEvent("dispatch-board-queued", "Queued a same-folder dispatch board item for downstream activation delivery.", {
+          await recordRecoveryEvent("dispatch-board-queued", "Queued a 0S workspace dispatch board item for downstream activation delivery.", {
             executionItemId: dispatch?.executionItem?.executionItemId || null,
             workflowId: dispatch?.executionItem?.workflowId || null,
             owner: dispatch?.executionItem?.dispatch?.owner || null,
@@ -3295,9 +3663,9 @@ Aggressive | 0.50 | 0.25`;
           });
           renderDispatchBoardStatus(`Latest dispatch item: ${dispatch?.executionItem?.executionItemId || "saved"}.`);
           renderWorkflowTimelineStatus("Workflow timeline updated with dispatch evidence.");
-          toast("Dispatch board item queued ✅");
+          toast("Dispatch board item queued");
         }catch(e){
-          toast("Dispatch board needs the local runtime lane");
+          toast("Dispatch board stayed in the 0S browser workspace");
         }
       });
 
@@ -3337,6 +3705,11 @@ Aggressive | 0.50 | 0.25`;
 
     // ---- Init ----
     (function init(){
+      try{
+        history.scrollRestoration = "manual";
+        window.scrollTo(0, 0);
+        requestAnimationFrame(() => window.scrollTo(0, 0));
+      }catch(e){}
       initCosmosBackground();
       loadState();
       renderScripts();
@@ -3354,6 +3727,7 @@ Aggressive | 0.50 | 0.25`;
       bindUI();
       renderAll();
       probeRuntimeLane();
+      refreshFounderCrmStatus();
 
       setOfflineFlag();
       window.addEventListener("online", setOfflineFlag);

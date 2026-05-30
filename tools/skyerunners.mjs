@@ -184,6 +184,24 @@ const COMMANDS = {
     spend_profile: 'local-only',
     result: 'Runs the repo-local QuantumSkyes MCP mining flow for metraiyux_0s_site.',
     steps: [{ label: 'MCP mine metraiyux_0s_site', command: 'npm', args: ['run', 'mcp:mine', '--', 'metraiyux_0s_site'] }]
+  },
+  'live-capability-watch': {
+    id: 'live-capability-watch',
+    title: 'Run 0S Live Capability Watch',
+    lane: 'proof',
+    risk: 'medium',
+    spend_profile: 'local-and-gated-live-http',
+    result: 'Executes the repo-native non-browser capability watch, labels live/static/smoke/provider-gated evidence, and mirrors a public-safe receipt into SkyErrors.',
+    steps: [{ label: '0S live capability watch', command: 'npm', args: ['run', '0s:live-capability-watch'] }]
+  },
+  'truth-ledger': {
+    id: 'truth-ledger',
+    title: 'Run 0S Truth Ledger',
+    lane: 'proof',
+    risk: 'low',
+    spend_profile: 'local-receipt-read',
+    result: 'Reads the closure workflow manifest and latest proof receipts, then writes the strict built/partial/provider-gated/unproven ledger for proof and docs surfaces.',
+    steps: [{ label: '0S truth ledger', command: 'npm', args: ['run', '0s:truth-ledger'] }]
   }
 };
 

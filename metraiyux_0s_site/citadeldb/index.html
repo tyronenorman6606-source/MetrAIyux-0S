@@ -153,13 +153,13 @@
         <div class="panel">
           <p class="eyebrow">Gate-owned database lane</p>
           <h1>CitadelDB Operations</h1>
-          <p>Neon or Worker KV can stay primary while CitadelDB becomes the controlled mirror and eventual cutover target. This page tracks real write receipts, catch-up work, sovereign exports, and readiness without pointing production at local Docker.</p>
+          <p>CitadelDB is the owned SkyeNet database lane for 0S mirror rows, write receipts, catch-up work, sovereign exports, and upstream cutover readiness. Existing upstream storage can stay connected while payload-backed writes mirror into CitadelDB.</p>
           <div class="actions">
             <button class="primary" id="refreshBtn" type="button">Refresh Status</button>
             <button id="catchupBtn" type="button">Queue Catch-Up Job</button>
             <button id="sampleBtn" type="button">Record Primary Test Receipt</button>
           </div>
-          <div class="notice">Local Citadel containers are development/runtime proof only. Production must use a remote Citadel gateway or app-owned Postgres credentials after the server is ready.</div>
+          <div class="notice">Local Citadel containers are development/runtime proof only. Production writes land in the live CitadelDB database, with the receipt mirror retained only as a fallback trail.</div>
         </div>
         <aside class="panel">
           <p class="eyebrow">Owner Session</p>
@@ -202,6 +202,14 @@
             <b>Citadel status</b>
             <span>Gated mirror counts, primary writes, jobs, catch-up state.</span>
           </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/dev/connection">
+            <b>Developer database URL</b>
+            <span>Gated CitadelDB HTTPS URL, bash commands, row write/query contract.</span>
+          </a>
+          <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/helper-k4i/status">
+            <b>Helper K4i status</b>
+            <span>Gated proof scans, SkyErrors, Resend alert readiness, patch plans.</span>
+          </a>
           <a class="link-card" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/ledger">
             <b>Citadel ledger</b>
             <span>Gated mirror/catch-up receipt ledger.</span>
@@ -218,8 +226,20 @@
       </section>
 
       <section class="panel" style="margin-top:18px">
+        <p class="eyebrow">Developer Access</p>
+        <h2>Use CitadelDB from a 0S account.</h2>
+        <p>Developers can paste the CitadelDB HTTPS database URL into their apps or use bash commands from a Chromebook. The shared gate session scopes row writes and queries to the caller's workspace unless an owner/operator session is used.</p>
+        <pre>export CITADELDB_DATABASE_URL="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/dev"
+export CITADELDB_AUTH="Bearer &lt;0S_GATE_SESSION&gt;"
+
+curl -s "$CITADELDB_DATABASE_URL/connection" -H "Authorization: $CITADELDB_AUTH"
+curl -s -X POST "$CITADELDB_DATABASE_URL/rows" -H "Authorization: $CITADELDB_AUTH" -H "content-type: application/json" --data '{"appId":"my-app","table":"profiles","recordId":"user_1","payload":{"id":"user_1"}}'
+curl -s -X POST "$CITADELDB_DATABASE_URL/query" -H "Authorization: $CITADELDB_AUTH" -H "content-type: application/json" --data '{"appId":"my-app","table":"profiles"}'</pre>
+      </section>
+
+      <section class="panel" style="margin-top:18px">
         <p class="eyebrow">Mirror Status</p>
-        <h2>Primary Storage to Citadel Parity</h2>
+        <h2>Primary Storage to CitadelDB Parity</h2>
         <div class="grid">
           <div class="stat"><strong id="ledgerCount">-</strong><span>Ledger events</span></div>
           <div class="stat"><strong id="primaryCount">-</strong><span>Primary writes logged</span></div>
@@ -241,9 +261,9 @@
           <h2>Citadel Platform Checklist</h2>
           <div class="stack">
             <div class="row"><b>App onboarding</b><small>Create app DB, app user, scoped DATABASE_URL, smoke write.</small><span class="status-dot ok">Defined</span></div>
-            <div class="row"><b>Mirror ledger</b><small>Every Neon-only write can be recorded and caught up.</small><span class="status-dot ok">Live API</span></div>
-            <div class="row"><b>Catch-up worker</b><small>Queue exists now; remote runner attaches when VPS Citadel is online.</small><span class="status-dot warn">Await VPS</span></div>
-            <div class="row"><b>Cutover gate</b><small>No DATABASE_URL swap until dump/restore, counts, smoke, restore test, rollback pass.</small><span class="status-dot ok">Blocked Safe</span></div>
+            <div class="row"><b>Mirror ledger</b><small>Payload-backed primary writes mirror into CitadelDB D1 and keep receipts.</small><span class="status-dot ok">Live API</span></div>
+            <div class="row"><b>Catch-up worker</b><small>Queue tracks Neon or primary writes that still need row payload transfer into CitadelDB.</small><span class="status-dot ok">D1 ready</span></div>
+            <div class="row"><b>Cutover gate</b><small>No Neon removal until dump/restore, counts, smoke, export, restore test, rollback pass.</small><span class="status-dot ok">Blocked Safe</span></div>
             <div class="row"><b>SkyeMail</b><small>Should use the same app-owned Citadel DB pattern when the mail server is online.</small><span class="status-dot warn">Planned</span></div>
           </div>
         </div>
@@ -350,7 +370,8 @@
           recordId: `probe-${Date.now()}`,
           operation: 'insert',
           primary: { ok: true, system: 'operator_dashboard', receiptId: `dashboard-probe-${Date.now()}`, writtenAt: new Date().toISOString() },
-          note: 'Dashboard proof receipt: primary write exists and Citadel catch-up is required.'
+          payload: { probe: true, source: 'operator-dashboard-proof', createdAt: new Date().toISOString() },
+          note: 'Dashboard proof receipt: primary write mirrored into CitadelDB D1.'
         })
       });
       show('loginOut', { ok: true, eventId: event.event?.id, status: event.event?.status });

@@ -191,6 +191,31 @@ test('Key Gate 13th tests, rotates, revokes, and audits a credential', async () 
   assert.equal(JSON.stringify(audit.body).includes('semrush_rotated_secret_key'), false);
 });
 
+test('Key Gate 13th Stripe live test is metered by the 0S provider runtime', async () => {
+  const e = env({ZERO_OS_PROVIDER_SANDBOX: '1'});
+  const created = await createSecret(e, {
+    vendorKey: 'stripe',
+    label: 'Stripe runtime key',
+    secret: 'sk_test_keygate_runtime',
+    scopes: ['skyepay:stripe']
+  });
+  const id = created.body.secret.id;
+
+  const tested = await call(e, `/api/key-gate-13th/v1/secrets/${id}/test`, {
+    method: 'POST',
+    token: 'fs27-keygate-token',
+    body: {live: true}
+  });
+
+  assert.equal(tested.response.status, 200);
+  assert.equal(tested.body.test.provider, 'stripe');
+  assert.equal(tested.body.test.endpoint, '0s-provider-runtime:stripe.balance.retrieve');
+  assert.equal(tested.body.test.provider_runtime.provider_id, 'stripe');
+  assert.equal(tested.body.test.provider_runtime.action, 'stripe.balance.retrieve');
+  assert.equal(tested.body.test.provider_runtime.provider_call_made, false);
+  assert.equal(JSON.stringify(tested.body).includes('sk_test_keygate_runtime'), false);
+});
+
 test('Agentic Growth source pulls use Key Gate refs and reject raw browser credentials', async () => {
   const e = env();
   const created = await createSecret(e);

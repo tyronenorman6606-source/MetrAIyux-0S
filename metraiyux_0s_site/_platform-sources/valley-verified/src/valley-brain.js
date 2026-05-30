@@ -530,15 +530,19 @@
   }
 
   function mountPath() {
-    return location.pathname.startsWith('/valley-verified') ? '/valley-verified' : '';
+    if (location.pathname.startsWith('/skyenet/valley-verified')) return '/skyenet/valley-verified';
+    if (location.pathname.startsWith('/valley-verified')) return '/valley-verified';
+    return '';
   }
 
   function link(href) {
     const value = text(href || '/');
-    if (!value) return mountPath() || '/';
+    const mount = mountPath();
+    if (!value) return mount || '/';
     if (/^https?:\/\//i.test(value) || value.startsWith('mailto:') || value.startsWith('tel:')) return value;
-    if (value.startsWith('/valley-verified/')) return value;
-    return `${mountPath()}${value.startsWith('/') ? value : `/${value}`}`.replace(/\/{2,}/g, '/');
+    if (value.startsWith('/skyenet/valley-verified/')) return value;
+    if (value.startsWith('/valley-verified/')) return mount === '/skyenet/valley-verified' ? `${mount}${value.slice('/valley-verified'.length)}` : value;
+    return `${mount}${value.startsWith('/') ? value : `/${value}`}`.replace(/\/{2,}/g, '/');
   }
 
   function isAdminRoute() {

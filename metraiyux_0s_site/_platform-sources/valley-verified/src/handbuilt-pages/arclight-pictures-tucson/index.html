@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArcLight Pictures | Valley Verified Tucson Video Production</title>
+  <meta name="description" content="Valley Verified landing page for ArcLight Pictures, a Tucson and Southern Arizona video production company.">
+  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/arclight-pictures-tucson/">
+  <meta property="og:title" content="ArcLight Pictures | Valley Verified">
+  <meta property="og:description" content="Tucson and Southern Arizona video production for promotional films, community storytelling, event coverage, and film work.">
+  <meta property="og:url" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/arclight-pictures-tucson/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1a1715;
+      --muted: #6f655f;
+      --paper: #fffaf3;
+      --panel: #ffffff;
+      --line: #e6d9ca;
+      --amber: #d88a2d;
+      --red: #b64133;
+      --teal: #287f7a;
+      --charcoal: #25211f;
+      --cream: #fff4df;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(216, 138, 45, 0.18), transparent 24rem),
+        linear-gradient(180deg, #fffaf3 0%, #f7eee1 44%, #f4fbf9 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page-shell {
+      width: min(1140px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 58px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--charcoal);
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .brand-mark span:first-child {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--red);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+      align-items: stretch;
+    }
+
+    .poster {
+      min-height: 560px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(120deg, rgba(37, 33, 31, 0.92), rgba(182, 65, 51, 0.78)),
+        linear-gradient(180deg, #352b25, #101010);
+      color: #fff;
+      padding: clamp(24px, 4vw, 44px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 22px 58px rgba(37, 33, 31, 0.16);
+    }
+
+    .poster::before,
+    .poster::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .poster::before {
+      inset: 34px 34px auto auto;
+      width: 140px;
+      height: 140px;
+      border: 18px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+    }
+
+    .poster::after {
+      inset: auto -12px 40px auto;
+      width: 55%;
+      height: 34px;
+      background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.42) 0 18px, rgba(255, 255, 255, 0.08) 18px 30px);
+      transform: rotate(-6deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: #ffd293;
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 9ch;
+      margin-bottom: 18px;
+      color: #fff;
+      font-size: clamp(3.6rem, 9vw, 7.1rem);
+      line-height: 0.92;
+    }
+
+    .poster p {
+      max-width: 640px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: clamp(1.04rem, 1.8vw, 1.22rem);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: #fff;
+      color: var(--charcoal);
+      font-weight: 850;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.46);
+    }
+
+    .summary,
+    .panel,
+    .skyemail {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 18px 50px rgba(37, 33, 31, 0.08);
+    }
+
+    .summary {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .status {
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--cream);
+      border-left: 6px solid var(--amber);
+    }
+
+    .status strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--charcoal);
+      font-size: 1.1rem;
+    }
+
+    .status span {
+      color: var(--muted);
+    }
+
+    .fact-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .fact-list div {
+      display: grid;
+      grid-template-columns: 136px 1fr;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .fact-list div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .fact-list dt {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .fact-list dd {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 720;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h2,
+    .skyemail h2 {
+      margin-bottom: 12px;
+      color: var(--charcoal);
+      font-size: 1.45rem;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag-cloud span {
+      border: 1px solid #decfbe;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fffdf8;
+      color: #433c37;
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    .hours-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hours-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hours-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .source-note {
+      margin: 18px 0 0;
+      color: var(--muted);
+    }
+
+    .skyemail {
+      padding: 26px;
+      background:
+        linear-gradient(135deg, rgba(40, 127, 122, 0.96), rgba(37, 33, 31, 0.94)),
+        #287f7a;
+      color: #fff;
+    }
+
+    .skyemail h2,
+    .skyemail p,
+    .skyemail a {
+      color: #fff;
+    }
+
+    .skyemail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .skyemail-grid div {
+      min-height: 126px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .skyemail-grid strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #ffd293;
+    }
+
+    @media (max-width: 880px) {
+      .hero,
+      .grid,
+      .skyemail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .poster {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page-shell {
+        width: min(100% - 20px, 1140px);
+        padding-top: 18px;
+      }
+
+      .masthead {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 17vw, 4.7rem);
+      }
+
+      .poster,
+      .summary,
+      .panel,
+      .skyemail {
+        padding: 18px;
+      }
+
+      .fact-list div {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-static-hand-page="true">
+  <main class="page-shell">
+    <nav class="masthead" aria-label="Page">
+      <a class="brand-mark" href="/valley-verified/">
+        <span>VV</span>
+        <span>Valley Verified</span>
+      </a>
+      <span>Owner-researched verified status for Tucson and Southern Arizona</span>
+    </nav>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="poster">
+        <div>
+          <p class="eyebrow">Film / Video Production</p>
+          <h1 id="page-title">ArcLight Pictures</h1>
+          <p>ArcLight Pictures is listed for promotional films, community storytelling, event coverage, cinematography, post production, and film work across Tucson and Southern Arizona.</p>
+        </div>
+        <div class="button-row" aria-label="Primary contact links">
+          <a class="button" href="https://arclight-pictures.pages.dev/">Open company app</a>
+          <a class="button secondary" href="https://arclight-pictures.pages.dev/contact.html">Project contact</a>
+          <a class="button secondary" href="tel:+15202301992">Call (520) 230-1992</a>
+        </div>
+      </div>
+
+      <aside class="summary" aria-label="Verification and contact summary">
+        <div class="status">
+          <strong>Owner-researched verified status</strong>
+          <span>Business profile marked verified in Valley Verified source data with a score of 55. License badge is not marked verified in the source record.</span>
+        </div>
+        <dl class="fact-list">
+          <div>
+            <dt>Business</dt>
+            <dd>ArcLight Pictures</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>Tucson, AZ / Phoenix Metro source city</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd><a href="tel:+15202301992">(520) 230-1992</a></dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>Not listed in source record</dd>
+          </div>
+          <div>
+            <dt>Language</dt>
+            <dd>English</dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="grid" aria-label="Business details">
+      <article class="panel">
+        <h2>Business Facts</h2>
+        <dl class="fact-list">
+          <div>
+            <dt>Category</dt>
+            <dd>Creative Services</dd>
+          </div>
+          <div>
+            <dt>Subcategory</dt>
+            <dd>Video Production</dd>
+          </div>
+          <div>
+            <dt>Niche</dt>
+            <dd>Film / Video Production</dd>
+          </div>
+          <div>
+            <dt>License</dt>
+            <dd>Business license</dd>
+          </div>
+          <div>
+            <dt>Requests</dt>
+            <dd>Accepts requests in the source record</dd>
+          </div>
+          <div>
+            <dt>Pricing</dt>
+            <dd>Contact for quote. Production scope, crew requirements, travel, edit volume, and deliverable needs affect pricing.</dd>
+          </div>
+        </dl>
+        <div class="tag-cloud" aria-label="Source tags">
+          <span>Promotional Films</span>
+          <span>Community Storytelling</span>
+          <span>Event Coverage</span>
+          <span>Cinematography</span>
+          <span>Post Production</span>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Hours And Policies</h2>
+        <ul class="hours-list" aria-label="Business hours">
+          <li><span>Monday</span><strong>Call for hours</strong></li>
+          <li><span>Tuesday</span><strong>Call for hours</strong></li>
+          <li><span>Wednesday</span><strong>Call for hours</strong></li>
+          <li><span>Thursday</span><strong>Call for hours</strong></li>
+          <li><span>Friday</span><strong>Call for hours</strong></li>
+          <li><span>Saturday</span><strong>Call for hours</strong></li>
+          <li><span>Sunday</span><strong>Call for hours</strong></li>
+        </ul>
+        <p class="source-note">Project pricing depends on production scope, crew, post-production, travel, and delivery requirements. Confirm schedule, location support, and revision timing directly with ArcLight Pictures.</p>
+      </article>
+    </section>
+
+    <section class="grid" aria-label="Source and profile record">
+      <article class="panel">
+        <h2>Contact And Source</h2>
+        <dl class="fact-list">
+          <div>
+            <dt>Website</dt>
+            <dd><a href="https://arclight-pictures.pages.dev/">arclight-pictures.pages.dev</a></dd>
+          </div>
+          <div>
+            <dt>Contact Link</dt>
+            <dd><a href="https://arclight-pictures.pages.dev/contact.html">arclight-pictures.pages.dev/contact.html</a></dd>
+          </div>
+          <div>
+            <dt>Source URL</dt>
+            <dd><a href="https://arclightpictures.com/">https://arclightpictures.com/</a></dd>
+          </div>
+          <div>
+            <dt>Source File</dt>
+            <dd>seed/businesses/clients.json</dd>
+          </div>
+          <div>
+            <dt>Source Hash</dt>
+            <dd>30690b219697</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="panel">
+        <h2>Record Notes</h2>
+        <dl class="fact-list">
+          <div>
+            <dt>Last Checked</dt>
+            <dd>2026-05-19</dd>
+          </div>
+          <div>
+            <dt>Primary Key</dt>
+            <dd>domain:arclight-pictures.pages.dev</dd>
+          </div>
+          <div>
+            <dt>Signals</dt>
+            <dd>domain, phone, name/address, name/city/zip</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Business verified: yes. License verified: no.</dd>
+          </div>
+          <div>
+            <dt>Source Note</dt>
+            <dd>Source URL domain differs from website.</dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="skyemail" aria-labelledby="skyemail-title">
+      <h2 id="skyemail-title">SkyEmail Acceptance</h2>
+      <p>Accept the free SkyEmail account for this Valley Verified workspace and sign in through the shared 0S/SkyGate lane when the workspace is provisioned.</p>
+      <div class="skyemail-grid">
+        <div>
+          <strong>Provisioning</strong>
+          <span>Notify the owner to provision the workspace before team activation starts.</span>
+        </div>
+        <div>
+          <strong>Activation</strong>
+          <span>Team activation is expected within 24 hours after provisioning.</span>
+        </div>
+        <div>
+          <strong>Escalation</strong>
+          <span>Use K4i escalation after 24 hours if the team is not active.</span>
+        </div>
+        <div>
+          <strong>Seats</strong>
+          <span>9 seats left. Warn at 2 seats. Buy seats in groups of 5.</span>
+        </div>
+      </div>
+      <p class="source-note"><a href="/admin/login.html?return=/valley-verified/business/arclight-pictures-tucson/">Sign in through shared 0S/SkyGate</a></p>
+    </section>
+  </main>
+</body>
+</html>

@@ -17,11 +17,13 @@ const pages = [
   "message",
   "monitoring",
   "onboarding",
+  "security",
   "send",
   "sent",
   "settings",
   "signup",
   "spam",
+  "tech-stack",
   "thread",
   "trash",
 ];

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeNet Console</title>
+  <meta name="description" content="SkyeNet standalone deploy console using the shared 0S and FS27 gate lane.">
+  <link rel="stylesheet" href="/assets/skyenet.css">
+</head>
+<body class="skyesol-living-page">
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/skyenet-mark.svg" alt="">
+      <span><strong>SkyeNet</strong><small>Deploy console</small></span>
+    </a>
+    <nav aria-label="SkyeNet console navigation">
+      <a href="/">Home</a>
+      <a href="/login">Shared gate</a>
+    </nav>
+  </header>
+  <main>
+    <section class="console-shell">
+      <div>
+        <p class="eyebrow">Shared gate console</p>
+        <h1 class="neon-gradient-text">SkyeNet command.</h1>
+        <p class="lede">Use a shared 0S/FS27 bearer session for deployments, receipts, source downloads, and stored source transfers. SkyeNet does not create a separate founder, owner, or deployer password.</p>
+      </div>
+      <form id="tokenForm" class="token-panel">
+        <label>
+          <span>Gate bearer</span>
+          <input id="tokenInput" type="password" autocomplete="current-password" placeholder="Paste shared gate session">
+        </label>
+        <button type="submit">Use gate session</button>
+        <p id="sourceStatus" class="mini-status">Source downloads and stored transfers use the same shared gate session.</p>
+      </form>
+      <section class="status-panel wide" aria-live="polite">
+        <h2>Publish package</h2>
+        <form id="deployForm" class="deploy-form">
+          <label><span>Workspace</span><input name="workspace_id" placeholder="default-workspace" value="default-workspace" required></label>
+          <label><span>Project</span><input name="project_id" placeholder="project-slug" required></label>
+          <label><span>Plan</span><select name="plan_name"><option value="free99">Free99</option><option value="skyenet-edge-starter">Edge Starter</option><option value="skyenet-edge-growth">Edge Growth</option><option value="skyenet-functions-managed">Functions Managed</option><option value="skyenet-sovereign-runtime-reserve">Sovereign Runtime Reserve</option></select></label>
+          <label><span>Host</span><input name="hostname" placeholder="skyenet.company-slug" value="skyenet.graylondonskyes.workers.dev" required></label>
+          <label><span>Mount</span><input name="mount_path" placeholder="/project-slug" value="/"></label>
+          <label><span>URL mode</span><select name="url_mode"><option value="">Path route</option><option value="subdomain">Host-native</option></select></label>
+          <label class="file-field"><span>Public build folder</span><input id="publicBuildInput" name="public_files" type="file" webkitdirectory directory multiple required></label>
+          <label class="file-field"><span>Private full source folder</span><input id="privateSourceInput" name="source_files" type="file" webkitdirectory directory multiple></label>
+          <label class="checkbox-line"><input name="public_access" type="checkbox" checked> Public route</label>
+          <button type="submit">Publish full package</button>
+        </form>
+        <p id="deployStatus" class="mini-status">Waiting for gate session and folders.</p>
+        <progress id="deployProgress" max="100" value="0"></progress>
+        <pre id="deployResult">No package published from this console yet.</pre>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel wide">
+          <h2>Deployments</h2>
+          <div id="deploymentList" class="list-panel">Checking deployments...</div>
+        </section>
+        <section class="status-panel">
+          <h2>Routes</h2>
+          <div id="routeList" class="list-panel">Checking routes...</div>
+        </section>
+        <section class="status-panel">
+          <h2>Receipts</h2>
+          <div id="receiptList" class="list-panel">Checking receipts...</div>
+        </section>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel wide">
+          <h2>Environment variables</h2>
+          <p class="mini-status">Project env values are stored behind the shared gate and only show redacted previews in the console.</p>
+          <form id="envForm" class="token-panel env-form">
+            <label><span>Project</span><input name="project_id" placeholder="project slug" required></label>
+            <label><span>Key</span><input name="key" placeholder="API_TOKEN" required></label>
+            <label><span>Value</span><input name="value" type="password" autocomplete="new-password" placeholder="Paste value"></label>
+            <label><span>Scope</span><input name="scope" value="production"></label>
+            <label class="checkbox-line"><input name="secret" type="checkbox" checked> Secret</label>
+            <button type="submit">Save env var</button>
+          </form>
+          <p id="envStatus" class="mini-status">Waiting for gate session.</p>
+        </section>
+        <section class="status-panel wide">
+          <h2>Env registry</h2>
+          <div id="envList" class="list-panel">Choose a workspace/project and save or refresh variables.</div>
+        </section>
+        <section class="status-panel">
+          <h2>Source custody</h2>
+          <p class="mini-status">New CLI deploys can upload a private full project source package separately from public assets. Source downloads prefer that private package and never serve it from public routes.</p>
+          <pre>npm run skyenet:deploy -- --dir dist --source-root . --project my-app --workspace my-company --host skyenet.my-company --mount / --url-mode subdomain --public</pre>
+        </section>
+      </section>
+      <section class="status-panel" aria-live="polite">
+        <h2>Runtime status</h2>
+        <pre id="statusOutput">Checking SkyeNet...</pre>
+      </section>
+    </section>
+  </main>
+  <script src="/assets/skyenet.js" defer></script>
+</body>
+</html>

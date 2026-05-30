@@ -15,9 +15,10 @@ Local proof:
 
 What this proof covers:
 - required static files exist
-- the main app shell exposes the recovery journal and same-folder runtime controls
+- the canonical root app exposes the lead CRM, recovery journal, platform command strip, and same-folder runtime controls
 - the browser script probes the same-origin runtime, records recovery events, and can push runtime snapshots, activation packs, plus activation workflows
-- the local runtime serves the app shell and exposes `/api/runtime/status`, `/api/runtime/journal`, `/api/runtime/snapshots`, `/api/runtime/recovery-packs`, `/api/runtime/activation-packs`, and `/api/runtime/activation-workflows`
+- the local runtime serves the root platform and exposes `/api/runtime/status`, `/api/runtime/journal`, `/api/runtime/snapshots`, `/api/runtime/recovery-packs`, `/api/runtime/activation-packs`, and `/api/runtime/activation-workflows`
+- `app.html` and the old routed shell pages are absent
 - the smoke proof writes a real journal row, a real backup snapshot artifact, a real recovery-pack artifact, a real activation-pack artifact, and a real activation-workflow artifact through the runtime lane
 
 What this proof does not claim:

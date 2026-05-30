@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes video rooms with music videos, live clips, teasers, archive loops, and the Chicago underground king footage.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Video Rooms</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="room-page">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes video rooms">
+      <a href="index.html">Hub</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="#video-room" data-scroll-target="#video-room">Room</a>
+      <a href="#room-cuts" data-scroll-target="#room-cuts">Cuts</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="video-wall" id="video-room">
+      <video id="roomVideo" autoplay muted loop playsinline controls preload="metadata" poster="media/images/gray-room-04.jpg"></video>
+      <div class="video-wall-caption">
+        <p class="eyebrow" id="roomLane">feature room</p>
+        <h1 id="roomTitle">Chicago's Underground Trap Metal King</h1>
+        <p class="lede" id="roomSource">Loading video room.</p>
+        <div class="button-row">
+          <button type="button" class="primary" id="unmuteRoom">Unmute room</button>
+          <button type="button" id="muteRoom">Mute</button>
+          <a class="button" href="catalog.html">Play catalog</a>
+          <a class="button" href="index.html">Back to hub</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="room-cuts">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">all cuts</p>
+          <h2>Nine video rooms</h2>
+        </div>
+        <p class="lede">Click any cut and the full room snaps back to the video viewport with that clip running.</p>
+      </div>
+      <div class="room-layout">
+        <div class="track-list" id="roomList"></div>
+        <aside class="room-note">
+          <p class="eyebrow">room spine</p>
+          <h3>Black room, red voltage, live proof</h3>
+          <p>The video world carries the artist pressure: official music videos, performance recap, raw motion, teaser, and the Phoenix leak lane.</p>
+          <div class="button-row">
+            <a class="button primary" href="catalog.html">Play songs</a>
+            <a class="button" href="release.html">Open release console</a>
+            <a class="button" href="gallery.html">Open gallery</a>
+          </div>
+        </aside>
+      </div>
+      <div class="video-grid" id="videoGrid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Gray Skyes video rooms. Nine files, one switching wall, clear exits back to the universe.</p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

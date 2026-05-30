@@ -1,3 +1,5 @@
+import { executeZeroOsAutomationAction } from './zero-os-automation-spine.mjs';
+
 const JSON_LIMIT = 1024 * 1024;
 const SECRET_TTL_SECONDS = 60 * 60 * 24 * 365;
 const AUDIT_TTL_SECONDS = 60 * 60 * 24 * 365;
@@ -545,6 +547,48 @@ export async function resolveKeyGate13Credential(env, {
   };
 }
 
+function keyGateProviderSandboxEnabled(env = {}) {
+  return ['KEY_GATE_13_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX']
+    .some((name) => ['1', 'true'].includes(String(env?.[name] || '').toLowerCase()));
+}
+
+function publicProviderRuntime(receipt = null) {
+  if (!receipt) return null;
+  return {
+    receipt_id: receipt.id || null,
+    status: receipt.status || null,
+    provider_id: receipt.provider_id || null,
+    action: receipt.action || null,
+    executed: receipt.executed === true,
+    provider_call_made: receipt.provider_call_made === true,
+    stored: receipt.stored === true,
+    error: receipt.error || ''
+  };
+}
+
+async function runKeyGateProviderProbe(env = {}, auth = {}, { provider_id, action, credential_env = {}, payload = {}, usage_lane = '' } = {}) {
+  const sandbox = keyGateProviderSandboxEnabled(env);
+  const runtime = await executeZeroOsAutomationAction({ ...env, ...credential_env }, {}, {
+    provider_id,
+    action,
+    app_id: 'key-gate-13th',
+    workspace_id: payload.workspace_id || payload.workspaceId || auth?.customer_id || '',
+    customer_id: auth?.customer_id || '',
+    usage_lane,
+    live: !sandbox,
+    sandbox,
+    owner_approved: true,
+    payload
+  }, {
+    actor: auth?.email || 'key-gate-13th-provider-runtime',
+    identity: auth || { role: 'operator' }
+  }, {
+    operator_ok: true
+  });
+  const receipt = runtime?.response?.receipt || null;
+  return { runtime, receipt };
+}
+
 function credentialPresence(vendorKey, credential) {
   if (vendorKey === 'dataforseo') return Boolean(credential?.login && credential?.password);
   if (credential && typeof credential === 'object') {
@@ -553,7 +597,7 @@ function credentialPresence(vendorKey, credential) {
   return Boolean(cleanText(credential, 8000));
 }
 
-async function providerTest(vendorKey, credential, body = {}) {
+async function providerTest(vendorKey, credential, body = {}, env = {}, auth = {}) {
   const live = body.live === true;
   if (!credentialPresence(vendorKey, credential)) {
     return { ok: false, live, status: 'failed', message: 'Credential shape is incomplete.' };
@@ -563,31 +607,42 @@ async function providerTest(vendorKey, credential, body = {}) {
   }
   if (vendorKey === 'cloudflare') {
     const token = typeof credential === 'object' ? (credential.token || credential.apiKey || credential.api_key) : credential;
-    const response = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
-      headers: { authorization: `Bearer ${token}` }
+    const {runtime, receipt} = await runKeyGateProviderProbe(env, auth, {
+      provider_id: 'cloudflare',
+      action: 'cloudflare.token.verify',
+      credential_env: {CLOUDFLARE_API_TOKEN: token},
+      payload: {},
+      usage_lane: 'key_gate_13th.credential_test.cloudflare'
     });
-    return { ok: response.ok, live: true, status: response.status, provider: 'cloudflare', endpoint: '/client/v4/user/tokens/verify' };
+    return { ok: runtime?.response?.ok === true, live: true, status: runtime?.status || receipt?.http_status || 500, provider: 'cloudflare', endpoint: '0s-provider-runtime:cloudflare.token.verify', provider_runtime: publicProviderRuntime(receipt) };
   }
   if (vendorKey === 'stripe') {
     const key = typeof credential === 'object' ? (credential.secretKey || credential.apiKey || credential.api_key) : credential;
-    const response = await fetch('https://api.stripe.com/v1/balance', {
-      headers: { authorization: `Bearer ${key}` }
+    const {runtime, receipt} = await runKeyGateProviderProbe(env, auth, {
+      provider_id: 'stripe',
+      action: 'stripe.balance.retrieve',
+      credential_env: {STRIPE_SECRET_KEY: key},
+      payload: {},
+      usage_lane: 'key_gate_13th.credential_test.stripe'
     });
-    return { ok: response.ok, live: true, status: response.status, provider: 'stripe', endpoint: '/v1/balance' };
+    return { ok: runtime?.response?.ok === true, live: true, status: runtime?.status || receipt?.http_status || 500, provider: 'stripe', endpoint: '0s-provider-runtime:stripe.balance.retrieve', provider_runtime: publicProviderRuntime(receipt) };
   }
   if (vendorKey === 'semrush') {
     const key = typeof credential === 'object' ? (credential.apiKey || credential.api_key) : credential;
-    const params = new URLSearchParams({
-      type: 'domain_organic',
-      key,
+    const {runtime, receipt} = await runKeyGateProviderProbe(env, auth, {
+      provider_id: 'semrush',
+      action: 'semrush.domain_organic.pull',
+      credential_env: {SEMRUSH_API_KEY: key},
+      usage_lane: 'key_gate_13th.credential_test.semrush',
+      payload: {
       domain: cleanText(body.domain || 'example.com', 180),
       database: cleanText(body.database || 'us', 20),
       display_limit: '1',
       export_columns: 'Ph,Po,Nq'
+      }
     });
-    const response = await fetch(`https://api.semrush.com/?${params}`);
-    const text = await response.text();
-    return { ok: response.ok && !/^ERROR/i.test(text), live: true, status: response.status, provider: 'semrush', endpoint: 'domain_organic', bytes: text.length };
+    const result = receipt?.provider_result || {};
+    return { ok: runtime?.response?.ok === true, live: true, status: runtime?.status || receipt?.http_status || 500, provider: 'semrush', endpoint: '0s-provider-runtime:semrush.domain_organic.pull', bytes: Number(result.bytes || 0), provider_runtime: publicProviderRuntime(receipt) };
   }
   if (vendorKey === 'google-search-console') {
     const token = typeof credential === 'object' ? (credential.accessToken || credential.token) : credential;
@@ -595,12 +650,14 @@ async function providerTest(vendorKey, credential, body = {}) {
     if (!siteUrl) return { ok: true, live: false, status: 'offline-validated', message: 'GSC token decrypted. Add siteUrl for a live Search Analytics probe.' };
     const endDate = new Date().toISOString().slice(0, 10);
     const startDate = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
-    const response = await fetch(`https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`, {
-      method: 'POST',
-      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ startDate, endDate, dimensions: ['query'], rowLimit: 1 })
+    const {runtime, receipt} = await runKeyGateProviderProbe(env, auth, {
+      provider_id: 'google-search-console',
+      action: 'gsc.search_analytics.query',
+      credential_env: {GOOGLE_SEARCH_CONSOLE_ACCESS_TOKEN: token},
+      usage_lane: 'key_gate_13th.credential_test.gsc',
+      payload: { siteUrl, startDate, endDate, dimensions: ['query'], rowLimit: 1 }
     });
-    return { ok: response.ok, live: true, status: response.status, provider: 'google-search-console', endpoint: 'searchAnalytics/query' };
+    return { ok: runtime?.response?.ok === true, live: true, status: runtime?.status || receipt?.http_status || 500, provider: 'google-search-console', endpoint: '0s-provider-runtime:gsc.search_analytics.query', provider_runtime: publicProviderRuntime(receipt) };
   }
   if (vendorKey === 'dataforseo') {
     return { ok: true, live: false, status: 'offline-validated', message: 'DataForSEO login/password decrypted. Live SERP probes run from Agentic Growth source pulls.' };
@@ -772,7 +829,7 @@ export async function handleKeyGate13Route(request, env, ctx, url, matchedBase =
           appId: 'key-gate-13th',
           purpose: 'credential-test'
         });
-        const testResult = await providerTest(record.vendor_key, resolved.credential, body);
+        const testResult = await providerTest(record.vendor_key, resolved.credential, body, env, auth);
         record.test_status = testResult.ok ? 'passed' : 'failed';
         record.test_receipt_id = randomId('kg13_test');
         record.updated_at = nowIso();

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dorn Policy Group, Inc. | Valley Verified</title>
+  <meta name="description" content="Dorn Policy Group is a Phoenix lobbying and public affairs firm for government relations, strategic counsel, issue management, media relations, and business development.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172123;
+      --paper: #fbfaf3;
+      --green: #1d5b50;
+      --brick: #b55343;
+      --blue: #dcebed;
+      --line: rgba(23, 33, 35, .16);
+      --muted: #586669;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(29, 91, 80, .08) 1px, transparent 1px),
+        linear-gradient(#f6faf8, #e9f0ec);
+      background-size: 70px 70px, auto;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; }
+
+    .brief {
+      width: min(1100px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 26px 0 44px;
+    }
+
+    .top {
+      display: grid;
+      grid-profile-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--green);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: 310px minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+      min-height: 560px;
+    }
+
+    .docket {
+      display: grid;
+      align-content: space-between;
+      gap: 24px;
+      padding: 28px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .seal {
+      width: 148px;
+      height: 148px;
+      display: grid;
+      place-items: center;
+      border: 3px solid rgba(255, 255, 255, .72);
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      font-size: 3.4rem;
+      font-weight: 900;
+    }
+
+    .docket p {
+      margin: 0;
+      color: #dff3ee;
+      font-size: 1.1rem;
+    }
+
+    .memo {
+      position: relative;
+      display: grid;
+      align-content: space-between;
+      gap: 34px;
+      padding: 42px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 55px rgba(29, 91, 80, .1);
+    }
+
+    .memo:before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 12px;
+      background: var(--brick);
+    }
+
+    .memo > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-block;
+      width: fit-content;
+      padding: 8px 12px;
+      background: var(--blue);
+      color: var(--green);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 22px 0 16px;
+      font-size: 5.4rem;
+      line-height: .95;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 700px;
+      margin: 0;
+      color: #3c4a4d;
+      font-size: 1.18rem;
+    }
+
+    .contacts {
+      display: grid;
+      grid-profile-columns: minmax(230px, .7fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .contact {
+      min-height: 126px;
+      padding: 20px;
+      display: grid;
+      align-content: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      font-style: normal;
+    }
+
+    .contact.primary {
+      background: var(--green);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--brick);
+      text-transform: uppercase;
+    }
+
+    .contact span {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .facts {
+      margin-top: 18px;
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .fact {
+      min-height: 128px;
+      padding: 18px;
+      background: rgba(251, 250, 243, .92);
+      border: 1px solid var(--line);
+    }
+
+    .fact span {
+      display: block;
+      font-size: 1.08rem;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .profile {
+      margin-top: 12px;
+      padding: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    @media (max-width: 860px) {
+      .hero, .contacts { grid-profile-columns: 1fr; }
+      .facts { grid-profile-columns: repeat(2, 1fr); }
+      h1 { font-size: 4rem; }
+    }
+
+    @media (max-width: 540px) {
+      .top { grid-profile-columns: 1fr; }
+      .memo, .docket { padding: 26px; }
+      h1 { font-size: 3rem; }
+      .facts { grid-profile-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="brief">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="top">
+      <span>Valley Verified Network</span>
+      <span>Phoenix, AZ 85003</span>
+    </header>
+
+    <section class="hero" aria-label="Dorn Policy Group profile">
+      <aside class="docket">
+        <div class="seal">DP</div>
+        <p>Public affairs and lobbying listing serving Phoenix from a downtown office.</p>
+      </aside>
+
+      <div class="memo">
+        <div>
+          <span class="eyebrow">Public Affairs / Lobbying</span>
+          <h1>Dorn Policy Group, Inc.</h1>
+          <p class="summary">A Phoenix public affairs and lobbying office listed at 101 N. 1st Ave., Ste. 2090. Call the office to start an engagement conversation.</p>
+        </div>
+        <div class="contacts">
+          <a class="contact primary" href="tel:+16026064667"><b>Call</b><span>(602) 606-4667</span></a>
+          <address class="contact"><b>Address</b><span>101 N. 1st Ave., Ste. 2090<br>Phoenix, AZ 85003</span></address>
+        </div>
+      </div>
+    </section>
+
+    <section class="facts" aria-label="Business facts">
+      <div class="fact"><b>Category</b><span>Creative Services</span></div>
+      <div class="fact"><b>Service type</b><span>Advertising &amp; Media / Public Affairs / Lobbying</span></div>
+      <div class="fact"><b>Languages</b><span>English</span></div>
+      <div class="fact"><b>Last listed</b><span>May 19, 2026</span></div>
+    </section>
+
+    <section class="profile">
+      <b>Public Chamber profile</b>
+      <p>Phoenix Chamber advertising and media evidence supports this public-affairs profile. <a href="https://business.phoenixchamber.com/list/ql/advertising-media-1">View Chamber profile</a>.</p>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-dorn-policy-group-inc-phoenix-85003-0f8ccf7" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-dorn-policy-group-inc-phoenix-85003-0f8ccf7" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Dorn Policy Group, Inc. is Valley Verified because the firm has a clear public-affairs role, a Phoenix office near the State Capitol, and official sources that match the local profile. Founded in 2000, Dorn works across federal, state, county, municipal, district, and tribal government entities.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The official contact page and Greater Phoenix Chamber listing align on 101 N. 1st Avenue, 20th Floor, Suite 2090, Phoenix, AZ 85003 and phone 602-606-4667. Public evidence supports nearly 60 years of combined government-relations and political-consulting experience among principal staff, plus policy categories including banking, economic development, education, energy, government, healthcare, tax, and transportation.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Dorn belongs in Valley Verified because Arizona organizations working around legislation, regulation, and public affairs need a locally present team with Capitol experience and a public profile that supports the claims.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Lobbying, government relations, public affairs consulting, issue management, media relations, and business development.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Private-sector, public-sector, and civic clients working with Arizona and Western U.S. government entities.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Official website, official contact page, Chamber listing, 2000 founding, downtown Phoenix address, and bipartisan positioning.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

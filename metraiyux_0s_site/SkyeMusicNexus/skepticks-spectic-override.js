@@ -84,13 +84,13 @@
     const status = $('[data-live-status]');
     const grid = $('[data-live-checks]');
     if (!status || !grid) return;
-    status.textContent = 'Checking live production endpoints...';
+    status.textContent = 'Checking live platform services...';
     const routes = [
       ['/api/skymusicnexus/routes/manifest', 'Route manifest'],
       ['/api/skymusicnexus/hub', 'Hub state'],
       ['/api/skymusicnexus/music-assets?action=storage-status', 'Storage status'],
       ['/api/skymusicnexus/observability', 'Observability'],
-      ['/api/skymusicnexus/visuals', 'Visual dashboard data']
+      ['/api/skymusicnexus/visuals', 'Visual workspace data']
     ];
     const results = await Promise.all(routes.map(async ([route, label]) => {
       try {
@@ -105,13 +105,13 @@
     const visuals = results.find((item) => item.route.includes('/visuals'))?.payload?.visuals || {};
     const storage = results.find((item) => item.route.includes('storage-status'))?.payload?.storage || observability.storage || {};
     status.textContent = allOk
-      ? `Live production data loaded: storage ${storage.mode || 'unknown'}, audit events ${observability.retained?.auditEvents || 0}, routes ${(visuals.route_health || []).length || 0}.`
-      : `Static claim ledger is shown; live check has ${results.filter((item) => !item.ok).length} failing endpoint(s).`;
+      ? `Live platform data loaded: storage ${storage.mode || 'unknown'}, activity records ${observability.retained?.auditEvents || 0}, service checks ${(visuals.route_health || []).length || 0}.`
+      : `Claim ledger is shown; live check has ${results.filter((item) => !item.ok).length} service check(s) unavailable.`;
     grid.innerHTML = results.map((item) => {
       const detail = item.route.includes('visuals')
-        ? `${(item.payload?.visuals?.route_health || []).length || 0} routes / ${(item.payload?.visuals?.flows || []).length || 0} flows`
+        ? `${(item.payload?.visuals?.route_health || []).length || 0} services / ${(item.payload?.visuals?.flows || []).length || 0} flows`
         : item.route.includes('observability')
-          ? `${item.payload?.storage?.mode || 'unknown'} / ${item.payload?.retained?.auditEvents || 0} audit events`
+          ? `${item.payload?.storage?.mode || 'unknown'} / ${item.payload?.retained?.auditEvents || 0} activity records`
           : item.route.includes('storage-status')
             ? `${item.payload?.storage?.mode || 'unknown'} / direct upload ${item.payload?.storage?.directUploadAvailable === true ? 'available' : 'not available'}`
             : item.payload?.base || item.payload?.surface || item.payload?.storage_mode || 'live response';

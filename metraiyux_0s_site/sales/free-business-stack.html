@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A client-facing free business stack offer from MetrAIyux 0S: landing experience, team workspace, live chat rooms, SkyeMail, CRM, and backup posture.">
+  <title>Free Business Stack · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+  <style>
+    :root {
+      --pitch-ink: #f4fbff;
+      --pitch-muted: #b7c7cf;
+      --pitch-panel: rgba(255,255,255,.055);
+      --pitch-line: rgba(255,255,255,.15);
+    }
+    .pitch-hero {
+      min-height: auto;
+      grid-template-columns: minmax(0,1fr) minmax(280px,.55fr);
+      align-items: stretch;
+      padding: 56px 5vw 42px;
+      gap: 24px;
+    }
+    .pitch-copy {
+      max-width: 980px;
+    }
+    .pitch-copy h1 {
+      font-size: clamp(42px, 6vw, 78px);
+      max-width: 940px;
+    }
+    .pitch-copy .hero-lede {
+      max-width: 820px;
+    }
+    .offer-snapshot {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      border: 1px solid rgba(111,242,199,.34);
+      border-radius: 8px;
+      background: linear-gradient(180deg,rgba(111,242,199,.12),rgba(255,255,255,.035));
+      padding: 20px;
+      box-shadow: 0 26px 70px rgba(0,0,0,.24);
+    }
+    .offer-snapshot img {
+      width: min(240px, 78%);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 24px rgba(53,183,255,.45));
+    }
+    .snapshot-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .snapshot-list li,
+    .limit-list.clean li {
+      border-left: 3px solid rgba(111,242,199,.58);
+      padding-left: 11px;
+      color: #dfeef3;
+    }
+    .pitch-band {
+      padding: 48px 5vw;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .pitch-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+    .pitch-head p {
+      color: var(--pitch-muted);
+      max-width: 760px;
+      margin: 0;
+    }
+    .value-grid,
+    .tier-stack,
+    .qr-grid,
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(245px,1fr));
+      gap: 16px;
+    }
+    .value-card,
+    .tier-card,
+    .qr-card,
+    .flow-card,
+    .comparison-card {
+      border: 1px solid var(--pitch-line);
+      border-radius: 8px;
+      background: var(--pitch-panel);
+      padding: 20px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.18);
+    }
+    .value-card h3,
+    .tier-card h3,
+    .qr-card h3,
+    .flow-card h3,
+    .comparison-card h3 {
+      color: #ffe9a8;
+      margin-bottom: 10px;
+    }
+    .value-card p,
+    .tier-card p,
+    .qr-card p,
+    .flow-card p,
+    .comparison-card p {
+      color: #dce9ed;
+      margin: 0 0 12px;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-meta span {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      background: rgba(0,0,0,.22);
+      color: #dce9ed;
+      padding: 6px 9px;
+      font-size: .84rem;
+      font-weight: 800;
+    }
+    .flow-card {
+      min-height: 188px;
+    }
+    .flow-number {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg,#f3d483,#6ff2c7);
+      color: #061016;
+      font-weight: 900;
+    }
+    .comparison-strip {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(240px,.55fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    .comparison-card.big {
+      background: linear-gradient(135deg,rgba(53,183,255,.12),rgba(111,242,199,.08));
+    }
+    .comparison-number {
+      font-size: clamp(44px, 7vw, 76px);
+      line-height: 1;
+      font-weight: 950;
+      color: #ffe9a8;
+      margin: 8px 0 12px;
+    }
+    .fine-print {
+      color: var(--pitch-muted);
+      font-size: .92rem;
+    }
+    .limit-list.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+    .qr-code {
+      display: grid;
+      place-items: center;
+      width: 150px;
+      aspect-ratio: 1;
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 12px 0;
+    }
+    .qr-code svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .url-line {
+      color: #dce9ed;
+      font-size: .86rem;
+      overflow-wrap: anywhere;
+    }
+    .contact-band {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(240px,.45fr);
+      gap: 18px;
+      align-items: center;
+      border: 1px solid rgba(243,212,131,.35);
+      border-radius: 8px;
+      background: linear-gradient(135deg,rgba(243,212,131,.12),rgba(53,183,255,.08));
+      padding: 24px;
+    }
+    .print-link {
+      justify-self: end;
+    }
+    @media (max-width: 880px) {
+      .pitch-hero,
+      .comparison-strip,
+      .contact-band {
+        grid-template-columns: 1fr;
+      }
+      .offer-snapshot img,
+      .print-link {
+        justify-self: start;
+      }
+      .pitch-head {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav>
+      <a href="index.html">Sales</a>
+      <a href="free-business-stack-flyer.html">Flyer</a>
+      <a href="../0s/index.html">0S Browser</a>
+      <a href="pricing-offer-router.html">Pricing</a>
+      <a href="../saas/signup.html">Claim Access</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero pitch-hero">
+      <div class="pitch-copy">
+        <p class="eyebrow">Free business stack</p>
+        <h1>A real workspace your team can claim before you spend a dollar.</h1>
+        <p class="hero-lede">MetrAIyux 0S can give a business a landing experience, team workspace, live chat rooms, SkyeMail inbox/outbox, CRM follow-up lane, and biweekly backup posture as the first handshake. If the business likes it, they keep it and grow. If they do not, we edit it or remove it.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="../saas/signup.html">Request Free Claim</a>
+          <a class="button" href="free-business-stack-flyer.html">Open Printable Flyer</a>
+          <a class="button" href="../0s/index.html">Open 0S Browser</a>
+        </div>
+      </div>
+      <aside class="offer-snapshot" aria-label="Free stack snapshot">
+        <img src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent logo">
+        <ul class="snapshot-list">
+          <li>Sovereign infrastructure, not a reseller bundle.</li>
+          <li>One shared 0S gate for workspace access.</li>
+          <li>Free limits are clear before upgrades appear.</li>
+          <li>Managed AE support is available when the owner wants help operating it.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="pitch-band" id="included">
+      <div class="pitch-head">
+        <div>
+          <p class="eyebrow">What is included</p>
+          <h2>The free claim stack is practical from day one.</h2>
+        </div>
+        <p>This is not a promise that MetrAIyux 0S clones Slack, Google Workspace, or a full enterprise CRM. It is a useful owned starter lane for presence, team chat, mail flow, follow-up, and proof.</p>
+      </div>
+      <div class="value-grid">
+        <article class="value-card">
+          <h3>Landing experience</h3>
+          <p>A client-facing page, app preview, or QR handoff that gives the business something real to inspect.</p>
+          <div class="card-meta"><span>editable</span><span>removable</span><span>claim ready</span></div>
+        </article>
+        <article class="value-card">
+          <h3>ConnectLog + Relay13</h3>
+          <p>A team workspace with live rooms for staff communication, owner review, and relationship memory.</p>
+          <div class="card-meta"><span>team chat</span><span>live rooms</span><span>history limits</span></div>
+        </article>
+        <article class="value-card">
+          <h3>SkyeMail inbox/outbox</h3>
+          <p>A real mail lane with a reserved SkyEmail handle. The handle can be changed before launch, and the confirmed change persists.</p>
+          <div class="card-meta"><span>inbox</span><span>outbox</span><span>rename path</span></div>
+        </article>
+        <article class="value-card">
+          <h3>AE-FlowPro CRM</h3>
+          <p>A lightweight customer follow-up lane for leads, notes, next actions, and sales opportunities.</p>
+          <div class="card-meta"><span>lead board</span><span>follow-up</span><span>AE ready</span></div>
+        </article>
+        <article class="value-card">
+          <h3>CitadelDB backup posture</h3>
+          <p>A biweekly backup/export posture for the free workspace so the business has a continuity path.</p>
+          <div class="card-meta"><span>biweekly</span><span>export</span><span>receipt trail</span></div>
+        </article>
+        <article class="value-card">
+          <h3>0S Browser access</h3>
+          <p>An installable, fullscreen app launcher for the business workspace, sales routes, mail, CRM, and owned tools.</p>
+          <div class="card-meta"><span>PWA</span><span>launcher</span><span>one front door</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="pitch-band" id="path">
+      <div class="pitch-head">
+        <div>
+          <p class="eyebrow">How the handoff works</p>
+          <h2>Simple enough to explain at the counter.</h2>
+        </div>
+      </div>
+      <div class="flow-grid">
+        <article class="flow-card"><span class="flow-number">1</span><h3>Review the page</h3><p>The owner sees what was built, what is included, and what is free with limits.</p></article>
+        <article class="flow-card"><span class="flow-number">2</span><h3>Claim the workspace</h3><p>The business requests access through the 0S gate. No app-specific admin password is created.</p></article>
+        <article class="flow-card"><span class="flow-number">3</span><h3>Invite the team</h3><p>The owner adds the people who need chat, mail, CRM follow-up, or workspace visibility.</p></article>
+        <article class="flow-card"><span class="flow-number">4</span><h3>Choose the next move</h3><p>Keep the free stack, request edits, remove the preview, or upgrade only when more capacity is needed.</p></article>
+      </div>
+    </section>
+
+    <section class="pitch-band" id="savings">
+      <div class="comparison-strip">
+        <article class="comparison-card big">
+          <p class="eyebrow">Savings baseline</p>
+          <h2>Five people can avoid roughly this much starter software spend while they test the lane.</h2>
+          <div class="comparison-number">$855/yr</div>
+          <p>Baseline example: five users on Slack Pro annual published pricing plus Google Workspace Business Starter annual published pricing. MetrAIyux 0S is not claiming full feature parity. The value is an owned starter workspace that can begin free with practical limits.</p>
+          <p class="fine-print">Pricing basis checked May 26, 2026 against Slack and Google Workspace public pricing pages. Taxes, promotions, add-ons, domain costs, migrations, and support scope are not included.</p>
+        </article>
+        <aside class="comparison-card">
+          <h3>Where paid work begins</h3>
+          <ul class="limit-list clean">
+            <li>More seats, rooms, history, or message volume.</li>
+            <li>Custom domain mail and migration work.</li>
+            <li>Managed AE follow-up and customer support operations.</li>
+            <li>Daily backups, dedicated restore points, and custom compliance needs.</li>
+            <li>Paid ads, content campaigns, ecommerce, video, and custom app builds.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="pitch-band" id="tiers">
+      <div class="pitch-head">
+        <div>
+          <p class="eyebrow">Upgrade ladder</p>
+          <h2>Free first, then expand only when the business sees the use.</h2>
+        </div>
+      </div>
+      <div class="tier-stack">
+        <article class="tier-card"><h3>Free Claim Stack</h3><p><strong>$0 first claim</strong></p><p>Landing/app experience, workspace claim, ConnectLog + Relay13, SkyeMail, AE-FlowPro, and biweekly backup posture.</p></article>
+        <article class="tier-card"><h3>Starter Command</h3><p><strong>$397/mo + $1,500 setup</strong></p><p>For a business that wants the claimed workspace operated and cleaned up instead of only opened.</p></article>
+        <article class="tier-card"><h3>Growth Cabinet</h3><p><strong>$997/mo + $3,500 setup</strong></p><p>For businesses that want more workspaces, more seats, weekly review, and a stronger growth operating lane.</p></article>
+        <article class="tier-card"><h3>Autonomous Office</h3><p><strong>$2,497/mo + $7,500 setup</strong></p><p>For managed workflows, approval inboxes, digests, owner visibility, and deeper workspace operations.</p></article>
+        <article class="tier-card"><h3>Enterprise / Managed Gate</h3><p><strong>$3,997/mo + $15,000 setup</strong></p><p>For custom gate policies, white-label scope, staff training, dedicated operator support, and written terms.</p></article>
+      </div>
+    </section>
+
+    <section class="pitch-band" id="decision-maker">
+      <div class="contact-band">
+        <div>
+          <p class="eyebrow">Decision maker not here?</p>
+          <h2>No problem. Scan, review, and claim when ready.</h2>
+          <p>The QR codes below open the full pitch page and the 0S Browser lane. Access is gate-protected, so the owner can review the offer and request workspace access through the same shared system.</p>
+          <p class="fine-print">Fastest contact: <a href="mailto:MediaOverLondon@solenterprises.org">MediaOverLondon@solenterprises.org</a> · 1-(800)-484-4783</p>
+        </div>
+        <a class="button primary print-link" href="free-business-stack-flyer.html">Print Leave-Behind</a>
+      </div>
+      <div class="qr-grid" style="margin-top:18px">
+        <article class="qr-card">
+          <h3>Review Free Stack</h3>
+          <div class="qr-code" id="pitch-qr" aria-label="QR code for the free business stack pitch"></div>
+          <p class="url-line" data-url-for="pitch-qr"></p>
+        </article>
+        <article class="qr-card">
+          <h3>Open 0S Browser</h3>
+          <div class="qr-code" id="browser-qr" aria-label="QR code for the 0S Browser"></div>
+          <p class="url-line" data-url-for="browser-qr"></p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><p>MetrAIyux 0S free business stack. Built on owned infrastructure, protected by the shared 0S gate, and expanded only when the business is ready.</p></footer>
+  <script src="../assets/vendor/qrcode-generator.js"></script>
+  <script>
+    (function () {
+      var origin = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev";
+      var links = {
+        "pitch-qr": origin + "/sales/free-business-stack.html",
+        "browser-qr": origin + "/0s/index.html"
+      };
+      Object.keys(links).forEach(function (id) {
+        var target = document.getElementById(id);
+        var label = document.querySelector('[data-url-for="' + id + '"]');
+        if (label) label.textContent = links[id];
+        if (!target || typeof qrcode !== "function") return;
+        var qr = qrcode(0, "M");
+        qr.addData(links[id]);
+        qr.make();
+        target.innerHTML = qr.createSvgTag({
+          scalable: true,
+          margin: 2,
+          title: { text: "Scan to open " + links[id] },
+          alt: { text: "QR code for " + links[id] }
+        });
+      });
+    })();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@ const CORS = {
   'content-type':'application/json',
   'access-control-allow-origin':'*',
   'access-control-allow-methods':'GET,POST,OPTIONS',
-  'access-control-allow-headers':'content-type,authorization,x-admin-session,x-override-session,x-idempotency-key,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id'
+  'access-control-allow-headers':'content-type,authorization,x-admin-session,x-override-session,x-idempotency-key,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret'
 };
 const routes = [
   {keys:['post','social','content','campaign','blog','seo','linkedin','instagram','facebook','twitter','x ','tiktok'], primary:'Valentina Reyes — Marketing & Brand Brain', secondary:'Victor Saint — QA Brain', task:'Draft content, run claims/brand review, queue social draft for approval.'},
@@ -261,6 +261,15 @@ function bearer(request){
 function skygateOrigin(env){
   return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || '').replace(/\/+$/,'');
 }
+function internalProxySecret(env){
+  return String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.ADMIN_AUTOMATION_INTERNAL_PROXY_SECRET || '').trim();
+}
+function sharedGateProxyAuth(request, env){
+  const expected = internalProxySecret(env);
+  if (!expected) return false;
+  return String(request.headers.get('x-0s-shared-gate') || '').toLowerCase() === 'operator'
+    && String(request.headers.get('x-0s-internal-proxy-secret') || '').trim() === expected;
+}
 function scopeList(scope){
   if (Array.isArray(scope)) return scope.map(String);
   return String(scope || '').split(/\s+/).filter(Boolean);
@@ -314,8 +323,9 @@ async function introspectSkygate(token, env){
 }
 async function primaryAuth(request, env){
   const token = bearer(request);
-  if (env.ADMIN_TOKEN && token && token === env.ADMIN_TOKEN) return {ok:true, via:'legacy_admin_token', actor:'legacy-admin'};
+  if (sharedGateProxyAuth(request, env)) return {ok:true, via:'zero_os_shared_gate_proxy', actor:'0s-shared-gate'};
   if (env.SKYGATE_WORKER || skygateOrigin(env)) return introspectSkygate(token, env);
+  if (env.ADMIN_TOKEN && token && token === env.ADMIN_TOKEN) return {ok:true, via:'legacy_admin_token', actor:'legacy-admin'};
   if (!env.ADMIN_TOKEN) return {ok:false, error:'Neither ADMIN_TOKEN nor SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is configured on this Worker.'};
   return {ok:false, error:'Unauthorized admin request.'};
 }

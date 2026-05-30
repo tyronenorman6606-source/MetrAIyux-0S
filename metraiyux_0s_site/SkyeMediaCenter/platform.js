@@ -44,7 +44,7 @@ function gateHeaders(){ return window.SkyeMediaGate?.headers?.() || {}; }
 function fmtBytes(b){ if(!b) return '0 B'; if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
 function escapeHtml(value){ return String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function toast(message){ const old=document.querySelector('.toast'); if(old) old.remove(); const el=document.createElement('div'); el.className='toast'; el.textContent=message; document.body.appendChild(el); setTimeout(()=>el.remove(),2600); }
-function routeActive(){ document.querySelectorAll('.dock-nav a').forEach(a=>a.classList.toggle('active', a.getAttribute('href').endsWith(page))); }
+function routeActive(){ document.querySelectorAll('.command-nav a').forEach(a=>a.classList.toggle('active', a.getAttribute('href').endsWith(page))); }
 async function fetchJson(url, opts={}){ const headers = {...(opts.headers || {}), ...gateHeaders()}; const res = await fetch(url, {...opts, headers}); if(!res.ok) throw new Error(url+' returned '+res.status); return res.json(); }
 async function loadRuntime(){
   let stats = null; let assets = [];
@@ -59,7 +59,7 @@ async function loadRuntime(){
   document.getElementById('signal-drafts').textContent = String(byStatus.draft || 0);
   document.getElementById('signal-published').textContent = String(byStatus.published || 0);
   document.getElementById('signal-search').textContent = assets.length ? 'live' : 'demo';
-  document.getElementById('dock-runtime-state').textContent = assets.length || stats ? 'Live API' : 'Static Ready';
+  document.getElementById('runtime-state').textContent = assets.length || stats ? 'Live API' : 'Static Ready';
   return {records,total,byStatus,totalSize,stats};
 }
 function shell(title, label, body, aside=''){
@@ -86,7 +86,7 @@ async function render(){
   const data = await loadRuntime();
   const stage = document.getElementById('view-stage');
   if(view === 'nerve'){
-    stage.innerHTML = shell('The media center is now an instrument, not a dashboard.', 'command cortex', `<p>This shell turns media intake into a spatial control surface. Operators can enter through the public intake portal, jump into the operator theater, inspect runtime routes, and see asset motion as signals instead of dead cards.</p>${constellation(data.records)}`, `<span class="data-kicker">live read</span><h2>${data.records.length}</h2><p>records rendered from the media assets endpoint when available, with demo matter used only when the API has no records.</p><a href="./public/index.html">Launch Intake</a>`);
+    stage.innerHTML = shell('The media center is now an instrument, not a dashboard.', 'command cortex', `<p>This platform turns media intake into a spatial control surface. Operators can enter through the public intake portal, jump into the operator theater, inspect runtime routes, and see asset motion as signals instead of dead cards.</p>${constellation(data.records)}`, `<span class="data-kicker">live read</span><h2>${data.records.length}</h2><p>records rendered from the media assets endpoint when available, with demo matter used only when the API has no records.</p><a href="./public/index.html">Launch Intake</a>`);
   } else if(view === 'atlas'){
     stage.innerHTML = shell('Signal Atlas turns the library into an orbital asset map.', 'asset atlas', `${constellation(data.records)}`, `<h2>Recent Matter</h2>${assetRows(data.records)}`);
   } else if(view === 'flows'){
@@ -94,7 +94,7 @@ async function render(){
   } else if(view === 'vault'){
     stage.innerHTML = shell('Vault Loom renders records as usable media matter.', 'records lattice', `${assetRows(data.records)}`, `<h2>Search Path</h2><p>Public list and search remain available from the media functions. Draft file access stays protected until publish.</p><button data-command="search-proof">Run Search Pulse</button>`);
   } else if(view === 'runtime'){
-    stage.innerHTML = shell('Runtime Spine keeps the production media routes visible.', 'runtime spine', runtimeMap(), `<h2>Launch Targets</h2><p>Public intake, operator theater, worker smoke, and contract files are linked from the rebuilt shell.</p><a href="./smoke/smoke-proof.mjs">Open Smoke Proof</a>`);
+    stage.innerHTML = shell('Runtime Spine keeps the production media routes visible.', 'runtime spine', runtimeMap(), `<h2>Launch Targets</h2><p>Public intake, operator theater, worker smoke, and contract files are linked from the rebuilt command surface.</p><a href="./smoke/smoke-proof.mjs">Open Smoke Proof</a>`);
   } else if(view === 'proof'){
     stage.innerHTML = shell('Proof Forge separates what is verified from what still needs hosted proof.', 'proof forge', proofList(), `<h2>Truth Files</h2><p>PLATFORM_TRUTH.json, PROOF_STATUS.md, and docs/PLATFORM_STATUS.md were kept and refreshed for this build.</p><a href="./PLATFORM_TRUTH.json">Open Truth Marker</a>`);
   } else {

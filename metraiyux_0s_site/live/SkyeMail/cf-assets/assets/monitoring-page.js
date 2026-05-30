@@ -17,7 +17,7 @@
   function providerStatusLine(configured){
     const parts = [
       ['Database', configured?.database],
-      ['Resend API', configured?.resend_api_key],
+      ['Mail API', configured?.resend_api_key],
       ['Webhook secret', configured?.resend_webhook_secret],
       ['Inbound domain', configured?.inbound_domain],
     ];
@@ -46,7 +46,7 @@
   function renderDeliveryEvents(items){
     const rows = Array.isArray(items) ? items : [];
     if(!rows.length){
-      deliveryEventsEl.innerHTML = '<div class="empty">No Resend delivery events have been stored for this mailbox yet.</div>';
+      deliveryEventsEl.innerHTML = '<div class="empty">No Citadel delivery events have been stored for this mailbox yet.</div>';
       return;
     }
     deliveryEventsEl.innerHTML = rows.map((event)=>`
@@ -71,7 +71,7 @@
   function renderWebhookEvents(items){
     const rows = Array.isArray(items) ? items : [];
     if(!rows.length){
-      webhookEventsEl.innerHTML = '<div class="empty">No signed Resend webhook attempts have been stored for this mailbox yet.</div>';
+      webhookEventsEl.innerHTML = '<div class="empty">No signed Citadel webhook attempts have been stored for this mailbox yet.</div>';
       return;
     }
     webhookEventsEl.innerHTML = rows.map((event)=>`
@@ -95,7 +95,7 @@
 
   async function refresh(){
     try{
-      setBadge('Checking provider health…');
+      setBadge('Checking Citadel mail lane health...');
       const [health, events] = await Promise.all([
         apiFetch('/resend-health'),
         apiFetch('/resend-events-list?limit=100')

@@ -4,6 +4,7 @@ import { json } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { audit } from "./_lib/audit.js";
 import { resolveAdminAuthority } from "./_lib/admin.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
 
 const REVIEW_BATCH_SIZE = 5;
 const KINDS = new Set(["service_request", "review", "contact", "support", "partnership"]);
@@ -153,41 +154,41 @@ function recordEmailText(record) {
 }
 
 async function sendBackupEmail(record) {
-  const apiKey = firstEnv("RESEND_API_KEY");
-  const from = firstEnv("RESEND_FROM_EMAIL", "RESEND_FROM", "MAIL_FROM", "SKYEMAIL_FROM");
   const to = adminRecipients();
-  if (!apiKey || !from || !to.length) {
+  if (!to.length) {
     return {
       delivered: false,
       mode: "fallback_mailto",
-      reason: "resend_not_configured",
+      reason: "admin_recipient_not_configured",
       fallback_url: fallbackMailto(record)
     };
   }
 
   const subject = `[0S ${record.kind.replaceAll("_", " ")}] ${record.service || record.company || record.name || "new intake"}`;
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      from,
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "resend",
+    action: "resend.email.send",
+    app_id: "fs27-contact-intake",
+    workspace_id: record.source_app || "metraiyux-0s",
+    customer_id: `contact-intake:${record.id}`,
+    client_id: record.lane || record.kind || "contact",
+    usage_lane: `fs27:contact-intake:${record.lane || record.kind || "contact"}`,
+    payload: {
       to,
       subject,
-      text: recordEmailText(record),
-      reply_to: record.email || undefined
-    })
+      text: recordEmailText(record)
+    }
   });
-  const data = await res.json().catch(() => ({}));
+  const providerResult = runtime.receipt?.provider_result || {};
   return {
-    delivered: res.ok,
-    mode: "resend",
-    status: res.status,
-    id: data.id || null,
-    error: res.ok ? null : (data.message || data.error || "resend_delivery_failed"),
-    backup_recipient_count: to.length
+    delivered: runtime.ok,
+    mode: "provider_runtime_resend",
+    status: runtime.status,
+    id: providerResult.id || null,
+    error: runtime.ok ? null : (runtime.receipt?.error || runtime.response?.error || "resend_delivery_failed"),
+    backup_recipient_count: to.length,
+    provider_runtime: publicProviderRuntime(runtime.receipt),
+    fallback_url: runtime.ok ? undefined : fallbackMailto(record)
   };
 }
 

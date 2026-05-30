@@ -206,6 +206,7 @@ function normalizePacket(input = {}) {
     recommendedDestinations,
     handoffSummary: {
       crmLane: recommendedDestinations.includes("SkyeLeadVault") ? "SkyeLeadVault" : "manual-intake",
+      mediaLane: recommendedDestinations.includes("SkyeMediaCenter") ? "SkyeMediaCenter" : "manual-media-handoff",
       storefrontLane: recommendedDestinations.includes("SkyeWebCreatorMax") ? "SkyeWebCreatorMax" : "manual-site-build",
       opsLane: recommendedDestinations.includes("skyeroutex-workforce-command-v0.4.0")
         ? "skyeroutex-workforce-command-v0.4.0"
@@ -649,6 +650,7 @@ async function summarize(context) {
     },
     handoffLanes: {
       crm: packets.filter((packet) => packet.handoffSummary?.crmLane === "SkyeLeadVault").length,
+      media: packets.filter((packet) => packet.handoffSummary?.mediaLane === "SkyeMediaCenter").length,
       storefront: packets.filter((packet) => packet.handoffSummary?.storefrontLane === "SkyeWebCreatorMax").length,
       ops: packets.filter((packet) => packet.handoffSummary?.opsLane === "skyeroutex-workforce-command-v0.4.0").length,
     },

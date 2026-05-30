@@ -1,15 +1,52 @@
 import { requireGateAuth, gateAuthErrorResponse } from '../netlify/functions/_lib/authz.js';
 import { buildCors, json as httpJson } from '../netlify/functions/_lib/http.js';
+import { executeZeroOsAutomationAction } from '../../../../cloudflare/zero-os-automation-spine.mjs';
 
 const MAX_PROJECT = 160;
 const MAX_DEPLOYMENT = 180;
 const MAX_PATH = 700;
+const MAX_SOURCE_DOWNLOAD_FILES = 5000;
+const MAX_SOURCE_PACKAGE_FILES = 20000;
+const MAX_SOURCE_TRANSFER_ARCHIVE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_PLAN = 'free99';
+const SOURCE_TRANSFER_METHODS = {
+  download: {
+    id: 'download',
+    label: 'Direct gated download',
+    status: 'ready',
+    description: 'Returns the existing account-scoped tar recovery URL.'
+  },
+  'instant-download-link': {
+    id: 'instant-download-link',
+    label: 'Instant gated download link',
+    status: 'ready_gated',
+    description: 'Returns a gate-session-scoped source link without minting a public URL.'
+  },
+  skyedrive: {
+    id: 'skyedrive',
+    label: 'Send to SkyeDrive',
+    status: 'storage_ready',
+    description: 'Stores the source archive in the owner SkyeDrive transfer lane.'
+  },
+  skyevault: {
+    id: 'skyevault',
+    label: 'Send to SkyeVault',
+    status: 'storage_ready',
+    description: 'Stores the source archive in the owner SkyeVault custody lane.'
+  },
+  'secure-skye-pack': {
+    id: 'secure-skye-pack',
+    label: 'Secure .skye pack',
+    status: 'storage_ready',
+    description: 'Creates and stores an encrypted SkyeSecure v2 source pack using the canonical .skye extension.'
+  }
+};
 
 const PLAN_CAPS = {
   free99: {
     label: 'Free99 capped workspace',
     max_static_bundle_bytes: 25 * 1024 * 1024,
+    max_source_package_bytes: 50 * 1024 * 1024,
     deployments_per_month: 3,
     public_routes_per_workspace: 1,
     custom_domains: 0,
@@ -22,6 +59,7 @@ const PLAN_CAPS = {
   'skyenet-edge-starter': {
     label: 'SkyeNet Edge Starter',
     max_static_bundle_bytes: 25 * 1024 * 1024,
+    max_source_package_bytes: 75 * 1024 * 1024,
     deployments_per_month: 20,
     public_routes_per_workspace: 1,
     custom_domains: 0,
@@ -34,6 +72,7 @@ const PLAN_CAPS = {
   'skyenet-edge-growth': {
     label: 'SkyeNet Edge Growth',
     max_static_bundle_bytes: 150 * 1024 * 1024,
+    max_source_package_bytes: 300 * 1024 * 1024,
     deployments_per_month: 100,
     public_routes_per_workspace: 5,
     custom_domains: 1,
@@ -46,6 +85,7 @@ const PLAN_CAPS = {
   'skyenet-functions-managed': {
     label: 'SkyeNet Functions Managed',
     max_static_bundle_bytes: 250 * 1024 * 1024,
+    max_source_package_bytes: 500 * 1024 * 1024,
     deployments_per_month: 150,
     public_routes_per_workspace: 8,
     custom_domains: 2,
@@ -58,6 +98,7 @@ const PLAN_CAPS = {
   'skyenet-sovereign-runtime-reserve': {
     label: 'SkyeNet Sovereign Runtime Reserve',
     max_static_bundle_bytes: 500 * 1024 * 1024,
+    max_source_package_bytes: 1024 * 1024 * 1024,
     deployments_per_month: 300,
     public_routes_per_workspace: 20,
     custom_domains: 5,
@@ -72,6 +113,7 @@ const PLAN_CAPS = {
 const OWNER_ADMIN_CAPS = {
   label: 'Owner/admin unlocked SkyeNet lane',
   max_static_bundle_bytes: 1024 * 1024 * 1024,
+  max_source_package_bytes: 2 * 1024 * 1024 * 1024,
   deployments_per_month: 1000000,
   public_routes_per_workspace: 1000000,
   custom_domains: 1000000,
@@ -104,6 +146,24 @@ function randomId(prefix) {
 
 function deploymentBucket(env) {
   return env.DEPLOYMENT_ASSET_BUCKET || env.DEPLOYMENT_ASSETS_BUCKET || env.ZERO_OS_DEPLOYMENT_BUCKET || null;
+}
+
+function sourceTransferBucket(env) {
+  return env.SKYENET_SOURCE_TRANSFER_BUCKET
+    || env.SKYEDRIVE_BUCKET
+    || env.SKYEVAULT_BUCKET
+    || env.SKYENET_DRIVE_BUCKET
+    || env.SKYENET_VAULT_BUCKET
+    || deploymentBucket(env);
+}
+
+function sourceTransferBucketBinding(env) {
+  if (env.SKYENET_SOURCE_TRANSFER_BUCKET) return 'SKYENET_SOURCE_TRANSFER_BUCKET';
+  if (env.SKYEDRIVE_BUCKET) return 'SKYEDRIVE_BUCKET';
+  if (env.SKYEVAULT_BUCKET) return 'SKYEVAULT_BUCKET';
+  if (env.SKYENET_DRIVE_BUCKET) return 'SKYENET_DRIVE_BUCKET';
+  if (env.SKYENET_VAULT_BUCKET) return 'SKYENET_VAULT_BUCKET';
+  return deploymentBucket(env) ? 'DEPLOYMENT_ASSET_BUCKET' : '';
 }
 
 function routeKv(env) {
@@ -230,6 +290,137 @@ function deploymentPrefix(customerId, workspaceId) {
   return `skynet:deployment:v1:customer:${customerId}:workspace:${workspaceId}:`;
 }
 
+function sourceDownloadPath(workspaceId, projectId, deploymentId) {
+  const params = new URLSearchParams({
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  });
+  return `/api/skyenet/source-download?${params.toString()}`;
+}
+
+function sourceTransferPath() {
+  return '/api/skyenet/source-transfer';
+}
+
+function sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, explicit = '') {
+  const cleanExplicit = cleanText(explicit || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  if (cleanExplicit) return cleanExplicit;
+  return [
+    'source-packages',
+    `customer-${cleanText(principal?.customer_id || '0', 160)}`,
+    `workspace-${workspaceId}`,
+    `project-${projectId}`,
+    `deployment-${deploymentId}`
+  ].join('/');
+}
+
+function storageSegment(value, fallback = 'item') {
+  return normalizeSlug(value || fallback, fallback, 180);
+}
+
+function sourceTransferStorageLane(method) {
+  if (method === 'skyedrive') return 'skyedrive/source-transfers';
+  if (method === 'skyevault') return 'skyevault/source-transfers';
+  if (method === 'secure-skye-pack') return 'skyevault/secure-skye-packs';
+  return 'skyenet/source-transfers';
+}
+
+function sourceTransferStoragePrefix(method, principal, workspaceId, projectId, deploymentId, transferId) {
+  return [
+    sourceTransferStorageLane(method),
+    `customer-${storageSegment(principal?.customer_id || '0', '0')}`,
+    `workspace-${storageSegment(workspaceId, 'default-workspace')}`,
+    `project-${storageSegment(projectId, 'project')}`,
+    `deployment-${storageSegment(deploymentId, 'deployment')}`,
+    storageSegment(transferId, 'transfer')
+  ].join('/');
+}
+
+function envVarPrefix(customerId, workspaceId, projectId) {
+  return `skynet:env:v1:customer:${customerId}:workspace:${workspaceId}:project:${projectId}:`;
+}
+
+function envVarKey(customerId, workspaceId, projectId, key) {
+  return `${envVarPrefix(customerId, workspaceId, projectId)}key:${key}`;
+}
+
+function normalizeEnvKey(value) {
+  const key = cleanText(value || '', 120).trim().replace(/[^A-Za-z0-9_]/g, '_').replace(/^_+|_+$/g, '').toUpperCase();
+  if (!key || !/^[A-Z_][A-Z0-9_]{0,119}$/.test(key)) {
+    const error = new Error('Environment variable key must use letters, numbers, and underscores, and cannot start with a number.');
+    error.status = 400;
+    error.code = 'BAD_ENV_KEY';
+    throw error;
+  }
+  return key;
+}
+
+async function sha256Hex(bytes) {
+  const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(hashBuffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function concatBytes(chunks) {
+  const total = chunks.reduce((sum, chunk) => sum + chunk.byteLength, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
+function bytesToBase64(bytes) {
+  if (typeof globalThis.btoa !== 'function' && typeof Buffer !== 'undefined') {
+    return Buffer.from(bytes).toString('base64');
+  }
+  const chunkSize = 0x8000;
+  let binary = '';
+  for (let offset = 0; offset < bytes.byteLength; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return globalThis.btoa(binary);
+}
+
+function randomBytes(length) {
+  const bytes = new Uint8Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytes;
+}
+
+function envPreview(value) {
+  const text = String(value ?? '');
+  if (!text) return '';
+  if (text.length <= 4) return '****';
+  return `****${text.slice(-4)}`;
+}
+
+function normalizeSourceTransferMethod(value) {
+  const raw = normalizeSlug(value || 'download', 'download', 80).replace(/_/g, '-');
+  const aliases = {
+    link: 'instant-download-link',
+    instant: 'instant-download-link',
+    'instant-link': 'instant-download-link',
+    'instant-download': 'instant-download-link',
+    drive: 'skyedrive',
+    vault: 'skyevault',
+    skye: 'secure-skye-pack',
+    '.skye': 'secure-skye-pack',
+    skyepack: 'secure-skye-pack',
+    'skye-pack': 'secure-skye-pack',
+    secure: 'secure-skye-pack',
+    securepack: 'secure-skye-pack',
+    'secure-pack': 'secure-skye-pack'
+  };
+  return SOURCE_TRANSFER_METHODS[raw] ? raw : (aliases[raw] || 'download');
+}
+
+function sourceTransferMethodsForResponse() {
+  return Object.values(SOURCE_TRANSFER_METHODS).map((method) => ({ ...method }));
+}
+
 function receiptKey(customerId, workspaceId, type = 'event') {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   return `skynet:receipt:v1:customer:${customerId}:workspace:${workspaceId}:${stamp}:${type}:${randomId('rcpt')}`;
@@ -314,23 +505,25 @@ function skynetUrlModel(env, request, projectId = 'my-project') {
   return {
     schema: 'fs27.skynet.url_model.v1',
     public_product_name: 'SkyeNet',
-    current_release_default: 'host_path_route',
-    path_route_pattern: `https://${defaultHost}/skyenet/${projectId}/`,
-    branded_subdomain_pattern: root ? `https://${projectId}.${root}` : 'https://<project>.<your-skynet-domain>',
+    current_release_default: 'platform_native_host',
+    platform_native_host_pattern: `https://skyenet.<company-slug>/`,
+    shared_origin_path_pattern: `https://${defaultHost}/${projectId}/`,
+    legacy_zero_os_path_pattern: `https://<0s-origin>/skyenet/${projectId}/`,
+    branded_subdomain_pattern: root ? `https://skyenet.${root}` : 'https://skyenet.<company-slug>',
     url_modes: [
       {
         id: 'path',
-        label: 'SkyeNet path route',
-        status: 'live_now',
-        example: `https://${defaultHost}/skyenet/${projectId}/`,
+        label: 'SkyeNet shared-origin path route',
+        status: 'infrastructure_fallback_or_staging',
+        example: `https://${defaultHost}/${projectId}/`,
         required_fields: ['project_id', 'deployment_id'],
         optional_fields: ['hostname', 'mount_path']
       },
       {
         id: 'subdomain',
-        label: 'SkyeNet branded subdomain',
-        status: root ? 'ready_when_dns_routes_to_skynet' : 'requires_wildcard_domain',
-        example: root ? `https://${projectId}.${root}` : 'https://my-site.skynet.example',
+        label: 'SkyeNet platform-native host',
+        status: 'canonical_for_public_company_surfaces',
+        example: 'https://skyenet.<company-slug>/',
         required_fields: ['project_id', 'deployment_id', 'hostname or SKYENET_ROOT_DOMAIN'],
         optional_fields: ['custom_domain']
       }
@@ -359,6 +552,34 @@ function normalizeAssetPath(value) {
   return normalized;
 }
 
+function normalizeSourcePath(value) {
+  const raw = cleanText(value || '', MAX_PATH).replace(/\\/g, '/').replace(/^\/+/, '');
+  const parts = raw.split('/').filter(Boolean);
+  if (!parts.length) {
+    const error = new Error('Missing source path');
+    error.status = 400;
+    error.code = 'MISSING_SOURCE_PATH';
+    throw error;
+  }
+  if (parts.some((part) => part === '..' || part === '.')) {
+    const error = new Error('Invalid source path');
+    error.status = 400;
+    error.code = 'BAD_SOURCE_PATH';
+    throw error;
+  }
+  const normalized = parts.join('/');
+  if (/(^|\/)(\.git|node_modules|\.wrangler|\.next\/cache|dist\/cache|tmp|temp)(\/|$)/i.test(normalized)
+    || /(^|\/)\.env(\.|$|\/)/i.test(normalized)
+    || /(^|\/)(id_rsa|id_dsa|id_ecdsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)(\/|$)/i.test(normalized)
+    || /\.(pem|key|p12|pfx|crt|sqlite|sqlite3|db)$/i.test(normalized)) {
+    const error = new Error('Refusing to upload sensitive or generated source path');
+    error.status = 400;
+    error.code = 'PRIVATE_SOURCE_PATH_BLOCKED';
+    throw error;
+  }
+  return normalized;
+}
+
 function contentTypeForPath(pathname, fallback = '') {
   const explicit = cleanText(fallback, 160);
   if (explicit) return explicit;
@@ -374,6 +595,450 @@ function contentTypeForPath(pathname, fallback = '') {
   if (path.endsWith('.ico')) return 'image/x-icon';
   if (path.endsWith('.txt')) return 'text/plain; charset=utf-8';
   return 'application/octet-stream';
+}
+
+function safeDownloadName(...parts) {
+  const name = parts
+    .map((part) => cleanText(part, 180))
+    .filter(Boolean)
+    .join('-')
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return name || 'skyenet-source';
+}
+
+function encodeUtf8(value) {
+  return new TextEncoder().encode(String(value ?? ''));
+}
+
+function tarNumber(value, width) {
+  const text = Math.max(0, Number(value || 0)).toString(8);
+  return `${text.padStart(width - 1, '0')}\0`;
+}
+
+function tarString(target, offset, length, value) {
+  const bytes = encodeUtf8(value).slice(0, length);
+  target.set(bytes, offset);
+}
+
+function splitTarPath(name) {
+  const clean = String(name || 'file').replace(/^\/+/, '') || 'file';
+  if (encodeUtf8(clean).length <= 100) return { name: clean, prefix: '' };
+  const parts = clean.split('/');
+  for (let index = 1; index < parts.length; index += 1) {
+    const prefix = parts.slice(0, index).join('/');
+    const tail = parts.slice(index).join('/');
+    if (encodeUtf8(prefix).length <= 155 && encodeUtf8(tail).length <= 100) return { name: tail, prefix };
+  }
+  return { name: clean.split('/').pop().slice(-100) || 'file', prefix: '' };
+}
+
+function paxRecord(key, value) {
+  const payload = `${key}=${value}\n`;
+  let length = encodeUtf8(`${payload.length} ${payload}`).length;
+  while (true) {
+    const record = `${length} ${payload}`;
+    const actual = encodeUtf8(record).length;
+    if (actual === length) return record;
+    length = actual;
+  }
+}
+
+function tarHeader(name, size = 0, options = {}) {
+  const header = new Uint8Array(512);
+  const pathParts = splitTarPath(name);
+  tarString(header, 0, 100, pathParts.name);
+  tarString(header, 100, 8, tarNumber(options.mode || 0o644, 8));
+  tarString(header, 108, 8, tarNumber(options.uid || 0, 8));
+  tarString(header, 116, 8, tarNumber(options.gid || 0, 8));
+  tarString(header, 124, 12, tarNumber(size, 12));
+  tarString(header, 136, 12, tarNumber(options.mtime || Math.floor(Date.now() / 1000), 12));
+  for (let index = 148; index < 156; index += 1) header[index] = 32;
+  tarString(header, 156, 1, options.typeflag || '0');
+  tarString(header, 257, 6, 'ustar');
+  tarString(header, 263, 2, '00');
+  tarString(header, 265, 32, 'skyenet');
+  tarString(header, 297, 32, 'skyenet');
+  if (pathParts.prefix) tarString(header, 345, 155, pathParts.prefix);
+  let checksum = 0;
+  for (const byte of header) checksum += byte;
+  tarString(header, 148, 8, `${checksum.toString(8).padStart(6, '0')}\0 `);
+  return header;
+}
+
+function tarPadding(size) {
+  const remainder = size % 512;
+  return remainder ? new Uint8Array(512 - remainder) : null;
+}
+
+function tarPaxEntriesIfNeeded(name) {
+  const clean = String(name || '').replace(/^\/+/, '');
+  const pathParts = splitTarPath(clean);
+  const needsPath = encodeUtf8(clean).length > 100 && (!pathParts.prefix || encodeUtf8(clean).length > 255);
+  if (!needsPath) return null;
+  const body = encodeUtf8(paxRecord('path', clean));
+  const base = clean.split('/').pop() || 'file';
+  return {
+    header: tarHeader(`PaxHeaders.X/${base}`.slice(0, 100), body.length, { typeflag: 'x' }),
+    body,
+    padding: tarPadding(body.length)
+  };
+}
+
+function sanitizeEnvRecord(record) {
+  return {
+    schema: 'fs27.skynet.env_var.v1',
+    key: record.key,
+    project_id: record.project_id,
+    workspace_id: record.workspace_id,
+    scope: record.scope || 'production',
+    secret: record.secret !== false,
+    has_value: Boolean(record.value),
+    value_preview: record.value_preview || envPreview(record.value || ''),
+    value_sha256: record.value_sha256 || '',
+    created_at: record.created_at || '',
+    updated_at: record.updated_at || ''
+  };
+}
+
+async function readObjectBytes(object) {
+  if (!object) return new Uint8Array();
+  if (typeof object.arrayBuffer === 'function') return new Uint8Array(await object.arrayBuffer());
+  if (typeof object.text === 'function') return encodeUtf8(await object.text());
+  if (object.body) return new Uint8Array(await new Response(object.body).arrayBuffer());
+  return new Uint8Array();
+}
+
+function sourceArchiveError(status, code, message, extra = {}) {
+  const error = new Error(message);
+  error.status = status;
+  error.code = code;
+  error.extra = extra;
+  return error;
+}
+
+async function buildSourceArchiveBytes(env, principal, workspaceId, projectId, deploymentId, deployment) {
+  const bucket = deploymentBucket(env);
+  if (!bucket?.get) throw sourceArchiveError(500, 'NO_DEPLOYMENT_BUCKET_READ', 'DEPLOYMENT_ASSET_BUCKET read is not configured');
+  const privatePackage = deployment.source_package && Array.isArray(deployment.source_package.files) && deployment.source_package.files.length
+    ? deployment.source_package
+    : null;
+  const files = privatePackage
+    ? privatePackage.files.map((file) => normalizeSourcePath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
+    : Array.isArray(deployment.files)
+      ? deployment.files.map((file) => normalizeAssetPath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
+      : [];
+  if (!files.length) throw sourceArchiveError(409, 'DEPLOYMENT_SOURCE_EMPTY', 'Deployment has no recorded files to transfer');
+  const totalRecordedFiles = privatePackage ? privatePackage.files.length : (Array.isArray(deployment.files) ? deployment.files.length : 0);
+  if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
+    throw sourceArchiveError(
+      413,
+      'SOURCE_DOWNLOAD_FILE_LIMIT',
+      `Deployment source bundle has ${totalRecordedFiles} files; max transferable files per request is ${MAX_SOURCE_DOWNLOAD_FILES}.`,
+      { file_count: totalRecordedFiles, limit: MAX_SOURCE_DOWNLOAD_FILES }
+    );
+  }
+  const prefix = cleanText(
+    privatePackage?.prefix || deployment.asset_prefix || assetPrefix(projectId, deploymentId),
+    MAX_PATH
+  ).replace(/^\/+|\/+$/g, '');
+  const objects = [];
+  const missing = [];
+  let totalBytes = 0;
+  for (const file of files) {
+    const objectKey = `${prefix}/${file}`.replace(/\/+/g, '/');
+    const meta = bucket.head ? await bucket.head(objectKey).catch(() => null) : null;
+    let object = null;
+    if (!meta) object = await bucket.get(objectKey).catch(() => null);
+    const size = Number(meta?.size ?? object?.size ?? 0);
+    if (!meta && !object) {
+      missing.push(file);
+      continue;
+    }
+    totalBytes += size;
+    objects.push({ file, key: objectKey, size, object });
+  }
+  if (missing.length) {
+    throw sourceArchiveError(
+      409,
+      'SOURCE_DOWNLOAD_INCOMPLETE',
+      'Deployment source bundle is incomplete; one or more recorded files are missing from the SkyeNet vault.',
+      { missing }
+    );
+  }
+  if (totalBytes > MAX_SOURCE_TRANSFER_ARCHIVE_BYTES) {
+    throw sourceArchiveError(
+      413,
+      'SOURCE_TRANSFER_ARCHIVE_LIMIT',
+      `Deployment source archive is larger than the synchronous SkyeNet transfer limit of ${bytesLabel(MAX_SOURCE_TRANSFER_ARCHIVE_BYTES)}.`,
+      { bytes: totalBytes, limit: MAX_SOURCE_TRANSFER_ARCHIVE_BYTES }
+    );
+  }
+  const manifest = {
+    schema: 'fs27.skynet.source_download_manifest.v1',
+    generated_at: new Date().toISOString(),
+    account: {
+      customer_id: principal.customer_id,
+      workspace_id: workspaceId,
+      email: principal.email || '',
+      role: principal.role || ''
+    },
+    deployment: {
+      project_id: projectId,
+      deployment_id: deploymentId,
+      status: deployment.status || '',
+      live_url: deployment.live_url || '',
+      route_key: deployment.route_key || '',
+      asset_prefix: prefix,
+      source_mode: privatePackage ? 'private-full-project' : 'public-deployment-files',
+      source_package: privatePackage ? {
+        mode: privatePackage.mode || 'private-full-project',
+        file_count: privatePackage.file_count || files.length,
+        total_bytes: privatePackage.total_bytes || totalBytes,
+        public_asset_exposure: false,
+        completed_at: privatePackage.completed_at || ''
+      } : null,
+      file_count: files.length,
+      total_bytes: totalBytes
+    },
+    files
+  };
+  const chunks = [];
+  const addEntry = (name, bodyBytes, typeflag = '0') => {
+    const pax = tarPaxEntriesIfNeeded(name);
+    if (pax) {
+      chunks.push(pax.header, pax.body);
+      if (pax.padding) chunks.push(pax.padding);
+    }
+    chunks.push(tarHeader(name, bodyBytes.length, { typeflag }), bodyBytes);
+    const padding = tarPadding(bodyBytes.length);
+    if (padding) chunks.push(padding);
+  };
+  addEntry('.skyenet/source-manifest.json', encodeUtf8(JSON.stringify(manifest, null, 2)));
+  for (const item of objects) {
+    const object = item.object || await bucket.get(item.key);
+    const bodyBytes = await readObjectBytes(object);
+    addEntry(item.file, bodyBytes);
+  }
+  chunks.push(new Uint8Array(1024));
+  const bytes = concatBytes(chunks);
+  const sha256 = await sha256Hex(bytes);
+  return {
+    bytes,
+    sha256,
+    manifest,
+    files,
+    total_bytes: totalBytes,
+    download_name: `${safeDownloadName(projectId, deploymentId, 'source')}.tar`,
+    source_mode: privatePackage ? 'private-full-project' : 'public-deployment-files'
+  };
+}
+
+async function buildSecureSkyePack(archive, context) {
+  const iv = randomBytes(12);
+  const rawKey = randomBytes(32);
+  const imported = await globalThis.crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
+  const aadText = `SKYESEC2|skyenet-source-transfer|${context.transfer_id}`;
+  const encrypted = new Uint8Array(await globalThis.crypto.subtle.encrypt({
+    name: 'AES-GCM',
+    iv,
+    additionalData: encodeUtf8(aadText)
+  }, imported, archive.bytes));
+  const encryptedSha256 = await sha256Hex(encrypted);
+  const pack = {
+    schema: 'skye.secure.source_pack.v2',
+    marker: 'SKYESEC2',
+    format: 'skye-secure-secret-pack-v2',
+    encrypted: true,
+    algorithm: 'AES-256-GCM',
+    created_at: new Date().toISOString(),
+    custody: {
+      transfer_id: context.transfer_id,
+      customer_id: context.principal.customer_id,
+      workspace_id: context.workspace_id,
+      project_id: context.project_id,
+      deployment_id: context.deployment_id,
+      account_scoped: true,
+      plaintext_source_exposed_to_storage: false,
+      key_custody: 'owner-admin-private-skye-key-record'
+    },
+    source_archive: {
+      filename: archive.download_name,
+      bytes: archive.bytes.byteLength,
+      sha256: archive.sha256,
+      source_mode: archive.source_mode
+    },
+    encryption: {
+      iv: bytesToBase64(iv),
+      aad: aadText,
+      ciphertext_sha256: encryptedSha256,
+      ciphertext_bytes: encrypted.byteLength
+    },
+    manifest: archive.manifest,
+    payload_base64: bytesToBase64(encrypted)
+  };
+  const packBytes = encodeUtf8(JSON.stringify(pack, null, 2));
+  const keyCustody = {
+    schema: 'skye.secure.source_pack.key_custody.v1',
+    marker: 'SKYESEC2_KEY_CUSTODY',
+    transfer_id: context.transfer_id,
+    created_at: pack.created_at,
+    customer_id: context.principal.customer_id,
+    workspace_id: context.workspace_id,
+    project_id: context.project_id,
+    deployment_id: context.deployment_id,
+    algorithm: 'AES-256-GCM',
+    key_base64: bytesToBase64(rawKey),
+    iv: pack.encryption.iv,
+    aad: aadText,
+    ciphertext_sha256: encryptedSha256,
+    archive_sha256: archive.sha256,
+    access_policy: 'shared-gate-owner-admin-only',
+    public_response_exposes_key: false
+  };
+  return {
+    bytes: packBytes,
+    key_custody: keyCustody,
+    pack_sha256: await sha256Hex(packBytes),
+    encrypted_sha256: encryptedSha256
+  };
+}
+
+async function storeSourceTransferArtifact(env, method, archive, context) {
+  const bucket = sourceTransferBucket(env);
+  if (!bucket?.put) {
+    throw sourceArchiveError(500, 'NO_SOURCE_TRANSFER_BUCKET', 'SkyeNet source transfer storage is not configured.');
+  }
+  const prefix = sourceTransferStoragePrefix(
+    method,
+    context.principal,
+    context.workspace_id,
+    context.project_id,
+    context.deployment_id,
+    context.transfer_id
+  );
+  const bucketBinding = sourceTransferBucketBinding(env);
+  const baseMetadata = {
+    schema: 'fs27.skynet.source_transfer.artifact.v1',
+    transfer_id: context.transfer_id,
+    method,
+    customer_id: context.principal.customer_id,
+    workspace_id: context.workspace_id,
+    project_id: context.project_id,
+    deployment_id: context.deployment_id,
+    source_archive_sha256: archive.sha256,
+    source_mode: archive.source_mode
+  };
+  if (method === 'secure-skye-pack') {
+    const pack = await buildSecureSkyePack(archive, context);
+    const filename = `${safeDownloadName(context.project_id, context.deployment_id, 'source')}.skye`;
+    const objectKey = `${prefix}/${filename}`;
+    const manifestKey = `${prefix}/manifest.json`;
+    const keyCustodyKey = `${prefix}/.private/key-custody.json`;
+    await bucket.put(objectKey, pack.bytes, {
+      httpMetadata: { contentType: 'application/vnd.skye.secure-pack+json; charset=utf-8' },
+      customMetadata: {
+        ...baseMetadata,
+        content_kind: 'secure-skye-pack',
+        pack_sha256: pack.pack_sha256,
+        encrypted_sha256: pack.encrypted_sha256,
+        plaintext_source_exposed_to_storage: 'false'
+      }
+    });
+    const manifest = {
+      schema: 'fs27.skynet.source_transfer.storage_manifest.v1',
+      transfer_id: context.transfer_id,
+      method,
+      status: 'completed',
+      bucket_binding: bucketBinding,
+      object_key: objectKey,
+      key_custody_key: keyCustodyKey,
+      filename,
+      content_type: 'application/vnd.skye.secure-pack+json; charset=utf-8',
+      bytes: pack.bytes.byteLength,
+      sha256: pack.pack_sha256,
+      encrypted_payload_sha256: pack.encrypted_sha256,
+      source_archive_sha256: archive.sha256,
+      source_archive_bytes: archive.bytes.byteLength,
+      created_at: new Date().toISOString(),
+      plaintext_source_exposed_to_storage: false
+    };
+    await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
+      httpMetadata: { contentType: 'application/json; charset=utf-8' },
+      customMetadata: { ...baseMetadata, content_kind: 'transfer-manifest' }
+    });
+    await bucket.put(keyCustodyKey, JSON.stringify(pack.key_custody, null, 2), {
+      httpMetadata: { contentType: 'application/json; charset=utf-8' },
+      customMetadata: {
+        ...baseMetadata,
+        content_kind: 'secure-skye-key-custody',
+        public_response_exposes_key: 'false'
+      }
+    });
+    return {
+      stored: true,
+      method,
+      bucket_binding: bucketBinding,
+      key: objectKey,
+      manifest_key: manifestKey,
+      key_custody_key: keyCustodyKey,
+      filename,
+      content_type: manifest.content_type,
+      bytes: pack.bytes.byteLength,
+      sha256: pack.pack_sha256,
+      source_archive_bytes: archive.bytes.byteLength,
+      source_archive_sha256: archive.sha256,
+      plaintext_source_exposed_to_storage: false
+    };
+  }
+
+  const filename = `${safeDownloadName(context.project_id, context.deployment_id, method, 'source')}.tar`;
+  const objectKey = `${prefix}/${filename}`;
+  const manifestKey = `${prefix}/manifest.json`;
+  await bucket.put(objectKey, archive.bytes, {
+    httpMetadata: { contentType: 'application/x-tar' },
+    customMetadata: {
+      ...baseMetadata,
+      content_kind: 'source-archive',
+      sha256: archive.sha256
+    }
+  });
+  const manifest = {
+    schema: 'fs27.skynet.source_transfer.storage_manifest.v1',
+    transfer_id: context.transfer_id,
+    method,
+    status: 'completed',
+    bucket_binding: bucketBinding,
+    object_key: objectKey,
+    filename,
+    content_type: 'application/x-tar',
+    bytes: archive.bytes.byteLength,
+    sha256: archive.sha256,
+    source_archive_bytes: archive.bytes.byteLength,
+    source_archive_sha256: archive.sha256,
+    source_mode: archive.source_mode,
+    created_at: new Date().toISOString()
+  };
+  await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' },
+    customMetadata: { ...baseMetadata, content_kind: 'transfer-manifest' }
+  });
+  return {
+    stored: true,
+    method,
+    bucket_binding: bucketBinding,
+    key: objectKey,
+    manifest_key: manifestKey,
+    filename,
+    content_type: 'application/x-tar',
+    bytes: archive.bytes.byteLength,
+    sha256: archive.sha256,
+    source_archive_bytes: archive.bytes.byteLength,
+    source_archive_sha256: archive.sha256,
+    plaintext_source_exposed_to_storage: true,
+    storage_privacy: 'private-gated-transfer-bucket'
+  };
 }
 
 function assetPrefix(projectId, deploymentId, explicit = '') {
@@ -586,8 +1251,10 @@ async function ensureWorkspace(env, auth, request, body = {}) {
   return { key, workspace: workspaceForResponse(workspace, auth, request), created: true };
 }
 
-async function deploymentUsage(env, customerId, workspaceId) {
-  const rows = await kvListJson(receiptKv(env), receiptPrefix(customerId, workspaceId), 500);
+async function deploymentUsage(env, customerId, workspaceId, options = {}) {
+  const includeRoutes = options.include_routes !== false && options.includeRoutes !== false;
+  const receiptLimit = Math.max(0, Math.min(500, Number(options.receipt_limit ?? options.receiptLimit ?? 500)));
+  const rows = receiptLimit ? await kvListJson(receiptKv(env), receiptPrefix(customerId, workspaceId), receiptLimit) : [];
   const month = monthKey();
   const deployReceipts = rows
     .map((item) => item.value)
@@ -598,19 +1265,55 @@ async function deploymentUsage(env, customerId, workspaceId) {
       .map((item) => item.deployment_id || item.meta?.deployment_id || item.id)
       .filter(Boolean)
   );
-  const routeRows = await listRouteRecords(routeKv(env), 'route:v1:', 500);
-  const routes = (routeRows.routes || []).filter((item) => String(item.route?.customer_id || '') === String(customerId));
+  const routeRows = includeRoutes ? await listRouteRecords(routeKv(env), 'route:v1:', 500) : { routes: [] };
+  const routes = includeRoutes
+    ? (routeRows.routes || []).filter((item) => String(item.route?.customer_id || '') === String(customerId))
+    : [];
   return {
     monthly_deployments: monthlyDeployments.size,
     total_receipts: rows.length,
-    public_routes: routes.filter((item) => item.route?.public_access !== false).length,
-    routes: routes.length
+    public_routes: includeRoutes ? routes.filter((item) => item.route?.public_access !== false).length : null,
+    routes: includeRoutes ? routes.length : null,
+    route_scan_skipped: !includeRoutes
   };
 }
 
 async function saveReceipt(env, auth, workspaceId, type, meta = {}) {
   const principal = authPrincipal(auth);
   const kv = receiptKv(env);
+  let providerRuntime = null;
+  if (kv?.put) {
+    const runtime = await executeZeroOsAutomationAction({
+      ...env,
+      SITE_EVENTS_KV: env.SITE_EVENTS_KV || env.ZERO_OS_AUTOMATION_KV || env.AUTOMATION_KV || kv
+    }, {}, {
+      provider_id: 'skynet',
+      action: type,
+      app_id: 'skynet',
+      workspace_id: workspaceId || principal.workspace_id,
+      customer_id: principal.customer_id,
+      client_id: principal.email || '',
+      usage_lane: `skynet:${String(type || 'event').replace(/^skynet\./, '')}`,
+      live: false,
+      sandbox: true,
+      owner_approved: true,
+      payload: {
+        type,
+        project_id: meta.project_id || meta.projectId || '',
+        deployment_id: meta.deployment_id || meta.deploymentId || '',
+        live_url: meta.live_url || '',
+        route_key: meta.route_key || '',
+        meta
+      }
+    }, { actor: principal.email || 'skynet' }, { operator_ok: true });
+    const runtimeReceipt = runtime.response?.receipt || null;
+    providerRuntime = {
+      receipt_id: runtimeReceipt?.id || '',
+      status: runtimeReceipt?.status || '',
+      executed: Boolean(runtimeReceipt?.executed),
+      provider_call_made: Boolean(runtimeReceipt?.provider_call_made)
+    };
+  }
   const receipt = {
     schema: 'fs27.skynet.receipt.v1',
     id: randomId('receipt'),
@@ -622,6 +1325,7 @@ async function saveReceipt(env, auth, workspaceId, type, meta = {}) {
     live_url: cleanText(meta.live_url || '', 700),
     created_at: new Date().toISOString(),
     actor_email: principal.email || '',
+    provider_runtime: providerRuntime,
     meta
   };
   await kvPutJson(kv, receiptKey(principal.customer_id, receipt.workspace_id, type), receipt, {
@@ -655,6 +1359,7 @@ async function upsertDeploymentRecord(env, auth, request, patch = {}) {
     file_count: Number(patch.file_count ?? patch.fileCount ?? existing.file_count ?? 0),
     total_bytes: Number(patch.total_bytes ?? patch.totalBytes ?? existing.total_bytes ?? 0),
     asset_prefix: cleanText(patch.asset_prefix || patch.assetPrefix || existing.asset_prefix || assetPrefix(projectId, deploymentId), MAX_PATH),
+    source_package: patch.source_package || patch.sourcePackage || existing.source_package || null,
     live_url: cleanText(patch.live_url || existing.live_url || '', 700),
     route_key: cleanText(patch.route_key || existing.route_key || '', 700),
     created_at: existing.created_at || now,
@@ -685,6 +1390,18 @@ async function enforceDeploymentQuota(env, workspace, usage, nextBytes = 0, auth
     const error = new Error(`SkyeNet bundle exceeds ${bytesLabel(caps.max_static_bundle_bytes)} cap for ${workspace.plan_name || DEFAULT_PLAN}.`);
     error.status = 413;
     error.code = 'SKYENET_BUNDLE_CAP';
+    throw error;
+  }
+}
+
+async function enforceSourcePackageQuota(workspace, nextBytes = 0, auth = {}, request = null) {
+  const caps = capsForWorkspace(workspace, auth, request);
+  if (caps.admin_override) return;
+  const limit = Number(caps.max_source_package_bytes || caps.max_static_bundle_bytes || 0);
+  if (Number.isFinite(limit) && limit > 0 && nextBytes > limit) {
+    const error = new Error(`SkyeNet private source package exceeds ${bytesLabel(limit)} cap for ${workspace.plan_name || DEFAULT_PLAN}.`);
+    error.status = 413;
+    error.code = 'SKYENET_SOURCE_PACKAGE_CAP';
     throw error;
   }
 }
@@ -774,7 +1491,7 @@ async function handleInit(request, env, cors) {
   const auth = await requireDeployAuth(request, cors);
   const body = await readJson(request);
   const workspaceResult = await ensureWorkspace(env, auth, request, body);
-  const usage = await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceResult.workspace.workspace_id);
+  const usage = await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceResult.workspace.workspace_id, { include_routes: false });
   await enforceDeploymentQuota(env, workspaceResult.workspace, usage, 0, auth, request);
   const projectId = normalizeSlug(body.project_id || body.projectId, 'project', MAX_PROJECT);
   const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId || randomId('dep'), 'deployment', MAX_DEPLOYMENT);
@@ -845,7 +1562,14 @@ async function handleUpload(request, env, cors) {
     asset_prefix: prefix
   })).deployment;
   const nextBytes = Number(priorRecord.total_bytes || 0) + body.byteLength;
-  await enforceDeploymentQuota(env, workspaceResult.workspace, await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceId), nextBytes, auth, request);
+  await enforceDeploymentQuota(
+    env,
+    workspaceResult.workspace,
+    await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceId, { include_routes: false }),
+    nextBytes,
+    auth,
+    request
+  );
   const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', body);
   const sha256 = [...new Uint8Array(hashBuffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
   const key = `${prefix}/${deployPath}`.replace(/\/+/g, '/');
@@ -890,6 +1614,154 @@ async function handleUpload(request, env, cors) {
     total_bytes: nextBytes,
     sha256,
     content_type: contentType,
+    deployment: deployment.deployment,
+    receipt
+  }, cors);
+}
+
+async function handleSourceUpload(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const bucket = deploymentBucket(env);
+  if (!bucket?.put) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET is not configured', code: 'NO_DEPLOYMENT_BUCKET' }, cors);
+  const url = new URL(request.url);
+  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), 'project', MAX_PROJECT);
+  const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), 'dep_missing', MAX_DEPLOYMENT);
+  const principal = authPrincipal(auth);
+  const workspaceId = workspaceIdFromInput(Object.fromEntries(url.searchParams.entries()), principal);
+  const workspaceResult = await ensureWorkspace(env, auth, request, { workspace_id: workspaceId });
+  const sourcePath = normalizeSourcePath(url.searchParams.get('path') || url.searchParams.get('sourcePath') || '');
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, url.searchParams.get('sourcePrefix') || '');
+  const body = await request.arrayBuffer();
+  const priorRecord = (await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  })).deployment;
+  const priorPackage = priorRecord.source_package || {};
+  const nextBytes = Number(priorPackage.total_bytes || 0) + body.byteLength;
+  await enforceSourcePackageQuota(workspaceResult.workspace, nextBytes, auth, request);
+  const sha256 = await sha256Hex(body);
+  const key = `${prefix}/${sourcePath}`.replace(/\/+/g, '/');
+  const contentType = contentTypeForPath(sourcePath, request.headers.get('content-type') || '');
+  await bucket.put(key, body, {
+    httpMetadata: { contentType },
+    customMetadata: {
+      schema: 'fs27.private_source_file.v1',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      workspace_id: workspaceId,
+      sha256
+    }
+  });
+  const sourceFiles = Array.from(new Set([...(priorPackage.files || []), sourcePath]));
+  if (sourceFiles.length > MAX_SOURCE_PACKAGE_FILES) {
+    const error = new Error(`SkyeNet private source package has too many files; max is ${MAX_SOURCE_PACKAGE_FILES}.`);
+    error.status = 413;
+    error.code = 'SOURCE_PACKAGE_FILE_LIMIT';
+    throw error;
+  }
+  const sourcePackage = {
+    schema: 'fs27.skynet.source_package.v1',
+    mode: 'private-full-project',
+    prefix,
+    files: sourceFiles,
+    file_count: sourceFiles.length,
+    total_bytes: nextBytes,
+    downloadable: true,
+    public_asset_exposure: false,
+    completed_at: priorPackage.completed_at || null,
+    updated_at: new Date().toISOString()
+  };
+  const deployment = await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_package: sourcePackage
+  });
+  return httpJson(200, {
+    ok: true,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId,
+    path: sourcePath,
+    key,
+    bytes: body.byteLength,
+    total_bytes: nextBytes,
+    sha256,
+    content_type: contentType,
+    source_package: sourcePackage,
+    deployment: deployment.deployment
+  }, cors);
+}
+
+async function handleSourceComplete(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const body = await readJson(request);
+  const bucket = deploymentBucket(env);
+  if (!bucket?.put) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET is not configured', code: 'NO_DEPLOYMENT_BUCKET' }, cors);
+  const principal = authPrincipal(auth);
+  const workspaceResult = await ensureWorkspace(env, auth, request, body);
+  const workspaceId = workspaceResult.workspace.workspace_id;
+  const projectId = normalizeSlug(body.project_id || body.projectId, 'project', MAX_PROJECT);
+  const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId, 'dep_missing', MAX_DEPLOYMENT);
+  const existing = (await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  })).deployment;
+  const priorPackage = existing.source_package || {};
+  const files = Array.isArray(body.files)
+    ? body.files.map((item) => normalizeSourcePath(item)).slice(0, MAX_SOURCE_PACKAGE_FILES)
+    : (priorPackage.files || []);
+  if (!files.length) return httpJson(400, { ok: false, error: 'Private source package requires at least one source file.', code: 'SOURCE_PACKAGE_EMPTY' }, cors);
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, body.source_prefix || body.sourcePrefix || priorPackage.prefix || '');
+  const manifest = {
+    schema: 'fs27.skynet.source_package_manifest.v1',
+    mode: 'private-full-project',
+    project_id: projectId,
+    deployment_id: deploymentId,
+    customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    completed_at: new Date().toISOString(),
+    public_asset_exposure: false,
+    files,
+    meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
+  };
+  await bucket.put(`${prefix}/.skyenet/source-package.json`, JSON.stringify(manifest, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' }
+  });
+  const sourcePackage = {
+    schema: 'fs27.skynet.source_package.v1',
+    mode: 'private-full-project',
+    prefix,
+    files,
+    file_count: files.length,
+    total_bytes: Number(body.total_bytes ?? body.totalBytes ?? priorPackage.total_bytes ?? 0),
+    downloadable: true,
+    public_asset_exposure: false,
+    completed_at: manifest.completed_at,
+    updated_at: manifest.completed_at
+  };
+  const deployment = await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_package: sourcePackage
+  });
+  const receipt = await saveReceipt(env, auth, workspaceId, 'skynet.source.package.complete', {
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_prefix: prefix,
+    files: files.length,
+    total_bytes: sourcePackage.total_bytes,
+    public_asset_exposure: false
+  });
+  return httpJson(200, {
+    ok: true,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId,
+    source_package: sourcePackage,
     deployment: deployment.deployment,
     receipt
   }, cors);
@@ -1037,25 +1909,62 @@ async function handleDashboard(request, env, cors) {
   const result = await ensureWorkspace(env, auth, request, params);
   const workspace = result.workspace;
   const principal = authPrincipal(auth);
-  const usage = await deploymentUsage(env, workspace.customer_id, workspace.workspace_id);
+  const usage = await deploymentUsage(env, workspace.customer_id, workspace.workspace_id, { include_routes: false, receipt_limit: 100 });
   const deploymentRows = await kvListJson(receiptKv(env), deploymentPrefix(workspace.customer_id, workspace.workspace_id), 500);
   const deployments = deploymentRows
     .map((item) => item.value)
     .filter((item) => item?.schema === 'fs27.skynet.deployment.v1')
     .sort((a, b) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')))
-    .slice(0, 100);
+    .slice(0, 100)
+    .map((deployment) => ({
+      ...deployment,
+      source_download_url: sourceDownloadPath(workspace.workspace_id, deployment.project_id || '', deployment.deployment_id || ''),
+      source_transfer_url: sourceTransferPath(),
+      source_custody: {
+        account_scoped: true,
+        visible_to_authenticated_account: true,
+        client_handoff_requires_transfer: true,
+        package_mode: deployment.source_package?.mode || 'public-deployment-files',
+        private_full_project_package: Boolean(deployment.source_package?.files?.length),
+        private_source_file_count: deployment.source_package?.file_count || 0,
+        private_source_total_bytes: deployment.source_package?.total_bytes || 0,
+        public_asset_exposure: deployment.source_package?.public_asset_exposure === false ? false : 'public_assets_only',
+        direct_download_format: 'tar',
+        secure_pack_extension: '.skye',
+        secure_pack_lineage: 'SkyeDocxMax .skye envelope plus SkyeSecure v2 source-pack custody',
+        methods: sourceTransferMethodsForResponse()
+      }
+    }));
   const receiptRows = await kvListJson(receiptKv(env), receiptPrefix(workspace.customer_id, workspace.workspace_id), 100);
   const receipts = receiptRows
     .map((item) => item.value)
     .filter((item) => item?.schema === 'fs27.skynet.receipt.v1')
     .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
     .slice(0, 50);
-  const listed = await listRouteRecords(routeKv(env), 'route:v1:', 500);
-  const routes = (listed.routes || []).filter((item) => {
-    const route = item.route || {};
-    return String(route.customer_id || '') === String(workspace.customer_id)
-      && (!route.workspace_id || String(route.workspace_id) === String(workspace.workspace_id));
-  });
+  const includeFullRouteScan = truthy(params.include_routes || params.includeRoutes || params.full_routes || params.fullRoutes);
+  const listed = includeFullRouteScan ? await listRouteRecords(routeKv(env), 'route:v1:', 500) : { routes: [] };
+  const routes = includeFullRouteScan
+    ? (listed.routes || []).filter((item) => {
+      const route = item.route || {};
+      return String(route.customer_id || '') === String(workspace.customer_id)
+        && (!route.workspace_id || String(route.workspace_id) === String(workspace.workspace_id));
+    })
+    : deployments
+      .filter((deployment) => deployment.live_url || deployment.route_key)
+      .map((deployment) => ({
+        key: deployment.route_key || '',
+        route: {
+          schema: 'fs27.route.summary.v1',
+          project_id: deployment.project_id,
+          active_deployment_id: deployment.deployment_id,
+          workspace_id: deployment.workspace_id,
+          customer_id: deployment.customer_id,
+          live_url: deployment.live_url,
+          public_access: deployment.status !== 'gated',
+          route_key: deployment.route_key
+        },
+        metadata: { source: 'deployment-record' }
+      }));
   return httpJson(200, {
     ok: true,
     service: 'fs27-skynet-dashboard',
@@ -1068,12 +1977,89 @@ async function handleDashboard(request, env, cors) {
     usage,
     deployments,
     routes,
+    route_source: includeFullRouteScan ? 'route-registry-scan' : 'deployment-records',
+    route_scan_skipped: !includeFullRouteScan,
     receipts,
     links: {
       console: '/skyenet/index.html',
       api: '/api/skyenet',
       skyepay: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyenet-edge-starter'
     }
+  }, cors);
+}
+
+async function handleEnvVars(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const principal = authPrincipal(auth);
+  const input = request.method === 'GET' || request.method === 'DELETE'
+    ? Object.fromEntries(new URL(request.url).searchParams.entries())
+    : await readJson(request);
+  const workspaceResult = await ensureWorkspace(env, auth, request, input);
+  const workspaceId = workspaceResult.workspace.workspace_id;
+  const projectId = normalizeSlug(input.projectId || input.project_id || input.project || 'project', 'project', MAX_PROJECT);
+  const kv = receiptKv(env);
+  if (!kv?.put && request.method !== 'GET') return httpJson(500, { error: 'SKYENET_RECEIPTS_KV/ROUTING_KV is not configured for env storage', code: 'NO_ENV_KV' }, cors);
+  if (request.method === 'GET') {
+    if (!kv?.list) return httpJson(501, { ok: false, error: 'Env variable listing requires KV list support', code: 'NO_ENV_LIST' }, cors);
+    const rows = await kvListJson(kv, envVarPrefix(principal.customer_id, workspaceId, projectId), 500);
+    const vars = rows
+      .map((item) => item.value)
+      .filter((item) => item?.schema === 'fs27.skynet.env_var.v1')
+      .sort((a, b) => String(a.key || '').localeCompare(String(b.key || '')))
+      .map(sanitizeEnvRecord);
+    return httpJson(200, { ok: true, workspace_id: workspaceId, project_id: projectId, count: vars.length, env: vars }, cors);
+  }
+
+  const envKey = normalizeEnvKey(input.key || input.name || input.env_key || input.envKey);
+  const key = envVarKey(principal.customer_id, workspaceId, projectId, envKey);
+  if (request.method === 'DELETE' || input.delete === true || input.action === 'delete') {
+    if (kv?.delete) await kv.delete(key);
+    const receipt = await saveReceipt(env, auth, workspaceId, 'skynet.env.deleted', { project_id: projectId, env_key: envKey });
+    return httpJson(200, { ok: true, deleted: true, workspace_id: workspaceId, project_id: projectId, key: envKey, receipt }, cors);
+  }
+
+  const now = new Date().toISOString();
+  const existing = await kvGetJson(kv, key, null);
+  const rawValue = String(input.value ?? input.env_value ?? input.envValue ?? '');
+  const secret = input.secret !== false && input.is_secret !== false && input.isSecret !== false;
+  const valueBytes = encodeUtf8(rawValue);
+  const record = {
+    schema: 'fs27.skynet.env_var.v1',
+    key: envKey,
+    customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    project_id: projectId,
+    scope: cleanText(input.scope || input.context || 'production', 80).toLowerCase() || 'production',
+    secret,
+    value: rawValue,
+    value_preview: envPreview(rawValue),
+    value_sha256: await sha256Hex(valueBytes),
+    source: cleanText(input.source || 'skyenet-console', 160),
+    created_at: existing?.created_at || now,
+    updated_at: now
+  };
+  await kvPutJson(kv, key, record, {
+    schema: record.schema,
+    customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    project_id: projectId,
+    env_key: envKey,
+    secret
+  });
+  const receipt = await saveReceipt(env, auth, workspaceId, existing ? 'skynet.env.updated' : 'skynet.env.created', {
+    project_id: projectId,
+    env_key: envKey,
+    scope: record.scope,
+    secret,
+    value_preview: record.value_preview,
+    value_sha256: record.value_sha256
+  });
+  return httpJson(200, {
+    ok: true,
+    workspace_id: workspaceId,
+    project_id: projectId,
+    env: sanitizeEnvRecord(record),
+    receipt
   }, cors);
 }
 
@@ -1142,7 +2128,7 @@ async function handleStatus(request, env, cors) {
   const bucket = deploymentBucket(env);
   const kv = routeKv(env);
   const workspaceResult = await ensureWorkspace(env, auth, request, Object.fromEntries(url.searchParams.entries()));
-  const usage = await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceResult.workspace.workspace_id);
+  const usage = await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceResult.workspace.workspace_id, { include_routes: false, receipt_limit: 50 });
   const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
   const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), '', MAX_DEPLOYMENT);
   const prefix = projectId && deploymentId ? assetPrefix(projectId, deploymentId, url.searchParams.get('assetPrefix') || '') : '';
@@ -1183,6 +2169,11 @@ async function handleStatus(request, env, cors) {
       'GET /deploy/routes',
       'GET/POST /deploy/workspace',
       'GET /deploy/dashboard',
+      'GET/POST/DELETE /deploy/env',
+      'PUT /deploy/source-upload',
+      'POST /deploy/source-complete',
+      'GET /deploy/source-download',
+      'POST /deploy/source-transfer',
       'GET /deploy/receipts',
       'POST /deploy/rollback',
       'GET /deploy/observability',
@@ -1208,6 +2199,18 @@ async function handleStatus(request, env, cors) {
       static_deploy_root_index_required: true,
       asset_missing_route_diagnostic: true,
       direct_live_link_after_publish: true,
+      source_downloads: true,
+      netlify_style_deploy_file_downloads: true,
+      private_full_project_source_packages: true,
+      source_package_public_asset_exposure: false,
+      source_bundle_format: 'tar',
+      env_variable_registry: true,
+      env_values_redacted_in_dashboard: true,
+      source_transfers: true,
+      source_transfer_methods: sourceTransferMethodsForResponse(),
+      source_transfer_custody: 'account-scoped downloads; client handoff requires an explicit transfer receipt',
+      source_secure_pack_extension: '.skye',
+      source_secure_pack_format: 'skye-secure-secret-pack-v2',
       in_console_publish_tutorial: true,
       drop_private_source_path_filter: true,
       skrucible_forge_static_surface_pass: true,
@@ -1280,6 +2283,299 @@ async function handleRoutes(request, env, cors) {
   return httpJson(200, { ok: true, prefix, workspace_id: workspaceId, count: routes.length, routes, cursor: listed.cursor || null, list_complete: listed.list_complete !== false }, cors);
 }
 
+async function handleSourceTransfer(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const url = new URL(request.url);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const body = request.method === 'POST' ? await readJson(request) : {};
+  const input = { ...params, ...body };
+  const principal = authPrincipal(auth);
+  const workspaceId = workspaceIdFromInput(input, principal);
+  const projectId = normalizeSlug(input.projectId || input.project_id, '', MAX_PROJECT);
+  const deploymentId = normalizeSlug(input.deploymentId || input.deployment_id, '', MAX_DEPLOYMENT);
+  if (!projectId || !deploymentId) return httpJson(400, { error: 'project_id and deployment_id are required', code: 'MISSING_SOURCE_TRANSFER_TARGET' }, cors);
+
+  const key = deploymentKey(principal.customer_id, workspaceId, projectId, deploymentId);
+  const deployment = await kvGetJson(receiptKv(env), key, null);
+  if (!deployment || deployment.schema !== 'fs27.skynet.deployment.v1') {
+    return httpJson(404, { error: 'Deployment not found for this SkyeNet account/workspace', code: 'DEPLOYMENT_NOT_FOUND' }, cors);
+  }
+
+  const method = normalizeSourceTransferMethod(input.method || input.transfer_method || input.transferMethod);
+  const methodInfo = SOURCE_TRANSFER_METHODS[method] || SOURCE_TRANSFER_METHODS.download;
+  const transferId = randomId('srcxfer');
+  const sourceDownloadUrl = sourceDownloadPath(workspaceId, projectId, deploymentId);
+  const recipientCustomerId = cleanText(
+    input.recipient_customer_id || input.recipientCustomerId || input.transfer_to_customer_id || input.transferToCustomerId || input.client_customer_id || input.clientCustomerId || '',
+    160
+  );
+  const recipientEmail = cleanText(input.recipient_email || input.recipientEmail || input.to_email || input.toEmail || '', 220);
+  const destination = {
+    method,
+    label: methodInfo.label,
+    drive_id: cleanText(input.drive_id || input.driveId || '', 180),
+    vault_id: cleanText(input.vault_id || input.vaultId || '', 180),
+    recipient_customer_id: recipientCustomerId,
+    recipient_email: recipientEmail
+  };
+  const crossAccountTransfer = Boolean(recipientCustomerId && String(recipientCustomerId) !== String(principal.customer_id));
+  const admin = isAdminPrincipal(auth, request);
+  if (crossAccountTransfer && !admin) {
+    return httpJson(403, {
+      error: 'Cross-account source transfer requires owner/admin authority.',
+      code: 'SOURCE_TRANSFER_REQUIRES_OWNER',
+      custody_policy: 'Source remains account-scoped until an owner/admin transfer receipt is recorded.'
+    }, cors);
+  }
+
+  let archive = null;
+  let storage = null;
+  if (['skyedrive', 'skyevault', 'secure-skye-pack'].includes(method)) {
+    archive = await buildSourceArchiveBytes(env, principal, workspaceId, projectId, deploymentId, deployment);
+    storage = await storeSourceTransferArtifact(env, method, archive, {
+      transfer_id: transferId,
+      principal,
+      workspace_id: workspaceId,
+      project_id: projectId,
+      deployment_id: deploymentId
+    });
+  }
+
+  const queuePayload = {
+    schema: 'fs27.skynet.source_transfer.completed.v1',
+    transfer_id: transferId,
+    method,
+    status: storage?.stored ? 'completed' : 'ready',
+    customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    live_url: deployment.live_url || '',
+    destination,
+    storage,
+    requested_at: new Date().toISOString()
+  };
+  const queue = env.SKYENET_SOURCE_TRANSFER_QUEUE || env.SOURCE_TRANSFER_QUEUE || null;
+  let queueAccepted = false;
+  let queueError = '';
+  if (queue?.send && ['skyedrive', 'skyevault', 'secure-skye-pack'].includes(method)) {
+    try {
+      await queue.send(queuePayload);
+      queueAccepted = true;
+    } catch (error) {
+      queueError = error?.message || 'queue send failed';
+    }
+  }
+
+  const status = method === 'download'
+    ? 'ready'
+    : method === 'instant-download-link'
+      ? 'ready_gated'
+      : storage?.stored
+        ? 'completed'
+        : queueAccepted
+          ? 'queued'
+          : 'failed';
+  const custodyPolicy = {
+    source_owner_customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    account_scoped: true,
+    client_access_without_transfer: false,
+    cross_account_transfer: crossAccountTransfer,
+    transfer_required_for_client_source_handoff: true,
+    recipient_status: crossAccountTransfer ? 'pending_owner_approved_handoff' : 'same_account_destination',
+    secure_pack_extension: '.skye',
+    secure_pack_format: 'skye-secure-secret-pack-v2',
+    secure_pack_crypto_lineage: 'SkyeDocxMax .skye envelope naming with SkyeSecure v2 encrypted source-pack custody'
+  };
+  const receiptType = storage?.stored ? 'skynet.source.transfer.completed' : 'skynet.source.transfer.requested';
+  const receipt = await saveReceipt(env, auth, workspaceId, receiptType, {
+    transfer_id: transferId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    method,
+    status,
+    queue_accepted: queueAccepted,
+    queue_error: queueError,
+    source_download_url: sourceDownloadUrl,
+    storage,
+    archive: archive ? {
+      filename: archive.download_name,
+      source_mode: archive.source_mode,
+      files: archive.files.length,
+      bytes: archive.bytes.byteLength,
+      sha256: archive.sha256
+    } : null,
+    destination,
+    custody_policy: custodyPolicy
+  });
+
+  return httpJson(200, {
+    ok: true,
+    transfer_id: transferId,
+    status,
+    method: methodInfo,
+    queue_accepted: queueAccepted,
+    queue_error: queueError || null,
+    source_download_url: ['download', 'instant-download-link'].includes(method) ? sourceDownloadUrl : null,
+    gated_download_url: sourceDownloadUrl,
+    storage,
+    archive: archive ? {
+      filename: archive.download_name,
+      source_mode: archive.source_mode,
+      file_count: archive.files.length,
+      bytes: archive.bytes.byteLength,
+      sha256: archive.sha256
+    } : null,
+    destination,
+    custody_policy: custodyPolicy,
+    secure_pack: method === 'secure-skye-pack'
+      ? {
+        extension: '.skye',
+        format: 'skye-secure-secret-pack-v2',
+        marker: 'SKYESEC2',
+        object_key: storage?.key || '',
+        manifest_key: storage?.manifest_key || '',
+        key_custody_key: storage?.key_custody_key || '',
+        filename: storage?.filename || '',
+        bytes: storage?.bytes || 0,
+        sha256: storage?.sha256 || '',
+        plaintext_source_exposed_to_storage: false,
+        note: 'The encrypted .skye source pack was written to SkyeNet private storage. The raw key stays in an owner-admin key custody record and is not returned by this API.'
+      }
+      : null,
+    receipt
+  }, cors);
+}
+
+async function handleSourceDownload(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const bucket = deploymentBucket(env);
+  if (!bucket?.get) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET read is not configured', code: 'NO_DEPLOYMENT_BUCKET_READ' }, cors);
+  const url = new URL(request.url);
+  const principal = authPrincipal(auth);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const workspaceId = workspaceIdFromInput(params, principal);
+  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
+  const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), '', MAX_DEPLOYMENT);
+  if (!projectId || !deploymentId) return httpJson(400, { error: 'project_id and deployment_id are required', code: 'MISSING_SOURCE_DOWNLOAD_TARGET' }, cors);
+  const key = deploymentKey(principal.customer_id, workspaceId, projectId, deploymentId);
+  const deployment = await kvGetJson(receiptKv(env), key, null);
+  if (!deployment || deployment.schema !== 'fs27.skynet.deployment.v1') {
+    return httpJson(404, { error: 'Deployment not found for this SkyeNet account/workspace', code: 'DEPLOYMENT_NOT_FOUND' }, cors);
+  }
+  const privatePackage = deployment.source_package && Array.isArray(deployment.source_package.files) && deployment.source_package.files.length
+    ? deployment.source_package
+    : null;
+  const files = privatePackage
+    ? privatePackage.files.map((file) => normalizeSourcePath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
+    : Array.isArray(deployment.files)
+      ? deployment.files.map((file) => normalizeAssetPath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
+      : [];
+  if (!files.length) return httpJson(409, { error: 'Deployment has no recorded files to download', code: 'DEPLOYMENT_SOURCE_EMPTY', deployment }, cors);
+  const totalRecordedFiles = privatePackage ? privatePackage.files.length : (Array.isArray(deployment.files) ? deployment.files.length : 0);
+  if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
+    return httpJson(413, {
+      error: `Deployment source bundle has ${totalRecordedFiles} files; max downloadable files per request is ${MAX_SOURCE_DOWNLOAD_FILES}.`,
+      code: 'SOURCE_DOWNLOAD_FILE_LIMIT',
+      file_count: totalRecordedFiles,
+      limit: MAX_SOURCE_DOWNLOAD_FILES
+    }, cors);
+  }
+  const prefix = cleanText(
+    privatePackage?.prefix || deployment.asset_prefix || assetPrefix(projectId, deploymentId),
+    MAX_PATH
+  ).replace(/^\/+|\/+$/g, '');
+  const objects = [];
+  const missing = [];
+  let totalBytes = 0;
+  for (const file of files) {
+    const objectKey = `${prefix}/${file}`.replace(/\/+/g, '/');
+    const meta = bucket.head ? await bucket.head(objectKey).catch(() => null) : null;
+    let object = null;
+    if (!meta) object = await bucket.get(objectKey).catch(() => null);
+    const size = Number(meta?.size ?? object?.size ?? 0);
+    if (!meta && !object) {
+      missing.push(file);
+      continue;
+    }
+    totalBytes += size;
+    objects.push({ file, key: objectKey, size, object });
+  }
+  if (missing.length) {
+    return httpJson(409, {
+      error: 'Deployment source bundle is incomplete; one or more recorded files are missing from the SkyeNet vault.',
+      code: 'SOURCE_DOWNLOAD_INCOMPLETE',
+      missing,
+      deployment: { project_id: projectId, deployment_id: deploymentId, workspace_id: workspaceId }
+    }, cors);
+  }
+  const manifest = {
+    schema: 'fs27.skynet.source_download_manifest.v1',
+    generated_at: new Date().toISOString(),
+    account: {
+      customer_id: principal.customer_id,
+      workspace_id: workspaceId,
+      email: principal.email || '',
+      role: principal.role || ''
+    },
+    deployment: {
+      project_id: projectId,
+      deployment_id: deploymentId,
+      status: deployment.status || '',
+      live_url: deployment.live_url || '',
+      route_key: deployment.route_key || '',
+      asset_prefix: prefix,
+      source_mode: privatePackage ? 'private-full-project' : 'public-deployment-files',
+      source_package: privatePackage ? {
+        mode: privatePackage.mode || 'private-full-project',
+        file_count: privatePackage.file_count || files.length,
+        total_bytes: privatePackage.total_bytes || totalBytes,
+        public_asset_exposure: false,
+        completed_at: privatePackage.completed_at || ''
+      } : null,
+      file_count: files.length,
+      total_bytes: totalBytes
+    },
+    files
+  };
+  const manifestBytes = encodeUtf8(JSON.stringify(manifest, null, 2));
+  const downloadName = `${safeDownloadName(projectId, deploymentId, 'source')}.tar`;
+  const stream = new ReadableStream({
+    async start(controller) {
+      const enqueueEntry = async (name, bodyBytes, typeflag = '0') => {
+        const pax = tarPaxEntriesIfNeeded(name);
+        if (pax) {
+          controller.enqueue(pax.header);
+          controller.enqueue(pax.body);
+          if (pax.padding) controller.enqueue(pax.padding);
+        }
+        controller.enqueue(tarHeader(name, bodyBytes.length, { typeflag }));
+        controller.enqueue(bodyBytes);
+        const padding = tarPadding(bodyBytes.length);
+        if (padding) controller.enqueue(padding);
+      };
+      await enqueueEntry('.skyenet/source-manifest.json', manifestBytes);
+      for (const item of objects) {
+        const object = item.object || await bucket.get(item.key);
+        const bodyBytes = await readObjectBytes(object);
+        await enqueueEntry(item.file, bodyBytes);
+      }
+      controller.enqueue(new Uint8Array(1024));
+      controller.close();
+    }
+  });
+  const headers = new Headers(cors);
+  headers.set('content-type', 'application/x-tar');
+  headers.set('content-disposition', `attachment; filename="${downloadName}"`);
+  headers.set('cache-control', 'no-store');
+  headers.set('x-skynet-source-download', 'tar');
+  headers.set('x-skynet-project-id', projectId);
+  headers.set('x-skynet-deployment-id', deploymentId);
+  headers.set('x-skynet-workspace-id', workspaceId);
+  return new Response(stream, { status: 200, headers });
+}
+
 async function handleObservability(request, env, cors) {
   await requireDeployAuth(request, cors);
   const url = new URL(request.url);
@@ -1331,6 +2627,11 @@ export async function handleSkyeNetDeployRequest(request, context = {}) {
     if (url.pathname === '/deploy/routes' && request.method === 'GET') return await handleRoutes(request, env, cors);
     if (url.pathname === '/deploy/workspace' && ['GET', 'POST'].includes(request.method)) return await handleWorkspace(request, env, cors);
     if (url.pathname === '/deploy/dashboard' && request.method === 'GET') return await handleDashboard(request, env, cors);
+    if (url.pathname === '/deploy/env' && ['GET', 'POST', 'DELETE'].includes(request.method)) return await handleEnvVars(request, env, cors);
+    if (url.pathname === '/deploy/source-upload' && ['PUT', 'POST'].includes(request.method)) return await handleSourceUpload(request, env, cors);
+    if (url.pathname === '/deploy/source-complete' && request.method === 'POST') return await handleSourceComplete(request, env, cors);
+    if (url.pathname === '/deploy/source-download' && request.method === 'GET') return await handleSourceDownload(request, env, cors);
+    if (url.pathname === '/deploy/source-transfer' && request.method === 'POST') return await handleSourceTransfer(request, env, cors);
     if (url.pathname === '/deploy/receipts' && request.method === 'GET') return await handleReceipts(request, env, cors);
     if (url.pathname === '/deploy/rollback' && request.method === 'POST') return await handleRollback(request, env, cors);
     if (url.pathname === '/deploy/observability' && request.method === 'GET') return await handleObservability(request, env, cors);

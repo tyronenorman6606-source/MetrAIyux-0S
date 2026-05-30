@@ -69,6 +69,39 @@ document.querySelectorAll('[data-copy-target]').forEach(function(btn){
   started.name = 'form_started_at';
   started.value = String(Date.now());
   form.appendChild(started);
+  const params = new URLSearchParams(window.location.search || '');
+  const artistSlug = params.get('artist') || params.get('artist_slug') || '';
+  const artistId = params.get('artistId') || params.get('artist_id') || '';
+  const stageName = params.get('stageName') || params.get('stage_name') || (artistSlug.toLowerCase() === 'supaboy' ? 'SupaBoy' : '');
+  const sourceApp = params.get('source') || params.get('source_app') || (artistSlug || artistId ? 'SkyeMusicNexus' : '');
+  function setField(name, value, overwrite){
+    const field = form.elements[name];
+    if(!field || value == null || value === '') return;
+    if(overwrite || !field.value) field.value = String(value);
+  }
+  if(sourceApp || artistSlug || artistId){
+    const roleLane = params.get('roleLane') || params.get('role_lane') || 'Artist / Music Nexus Contractor';
+    const companyLane = params.get('companyLane') || params.get('company_onboarding_lane') || 'Skyes Over London LC artist/vendor contractor onboarding';
+    setField('source_app', sourceApp || 'SkyeMusicNexus', true);
+    setField('artist_slug', artistSlug, true);
+    setField('artist_id', artistId, true);
+    setField('stage_name', stageName, true);
+    setField('preferred_name', stageName || artistSlug, false);
+    setField('role_lane', roleLane, true);
+    setField('commission_plan', 'Artist/vendor payout hold — custom rights and payout addendum required', true);
+    setField('approved_by', 'Founder Command owner review required', false);
+    setField('payment_method', 'Hold payments until updated', false);
+    setField('company_onboarding_lane', companyLane, true);
+    setField('music_nexus_release_lane', params.get('releaseId') || params.get('release_id') || '', true);
+    setField('founder_command_copy', 'true', true);
+    setField('rights_review_required', 'true', true);
+    setField('skye_pay_tracking_ref', artistId ? 'skyepay_artist_' + artistId : '', true);
+    setField('payout_hold_reason', 'Artist payout and checkout stay blocked until paperwork, rights/audio ownership review, payout destination verification, and owner approval clear.', true);
+    setField('ae_command_route', '/ae-command/?artist=' + encodeURIComponent(artistSlug || 'artist') + (artistId ? '&artistId=' + encodeURIComponent(artistId) : '') + (stageName ? '&stageName=' + encodeURIComponent(stageName) : '') + '&lane=artist', true);
+    setField('workforce_command_route', '/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel', true);
+    setField('founder_command_route', '/api/founder-command/contractor-packets', true);
+    setField('contractor_packet_inbox_route', '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html', true);
+  }
   function gateToken(){
     const keys = ['FREE99_PLATFORM_GATE_SESSION','FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX','FREE99_PLATFORM_GATE_SESSION_MARKETING_MADE_EASY','skye_gate_session','skygate_session','skyegate_session','skyeGateSession','skye_gate_token','skygate_token','skyegate_token','metraiyux_gate_session','metraiyux_admin_session'];
     function tokenFromValue(value){
@@ -110,7 +143,7 @@ document.querySelectorAll('[data-copy-target]').forEach(function(btn){
       const res = await fetch(form.action, { method:'POST', body:new FormData(form), credentials:'include', headers });
       const data = await res.json().catch(()=>({}));
       if(!res.ok) throw new Error(data.error || 'Submission failed.');
-      if(status){ status.textContent = 'Packet saved to the Cloudflare encrypted packet store. Receipt ID: ' + (data.receiptId || data.submissionId || 'recorded') + '. Next step: admin verifies the W-9, payout profile, and vendor workspace before any payout release.'; }
+      if(status){ status.textContent = 'Packet saved to the Cloudflare encrypted packet store. Receipt ID: ' + (data.receiptId || data.submissionId || 'recorded') + '. Next step: admin verifies the W-9, payout profile, and vendor workspace before any payout release.' + (data.founderCommand?.copyEnabled ? ' Founder Command can read this same packet through the contractor-packets lane.' : ''); }
       form.reset();
       started.value = String(Date.now());
     }catch(err){

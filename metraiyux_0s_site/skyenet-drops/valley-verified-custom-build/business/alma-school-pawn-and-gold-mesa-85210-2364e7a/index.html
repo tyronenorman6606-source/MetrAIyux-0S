@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alma School Pawn and Gold | Mesa Pawn and Gold Buyer</title>
+  <meta name="description" content="Alma School Pawn and Gold in Mesa, AZ. Valley Verified pawn loans, gold buying, retail, title loan access, phone, address, hours, and customer details.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #21190e;
+      --muted: #665b4a;
+      --gold: #b88624;
+      --red: #8b362c;
+      --cream: #fff8e8;
+      --paper: #fffdf7;
+      --charcoal: #2d2922;
+      --line: rgba(33, 25, 14, .18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(184, 134, 36, .18) 0 25%, transparent 25% 50%, rgba(184, 134, 36, .1) 50% 75%, transparent 75%),
+        var(--cream);
+      background-size: 72px 72px;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .page {
+      min-height: 100vh;
+      background: linear-gradient(90deg, rgba(255, 253, 247, .94), rgba(255, 253, 247, .82));
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 34px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 38px;
+      min-height: 68vh;
+      padding: 38px 0 52px;
+      align-items: center;
+    }
+
+    .shop-sign {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+      border: 2px solid var(--charcoal);
+      background: #fff;
+      box-shadow: 12px 12px 0 var(--gold);
+    }
+
+    .shop-sign img {
+      width: 170px;
+      height: 170px;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+
+    .shop-sign span {
+      display: block;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--red);
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 5rem;
+      line-height: .93;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 2px solid var(--charcoal);
+      border-radius: 6px;
+      background: white;
+      color: var(--ink);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--charcoal);
+      color: #fff;
+    }
+
+    .ledger {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 22px;
+      padding-bottom: 56px;
+    }
+
+    .record,
+    .source {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .88);
+      padding: 24px;
+    }
+
+    .record {
+      border-top: 8px solid var(--gold);
+    }
+
+    .source {
+      border-top: 8px solid var(--red);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 1.02rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .line {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid rgba(33, 25, 14, .1);
+    }
+
+    .line:first-of-type {
+      border-top: 0;
+    }
+
+    .line b {
+      color: var(--muted);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      padding: 8px 10px;
+      border: 1px solid rgba(184, 134, 36, .34);
+      border-radius: 6px;
+      background: #fff9e8;
+      font-size: .92rem;
+      font-weight: 800;
+    }
+
+    .source ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .source li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 22px 0 32px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255, 255, 255, .6);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .ledger {
+        grid-template-columns: 1fr;
+      }
+
+      .shop-sign {
+        max-width: 320px;
+      }
+
+      h1 {
+        font-size: 3.25rem;
+      }
+    }
+
+    @media (max-width: 560px) {
+      h1 {
+        font-size: 2.45rem;
+      }
+
+      .line {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="wrap">
+      <section class="hero" aria-labelledby="page-title">
+        <aside class="shop-sign" aria-label="Alma School Pawn and Gold mark">
+          <img src="assets/logo.svg" alt="Alma School Pawn and Gold mark">
+          <span>Mesa pawn loans, gold buying, and specialty retail</span>
+        </aside>
+        <div>
+          <p class="eyebrow">Pawn / Gold Buyer</p>
+          <h1 id="page-title">Alma School Pawn and Gold</h1>
+          <p class="lead">Alma School Pawn and Gold serves Mesa customers with pawn loans, gold and jewelry buying, estate jewelry evaluations, electronics, tools, gaming systems, instruments, coins, watches, used retail items, and title-loan access through Phoenix Title Loans, LLC.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14806447932">(480) 644-7932</a>
+            <a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=752%20S.%20Alma%20School%20Rd.%2C%20Mesa%2C%20AZ%2085210">752 S. Alma School Rd.</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="ledger" aria-label="Business facts and Valley Verified rationale">
+        <div class="record">
+          <h2>Business Details</h2>
+          <div class="line"><b>Category</b><span>Retail And Specialty</span></div>
+          <div class="line"><b>Niche</b><span>Pawn / Gold Buyer</span></div>
+          <div class="line"><b>License type</b><span>Shopping/Retail / Pawn / Gold</span></div>
+          <div class="line"><b>City</b><span>Mesa, AZ 85210</span></div>
+          <div class="line"><b>Hours</b><span>Monday-Saturday 9:00 AM-7:00 PM; Sunday 9:00 AM-6:00 PM</span></div>
+          <div class="line"><b>Loan basics</b><span>In-person evaluation, valid government ID, same-day cash positioning</span></div>
+          <div class="tags" aria-label="Tags">
+            <span class="tag">Pawn / gold</span>
+            <span class="tag">Pawn / gold buyer</span>
+            <span class="tag">Shopping/Retail</span>
+            <span class="tag">Retail / Specialty Store</span>
+            <span class="tag">Finance &amp; Insurance</span>
+            <span class="tag">Legal / Financial Services</span>
+          </div>
+        </div>
+        <div class="source">
+          <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+          <ul>
+            <li>Skyes Over London marks Alma School Pawn and Gold as Valley Verified because the official site, booking page, and Greater Phoenix Chamber profile align on the Mesa address, phone, hours, pawn and gold-buying services, and East Valley customer base.</li>
+            <li>The business has served Mesa for more than 30 years and lists pawn loans, buying and lending against valuables, estate jewelry buying, used-goods sales, and auto title loan availability through Phoenix Title Loans, LLC.</li>
+            <li>The official disclosures give customers useful boundaries before they walk in: customers must be 18 or older with valid government-issued ID, preferred pawn loans list a 90-day minimum and 60-month maximum repayment period, a 35.99% maximum APR, and a one-time $5 ticket fee.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer>
+    <div class="wrap">Valley Verified profile for Alma School Pawn and Gold at 752 S. Alma School Rd. in Mesa.</div>
+  </footer>
+</body>
+</html>

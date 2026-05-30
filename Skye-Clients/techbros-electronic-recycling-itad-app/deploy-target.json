@@ -1,17 +1,86 @@
 {
-  "primary": {
-    "host": "cloudflare",
-    "url": "https://techbros-electronic-recycling-itad.pages.dev/",
-    "envKey": "TECHBROS_ELECTRONIC_RECYCLING_ITAD_PRODUCTION_URL"
+  "schema": "skyenet.static-surface.deploy-target.v1",
+  "updatedAt": "2026-05-30T18:17:54.919Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "lane": "skye-clients",
+  "purpose": "electronics recycling, ITAD, logistics, intake, and compliance app",
+  "projectId": "techbros-electronic-recycling-itad",
+  "workspaceId": "techbros-electronic-recycling-itad",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530181628",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/techbros-electronic-recycling-itad/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/techbros-electronic-recycling-itad",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "Skye-Clients/techbros-electronic-recycling-itad-app",
+  "publicBuildDir": "Skye-Clients/techbros-electronic-recycling-itad-app",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=techbros-electronic-recycling-itad&project_id=techbros-electronic-recycling-itad&deployment_id=dep_20260530181628",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "latestDeployment": {
-    "host": "cloudflare",
-    "url": "https://ee73e537.techbros-electronic-recycling-itad.pages.dev",
-    "deployedAt": "2026-05-19"
-  },
-  "qr": {
-    "target": "https://techbros-electronic-recycling-itad.pages.dev/",
-    "asset": "/assets/live-site/techbros-preview-qr.png",
-    "printAsset": "/assets/live-site/techbros-preview-qr.png"
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "route": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/techbros-electronic-recycling-itad",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/techbros-electronic-recycling-itad",
+          "url_mode": "path",
+          "workspace_id": "techbros-electronic-recycling-itad",
+          "project_id": "techbros-electronic-recycling-itad",
+          "active_deployment_id": "dep_20260530181628",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/techbros-electronic-recycling-itad/dep_20260530181628",
+          "updated_at": "2026-05-30T18:17:33.464Z"
+        },
+        "elapsed_ms": 495.26
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/techbros-electronic-recycling-itad/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/techbros-electronic-recycling-itad",
+        "elapsed_ms": 2049.38
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 201.71,
+        "bytes": 14358,
+        "title": "Techbros Electronic Recycling &amp; ITAD | Operations App",
+        "error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=techbros-electronic-recycling-itad&project_id=techbros-electronic-recycling-itad&deployment_id=dep_20260530181628",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 305.76
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 132927,
+        "read_truncated": true,
+        "elapsed_ms": 2696.94,
+        "error": ""
+      }
+    }
   }
 }

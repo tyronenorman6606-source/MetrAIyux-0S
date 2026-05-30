@@ -1,0 +1,62 @@
+{
+  "started_at": "2026-05-24T01:22:33.261Z",
+  "smoke": "manual-compliance",
+  "checks": [
+    {
+      "status": "PASS",
+      "name": "manual_government_check_provider_active",
+      "data": {
+        "name": "identity_compliance",
+        "status": "manual-compliance",
+        "driver": "manual-government-check",
+        "note": "Records consented manual public-record, government-portal, E-Verify/I-9, and proof-vault compliance work. It does not claim CRA status, FBI direct access, or automated background-report furnishing."
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "signup_creates_manual_compliance_intake",
+      "data": {
+        "user_id": "usr_9fdcfdcd4e7fb9bdee"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "manual_compliance_proof_recorded_with_media",
+      "data": {
+        "compliance_check": "cmp_010ca425b3f6e0a026",
+        "media": "med_9c9f338b4d1a7e6362"
+      }
+    },
+    {
+      "status": "PASS",
+      "name": "manual_compliance_ledger_returns_az_workflow",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "identity_compliance_outbox_contains_manual_proof_event",
+      "data": {}
+    },
+    {
+      "status": "PASS",
+      "name": "manual_compliance_media_integrity_passes",
+      "data": {
+        "ok": true,
+        "media_count": 1,
+        "checks": [
+          {
+            "ok": true,
+            "id": "med_9c9f338b4d1a7e6362",
+            "storage_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/data/manual-compliance-media/cmp_010ca425b3f6e0a026.txt",
+            "expected_bytes": 29,
+            "actual_bytes": 29,
+            "expected_sha256": "625a467fbeb0f0444e5eba42f32af197d643f2e66c97eda8fe8911a50ab9e523",
+            "actual_sha256": "625a467fbeb0f0444e5eba42f32af197d643f2e66c97eda8fe8911a50ab9e523"
+          }
+        ]
+      }
+    }
+  ],
+  "status": "PASS",
+  "completed_at": "2026-05-24T01:22:33.637Z"
+}

@@ -32,6 +32,11 @@ if (!stripeKey) {
 }
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const PLAN_FILTERS = process.argv
+  .filter((arg) => arg.startsWith("--plan="))
+  .flatMap((arg) => arg.slice("--plan=".length).split(","))
+  .map((item) => item.trim())
+  .filter(Boolean);
 const musicPricingPath = path.join(ROOT, "metraiyux_0s_site", "data", "skyemusicnexus-pricing.json");
 const musicPricing = JSON.parse(fs.readFileSync(musicPricingPath, "utf8"));
 
@@ -71,6 +76,275 @@ const musicOffers = [
   prices: musicPriceSpecs(item),
   includes: `skyemusicnexus_${item.id.replace(/^skyemusicnexus-/, "").replace(/-/g, "_")}_gate_required`
 }));
+
+function mediaOverLondonOffer({
+  planId,
+  productName,
+  description,
+  prices,
+  includes,
+  status = "approved"
+}) {
+  return {
+    planId,
+    productName,
+    description,
+    sourceFolder: "marketing/metraiyux-0s",
+    sourceFile: "marketing/metraiyux-0s/media-over-london.html",
+    offerFamily: "media-over-london",
+    brainOwner: "media-over-london",
+    ownerApprovalRequired: true,
+    status,
+    prices,
+    includes
+  };
+}
+
+const mediaOverLondonOffers = [
+  mediaOverLondonOffer({
+    planId: "media-over-london-static-preview-page",
+    productName: "Media Over London Static Preview Page",
+    description: "Static preview and QR-ready campaign landing surface for a single artist drop, product, logo, client picture, or focused offer.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Static Preview Page", lookupKey: "media_over_london_static_preview_page", amount: 23900 }],
+    includes: "static_preview_qr_ready_client_asset_skypay_receipt"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-floating-orb-gallery",
+    productName: "Media Over London Floating Orb Gallery",
+    description: "Floating picture orbit gallery for artists, stores, founders, products, and campaigns with gallery, EPK/media, booking/contact, and proof-ready surface.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Floating Orb Gallery", lookupKey: "media_over_london_floating_orb_gallery", amount: 44400 }],
+    includes: "floating_orbit_gallery_epk_booking_client_assets"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-video-rotator-page",
+    productName: "Media Over London Multi-Video Rotator",
+    description: "Animated landing or visualizer page with multi-video rotator treatment, image stack, and campaign-ready checkout handoff.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Multi-Video Rotator", lookupKey: "media_over_london_video_rotator_page", amount: 79600 }],
+    includes: "animated_landing_multi_video_rotator_campaign_cta"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-campaign-universe",
+    productName: "Media Over London Custom Campaign Universe",
+    description: "Custom campaign universe like the SupaBoy-level artist build or full client media world, quoted manually after scope with a starting SkyePay floor.",
+    status: "approved_floor",
+    prices: [{ kind: "one-time-floor", nickname: "Media Over London Custom Campaign Universe", lookupKey: "media_over_london_campaign_universe", amount: 119700 }],
+    includes: "custom_media_universe_asset_mining_manual_scope_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-launch-page",
+    productName: "Media Over London Launch Page",
+    description: "One high-converting launch page with up to eight sections, core copy, contact form, mobile QA, deployment, and launch handoff.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Launch Page", lookupKey: "media_over_london_launch_page", amount: 79900 }],
+    includes: "launch_page_core_copy_contact_form_mobile_qa_deployment"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-business-site",
+    productName: "Media Over London Business Site",
+    description: "Up to five pages with service sections, trust blocks, SEO foundation, form handling, performance pass, and handoff.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Business Site", lookupKey: "media_over_london_business_site", amount: 225000 }],
+    includes: "five_page_business_site_services_trust_seo_forms_performance"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-authority-suite",
+    productName: "Media Over London Authority Suite",
+    description: "Up to ten pages with deeper positioning, expanded FAQs, stronger proof sections, premium visual polish, and launch checklist.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Authority Suite", lookupKey: "media_over_london_authority_suite", amount: 475000 }],
+    includes: "ten_page_authority_suite_positioning_faqs_proof_visual_polish"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-managed-host",
+    productName: "Media Over London Managed Host",
+    description: "Hosting, SSL, CDN-backed delivery, lightweight form routing, and one small edit monthly.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Managed Host", lookupKey: "media_over_london_managed_host_monthly", amount: 2900, interval: "month" }],
+    includes: "hosting_ssl_cdn_forms_one_edit_monthly"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-host-care",
+    productName: "Media Over London Host + Care",
+    description: "Up to four small edits monthly, quarterly tune-up, priority response window, and status note.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Host + Care", lookupKey: "media_over_london_host_care_monthly", amount: 5900, interval: "month" }],
+    includes: "four_edits_quarterly_tuneup_priority_status_note"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-host-growth",
+    productName: "Media Over London Host + Growth",
+    description: "Care plus meaningful page or section expansion support and monthly growth recommendations.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Host + Growth", lookupKey: "media_over_london_host_growth_monthly", amount: 9900, interval: "month" }],
+    includes: "care_page_section_expansion_monthly_recommendations"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-starter-content-engine",
+    productName: "Media Over London Starter Content Engine",
+    description: "Two content assets monthly plus basic optimization on existing pages.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Starter Content Engine", lookupKey: "media_over_london_starter_content_engine_monthly", amount: 24900, interval: "month" }],
+    includes: "two_content_assets_basic_optimization"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-growth-content-engine",
+    productName: "Media Over London Growth Content Engine",
+    description: "Four content assets monthly with stronger service, city, FAQ, offer, and trust-building work.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Growth Content Engine", lookupKey: "media_over_london_growth_content_engine_monthly", amount: 49900, interval: "month" }],
+    includes: "four_content_assets_service_city_faq_offer_trust"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-authority-engine",
+    productName: "Media Over London Authority Engine",
+    description: "Editorial cadence, larger service/city/topic expansion, and deeper credibility reinforcement.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Authority Engine", lookupKey: "media_over_london_authority_engine_monthly", amount: 125000, interval: "month" }],
+    includes: "editorial_cadence_topic_expansion_credibility_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-starter-ppc-management",
+    productName: "Media Over London Starter PPC Management",
+    description: "One simple campaign lane with basic monthly optimization and reporting. Ad spend is separate.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Starter PPC Management", lookupKey: "media_over_london_starter_ppc_management_monthly", amount: 39900, interval: "month" }],
+    includes: "starter_ppc_campaign_optimization_reporting_ad_spend_separate"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-local-lead-campaigns",
+    productName: "Media Over London Local Lead Campaigns",
+    description: "Landing page support, tracking plan, campaign iteration, and conversion reporting. Ad spend is separate.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Local Lead Campaigns", lookupKey: "media_over_london_local_lead_campaigns_monthly", amount: 79900, interval: "month" }],
+    includes: "local_lead_campaigns_landing_tracking_iteration_reporting"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-multi-channel-growth",
+    productName: "Media Over London Multi-Channel Growth",
+    description: "Google, Meta, retargeting, offer testing, deeper reporting, and campaign coordination. Ad spend is separate.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Multi-Channel Growth", lookupKey: "media_over_london_multi_channel_growth_monthly", amount: 150000, interval: "month" }],
+    includes: "multi_channel_growth_google_meta_reporting_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-campaign-buildout",
+    productName: "Media Over London Campaign Buildout",
+    description: "Landing page, tracking, creative, and setup work based on complexity. Checkout is the starting floor before final scope.",
+    status: "approved_floor",
+    prices: [{ kind: "one-time-floor", nickname: "Media Over London Campaign Buildout", lookupKey: "media_over_london_campaign_buildout", amount: 50000 }],
+    includes: "campaign_buildout_landing_tracking_creative_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-gbp-cleanup",
+    productName: "Media Over London GBP Cleanup",
+    description: "Profile audit, cleanup recommendations, services/categories, description, links, and basic fix list.",
+    prices: [{ kind: "one-time", nickname: "Media Over London GBP Cleanup", lookupKey: "media_over_london_gbp_cleanup", amount: 29900 }],
+    includes: "gbp_audit_categories_description_links_fix_list"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-gbp-monthly-ops",
+    productName: "Media Over London GBP Monthly Ops",
+    description: "Posts, photos, offers, Q&A, service updates, and monthly activity summary.",
+    prices: [{ kind: "monthly", nickname: "Media Over London GBP Monthly Ops", lookupKey: "media_over_london_gbp_monthly_ops_monthly", amount: 19900, interval: "month" }],
+    includes: "gbp_posts_photos_offers_qna_service_updates"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-local-trust-system",
+    productName: "Media Over London Local Trust System",
+    description: "GBP Ops plus review engine, local pages, and trust-content coordination.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Local Trust System", lookupKey: "media_over_london_local_trust_system_monthly", amount: 49900, interval: "month" }],
+    includes: "gbp_review_engine_local_pages_trust_content"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-review-setup",
+    productName: "Media Over London Review Setup",
+    description: "Review link, QR asset, request templates, and staff instruction sheet.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Review Setup", lookupKey: "media_over_london_review_setup", amount: 19900 }],
+    includes: "review_link_qr_templates_staff_sheet"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-review-engine",
+    productName: "Media Over London Review Engine",
+    description: "Monthly request support, testimonial capture, and reputation report.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Review Engine", lookupKey: "media_over_london_review_engine_monthly", amount: 14900, interval: "month" }],
+    includes: "monthly_review_support_testimonials_reputation_report"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-reputation-ops",
+    productName: "Media Over London Reputation Ops",
+    description: "Review engine plus GBP posts, response guidance, and trust-content reuse.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Reputation Ops", lookupKey: "media_over_london_reputation_ops_monthly", amount: 39900, interval: "month" }],
+    includes: "review_engine_gbp_posts_response_guidance_trust_reuse"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-lead-rescue-setup",
+    productName: "Media Over London Lead Rescue Setup",
+    description: "Missed-call flow, auto-response copy, booking/quote link, alerts, and test proof.",
+    prices: [{ kind: "one-time", nickname: "Media Over London Lead Rescue Setup", lookupKey: "media_over_london_lead_rescue_setup", amount: 39900 }],
+    includes: "missed_call_flow_auto_response_booking_alerts_test_proof"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-lead-recovery-ops",
+    productName: "Media Over London Lead Recovery Ops",
+    description: "Monitoring support, script updates, lead summaries, and monthly missed-lead report.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Lead Recovery Ops", lookupKey: "media_over_london_lead_recovery_ops_monthly", amount: 19900, interval: "month" }],
+    includes: "lead_recovery_monitoring_scripts_summaries_report"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-crm-setup",
+    productName: "Media Over London CRM Setup",
+    description: "Pipeline, fields, stages, lead forms, templates, and basic staff handoff. Checkout is the starting floor.",
+    status: "approved_floor",
+    prices: [{ kind: "one-time-floor", nickname: "Media Over London CRM Setup", lookupKey: "media_over_london_crm_setup", amount: 75000 }],
+    includes: "crm_pipeline_fields_stages_forms_templates_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-follow-up-ops",
+    productName: "Media Over London Follow-Up Ops",
+    description: "Template maintenance, reactivation campaigns, pipeline cleanup, and monthly summary.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Follow-Up Ops", lookupKey: "media_over_london_follow_up_ops_monthly", amount: 29900, interval: "month" }],
+    includes: "follow_up_templates_reactivation_pipeline_cleanup_summary"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-monthly-operator-report",
+    productName: "Media Over London Monthly Operator Report",
+    description: "Executive summary, shipped-work log, key metrics, blockers, and next recommendations.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Monthly Operator Report", lookupKey: "media_over_london_monthly_operator_report_monthly", amount: 14900, interval: "month" }],
+    includes: "operator_report_summary_work_log_metrics_blockers"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-lead-dashboard",
+    productName: "Media Over London Lead Dashboard",
+    description: "Dashboard setup and monthly maintenance for available sources.",
+    prices: [
+      { kind: "setup", nickname: "Media Over London Lead Dashboard setup", lookupKey: "media_over_london_lead_dashboard_setup", amount: 39900 },
+      { kind: "monthly", nickname: "Media Over London Lead Dashboard monthly", lookupKey: "media_over_london_lead_dashboard_monthly", amount: 9900, interval: "month" }
+    ],
+    includes: "lead_dashboard_setup_monthly_maintenance_available_sources"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-growth-command",
+    productName: "Media Over London Growth Command",
+    description: "Hosting + care, GBP support, review engine, basic reporting, and monthly recommendations.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Growth Command", lookupKey: "media_over_london_growth_command_monthly", amount: 39900, interval: "month" }],
+    includes: "growth_command_hosting_gbp_reviews_reporting_recommendations"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-lead-engine",
+    productName: "Media Over London Lead Engine",
+    description: "Landing page support, paid traffic management, tracking, review flow, and monthly conversion report. Ad spend is separate.",
+    prices: [{ kind: "monthly", nickname: "Media Over London Lead Engine", lookupKey: "media_over_london_lead_engine_monthly", amount: 79900, interval: "month" }],
+    includes: "lead_engine_landing_paid_traffic_tracking_reviews_ad_spend_separate"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-revenue-ops",
+    productName: "Media Over London Revenue Ops",
+    description: "CRM pipeline, missed-call recovery, booking flow, content, PPC coordination, dashboard, and reputation system. Tools and ad spend are separate.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Revenue Ops", lookupKey: "media_over_london_revenue_ops_monthly", amount: 150000, interval: "month" }],
+    includes: "revenue_ops_crm_lead_recovery_content_ppc_dashboard_floor"
+  }),
+  mediaOverLondonOffer({
+    planId: "media-over-london-embedded-growth-operator",
+    productName: "Media Over London Embedded Growth Operator",
+    description: "Website, content, ads, vendors, automation, review ops, reporting, offer calendar, and strategy cadence.",
+    status: "approved_floor",
+    prices: [{ kind: "monthly-floor", nickname: "Media Over London Embedded Growth Operator", lookupKey: "media_over_london_embedded_growth_operator_monthly", amount: 300000, interval: "month" }],
+    includes: "embedded_growth_operator_site_content_ads_vendors_automation_reporting"
+  })
+];
 
 const offers = [
   {
@@ -142,6 +416,62 @@ const offers = [
     includes: "managed_adapter_auto_apply_policy_live_browser_proof_monthly_growth_ledger"
   },
   {
+    planId: "skyenet-edge-starter",
+    productName: "SkyeNet Edge Starter",
+    description: "Owner-approved SkyeNet starter hosting lane for one static surface, shared-gate deploy control, route registration, observability receipts, and capped Free99-safe usage.",
+    sourceFolder: "metraiyux_0s_site/skyenet",
+    offerFamily: "skyenet",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "SkyeNet Edge Starter setup", lookupKey: "skyenet_edge_starter_setup", amount: 29700 },
+      { kind: "monthly", nickname: "SkyeNet Edge Starter monthly", lookupKey: "skyenet_edge_starter_monthly", amount: 9700, interval: "month" }
+    ],
+    includes: "static_drop_route_registry_observability_free99_caps_owner_approval"
+  },
+  {
+    planId: "skyenet-edge-growth",
+    productName: "SkyeNet Edge Growth",
+    description: "Owner-approved SkyeNet growth lane for multiple routed surfaces, deployment receipts, custom route support, managed platform functions, and stronger usage guardrails.",
+    sourceFolder: "metraiyux_0s_site/skyenet",
+    offerFamily: "skyenet",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "SkyeNet Edge Growth setup", lookupKey: "skyenet_edge_growth_setup", amount: 99700 },
+      { kind: "monthly", nickname: "SkyeNet Edge Growth monthly", lookupKey: "skyenet_edge_growth_monthly", amount: 29700, interval: "month" }
+    ],
+    includes: "multi_surface_skynet_hosting_custom_routes_managed_functions_cost_receipts"
+  },
+  {
+    planId: "skyenet-functions-managed",
+    productName: "SkyeNet Functions Managed",
+    description: "Managed SkyeNet Functions lane for Netlify-compatible function intake, conversion, inspection, signing, staging, and platform-owned execution support under owner-approved limits.",
+    sourceFolder: "tools/skyenet-functions-convert.mjs",
+    offerFamily: "skyenet",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "SkyeNet Functions Managed setup", lookupKey: "skyenet_functions_managed_setup", amount: 150000 },
+      { kind: "monthly", nickname: "SkyeNet Functions Managed monthly", lookupKey: "skyenet_functions_managed_monthly", amount: 49700, interval: "month" }
+    ],
+    includes: "netlify_functions_intake_conversion_signing_staging_managed_execution"
+  },
+  {
+    planId: "skyenet-sovereign-runtime-reserve",
+    productName: "SkyeNet Sovereign Runtime Reserve",
+    description: "Owner-scoped SkyeNet capacity reserve for isolated customer-uploaded functions, private runtime admission, secret boundaries, egress policy, abuse controls, and billing cutoffs.",
+    sourceFolder: "docs/SKYENET_HYBRID_RELEASE_ARCHITECTURE.md",
+    offerFamily: "skyenet",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "setup", nickname: "SkyeNet Sovereign Runtime setup reserve", lookupKey: "skyenet_sovereign_runtime_setup", amount: 500000 },
+      { kind: "monthly", nickname: "SkyeNet Sovereign Runtime monthly reserve", lookupKey: "skyenet_sovereign_runtime_monthly", amount: 99700, interval: "month" }
+    ],
+    includes: "private_runtime_isolation_secret_egress_abuse_controls_billing_cutoffs"
+  },
+  {
     planId: "houseoperations-command",
     productName: "MetrAIyux 0S - HouseOperations Command",
     description: "Paid HouseOperations command room with task, vendor, owner-alert, proof, tutorial, local SkyeBox vault, and FS27 PIN Gate handoff boundaries.",
@@ -205,6 +535,33 @@ const offers = [
     ],
     includes: "managed_connectlog_relay13_houseops_skyebox_custom_skyeroutex_v040"
   },
+  {
+    planId: "ae-flowpro-manual-json-ledger",
+    productName: "AE FlowPro Manual JSON Ledger Backup",
+    description: "Low-cost AE FlowPro backup lane for local-first CRM users who want an app-kept JSON ledger, manual export/import workflow, and owner-visible backup receipts without automatic external database sync.",
+    sourceFolder: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro",
+    offerFamily: "ae-flowpro",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "AE FlowPro Manual JSON Ledger", lookupKey: "ae_flowpro_manual_json_ledger_monthly", amount: 499, interval: "month" }
+    ],
+    includes: "local_json_ledger_manual_backup_owner_receipts_no_auto_cloud_sync"
+  },
+  {
+    planId: "ae-flowpro-cloud-sync-unlimited",
+    productName: "AE FlowPro Cloud Sync Unlimited",
+    description: "AE FlowPro cloud sync lane with app-kept JSON ledger, CitadelDB primary storage, Neon fallback mirror when configured, and a two-day external database write cadence for durable CRM backups.",
+    sourceFolder: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro",
+    offerFamily: "ae-flowpro",
+    brainOwner: "celeste-monroe-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "AE FlowPro Cloud Sync Unlimited", lookupKey: "ae_flowpro_cloud_sync_unlimited_monthly", amount: 1299, interval: "month" }
+    ],
+    includes: "json_ledger_citadeldb_primary_neon_fallback_two_day_external_sync"
+  },
+  ...mediaOverLondonOffers,
   ...musicOffers,
   {
     planId: "skygatefs27-managed",
@@ -308,10 +665,10 @@ async function ensureProduct(offer, existingPrices) {
     description: offer.description,
     statement_descriptor: offer.productName.startsWith("SkyeGate") ? "SKYEGATEFS27" : "METRAIYUX0S",
     "metadata[source_folder]": offer.sourceFolder,
-    "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
+    "metadata[source_file]": offer.sourceFile || "STRIPE_PRODUCT_PRICE_CATALOG.md",
     "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
-    "metadata[status]": "approved",
+    "metadata[status]": offer.status || "approved",
     "metadata[brain_owner]": offer.brainOwner,
     "metadata[includes]": offer.includes,
     ...(offer.ownerApprovalRequired ? { "metadata[owner_approval_required]": "true" } : {})
@@ -325,10 +682,10 @@ async function updateProduct(productIdValue, offer) {
     name: offer.productName,
     description: offer.description,
     "metadata[source_folder]": offer.sourceFolder,
-    "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
+    "metadata[source_file]": offer.sourceFile || "STRIPE_PRODUCT_PRICE_CATALOG.md",
     "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
-    "metadata[status]": "approved",
+    "metadata[status]": offer.status || "approved",
     "metadata[brain_owner]": offer.brainOwner,
     "metadata[includes]": offer.includes,
     ...(offer.ownerApprovalRequired ? { "metadata[owner_approval_required]": "true" } : {})
@@ -356,10 +713,10 @@ async function createPrice(productIdValue, offer, spec) {
     lookup_key: spec.lookupKey,
     transfer_lookup_key: "true",
     "metadata[source_folder]": offer.sourceFolder,
-    "metadata[source_file]": "STRIPE_PRODUCT_PRICE_CATALOG.md",
+    "metadata[source_file]": offer.sourceFile || "STRIPE_PRODUCT_PRICE_CATALOG.md",
     "metadata[offer_family]": offer.offerFamily || (offer.productName.startsWith("SkyeGate") ? "skygate" : "metraiyux"),
     "metadata[plan_id]": offer.planId,
-    "metadata[status]": "approved",
+    "metadata[status]": offer.status || "approved",
     "metadata[brain_owner]": offer.brainOwner,
     "metadata[price_kind]": spec.kind,
     "metadata[includes]": offer.includes,
@@ -375,6 +732,12 @@ async function archivePrice(priceIdValue) {
 
 const startedAt = new Date().toISOString();
 const account = await stripe("GET", "account");
+const selectedOffers = PLAN_FILTERS.length ? offers.filter((offer) => PLAN_FILTERS.includes(offer.planId)) : offers;
+if (PLAN_FILTERS.length && selectedOffers.length !== PLAN_FILTERS.length) {
+  const found = new Set(selectedOffers.map((offer) => offer.planId));
+  const missing = PLAN_FILTERS.filter((plan) => !found.has(plan));
+  throw new Error(`Unknown Stripe plan filter(s): ${missing.join(", ")}`);
+}
 const receipt = {
   ok: true,
   mode: DRY_RUN ? "dry_run" : "live",
@@ -385,10 +748,11 @@ const receipt = {
     details_submitted: account.details_submitted
   },
   source_env_file: ENV_FILE.replace(ROOT, "."),
+  plan_filters: PLAN_FILTERS,
   synced: []
 };
 
-for (const offer of offers) {
+for (const offer of selectedOffers) {
   const existingBySpec = {};
   const allExisting = [];
   for (const spec of offer.prices) {

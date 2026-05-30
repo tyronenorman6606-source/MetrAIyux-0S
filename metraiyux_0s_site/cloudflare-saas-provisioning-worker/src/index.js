@@ -1,7 +1,10 @@
 import { createSkyeMailClient, skymailConfigured } from "./skymail-sdk.js";
+import { executeZeroOsAutomationAction } from "../../cloudflare/zero-os-automation-spine.mjs";
 import {
   SKYEMERIT_AUTO_CODE,
   SKYEMERIT_FIRST_TIME_PACK_ID,
+  GRAYSCAPE467_CODE,
+  GRAYSCAPE467_PACK_ID,
   buildFirstTimeSkyeMeritPack,
   buildSkyeMeritCheckout,
   calculateSkyeMerit,
@@ -218,6 +221,47 @@ const PLANS = {
       allowed_providers: ["openai", "gemini", "anthropic"],
       allowed_models: { openai: ["gpt-4o-mini", "gpt-4o"], gemini: ["gemini-2.5-flash"], anthropic: ["claude-3-5-sonnet-20241022"] }
     }
+  },
+  "unlimited-command": {
+    name: "Unlimited Command",
+    tagline: "Owner QA unlimited 0S lane for full-platform readiness scans.",
+    monthly: 3997,
+    setup: 15000,
+    skyepay_offer_id: "metraiyux-enterprise-command",
+    checkout_url: "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-enterprise-command",
+    owner_approval_required: true,
+    activation_path: "owner_qa_zero_balance_pending_owner_approval",
+    internal_qa_only: true,
+    features: {
+      skyeprofitconsole_free99: "gate_session_required_no_charge",
+      skyemediacenter_free99: "gate_session_required_no_charge",
+      ai_compute_credits_monthly: "owner_qa_capped",
+      kaixu_variants: ["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"],
+      workspaces: "owner_qa_unlimited",
+      api_keys: "owner_qa_unlimited",
+      vault_storage_gb: "owner_qa_capped",
+      vault_files: "owner_qa_capped",
+      operating_lanes: ["NEXUS", "QUANTUM-OPS", "CROWN-OS", "ASCENSION", "APEX", "SKYEROUTEX_V0_4_CUSTOM", "SKYENET", "SKYEMAIL"],
+      brains: 16,
+      skyemail_inboxes: "owner_qa_unlimited",
+      citadeldb: "owner_qa_full",
+      vps_instances: "owner_qa_optional",
+      white_label: true,
+      support: "owner_qa",
+      rpm: "owner_qa_capped",
+      rpd: "owner_qa_capped"
+    },
+    limits: {
+      monthly_ai_cap_usd: 0,
+      requests_per_minute: 240,
+      requests_per_day: 10000,
+      devices_per_key: 20,
+      workspaces: 25,
+      vault_storage_mb: 51200,
+      vault_file_limit: 25000,
+      allowed_providers: ["openai", "gemini", "anthropic"],
+      allowed_models: { openai: ["gpt-4o-mini", "gpt-4o"], gemini: ["gemini-2.5-flash"], anthropic: ["claude-3-5-sonnet-20241022"] }
+    }
   }
 };
 
@@ -314,6 +358,7 @@ const STRIPE_PRICES = {
   'routex-workforce-command': { setup: 'price_1TY9U1HEgCmnlKPJPNiPFacB', monthly: 'price_1TY9U1HEgCmnlKPJ8s3kF0eC' },
   'autonomous-office': { setup: 'price_1TY9U2HEgCmnlKPJPqDe4Cqr', monthly: 'price_1TY9U2HEgCmnlKPJq5d7ccZs' },
   'enterprise-command': { setup: 'price_1TY9U3HEgCmnlKPJ7ACUntvj', monthly: 'price_1TY9U4HEgCmnlKPJSWLllIxH' },
+  'unlimited-command': { setup: 'price_1TY9U3HEgCmnlKPJ7ACUntvj', monthly: 'price_1TY9U4HEgCmnlKPJSWLllIxH' },
 };
 
 const SOVEREIGN_STACK = {
@@ -352,7 +397,7 @@ const PREVIEW_CLIENTS = {
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret,x-kaixu-install-id,x-kaixu-app,x-kaixu-build,x-kaixu-request-id"
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret,x-kaixu-install-id,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret"
 };
 
 const json = (data, status = 200) => new Response(JSON.stringify(data, null, 2), {
@@ -360,8 +405,13 @@ const json = (data, status = 200) => new Response(JSON.stringify(data, null, 2),
   headers: { "content-type": "application/json", ...cors }
 });
 
-const id = (p) => `${p}_${crypto.randomUUID()}`;
+const id = (p) => `${p}_${safeRandomUUID()}`;
 const now = () => new Date().toISOString();
+
+function safeRandomUUID() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `uuid_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
+}
 
 async function body(req) {
   try { return await req.json(); } catch { return {}; }
@@ -382,6 +432,12 @@ function emailDomain(email) {
 
 function validEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalizeEmail(email));
+}
+
+function normalizePlanId(value, fallback = "starter-command") {
+  const raw = String(value || fallback).trim().toLowerCase();
+  if (raw === "unlimited") return "unlimited-command";
+  return raw || fallback;
 }
 
 function testEmailDomain(domain) {
@@ -422,8 +478,16 @@ function clampInt(value, fallback, min, max) {
 }
 
 async function sha256Short(value) {
+  if (!globalThis.crypto?.subtle?.digest) {
+    let hash = 2166136261;
+    for (const char of String(value || "")) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, "0").repeat(3).slice(0, 24);
+  }
   const bytes = new TextEncoder().encode(String(value || ""));
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  const digest = new Uint8Array(await globalThis.crypto.subtle.digest("SHA-256", bytes));
   return Array.from(digest).map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 24);
 }
 
@@ -458,11 +522,188 @@ async function checkSignupRateLimit(req, env, email) {
   return blocked ? { ok: false, enforced: true, ...blocked } : { ok: true, enforced: true, checks };
 }
 
+function boolEnv(value) {
+  return ["1", "true", "yes", "on"].includes(String(value || "").trim().toLowerCase());
+}
+
+function sharedGateRequired(env) {
+  return boolEnv(env.ZERO_OS_SHARED_GATE_REQUIRED) || boolEnv(env.SKYE_SHARED_GATE_REQUIRED);
+}
+
+function sharedProxySecret(env) {
+  return String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.SAAS_INTERNAL_PROXY_SECRET || "").trim();
+}
+
+function sharedGateProxyAuth(req, env) {
+  const secret = sharedProxySecret(env);
+  if (!secret) return false;
+  return ["operator", "gate", "user"].includes(String(req.headers.get("x-0s-shared-gate") || "").toLowerCase())
+    && String(req.headers.get("x-0s-internal-proxy-secret") || "").trim() === secret;
+}
+
 function auth(req, env) {
-  const need = env.ADMIN_TOKEN;
-  if (!need) return true;
-  const got = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
-  return got === need;
+  if (sharedGateProxyAuth(req, env)) return true;
+  return false;
+}
+
+function providerRuntimeEnv(env) {
+  return {
+    ...env,
+    SKYEMAIL_PLATFORM_WORKER: env.SKYEMAIL_PLATFORM_WORKER || env.SKYMAIL_PLATFORM_WORKER || env.SKYMAIL_WORKER || null,
+    SKYMAIL_API_TOKEN: env.SKYMAIL_API_TOKEN || env.SKYEMAIL_API_TOKEN || env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN || "",
+    RELAY13_WORKER_ORIGIN: env.RELAY13_WORKER_ORIGIN || env.RELAY13_ORIGIN || originFromUrl(env.RELAY13_SKYEMERIT_URL || env.RELAY13_EVENT_URL || ""),
+    RELAY13_API_KEY: env.RELAY13_API_KEY || env.CONNECTLOG_RELAY13_API_KEY || env.RELAY13_API_TOKEN || env.RELAY13_EVENT_SECRET || "",
+    RELAY13_ADMIN_TOKEN: env.RELAY13_ADMIN_TOKEN || env.RELAY13_PLATFORM_ADMIN_TOKEN || env.RELAY13_API_TOKEN || "",
+    SITE_EVENTS_KV: env.SITE_EVENTS_KV || env.ZERO_OS_AUTOMATION_KV || env.AUTOMATION_KV || env.SAAS_KV || null
+  };
+}
+
+function originFromUrl(value) {
+  try {
+    return new URL(String(value || "")).origin;
+  } catch {
+    return "";
+  }
+}
+
+function pathFromUrl(value, fallback = "/api/v1/connectlog/scan") {
+  const raw = String(value || "").trim();
+  if (!raw) return fallback;
+  if (raw.startsWith("/")) return raw;
+  try {
+    const url = new URL(raw);
+    return `${url.pathname || fallback}${url.search || ""}`;
+  } catch {
+    return fallback;
+  }
+}
+
+async function runSaasProviderAction(env, envelope) {
+  const runtimeEnv = providerRuntimeEnv(env);
+  return executeZeroOsAutomationAction(runtimeEnv, {}, {
+    app_id: "saas-provisioning",
+    owner_approved: true,
+    ...envelope
+  }, { actor: "saas-provisioning-worker" }, { operator_ok: true });
+}
+
+function publicProviderRuntimeReceipt(receipt = null) {
+  if (!receipt) return null;
+  return {
+    id: receipt.id,
+    provider_id: receipt.provider_id,
+    action: receipt.action,
+    status: receipt.status,
+    executed: receipt.executed === true,
+    provider_call_made: receipt.provider_call_made === true,
+    provider_result: receipt.provider_result || null,
+    http_status: receipt.http_status || null,
+    error: receipt.error || ""
+  };
+}
+
+async function sendRuntimeEmail(env, { to, subject, html, text = "", usage_lane = "saas:email", workspace_id = "", customer_id = "", client_id = "" } = {}) {
+  const recipients = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
+  if (!recipients.length || !env.RESEND_FROM_EMAIL) return { sent: false, reason: "resend_not_configured" };
+  const runtimeSandbox = boolEnv(env.SAAS_PROVIDER_RUNTIME_SANDBOX) || boolEnv(env.ZERO_OS_PROVIDER_SANDBOX);
+  const runtimeEmail = await runSaasProviderAction(env, {
+    provider_id: "resend",
+    action: "resend.email.send",
+    workspace_id,
+    customer_id,
+    client_id: client_id || recipients[0] || "",
+    usage_lane,
+    live: !runtimeSandbox,
+    sandbox: runtimeSandbox,
+    payload: {
+      to: recipients,
+      subject,
+      html,
+      text: text || html
+    }
+  });
+  const receipt = runtimeEmail.response?.receipt || null;
+  return {
+    sent: runtimeEmail.response?.ok === true,
+    status: receipt?.http_status || runtimeEmail.status,
+    provider_runtime: publicProviderRuntimeReceipt(receipt),
+    provider_runtime_receipt_id: receipt?.id || null,
+    provider_runtime_status: receipt?.status || null,
+    provider_call_made: receipt?.provider_call_made === true,
+    response: receipt?.provider_result || null,
+    error: runtimeEmail.response?.ok === true ? "" : (receipt?.error || "resend_provider_runtime_failed")
+  };
+}
+
+async function sendRelay13RuntimeEvent(env, event = {}) {
+  const relayUrl = env.RELAY13_SKYEMERIT_URL || env.RELAY13_EVENT_URL || "";
+  const hasRuntimeConfig = relayUrl || env.RELAY13_WORKER_ORIGIN || env.RELAY13_ORIGIN || boolEnv(env.SAAS_PROVIDER_RUNTIME_SANDBOX) || boolEnv(env.ZERO_OS_PROVIDER_SANDBOX);
+  if (!hasRuntimeConfig) return { status: "skipped", reason: "relay13_not_configured" };
+  const runtimeSandbox = boolEnv(env.SAAS_PROVIDER_RUNTIME_SANDBOX) || boolEnv(env.ZERO_OS_PROVIDER_SANDBOX);
+  const runtime = await runSaasProviderAction(env, {
+    provider_id: "relay13",
+    action: "relay13.thread.attach",
+    workspace_id: event.workspace_id || "",
+    customer_id: event.customer_id || "",
+    client_id: event.actor || event.customer_id || "",
+    usage_lane: "saas:relay13_skyemerit_delivery",
+    live: !runtimeSandbox,
+    sandbox: runtimeSandbox,
+    payload: {
+      path: pathFromUrl(relayUrl),
+      method: "POST",
+      body: event
+    }
+  });
+  const receipt = runtime.response?.receipt || null;
+  return {
+    status: runtime.response?.ok === true ? "sent" : "failed",
+    http_status: receipt?.http_status || runtime.status,
+    response: receipt?.provider_result || null,
+    provider_runtime: publicProviderRuntimeReceipt(receipt),
+    provider_runtime_receipt_id: receipt?.id || null,
+    provider_runtime_status: receipt?.status || null,
+    provider_call_made: receipt?.provider_call_made === true,
+    error: runtime.response?.ok === true ? "" : (receipt?.error || "relay13_provider_runtime_failed")
+  };
+}
+
+function saasStripeWebhookRuntimePayload(event = {}, object = {}) {
+  const metadata = object?.metadata && typeof object.metadata === "object" ? object.metadata : {};
+  return {
+    event_id: String(event.id || object.id || ""),
+    event_type: String(event.type || ""),
+    type: String(event.type || ""),
+    object_id: String(object.id || event.id || ""),
+    object_type: String(object.object || ""),
+    session_id: String(object.object === "checkout.session" ? object.id || "" : metadata.session_id || ""),
+    subscription_id: String(object.subscription || metadata.subscription_id || ""),
+    payment_status: String(object.payment_status || object.status || ""),
+    amount_total: Number(object.amount_total || object.amount || 0) || 0,
+    currency: String(object.currency || "usd"),
+    client_reference_id: String(object.client_reference_id || ""),
+    workspace_id: String(metadata.workspace_id || ""),
+    customer_id: String(metadata.customer_id || object.customer || ""),
+    plan_id: String(metadata.plan_id || ""),
+    subscription_record_id: String(metadata.subscription_id || "")
+  };
+}
+
+async function mirrorSaasStripeWebhookProviderRuntime(env, event = {}, object = {}) {
+  const payload = saasStripeWebhookRuntimePayload(event, object);
+  const runtime = await runSaasProviderAction(env, {
+    provider_id: "stripe",
+    action: "stripe.webhook.lifecycle",
+    workspace_id: payload.workspace_id,
+    customer_id: payload.customer_id,
+    client_id: payload.client_reference_id || payload.customer_id || payload.subscription_record_id || "",
+    usage_lane: "saas:stripe_webhook_lifecycle",
+    live: true,
+    sandbox: false,
+    payload
+  });
+  const receipt = runtime.response?.receipt || null;
+  return publicProviderRuntimeReceipt(receipt);
 }
 
 function fs27MirrorUrl(env) {
@@ -563,13 +804,14 @@ function routeCommand(text) {
 }
 
 async function email(env, subject, html) {
-  if (!env.RESEND_API_KEY || !env.ADMIN_APPROVAL_EMAIL || !env.RESEND_FROM_EMAIL) return { sent: false, reason: "resend_not_configured" };
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: env.RESEND_FROM_EMAIL, to: [env.ADMIN_APPROVAL_EMAIL], subject, html })
+  if (!env.ADMIN_APPROVAL_EMAIL || !env.RESEND_FROM_EMAIL) return { sent: false, reason: "resend_not_configured" };
+  return sendRuntimeEmail(env, {
+    to: [env.ADMIN_APPROVAL_EMAIL],
+    subject,
+    html,
+    usage_lane: "saas:admin_email",
+    client_id: env.ADMIN_APPROVAL_EMAIL
   });
-  return { sent: res.ok, status: res.status, body: await res.text() };
 }
 
 function skyeMeritCheckoutOffer(plan, planId) {
@@ -592,8 +834,12 @@ function skyeMeritCheckoutOffer(plan, planId) {
 
 function skyeMeritHtml(pack) {
   const codes = (pack.coupon_codes || []).map((code) => `<li><b>${code}</b></li>`).join("");
-  return `<h2>Your SkyeMerit pack is active</h2>
-    <p>Your first-time pack includes a $${((pack.kaixu_credit_cents || 0) / 100).toFixed(2)} premium kAIxu model spend credit.</p>
+  const credit = Number(pack.kaixu_credit_cents || 0);
+  const creditLine = credit > 0
+    ? `<p>Your pack includes a $${(credit / 100).toFixed(2)} premium kAIxu model spend credit.</p>`
+    : `<p>This owner-issued pack is a zero-balance QA unlock. Gate, abuse, quota, and owner-approval checks still apply.</p>`;
+  return `<h2>${pack.title || "Your SkyeMerit pack is active"}</h2>
+    ${creditLine}
     <p>Use the SkyePay checkout lane to apply the best eligible SkyeMerit. Free99 means no charge, but the gate session still applies.</p>
     <ul>${codes}</ul>
     <p>Pack: ${pack.pack_id}</p>`;
@@ -602,13 +848,14 @@ function skyeMeritHtml(pack) {
 async function sendCustomerEmail(env, to, subject, html) {
   const policy = emailDeliveryPolicy(to, env);
   if (!policy.ok) return { sent: false, skipped: true, provider_delivery_suppressed: true, reason: policy.reason };
-  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL || !to) return { sent: false, reason: "resend_not_configured" };
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: env.RESEND_FROM_EMAIL, to: [to], subject, html })
+  if (!env.RESEND_FROM_EMAIL || !to) return { sent: false, reason: "resend_not_configured" };
+  return sendRuntimeEmail(env, {
+    to: [to],
+    subject,
+    html,
+    usage_lane: "saas:customer_email",
+    client_id: policy.email || to
   });
-  return { sent: res.ok, status: res.status, body: await res.text() };
 }
 
 async function optionalJsonPost(url, payload, secret = "") {
@@ -629,10 +876,7 @@ async function optionalJsonPost(url, payload, secret = "") {
 async function sendSkyeMailSystemMessage(env, pack) {
   const policy = emailDeliveryPolicy(pack.email, env);
   if (!policy.ok) return { status: "skipped", provider_delivery_suppressed: true, reason: policy.reason };
-  const token = String(env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN || "").trim();
-  if (!token || !pack.email) return { status: "skipped", reason: "skymail_not_configured" };
-  const base = String(env.SKYMAIL_API_URL || env.SKYMAIL_PUBLIC_URL || "https://skyemail-platform.graylondonskyes.workers.dev").replace(/\/+$/, "");
-  const path = String(env.SKYMAIL_SKYEMERIT_PATH || "/api/skymail/system-message");
+  const path = String(env.SKYMAIL_SKYEMERIT_PATH || "/system-message");
   const payload = {
     type: "skyemerit.pack_issued",
     to: pack.email,
@@ -640,28 +884,33 @@ async function sendSkyeMailSystemMessage(env, pack) {
     html: skyeMeritHtml(pack),
     pack
   };
-  const init = {
-    method: "POST",
-    headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload)
+  const runtimeSandbox = boolEnv(env.SAAS_PROVIDER_RUNTIME_SANDBOX) || boolEnv(env.ZERO_OS_PROVIDER_SANDBOX);
+  const runtime = await runSaasProviderAction(env, {
+    provider_id: "skymail",
+    action: "skymail.system_message.send",
+    workspace_id: pack.workspace_id || "",
+    customer_id: pack.customer_id || "",
+    client_id: pack.email || "",
+    usage_lane: "saas:skymail_skyemerit_system_message",
+    live: !runtimeSandbox,
+    sandbox: runtimeSandbox,
+    payload: { path, method: "POST", body: payload }
+  });
+  const receipt = runtime.response?.receipt || null;
+  return {
+    status: runtime.response?.ok === true ? "sent" : "failed",
+    http_status: receipt?.http_status || runtime.status,
+    response: receipt?.provider_result || null,
+    provider_runtime: publicProviderRuntimeReceipt(receipt),
+    provider_runtime_receipt_id: receipt?.id || null,
+    provider_runtime_status: receipt?.status || null,
+    provider_call_made: receipt?.provider_call_made === true,
+    error: runtime.response?.ok === true ? "" : (receipt?.error || "skymail_send_failed")
   };
-  try {
-    const res = env.SKYMAIL_WORKER && typeof env.SKYMAIL_WORKER.fetch === "function"
-      ? await env.SKYMAIL_WORKER.fetch(new Request(`${base}${path}`, init))
-      : await fetch(`${base}${path}`, init);
-    const text = await res.text();
-    let data;
-    try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text.slice(0, 1000) }; }
-    return { status: res.ok ? "sent" : "failed", http_status: res.status, response: data };
-  } catch (error) {
-    return { status: "failed", error: error?.message || "skymail_send_failed" };
-  }
 }
 
 async function deliverSkyeMeritPack(env, pack) {
-  const relayUrl = env.RELAY13_SKYEMERIT_URL || env.RELAY13_EVENT_URL || "";
   const connectLogUrl = env.CONNECTLOG_SKYEMERIT_URL || env.CONNECTLOG_EVENT_URL || "";
-  const relaySecret = env.RELAY13_API_TOKEN || env.RELAY13_EVENT_SECRET || "";
   const connectLogSecret = env.CONNECTLOG_API_TOKEN || env.CONNECTLOG_EVENT_SECRET || "";
   const event = {
     source_app: "metraiyux-0s",
@@ -683,7 +932,7 @@ async function deliverSkyeMeritPack(env, pack) {
   return {
     resend: await sendCustomerEmail(env, pack.email, "Your SkyeMerit pack is active", skyeMeritHtml(pack)),
     skymail: await sendSkyeMailSystemMessage(env, pack),
-    relay13: await optionalJsonPost(relayUrl, event, relaySecret),
+    relay13: await sendRelay13RuntimeEvent(env, event),
     connectlog: await optionalJsonPost(connectLogUrl, event, connectLogSecret),
     fs27_mirror: await mirrorToFs27(env, event)
   };
@@ -740,12 +989,23 @@ async function recordSkyeMeritPack(env, pack, delivery) {
 }
 
 async function issueSkyeMeritPack(env, payload = {}, source = "signup") {
+  const requestedCode = String(payload.skyemerit_code || payload.code || payload.skyeMeritCode || "").trim().toUpperCase();
   const pack = buildFirstTimeSkyeMeritPack({
     email: payload.email || payload.customer_email || payload.approval_email || "",
     customerId: payload.customer_id || "",
     workspaceId: payload.workspace_id || "",
     source
   });
+  if (requestedCode === GRAYSCAPE467_CODE) {
+    pack.pack_id = GRAYSCAPE467_PACK_ID;
+    pack.title = "GRAYSCAPE467 Owner QA Merit Pack";
+    pack.status = "issued";
+    pack.audience = "owner_qa_unlimited";
+    pack.kaixu_credit_cents = 0;
+    pack.coupon_codes = [GRAYSCAPE467_CODE];
+    pack.delivery_channels = ["skymail", "relay13", "connectlog", "fs27_event_mirror"];
+    pack.customer_summary = "GRAYSCAPE467 is an owner-issued zero-balance unlimited QA merit. It does not bypass FS27/SkyGate auth, owner approval, quota guards, or abuse controls.";
+  }
   const delivery = await deliverSkyeMeritPack(env, pack);
   const record = await recordSkyeMeritPack(env, pack, delivery);
   await audit(env, pack.email || "public", "skyemerit_pack_issued", "skyemerit_pack", pack.id, {
@@ -1189,7 +1449,7 @@ export default {
       }
 
       if (path === "/api/saas/customer-visuals") {
-        if (String(env.CUSTOMER_VISUALS_PUBLIC || "").toLowerCase() !== "true" && !auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspaceId = url.searchParams.get("workspace_id") || url.searchParams.get("workspace") || "bob-smoke-shop-preview-001";
         const visuals = await buildCustomerVisuals(env, workspaceId);
         await audit(env, workspaceId, "customer_visuals_view", "customer_visuals", workspaceId, { workspace_id: workspaceId, status: "rendered", billable: false });
@@ -1201,6 +1461,8 @@ export default {
         if (eventSecret) {
           const got = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "") || req.headers.get("x-saas-event-secret") || "";
           if (got !== eventSecret) return json({ ok: false, error: "unauthorized_action_event" }, 401);
+        } else if (!auth(req, env)) {
+          return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         }
         const b = await body(req);
         const eventId = b.event_id || id("evt");
@@ -1212,22 +1474,11 @@ export default {
       }
 
       if (path === "/api/saas/client-login" && req.method === "POST") {
-        const b = await body(req);
-        const clientId = slugify(b.client_id || b.client || "bobs-smoke-shop");
-        const client = PREVIEW_CLIENTS[clientId];
-        if (!client) return json({ ok: false, error: "client_preview_not_found" }, 404);
-        const emailIn = String(b.email || "").trim().toLowerCase();
-        const code = String(b.access_code || b.accessCode || "").trim();
-        if (emailIn !== client.email.toLowerCase() || code !== client.access_code) {
-          await audit(env, emailIn || "preview-client", "client_login_failed", "preview_client", clientId, { client_id: clientId, email: emailIn });
-          return json({ ok: false, error: "invalid_preview_access" }, 401);
-        }
-        const session = previewSession(client);
-        await audit(env, emailIn, "client_login", "preview_client", clientId, { workspace_id: client.workspace_id });
-        return json({ ok: true, session, workspace: previewPublic(client), next: `/saas/customer-dashboard.html?workspace=${client.workspace_id}` });
+        return json({ ok: false, error: "preview_auth_disabled_by_shared_gate", gate: "FS27/SkyGate/Free99" }, 410);
       }
 
       if (path === "/api/saas/client-preview") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const clientId = slugify(url.searchParams.get("client") || "bobs-smoke-shop");
         const client = PREVIEW_CLIENTS[clientId];
         if (!client) return json({ ok: false, error: "client_preview_not_found" }, 404);
@@ -1235,6 +1486,7 @@ export default {
       }
 
       if (path === "/api/saas/client-workspace/claim" && req.method === "POST") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const clientId = slugify(b.client_id || "bobs-smoke-shop");
         const client = PREVIEW_CLIENTS[clientId];
@@ -1294,7 +1546,7 @@ export default {
           return json({ ok: false, error: "signup_rate_limited", rate_limit: rateLimit, provider_delivery_suppressed: true }, 429);
         }
         const customer_id = id("cus");
-        const plan_id = b.plan_id || b.plan || "starter-command";
+        const plan_id = normalizePlanId(b.plan_id || b.plan, "starter-command");
         const customer = { id: customer_id, full_name: b.full_name || "", email: emailPolicy.email, company_name: b.company_name || "", phone: b.phone || "", plan_id, status: "intake_pending_review", created_at: now() };
         if (env.SAAS_KV) await env.SAAS_KV.put(`customer:${customer_id}`, JSON.stringify(customer));
         if (env.SAAS_DB) await env.SAAS_DB.prepare("INSERT INTO customers (id,full_name,email,company_name,phone,plan_id,status,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(customer_id, customer.full_name, customer.email, customer.company_name, customer.phone, plan_id, customer.status, customer.created_at).run();
@@ -1304,10 +1556,11 @@ export default {
       }
 
       if (path === "/api/saas/workspaces" && req.method === "POST") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const workspace_id = id("ws");
         const slug = slugify(b.company_name || b.slug || workspace_id);
-        const plan_id = b.plan_id || "starter-command";
+        const plan_id = normalizePlanId(b.plan_id, "starter-command");
         const database_lane = String(b.database_lane || b.database_provider || "citadeldb_or_neon_owner_choice").slice(0, 80);
         const vault_lane = String(b.vault_lane || b.file_storage_provider || "skyevault").slice(0, 80);
         const mail_lane = String(b.mail_lane || b.email_provider || "skyemail").slice(0, 80);
@@ -1334,6 +1587,7 @@ export default {
       }
 
       if (path === "/api/saas/skymail/status") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1348,6 +1602,7 @@ export default {
       }
 
       if (path === "/api/saas/key-card") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1362,6 +1617,7 @@ export default {
       }
 
       if (path === "/api/saas/workspace-stack") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1380,25 +1636,12 @@ export default {
       }
 
       if (path === "/api/saas/billing/checkout-session" && req.method === "POST") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
-        const plan_id = b.plan_id || "starter-command";
+        const plan_id = normalizePlanId(b.plan_id, "starter-command");
         const plan = PLANS[plan_id];
-        const prices = STRIPE_PRICES[plan_id];
-        if (!prices) {
-          if (plan?.owner_approval_required) {
-            return json({ ok: false, error: "owner_approved_plan_requires_custom_checkout", plan_id, checkout_url: plan.checkout_url, activation_path: plan.activation_path }, 409);
-          }
-          return json({ ok: false, error: `unknown_plan: ${plan_id}` }, 400);
-        }
-        const stripeSecret = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
-        if (!stripeSecret) return json({ ok: false, error: "stripe_not_configured" }, 503);
-
+        if (!plan) return json({ ok: false, error: `unknown_plan: ${plan_id}` }, 400);
         const subscription_id = id("sub");
-        const sub = { id: subscription_id, customer_id: b.customer_id || "", workspace_id: b.workspace_id || "", plan_id, provider: "stripe", provider_subscription_id: "", status: "checkout_requested", created_at: now() };
-        if (env.SAAS_KV) await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(sub));
-        if (env.SAAS_DB) await env.SAAS_DB.prepare("INSERT INTO subscriptions (id,customer_id,workspace_id,plan_id,provider,provider_subscription_id,status,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(subscription_id, sub.customer_id, sub.workspace_id, plan_id, "stripe", "", "checkout_requested", sub.created_at).run();
-        await audit(env, "system", "billing_checkout_started", "subscription", subscription_id, { plan_id, workspace_id: b.workspace_id });
-
         const baseUrl = env.SAAS_PUBLIC_URL || "https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev";
         const successUrl = `${baseUrl}/api/saas/billing/checkout-success?subscription_id=${subscription_id}&session_id={CHECKOUT_SESSION_ID}`;
         const cancelUrl = `${baseUrl}/api/saas/billing/checkout-cancel?subscription_id=${subscription_id}`;
@@ -1407,9 +1650,82 @@ export default {
           : buildSkyeMeritCheckout({
             offer: skyeMeritCheckoutOffer(plan, plan_id),
             code: b.skyemerit_code || SKYEMERIT_AUTO_CODE,
-            packId: b.skyemerit_pack_id || SKYEMERIT_FIRST_TIME_PACK_ID,
+            packId: b.skyemerit_pack_id || (String(b.skyemerit_code || "").trim().toUpperCase() === GRAYSCAPE467_CODE ? GRAYSCAPE467_PACK_ID : SKYEMERIT_FIRST_TIME_PACK_ID),
             firstTimeEligible: b.skyemerit_first_time !== false
           });
+
+        const zeroBalanceApproved = skyeMeritCheckout?.applied
+          && skyeMeritCheckout.allow_free_checkout === true
+          && Number(skyeMeritCheckout.adjusted_due_cents || 0) === 0;
+        const subStatus = zeroBalanceApproved
+          ? (plan.owner_approval_required ? "zero_balance_pending_owner_approval" : "active")
+          : "checkout_requested";
+        const sub = { id: subscription_id, customer_id: b.customer_id || "", workspace_id: b.workspace_id || "", plan_id, provider: zeroBalanceApproved ? "skyemerit_zero_balance" : "stripe", provider_subscription_id: "", status: subStatus, created_at: now() };
+        if (env.SAAS_KV) await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(sub));
+        if (env.SAAS_DB) await env.SAAS_DB.prepare("INSERT INTO subscriptions (id,customer_id,workspace_id,plan_id,provider,provider_subscription_id,status,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(subscription_id, sub.customer_id, sub.workspace_id, plan_id, sub.provider, "", subStatus, sub.created_at).run();
+        await audit(env, "system", zeroBalanceApproved ? "billing_zero_balance_started" : "billing_checkout_started", "subscription", subscription_id, { plan_id, workspace_id: b.workspace_id, skyemerit: skyeMeritCheckout, status: subStatus });
+
+        if (zeroBalanceApproved) {
+          const zeroSessionId = `skye_zero_${safeRandomUUID()}`;
+          const updated_at = now();
+          const workspaceStatus = plan.owner_approval_required ? "zero_balance_pending_owner_approval" : "active";
+          if (env.SAAS_DB) {
+            try {
+              await env.SAAS_DB.prepare("UPDATE subscriptions SET provider_subscription_id=?, status=?, updated_at=? WHERE id=?").bind(zeroSessionId, subStatus, updated_at, subscription_id).run();
+            } catch {
+              await env.SAAS_DB.prepare("UPDATE subscriptions SET provider_subscription_id=?, status=? WHERE id=?").bind(zeroSessionId, subStatus, subscription_id).run();
+            }
+            if (b.workspace_id) await env.SAAS_DB.prepare("UPDATE workspaces SET status=?, updated_at=? WHERE id=?").bind(workspaceStatus, updated_at, b.workspace_id).run();
+          }
+          if (env.SAAS_KV) {
+            const stored = await env.SAAS_KV.get(`subscription:${subscription_id}`, "json");
+            if (stored) {
+              stored.provider_subscription_id = zeroSessionId;
+              stored.status = subStatus;
+              stored.updated_at = updated_at;
+              await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(stored));
+            }
+            if (b.workspace_id) {
+              const ws = await env.SAAS_KV.get(`workspace:${b.workspace_id}`, "json");
+              if (ws) {
+                ws.status = workspaceStatus;
+                ws.owner_approval_required = plan.owner_approval_required !== false;
+                ws.updated_at = updated_at;
+                await env.SAAS_KV.put(`workspace:${b.workspace_id}`, JSON.stringify(ws));
+              }
+            }
+          }
+          if (b.workspace_id) {
+            await recordProvisioningEvent(env, b.workspace_id, "billing.zero_balance.owner_qa", {
+              subscription_id,
+              session_id: zeroSessionId,
+              plan_id,
+              amount_total: 0,
+              currency: "usd",
+              owner_approval_required: plan.owner_approval_required !== false,
+              activation_path: plan.activation_path,
+              skyemerit: skyeMeritCheckout
+            }, "pending_owner_approval");
+          }
+          await audit(env, b.customer_email || b.customer_id || "system", "billing_zero_balance_confirmed", "subscription", subscription_id, {
+            customer_id: b.customer_id || null,
+            workspace_id: b.workspace_id || null,
+            plan_id,
+            stripe_bypassed: true,
+            status: subStatus,
+            skyemerit: skyeMeritCheckout
+          });
+          await email(env, "Zero-balance owner QA checkout recorded", `<h2>Zero-balance owner QA checkout recorded</h2><p>Workspace: ${b.workspace_id || "none"}</p><p>Plan: ${plan_id}</p><p>Session: ${zeroSessionId}</p><p>SkyeMerit: ${skyeMeritCheckout.code || skyeMeritCheckout.requested_code}</p>`);
+          return json({ ok: true, zero_balance: true, subscription_id, checkout_url: successUrl.replace("{CHECKOUT_SESSION_ID}", zeroSessionId), stripe_session_id: null, session_id: zeroSessionId, payment_status: "no_payment_required", approval_status: subStatus, owner_approval_required: plan.owner_approval_required !== false, activation_path: plan.activation_path, plan_id, skyemerit: skyeMeritCheckout, persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
+        }
+
+        const prices = STRIPE_PRICES[plan_id];
+        if (!prices) {
+          if (plan?.owner_approval_required) {
+            return json({ ok: false, error: "owner_approved_plan_requires_custom_checkout", plan_id, checkout_url: plan.checkout_url, activation_path: plan.activation_path }, 409);
+          }
+          return json({ ok: false, error: `unknown_plan: ${plan_id}` }, 400);
+        }
         const params = new URLSearchParams({
           mode: "payment",
           success_url: successUrl,
@@ -1437,26 +1753,58 @@ export default {
         }
         if (b.customer_email) params.set("customer_email", b.customer_email);
 
-        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${stripeSecret}`, "Content-Type": "application/x-www-form-urlencoded" },
-          body: params.toString()
+        const runtimeSandbox = boolEnv(env.SAAS_PROVIDER_RUNTIME_SANDBOX) || boolEnv(env.ZERO_OS_PROVIDER_SANDBOX);
+        const runtimeCheckout = await runSaasProviderAction(env, {
+          provider_id: "stripe",
+          action: "stripe.checkout.create",
+          workspace_id: b.workspace_id || "",
+          customer_id: b.customer_id || "",
+          client_id: b.client_id || b.customer_id || "",
+          usage_lane: "saas:stripe_checkout",
+          live: !runtimeSandbox,
+          sandbox: runtimeSandbox,
+          payload: { params: Object.fromEntries(params.entries()) }
         });
-        const session = await stripeRes.json();
-        if (!stripeRes.ok) return json({ ok: false, error: "stripe_checkout_failed", stripe_error: session?.error?.message || session }, 502);
+        const runtimeReceipt = runtimeCheckout.response?.receipt || null;
+        if (runtimeCheckout.response?.ok !== true) {
+          return json({
+            ok: false,
+            error: runtimeReceipt?.error || "stripe_checkout_failed",
+            provider_runtime_receipt_id: runtimeReceipt?.id || null,
+            provider_runtime_status: runtimeReceipt?.status || null
+          }, runtimeReceipt?.http_status || runtimeCheckout.status || 502);
+        }
+        const session = {
+          id: runtimeReceipt.provider_result?.id,
+          url: runtimeReceipt.provider_result?.url
+        };
 
         if (env.SAAS_DB) await env.SAAS_DB.prepare("UPDATE subscriptions SET provider_subscription_id=? WHERE id=?").bind(session.id, subscription_id).run();
         if (env.SAAS_KV) {
           const s = await env.SAAS_KV.get(`subscription:${subscription_id}`, "json");
-          if (s) { s.provider_subscription_id = session.id; await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(s)); }
+          if (s) {
+            s.provider_subscription_id = session.id;
+            s.provider_runtime_receipt_id = runtimeReceipt.id;
+            s.provider_runtime_status = runtimeReceipt.status;
+            await env.SAAS_KV.put(`subscription:${subscription_id}`, JSON.stringify(s));
+          }
         }
-        return json({ ok: true, subscription_id, checkout_url: session.url, stripe_session_id: session.id, plan_id, skyemerit: skyeMeritCheckout, persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
+        await audit(env, b.customer_email || b.customer_id || "system", "billing_checkout_provider_runtime_receipted", "subscription", subscription_id, {
+          customer_id: b.customer_id || null,
+          workspace_id: b.workspace_id || null,
+          plan_id,
+          provider_runtime_receipt_id: runtimeReceipt.id,
+          provider_call_made: runtimeReceipt.provider_call_made,
+          status: runtimeReceipt.status
+        });
+        return json({ ok: true, subscription_id, checkout_url: session.url, stripe_session_id: session.id, provider_runtime_receipt_id: runtimeReceipt.id, provider_runtime_status: runtimeReceipt.status, provider_call_made: runtimeReceipt.provider_call_made, plan_id, skyemerit: skyeMeritCheckout, persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
       }
 
       if (path === "/api/saas/billing/webhook" && req.method === "POST") {
         const rawBody = await req.text();
         const sig = req.headers.get("stripe-signature") || "";
-        if (env.STRIPE_WEBHOOK_SECRET) {
+        if (!env.STRIPE_WEBHOOK_SECRET) return new Response("stripe_webhook_secret_required", { status: 503 });
+        {
           const encoder = new TextEncoder();
           const parts = sig.split(",").reduce((acc, p) => { const [k, v] = p.split("="); acc[k] = v; return acc; }, {});
           const ts = parts.t; const v1 = parts.v1;
@@ -1467,8 +1815,10 @@ export default {
           if (hex !== v1) return new Response("invalid_signature", { status: 400 });
         }
         let event; try { event = JSON.parse(rawBody); } catch { return new Response("invalid_json", { status: 400 }); }
+        const webhookObject = event.data?.object || {};
+        const providerRuntime = await mirrorSaasStripeWebhookProviderRuntime(env, event, webhookObject);
         if (event.type === "checkout.session.completed") {
-          const session = event.data?.object || {};
+          const session = webhookObject;
           const workspaceId = session.metadata?.workspace_id;
           const subscriptionId = session.metadata?.subscription_id;
           const planId = session.metadata?.plan_id || "";
@@ -1489,8 +1839,8 @@ export default {
               const ws = await env.SAAS_KV.get(`workspace:${workspaceId}`, "json");
               if (ws) { ws.status = workspaceStatus; ws.owner_approval_required = ownerApprovalRequired; ws.updated_at = updated_at; await env.SAAS_KV.put(`workspace:${workspaceId}`, JSON.stringify(ws)); }
             }
-            await audit(env, "stripe_webhook", auditAction, "workspace", workspaceId, { stripe_session_id: session.id, subscription_id: subscriptionId, plan_id: planId, owner_approval_required: ownerApprovalRequired });
-            await recordProvisioningEvent(env, workspaceId, provisioningEvent, { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency, owner_approval_required: ownerApprovalRequired, activation_path: plan?.activation_path || "paid_pending_owner_approval", skyemerit: session.metadata?.skyemerit_code ? {
+            await audit(env, "stripe_webhook", auditAction, "workspace", workspaceId, { stripe_session_id: session.id, subscription_id: subscriptionId, plan_id: planId, owner_approval_required: ownerApprovalRequired, provider_runtime: providerRuntime });
+            await recordProvisioningEvent(env, workspaceId, provisioningEvent, { stripe_session_id: session.id, amount_total: session.amount_total, currency: session.currency, owner_approval_required: ownerApprovalRequired, activation_path: plan?.activation_path || "paid_pending_owner_approval", provider_runtime: providerRuntime, skyemerit: session.metadata?.skyemerit_code ? {
               applied: session.metadata.skyemerit_applied,
               code: session.metadata.skyemerit_code,
               discount_cents: session.metadata.skyemerit_discount_cents,
@@ -1499,7 +1849,7 @@ export default {
             await email(env, ownerApprovalRequired ? "Payment confirmed — owner approval pending" : "Payment confirmed — workspace active", `<h2>Payment received</h2><p>Workspace: ${workspaceId}</p><p>Stripe session: ${session.id}</p><p>Amount: $${((session.amount_total || 0) / 100).toFixed(2)} ${(session.currency || "usd").toUpperCase()}</p><p>${ownerApprovalRequired ? "Paid status is recorded. FS27 is holding activation for owner approval." : "Workspace activation is complete."}</p>`);
           }
         }
-        return json({ received: true });
+        return json({ received: true, provider_runtime: providerRuntime });
       }
 
       if (path === "/api/saas/billing/checkout-success") {
@@ -1512,6 +1862,7 @@ export default {
       }
 
       if (path === "/api/saas/customer-command" && req.method === "POST") {
+        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const cmd_id = id("cmd");
         const omega = omegaScan(b.command_text || b.command || "");

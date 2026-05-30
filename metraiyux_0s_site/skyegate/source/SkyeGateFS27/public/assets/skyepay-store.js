@@ -2,6 +2,7 @@
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
   const params = new URLSearchParams(window.location.search);
+  const LEGAL_ACCEPTANCE_VERSION = "legal-skyes-transaction-pack-2026-05-28";
   const state = {
     clientSlug: (params.get("client") || "metraiyux-0s").trim(),
     dryRun: params.get("dry_run") === "1" || params.get("proof") === "1",
@@ -40,6 +41,24 @@
     panel.hidden = !show;
     $("#storeStatusTitle").textContent = title;
     $("#storeStatusText").textContent = text;
+  }
+
+  function legalAcceptancePayload(form, source) {
+    const accepted = Boolean(form.legal_acceptance?.checked);
+    return {
+      legal_acceptance: {
+        legal_terms_accepted: accepted,
+        arbitration_accepted: accepted,
+        payments_policy_accepted: accepted,
+        no_outcome_guarantee_accepted: accepted,
+        truthful_review_boundary_acknowledged: accepted,
+        privacy_policy_accepted: accepted,
+        legal_version: LEGAL_ACCEPTANCE_VERSION,
+        accepted_at: accepted ? new Date().toISOString() : "",
+        acceptance_surface: source,
+        source_url: window.location.href
+      }
+    };
   }
 
   function priceLine(offer) {
@@ -141,6 +160,11 @@
     if (!offer) return setStatus("No offer selected", "Choose an item from the public catalog first.");
     const form = event.currentTarget;
     const button = $("#storeCheckoutBtn");
+    if (!form.legal_acceptance?.checked) {
+      setStatus("Legal acceptance required", "Please accept the Legal Skyes transaction terms before checkout.");
+      form.legal_acceptance?.focus();
+      return;
+    }
     button.disabled = true;
     button.textContent = "Preparing Stripe...";
     setStatus("Creating checkout", "SkyePay is routing this offer through the FS27 payment gate.");
@@ -150,7 +174,8 @@
       customer_name: form.customer_name.value,
       customer_email: form.customer_email.value,
       company_name: form.company_name.value || state.client?.company_name || "",
-      dry_run: state.dryRun
+      dry_run: state.dryRun,
+      ...legalAcceptancePayload(form, "skyepay-store")
     };
     payload.idempotency_key = requestToken(payload);
     try {

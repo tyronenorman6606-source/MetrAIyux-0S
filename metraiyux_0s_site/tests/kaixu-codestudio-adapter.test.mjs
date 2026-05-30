@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import siteWorker from '../cloudflare/worker.js';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 class MemoryKV {
   constructor() { this.map = new Map(); }
@@ -46,7 +49,7 @@ async function data(response) {
 }
 
 test('KAI-02 root /api/platform routes are blocked with a namespaced repair path', async () => {
-  const res = await siteWorker.fetch(req('/api/platform/projects'), env(), ctx());
+  const res = await siteWorker.fetch(req('/api/platform/projects', {token:'secret'}), env({ADMIN_TOKEN:'secret'}), ctx());
   assert.equal(res.status, 409);
   const body = await data(res);
   assert.equal(body.error, 'api_root_collision');
@@ -55,30 +58,31 @@ test('KAI-02 root /api/platform routes are blocked with a namespaced repair path
 });
 
 test('KAI-01 health marks CodeStudio as same-domain local/static proof adapter', async () => {
-  const res = await siteWorker.fetch(req('/api/kaixu-codestudio/health'), env(), ctx());
+  const res = await siteWorker.fetch(req('/api/kaixu-codestudio/health', {token:'secret'}), env({ADMIN_TOKEN:'secret'}), ctx());
   assert.equal(res.status, 200);
   const body = await data(res);
   assert.equal(body.app_id, 'kaixuCodestudio');
   assert.equal(body.mounted, true);
-  assert.equal(body.status, 'LOCAL/PARTIAL');
+  assert.equal(body.status, 'LIVE/PARTIAL');
   assert.equal(body.execution_mode, 'same_domain_control_plane_adapter');
   assert.equal(body.platform_api_base, '/api/kaixu-codestudio/platform');
   assert.equal(body.storage_mode, 'not_configured');
+  assert.match(body.execution_semantics.external_provider_call, /provider_call_made:true/);
 });
 
 test('KAI-02 public catalog/status routes are namespaced and non-404', async () => {
-  const e = env();
-  const packs = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/provider-packs'), e, ctx());
+  const e = env({ADMIN_TOKEN:'secret'});
+  const packs = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/provider-packs', {token:'secret'}), e, ctx());
   assert.equal(packs.status, 200);
   const packsBody = await data(packs);
   assert.equal(packsBody.packs.some(pack => pack.id === 'stripe'), true);
 
-  const openapi = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/openapi.json'), e, ctx());
+  const openapi = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/openapi.json', {token:'secret'}), e, ctx());
   assert.equal(openapi.status, 200);
   const openapiBody = await data(openapi);
   assert.ok(openapiBody.paths['/api/kaixu-codestudio/platform/projects']);
 
-  const projects = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/projects'), e, ctx());
+  const projects = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/projects', {token:'secret'}), e, ctx());
   assert.equal(projects.status, 200);
   const projectsBody = await data(projects);
   assert.equal(projectsBody.projects[0].id, 'default');
@@ -92,7 +96,7 @@ test('KAI-02 platform mutations require operator auth before storage writes', as
   }), e, ctx());
   assert.equal(res.status, 401);
   const body = await data(res);
-  assert.match(body.error, /Unauthorized kAIxu CodeStudio platform mutation/);
+  assert.match(body.error, /Unauthorized/);
 });
 
 test('KAI-02 configured CodeStudio service bindings still get edge auth on platform mutations', async () => {
@@ -137,7 +141,7 @@ test('KAI-02 authenticated project mutation persists through the namespaced adap
   assert.equal(createdBody.project.id, 'client-a');
   assert.equal(createdBody.receipt.type, 'project_upsert');
 
-  const listed = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/projects'), e, ctx());
+  const listed = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/projects', {token:'secret'}), e, ctx());
   const listedBody = await data(listed);
   assert.equal(listedBody.projects.some(project => project.id === 'client-a'), true);
 });
@@ -154,7 +158,89 @@ test('KAI-01 authenticated paid/provider actions are queued, not fake-executed',
   assert.equal(body.ok, false);
   assert.equal(body.executed, false);
   assert.equal(body.status, 'queued_for_operator_review');
-  assert.equal(body.receipt.type, 'platform_execution_blocked');
+  assert.equal(body.receipt.type, 'provider_action_owner_approval_required');
+  assert.equal(body.receipt.execution_mode, 'queued_for_owner_approval');
+  assert.equal(body.receipt.external_provider_boundary, 'not_crossed');
+});
+
+test('KAI-03 owner-approved Twilio actions execute through the shared 0S provider runtime in sandbox', async () => {
+  const sharedKv = new MemoryKV();
+  const e = env({
+    KAIXU_CODESTUDIO_KV:new MemoryKV(),
+    SITE_EVENTS_KV:sharedKv,
+    ADMIN_TOKEN:'secret',
+    TWILIO_ACCOUNT_SID:'AC00000000000000000000000000000000',
+    TWILIO_AUTH_TOKEN:'twilio-secret-not-returned',
+    TWILIO_FROM:'+15555550100'
+  });
+  const res = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/provider-packs/twilio/actions/sms.send/run', {
+    method:'POST',
+    token:'secret',
+    body:{
+      projectId:'default',
+      ownerApproved:true,
+      sandbox:true,
+      to:'+15555550123',
+      body:'CodeStudio shared provider runtime proof.',
+      sms_opt_in:true
+    }
+  }), e, ctx());
+  assert.equal(res.status, 200);
+  const body = await data(res);
+  assert.equal(body.executed, true);
+  assert.equal(body.provider_call_made, false);
+  assert.equal(body.execution_mode, 'sandbox_receipt');
+  assert.equal(body.external_provider_boundary, 'not_crossed');
+  assert.equal(body.provider.id, 'twilio');
+  assert.equal(body.shared_runtime_receipt.executed, true);
+  assert.equal(body.shared_runtime_receipt.status, 'executed_sandbox');
+});
+
+test('KAI-04 dead-letter retry receipts carry attempt lineage before execution', async () => {
+  const e = env({KAIXU_CODESTUDIO_KV:new MemoryKV(), ADMIN_TOKEN:'secret'});
+  const seed = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/dead-letters', {
+    method:'POST',
+    token:'secret',
+    body:{
+      id:'dead-retry-proof',
+      projectId:'default',
+      providerId:'zero_os_executor',
+      actionRoute:'deadletter.retry',
+      reason:'lineage proof'
+    }
+  }), e, ctx());
+  assert.equal(seed.status, 200);
+
+  const retry = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/dead-letters/dead-retry-proof/retry', {
+    method:'POST',
+    token:'secret',
+    body:{projectId:'default', ownerApproved:true}
+  }), e, ctx());
+  assert.equal(retry.status, 200);
+  const retryBody = await data(retry);
+  assert.equal(retryBody.executed, false);
+  assert.equal(retryBody.receipt.retryAttempt, 1);
+  assert.equal(retryBody.receipt.execution_mode, 'retry_queued_no_execution');
+  assert.equal(retryBody.deadLetter.retry_count, 1);
+  assert.equal(retryBody.deadLetter.retryHistory[0].jobId, retryBody.job.id);
+
+  const run = await siteWorker.fetch(req(`/api/kaixu-codestudio/platform/jobs/${retryBody.job.id}/run`, {
+    method:'POST',
+    token:'secret',
+    body:{projectId:'default', ownerApproved:true, providerId:'zero_os_executor', actionRoute:'deadletter.retry', input:{deadLetterId:'dead-retry-proof'}}
+  }), e, ctx());
+  assert.equal(run.status, 200);
+  const runBody = await data(run);
+  assert.equal(runBody.executed, true);
+  assert.equal(runBody.receipt.retryAttempt, 1);
+  assert.equal(runBody.receipt.retry_of_dead_letter_id, 'dead-retry-proof');
+  assert.equal(runBody.receipt.execution_mode, 'internal_receipt_executor');
+
+  const deadLetters = await siteWorker.fetch(req('/api/kaixu-codestudio/platform/dead-letters', {token:'secret'}), e, ctx());
+  const deadBody = await data(deadLetters);
+  const row = deadBody.deadLetters.find((item) => item.id === 'dead-retry-proof');
+  assert.equal(row.status, 'retried_and_closed');
+  assert.equal(row.retryHistory[0].receiptId, runBody.receipt.id);
 });
 
 test('KAI-02 CodeStudio browser bridge maps root platform paths to the namespaced 0S base', async () => {

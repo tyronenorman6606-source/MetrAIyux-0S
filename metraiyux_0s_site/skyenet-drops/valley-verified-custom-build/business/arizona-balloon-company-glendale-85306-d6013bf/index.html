@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Balloon Company | Glendale Outdoor Advertising / Balloons</title>
+  <meta name="description" content="Arizona Balloon Company is a Valley Verified outdoor advertising / balloons profile at 4333 W. Paradise LN, Glendale, AZ 85306, highlighting Outdoor.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --paper: #fffdf8;
+      --sky: #d8f2ff;
+      --blue: #1f78d1;
+      --coral: #ff6847;
+      --gold: #f6c34f;
+      --line: rgba(23, 33, 43, .16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(90deg, rgba(31,120,209,.07) 0 1px, transparent 1px 84px),
+        linear-gradient(180deg, #f3fbff 0%, #fffdf8 52%, #ffffff 100%);
+      overflow-wrap: anywhere;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 248, .82);
+    }
+    .topbar {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+    .city { border: 1px solid var(--line); padding: 10px 12px; background: #fff; font-weight: 700; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 36px;
+      align-items: stretch;
+      padding: 56px 0 34px;
+    }
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--blue);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: .82rem;
+      letter-spacing: .12em;
+    }
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: 4rem;
+      line-height: .94;
+      letter-spacing: 0;
+    }
+    .lead {
+      max-width: 680px;
+      margin: 22px 0 0;
+      font-size: 1.14rem;
+      line-height: 1.7;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--ink);
+      background: var(--coral);
+      color: #fff;
+      padding: 12px 18px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .button.secondary { background: #fff; color: var(--ink); }
+    .signal {
+      min-height: 430px;
+      border: 2px solid var(--ink);
+      background:
+        linear-gradient(135deg, transparent 0 34%, rgba(255,104,71,.88) 34% 40%, transparent 40% 100%),
+        linear-gradient(30deg, rgba(246,195,79,.9) 0 12%, transparent 12% 100%),
+        var(--sky);
+      position: relative;
+      box-shadow: 12px 12px 0 var(--gold);
+      overflow: hidden;
+    }
+    .signal::before {
+      content: "";
+      position: absolute;
+      inset: 44px;
+      border: 2px dashed rgba(23,33,43,.45);
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.58) 0 18px, transparent 18px 34px);
+    }
+    .signal::after {
+      content: "OUTDOOR ADVERTISING / BALLOONS";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 30px;
+      padding: 18px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-align: center;
+    }
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin: 22px 0 42px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+    .fact { background: #fff; padding: 20px; min-height: 126px; }
+    .label { margin: 0 0 8px; font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: #5a6671; font-weight: 800; }
+    .value { margin: 0; font-size: 1.02rem; line-height: 1.45; font-weight: 700; }
+    .section {
+      display: grid;
+      grid-template-columns: .78fr 1.22fr;
+      gap: 34px;
+      padding: 38px 0 58px;
+      border-top: 1px solid var(--line);
+    }
+    h2 { margin: 0; font-size: 2rem; line-height: 1; }
+    .copy { margin: 0; font-size: 1rem; line-height: 1.75; }
+    .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .tag { border: 1px solid var(--line); padding: 9px 11px; background: #fff; font-weight: 700; }
+    footer { border-top: 1px solid var(--line); padding: 24px 0; color: #5a6671; font-size: .9rem; }
+    @media (max-width: 820px) {
+      .hero, .section { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2.7rem; }
+      .signal { min-height: 300px; box-shadow: 7px 7px 0 var(--gold); }
+    }
+    @media (max-width: 520px) {
+      .topbar, .actions { align-items: stretch; flex-direction: column; }
+      .facts { grid-template-columns: 1fr; }
+      h1 { font-size: 2.2rem; }
+      .signal::after { font-size: .82rem; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div class="brand">Valley Verified</div>
+      <div class="city">Glendale, AZ 85306</div>
+    </div>
+  </header>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Creative Services / Outdoor Advertising</p>
+        <h1>Arizona Balloon Company</h1>
+        <p class="lead">Arizona Balloon Company gives local customers, Valley residents, and business clients a practical Glendale connection for Outdoor Advertising / Balloons, Advertising &amp; Media / Outdoor Advertising / Balloons, Advertising &amp; Media, and Creative / Media Services. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+        <div class="actions">
+          <a class="button" href="tel:+16029383550">Call (602) 938-3550</a>
+          <a class="button secondary" href="https://business.phoenixchamber.com/list/ql/advertising-media-1">Public category evidence</a>
+        </div>
+      </div>
+      <div class="signal" aria-hidden="true"></div>
+    </section>
+    <section class="wrap facts" aria-label="Local details">
+      <div class="fact"><p class="label">Category</p><p class="value">Creative Services</p></div>
+      <div class="fact"><p class="label">Niche</p><p class="value">Outdoor Advertising / Balloons</p></div>
+      <div class="fact"><p class="label">Address</p><p class="value">4333 W. Paradise LN, Glendale, AZ 85306</p></div>
+      <div class="fact"><p class="label">Directory Date</p><p class="value">May 19, 2026</p></div>
+    </section>
+    <section class="wrap section">
+      <h2>Public Listing Notes</h2>
+      <div>
+        <p class="copy">Arizona Balloon Company appears in the Valley Verified Network as a public business profile for advertising and media work in Glendale. Contact the provider directly for availability, scope, and pricing.</p>
+        <div class="tags" aria-label="Business tags">
+          <span class="tag">Advertising &amp; Media</span>
+          <span class="tag">Local service business</span>
+          <span class="tag">English</span>
+          <span class="tag">Contact for quote</span>
+        </div>
+      </div>
+    </section>
+  </main>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-arizona-balloon-company-glendale-85306-d6013bf">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-arizona-balloon-company-glendale-85306-d6013bf">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Arizona Balloon Company earns this Valley Verified placement because public business evidence connects a real outdoor advertising / balloons operation to 4333 W. Paradise LN, Glendale, AZ 85306 and (602) 938-3550. Greater Phoenix Chamber directory evidence supports this local profile. For local customers, Valley residents, and business clients, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Outdoor Advertising / Balloons, Advertising &amp; Media / Outdoor Advertising / Balloons, Advertising &amp; Media, and Creative / Media Services</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>local customers, Valley residents, and business clients</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>4333 W. Paradise LN, Glendale, AZ 85306; (602) 938-3550</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+  <footer><div class="vv-footer-inner">Arizona Balloon Company in Glendale - Valley Verified local business profile.</div></footer>
+</body>
+</html>

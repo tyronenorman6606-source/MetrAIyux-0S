@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const failures = [];
-const generatedPages = ["index.html","dashboard.html","workflows.html","records.html","proof.html","runtime.html","settings.html"];
+const removedPages = ["app.html","dashboard.html","workflows.html","records.html","proof.html","runtime.html","settings.html","platform.js","platform.css"];
 
 async function exists(filePath) {
   try {
@@ -28,18 +28,21 @@ async function walk(dir, files = []) {
 
 const allFiles = await walk(root);
 const htmlPages = allFiles.filter((file) => file.endsWith('.html')).map((file) => path.relative(root, file).replaceAll(path.sep, '/'));
-if (htmlPages.length < 8) failures.push('expected at least 8 html routes, found ' + htmlPages.length);
+if (!htmlPages.includes('index.html')) failures.push('index.html missing');
 
-for (const page of generatedPages) {
-  if (true) {
-    const html = await fs.readFile(path.join(root, page), 'utf8').catch(() => '');
-    if (!html.includes("data-platform-hardening=\"p1-routed\"")) failures.push(page + ' missing routed platform marker');
-  }
+const indexHtml = await fs.readFile(path.join(root, 'index.html'), 'utf8').catch(() => '');
+if (!indexHtml.includes('data-platform-hardening="single-canonical-real-platform"')) failures.push('index.html missing single canonical platform marker');
+if (!indexHtml.includes('platformCommand')) failures.push('index.html missing real platform command strip');
+if (!indexHtml.includes('runtimeLaneStatus')) failures.push('index.html missing runtime lane status');
+if (!indexHtml.includes('intakeForm')) failures.push('index.html missing intake form');
+if (indexHtml.includes('Open Imported App') || indexHtml.includes('href="./app.html"')) failures.push('index.html still links to removed imported app');
+
+for (const page of removedPages) {
+  if (await exists(path.join(root, page))) failures.push(page + ' should not exist on the canonical platform');
 }
 
 for (const required of [
   'PLATFORM_TRUTH.json',
-  'assets/platform-mark.svg',
   'docs/PLATFORM_STATUS.md',
   'src/runtime-contract.json',
 ]) {
@@ -51,4 +54,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('AE-FlowPro P1 fix smoke passed: ' + htmlPages.length + ' routes checked.');
+console.log('AE-FlowPro single-platform smoke passed: canonical index checked and duplicate entrypoints absent.');

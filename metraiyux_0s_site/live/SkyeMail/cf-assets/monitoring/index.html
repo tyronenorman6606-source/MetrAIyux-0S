@@ -6,7 +6,7 @@
   <script defer src="/assets/app.js"></script>
   <script defer src="/assets/mail-ui.js"></script>
   <link rel="stylesheet" href="/assets/mail-ui.css" />
-  <title>Monitoring — SkyeMail Vault</title>
+  <title>Monitoring — SkyeMail Citadel</title>
 </head>
 <body data-page-id="monitoring" data-page-name="Monitoring" data-page-hint="Delivery and webhook operations">
 <div class="wrap">
@@ -16,9 +16,9 @@
     <main class="main">
       <section class="hero">
         <section class="card">
-          <div class="badge" id="monitoringBadge">Checking provider health…</div>
+          <div class="badge" id="monitoringBadge">Checking Citadel mail lane health...</div>
           <h1 class="h1">Monitoring</h1>
-          <p class="sub">Resend lifecycle events, inbound webhook processing, and delivery health for the connected mailbox.</p>
+          <p class="sub">Citadel lifecycle events, inbound webhook processing, and delivery health for the connected mailbox.</p>
           <div class="btnrow">
             <button class="btn gold" id="refreshMonitoringBtn" type="button">Refresh</button>
             <a class="btn" href="dashboard.html">Inbox</a>
@@ -37,7 +37,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Delivery Summary</h2>
-            <div class="mini">Last 30 days of Resend events stored by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span>.</div>
+            <div class="mini">Last 30 days of Citadel events stored by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span>.</div>
           </div>
           <div class="mini" id="summaryStatus">Waiting for event load…</div>
         </div>
@@ -58,7 +58,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Webhook Processing</h2>
-            <div class="mini">Signed Resend webhook attempts processed by the backend.</div>
+            <div class="mini">Signed Citadel webhook attempts processed by the backend.</div>
           </div>
         </div>
         <div class="mailtable" id="webhookEvents"><div class="empty">Loading webhook events…</div></div>

@@ -2,6 +2,7 @@ const stateChangingMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 export function createSecurity({ env = process.env, nowMs = () => Date.now() } = {}) {
   const isProduction = env.NODE_ENV === 'production';
+  const sharedGateRequired = env.ZERO_OS_SHARED_GATE_REQUIRED === '1' || env.SKYE_SHARED_GATE_REQUIRED === '1' || env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN;
   const requireCsrf = env.SKYE_REQUIRE_CSRF === '1' || isProduction;
   const maxBodyBytes = Number(env.MAX_BODY_BYTES || 1024 * 1024);
   const rateLimitWindowMs = Number(env.RATE_LIMIT_WINDOW_MS || 60_000);
@@ -18,7 +19,7 @@ export function createSecurity({ env = process.env, nowMs = () => Date.now() } =
       runtime: ['standalone-local-events', 'standalone']
     };
     const checks = [
-      { name: 'admin_bootstrap_configured', ok: !!String(env.SKYE_ADMIN_EMAIL || '').trim() && !!String(env.SKYE_ADMIN_PASSWORD || '').trim(), required: isProduction, detail: 'SKYE_ADMIN_EMAIL and SKYE_ADMIN_PASSWORD must be configured in production.' },
+      { name: 'shared_gate_required', ok: !!sharedGateRequired, required: isProduction, detail: 'Production SkyeRouteX must use the shared FS27/SkyGate/Free99 gate instead of SKYE_ADMIN_EMAIL/SKYE_ADMIN_PASSWORD.' },
       { name: 'csrf_required', ok: requireCsrf, required: isProduction, detail: 'SKYE_REQUIRE_CSRF=1 is required in production.' },
       { name: 'body_limit_configured', ok: maxBodyBytes > 0 && maxBodyBytes <= 2 * 1024 * 1024, required: isProduction, detail: 'MAX_BODY_BYTES must be configured at or below 2MB.' },
       { name: 'rate_limit_configured', ok: rateLimitMax > 0 && rateLimitWindowMs > 0, required: isProduction, detail: 'RATE_LIMIT_MAX and RATE_LIMIT_WINDOW_MS must be positive.' },

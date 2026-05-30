@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import siteWorker from '../cloudflare/worker.js';
+import { webcrypto } from 'node:crypto';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+const siteWorker = (await import('../cloudflare/worker.js')).default;
 
 const OWNER_CODE = 'owner-code';
 const RELAY_ADMIN = 'relay-admin-token-long-enough-for-tests';
@@ -72,32 +75,32 @@ function relay13Binding(calls) {
         body
       });
 
-      if (url.pathname === '/api/v1/conversations' && request.method === 'POST' && !request.headers.get('x-relay13-api-key')) {
+      const isRelayAdmin = request.headers.get('authorization') === `Bearer ${RELAY_ADMIN}`;
+      if (url.pathname === '/api/v1/conversations' && request.method === 'POST' && isRelayAdmin) {
+        return Response.json({ ok: false, error: 'Invalid or revoked API key' }, { status: 401 });
+      }
+      if (url.pathname === '/api/v1/conversations' && request.method === 'POST' && !request.headers.get('x-relay13-api-key') && !body.workspace_id) {
         return Response.json({ ok: false, error: 'Valid workspace or API key required' }, { status: 401 });
       }
       if (url.pathname === '/api/admin/workspaces' && request.method === 'GET') {
         return Response.json({ ok: true, workspaces: [{ id: 'ws_0s', slug: 'connectlog-main', name: 'ConnectLog Main' }] });
       }
-      if (url.pathname === '/api/admin/api-keys' && request.method === 'POST') {
+      if (url.pathname === '/api/admin/workspaces' && request.method === 'POST') {
         return Response.json({
           ok: true,
-          api_key: {
-            id: 'key_founder',
-            key: 'r13_live_founder_test_key',
-            key_prefix: 'r13_live_founder',
-            scopes: body.scopes || []
+          workspace: {
+            id: `ws_${body.slug}`,
+            slug: body.slug,
+            name: body.name || body.slug
           }
         }, { status: 201 });
-      }
-      if (url.pathname === '/api/admin/api-keys/key_founder/revoke' && request.method === 'POST') {
-        return Response.json({ ok: true, revoked: true });
       }
       if (url.pathname === '/api/v1/conversations' && request.method === 'POST') {
         return Response.json({
           ok: true,
           conversation_id: 'conv_founder',
           visitor_token: 'secret-visitor-token',
-          workspace_id: 'ws_0s',
+          workspace_id: body.workspace_id || 'ws_0s',
           bridge: 'connectlog',
           guardrail: { decision: 'allow' }
         }, { status: 201 });
@@ -147,7 +150,7 @@ function env(calls = [], queueItems = []) {
   };
 }
 
-test('Founder Command creates a real Relay13 conversation through a short-lived scoped key', async () => {
+test('Founder Command creates a real Relay13 conversation through the shared admin bridge', async () => {
   const calls = [];
   const queueItems = [];
   const e = env(calls, queueItems);
@@ -164,18 +167,47 @@ test('Founder Command creates a real Relay13 conversation through a short-lived 
   assert.equal(body.ok, true);
   assert.equal(body.relay13.conversation_id, 'conv_founder');
   assert.equal(body.relay13.visitor_token_present, true);
+  assert.equal(body.record.provider_runtime.status, 'executed_sandbox');
+  assert.ok(body.record.provider_runtime.receipt_id);
+  assert.equal(body.record.provider_runtime.provider_call_made, false);
+  assert.equal(body.record.provider_runtime.callback?.provider_callback_call_made, true);
+  assert.equal(body.record.provider_runtime.callback?.callback_status, 'relay13_created');
   assert.equal(JSON.stringify(body).includes('secret-visitor-token'), false);
-  assert.equal(JSON.stringify(body).includes('r13_live_founder_test_key'), false);
+  assert.equal(JSON.stringify(body).includes(RELAY_ADMIN), false);
   assert.deepEqual(calls.map(call => `${call.method} ${call.path}`), [
     'POST /api/v1/conversations',
     'GET /api/admin/workspaces',
-    'POST /api/admin/api-keys',
-    'POST /api/v1/conversations',
-    'POST /api/admin/api-keys/key_founder/revoke'
+    'POST /api/v1/conversations'
   ]);
   assert.equal(calls[1].authorization, `Bearer ${RELAY_ADMIN}`);
-  assert.equal(calls[3].apiKey, 'r13_live_founder_test_key');
+  assert.equal(calls[2].authorization, '');
+  assert.equal(calls[2].apiKey, '');
+  assert.equal(calls[2].body.workspace_id, 'ws_0s');
   assert.equal(queueItems.length, 1);
+});
+
+test('Founder Command keeps Relay13 client inboxes separated by exact workspace id', async () => {
+  const calls = [];
+  const e = env(calls);
+  const c = ctx();
+  const res = await siteWorker.fetch(req('/api/founder-command/inbox/conversations', {
+    method: 'POST',
+    headers: AUTH_HEADERS,
+    body: { workspace: 'client alpha', subject: 'Client Alpha support', message: 'Open a separate client inbox' }
+  }), e, c);
+  const body = await res.json();
+  await Promise.all(c.pending);
+
+  assert.equal(res.status, 201);
+  assert.equal(body.ok, true);
+  const createdWorkspace = calls.find(call => call.method === 'POST' && call.path === '/api/admin/workspaces');
+  assert.equal(createdWorkspace.body.slug, 'client-alpha');
+  const conversationCreate = calls.filter(call => call.method === 'POST' && call.path === '/api/v1/conversations').at(-1);
+  assert.equal(conversationCreate.authorization, '');
+  assert.equal(conversationCreate.apiKey, '');
+  assert.equal(conversationCreate.body.workspace_id, 'ws_client-alpha');
+  assert.equal(conversationCreate.body.workspace, 'client-alpha');
+  assert.notEqual(conversationCreate.body.workspace_id, 'ws_0s');
 });
 
 test('Founder Command reads Relay13 inbox and sends an operator reply', async () => {
@@ -201,6 +233,11 @@ test('Founder Command reads Relay13 inbox and sends an operator reply', async ()
   assert.equal(reply.status, 201);
   assert.equal(replyBody.ok, true);
   assert.equal(replyBody.message.id, 'msg_2');
+  assert.equal(replyBody.record.provider_runtime.status, 'executed_sandbox');
+  assert.ok(replyBody.record.provider_runtime.receipt_id);
+  assert.equal(replyBody.record.provider_runtime.provider_call_made, false);
+  assert.equal(replyBody.record.provider_runtime.callback?.provider_callback_call_made, true);
+  assert.equal(replyBody.record.provider_runtime.callback?.callback_status, 'relay13_message_sent');
   assert.equal(calls.at(-1).authorization, `Bearer ${RELAY_ADMIN}`);
 });
 

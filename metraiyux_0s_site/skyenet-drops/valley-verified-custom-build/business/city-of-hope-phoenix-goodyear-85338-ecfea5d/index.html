@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>City of Hope - Phoenix | Cancer Treatment Center in Goodyear</title>
+  <meta name="description" content="City of Hope - Phoenix in Goodyear, AZ is listed as a cancer treatment center at 14200 W. Celebrate Life Way with public phone (623) 207-3000.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #101927;
+      --muted: #5a6472;
+      --navy: #183866;
+      --aqua: #2c8a9a;
+      --gold: #d7a03d;
+      --paper: #fbfcff;
+      --soft: #edf6f7;
+      --line: rgba(16, 25, 39, .14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(44, 138, 154, .12), transparent 34%),
+        linear-gradient(90deg, transparent 0 50%, rgba(215, 160, 61, .12) 50% 100%),
+        var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 26px 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--navy);
+      font-weight: 800;
+    }
+
+    .lockup img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(320px, 1.05fr);
+      gap: 30px;
+      min-height: 74vh;
+      align-items: center;
+      padding: 28px 0 56px;
+    }
+
+    .copy {
+      padding-right: 12px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--aqua);
+      font-weight: 800;
+      font-size: .86rem;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 20px 0 0;
+      font-size: 4.25rem;
+      line-height: .98;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 650px;
+      margin: 22px 0 0;
+      color: #344154;
+      font-size: 1.24rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--navy);
+      text-decoration: none;
+      font-weight: 800;
+      background: white;
+      color: var(--navy);
+    }
+
+    .button.primary {
+      background: var(--navy);
+      color: white;
+    }
+
+    .campus {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(155deg, rgba(24, 56, 102, .94), rgba(44, 138, 154, .88)),
+        var(--navy);
+      color: white;
+      overflow: hidden;
+    }
+
+    .campus-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 28px;
+    }
+
+    .campus img {
+      width: 74px;
+      height: 74px;
+      padding: 8px;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .map-lines {
+      margin: 12px 28px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      min-height: 250px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, .11) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, .11) 1px, transparent 1px);
+      background-size: 20% 25%;
+    }
+
+    .pin {
+      grid-column: 4;
+      grid-row: 2;
+      align-self: center;
+      justify-self: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 10px solid rgba(255, 255, 255, .7);
+    }
+
+    .campus-bottom {
+      padding: 24px 28px 28px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .campus-bottom strong {
+      font-size: 1.45rem;
+      letter-spacing: 0;
+    }
+
+    .campus-bottom span {
+      color: rgba(255, 255, 255, .82);
+      line-height: 1.45;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding-bottom: 58px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      padding: 22px;
+      min-height: 170px;
+    }
+
+    .label {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      margin: 0;
+      color: #334154;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .topline,
+      .hero,
+      .details {
+        grid-template-columns: 1fr;
+      }
+
+      .hero { min-height: auto; }
+      .campus { min-height: 420px; }
+      h1 { font-size: 3.05rem; }
+    }
+
+    @media (max-width: 520px) {
+      h1 { font-size: 2.35rem; }
+      .lead { font-size: 1.06rem; }
+      .topline { align-items: flex-start; flex-direction: column; }
+      .campus-top { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <header class="topline">
+        <div class="lockup">
+          <img src="assets/logo.svg" alt="City of Hope - Phoenix mark">
+          <span>City of Hope - Phoenix</span>
+        </div>
+        <span>Valley Verified Health And Care</span>
+      </header>
+
+      <section class="hero" aria-labelledby="business-name">
+        <div class="copy">
+          <div class="eyebrow">Health And Care / Cancer Treatment Center</div>
+          <h1 id="business-name">City of Hope - Phoenix in Goodyear.</h1>
+          <p class="lead">City of Hope - Phoenix gives West Valley patients and families a cancer treatment center contact at 14200 W. Celebrate Life Way in Goodyear.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+16232073000">Call (623) 207-3000</a>
+            <a class="button" href="https://cancercenter.com">Visit website</a>
+          </div>
+        </div>
+
+        <aside class="campus" aria-label="Goodyear listing panel">
+          <div class="campus-top">
+            <img src="assets/logo.svg" alt="">
+            <span>Health care profile</span>
+          </div>
+          <div class="map-lines" aria-hidden="true">
+            <div class="pin"></div>
+          </div>
+          <div class="campus-bottom">
+            <strong>14200 W. Celebrate Life Way</strong>
+            <span>Goodyear, AZ 85338-3005</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="details" aria-label="Business facts">
+        <article class="card">
+          <span class="label">Public Source</span>
+          <p><a href="https://business.phoenixchamber.com/list/ql/health-care-11">Phoenix Chamber health care profile</a></p>
+        </article>
+        <article class="card">
+          <span class="label">Audience</span>
+          <p>Patients, families seeking care, and Phoenix-area residents.</p>
+        </article>
+        <article class="card">
+          <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+          <p>City of Hope - Phoenix belongs in Valley Verified because the research identifies a specific cancer treatment center address in Goodyear, a public phone number, health-care category evidence, and a Chamber source. For families navigating care options, those grounded facts matter: place, contact route, service class, and local West Valley context.</p>
+        </article>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

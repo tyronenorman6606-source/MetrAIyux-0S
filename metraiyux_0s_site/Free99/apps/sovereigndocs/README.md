@@ -2,7 +2,7 @@
 
 SovereignDocs v20 is the current governed document automation platform. It includes the public website refresh, source-truth template library, guided builders, case workflows, template governance, partner review routing, SkyeDocxMax-powered document editing, branded exports, workspace/vault surfaces, audit events, and upstream-gateway session enforcement.
 
-It keeps the v2.1 source-truth template library, governed publish lanes, official-source workflow routing, legal-partner review submissions, business formation/compliance workflows, order tracking, DOCX export in API mode, append-only audit events, signed upstream session support, bundled SkyeDocxMax runtime integration, end-to-end case workflows, and case operations.
+It keeps the v2.1 source-truth template library, governed publish lanes, official-source workflow routing, legal-partner review submissions, business formation/compliance workflows, order tracking, DOCX export in API mode, append-only audit events, signed upstream session support, canonical 0S SkyeDocxMax integration, end-to-end case workflows, and case operations.
 
 The current package layers v20 website and public-copy cleanup on top of the v18/v19 workflow engine: modular route ownership, tenant-scoped case/state/update/notes/artifacts/closure endpoints, role-aware closure dashboards, SkyeDocxMax case launch and return-to-case reconciliation, workflow anchors/return contracts, premium workflow surfaces, and E2E proof that verifies cross-tenant case access is blocked.
 
@@ -11,7 +11,7 @@ SovereignDocs is not a law firm, does not provide legal advice, does not guarant
 ## Run
 
 ```bash
-npm start
+npm run 0s:worker:dev
 ```
 
 Open:
@@ -30,7 +30,7 @@ http://localhost:8787
 - `/reviewer-notes/`
 - `/case-export/`
 - `/work-queues/`
-- `/skye-docx-max/`
+- `/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs`
 - `/partner-workbench/`
 - `/customer-dashboard/`
 

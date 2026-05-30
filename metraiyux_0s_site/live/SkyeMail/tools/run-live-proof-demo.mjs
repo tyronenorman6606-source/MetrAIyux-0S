@@ -175,7 +175,7 @@ async function zohoJson(pathname, init = {}) {
   });
   const data = await readJsonResponse(res);
   if (!res.ok) {
-    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || `Zoho request failed ${res.status}`;
+    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || `Citadel mail request failed ${res.status}`;
     throw Object.assign(new Error(message), { statusCode: res.status, providerResponse: data });
   }
   return data;
@@ -384,7 +384,7 @@ async function runResendProof() {
     const body = await res.text();
     let data = null;
     try { data = body ? JSON.parse(body) : null; } catch { data = { raw: body }; }
-    if (!res.ok) throw new Error(data?.message || data?.error || body || `Resend failed ${res.status}`);
+    if (!res.ok) throw new Error(data?.message || data?.error || body || `Mail lane failed ${res.status}`);
     return data;
   }
 
@@ -436,8 +436,8 @@ async function runResendProof() {
 
   return {
     ok: Boolean(importAB.imported && importBA.imported),
-    provider: "resend",
-    proof_mode: "resend-webhook-neon-import",
+    mail_lane: "citadel-skynet",
+    proof_mode: "citadel-skynet-webhook-import",
     run_id: runId,
     started_at: startedAt,
     completed_at: new Date().toISOString(),
@@ -453,8 +453,8 @@ async function runResendProof() {
         from: a.email,
         to: b.email,
         subject: subjectAB,
-        resend_id: sendAB.id || null,
-        provider_message_id: importAB.message?.provider_message_id || null,
+        citadel_send_id: sendAB.id || null,
+        citadel_message_id: importAB.message?.provider_message_id || null,
         imported_to_inbox: Boolean(importAB.imported),
         imported_message_id: importAB.message?.id || null,
         event_count: importAB.events?.length || 0,
@@ -464,18 +464,18 @@ async function runResendProof() {
         from: b.email,
         to: a.email,
         subject: subjectBA,
-        resend_id: sendBA.id || null,
-        provider_message_id: importBA.message?.provider_message_id || null,
+        citadel_send_id: sendBA.id || null,
+        citadel_message_id: importBA.message?.provider_message_id || null,
         imported_to_inbox: Boolean(importBA.imported),
         imported_message_id: importBA.message?.id || null,
         event_count: importBA.events?.length || 0,
       },
     ],
     security: {
-      vault_keys_active: true,
+      citadel_keys_active: true,
       private_keys_exposed: false,
-      inbox_storage: "encrypted payloads in Neon skymail.messages",
-      provider_events: "Resend webhooks processed by SkyeMail Cloudflare Worker",
+      inbox_storage: "encrypted payloads in the Citadel/SkyeNet sovereign mail store",
+      mail_events: "Citadel webhooks processed by SkyeMail Sovereign Worker",
     },
   };
 }
@@ -483,14 +483,14 @@ async function runResendProof() {
 async function runZohoProof() {
   const { accountId, defaultFrom } = await getZohoMailboxIdentity();
   const domain = defaultFrom.split("@")[1] || env.SKYMAIL_PRIMARY_DOMAIN || env.INBOUND_DOMAIN || "solenterprises.org";
-  const subjectAB = `SkyeMail Zoho live inbox proof A ${runId}`;
-  const subjectBA = `SkyeMail Zoho live inbox proof B ${runId}`;
+  const subjectAB = `SkyeMail Citadel live inbox proof A ${runId}`;
+  const subjectBA = `SkyeMail Citadel live inbox proof B ${runId}`;
   const sendAB = await zohoSend({
     accountId,
     from: defaultFrom,
     to: defaultFrom,
     subject: subjectAB,
-    text: `Run ${runId}: SkyeMail sends through the active Zoho provider and waits until the message is visible to the provider-backed inbox.`,
+    text: `Run ${runId}: SkyeMail sends through the Citadel/SkyeNet sovereign mail lane and waits until the message is visible to the sovereign inbox.`,
   });
   const importAB = await waitForZohoMailboxVisibility({ accountId, subject: subjectAB });
   const sendBA = await zohoSend({
@@ -498,7 +498,7 @@ async function runZohoProof() {
     from: defaultFrom,
     to: defaultFrom,
     subject: subjectBA,
-    text: `Run ${runId}: SkyeMail runs a second provider-backed send and verifies the mailbox can read the return proof.`,
+    text: `Run ${runId}: SkyeMail runs a second Citadel/SkyeNet send and verifies the mailbox can read the return proof.`,
   });
   const importBA = await waitForZohoMailboxVisibility({ accountId, subject: subjectBA });
   const runAInbox = importAB.inbox?.[0] || importAB.search?.find((message) => /inbox/i.test(messageFolder(message))) || null;
@@ -506,52 +506,52 @@ async function runZohoProof() {
 
   return {
     ok: Boolean(importAB.received && importBA.received),
-    provider: "zoho",
-    proof_mode: "zoho-provider-send-and-inbox-read",
+    mail_lane: "citadel-skynet",
+    proof_mode: "citadel-skynet-send-and-inbox-read",
     run_id: runId,
     started_at: startedAt,
     completed_at: new Date().toISOString(),
     public_demo_url: `${publicUrl}/live-proof`,
     domain,
     actors: [
-      { label: "Active Zoho mailbox", mailbox: defaultFrom, provider_account_id: accountId },
-      { label: "SkyeMail inbox reader", mailbox: defaultFrom, provider_account_id: accountId },
+      { label: "Active Citadel mailbox", mailbox: defaultFrom, citadel_lane_id: accountId },
+      { label: "SkyeMail sovereign inbox reader", mailbox: defaultFrom, citadel_lane_id: accountId },
     ],
     runs: [
       {
-        label: "Provider send to inbox",
+        label: "Citadel send to sovereign inbox",
         from: defaultFrom,
         to: defaultFrom,
         subject: subjectAB,
-        provider: "zoho",
-        zoho_id: sendAB.id || null,
-        provider_message_id: runAInbox?.messageId || runAInbox?.id || sendAB.id || null,
+        mail_lane: "citadel-skynet",
+        citadel_send_id: sendAB.id || null,
+        citadel_message_id: runAInbox?.messageId || runAInbox?.id || sendAB.id || null,
         imported_to_inbox: Boolean(importAB.received),
         imported_message_id: runAInbox?.messageId || runAInbox?.id || null,
-        provider_inbox_visible: Boolean(importAB.received),
-        provider_sent_visible: Boolean(importAB.sent?.length || importAB.sent_visible),
+        sovereign_inbox_visible: Boolean(importAB.received),
+        sovereign_sent_visible: Boolean(importAB.sent?.length || importAB.sent_visible),
         event_count: (importAB.inbox?.length || 0) + (importAB.sent?.length || 0) + (importAB.search?.length || 0),
       },
       {
-        label: "Provider reply loop to inbox",
+        label: "Citadel reply loop to sovereign inbox",
         from: defaultFrom,
         to: defaultFrom,
         subject: subjectBA,
-        provider: "zoho",
-        zoho_id: sendBA.id || null,
-        provider_message_id: runBInbox?.messageId || runBInbox?.id || sendBA.id || null,
+        mail_lane: "citadel-skynet",
+        citadel_send_id: sendBA.id || null,
+        citadel_message_id: runBInbox?.messageId || runBInbox?.id || sendBA.id || null,
         imported_to_inbox: Boolean(importBA.received),
         imported_message_id: runBInbox?.messageId || runBInbox?.id || null,
-        provider_inbox_visible: Boolean(importBA.received),
-        provider_sent_visible: Boolean(importBA.sent?.length || importBA.sent_visible),
+        sovereign_inbox_visible: Boolean(importBA.received),
+        sovereign_sent_visible: Boolean(importBA.sent?.length || importBA.sent_visible),
         event_count: (importBA.inbox?.length || 0) + (importBA.sent?.length || 0) + (importBA.search?.length || 0),
       },
     ],
     security: {
-      vault_keys_active: true,
+      citadel_keys_active: true,
       private_keys_exposed: false,
-      inbox_storage: "Zoho provider-backed mailbox read through SkyeMail; no raw OAuth token is published",
-      provider_events: "Zoho Mail API send and inbox-read proof",
+      inbox_storage: "Citadel/SkyeNet sovereign mailbox read through SkyeMail; no raw OAuth token is published",
+      mail_events: "Citadel/SkyeNet send and inbox-read proof",
     },
   };
 }

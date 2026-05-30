@@ -1,0 +1,454 @@
+{
+  "schema": "metraiyux-0s-platform-surface-pricing-registry-v1",
+  "generated_at": "2026-05-24",
+  "source_of_truth": "Built from the 0S upscale handoff and current sales/router/proof surfaces. Keep this file aligned with pricing-offer-router.html, brain/sales-offer-registry.json, data/plans.json, and live proof receipts.",
+  "valuation_source_of_truth": "../data/valuation-source-of-truth.json",
+  "status_legend": {
+    "live_proven": "Live route or platform has production proof receipts in the repo.",
+    "local_proven": "Local smoke/proof exists; deploy or live browser proof may still be needed.",
+    "provider_gated": "Core scaffold exists but provider credentials, customer connected accounts, or secrets are required before live claims.",
+    "scaffolded": "Initial surface/API/doc scaffold exists and needs deeper proof before selling as complete.",
+    "quote_only": "Do not create checkout without owner-approved scope.",
+    "not_ready": "Do not sell as live."
+  },
+  "groups": [
+    {
+      "id": "core_0s",
+      "label": "Core 0S",
+      "description": "Primary operating system, gate, SaaS plans, signup, billing, and owner command surfaces.",
+      "items": [
+        {
+          "id": "starter-command",
+          "name": "Starter Command",
+          "route": "../saas/signup.html?plan=starter-command",
+          "api_route": "/api/saas",
+          "price": "$397/mo + $1,500 setup",
+          "status": "live_proven",
+          "proof": ["npm run 0s:connectlog-relay13:prod-proof", "npm run proof:skyepay"],
+          "boundary": "1 workspace, 25,000 AI credits, Free99 apps, ConnectLog/Relay13 ready; provider usage and AI beyond plan caps are paid."
+        },
+        {
+          "id": "growth-cabinet",
+          "name": "Growth Cabinet",
+          "route": "../saas/signup.html?plan=growth-cabinet",
+          "api_route": "/api/saas",
+          "price": "$997/mo + $3,500 setup",
+          "status": "live_proven",
+          "proof": ["npm run proof:skyepay", "npm run 0s:skyemerit:proof"],
+          "boundary": "3 workspaces, 75,000 AI credits, weekly cabinet review, HouseOperations workspace, Relay13 workspace."
+        },
+        {
+          "id": "routex-workforce-command",
+          "name": "RouteX Workforce Command",
+          "route": "../SkyeRouteX/workforce-command-v0.4.0/index.html",
+          "api_route": "/api/routex",
+          "price": "$1,497/mo + $6,500 setup",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyeroutex:v04", "npm run 0s:skyeroutex:stress"],
+          "boundary": "Workforce command and proof vault lane. Live dispatch, provider actions, and compliance claims need customer-specific proof."
+        },
+        {
+          "id": "autonomous-office",
+          "name": "Autonomous Office",
+          "route": "../saas/signup.html?plan=autonomous-office",
+          "api_route": "/api/saas",
+          "price": "$2,497/mo + $7,500 setup",
+          "status": "live_proven",
+          "proof": ["npm run proof:skyepay"],
+          "boundary": "Managed office lane with approvals, digests, relationship intelligence, HouseOps, SkyeBox, and Relay13 handoff."
+        },
+        {
+          "id": "enterprise-managed-gate",
+          "name": "Enterprise / Managed Gate",
+          "route": "../saas/signup.html?plan=enterprise-command",
+          "api_route": "/api/saas",
+          "price": "$3,997/mo + $15,000 setup",
+          "status": "quote_only",
+          "proof": ["npm run proof:key-gate-13th", "npm run 0s:platform-accounting"],
+          "boundary": "Custom gate policy, white-label or resale, custom limits, and managed control plane require written owner-approved scope."
+        },
+        {
+          "id": "free99",
+          "name": "Free99 Gate and App Access",
+          "route": "../Free99/index.html",
+          "api_route": "/api/free99/demo-login",
+          "price": "$0 gated core; paid for cost-bearing work",
+          "status": "live_proven",
+          "proof": ["npm run proof:live-free99-reported-apps"],
+          "boundary": "Free99 opens safe local/no-charge lanes. AI, provider sends, hosted custody, payment movement, and resale are paid."
+        }
+      ]
+    },
+    {
+      "id": "expansions",
+      "label": "0S Expansions",
+      "description": "Shared services and expansion layers that extend the core 0S.",
+      "items": [
+        {
+          "id": "agentic-growth-layer",
+          "name": "Agentic Growth Layer",
+          "route": "../agentic-growth-layer/index.html",
+          "api_route": "/api/agentic-growth",
+          "price": "Starter $497/mo + $1,500 setup; Connected $1,497/mo + $3,500 setup; Operator $2,997/mo + $7,500 setup",
+          "status": "live_proven",
+          "proof": ["agentic-growth:test", "agentic-growth:0s-proof"],
+          "boundary": "Self-serve and managed growth cycles; external posting/ad actions require connected accounts and proof."
+        },
+        {
+          "id": "skyenet",
+          "name": "SkyeNet",
+          "route": "../skyenet/index.html",
+          "api_route": "/api/skyenet",
+          "price": "Included where plan scope allows; custom deploy lanes quoted",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyenet:hybrid-proof", "npm run 0s:skyenet:live-production-stress"],
+          "boundary": "Build/deploy orchestration needs deployment credentials and live proof before production claims."
+        },
+        {
+          "id": "skyepay-skyemerit",
+          "name": "SkyePay + SkyeMerit",
+          "route": "../saas/skyepay.html",
+          "api_route": "/api/skyepay",
+          "price": "Plan checkout, add-ons, top-ups, and SkyeMerit discounts by catalog",
+          "status": "live_proven",
+          "proof": ["npm run proof:skyepay", "npm run 0s:skyemerit:proof"],
+          "boundary": "Only approved catalog offers should create checkout. Quote-only rows stay quote-only."
+        },
+        {
+          "id": "connectlog-relay13",
+          "name": "ConnectLog + Relay13",
+          "route": "../live/connectlog-relay13-operator-proof.html",
+          "api_route": "/api/relay13",
+          "price": "Included in 0S plans; AI response add-on $35/mo for 100 included replies",
+          "status": "live_proven",
+          "proof": ["npm run 0s:connectlog-relay13:prod-proof", "npm run 0s:relay13-chat:proof"],
+          "boundary": "Customer chat uses app knowledge only. Web search and AI provider replies stay paid and guarded."
+        },
+        {
+          "id": "skymail",
+          "name": "SkyeMail",
+          "route": "../live/SkyeMail/index.html",
+          "api_route": "https://skyemail-platform.graylondonskyes.workers.dev/",
+          "price": "Included by workspace scope; hosted provider sends cost-bearing",
+          "status": "provider_gated",
+          "proof": ["cd metraiyux_0s_site/live/SkyeMail && npm run smoke:proof", "cd metraiyux_0s_site/live/SkyeMail && npm run smoke:zoho-provider"],
+          "boundary": "Cloudflare Worker and Zoho aliases exist. Zoho org/account/default-from and live inbox/outbox proof must pass before full workspace parity is claimed."
+        },
+        {
+          "id": "citadeldb",
+          "name": "CitadelDB",
+          "route": "../citadeldb/index.html",
+          "api_route": "/api/citadel",
+          "price": "Included in 0S platform storage; dedicated managed database quoted",
+          "status": "local_proven",
+          "proof": ["npm run audit:citadeldb-runtime", "npm run citadeldb:live-d1-sync-proof"],
+          "boundary": "Cloudflare D1/KV mirror lane is current 0S production path. Dedicated VPS/Postgres package needs its own receipts."
+        },
+        {
+          "id": "skyerrors-helper-k4i",
+          "name": "SkyErrors + Helper K4i",
+          "route": "../skyerrors/index.html",
+          "api_route": "/api/skyerrors",
+          "price": "Included for 0S-owned surfaces; customer observability package quote-only",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:helper-k4i:proof"],
+          "boundary": "Sentry-style capture scaffold uses shared gate credentials, KV receipts, and CitadelDB mirroring. External SDK offering needs live customer proof."
+        },
+        {
+          "id": "skyevault-skysecure",
+          "name": "SkyeVault + SkyeSecure",
+          "route": "../skye-secure-platform/index.html",
+          "api_route": "/api/skygate/platform-event",
+          "price": "Included where plan allows; hosted backup add-ons from $4.99/mo; managed vault quoted",
+          "status": "live_proven",
+          "proof": ["npm run proof:skyevaultpro-docxmax", "npm run vault:autosync:proof"],
+          "boundary": "Hosted custody, restore, and managed security require paid scope and proof."
+        },
+        {
+          "id": "northstar-fs27",
+          "name": "NorthStar / FS27 / SkyGate",
+          "route": "../northstar/index.html",
+          "api_route": "/api/skygate/auth-introspect",
+          "price": "SkyeGateFS27 managed control plane $1,250/mo + $12,500 onboarding; lane maintenance $249/mo per lane",
+          "status": "live_proven",
+          "proof": ["npm run proof:key-gate-13th"],
+          "boundary": "Shared owner gate is the only auth lane for mounted 0S apps."
+        }
+      ]
+    },
+    {
+      "id": "apps_platforms",
+      "label": "Apps And Platforms",
+      "description": "Mounted apps, customer-facing platforms, and specialized product lanes.",
+      "items": [
+        {
+          "id": "skyemusicnexus",
+          "name": "SkyeMusicNexus",
+          "route": "../SkyeMusicNexus/index.html",
+          "api_route": "/api/skymusicnexus",
+          "price": "Lite $0; Artist Host $9/mo; Collective $29/mo + $99 setup; Managed Music Ops $99/mo + $499 setup; add-ons $15-$250+",
+          "status": "live_proven",
+          "proof": ["npm run 0s:skyemusicnexus:proof", "npm run 0s:skyemusicnexus:claims"],
+          "boundary": "Provider/distributor/payment/legal integrations remain owner-approved proof lanes."
+        },
+        {
+          "id": "skyeroutex",
+          "name": "SkyeRouteX Workforce Command",
+          "route": "../SkyeRouteX/workforce-command-v0.4.0/index.html",
+          "api_route": "/api/routex",
+          "price": "$1,497/mo + $6,500 setup inside 0S RouteX plan; standalone quote-only",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyeroutex:v04", "npm run 0s:skyeroutex:stress"],
+          "boundary": "Dispatch/provider actions need connected customer lanes and proof."
+        },
+        {
+          "id": "skyemediacenter",
+          "name": "SkyeMediaCenter",
+          "route": "../SkyeMediaCenter/index.html",
+          "api_route": "/api/media",
+          "price": "Free99 core; hosted media/provider execution paid or quoted",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyemediacenter:smoke"],
+          "boundary": "Durable storage, external publishing, and provider work are cost-bearing."
+        },
+        {
+          "id": "skyeprofitconsole",
+          "name": "SkyeProfitConsole",
+          "route": "../SkyeProfitConsole/index.html",
+          "api_route": "/api/profit",
+          "price": "Free99 core; managed finance ops quote-only",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyeprofitconsole:proof"],
+          "boundary": "No legal, tax, accounting, or investment advice without activated professional scope."
+        },
+        {
+          "id": "skye-split-engine",
+          "name": "Skye Split Engine",
+          "route": "../live/skye-split-engine-operator-proof.html",
+          "api_route": "/api/skye-split-engine",
+          "price": "Free99 core; payment movement and managed settlements quoted",
+          "status": "local_proven",
+          "proof": ["npm run 0s:skyesplitengine:proof"],
+          "boundary": "Ledger calculations are proof-safe until payment movement is separately activated."
+        },
+        {
+          "id": "skye-content-forge",
+          "name": "Skye Content Forge",
+          "route": "../live/skye-content-forge-publisher.html",
+          "api_route": "/api/marketing-made-easy",
+          "price": "Free99 core; paid AI generation and managed publishing by scope",
+          "status": "local_proven",
+          "proof": ["npm run 0s:marketing-made-easy:proof"],
+          "boundary": "Owned-site content first. External publishing requires credentials and customer approval."
+        },
+        {
+          "id": "houseoperations-skyebox",
+          "name": "HouseOperations + SkyeBox",
+          "route": "../HouseOperations/dashboard.html",
+          "api_route": "/api/houseops",
+          "price": "Bundled in 0S plans; standalone managed custody quote-only",
+          "status": "live_proven",
+          "proof": ["npm run 0s:houseops:claims", "npm run 0s:houseops-skyebox:e2e"],
+          "boundary": "Standalone custody remains quote-only until managed-security policy and live proof are approved."
+        },
+        {
+          "id": "marketing-made-easy-skyedocxmax",
+          "name": "Marketing Made Easy / SkyeDocxMax",
+          "route": "../Marketing-Made-Easy/SkyeDocxMax/editor.html",
+          "api_route": "/api/marketing-made-easy",
+          "price": "Suite quote-only; simple doc drafts from $49; full landing builds from $497",
+          "status": "local_proven",
+          "proof": ["npm run 0s:marketing-made-easy:proof"],
+          "boundary": "Simple paid outputs should generate starter artifacts and Relay13 paid-event handoffs immediately."
+        },
+        {
+          "id": "sovereigndocs",
+          "name": "SovereignDocs",
+          "route": "../Free99/apps/sovereigndocs/index.html",
+          "api_route": "/api/sovereigndocs",
+          "price": "Free99 prep core; formation prep $297 + state filing fee; legal review add-on from $299 deposit",
+          "status": "live_proven",
+          "proof": ["npm run proof:sovereigndocs-docxmax-lane"],
+          "boundary": "Official-source prep and owner-approved filing support only; the 0S is not a law firm."
+        },
+        {
+          "id": "free99-paid-apps",
+          "name": "Free99 Paid Apps",
+          "route": "../Free99/index.html",
+          "api_route": "/api/free99",
+          "price": "Pending SKU rebuild or quote-only unless explicitly priced",
+          "status": "quote_only",
+          "proof": ["npm run proof:live-free99-reported-apps"],
+          "boundary": "Do not invent checkout for imported apps without owner-approved pricing and metering."
+        },
+        {
+          "id": "client-app-factory",
+          "name": "Client App Factory",
+          "route": "../client-app-factory/index.html",
+          "api_route": "/api/client-app-factory",
+          "price": "Starter page/builds quoted; simple landing draft from $99; full landing build from $497",
+          "status": "live_proven",
+          "proof": ["npm run 0s:free99-platforms:proof"],
+          "boundary": "Generated starter pages still need QA, deploy proof, and customer approval before public-live claims."
+        },
+        {
+          "id": "kaixu-codestudio",
+          "name": "kAIxU CodeStudio",
+          "route": "../Free99/apps/kaixu-codestudio/index.html",
+          "api_route": "/api/kaixu-codestudio",
+          "price": "kAIxU platform Starter $249/mo, Team $799/mo, Scale $1,890/mo",
+          "status": "local_proven",
+          "proof": ["npm run 0s:platform-accounting"],
+          "boundary": "Provider execution and model calls require paid usage and reporting."
+        },
+        {
+          "id": "valley-verified",
+          "name": "Valley Verified",
+          "route": "../valley-verified/",
+          "api_route": "/api/valley-verified",
+          "price": "Marketplace/profile products by quote or active campaign",
+          "status": "live_proven",
+          "proof": ["test-artifacts/valley-verified-live-proof/report.json"],
+          "boundary": "Claims ledger and listings need source receipts and current proof."
+        },
+        {
+          "id": "vantacore",
+          "name": "VantaCore CRM",
+          "route": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/vantacore-crm",
+          "api_route": "FS27 workspace",
+          "price": "Service CRM quoted or bundled by managed office scope",
+          "status": "live_proven",
+          "proof": ["test-artifacts/vantacore-crm-live-production/live-browser-report.json"],
+          "boundary": "FS27 workspace is live; imported Next package is a source package until dedicated runtime is selected."
+        },
+        {
+          "id": "jobping",
+          "name": "JobPing",
+          "route": "../Free99/apps/jobping/index.html",
+          "api_route": "/api/jobping",
+          "price": "Paid SkyPay runtime surface; pricing by active catalog",
+          "status": "local_proven",
+          "proof": ["npm run 0s:platform-accounting"],
+          "boundary": "AI matching and notifications unlock only after confirmed JobPing payment."
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "label": "Services",
+      "description": "Human-assisted, self-serve, and managed offers to sell from the 0S.",
+      "items": [
+        {
+          "id": "365-self-serve-marketing-os",
+          "name": "365 Self-Serve Marketing OS",
+          "route": "pricing-offer-router.html#365-day-marketing",
+          "api_route": "/api/agentic-growth",
+          "price": "$197/mo + AI/provider usage",
+          "status": "provider_gated",
+          "proof": ["agentic-growth:test"],
+          "boundary": "Customer can do it themselves through 0S-guided intake, calendar, drafts, approvals, and proof receipts."
+        },
+        {
+          "id": "365-managed-marketing-push",
+          "name": "365 Managed Marketing Push",
+          "route": "pricing-offer-router.html#365-day-marketing",
+          "api_route": "/api/agentic-growth",
+          "price": "Starts at $997/mo + ad spend/provider costs",
+          "status": "quote_only",
+          "proof": ["agentic-growth:0s-proof"],
+          "boundary": "Company can do it for customers. External posting and ads require connected accounts, approvals, and proof."
+        },
+        {
+          "id": "formation-paperwork-prep",
+          "name": "Formation Paperwork Prep",
+          "route": "pricing-offer-router.html#formation-front-back-office",
+          "api_route": "/api/sovereigndocs",
+          "price": "$297 + state filing fee passthrough",
+          "status": "provider_gated",
+          "proof": ["npm run proof:sovereigndocs-docxmax-lane"],
+          "boundary": "Administrative prep and owner-approved filing support, not legal advice."
+        },
+        {
+          "id": "formation-front-office",
+          "name": "Formation + Front Office",
+          "route": "../saas/signup.html?plan=formation-front-office",
+          "api_route": "/api/saas",
+          "price": "$997 setup + $297/mo + state filing fee",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:relay13:smoke"],
+          "boundary": "Workspace setup, ConnectLog/Relay13 inbox, SkyeMail identity when provider-ready, documents, billing/task intake, and AE assignment."
+        },
+        {
+          "id": "growth-office-formation",
+          "name": "Growth Office Formation",
+          "route": "../saas/signup.html?plan=growth-office-formation",
+          "api_route": "/api/saas",
+          "price": "$2,500 setup + $997/mo + state filing fee",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:relay13:smoke"],
+          "boundary": "Includes AE assigned and up to 10 hours/week prospecting and advertising ops with weekly 0S report."
+        },
+        {
+          "id": "agentic-blog-website",
+          "name": "Agentic Blog Website Build",
+          "route": "pricing-offer-router.html#agentic-blog-site",
+          "api_route": "/api/client-app-factory",
+          "price": "Included with formation",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:free99-platforms:proof"],
+          "boundary": "Starter owned blog/site included. Ecommerce, bookings, advanced integrations, and custom brand universes are quoted."
+        },
+        {
+          "id": "automated-content-engine",
+          "name": "Automated Content Engine",
+          "route": "pricing-offer-router.html#agentic-blog-site",
+          "api_route": "/api/marketing-made-easy",
+          "price": "$67/mo",
+          "status": "provider_gated",
+          "proof": ["npm run 0s:marketing-made-easy:proof"],
+          "boundary": "Covers calendar, draft queue, owned blog updates, source notes, review/approve workflow, publish receipt, and monthly summary."
+        },
+        {
+          "id": "document-draft-docx-packet",
+          "name": "Document Draft / DOCX Packet",
+          "route": "pricing-offer-router.html#instant-deliverables",
+          "api_route": "/api/v1/connectlog/paid-event-handoffs",
+          "price": "Starts at $49",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:relay13:smoke"],
+          "boundary": "Checkout should generate immediate starter artifact and ConnectLog/Relay13 owner handoff."
+        },
+        {
+          "id": "simple-landing-page-draft",
+          "name": "Simple Landing Page Draft",
+          "route": "pricing-offer-router.html#instant-deliverables",
+          "api_route": "/api/v1/connectlog/paid-event-handoffs",
+          "price": "Starts at $99",
+          "status": "scaffolded",
+          "proof": ["npm run 0s:relay13:smoke"],
+          "boundary": "Immediate starter HTML/section draft plus owner/AE paid completion task."
+        },
+        {
+          "id": "full-landing-build",
+          "name": "Full Landing Build",
+          "route": "pricing-offer-router.html#instant-deliverables",
+          "api_route": "/api/v1/connectlog/paid-event-handoffs",
+          "price": "Starts at $497",
+          "status": "quote_only",
+          "proof": ["npm run proof:live-browser -- --url <production-url> --expect <brand>"],
+          "boundary": "Owner/AE completion, QA, deployment, and live headed browser proof required before public-ready claims."
+        },
+        {
+          "id": "legal-review-add-on",
+          "name": "Legal Review Add-On",
+          "route": "../valley-verified/legal-review-lane/",
+          "api_route": "/api/valley-legal-review",
+          "price": "Starts at $299 deposit",
+          "status": "provider_gated",
+          "proof": ["npm run proof:sovereigndocs-docxmax-lane"],
+          "boundary": "Only after payment, partner activation, conflict checks, and signed terms."
+        }
+      ]
+    }
+  ]
+}

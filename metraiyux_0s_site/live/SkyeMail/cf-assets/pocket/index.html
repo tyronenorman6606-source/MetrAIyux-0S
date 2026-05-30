@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <script defer src="/assets/os-bridge.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>SkyeMail Pocket</title>
+</head>
+<body class="skyemail-pocket-page" data-page-id="pocket" data-page-name="SkyeMail Pocket" data-page-hint="0S context tab">
+  <main class="pocket-shell">
+    <section class="pocket-panel">
+      <div class="pocket-headline">
+        <div>
+          <span class="kicker">SkyeMail Pocket</span>
+          <h1>Mail context</h1>
+        </div>
+        <button class="btn small" id="collapsePocketBtn" type="button">Collapse</button>
+      </div>
+      <div class="workspace-context" id="pocketContext"></div>
+      <div class="btnrow">
+        <a class="btn gold" id="pocketInboxLink" href="dashboard.html">Inbox</a>
+        <a class="btn" id="pocketComposeLink" href="compose.html">Compose</a>
+        <button class="btn" id="pocketDocxBtn" type="button">Doc</button>
+        <button class="btn ok" id="pocketPacketBtn" type="button">Packet</button>
+      </div>
+      <div class="hr"></div>
+      <div class="mailtable" id="pocketPackets"><div class="empty">Loading packets...</div></div>
+      <div class="mini" id="pocketStatus">Ready.</div>
+    </section>
+    <button class="pocket-rail-button" id="expandPocketBtn" type="button">SkyeMail</button>
+  </main>
+  <script defer src="/assets/pocket-page.js"></script>
+</body>
+</html>

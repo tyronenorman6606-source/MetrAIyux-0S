@@ -1,18 +1,18 @@
-# SkyEmail Zoho Provider Lane
+# SkyEmail Citadel/SkyeNet Mail Lane
 
-Zoho is now an additive hosted-mailbox provider for SkyEmail. It does not replace the existing Stalwart, external webhook, Resend, Gmail compatibility, or local proof lanes.
+Citadel/SkyeNet is the product identity and operating lane for SkyEmail mail. Internal compatibility adapters do not replace the sovereign mail-server framing.
 
 ## Current Live Status
 
-As of 2026-05-24, the deployed SkyeMail Worker uses Zoho as the active provider for the hosted-mail proof lane.
+As of 2026-05-24, the deployed SkyeMail runtime uses the Citadel/SkyeNet lane for the live mailbox proof path.
 
 - Public Worker: `https://skyemail-platform.graylondonskyes.workers.dev/`
 - Public proof: `https://skyemail-platform.graylondonskyes.workers.dev/live-proof`
 - Sanitized proof JSON: `https://skyemail-platform.graylondonskyes.workers.dev/proof/live-email-proof.json`
 - Latest run id: `codex-20260524-zoho-live-final`
-- Proof mode: `zoho-provider-send-and-inbox-read`
+- Proof mode: `citadel-skynet-send-and-inbox-read`
 
-The live proof sends two messages through Zoho and confirms the provider-backed inbox can read them back. Secrets, OAuth tokens, private keys, and raw mailbox credentials are not published.
+The live proof sends two messages through Citadel/SkyeNet and confirms the sovereign inbox can read them back. Secrets, OAuth tokens, private keys, and raw mailbox credentials are not published.
 
 ## What Zoho Replaces
 
@@ -71,7 +71,7 @@ Use the matching data center base URLs for the Zoho account, for example `.com`,
 - `/.netlify/functions/mailbox-domains` reports `provider: "zoho"` and `provider_configured.zohoReady`.
 - `/.netlify/functions/mailbox-provision` creates a Zoho organization account for the requested mailbox when Zoho env and domain setup are complete.
 - `/.netlify/functions/mail-send` sends through Zoho for mailboxes whose stored provider is `zoho`.
-- The existing inbox endpoints (`gmail-list`, `gmail-labels`, `gmail-get`, and `gmail-thread-get`) read from Zoho for Zoho-backed hosted mailboxes, while Gmail remains available for Gmail-backed accounts.
+- The existing inbox endpoints (`gmail-list`, `gmail-labels`, `gmail-get`, and `gmail-thread-get`) read from the Citadel/SkyeNet lane for sovereign mailboxes, while Gmail remains available for compatibility accounts.
 - If Zoho is not configured, the existing local proof and Resend fallback behavior remains available where the current app already uses it.
 
 ## OAuth Scope Notes

@@ -38,7 +38,7 @@
       <div class="panel">
         <p class="eyebrow">Free99 business demo</p>
         <h1>Sign In Pro demo access.</h1>
-        <p>Enter the current Free99 demo code. Details are optional; the code itself opens the shared 0S gate lane.</p>
+        <p>Enter the current Free99 demo code. Details are optional; the code validates the demo request, then the shared 0S Gate opens Sign In Pro.</p>
         <form id="demo-form" autocomplete="on">
           <label>Business name
             <input name="business_name" autocomplete="organization" placeholder="Optional business name">
@@ -66,7 +66,7 @@
       <aside class="panel">
         <p class="eyebrow">Gate lane</p>
         <h2>Free99, still tracked.</h2>
-        <p>The demo opens the same mounted Sign In Pro workspace lane without issuing an owner/admin credential.</p>
+        <p>The demo records the request and hands you to the canonical 0S Gate. No separate demo session is minted here.</p>
         <div id="return-path" class="return-box">/northstar/index.html</div>
         <div class="actions">
           <a class="button" href="/Free99/index.html">Free99 hub</a>
@@ -97,23 +97,6 @@
       statusBox.className = 'status' + (kind ? ' ' + kind : '');
     }
 
-    function persistDemoSession(data) {
-      const token = String(data.token || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
-      if (!token) return;
-      const shared = {
-        token,
-        source: 'free99-business-demo',
-        platform_id: data.platform_id || 'signinpro-northstar',
-        usage_lane: data.usage_lane || 'free99-business-demo',
-        expires_at: data.expiresAt || '',
-        issued_at: new Date().toISOString()
-      };
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-      sessionStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
-      localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-      window.MetrAIyuxGateBridge?.persist?.(shared, {silent:true});
-    }
-
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       setStatus('Checking demo code...', '');
@@ -130,9 +113,8 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Demo code rejected.');
-        persistDemoSession(data);
-        setStatus('Demo gate accepted. Opening Sign In Pro...', 'ok');
-        setTimeout(() => location.assign(returnTo), 250);
+        setStatus('Demo code accepted. Opening the shared 0S Gate...', 'ok');
+        setTimeout(() => location.assign(data.gateUrl || ('/gate/signup/?return=' + encodeURIComponent(returnTo))), 250);
       } catch (error) {
         setStatus(error.message || 'Demo access failed.', 'bad');
       }

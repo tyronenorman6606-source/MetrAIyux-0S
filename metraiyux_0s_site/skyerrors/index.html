@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkyErrors is the gated MetrAIyux 0S error capture lane backed by Helper K4i, SkyErrors KV, CitadelDB mirroring, and the shared FS27 gate.">
+  <title>SkyErrors - MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body class="skyesol-living-page" data-command-bridge-app="skyerrors" data-command-bridge-surface="SkyErrors">
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">SkyErrors</span></a>
+    <nav>
+      <a href="../skyeway.html">0s SkyeWay</a>
+      <a href="../proof/index.html">Proof</a>
+      <a href="../citadeldb/index.html">CitadelDB</a>
+      <a href="../admin/index.html">Admin OS</a>
+    </nav>
+  </header>
+  <main>
+    <section class="section upgrade-hero">
+      <p class="eyebrow">Sentry-style lane, 0S-owned</p>
+      <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+      <h1>SkyErrors captures app failures without creating a new auth lane.</h1>
+      <p class="hero-copy">SkyErrors is the first-class error ledger for 0S surfaces and customer apps. The capture API uses the shared FS27/SkyGate/Free99 session, stores recent errors in the SkyErrors/Helper K4i receipt lane, and mirrors records into CitadelDB when the D1 binding is present.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="/api/skyerrors/status">API Status</a>
+        <a class="button" href="/api/skyerrors/events">Recent Events</a>
+        <a class="button" href="./live-capability-watch.json">Latest Capability Watch</a>
+        <a class="button" href="../proof/0s-truth-ledger.html">Truth Ledger</a>
+        <a class="button" href="/api/helper-k4i/status">Helper K4i</a>
+        <a class="button" href="../founder-command/apps/0s-command-bridge/index.html">Command Bridge</a>
+        <a class="button" href="../skyehawk/">Skye Hawk</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Live capability watch</p>
+      <h2>SkyErrors now tracks what was actually exercised.</h2>
+      <p class="hero-copy">The 0S live capability watch runs existing non-browser proof lanes, labels live HTTP/API, local behavior, smoke, status, browser-disabled, and provider-gated evidence separately, then writes a public-safe receipt back here.</p>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>System</th><th>Status</th><th>Evidence</th><th>Boundary</th></tr></thead>
+          <tbody data-watch-checks>
+            <tr><td colspan="4">Run <code>npm run 0s:live-capability-watch</code> to publish the latest receipt.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre class="tool-output" data-watch-summary><code>Waiting for live capability watch receipt.</code></pre>
+      <div class="billing-disclosure">
+        <strong>Boundary:</strong> browser proof remains owner-handled. Provider-spend, destructive, deployment, billing, credential, and external customer-impacting actions stay gated unless the owner explicitly approves that execution scope.
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Drop-in SDK</p>
+      <h2>Use the shared gate token as the capture credential.</h2>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Route</th><th>Status</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /api/skyerrors/events</code></td><td>Gated capture</td><td>Accepts error/message payloads from the SDK and writes a SkyErrors receipt plus CitadelDB mirror event.</td></tr>
+            <tr><td><code>GET /api/skyerrors/events</code></td><td>Gated read</td><td>Lists recent SkyErrors entries for the owner/operator session.</td></tr>
+            <tr><td><code>GET /api/skyerrors/status</code></td><td>Gated status</td><td>Reports Helper K4i persona, alert configuration, KV availability, and CitadelDB availability.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre class="tool-output"><code>import { createSkyErrorsClient } from "../sdk/src/index.js";
+
+const skyerrors = createSkyErrorsClient({
+  token: gateSessionToken,
+  zeroOsUrl: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  service: "customer-app",
+  release: "2026.05.24"
+});
+
+skyerrors.installGlobalHandlers();
+skyerrors.captureException(error, { tags: { surface: "checkout" } });</code></pre>
+      <div class="billing-disclosure">
+        <strong>Boundary:</strong> this is now a real gated capture scaffold, not a public anonymous DSN. External customer SDK usage needs a valid 0S gate/session credential and live delivery proof before it is sold as a full managed observability platform.
+      </div>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S SkyErrors - <a href="../sales/platform-surface-pricing-registry.html">Surface registry</a></p></footer>
+  <script src="../assets/js/0s-command-bridge.js" data-command-bridge-app="skyerrors" data-command-bridge-surface="SkyErrors" data-command-bridge-auto="true"></script>
+  <script src="../assets/js/skyehawk-os.js" data-skyehawk-surface="SkyErrors"></script>
+  <script>
+    (async () => {
+      const summary = document.querySelector('[data-watch-summary]');
+      const checks = document.querySelector('[data-watch-checks]');
+      const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+      try {
+        const response = await fetch('./live-capability-watch.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Receipt unavailable (${response.status})`);
+        const receipt = await response.json();
+        const status = receipt.ok && receipt.summary?.warn ? 'green with warnings' : receipt.ok ? 'green' : 'needs attention';
+        summary.innerHTML = `<code>${esc(JSON.stringify({
+          ok: receipt.ok,
+          generated_at: receipt.generated_at,
+          profile: receipt.profile,
+          status,
+          summary: receipt.summary,
+          health_watch: {
+            schema: receipt.health_watch?.schema || '',
+            recent_receipts: receipt.health_watch?.summary?.total_receipts || 0,
+            failed_receipts: receipt.health_watch?.summary?.failed_receipts || 0,
+            missing_receipts: receipt.health_watch?.summary?.missing_receipts || 0,
+            external_boundaries: receipt.health_watch?.summary?.external_boundary_workflows || 0,
+            production_closure_ok: receipt.health_watch?.summary?.production_closure_ok === true
+          }
+        }, null, 2))}</code>`;
+        checks.innerHTML = (receipt.checks || []).map((item) => `
+          <tr>
+            <td>${esc(item.label || item.system || item.id)}</td>
+            <td>${esc(item.status || 'unknown')}</td>
+            <td>${esc(item.evidence_level || item.classification || 'unclassified')}</td>
+            <td>${esc(item.boundary || '')}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">No capability checks recorded.</td></tr>';
+      } catch (error) {
+        summary.innerHTML = `<code>${esc(error.message || error)}</code>`;
+      }
+    })();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

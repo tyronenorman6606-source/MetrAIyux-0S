@@ -46,9 +46,21 @@ function validateDate(value) {
   return date;
 }
 
+function booleanField(value, fallback = true) {
+  if (value === undefined || value === null || value === '') return fallback;
+  if (typeof value === 'boolean') return value;
+  return !['0', 'false', 'no', 'off'].includes(String(value).trim().toLowerCase());
+}
+
 function intakeFields(config, body, portalAccess = {}) {
   const workspaceId = safeId(portalAccess.workspaceId || body.workspaceId || '');
   const developerId = safeId(portalAccess.developerId || body.developerId || '');
+  const requestedCustodyScope = cleanText(body.custodyScope || portalAccess.custodyScope || '', 80).toLowerCase();
+  const custodyScope = requestedCustodyScope || (portalAccess.type === 'owner-admin' && body.ownerPrivate === true ? 'owner-private' : '');
+  if (custodyScope === 'owner-private' && portalAccess.type !== 'owner-admin') {
+    fail('Owner-private vault custody can only be created from the shared owner/admin gate.');
+  }
+  const ownerPrivate = custodyScope === 'owner-private';
   const fields = {
     clientName: cleanText(body.clientName || portalAccess.clientName, 180),
     clientEmail: validateEmail(body.clientEmail || portalAccess.clientEmail),
@@ -66,7 +78,17 @@ function intakeFields(config, body, portalAccess = {}) {
     workspaceId,
     developerId,
     developerName: cleanText(body.developerName || portalAccess.developerName, 120),
-    accessType: cleanText(portalAccess.type || 'portal', 40)
+    accessType: cleanText(portalAccess.type || 'portal', 40),
+    custodyScope,
+    vaultVisibility: cleanText(body.vaultVisibility || (ownerPrivate ? 'owner-only' : ''), 80).toLowerCase(),
+    ownerAccountId: safeId(body.ownerAccountId || body.accountId || ''),
+    ownerSubject: cleanText(body.ownerSubject || '', 120),
+    ownerEmail: validateEmail(body.ownerEmail || ''),
+    ownerWorkspaceId: safeId(body.ownerWorkspaceId || ''),
+    ownerWorkspaceSlug: safeId(body.ownerWorkspaceSlug || ''),
+    accessPolicy: cleanText(body.accessPolicy || (ownerPrivate ? 'shared-gate-owner-admin-only' : ''), 160),
+    clientVaultVisible: ownerPrivate ? false : booleanField(body.clientVaultVisible, true),
+    clientVaultDownloadAllowed: ownerPrivate ? false : booleanField(body.clientVaultDownloadAllowed, true)
   };
 
   if (config.requireClientName !== false && !fields.clientName) fail('Client name is required.');
@@ -287,7 +309,12 @@ export async function handler(event) {
             type: portalAccess.type || 'portal',
             workspaceId: fields.workspaceId,
             developerId: fields.developerId,
-            developerName: fields.developerName
+            developerName: fields.developerName,
+            custodyScope: fields.custodyScope,
+            vaultVisibility: fields.vaultVisibility,
+            ownerAccountId: fields.ownerAccountId,
+            ownerWorkspaceId: fields.ownerWorkspaceId,
+            accessPolicy: fields.accessPolicy
           },
           policy: {
             chunkSizeMb: config.chunkSizeMb,

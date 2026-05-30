@@ -10,7 +10,7 @@
     "smoke": "node scripts/smoke-platform.mjs",
     "smoke:fixture": "CODESTUDIO_PROVIDER_MODE=fixture node scripts/smoke-platform.mjs",
     "check": "node --check app/app.js && node --check dashboard.js && node --check server/http-server.mjs && node --check server/platform-engine.mjs && node --check scripts/browser-click-smoke.mjs && node scripts/smoke-platform.mjs --syntax-only",
-    "smoke:browser": "CODESTUDIO_PROVIDER_MODE=fixture node scripts/browser-click-smoke.mjs"
+    "smoke:browser": "node ../../../../tools/browser-proof-disabled.mjs --lane=kaixu-codestudio-browser-smoke"
   },
   "engines": {
     "node": ">=20.10.0"

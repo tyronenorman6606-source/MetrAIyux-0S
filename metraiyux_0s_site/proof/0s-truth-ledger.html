@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Strict 0S truth ledger for built, partial, provider-gated, unproven, and untracked operating lanes.">
+  <title>0S Truth Ledger · MetrAIyux 0S</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../favicon-32.png">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><img class="brand-logo floating-logo" src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span class="brand-text">MetrAIyux 0S</span></a>
+    <nav><a href="../index.html">Home</a><a href="index.html">Proof</a><a href="../skyerrors/">SkyErrors</a><a href="../founder-command/">Founder Command</a></nav>
+  </header>
+  <main>
+    <section class="hero slim">
+      <div class="hero-copy">
+        <p class="eyebrow">Truth ledger</p>
+        <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
+        <h1>Built means proven, not implied.</h1>
+        <p class="hero-lede">This ledger reads the closure workflow manifest and latest proof receipts. Partial, provider-gated, unproven, and untracked lanes stay visible until they have real receipts.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Current state</p>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Metric</th><th>Count</th></tr></thead>
+          <tbody data-summary>
+            <tr><td colspan="2">Loading truth ledger.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="hero-actions">
+        <a class="button" href="0s-truth-ledger.json">JSON</a>
+        <a class="button" href="0s-truth-ledger.md">Markdown</a>
+        <a class="button" href="../skyerrors/live-capability-watch.json">Capability Watch</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Repair queue</p>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Priority</th><th>Lane</th><th>Truth</th><th>Next step</th></tr></thead>
+          <tbody data-repair-queue>
+            <tr><td colspan="4">Loading repair queue.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Workflow truth</p>
+      <div class="table-wrap">
+        <table class="commercial-table">
+          <thead><tr><th>Lane</th><th>Claimed</th><th>Computed</th><th>Receipt</th><th>Gap class</th></tr></thead>
+          <tbody data-workflows>
+            <tr><td colspan="5">Loading workflows.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="billing-disclosure">
+        <strong>Boundary:</strong> browser proof is owner-handled. Provider spend, destructive actions, legal/government filings, billing changes, payouts/refunds, credentials, and external customer-impacting execution require explicit approval and receipts.
+      </div>
+    </section>
+  </main>
+  <footer><p>MetrAIyux 0S truth ledger. Private controls stay gated.</p></footer>
+  <script>
+    (async () => {
+      const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+      const summary = document.querySelector('[data-summary]');
+      const queue = document.querySelector('[data-repair-queue]');
+      const workflows = document.querySelector('[data-workflows]');
+      try {
+        const response = await fetch('0s-truth-ledger.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Truth ledger unavailable (${response.status})`);
+        const data = await response.json();
+        const rows = [
+          ['Ledger OK', data.ok ? 'yes' : 'no - repair queue open'],
+          ['Total workflows', data.summary?.total],
+          ['Built', data.summary?.built],
+          ['Partial', data.summary?.partial],
+          ['Failing proof', data.summary?.failing_proof],
+          ['Unproven', data.summary?.unproven],
+          ['Not built or untracked', data.summary?.not_built_or_untracked],
+          ['Provider or real-world gated', data.summary?.provider_or_real_world_gated],
+          ['P0 not built', (data.summary?.p0_not_built || []).join(', ') || 'none'],
+          ['P1 not built', (data.summary?.p1_not_built || []).join(', ') || 'none']
+        ];
+        summary.innerHTML = rows.map(([label, value]) => `<tr><td>${esc(label)}</td><td>${esc(value ?? 0)}</td></tr>`).join('');
+        queue.innerHTML = (data.repair_queue || []).map((item) => `
+          <tr>
+            <td>${esc(item.priority)}</td>
+            <td>${esc(item.id)}</td>
+            <td>${esc(item.computed_truth)}</td>
+            <td>${esc(item.next_step)}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">No open repair queue.</td></tr>';
+        workflows.innerHTML = (data.workflows || []).map((item) => `
+          <tr>
+            <td>${esc(item.id)}</td>
+            <td>${esc(item.claimed_truth)}</td>
+            <td>${esc(item.computed_truth)}</td>
+            <td>${esc(item.receipt_ok ? 'ok' : item.receipt_path ? 'missing/not ok' : 'missing')}</td>
+            <td>${esc(item.gap_class)}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="5">No workflows recorded.</td></tr>';
+      } catch (error) {
+        summary.innerHTML = `<tr><td colspan="2">${esc(error.message || error)}</td></tr>`;
+      }
+    })();
+  </script>
+  <script src="../script.js"></script>
+</body>
+</html>

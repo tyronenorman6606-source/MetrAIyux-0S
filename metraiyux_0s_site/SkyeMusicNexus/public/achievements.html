@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeMusicNexus // Achievement Wall</title>
+    <link rel="stylesheet" href="./neo-nexus.css" />
+    <link rel="stylesheet" href="./nexus-player.css" />
+    <script src="../gate-session.js" defer></script>
+    <script src="./skygate-auth.js" defer></script>
+    <style>
+      :root{color-scheme:dark;--ink:#f7f5ea;--muted:rgba(247,245,234,.68);--line:rgba(247,245,234,.16);--panel:rgba(7,10,14,.88);--cyan:#6ee7f8;--pink:#ff75b7;--gold:#ffd166;--green:#a4f08a}
+      body{min-height:100vh;background:radial-gradient(circle at 18% 12%,rgba(110,231,248,.2),transparent 30rem),radial-gradient(circle at 82% 14%,rgba(255,117,183,.17),transparent 28rem),linear-gradient(135deg,#05070a,#10151a 52%,#07090d);color:var(--ink)}
+      .award-shell{width:min(1440px,calc(100% - 32px));margin:0 auto;padding:24px 0 132px}
+      .award-nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0 22px}
+      .award-nav a{color:var(--muted);text-decoration:none}.award-nav strong{color:var(--ink)}
+      .award-nav div{display:flex;gap:10px;flex-wrap:wrap}.award-nav div a{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.05)}.award-nav div a[aria-current=page]{background:var(--gold);border-color:var(--gold);color:#161006}
+      .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.86fr);gap:18px;align-items:stretch}
+      .panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 18px 60px rgba(0,0,0,.3);padding:18px}
+      .hero-copy{position:relative;overflow:hidden;min-height:370px;display:grid;align-content:end;padding:clamp(24px,4vw,44px)}
+      .hero-copy::after{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(34deg,rgba(255,209,102,.16) 0 2px,transparent 2px 24px),repeating-linear-gradient(136deg,rgba(110,231,248,.12) 0 2px,transparent 2px 20px);animation:fall 9s linear infinite;pointer-events:none}
+      .hero-copy>*{position:relative;z-index:1}.kicker{color:var(--cyan);font-size:12px;text-transform:uppercase;font-weight:950;letter-spacing:0}
+      h1{font-size:clamp(44px,8vw,104px);line-height:.86;margin:10px 0 14px;letter-spacing:0}h2,h3{letter-spacing:0;margin:0}p{color:var(--muted);line-height:1.55}
+      .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}.stat{border:1px solid var(--line);border-radius:8px;padding:14px;background:rgba(255,255,255,.05)}.stat strong{display:block;font-size:28px;color:var(--ink)}.stat span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase}
+      .map{width:100%;height:100%;min-height:370px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04)}
+      .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:18px;margin-top:18px}
+      .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.07);color:var(--ink);min-height:40px;padding:9px 12px;font:inherit;font-weight:950;text-decoration:none;cursor:pointer}.button:hover,.button.is-active{background:var(--cyan);border-color:var(--cyan);color:#061013}
+      .award-list,.progress-list{display:grid;gap:10px;margin-top:14px}.award-card{position:relative;overflow:hidden;display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:10px}.award-card::after{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 35%,rgba(255,209,102,.16),transparent 62%);transform:translateX(-30%);animation:shine 4.4s ease-in-out infinite}.award-card>*{position:relative;z-index:1}
+      .award-card img{width:72px;height:72px;border-radius:6px;object-fit:cover;border:1px solid rgba(247,245,234,.15)}.award-card strong,.award-card span{display:block;overflow-wrap:anywhere}.award-card span{color:var(--muted);font-size:13px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:92px;min-height:38px;border-radius:999px;border:1px solid rgba(255,209,102,.45);background:rgba(255,209,102,.13);color:#fff3c3;font-weight:950;font-size:12px;text-transform:uppercase}
+      .progress-card{display:grid;gap:8px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:12px}.progress-card strong,.progress-card span{display:block}.progress-card span{color:var(--muted);font-size:13px}.bar{height:9px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold),var(--pink));width:0}
+      @keyframes shine{0%,55%{transform:translateX(-45%)}100%{transform:translateX(45%)}}@keyframes fall{from{transform:translateY(-18px)}to{transform:translateY(34px)}}
+      @media(max-width:940px){.hero,.grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.award-nav{align-items:flex-start;flex-direction:column}.award-card{grid-template-columns:60px minmax(0,1fr)}.award-card .badge,.award-card .button{grid-column:1/-1}}
+    </style>
+  </head>
+  <body data-sky-gate="public">
+    <main class="award-shell">
+      <nav class="award-nav" aria-label="Music Nexus">
+        <a href="../index.html"><strong>SkyeMusicNexus</strong></a>
+        <div>
+          <a href="./discover.html">Playlists</a>
+          <a href="./radio.html">Radio</a>
+          <a href="./stream-analytics.html">Streams</a>
+          <a href="./achievements.html" aria-current="page">Awards</a>
+          <a href="./store.html">Store</a>
+          <a href="./ads.html">Ads</a>
+        </div>
+      </nav>
+      <section class="hero">
+        <article class="panel hero-copy">
+          <span class="kicker">Achievement Wall</span>
+          <h1>Stream milestones become artist badges.</h1>
+          <p>When an artist or track crosses a Nexus stream threshold, the platform issues a permanent badge, pushes a celebration through the player, and adds it to the wall.</p>
+          <div class="stat-grid" aria-label="Achievement totals">
+            <div class="stat"><strong id="stat-awards">0</strong><span>awards</span></div>
+            <div class="stat"><strong id="stat-artists">0</strong><span>artist badges</span></div>
+            <div class="stat"><strong id="stat-tracks">0</strong><span>track badges</span></div>
+            <div class="stat"><strong id="stat-next">100</strong><span>first milestone</span></div>
+          </div>
+        </article>
+        <canvas id="award-map" class="map" width="840" height="520" aria-label="Music Nexus achievement map"></canvas>
+      </section>
+      <section class="grid">
+        <article class="panel">
+          <div class="toolbar">
+            <div><span class="kicker">Unlocked</span><h2>Recent Awards</h2></div>
+            <button class="button" type="button" id="refresh">Refresh</button>
+          </div>
+          <div id="award-list" class="award-list"></div>
+        </article>
+        <aside class="panel">
+          <span class="kicker">Next Up</span>
+          <h2>Artist Progress</h2>
+          <div id="progress-list" class="progress-list"></div>
+        </aside>
+      </section>
+    </main>
+    <script src="./nexus-player.js"></script>
+    <script>
+      (() => {
+        const CATALOG_URL = 'https://skye-music-nexus.pages.dev/public/data/playlists.json';
+        const WALL_URL = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/music-drops?action=achievement-wall';
+        const state = { catalog: { tracks: [], artists: [] }, wall: { achievements: [], artistProgress: [], trackProgress: [] } };
+        const el = {
+          awards: document.getElementById('stat-awards'),
+          artists: document.getElementById('stat-artists'),
+          tracks: document.getElementById('stat-tracks'),
+          next: document.getElementById('stat-next'),
+          list: document.getElementById('award-list'),
+          progress: document.getElementById('progress-list'),
+          map: document.getElementById('award-map'),
+        };
+        function escapeHtml(value){return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");}
+        function absoluteAsset(value){try{return new URL(value || '../assets/og-card.svg', location.href).href}catch{return '../assets/og-card.svg'}}
+        function byTrack(id){return (state.catalog.tracks || []).find((track) => track.trackId === id || track.productId === id) || null}
+        function byArtist(award){return (state.catalog.artists || []).find((artist) => artist.artistSlug === award.artistSlug || artist.artistId === award.artistId || artist.artistName === award.artistName) || null}
+        function imageFor(award){
+          const track = byTrack(award.trackId);
+          const artist = byArtist(award);
+          return absoluteAsset(track?.coverImage || track?.artistImage || artist?.artistImage || '../assets/og-card.svg');
+        }
+        async function load(){
+          const [catalog, wallResponse] = await Promise.all([
+            fetch(CATALOG_URL,{cache:'no-store'}).then((res)=>res.json()).catch(()=>({tracks:[],artists:[]})),
+            fetch(WALL_URL,{cache:'no-store',credentials:'omit'}).then((res)=>res.ok?res.json():null).catch(()=>null),
+          ]);
+          state.catalog = catalog;
+          state.wall = wallResponse?.achievementWall || { achievements: [], recentAwards: [], artistAwards: [], trackAwards: [], artistProgress: [], trackProgress: [], milestones: [100] };
+          render();
+        }
+        function render(){
+          const wall = state.wall;
+          const awards = wall.recentAwards || wall.achievements || [];
+          el.awards.textContent = wall.total || awards.length || 0;
+          el.artists.textContent = (wall.artistAwards || []).length;
+          el.tracks.textContent = (wall.trackAwards || []).length;
+          el.next.textContent = (wall.milestones || [100])[0] || 100;
+          el.list.innerHTML = awards.length ? awards.map((award) => {
+            const track = byTrack(award.trackId) || {};
+            const href = track.dropUrl ? absoluteAsset(track.dropUrl) : './stream-analytics.html';
+            return `<article class="award-card">
+              <img src="${escapeHtml(imageFor(award))}" alt="">
+              <span><strong>${escapeHtml(award.headline || award.badgeLabel || 'Nexus stream award')}</strong><span>${escapeHtml(award.artistName || '')}${award.title ? ' - ' + escapeHtml(award.title) : ''}</span><span>${escapeHtml(award.message || '')}</span></span>
+              <span class="badge">${escapeHtml(award.badgeLabel || 'Award')}</span>
+              ${track.trackId ? `<button class="button" type="button" data-nexus-track-id="${escapeHtml(track.trackId)}">Play</button>` : `<a class="button" href="${escapeHtml(href)}">Open</a>`}
+            </article>`;
+          }).join('') : '<p>No badges are unlocked yet. The first awards issue automatically at 100 Nexus streams.</p>';
+          const progress = wall.artistProgress || [];
+          el.progress.innerHTML = progress.length ? progress.slice(0, 18).map((artist) => {
+            const meter = artist.nextMilestone || { current: 0, next: 100, remaining: 100, percent: 0 };
+            const profile = (state.catalog.artists || []).find((item) => item.artistSlug === artist.artistSlug || item.artistId === artist.artistId || item.artistName === artist.artistName) || {};
+            return `<article class="progress-card">
+              <strong>${escapeHtml(artist.artistName || artist.artistSlug || 'Artist')}</strong>
+              <span>${Number(artist.nexusStreams || 0)} Nexus streams / ${Number(meter.remaining || 0)} until ${Number(meter.next || 100)}</span>
+              <div class="bar" aria-label="Milestone progress"><i style="width:${Math.max(0, Math.min(100, Number(meter.percent || 0)))}%"></i></div>
+              <a class="button" href="${escapeHtml(absoluteAsset(profile.storefrontUrl || './discover.html'))}">Profile</a>
+            </article>`;
+          }).join('') : '<p>Artist progress appears after streams are recorded.</p>';
+          drawMap();
+        }
+        function drawMap(){
+          const canvas = el.map;
+          const ctx = canvas.getContext('2d');
+          const w = canvas.width; const h = canvas.height;
+          ctx.clearRect(0,0,w,h);
+          const awards = (state.wall.recentAwards || state.wall.achievements || []).slice(0, 32);
+          const progress = (state.wall.artistProgress || []).slice(0, 28);
+          const rows = awards.length ? awards : progress;
+          rows.forEach((row,index)=>{
+            const streams = Number(row.streamCount || row.nexusStreams || 0);
+            const angle = index / Math.max(1, rows.length) * Math.PI * 2 + performance.now() / 8000;
+            const radius = 80 + (index % 5) * 34 + Math.min(120, streams / 8);
+            const x = w / 2 + Math.cos(angle) * radius;
+            const y = h / 2 + Math.sin(angle) * radius * .6;
+            const size = 9 + Math.min(34, streams / 20);
+            ctx.beginPath(); ctx.moveTo(w/2,h/2); ctx.lineTo(x,y); ctx.strokeStyle='rgba(247,245,234,.13)'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(x,y,size,0,Math.PI*2);
+            ctx.fillStyle = index % 3 === 0 ? 'rgba(255,209,102,.84)' : index % 3 === 1 ? 'rgba(110,231,248,.78)' : 'rgba(255,117,183,.74)';
+            ctx.fill();
+          });
+          ctx.fillStyle='rgba(247,245,234,.92)'; ctx.font='800 15px Inter, sans-serif'; ctx.fillText('Nexus achievement wall',22,34);
+          requestAnimationFrame(drawMap);
+        }
+        document.getElementById('refresh').addEventListener('click', load);
+        window.addEventListener('skymusicnexus:achievement-award', load);
+        load();
+        setInterval(load, 10000);
+      })();
+    </script>
+  </body>
+</html>

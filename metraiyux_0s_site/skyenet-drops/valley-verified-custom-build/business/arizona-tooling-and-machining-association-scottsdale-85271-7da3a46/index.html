@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Tooling &amp; Machining Association | Scottsdale Manufacturing Association</title>
+  <meta name="description" content="Arizona Tooling &amp; Machining Association in Scottsdale, AZ. Valley Verified profile for a manufacturing and machining association at PO Box 3518.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111417;
+      --muted: #55606a;
+      --steel: #26323a;
+      --orange: #e06b32;
+      --aqua: #35a9a6;
+      --paper: #f8faf9;
+      --line: rgba(17, 20, 23, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(90deg, rgba(38, 50, 58, .07) 0 1px, transparent 1px 48px),
+        linear-gradient(180deg, rgba(224, 107, 50, .12), transparent 380px),
+        #f2f4f2;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 26px 0 48px;
+    }
+
+    .bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding-bottom: 20px;
+      color: var(--steel);
+      font-weight: 800;
+    }
+
+    .bar img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, .65fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .machine-face {
+      min-height: 560px;
+      padding: 26px;
+      border-radius: 8px;
+      background: var(--steel);
+      color: #fff;
+      display: grid;
+      align-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .machine-face::before,
+    .machine-face::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 24px solid rgba(53, 169, 166, .23);
+    }
+
+    .machine-face::before {
+      width: 220px;
+      height: 220px;
+      right: -70px;
+      top: 70px;
+    }
+
+    .machine-face::after {
+      width: 150px;
+      height: 150px;
+      left: 34px;
+      bottom: 90px;
+      border-color: rgba(224, 107, 50, .28);
+    }
+
+    .machine-face img {
+      width: 132px;
+      height: 132px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .machine-face span {
+      color: #baf0ec;
+      font-weight: 800;
+      position: relative;
+      z-index: 1;
+    }
+
+    .copy {
+      min-height: 560px;
+      display: grid;
+      align-content: center;
+      gap: 24px;
+      padding: clamp(28px, 5vw, 58px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .86);
+    }
+
+    .kicker {
+      width: fit-content;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: var(--orange);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(40px, 7vw, 86px);
+      line-height: .94;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 700px;
+      color: #404b54;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.52;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .actions a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 13px 16px;
+      border-radius: 7px;
+      background: var(--steel);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .card {
+      min-height: 128px;
+      padding: 20px;
+      border-radius: 8px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+    }
+
+    .card b {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--orange);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .card span {
+      display: block;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    address {
+      font-style: normal;
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .cards,
+      .bar {
+        grid-template-columns: 1fr;
+      }
+
+      .machine-face,
+      .copy {
+        min-height: 380px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .copy { padding: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="bar">
+      <img src="assets/logo.svg" alt="Arizona Tooling and Machining Association profile mark">
+      <span>Valley Verified Network</span>
+      <span>Scottsdale, AZ 85271</span>
+    </header>
+
+    <section class="hero">
+      <aside class="machine-face">
+        <img src="assets/logo.svg" alt="">
+        <span>Manufacturing / Machining Association</span>
+      </aside>
+
+      <div class="copy">
+        <div class="kicker">Tooling and machining</div>
+        <h1>Arizona Tooling &amp; Machining Association</h1>
+        <p class="lead">Arizona Tooling &amp; Machining Association gives Scottsdale and Valley manufacturers a clear association contact for the machining, tooling, and business-services side of Arizona's industrial economy.</p>
+        <div class="actions">
+          <a href="tel:+16025107219">(602) 510-7219</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="cards" aria-label="Business facts">
+      <div class="card">
+        <b>Address</b>
+        <address>PO Box 3518<br>Scottsdale, AZ 85271</address>
+      </div>
+      <div class="card">
+        <b>Category</b>
+        <span>Local Services</span>
+      </div>
+      <div class="card">
+        <b>License Type</b>
+        <span>Business &amp; Professional Services</span>
+      </div>
+      <div class="card">
+        <b>Audience</b>
+        <span>Manufacturing, machining, and tooling businesses</span>
+      </div>
+      <div class="card">
+        <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <span>The association belongs in Valley Verified because the research ties a specific Scottsdale PO Box, direct phone number, business and professional services category, and manufacturing/machining focus to a local public profile. It gives Valley companies a concrete starting point for tooling and machining association inquiries.</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

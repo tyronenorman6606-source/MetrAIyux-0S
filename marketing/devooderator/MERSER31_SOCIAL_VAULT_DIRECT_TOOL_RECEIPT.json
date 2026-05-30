@@ -1,0 +1,318 @@
+{
+  "schema": "merser31-social-vault-direct-mcp-tool-receipt.v6",
+  "mcpName": "Merser31 / Mercer 3.1",
+  "mcpServer": ".vscode/MCP5-Merser3.1/stdio-server.mjs --stdio",
+  "targetSurface": "DevodeRator Social Vault final posting cockpit upgrade",
+  "targetFolder": "marketing/devooderator",
+  "startedAt": "2026-05-26T12:37:39.446Z",
+  "finishedAt": "2026-05-26T12:37:40.097Z",
+  "repoProofPolicyOverride": "Owner disabled Codex browser proof in this repo; verification is static/build/HTTP/deploy smoke plus owner manual browser review.",
+  "mcpToolInventory": {
+    "listedTools": [
+      "mcp5_index",
+      "mcp5_packs",
+      "mcp5_room",
+      "mcp5_component",
+      "mcp5_prompt_pack",
+      "mcp5_cli",
+      "mcp5_build_plan",
+      "mcp5_icons"
+    ]
+  },
+  "campaignInventory": {
+    "platformAppLaunchBlocks": 54,
+    "adVariantBlocks": 54,
+    "shortVideoScripts": 54,
+    "postingCalendarRows": 54,
+    "quickLaunchRows": 54,
+    "postingTrackerRows": 54,
+    "channelSnippetRows": 54,
+    "priorityReplyDmSequences": 15,
+    "approvalGatedRows": 10,
+    "platformVisualCards": 54,
+    "platformSvgCards": 54,
+    "platformPngCards": 54,
+    "generalSvgCards": 12,
+    "generalPngCards": 12,
+    "totalLocalGeneratedCards": 66,
+    "totalUploadReadyPngCards": 66,
+    "contentFiles": 21,
+    "replyBankSections": 11,
+    "dmOutreachSections": 6
+  },
+  "publicArtifacts": [
+    "content/social-vault/image-briefs-pack.md",
+    "content/social-vault/instagram-facebook-pack.md",
+    "content/social-vault/linkedin-longform-pack.md",
+    "content/social-vault/platform-app-ad-variant-bank.md",
+    "content/social-vault/platform-app-campaign-pack.md",
+    "content/social-vault/platform-app-channel-snippets.json",
+    "content/social-vault/platform-app-channel-snippets.md",
+    "content/social-vault/platform-app-dm-outreach-pack.md",
+    "content/social-vault/platform-app-posting-calendar.csv",
+    "content/social-vault/platform-app-posting-calendar.json",
+    "content/social-vault/platform-app-posting-calendar.md",
+    "content/social-vault/platform-app-posting-log-template.csv",
+    "content/social-vault/platform-app-posting-log-template.md",
+    "content/social-vault/platform-app-priority-reply-dm-sequences.json",
+    "content/social-vault/platform-app-priority-reply-dm-sequences.md",
+    "content/social-vault/platform-app-quick-launch-index.json",
+    "content/social-vault/platform-app-quick-launch-index.md",
+    "content/social-vault/platform-app-reply-bank.md",
+    "content/social-vault/platform-app-short-video-script-pack.md",
+    "content/social-vault/reddit-x-thread-pack.md",
+    "content/social-vault/social-vault-end-to-end-runbook.md",
+    "assets/social/generated/platforms/platform-cards.json",
+    "assets/social/generated/social-vault-refresh.svg",
+    "assets/social/generated/social-vault-refresh.png",
+    "social.html",
+    "social-vault.css",
+    "social-vault.js"
+  ],
+  "actualToolCalls": [
+    {
+      "tool": "mcp5_index",
+      "arguments": {},
+      "isError": false
+    },
+    {
+      "tool": "mcp5_packs",
+      "arguments": {},
+      "isError": false
+    },
+    {
+      "tool": "mcp5_build_plan",
+      "arguments": {},
+      "isError": false
+    },
+    {
+      "tool": "mcp5_prompt_pack",
+      "arguments": {},
+      "isError": false
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "enterprise-hero-orbit"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "proof-receipt-rail"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "command-terminal-card"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "metraiyux-icons"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "barbershop"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "tattoo"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "med-spa"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "gym"
+      },
+      "isError": false
+    },
+    {
+      "tool": "mcp5_icons",
+      "arguments": {},
+      "isError": false
+    },
+    {
+      "tool": "mcp5_cli",
+      "arguments": {},
+      "isError": false
+    }
+  ],
+  "failedCalls": [],
+  "implementationNotes": [
+    "Preserve existing copied social assets and mirror links.",
+    "Expose the final 54-day calendar as a selected-day posting cockpit with day selector, copy plan, and image downloads.",
+    "Add 54 structured channel snippet rows and channel-specific copy buttons for Hook, LinkedIn, Instagram/Facebook, carousel, X, Reddit, CTA, and hashtags.",
+    "Add 15 high-priority reply/DM sequences for hot lead handling after app-specific posts go live.",
+    "Keep public copy free of raw credentials, signed owner URLs, private proof routes, unapproved endorsement claims, fake screenshots, and unverified metrics.",
+    "Default social image workflow to PNG while preserving SVG source downloads."
+  ],
+  "validationSummary": {
+    "nodeCheck": "node --check marketing/devooderator/social-vault.js passed",
+    "staticInventory": "21 content files, 54 calendar rows, 54 snippet rows, 15 priority rows, 54 platform cards with PNGs",
+    "localHttp": "HTTP-only local smoke fetched social page, JS/CSS, new content packs, generated PNG, and manifest; browser proof remains owner-handled."
+  },
+  "results": [
+    {
+      "tool": "mcp5_index",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.047Z",
+      "finishedAt": "2026-05-26T12:37:40.055Z",
+      "durationMs": 8,
+      "isError": false,
+      "text": "{\n  \"name\": \"merser3-1\",\n  \"displayName\": \"Merser3.1 by Skyes Over London\",\n  \"packageName\": \"@skyes0verl0nd0n/merser3-1\",\n  \"binAliases\": [\n    \"Merser\",\n    \"merser\",\n    \"Merser31\",\n    \"merser31\",\n    \"merser3-1\"\n  ],\n  \"version\": \"3.1.0\",\n  \"tools\": [\n    {\n      \"name\": \"mcp5_index\",\n      \"desc\": \"List Merser tools, source packs, commands, and exposed world lanes.\"\n    },\n    {\n      \"name\": \"mcp5_packs\",\n      \"desc\": \"Return the extracted source-pack manifest and provenance.\"\n    },\n    {\n      \"name\": \"mcp5_room\",\n      \"desc\": \"Return a real world-site room contract. id: barbershop | tattoo | med-spa | gym\"\n    },\n    {\n      \"name\": \"mcp5_component\",\n      \"desc\": \"Return a source component registry entry by id.\"\n    },\n    {\n      \"name\": \"mcp5_prompt_pack\",\n      \"desc\": \"Return prompt/context pack paths and uses.\"\n    },\n    {\n      \"name\": \"mcp5_cli\",\n      \"desc\": \"Return local stdio, local HTTP, build, worker, deploy, stress, mine, and proof commands.\"\n    },\n    {\n      \"name\": \"mcp5_build_plan\",\n      \"desc\": \"Return the Merser implementation contract for building from these packs.\"\n    },\n    {\n      \"name\": \"mcp5_icons\",\n      \"desc\": \"Return the MetrAIyux icon-system location and representative icon names.\"\n    }\n  ],\n  \"sourcePacks\": [\n    {\n      \"id\": \"real-room-pack\",\n      \"title\": \"Skye Real World-Site Full Room Pack v3\",\n      \"path\": \"source-packs/skye_real_worldsite_full_room_pack_v3\",\n      \"origin\": \"skye_real_worldsite_full_room_pack_v3.zip\"\n    },\n    {\n      \"id\": \"visual-standard-themes\",\n      \"title\": \"MetrAIyux 0S Skye Visual Standard Themes v4\",\n      \"path\": \"source-packs\",\n      \"origin\": \"metraiyux-0s-skye-visual-standard-themes-v4.zip\"\n    },\n    {\n      \"id\": \"kaixu-arsenal\",\n      \"title\": \"Kaixu Personal Design Arsenal v3\",\n      \"path\": \"source-packs/kaixu_personal_design_arsenal_v3\",\n      \"origin\": \"kaixu-personal-design-arsenal-v3-copy-paste-fixed.zip\"\n    },\n    {\n      \"id\": \"mcp2-base\",\n      \"title\": \"MCP2 Base Lane\",\n      \"path\": \".\",\n      \"origin\": \"copied from .vscode/MCP2 after zip extraction\"\n    }\n  ],\n  \"roomWorlds\": [\n    {\n      \"id\": \"barbershop\",\n      \"title\": \"Barbershop Chair Room World\",\n      \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/barbershop_chair_room_world.html\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/barbershop_chair_room_world.html\"\n    },\n    {\n      \"id\": \"tattoo\",\n      \"title\": \"Tattoo Studio Ink Room\",\n      \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/tattoo_studio_ink_room.html\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/tattoo_studio_ink_room.html\"\n    },\n    {\n      \"id\": \"med-spa\",\n      \"title\": \"Med Spa Glow Room\",\n      \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/med_spa_glow_room.html\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/med_spa_glow_room.html\"\n    },\n    {\n      \"id\": \"gym\",\n      \"title\": \"Gym Training Floor World\",\n      \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/gym_training_floor_world.html\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/gym_training_floor_world.html\"\n    }\n  ],\n  \"componentCount\": 9,\n  \"cli\": [\n    \"cd /workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1\",\n    \"npm install\",\n    \"npx @skyes0verl0nd0n/merser3-1 --help\",\n    \"npx @skyes0verl0nd0n/merser3-1 --health\",\n    \"node stdio-server.mjs --help\",\n    \"node stdio-server.mjs --stdio\",\n    \"node stdio-server.mjs --health\",\n    \"npm run dev\",\n    \"npm start\",\n    \"npm run start:http\",\n    \"npm run build\",\n    \"npm run build:worker\",\n    \"npm run deploy\",\n    \"npm run stress\",\n    \"npm run mcp:mine -- .vscode/MCP5-Merser3.1\",\n    \"npm run proof:live-browser -- --url https://merser3-1.pages.dev/ --expect \\\"Merser3.1\\\"\"\n  ]\n}"
+    },
+    {
+      "tool": "mcp5_packs",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.055Z",
+      "finishedAt": "2026-05-26T12:37:40.058Z",
+      "durationMs": 3,
+      "isError": false,
+      "text": "{\n  \"extractedInto\": \"/workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1/source-packs\",\n  \"zipsMovedFrom\": \"/workspaces/MetrAIyux-0S/.vscode/MCP2\",\n  \"zipsDeletedAfterExtract\": true,\n  \"packs\": [\n    {\n      \"id\": \"real-room-pack\",\n      \"title\": \"Skye Real World-Site Full Room Pack v3\",\n      \"path\": \"source-packs/skye_real_worldsite_full_room_pack_v3\",\n      \"origin\": \"skye_real_worldsite_full_room_pack_v3.zip\",\n      \"count\": 5,\n      \"purpose\": \"Actual environment pages with central physical anchors, hotspots, drag-to-pan, zoom, scroll camera movement, and drawer panels.\"\n    },\n    {\n      \"id\": \"visual-standard-themes\",\n      \"title\": \"MetrAIyux 0S Skye Visual Standard Themes v4\",\n      \"path\": \"source-packs\",\n      \"origin\": \"metraiyux-0s-skye-visual-standard-themes-v4.zip\",\n      \"count\": 1162,\n      \"purpose\": \"Theme engine, visual standard CSS, icon libraries, copy-paste components, MCP bridge packets, QA ledgers, and public claims docs.\"\n    },\n    {\n      \"id\": \"kaixu-arsenal\",\n      \"title\": \"Kaixu Personal Design Arsenal v3\",\n      \"path\": \"source-packs/kaixu_personal_design_arsenal_v3\",\n      \"origin\": \"kaixu-personal-design-arsenal-v3-copy-paste-fixed.zip\",\n      \"count\": 182,\n      \"purpose\": \"Zero-dependency personal design arsenal with icons, templates, snippets, social cards, and paste-ready UI material.\"\n    },\n    {\n      \"id\": \"mcp2-base\",\n      \"title\": \"MCP2 Base Lane\",\n      \"path\": \".\",\n      \"origin\": \"copied from .vscode/MCP2 after zip extraction\",\n      \"count\": 1,\n      \"purpose\": \"The shipped Merser source copied into MCP5-Merser3.1 as the next base for zoomed-out, scroll-entered, dimensional universe rooms.\"\n    }\n  ],\n  \"deployedSourceRoot\": \"https://merser3-1.pages.dev/source-packs/\",\n  \"mcpMineReceipt\": \"MCP_TOOLING_RECEIPT.json\"\n}"
+    },
+    {
+      "tool": "mcp5_build_plan",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.058Z",
+      "finishedAt": "2026-05-26T12:37:40.060Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"name\": \"Merser3.1 by Skyes Over London\",\n  \"packageName\": \"@skyes0verl0nd0n/merser3-1\",\n  \"rule\": \"Merser3.1 starts from the extracted MCP2/Merser packs, not from a disconnected visual demo, and stays separate from the shipped Merser release.\",\n  \"appSurface\": \"React/R3F world with a zoomed-out first camera, draggable chambers, 360 orbit/focus controls, modular dimensional room surfaces, live iframe source-room previews, and a deployed source-pack browser.\",\n  \"nextGenerationDirective\": \"Start every universe zoomed out. Let GSAP/Lenis scroll bring the user into the world, reveal dimensional surfaces over time, and break flat rooms into modular whole-surface universes.\",\n  \"runtimeStack\": [\n    \"React\",\n    \"Three\",\n    \"R3F\",\n    \"Drei\",\n    \"postprocessing\",\n    \"GSAP\",\n    \"Lenis\",\n    \"Framer Motion\",\n    \"Motion\",\n    \"Theatre\",\n    \"Remotion\",\n    \"live source-pack iframe previews\"\n  ],\n  \"deployedRoomWorlds\": [\n    {\n      \"id\": \"barbershop\",\n      \"title\": \"Barbershop Chair Room World\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/barbershop_chair_room_world.html\"\n    },\n    {\n      \"id\": \"tattoo\",\n      \"title\": \"Tattoo Studio Ink Room\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/tattoo_studio_ink_room.html\"\n    },\n    {\n      \"id\": \"med-spa\",\n      \"title\": \"Med Spa Glow Room\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/med_spa_glow_room.html\"\n    },\n    {\n      \"id\": \"gym\",\n      \"title\": \"Gym Training Floor World\",\n      \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/gym_training_floor_world.html\"\n    }\n  ],\n  \"mcpSurfaces\": [\n    \"stdio\",\n    \"streamable HTTP\",\n    \"Cloudflare Pages Worker\"\n  ],\n  \"gatePolicy\": \"No new app password. Remote worker uses the shared 0S gate introspection or owner bearer.\",\n  \"proofPolicy\": \"Mine with quantumskyes, build, deploy, then live headed browser proof on desktop and mobile.\"\n}"
+    },
+    {
+      "tool": "mcp5_prompt_pack",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.060Z",
+      "finishedAt": "2026-05-26T12:37:40.062Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "[\n  {\n    \"id\": \"context\",\n    \"title\": \"MetrAIyux MCP Context Packet\",\n    \"path\": \"source-packs/mcp/METRAIYUX_MCP_CONTEXT_PACKET.md\",\n    \"use\": \"Brand/output contract for MCP-backed generation.\"\n  },\n  {\n    \"id\": \"prompts\",\n    \"title\": \"MetrAIyux MCP Prompt Pack\",\n    \"path\": \"source-packs/mcp/METRAIYUX_MCP_PROMPT_PACK.md\",\n    \"use\": \"Ready prompts for icons, components, registries, and polish passes.\"\n  },\n  {\n    \"id\": \"bridge\",\n    \"title\": \"Skye Design MCP Bridge\",\n    \"path\": \"source-packs/mcp/README_MCP_BRIDGE.md\",\n    \"use\": \"Explains how the copy-paste vault is wired into the MCP workflow.\"\n  }\n]"
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "enterprise-hero-orbit"
+      },
+      "startedAt": "2026-05-26T12:37:40.062Z",
+      "finishedAt": "2026-05-26T12:37:40.064Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"enterprise-hero-orbit\",\n  \"path\": \"source-packs/copy-paste/expanded/components/enterprise-hero-orbit.html\",\n  \"group\": \"expanded\",\n  \"use\": \"Orbiting hero system for larger platform pages.\"\n}"
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "proof-receipt-rail"
+      },
+      "startedAt": "2026-05-26T12:37:40.064Z",
+      "finishedAt": "2026-05-26T12:37:40.065Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"proof-receipt-rail\",\n  \"path\": \"source-packs/copy-paste/components/proof-receipt-rail.html\",\n  \"group\": \"core copy-paste\",\n  \"use\": \"Receipt strip for deployments, QA, and browser proof.\"\n}"
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "command-terminal-card"
+      },
+      "startedAt": "2026-05-26T12:37:40.066Z",
+      "finishedAt": "2026-05-26T12:37:40.068Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"command-terminal-card\",\n  \"path\": \"source-packs/copy-paste/components/command-terminal-card.html\",\n  \"group\": \"core copy-paste\",\n  \"use\": \"Terminal-style CLI and command display.\"\n}"
+    },
+    {
+      "tool": "mcp5_component",
+      "arguments": {
+        "id": "metraiyux-icons"
+      },
+      "startedAt": "2026-05-26T12:37:40.068Z",
+      "finishedAt": "2026-05-26T12:37:40.070Z",
+      "durationMs": 3,
+      "isError": false,
+      "text": "{\n  \"id\": \"metraiyux-icons\",\n  \"path\": \"source-packs/assets/icons/metraiyux-icons.json\",\n  \"group\": \"icon system\",\n  \"use\": \"78 themed platform icons in SVG and PNG form.\"\n}"
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "barbershop"
+      },
+      "startedAt": "2026-05-26T12:37:40.070Z",
+      "finishedAt": "2026-05-26T12:37:40.072Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"barbershop\",\n  \"title\": \"Barbershop Chair Room World\",\n  \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/barbershop_chair_room_world.html\",\n  \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/barbershop_chair_room_world.html\",\n  \"anchor\": \"barber chair\",\n  \"interactions\": [\n    \"drag-to-pan room\",\n    \"clickable service hotspots\",\n    \"drawer conversion panels\",\n    \"scroll camera movement\",\n    \"ctrl-wheel zoom\"\n  ],\n  \"use\": \"Local-service world-site where the room sells the appointment through a physical environment instead of a generic layout.\"\n}"
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "tattoo"
+      },
+      "startedAt": "2026-05-26T12:37:40.072Z",
+      "finishedAt": "2026-05-26T12:37:40.074Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"tattoo\",\n  \"title\": \"Tattoo Studio Ink Room\",\n  \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/tattoo_studio_ink_room.html\",\n  \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/tattoo_studio_ink_room.html\",\n  \"anchor\": \"ink chair and studio walls\",\n  \"interactions\": [\n    \"flash-wall hotspot\",\n    \"artist proof drawer\",\n    \"camera drift\",\n    \"drag-to-pan room\",\n    \"consult route\"\n  ],\n  \"use\": \"Portfolio and booking room with the studio itself as the navigation model.\"\n}"
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "med-spa"
+      },
+      "startedAt": "2026-05-26T12:37:40.074Z",
+      "finishedAt": "2026-05-26T12:37:40.075Z",
+      "durationMs": 1,
+      "isError": false,
+      "text": "{\n  \"id\": \"med-spa\",\n  \"title\": \"Med Spa Glow Room\",\n  \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/med_spa_glow_room.html\",\n  \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/med_spa_glow_room.html\",\n  \"anchor\": \"treatment bed glow room\",\n  \"interactions\": [\n    \"treatment hotspots\",\n    \"proof drawer\",\n    \"scroll camera\",\n    \"drag-to-pan room\",\n    \"soft zoom\"\n  ],\n  \"use\": \"High-trust service page where proof, service menu, and conversion live inside a calm treatment room.\"\n}"
+    },
+    {
+      "tool": "mcp5_room",
+      "arguments": {
+        "id": "gym"
+      },
+      "startedAt": "2026-05-26T12:37:40.075Z",
+      "finishedAt": "2026-05-26T12:37:40.077Z",
+      "durationMs": 2,
+      "isError": false,
+      "text": "{\n  \"id\": \"gym\",\n  \"title\": \"Gym Training Floor World\",\n  \"sourcePath\": \"source-packs/skye_real_worldsite_full_room_pack_v3/gym_training_floor_world.html\",\n  \"liveUrl\": \"https://merser3-1.pages.dev/source-packs/skye_real_worldsite_full_room_pack_v3/gym_training_floor_world.html\",\n  \"anchor\": \"training floor\",\n  \"interactions\": [\n    \"program hotspots\",\n    \"trainer proof drawer\",\n    \"camera rail\",\n    \"drag-to-pan room\",\n    \"zoom\"\n  ],\n  \"use\": \"Fitness offer surface with the training floor acting as the navigation and sales environment.\"\n}"
+    },
+    {
+      "tool": "mcp5_icons",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.077Z",
+      "finishedAt": "2026-05-26T12:37:40.078Z",
+      "durationMs": 1,
+      "isError": false,
+      "text": "{\n  \"registry\": \"source-packs/assets/icons/metraiyux-icons.json\",\n  \"svgDir\": \"source-packs/assets/icons/metraiyux\",\n  \"pngDir\": \"source-packs/assets/icons/metraiyux-png\",\n  \"representative\": [\n    \"command-core\",\n    \"component-kit\",\n    \"proof-ledger\",\n    \"route-engine\",\n    \"worker-node\",\n    \"workspace-orbit\",\n    \"approval-gate\",\n    \"database-vault\"\n  ]\n}"
+    },
+    {
+      "tool": "mcp5_cli",
+      "arguments": {},
+      "startedAt": "2026-05-26T12:37:40.078Z",
+      "finishedAt": "2026-05-26T12:37:40.079Z",
+      "durationMs": 1,
+      "isError": false,
+      "text": "{\n  \"localStdio\": {\n    \"command\": \"node\",\n    \"args\": [\n      \"/workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1/stdio-server.mjs\",\n      \"--stdio\"\n    ]\n  },\n  \"localSourceStdio\": {\n    \"command\": \"node\",\n    \"args\": [\n      \"/workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1/stdio-server.mjs\",\n      \"--stdio\"\n    ]\n  },\n  \"binAliases\": [\n    \"Merser\",\n    \"merser\",\n    \"Merser31\",\n    \"merser31\",\n    \"merser3-1\"\n  ],\n  \"localHttp\": \"cd /workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1 && npm run start:http\",\n  \"remoteEndpoint\": \"https://merser3-1.pages.dev/mcp\",\n  \"health\": \"https://merser3-1.pages.dev/health\",\n  \"auth\": \"Remote access is gate-owned. Use the shared FS27/SkyGate/Free99 bearer or an owner-issued MCP_HTTP_BEARER_TOKEN.\",\n  \"commands\": [\n    \"cd /workspaces/MetrAIyux-0S/.vscode/MCP5-Merser3.1\",\n    \"npm install\",\n    \"npx @skyes0verl0nd0n/merser3-1 --help\",\n    \"npx @skyes0verl0nd0n/merser3-1 --health\",\n    \"node stdio-server.mjs --help\",\n    \"node stdio-server.mjs --stdio\",\n    \"node stdio-server.mjs --health\",\n    \"npm run dev\",\n    \"npm start\",\n    \"npm run start:http\",\n    \"npm run build\",\n    \"npm run build:worker\",\n    \"npm run deploy\",\n    \"npm run stress\",\n    \"npm run mcp:mine -- .vscode/MCP5-Merser3.1\",\n    \"npm run proof:live-browser -- --url https://merser3-1.pages.dev/ --expect \\\"Merser3.1\\\"\"\n  ]\n}"
+    }
+  ]
+}

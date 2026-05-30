@@ -34,6 +34,61 @@ const env = {
   ...parseEnv(path.join(repoRoot, '.env')),
   ...process.env
 };
+for (const [key, value] of Object.entries(env)) {
+  if (value !== undefined && value !== null) process.env[key] = String(value);
+}
+if (!process.env.R2_CONFIG_PREFIX && !process.env.R2_CONFIG_FOLDER_ID) process.env.R2_CONFIG_PREFIX = 'vault-system';
+if (!process.env.R2_BUCKET && !process.env.S3_BUCKET) process.env.R2_BUCKET = 'client-drop-vault';
+
+const SOURCE_CUSTODY_DIR_EXCLUDES = [
+  'node_modules',
+  '.next',
+  'dist',
+  'build',
+  '.netlify',
+  '.wrangler',
+  '.wrangler-dry-run',
+  '.cache',
+  '.tmp',
+  '.1',
+  'test-artifacts',
+  'test-results',
+  'download-handoffs',
+  'backups',
+  'wal_archive',
+  '.staffing-db',
+  '.skyevault-out'
+];
+
+const SOURCE_CUSTODY_MEDIA_EXTS = [
+  '.3gp',
+  '.aac',
+  '.aiff',
+  '.ape',
+  '.avif',
+  '.flac',
+  '.gif',
+  '.heic',
+  '.heif',
+  '.jpeg',
+  '.jpg',
+  '.m4a',
+  '.m4v',
+  '.mkv',
+  '.mov',
+  '.mp3',
+  '.mp4',
+  '.ogg',
+  '.opus',
+  '.png',
+  '.psd',
+  '.raw',
+  '.tif',
+  '.tiff',
+  '.wav',
+  '.webm',
+  '.webp'
+];
 
 function cleanName(value, fallback = 'MetrAIyux-0S') {
   return String(value || fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
@@ -62,6 +117,144 @@ function archiveFormatValue() {
   if (['zip', 'repo.zip', 'full-zip'].includes(raw)) return 'zip';
   if (['tar.zst', 'tar-zst', 'tarzst', 'tar'].includes(raw)) return 'tar.zst';
   throw new Error(`Unsupported --archive-format=${raw}. Use "zip" or "tar.zst".`);
+}
+
+function envBool(name, fallback = false) {
+  const value = env[name];
+  if (value === undefined || value === '') return fallback;
+  return !['0', 'false', 'no', 'off'].includes(String(value).trim().toLowerCase());
+}
+
+function firstCsv(value = '') {
+  return String(value || '').split(',').map((item) => item.trim()).filter(Boolean)[0] || '';
+}
+
+function firstValidEmail(...values) {
+  for (const value of values) {
+    for (const candidate of String(value || '').split(',')) {
+      const email = candidate.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return email;
+    }
+  }
+  return '';
+}
+
+function ownerCustodyFields() {
+  const ownerEmail = firstValidEmail(
+    argValue('--owner-email'),
+    env.SKYEVAULT_OWNER_EMAIL,
+    env.OWNER_EMAIL,
+    env.ADMIN_EMAILS,
+    env.METRAIYUX_0S_SKYGATE_ADMIN_EMAILS,
+    env.LEGAL_REVIEW_ADMIN_EMAIL,
+    env.RESEND_FROM_EMAIL,
+    env.ZOHO_DEFAULT_FROM,
+    env.SKYEVAULT_CLIENT_EMAIL
+  ) || 'owner@metraiyux.local';
+  const ownerName = String(
+    argValue('--owner-name')
+    || env.SKYEVAULT_OWNER_NAME
+    || env.OWNER_NAME
+    || env.GIT_AUTHOR_NAME
+    || '0S Founder Account'
+  ).trim();
+  return {
+    ownerEmail,
+    ownerName,
+    ownerWorkspaceId: String(env.SKYEVAULT_OWNER_WORKSPACE_ID || 'metraiyux-0s-owner').trim(),
+    ownerWorkspaceSlug: String(env.SKYEVAULT_OWNER_WORKSPACE_SLUG || 'metraiyux-0s').trim(),
+    ownerSubject: String(env.SKYEVAULT_OWNER_SUBJECT || 'metraiyux-owner-admin').trim(),
+    ownerAccountId: String(env.SKYEVAULT_OWNER_ACCOUNT_ID || 'founder-metraiyux-0s-owner').trim(),
+    custodyScope: 'owner-private',
+    vaultVisibility: 'owner-only',
+    accessPolicy: 'shared-gate-owner-admin-only',
+    clientVaultVisible: false,
+    clientVaultDownloadAllowed: false
+  };
+}
+
+function sourceCustodyMode() {
+  if (
+    args.includes('--literal-full')
+    || args.includes('--all-bytes')
+    || args.includes('--no-source-custody')
+    || envBool('SKYEVAULT_FULL_REPO_LITERAL', false)
+    || envBool('SKYEVAULT_FULL_REPO_ALL_BYTES', false)
+  ) {
+    return false;
+  }
+  return args.includes('--source-custody') || envBool('SKYEVAULT_FULL_REPO_SOURCE_CUSTODY', false);
+}
+
+function sourceCustodyZipExcludes(repoBase) {
+  const patterns = [];
+  for (const dir of SOURCE_CUSTODY_DIR_EXCLUDES) {
+    patterns.push(`${repoBase}/${dir}/*`, `${repoBase}/*/${dir}/*`, `${repoBase}/*/*/${dir}/*`, `${repoBase}/*/*/*/${dir}/*`);
+  }
+  for (const ext of SOURCE_CUSTODY_MEDIA_EXTS) {
+    patterns.push(`*${ext}`, `*${ext.toUpperCase()}`);
+  }
+  return patterns;
+}
+
+function sourceCustodyTarExcludes(repoBase) {
+  const patterns = [];
+  for (const dir of SOURCE_CUSTODY_DIR_EXCLUDES) {
+    patterns.push(`${repoBase}/${dir}`, `${repoBase}/*/${dir}`, `${repoBase}/*/*/${dir}`, `${repoBase}/*/*/*/${dir}`);
+  }
+  for (const ext of SOURCE_CUSTODY_MEDIA_EXTS) {
+    patterns.push(`*${ext}`, `*${ext.toUpperCase()}`);
+  }
+  return patterns;
+}
+
+function vaultBaseUrl() {
+  const explicit = argValue('--base-url', '');
+  const workerUrl = env.SKYEVAULT_DROP_WORKER_URL || env.SKYEVAULT_DROP_CLOUDFLARE_URL || '';
+  const configured = explicit || workerUrl || env.SKYEVAULT_DROP_URL || env.URL || '';
+  const fallback = 'https://skyevault-drop.graylondonskyes.workers.dev';
+  if (!explicit && /netlify\.app/i.test(configured) && env.SKYEVAULT_ALLOW_NETLIFY_VAULT_URL !== '1') {
+    return (workerUrl || fallback).replace(/\/$/, '');
+  }
+  return String(configured || fallback).replace(/\/$/, '');
+}
+
+function directR2Mode() {
+  return args.includes('--direct-r2') || envBool('SKYEVAULT_FULL_REPO_DIRECT_R2', false);
+}
+
+function directR2Destination(sessionBody) {
+  const prefix = argValue(
+    '--direct-r2-prefix',
+    env.SKYEVAULT_FULL_REPO_DIRECT_R2_PREFIX
+      || env.SKYEVAULT_DIRECT_R2_PREFIX
+      || env.SKYEVAULT_DESTINATION_PREFIX
+      || 'client-uploads/primary'
+  );
+  return {
+    id: argValue('--destination-id', env.SKYEVAULT_DESTINATION_ID || 'primary') || 'primary',
+    name: env.SKYEVAULT_DESTINATION_NAME || 'Primary Production Intake',
+    role: 'primary',
+    priority: 1,
+    folderId: prefix,
+    maxFileSizeGb: numberValue('max-gb', 100),
+    accept: '*',
+    enabled: true,
+    directR2: true,
+    workspaceId: sessionBody.workspaceId
+  };
+}
+
+let directR2ModulePromise = null;
+
+function directR2Modules() {
+  if (!directR2ModulePromise) {
+    directR2ModulePromise = Promise.all([
+      import('../SkyeVault-Drop/netlify/functions/_lib/google-drive.js'),
+      import('../SkyeVault-Drop/netlify/functions/_lib/config.js')
+    ]).then(([drive, config]) => ({ drive, config }));
+  }
+  return directR2ModulePromise;
 }
 
 function portalHeaders(portalKey) {
@@ -160,16 +353,25 @@ function readJsonIfExists(file) {
 async function main() {
   const repo = path.resolve(argValue('--repo', repoRoot));
   const repoName = cleanName(argValue('--repo-name', path.basename(repo)));
+  const parent = path.dirname(repo);
+  const repoBase = path.basename(repo);
   const runStamp = stamp();
   const outDir = path.resolve(argValue('--out-dir', path.join(os.tmpdir(), `skyevault-full-repo-${repoName}-${runStamp}`)));
   const maxGb = numberValue('max-gb', 100);
   const archiveFormat = archiveFormatValue();
+  const sourceCustody = sourceCustodyMode();
+  const ownerCustody = ownerCustodyFields();
   const zipLevel = Math.max(0, Math.min(9, integerValue('zip-level', archiveFormat === 'zip' ? 0 : 1)));
   const zipUploadConcurrency = archiveFormat === 'zip' ? Math.max(1, Math.min(32, integerValue('zip-upload-concurrency', 8))) : 1;
   const keepZipStage = args.includes('--keep-zip-stage') || env.SKYEVAULT_FULL_REPO_KEEP_ZIP_STAGE === '1';
-  const skipDirectRestoreKitUpload = args.includes('--skip-direct-restore-kit-upload') || env.SKYEVAULT_FULL_REPO_SKIP_DIRECT_RESTORE_KIT_UPLOAD === '1';
+  const uploadDirectRestoreKit = (
+    args.includes('--upload-direct-restore-kit')
+    || env.SKYEVAULT_FULL_REPO_UPLOAD_DIRECT_RESTORE_KIT === '1'
+  ) && !args.includes('--skip-direct-restore-kit-upload') && env.SKYEVAULT_FULL_REPO_SKIP_DIRECT_RESTORE_KIT_UPLOAD !== '1';
+  const skipDirectRestoreKitUpload = !uploadDirectRestoreKit;
   const declaredMaxBytes = Math.floor(maxGb * 1024 * 1024 * 1024);
-  const baseUrl = String(env.SKYEVAULT_DROP_URL || env.URL || 'https://skyevault-drop.netlify.app').replace(/\/$/, '');
+  const baseUrl = vaultBaseUrl();
+  const useDirectR2 = directR2Mode();
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   const headers = portalHeaders(portalKey);
   const artifactPassphrase = randBase64(48);
@@ -184,6 +386,7 @@ async function main() {
     : '';
   const zipArchivePath = archiveFormat === 'zip' ? path.join(zipStagingDir, restoreArchiveName) : '';
   const zipEncryptedStagePath = archiveFormat === 'zip' ? path.join(zipStagingDir, fileName) : '';
+  let precomputedEncryptedZip = null;
   const logFile = path.join(outDir, 'full-repo-stream-upload.log');
 
   fs.mkdirSync(outDir, { recursive: true, mode: 0o700 });
@@ -207,15 +410,25 @@ async function main() {
   const sessionBody = {
     uploadModeRequested: 's3-multipart-streaming',
     streamingMultipart: true,
-    clientName: argValue('--client-name', env.SKYEVAULT_CLIENT_NAME || 'Owner Admin'),
-    clientEmail: argValue('--client-email', env.SKYEVAULT_CLIENT_EMAIL || 'owner-admin@metraiyux.local'),
+    clientName: argValue('--client-name', env.SKYEVAULT_CLIENT_NAME || ownerCustody.ownerName),
+    clientEmail: argValue('--client-email', env.SKYEVAULT_CLIENT_EMAIL || ownerCustody.ownerEmail),
     projectName: argValue('--project-name', `${repoName} Full Repo SkyDrive Push`),
     clientReference: argValue('--client-reference', `full-repo:${runStamp}`),
     assetType: argValue('--asset-type', `Encrypted full-repo ${archiveFormat} SkyDrive artifact`),
     notes: argValue('--notes', 'Streaming encrypted full repository artifact. Unlock/control metadata is stored in a separate SkyeSecure secret pack.'),
-    workspaceId: argValue('--workspace-id', env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || 'owner-admin'),
-    developerId: argValue('--developer-id', env.SKYEVAULT_DEVELOPER_ID || env.USER || 'owner-admin'),
-    developerName: argValue('--developer-name', env.SKYEVAULT_DEVELOPER_NAME || 'Owner Admin'),
+    workspaceId: argValue('--workspace-id', env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || ownerCustody.ownerWorkspaceId),
+    developerId: argValue('--developer-id', env.SKYEVAULT_DEVELOPER_ID || ownerCustody.ownerSubject),
+    developerName: argValue('--developer-name', env.SKYEVAULT_DEVELOPER_NAME || ownerCustody.ownerName),
+    custodyScope: ownerCustody.custodyScope,
+    vaultVisibility: ownerCustody.vaultVisibility,
+    ownerAccountId: ownerCustody.ownerAccountId,
+    ownerSubject: ownerCustody.ownerSubject,
+    ownerEmail: ownerCustody.ownerEmail,
+    ownerWorkspaceId: ownerCustody.ownerWorkspaceId,
+    ownerWorkspaceSlug: ownerCustody.ownerWorkspaceSlug,
+    accessPolicy: ownerCustody.accessPolicy,
+    clientVaultVisible: ownerCustody.clientVaultVisible,
+    clientVaultDownloadAllowed: ownerCustody.clientVaultDownloadAllowed,
     destinationId: argValue('--destination-id', env.SKYEVAULT_DESTINATION_ID || ''),
     usageRightsAccepted: true,
     retentionAcknowledged: true,
@@ -234,12 +447,37 @@ async function main() {
     outDir,
     maxGb,
     baseUrl,
+    directR2: useDirectR2 ? {
+      enabled: true,
+      target: 'cloudflare-r2',
+      note: 'Bypasses the SkyeVault HTTP Worker only for the data plane; artifact and receipt ledger still land in the SkyeVault R2 bucket.'
+    } : { enabled: false },
     fileName,
+    ownerCustody: {
+      custodyScope: ownerCustody.custodyScope,
+      vaultVisibility: ownerCustody.vaultVisibility,
+      ownerAccountId: ownerCustody.ownerAccountId,
+      ownerSubject: ownerCustody.ownerSubject,
+      ownerWorkspaceId: ownerCustody.ownerWorkspaceId,
+      accessPolicy: ownerCustody.accessPolicy
+    },
     archiveFormat,
     zipLevel: archiveFormat === 'zip' ? zipLevel : undefined,
     zipUploadConcurrency: archiveFormat === 'zip' ? zipUploadConcurrency : undefined,
     zipStagingDir: archiveFormat === 'zip' ? zipStagingDir : undefined,
     zipUploadMode: archiveFormat === 'zip' ? 'staged-encrypted-concurrent-multipart' : undefined,
+    sourceCustody: sourceCustody ? {
+      enabled: true,
+      includes: ['.git history', 'tracked source files', 'untracked source files', 'env/config/secrets inside repo tree'],
+      excludes: {
+        directories: SOURCE_CUSTODY_DIR_EXCLUDES,
+        mediaExtensions: SOURCE_CUSTODY_MEDIA_EXTS
+      },
+      note: 'Source custody excludes dependency/cache/build output and production media, while keeping source code, local config, secrets, and Git history encrypted inside the artifact.'
+    } : { enabled: false },
+    directRestoreKitUpload: uploadDirectRestoreKit
+      ? 'explicitly-enabled'
+      : 'disabled-by-default; use --upload-direct-restore-kit only for private controlled recovery lanes',
     control: 'SkyDrive artifact + SkyeSecure unlock/control pack'
   };
   fs.writeFileSync(path.join(outDir, 'PLAN.json'), `${JSON.stringify(localPlan, null, 2)}\n`);
@@ -247,8 +485,6 @@ async function main() {
   console.log(`Unlock codes: ${path.join(outDir, 'UNLOCK_CODES.txt')}`);
   if (dryRun) return;
 
-  const parent = path.dirname(repo);
-  const repoBase = path.basename(repo);
   const keyFile = path.join(outDir, `${repoName}-artifact-key-material.txt`);
 
   if (archiveFormat === 'zip') {
@@ -262,6 +498,7 @@ async function main() {
       }
     }
     if (excludePatterns.length) zipArgs.push('-x', ...excludePatterns);
+    if (sourceCustody) zipArgs.push('-x', ...sourceCustodyZipExcludes(repoBase));
     appendLog(logFile, `Creating ZIP stage ${zipArchivePath}`);
     const zip = spawn('zip', zipArgs, { cwd: parent, stdio: ['ignore', 'ignore', 'pipe'] });
     zip.stderr.on('data', (chunk) => appendLog(logFile, `[zip] ${chunk.toString().trim()}`));
@@ -279,12 +516,104 @@ async function main() {
       fs.rmSync(zipArchivePath, { force: true });
       appendLog(logFile, `Removed plaintext ZIP stage ${zipArchivePath}`);
     }
+    const encryptedZipSha256 = await sha256File(zipEncryptedStagePath);
+    precomputedEncryptedZip = { file: zipEncryptedStagePath, bytes: encryptedZipBytes, sha256: encryptedZipSha256 };
+    sessionBody.fileSize = encryptedZipBytes;
+    sessionBody.submissionTotalBytes = encryptedZipBytes;
+    sessionBody.fileFingerprint = {
+      algorithm: 'SHA-256',
+      mode: 'encrypted-full-repo-artifact',
+      value: encryptedZipSha256,
+      bytesHashed: encryptedZipBytes,
+      generatedAt: new Date().toISOString(),
+      note: `SHA-256 of encrypted ${archiveFormat} artifact before vault upload.`
+    };
   }
 
-  const session = await fetchJson(`${baseUrl}/api/upload-session`, sessionBody, headers, 'upload-session');
+  let directR2 = null;
+  let session = null;
+  if (useDirectR2) {
+    const modules = await directR2Modules();
+    const destination = directR2Destination(sessionBody);
+    const sessionId = modules.config.newSessionId();
+    const directUploadInput = {
+      ...sessionBody,
+      sessionId,
+      chunkSizeMb: Number(env.SKYEVAULT_FULL_REPO_DIRECT_R2_CHUNK_MB || env.SKYEVAULT_CHUNK_SIZE_MB || 64)
+    };
+    session = await modules.drive.createStreamingMultipartSession(destination, directUploadInput);
+    await modules.config.saveSessionManifest({
+      sessionId,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      destination,
+      file: {
+        name: fileName,
+        size: sessionBody.fileSize,
+        mimeType: sessionBody.mimeType,
+        fingerprint: sessionBody.fileFingerprint || null
+      },
+      intake: {
+        clientName: sessionBody.clientName,
+        clientEmail: sessionBody.clientEmail,
+        projectName: sessionBody.projectName,
+        clientReference: sessionBody.clientReference,
+        assetType: sessionBody.assetType,
+        notes: sessionBody.notes,
+        workspaceId: sessionBody.workspaceId,
+        developerId: sessionBody.developerId,
+        developerName: sessionBody.developerName,
+        accessType: 'owner-direct-r2'
+      },
+      access: {
+        type: 'owner-direct-r2',
+        workspaceId: sessionBody.workspaceId,
+        developerId: sessionBody.developerId,
+        developerName: sessionBody.developerName
+      },
+      policy: {
+        directR2: true,
+        streamingMultipart: true,
+        repoPushPolicy: {
+          kind: 'full-repo-push',
+          mode: 'owner-direct-r2',
+          plan: 'owner-direct-r2-unlimited',
+          maxGb
+        }
+      },
+      attempts: [],
+      uploadUrlHash: null
+    });
+    session = {
+      ...session,
+      ok: true,
+      sessionId,
+      destination: {
+        id: destination.id,
+        name: destination.name,
+        role: destination.role,
+        priority: destination.priority
+      },
+      directR2: true
+    };
+    directR2 = { ...modules, destination };
+  } else {
+    session = await fetchJson(`${baseUrl}/api/upload-session`, sessionBody, headers, 'upload-session');
+  }
   appendLog(logFile, `Upload session ${session.sessionId} object ${session.objectKey}`);
   const chunkSize = Number(session.chunkSize || 64 * 1024 * 1024);
   const partBatch = Math.max(1, Math.min(250, Number(env.SKYEVAULT_STREAM_PART_URL_BATCH || 64)));
+  const streamUploadConcurrency = Math.max(
+    1,
+    Math.min(
+      16,
+      Number(
+        env.SKYEVAULT_FULL_REPO_STREAM_UPLOAD_CONCURRENCY
+        || env.SKYEVAULT_FULL_REPO_TAR_UPLOAD_CONCURRENCY
+        || Math.min(4, zipUploadConcurrency)
+      )
+    )
+  );
   const completedParts = [];
   let encryptedBytes = 0;
   let sha256 = '';
@@ -293,6 +622,9 @@ async function main() {
   let partUrls = [];
 
   async function nextPartUrl() {
+    if (directR2) {
+      return directR2.drive.createMultipartPartUrl(session.objectKey, session.uploadId, partNumber);
+    }
     if (!partUrls.length) {
       const partNumbers = Array.from({ length: partBatch }, (_, index) => partNumber + index);
       const batch = await fetchJson(`${baseUrl}/api/upload-part-url`, {
@@ -319,7 +651,25 @@ async function main() {
     partNumber += 1;
   }
 
+  async function uploadChunkAt(currentPartNumber, chunk) {
+    encryptedBytes += chunk.length;
+    if (encryptedBytes > declaredMaxBytes) throw new Error(`Encrypted stream exceeded declared ${maxGb} GB ceiling.`);
+    const uploadUrl = directR2
+      ? directR2.drive.createMultipartPartUrl(session.objectKey, session.uploadId, currentPartNumber)
+      : (await fetchPartUrls([currentPartNumber])).find((part) => Number(part.partNumber) === currentPartNumber)?.uploadUrl;
+    if (!uploadUrl) throw new Error(`No upload URL was returned for part ${currentPartNumber}.`);
+    const eTag = await putPart(uploadUrl, chunk, `R2 part ${currentPartNumber}`);
+    completedParts[currentPartNumber - 1] = { partNumber: currentPartNumber, eTag };
+    appendLog(logFile, `Uploaded part ${currentPartNumber} (${chunk.length} bytes)`);
+  }
+
   async function fetchPartUrls(partNumbers) {
+    if (directR2) {
+      return partNumbers.map((partNumber) => ({
+        partNumber,
+        uploadUrl: directR2.drive.createMultipartPartUrl(session.objectKey, session.uploadId, partNumber)
+      }));
+    }
     const batch = await fetchJson(`${baseUrl}/api/upload-part-url`, {
       ...sessionBody,
       sessionId: session.sessionId,
@@ -336,15 +686,23 @@ async function main() {
     if (size > declaredMaxBytes) throw new Error(`Encrypted file exceeded declared ${maxGb} GB ceiling.`);
     const totalParts = Math.ceil(size / chunkSize);
     const urls = new Map();
-    appendLog(logFile, `Preparing ${totalParts} multipart URLs for concurrent upload (${zipUploadConcurrency} workers)`);
+    for (const part of session.parts || []) {
+      if (part?.partNumber && part.uploadUrl) urls.set(Number(part.partNumber), part.uploadUrl);
+    }
+    appendLog(logFile, `Preparing ${totalParts} multipart URLs for concurrent upload (${zipUploadConcurrency} workers; ${urls.size} returned by session)`);
     for (let start = 1; start <= totalParts; start += partBatch) {
       const end = Math.min(totalParts, start + partBatch - 1);
       const partNumbers = Array.from({ length: end - start + 1 }, (_, index) => start + index);
-      for (const part of await fetchPartUrls(partNumbers)) urls.set(part.partNumber, part.uploadUrl);
+      const missingPartNumbers = partNumbers.filter((partNumber) => !urls.has(partNumber));
+      if (missingPartNumbers.length) {
+        for (const part of await fetchPartUrls(missingPartNumbers)) urls.set(part.partNumber, part.uploadUrl);
+      }
     }
     const fd = await fs.promises.open(file, 'r');
     let nextFilePart = 1;
-    const hashPromise = sha256File(file);
+    const hashPromise = precomputedEncryptedZip?.file === file
+      ? Promise.resolve(precomputedEncryptedZip.sha256)
+      : sha256File(file);
     async function worker() {
       while (true) {
         const currentPart = nextFilePart;
@@ -376,15 +734,26 @@ async function main() {
     sha256 = result.sha256;
   } else {
     const hash = crypto.createHash('sha256');
-    const originalUploadChunk = uploadChunk;
+    const inFlightUploads = new Set();
     const uploadAndHashChunk = async (chunk) => {
       hash.update(chunk);
-      await originalUploadChunk(chunk);
+      const currentPartNumber = partNumber;
+      partNumber += 1;
+      const uploadPromise = uploadChunkAt(currentPartNumber, chunk)
+        .finally(() => inFlightUploads.delete(uploadPromise));
+      inFlightUploads.add(uploadPromise);
+      if (inFlightUploads.size >= streamUploadConcurrency) await Promise.race(inFlightUploads);
     };
+    appendLog(logFile, `Streaming tar.zst upload concurrency: ${streamUploadConcurrency}`);
     const openssl = spawn('openssl', ['enc', '-aes-256-cbc', '-salt', '-pbkdf2', '-iter', '700000', '-md', 'sha256', '-pass', `file:${keyFile}`], { stdio: ['pipe', 'pipe', 'pipe'] });
     const opensslDone = exitPromise(openssl, 'openssl', [0]);
     const archiveDone = [];
-    const tar = spawn('tar', ['--warning=no-file-changed', '--ignore-failed-read', '-C', parent, '-cf', '-', repoBase], { stdio: ['ignore', 'pipe', 'pipe'] });
+    const tarArgs = ['--warning=no-file-changed', '--ignore-failed-read'];
+    if (sourceCustody) {
+      for (const pattern of sourceCustodyTarExcludes(repoBase)) tarArgs.push(`--exclude=${pattern}`);
+    }
+    tarArgs.push('-C', parent, '-cf', '-', repoBase);
+    const tar = spawn('tar', tarArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
     const zstd = spawn('zstd', ['-T0', '-3'], { stdio: ['pipe', 'pipe', 'pipe'] });
     archiveDone.push(exitPromise(tar, 'tar', [0, 1]), exitPromise(zstd, 'zstd', [0]));
     tar.stderr.on('data', (chunk) => appendLog(logFile, `[tar] ${chunk.toString().trim()}`));
@@ -402,28 +771,26 @@ async function main() {
       }
     }
     if (pending.length) await uploadAndHashChunk(pending);
+    await Promise.all(inFlightUploads);
     await Promise.all([...archiveDone, opensslDone]);
     sha256 = hash.digest('hex');
   }
 
-  const completion = await fetchJson(`${baseUrl}/api/upload-complete`, {
-    ...sessionBody,
-    sessionId: session.sessionId,
-    destinationId: session.destination.id,
-    destinationName: session.destination.name,
-    driveFileId: session.objectKey,
-    fileSize: encryptedBytes,
-    submissionTotalBytes: encryptedBytes,
-    fileFingerprint: {
-      algorithm: 'SHA-256',
-      mode: 'streamed-encrypted-artifact',
-      value: sha256,
-      bytesHashed: encryptedBytes,
-      generatedAt: new Date().toISOString(),
-      note: `SHA-256 of encrypted ${archiveFormat} stream uploaded to Cloudflare R2.`
-    },
-    driveFile: {
+  const completedFingerprint = {
+    algorithm: 'SHA-256',
+    mode: 'streamed-encrypted-artifact',
+    value: sha256,
+    bytesHashed: encryptedBytes,
+    generatedAt: new Date().toISOString(),
+    note: `SHA-256 of encrypted ${archiveFormat} stream uploaded to Cloudflare R2.`
+  };
+  let completion = null;
+  if (directR2) {
+    const completedObject = await directR2.drive.completeMultipartUpload(session.objectKey, session.uploadId, completedParts);
+    const completedAt = new Date().toISOString();
+    const driveFile = {
       ...(session.r2Object || {}),
+      ...completedObject,
       id: session.objectKey,
       key: session.objectKey,
       bucket: session.bucket,
@@ -431,9 +798,144 @@ async function main() {
       parts: completedParts,
       name: fileName,
       size: String(encryptedBytes),
-      mimeType: 'application/octet-stream'
+      mimeType: 'application/octet-stream',
+      appProperties: {
+        source: 'client-drop-vault',
+        sessionId: session.sessionId,
+        destinationId: session.destination.id,
+        workspaceId: sessionBody.workspaceId,
+        developerId: sessionBody.developerId,
+        custodyScope: sessionBody.custodyScope,
+        vaultVisibility: sessionBody.vaultVisibility,
+        ownerAccountId: sessionBody.ownerAccountId,
+        ownerSubject: sessionBody.ownerSubject,
+        ownerWorkspaceId: sessionBody.ownerWorkspaceId,
+        fileFingerprintAlgorithm: completedFingerprint.algorithm,
+        fileFingerprintMode: completedFingerprint.mode,
+        fileFingerprintValue: completedFingerprint.value,
+        fileFingerprintBytes: String(completedFingerprint.bytesHashed),
+        usageRightsAccepted: 'true',
+        retentionAcknowledged: 'true'
+      }
+    };
+    const receiptId = directR2.config.receiptIdFor(session.sessionId, session.objectKey);
+    const entry = {
+      id: receiptId,
+      completedAt,
+      sessionId: session.sessionId,
+      workspaceId: sessionBody.workspaceId,
+      developerId: sessionBody.developerId,
+      developerName: sessionBody.developerName,
+      accessType: 'owner-direct-r2',
+      custodyScope: sessionBody.custodyScope,
+      vaultVisibility: sessionBody.vaultVisibility,
+      ownerAccountId: sessionBody.ownerAccountId,
+      ownerSubject: sessionBody.ownerSubject,
+      ownerEmail: sessionBody.ownerEmail,
+      ownerWorkspaceId: sessionBody.ownerWorkspaceId,
+      ownerWorkspaceSlug: sessionBody.ownerWorkspaceSlug,
+      accessPolicy: sessionBody.accessPolicy,
+      clientVaultVisible: sessionBody.clientVaultVisible,
+      clientVaultDownloadAllowed: sessionBody.clientVaultDownloadAllowed,
+      destinationId: session.destination.id,
+      destinationName: session.destination.name,
+      clientName: sessionBody.clientName,
+      clientEmail: sessionBody.clientEmail,
+      projectName: sessionBody.projectName,
+      clientReference: sessionBody.clientReference,
+      assetType: sessionBody.assetType,
+      notes: sessionBody.notes,
+      usageRightsAccepted: true,
+      retentionAcknowledged: true,
+      fileName,
+      fileSize: encryptedBytes,
+      mimeType: 'application/octet-stream',
+      driveFile,
+      fileFingerprint: completedFingerprint,
+      scan: {
+        status: 'skipped',
+        verdict: 'owner-direct-r2-source-custody',
+        reason: 'Direct R2 owner custody lane stores encrypted artifact only; source scan already ran locally before autosync.'
+      }
+    };
+    const ledger = await directR2.config.appendLedger(entry);
+    let manifestWarning = '';
+    try {
+      await directR2.config.markSessionManifestComplete(session.sessionId, {
+        receiptId,
+        driveFileId: session.objectKey,
+        completedAt,
+        destination: directR2.destination,
+        file: { name: fileName, size: encryptedBytes, mimeType: 'application/octet-stream', fingerprint: completedFingerprint },
+        intake: {
+          clientName: sessionBody.clientName,
+          clientEmail: sessionBody.clientEmail,
+          projectName: sessionBody.projectName,
+          clientReference: sessionBody.clientReference,
+          assetType: sessionBody.assetType,
+          workspaceId: sessionBody.workspaceId,
+          developerId: sessionBody.developerId,
+          developerName: sessionBody.developerName,
+          accessType: 'owner-direct-r2',
+          custodyScope: sessionBody.custodyScope,
+          vaultVisibility: sessionBody.vaultVisibility,
+          ownerAccountId: sessionBody.ownerAccountId,
+          ownerSubject: sessionBody.ownerSubject,
+          ownerEmail: sessionBody.ownerEmail,
+          ownerWorkspaceId: sessionBody.ownerWorkspaceId,
+          ownerWorkspaceSlug: sessionBody.ownerWorkspaceSlug,
+          accessPolicy: sessionBody.accessPolicy,
+          clientVaultVisible: sessionBody.clientVaultVisible,
+          clientVaultDownloadAllowed: sessionBody.clientVaultDownloadAllowed
+        },
+        policy: { directR2: true }
+      });
+    } catch (error) {
+      manifestWarning = error.message;
     }
-  }, headers, 'upload-complete');
+    completion = {
+      ok: true,
+      directR2: true,
+      entry,
+      receipt: {
+        id: receiptId,
+        created: ledger.receiptCreated,
+        fileId: ledger.receiptSaved?.id || null,
+        warning: ledger.ledgerWarning || manifestWarning || null
+      },
+      ledger: {
+        entryCount: ledger.entryCount,
+        warning: ledger.ledgerWarning || ''
+      },
+      download: {
+        ok: false,
+        recoveryUrl: `${baseUrl}/#client-vault`,
+        warning: 'Direct R2 owner custody mode does not mint a public signed download URL from the Worker.'
+      }
+    };
+  } else {
+    completion = await fetchJson(`${baseUrl}/api/upload-complete`, {
+      ...sessionBody,
+      sessionId: session.sessionId,
+      destinationId: session.destination.id,
+      destinationName: session.destination.name,
+      driveFileId: session.objectKey,
+      fileSize: encryptedBytes,
+      submissionTotalBytes: encryptedBytes,
+      fileFingerprint: completedFingerprint,
+      driveFile: {
+        ...(session.r2Object || {}),
+        id: session.objectKey,
+        key: session.objectKey,
+        bucket: session.bucket,
+        uploadId: session.uploadId,
+        parts: completedParts,
+        name: fileName,
+        size: String(encryptedBytes),
+        mimeType: 'application/octet-stream'
+      }
+    }, headers, 'upload-complete');
+  }
 
   if (archiveFormat === 'zip' && !keepZipStage) {
     fs.rmSync(zipEncryptedStagePath, { force: true });
@@ -544,7 +1046,10 @@ async function main() {
         fs.existsSync(helperSource) ? 'skyevault-restore-encrypted-zip.mjs' : ''
       ].filter(Boolean),
       upload: {
-        status: skipDirectRestoreKitUpload ? 'skipped' : 'not-attempted'
+        status: skipDirectRestoreKitUpload ? 'local-only' : 'not-attempted',
+        reason: skipDirectRestoreKitUpload
+          ? 'Direct restore kit contains artifact key material. Upload is disabled by default; the encrypted SkyeSecure control pack is the vault-owned recovery lane.'
+          : ''
       }
     };
 
@@ -560,6 +1065,9 @@ async function main() {
         `--client-reference=full-repo-direct-restore-kit:${runStamp}`,
         `--client-name=${sessionBody.clientName}`,
         `--client-email=${sessionBody.clientEmail}`,
+        `--workspace-id=${sessionBody.workspaceId}`,
+        `--developer-id=${sessionBody.developerId}`,
+        `--developer-name=${sessionBody.developerName}`,
         '--mime-type=application/zip'
       ], {
         cwd: repoRoot,
@@ -585,6 +1093,213 @@ async function main() {
     }
   }
 
+  async function uploadDirectR2File(file, fields = {}) {
+    if (!directR2) throw new Error('Direct R2 upload is not active.');
+    const bytes = fs.statSync(file).size;
+    const fileSha256 = await sha256File(file);
+    const uploadSessionId = directR2.config.newSessionId();
+    const name = path.basename(file);
+    const controlDestination = {
+      ...directR2.destination,
+      folderId: fields.folderId || env.SKYEVAULT_CONTROL_PACK_R2_PREFIX || `${directR2.destination.folderId}/control-packs`
+    };
+    const fingerprint = {
+      algorithm: 'SHA-256',
+      mode: fields.fingerprintMode || 'direct-r2-control-pack',
+      value: fileSha256,
+      bytesHashed: bytes,
+      generatedAt: new Date().toISOString(),
+      note: fields.fingerprintNote || 'SHA-256 of encrypted SkyeSecure control pack uploaded directly to Cloudflare R2.'
+    };
+    const uploadInput = {
+      sessionId: uploadSessionId,
+      fileName: name,
+      fileSize: bytes,
+      mimeType: fields.mimeType || 'application/octet-stream',
+      chunkSizeMb: Number(env.SKYEVAULT_CONTROL_PACK_DIRECT_R2_CHUNK_MB || 8),
+      submissionFileCount: 1,
+      submissionTotalBytes: bytes,
+      fileFingerprint: fingerprint,
+      clientName: fields.clientName || sessionBody.clientName,
+      clientEmail: fields.clientEmail || sessionBody.clientEmail,
+      projectName: fields.projectName || `${repoName} Full Repo SkyDrive Control Pack`,
+      clientReference: fields.clientReference || `full-repo-control-pack:${runStamp}`,
+      assetType: fields.assetType || 'Encrypted SkyeSecure full-repo control pack',
+      notes: fields.notes || 'Encrypted owner control pack for the matching full-repo source-custody artifact.',
+      workspaceId: fields.workspaceId || sessionBody.workspaceId,
+      developerId: fields.developerId || sessionBody.developerId,
+      developerName: fields.developerName || sessionBody.developerName,
+      custodyScope: fields.custodyScope || sessionBody.custodyScope,
+      vaultVisibility: fields.vaultVisibility || sessionBody.vaultVisibility,
+      ownerAccountId: fields.ownerAccountId || sessionBody.ownerAccountId,
+      ownerSubject: fields.ownerSubject || sessionBody.ownerSubject,
+      ownerEmail: fields.ownerEmail || sessionBody.ownerEmail,
+      ownerWorkspaceId: fields.ownerWorkspaceId || sessionBody.ownerWorkspaceId,
+      ownerWorkspaceSlug: fields.ownerWorkspaceSlug || sessionBody.ownerWorkspaceSlug,
+      accessPolicy: fields.accessPolicy || sessionBody.accessPolicy,
+      clientVaultVisible: sessionBody.clientVaultVisible,
+      clientVaultDownloadAllowed: sessionBody.clientVaultDownloadAllowed,
+      usageRightsAccepted: true,
+      retentionAcknowledged: true
+    };
+    const directSession = await directR2.drive.createStreamingMultipartSession(controlDestination, uploadInput);
+    await directR2.config.saveSessionManifest({
+      sessionId: uploadSessionId,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      destination: controlDestination,
+      file: { name, size: bytes, mimeType: uploadInput.mimeType, fingerprint },
+      intake: {
+        clientName: uploadInput.clientName,
+        clientEmail: uploadInput.clientEmail,
+        projectName: uploadInput.projectName,
+        clientReference: uploadInput.clientReference,
+        assetType: uploadInput.assetType,
+        notes: uploadInput.notes,
+        workspaceId: uploadInput.workspaceId,
+        developerId: uploadInput.developerId,
+        developerName: uploadInput.developerName,
+        accessType: 'owner-direct-r2',
+        custodyScope: uploadInput.custodyScope,
+        vaultVisibility: uploadInput.vaultVisibility,
+        ownerAccountId: uploadInput.ownerAccountId,
+        ownerSubject: uploadInput.ownerSubject,
+        ownerEmail: uploadInput.ownerEmail,
+        ownerWorkspaceId: uploadInput.ownerWorkspaceId,
+        ownerWorkspaceSlug: uploadInput.ownerWorkspaceSlug,
+        accessPolicy: uploadInput.accessPolicy,
+        clientVaultVisible: uploadInput.clientVaultVisible,
+        clientVaultDownloadAllowed: uploadInput.clientVaultDownloadAllowed
+      },
+      access: {
+        type: 'owner-direct-r2',
+        workspaceId: uploadInput.workspaceId,
+        developerId: uploadInput.developerId,
+        developerName: uploadInput.developerName
+      },
+      policy: { directR2: true, controlPack: true },
+      attempts: [],
+      uploadUrlHash: null
+    });
+
+    const directChunkSize = Number(directSession.chunkSize || 8 * 1024 * 1024);
+    const directParts = [];
+    const fd = await fs.promises.open(file, 'r');
+    try {
+      let offset = 0;
+      let directPartNumber = 1;
+      while (offset < bytes || (bytes === 0 && directPartNumber === 1)) {
+        const length = Math.min(directChunkSize, Math.max(0, bytes - offset));
+        const buffer = Buffer.allocUnsafe(length);
+        const { bytesRead } = length ? await fd.read(buffer, 0, length, offset) : { bytesRead: 0 };
+        const body = bytesRead === length ? buffer : buffer.subarray(0, bytesRead);
+        const uploadUrl = directR2.drive.createMultipartPartUrl(directSession.objectKey, directSession.uploadId, directPartNumber);
+        const eTag = await putPart(uploadUrl, body, `R2 control-pack part ${directPartNumber}`);
+        directParts.push({ partNumber: directPartNumber, eTag });
+        appendLog(logFile, `Uploaded control pack part ${directPartNumber} (${body.length} bytes)`);
+        offset += body.length;
+        directPartNumber += 1;
+        if (!body.length) break;
+      }
+    } finally {
+      await fd.close();
+    }
+    const completedObject = await directR2.drive.completeMultipartUpload(directSession.objectKey, directSession.uploadId, directParts);
+    const completedAt = new Date().toISOString();
+    const driveFile = {
+      ...(directSession.r2Object || {}),
+      ...completedObject,
+      id: directSession.objectKey,
+      key: directSession.objectKey,
+      bucket: directSession.bucket,
+      uploadId: directSession.uploadId,
+      parts: directParts,
+      name,
+      size: String(bytes),
+      mimeType: uploadInput.mimeType
+    };
+    const receiptId = directR2.config.receiptIdFor(uploadSessionId, directSession.objectKey);
+    const entry = {
+      id: receiptId,
+      completedAt,
+      sessionId: uploadSessionId,
+      workspaceId: uploadInput.workspaceId,
+      developerId: uploadInput.developerId,
+      developerName: uploadInput.developerName,
+      accessType: 'owner-direct-r2',
+      custodyScope: uploadInput.custodyScope,
+      vaultVisibility: uploadInput.vaultVisibility,
+      ownerAccountId: uploadInput.ownerAccountId,
+      ownerSubject: uploadInput.ownerSubject,
+      ownerEmail: uploadInput.ownerEmail,
+      ownerWorkspaceId: uploadInput.ownerWorkspaceId,
+      ownerWorkspaceSlug: uploadInput.ownerWorkspaceSlug,
+      accessPolicy: uploadInput.accessPolicy,
+      clientVaultVisible: uploadInput.clientVaultVisible,
+      clientVaultDownloadAllowed: uploadInput.clientVaultDownloadAllowed,
+      destinationId: controlDestination.id,
+      destinationName: controlDestination.name,
+      clientName: uploadInput.clientName,
+      clientEmail: uploadInput.clientEmail,
+      projectName: uploadInput.projectName,
+      clientReference: uploadInput.clientReference,
+      assetType: uploadInput.assetType,
+      notes: uploadInput.notes,
+      usageRightsAccepted: true,
+      retentionAcknowledged: true,
+      fileName: name,
+      fileSize: bytes,
+      mimeType: uploadInput.mimeType,
+      driveFile,
+      fileFingerprint: fingerprint,
+      scan: {
+        status: 'skipped',
+        verdict: 'owner-direct-r2-control-pack',
+        reason: 'Control pack is already encrypted as a SkyeSecure secret pack before upload.'
+      }
+    };
+    const ledger = await directR2.config.appendLedger(entry);
+    await directR2.config.markSessionManifestComplete(uploadSessionId, {
+      receiptId,
+      driveFileId: directSession.objectKey,
+      completedAt,
+      destination: controlDestination,
+      file: { name, size: bytes, mimeType: uploadInput.mimeType, fingerprint },
+      intake: {
+        clientName: uploadInput.clientName,
+        clientEmail: uploadInput.clientEmail,
+        projectName: uploadInput.projectName,
+        clientReference: uploadInput.clientReference,
+        assetType: uploadInput.assetType,
+        workspaceId: uploadInput.workspaceId,
+        developerId: uploadInput.developerId,
+        developerName: uploadInput.developerName,
+        accessType: 'owner-direct-r2',
+        custodyScope: uploadInput.custodyScope,
+        vaultVisibility: uploadInput.vaultVisibility,
+        ownerAccountId: uploadInput.ownerAccountId,
+        ownerSubject: uploadInput.ownerSubject,
+        ownerEmail: uploadInput.ownerEmail,
+        ownerWorkspaceId: uploadInput.ownerWorkspaceId,
+        ownerWorkspaceSlug: uploadInput.ownerWorkspaceSlug,
+        accessPolicy: uploadInput.accessPolicy,
+        clientVaultVisible: uploadInput.clientVaultVisible,
+        clientVaultDownloadAllowed: uploadInput.clientVaultDownloadAllowed
+      },
+      policy: { directR2: true, controlPack: true }
+    }).catch((error) => appendLog(logFile, `Control pack manifest completion warning: ${error.message}`));
+    return {
+      status: 'uploaded',
+      receiptId,
+      sessionId: uploadSessionId,
+      objectKey: directSession.objectKey,
+      bytes,
+      sha256: fileSha256,
+      parts: directParts.length,
+      ledgerEntryCount: ledger.entryCount
+    };
+  }
+
   const controlPack = path.join(outDir, `${repoName}-skydrive-control-${runStamp}.skyesecrets`);
   const packEnv = { ...process.env, SKYE_SECURE_PASSPHRASE: controlPassphrase, SKYE_SECURE_PEPPER: controlPepper };
   const packResult = spawnSync(process.execPath, [
@@ -607,13 +1322,19 @@ async function main() {
   if (packResult.status) throw new Error(`SkyeSecure control pack failed with status ${packResult.status}.`);
 
   let controlUploadStatus = 'not-attempted';
+  let controlUpload = null;
   if (!args.includes('--skip-control-upload')) {
-    const uploadResult = spawnSync(process.execPath, [
-      path.join(repoRoot, 'tools', 'skye-secure-packs.mjs'),
-      'upload',
-      `--pack=${controlPack}`
-    ], { cwd: repoRoot, env: process.env, stdio: 'inherit' });
-    controlUploadStatus = uploadResult.status === 0 ? 'uploaded' : `failed:${uploadResult.status}`;
+    if (directR2) {
+      controlUpload = await uploadDirectR2File(controlPack);
+      controlUploadStatus = 'uploaded';
+    } else {
+      const uploadResult = spawnSync(process.execPath, [
+        path.join(repoRoot, 'tools', 'skye-secure-packs.mjs'),
+        'upload',
+        `--pack=${controlPack}`
+      ], { cwd: repoRoot, env: process.env, stdio: 'inherit' });
+      controlUploadStatus = uploadResult.status === 0 ? 'uploaded' : `failed:${uploadResult.status}`;
+    }
   }
 
   const handoff = {
@@ -621,6 +1342,7 @@ async function main() {
     directRestoreKit,
     controlPack,
     controlUploadStatus,
+    controlUpload,
     controlPackCodes: path.join(outDir, 'UNLOCK_CODES.txt'),
     logFile
   };
@@ -641,7 +1363,8 @@ async function main() {
       upload: directRestoreKit.upload
     } : null,
     controlPack,
-    controlUploadStatus
+    controlUploadStatus,
+    controlUpload
   }, null, 2));
 }
 

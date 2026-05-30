@@ -7,13 +7,21 @@ import { cleanRequestToken } from "./skyepaySecurity.js";
 import {
   SKYEMERIT_AUTO_CODE,
   SKYEMERIT_FIRST_TIME_PACK_ID,
+  SKYEMERIT_CART_ADD_ON_CODE,
+  SKYEMUSICNEXUS_LANDING_MERIT_CODE,
+  SKYEMUSICNEXUS_LANDING_MERIT_ENDS_AT,
   buildSkyeMeritCheckout,
   skyeMeritMetadata
 } from "./skyeMerit.js";
+import {
+  legalAcceptanceMetadata,
+  normalizeLegalAcceptance
+} from "./legalAcceptance.js";
 import { SKYPAY_REPO_STRIPE_OFFERS } from "./skyepayRepoStripeOffers.js";
 
 const DEFAULT_CURRENCY = "usd";
 const DEFAULT_TRIAL_DAYS = 7;
+const SKYCART_ADD_ON_DISCOUNT_BPS = 3100;
 
 function cents(value) {
   return Math.round(Number(value || 0) * 100);
@@ -637,44 +645,162 @@ function hydrateOffer(offer) {
   };
 }
 
+function skyMusicNexusLandingOffer({
+  id,
+  title,
+  netPrice,
+  storeRank,
+  badge,
+  description,
+  includes,
+  activationPath = "artist_landing_checkout_pending_intake"
+}) {
+  const listedPrice = netPrice + 2000;
+  const lookupSuffix = id.replace(/^skyemusicnexus-/, "").replace(/-/g, "_");
+  return {
+    id,
+    plan_name: id,
+    title,
+    family: "skyemusicnexus",
+    description,
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    status: id === "skyemusicnexus-custom-artist-universe" ? "approved_floor" : "approved",
+    storefront: true,
+    lookup_keys: [`skyemusicnexus_${lookupSuffix}`],
+    line_items: [
+      {
+        id: lookupSuffix,
+        name: title,
+        amount_cents: cents(listedPrice),
+        type: "one_time",
+        lookup_key: `skyemusicnexus_${lookupSuffix}`
+      }
+    ],
+    store_category: "Artist landing builds",
+    store_rank: storeRank,
+    badge,
+    price_label: `$${listedPrice.toLocaleString("en-US")}${id === "skyemusicnexus-custom-artist-universe" ? "+" : ""} listed - $2,000 SkyeMerit = $${netPrice.toLocaleString("en-US")}${id === "skyemusicnexus-custom-artist-universe" ? "+" : ""} due through 2026-06-26`,
+    skyemerit_default_code: SKYEMUSICNEXUS_LANDING_MERIT_CODE,
+    skyemerit_pack_id: "SKYEMUSICNEXUS-LAUNCH-MERIT-PACK",
+    skyemerit_merit_cents: cents(2000),
+    skyemerit_effective_cents: cents(netPrice),
+    skyemerit_expires_at: SKYEMUSICNEXUS_LANDING_MERIT_ENDS_AT,
+    launch_window_ends_on: "2026-06-26",
+    skye_merit_delivery: ["relay13", "skymail", "connectlog", "fs27_event_mirror"],
+    relay13_inbox_delivery: true,
+    relay13_channel: "skyemusicnexus-artist-landing",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: [
+      "Gate session required",
+      "$2,000 SkyeMerit applied before checkout through June 26, 2026",
+      "Relay13/0S inbox handoff after checkout creation",
+      ...includes
+    ],
+    owner_approval_required: true,
+    activation_path: activationPath
+  };
+}
+
 const SKYEMUSICNEXUS_OFFERS = [
+  skyMusicNexusLandingOffer({
+    id: "skyemusicnexus-single-drop-landing-page",
+    title: "SkyeMusicNexus Single / Drop Landing Page",
+    netPrice: 239,
+    storeRank: 27,
+    badge: "Single drop page",
+    description: "One premium artist single or drop landing page generated from artist info, one main image, links, release details, and SkyeMusicNexus proof fields. Listed at premium value, with launch SkyeMerit applying the platform-building credit before checkout.",
+    includes: ["Single/drop landing surface", "Artist info intake", "One main picture transformed into the page", "Music/link buttons", "Basic proof receipt", "Not a white-label platform"]
+  }),
+  skyMusicNexusLandingOffer({
+    id: "skyemusicnexus-artist-page-epk",
+    title: "SkyeMusicNexus Artist Page + EPK",
+    netPrice: 444,
+    storeRank: 28,
+    badge: "Artist EPK",
+    description: "Premium artist page with gallery, EPK, booking/media section, music links, and SkyeMusicNexus dashboard handoff. The artist gets a real owned hub without receiving a white-label copy of the platform.",
+    includes: ["Artist page", "Gallery", "EPK/press surface", "Booking/media section", "Music/social links", "SkyeMusicNexus dashboard handoff", "Not a white-label platform"]
+  }),
+  skyMusicNexusLandingOffer({
+    id: "skyemusicnexus-animated-visualizer-page",
+    title: "SkyeMusicNexus Animated Landing / Visualizer Page",
+    netPrice: 796,
+    storeRank: 29,
+    badge: "Animated page",
+    description: "Animated artist landing and visualizer page using the artist image, drop metadata, music surfaces, and motion system. Built as a premium launch surface, with the $2,000 SkyeMerit shown before checkout during the launch window.",
+    includes: ["Animated landing page", "Visualizer-style hero or section", "Artist image treatment", "Music/drop link surfaces", "Basic content prompts", "Proof receipt", "Not a white-label platform"]
+  }),
+  skyMusicNexusLandingOffer({
+    id: "skyemusicnexus-custom-artist-universe",
+    title: "SkyeMusicNexus Custom Artist Universe",
+    netPrice: 1197,
+    storeRank: 30,
+    badge: "Custom universe",
+    description: "Custom artist universe like the SupaBoy-level build, quoted manually after scope. The SkyePay floor keeps premium value visible while the launch SkyeMerit applies to the starting build floor through June 26, 2026.",
+    includes: ["Custom artist universe", "Asset mining", "Immersive motion/visualizer treatment", "Music/player surfaces", "Gallery/media world", "Booking/contact lane", "Manual quote for scope above the starting floor"]
+  }),
+  {
+    id: "skyemusicnexus-storefront-starter",
+    plan_name: "skyemusicnexus-storefront-starter",
+    title: "SkyeMusicNexus Storefront Starter",
+    family: "skyemusicnexus",
+    description: "Low-friction paid artist storefront lane with 10 active products, SkyePay checkout intents, SkyeCommerce storefront attachment, limited SkyeNet publishing, and shared 0S gate ownership.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    lookup_keys: ["skyemusicnexus_storefront_starter_monthly"],
+    line_items: [
+      { id: "monthly", name: "SkyeMusicNexus Storefront Starter", amount_cents: cents(5), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_storefront_starter_monthly" }
+    ],
+    trial_days: 0,
+    zero_upfront_trial: false,
+    store_category: "Music ops",
+    store_rank: 30.5,
+    badge: "Storefront",
+    source_folder: "metraiyux_0s_site/SkyeMusicNexus",
+    source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
+    brain_owner: "naomi-sterling-brain",
+    includes: ["Gate session required", "1 artist storefront", "10 active products", "150 order intents per month", "SkyePay checkout intent routing", "SkyeCommerce storefront attachment", "2 SkyeNet storefront publishes per month", "13% platform fee policy visible on order intents"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval"
+  },
   {
     id: "skyemusicnexus-studio",
     plan_name: "skyemusicnexus-studio",
-    title: "SkyeMusicNexus Studio",
+    title: "SkyeMusicNexus Artist Host",
     family: "skyemusicnexus",
-    description: "Paid music ops room for active creators and small teams that need gated upload studio, proof playback, release workflow, royalty ledger tracking, payout review, proof exports, and a basic operator dashboard.",
+    description: "Low-cost artist hosting and release packaging for solo artists that need gated upload studio, proof playback, release workflow, royalty ledger tracking, payout review, live drop updates, and fan preview/private-download surfaces without enterprise pricing.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
-    lookup_keys: ["skyemusicnexus_studio_setup", "skyemusicnexus_studio_monthly"],
+    lookup_keys: ["skyemusicnexus_studio_monthly"],
     line_items: [
-      { id: "setup", name: "SkyeMusicNexus Studio Setup", amount_cents: cents(1500), type: "one_time", lookup_key: "skyemusicnexus_studio_setup" },
-      { id: "monthly", name: "SkyeMusicNexus Studio", amount_cents: cents(497), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_studio_monthly" }
+      { id: "monthly", name: "SkyeMusicNexus Artist Host", amount_cents: cents(9), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_studio_monthly" }
     ],
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Music ops",
     store_rank: 31,
-    badge: "Music studio",
+    badge: "Artist host",
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Gate session required", "Up to 5 artists", "25 active releases", "Gated upload studio", "Uploaded audio proof playback", "Release workflow board", "Royalty ledger tracking", "Payout review queue", "Proof exports"],
+    includes: ["Gate session required", "1 primary artist workspace", "Self-serve uploads under fair-use and provider-cost limits", "Live drop updates", "Fan preview plus paid download/private access configuration", "Gated upload studio", "Uploaded audio proof playback", "Release workflow board", "Royalty ledger tracking", "Payout review queue", "Proof exports"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
   {
     id: "skyemusicnexus-label-command",
     plan_name: "skyemusicnexus-label-command",
-    title: "SkyeMusicNexus Label Command",
+    title: "SkyeMusicNexus Artist Collective",
     family: "skyemusicnexus",
-    description: "Label-grade music command lane for multi-artist release operations, gated upload studio, SkyeVault/R2 storage scoping, approval workflows, payout review controls, analytics, reporting, and custom proof receipts.",
+    description: "Small-collective music command lane for several solo artists, collaborators, or a tiny indie label with gated upload studio, SkyeVault/R2 storage scoping, approval workflows, payout review controls, analytics, reporting, and custom proof receipts.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_label_command_setup", "skyemusicnexus_label_command_monthly"],
     line_items: [
-      { id: "setup", name: "SkyeMusicNexus Label Command Setup", amount_cents: cents(6500), type: "one_time", lookup_key: "skyemusicnexus_label_command_setup" },
-      { id: "monthly", name: "SkyeMusicNexus Label Command", amount_cents: cents(1497), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_label_command_monthly" }
+      { id: "setup", name: "SkyeMusicNexus Artist Collective Setup", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_label_command_setup" },
+      { id: "monthly", name: "SkyeMusicNexus Artist Collective", amount_cents: cents(29), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_label_command_monthly" }
     ],
     trial_days: 0,
     zero_upfront_trial: false,
@@ -684,7 +810,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Gate session required", "Up to 25 artists", "150 active releases", "Gated upload studio", "Uploaded audio proof playback", "SkyeVault/R2 storage scoping", "Operator/admin stage", "Approval workflows", "Payout review controls", "Custom proof receipts"],
+    includes: ["Gate session required", "Up to 5 artists", "60 active releases", "Gated upload studio", "Uploaded audio proof playback", "Basic SkyeVault/R2 storage scoping when provider cost is present", "Operator/admin stage", "Approval workflows", "Payout review controls", "Custom proof receipts"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -693,13 +819,13 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-managed-music-ops",
     title: "SkyeMusicNexus Managed Music Ops",
     family: "skyemusicnexus",
-    description: "Managed music operations room with custom artist, release, upload, and storage limits, managed onboarding, team roles, client-facing music ops, custom proof receipts, and owner-approved integration scoping.",
+    description: "Managed artist operations lane for hands-on rollout help, custom release packaging, content runway, proof receipts, and owner-approved integration scoping.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_managed_music_ops_setup", "skyemusicnexus_managed_music_ops_monthly"],
     line_items: [
-      { id: "setup", name: "SkyeMusicNexus Managed Music Ops Setup", amount_cents: cents(15000), type: "one_time", lookup_key: "skyemusicnexus_managed_music_ops_setup" },
-      { id: "monthly", name: "SkyeMusicNexus Managed Music Ops", amount_cents: cents(3997), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_managed_music_ops_monthly" }
+      { id: "setup", name: "SkyeMusicNexus Managed Music Ops Setup", amount_cents: cents(499), type: "one_time", lookup_key: "skyemusicnexus_managed_music_ops_setup" },
+      { id: "monthly", name: "SkyeMusicNexus Managed Music Ops", amount_cents: cents(99), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_managed_music_ops_monthly" }
     ],
     trial_days: 0,
     zero_upfront_trial: false,
@@ -709,7 +835,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Gate session required", "Custom artist limits", "Custom release limits", "Custom upload and storage limits", "SkyeVault/R2 storage scoping", "Managed onboarding", "Team roles", "Client-facing music ops room", "Integration scope quoted separately"],
+    includes: ["Gate session required", "Custom artist limits", "Custom release limits", "Custom upload and storage limits", "SkyeVault/R2 storage scoping", "Managed onboarding", "Team roles", "Client-facing music ops room", "Custom full release worlds quoted separately", "Provider/storage costs approved separately"],
     owner_approval_required: true,
     activation_path: "owner_approved_after_music_scope"
   },
@@ -718,18 +844,18 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-single-song-drop",
     title: "SkyeMusicNexus Single Song Drop",
     family: "skyemusicnexus",
-    description: "One song release capsule, metadata checklist, gated handoff, and proof receipt. No DSP/distributor guarantee is included without separate provider proof.",
+    description: "One song release capsule, metadata checklist, preview/full-file packaging, gated handoff, and proof receipt. No DSP/distributor guarantee is included without separate provider proof.",
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_single_song_drop"],
-    line_items: [{ id: "single-song-drop", name: "SkyeMusicNexus Single Song Drop", amount_cents: cents(199), type: "one_time", lookup_key: "skyemusicnexus_single_song_drop" }],
+    line_items: [{ id: "single-song-drop", name: "SkyeMusicNexus Single Song Drop", amount_cents: cents(15), type: "one_time", lookup_key: "skyemusicnexus_single_song_drop" }],
     store_category: "Music drops",
     store_rank: 34,
     badge: "One song",
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["1 release capsule", "Metadata checklist", "Gated handoff", "Proof receipt", "Gate session required"],
+    includes: ["1 release capsule", "Metadata checklist", "Preview/full package settings", "Gated handoff", "Proof receipt", "Gate session required"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -738,18 +864,18 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-release-drop-plus",
     title: "SkyeMusicNexus Release Drop Plus",
     family: "skyemusicnexus",
-    description: "Single or multi-track release prep with cover/metadata QA, ops queue, and proof export.",
+    description: "Single or multi-track release prep with cover/metadata QA, preview/full package settings, ops queue, and proof export.",
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_release_drop_plus"],
-    line_items: [{ id: "release-drop-plus", name: "SkyeMusicNexus Release Drop Plus", amount_cents: cents(399), type: "one_time", lookup_key: "skyemusicnexus_release_drop_plus" }],
+    line_items: [{ id: "release-drop-plus", name: "SkyeMusicNexus Release Drop Plus", amount_cents: cents(29), type: "one_time", lookup_key: "skyemusicnexus_release_drop_plus" }],
     store_category: "Music drops",
     store_rank: 35,
     badge: "Release prep",
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Release prep", "Cover and metadata QA", "Ops queue", "Proof export", "Gate session required"],
+    includes: ["Release prep", "Cover and metadata QA", "Preview/full package settings", "Ops queue", "Proof export", "Gate session required"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -762,7 +888,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_ep_drop"],
-    line_items: [{ id: "ep-drop", name: "SkyeMusicNexus EP Drop", amount_cents: cents(799), type: "one_time", lookup_key: "skyemusicnexus_ep_drop" }],
+    line_items: [{ id: "ep-drop", name: "SkyeMusicNexus EP Drop", amount_cents: cents(49), type: "one_time", lookup_key: "skyemusicnexus_ep_drop" }],
     store_category: "Music drops",
     store_rank: 36,
     badge: "EP",
@@ -782,7 +908,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_album_drop"],
-    line_items: [{ id: "album-drop", name: "SkyeMusicNexus Album Drop", amount_cents: cents(1497), type: "one_time", lookup_key: "skyemusicnexus_album_drop" }],
+    line_items: [{ id: "album-drop", name: "SkyeMusicNexus Album Drop", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_album_drop" }],
     store_category: "Music drops",
     store_rank: 37,
     badge: "Album",
@@ -802,7 +928,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_catalog_import_pack"],
-    line_items: [{ id: "catalog-import", name: "SkyeMusicNexus Catalog Import Pack", amount_cents: cents(299), type: "one_time", lookup_key: "skyemusicnexus_catalog_import_pack" }],
+    line_items: [{ id: "catalog-import", name: "SkyeMusicNexus Catalog Import Pack", amount_cents: cents(49), type: "one_time", lookup_key: "skyemusicnexus_catalog_import_pack" }],
     store_category: "Music add-ons",
     store_rank: 38,
     badge: "Catalog",
@@ -822,7 +948,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_royalty_ledger_setup"],
-    line_items: [{ id: "royalty-ledger", name: "SkyeMusicNexus Royalty Ledger Setup", amount_cents: cents(249), type: "one_time", lookup_key: "skyemusicnexus_royalty_ledger_setup" }],
+    line_items: [{ id: "royalty-ledger", name: "SkyeMusicNexus Royalty Ledger Setup", amount_cents: cents(25), type: "one_time", lookup_key: "skyemusicnexus_royalty_ledger_setup" }],
     store_category: "Music add-ons",
     store_rank: 39,
     badge: "Ledger",
@@ -842,7 +968,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_payout_review_pack"],
-    line_items: [{ id: "payout-review", name: "SkyeMusicNexus Payout Review Pack", amount_cents: cents(149), type: "one_time", lookup_key: "skyemusicnexus_payout_review_pack" }],
+    line_items: [{ id: "payout-review", name: "SkyeMusicNexus Payout Review Pack", amount_cents: cents(25), type: "one_time", lookup_key: "skyemusicnexus_payout_review_pack" }],
     store_category: "Music add-ons",
     store_rank: 40,
     badge: "Payout review",
@@ -862,7 +988,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_artist_profile_buildout"],
-    line_items: [{ id: "artist-profile", name: "SkyeMusicNexus Artist Profile Buildout", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_artist_profile_buildout" }],
+    line_items: [{ id: "artist-profile", name: "SkyeMusicNexus Artist Profile Buildout", amount_cents: cents(15), type: "one_time", lookup_key: "skyemusicnexus_artist_profile_buildout" }],
     store_category: "Music add-ons",
     store_rank: 41,
     badge: "Profile",
@@ -882,7 +1008,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_social_caption_pack"],
-    line_items: [{ id: "social-caption-pack", name: "SkyeMusicNexus Social Caption Pack", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_social_caption_pack" }],
+    line_items: [{ id: "social-caption-pack", name: "SkyeMusicNexus Social Caption Pack", amount_cents: cents(15), type: "one_time", lookup_key: "skyemusicnexus_social_caption_pack" }],
     store_category: "Music content",
     store_rank: 42,
     badge: "Captions",
@@ -902,7 +1028,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_cover_canvas_request"],
-    line_items: [{ id: "cover-canvas-request", name: "SkyeMusicNexus Cover / Canvas Request", amount_cents: cents(199), type: "one_time", lookup_key: "skyemusicnexus_cover_canvas_request" }],
+    line_items: [{ id: "cover-canvas-request", name: "SkyeMusicNexus Cover / Canvas Request", amount_cents: cents(35), type: "one_time", lookup_key: "skyemusicnexus_cover_canvas_request" }],
     store_category: "Music content",
     store_rank: 43,
     badge: "Cover canvas",
@@ -922,7 +1048,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_short_form_clip_brief"],
-    line_items: [{ id: "short-form-clip-brief", name: "SkyeMusicNexus Short-Form Clip Brief", amount_cents: cents(249), type: "one_time", lookup_key: "skyemusicnexus_short_form_clip_brief" }],
+    line_items: [{ id: "short-form-clip-brief", name: "SkyeMusicNexus Short-Form Clip Brief", amount_cents: cents(35), type: "one_time", lookup_key: "skyemusicnexus_short_form_clip_brief" }],
     store_category: "Music content",
     store_rank: 44,
     badge: "Short form",
@@ -942,7 +1068,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_release_content_kit"],
-    line_items: [{ id: "release-content-kit", name: "SkyeMusicNexus Release Content Kit", amount_cents: cents(499), type: "one_time", lookup_key: "skyemusicnexus_release_content_kit" }],
+    line_items: [{ id: "release-content-kit", name: "SkyeMusicNexus Release Content Kit", amount_cents: cents(79), type: "one_time", lookup_key: "skyemusicnexus_release_content_kit" }],
     store_category: "Music content",
     store_rank: 45,
     badge: "Content kit",
@@ -962,7 +1088,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_community_campaign_sprint"],
-    line_items: [{ id: "community-campaign-sprint", name: "SkyeMusicNexus Community Campaign Sprint", amount_cents: cents(899), type: "one_time", lookup_key: "skyemusicnexus_community_campaign_sprint" }],
+    line_items: [{ id: "community-campaign-sprint", name: "SkyeMusicNexus Community Campaign Sprint", amount_cents: cents(149), type: "one_time", lookup_key: "skyemusicnexus_community_campaign_sprint" }],
     store_category: "Music content",
     store_rank: 46,
     badge: "Campaign",
@@ -982,7 +1108,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_extra_artist_seat_monthly"],
-    line_items: [{ id: "extra-artist-seat", name: "SkyeMusicNexus Extra Artist Seat", amount_cents: cents(29), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_extra_artist_seat_monthly" }],
+    line_items: [{ id: "extra-artist-seat", name: "SkyeMusicNexus Extra Artist Seat", amount_cents: cents(5), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_extra_artist_seat_monthly" }],
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Music add-ons",
@@ -1004,7 +1130,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_extra_release_pack_monthly"],
-    line_items: [{ id: "extra-release-pack", name: "SkyeMusicNexus Extra Release Pack", amount_cents: cents(99), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_extra_release_pack_monthly" }],
+    line_items: [{ id: "extra-release-pack", name: "SkyeMusicNexus Extra Release Pack", amount_cents: cents(9), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_extra_release_pack_monthly" }],
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Music add-ons",
@@ -1022,11 +1148,11 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-gated-audio-vault-pack",
     title: "SkyeMusicNexus Gated Audio Vault Pack",
     family: "skyemusicnexus",
-    description: "Music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing.",
+    description: "Music-specific SkyeVault/R2 storage lane for larger audio files, fan-paid downloads, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_gated_audio_vault_pack_monthly"],
-    line_items: [{ id: "gated-audio-vault-pack", name: "SkyeMusicNexus Gated Audio Vault Pack", amount_cents: cents(79), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_gated_audio_vault_pack_monthly" }],
+    line_items: [{ id: "gated-audio-vault-pack", name: "SkyeMusicNexus Gated Audio Vault Pack", amount_cents: cents(9), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_gated_audio_vault_pack_monthly" }],
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Music add-ons",
@@ -1035,7 +1161,7 @@ const SKYEMUSICNEXUS_OFFERS = [
     source_folder: "metraiyux_0s_site/SkyeMusicNexus",
     source_file: "metraiyux_0s_site/data/skyemusicnexus-pricing.json",
     brain_owner: "naomi-sterling-brain",
-    includes: ["Music-specific vault lane", "Larger audio handoff", "Proof receipts", "Paid plan required", "Gate session required", "No public streaming license claim"],
+    includes: ["Music-specific vault lane", "Larger audio handoff", "Fan-paid download support", "Proof receipts", "Paid plan required", "Gate session required", "No public streaming license claim"],
     owner_approval_required: true,
     activation_path: "paid_pending_owner_approval"
   },
@@ -1049,8 +1175,8 @@ const SKYEMUSICNEXUS_OFFERS = [
     mode: "subscription",
     lookup_keys: ["skyemusicnexus_white_label_artist_portal_setup", "skyemusicnexus_white_label_artist_portal_monthly"],
     line_items: [
-      { id: "setup", name: "SkyeMusicNexus White-Label Artist Portal Setup", amount_cents: cents(997), type: "one_time", lookup_key: "skyemusicnexus_white_label_artist_portal_setup" },
-      { id: "monthly", name: "SkyeMusicNexus White-Label Artist Portal", amount_cents: cents(197), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_white_label_artist_portal_monthly" }
+      { id: "setup", name: "SkyeMusicNexus White-Label Artist Portal Setup", amount_cents: cents(99), type: "one_time", lookup_key: "skyemusicnexus_white_label_artist_portal_setup" },
+      { id: "monthly", name: "SkyeMusicNexus White-Label Artist Portal", amount_cents: cents(19), type: "recurring", interval: "month", lookup_key: "skyemusicnexus_white_label_artist_portal_monthly" }
     ],
     trial_days: 0,
     zero_upfront_trial: false,
@@ -1069,11 +1195,11 @@ const SKYEMUSICNEXUS_OFFERS = [
     plan_name: "skyemusicnexus-provider-integration-proof-lane",
     title: "SkyeMusicNexus Provider Integration Proof Lane",
     family: "skyemusicnexus",
-    description: "Owner-approved provider, distributor, payment, or identity proof lane before any live integration claim.",
+    description: "Owner-approved provider, distributor, payment, storage, or identity proof lane before any live integration claim. Use this when an actual provider starts creating cost.",
     currency: DEFAULT_CURRENCY,
     mode: "payment",
     lookup_keys: ["skyemusicnexus_provider_integration_proof_lane"],
-    line_items: [{ id: "integration-proof", name: "SkyeMusicNexus Provider Integration Proof Lane", amount_cents: cents(2500), type: "one_time", lookup_key: "skyemusicnexus_provider_integration_proof_lane" }],
+    line_items: [{ id: "integration-proof", name: "SkyeMusicNexus Provider Integration Proof Lane", amount_cents: cents(250), type: "one_time", lookup_key: "skyemusicnexus_provider_integration_proof_lane" }],
     store_category: "Music add-ons",
     store_rank: 45,
     badge: "Proof lane",
@@ -1084,6 +1210,452 @@ const SKYEMUSICNEXUS_OFFERS = [
     owner_approval_required: true,
     activation_path: "owner_approved_after_provider_scope"
   }
+];
+
+function mediaOverLondonCheckoutOffer({
+  id,
+  title,
+  description,
+  prices,
+  storeRank,
+  badge,
+  status = "approved",
+  priceLabel = "",
+  includes = [],
+  activationPath = "paid_pending_media_intake"
+}) {
+  const lineItems = prices.map((price) => ({
+    id: price.id,
+    name: price.name,
+    amount_cents: cents(price.amount),
+    type: price.type,
+    ...(price.interval ? { interval: price.interval } : {}),
+    lookup_key: price.lookupKey
+  }));
+  const hasRecurring = lineItems.some((item) => item.type === "recurring");
+  return {
+    id,
+    plan_name: id,
+    title,
+    family: "media-over-london",
+    description,
+    currency: DEFAULT_CURRENCY,
+    mode: hasRecurring ? "subscription" : "payment",
+    status,
+    storefront: true,
+    lookup_keys: lineItems.map((item) => item.lookup_key),
+    line_items: lineItems,
+    trial_days: 0,
+    zero_upfront_trial: false,
+    store_category: "Media Over London",
+    store_rank: storeRank,
+    badge,
+    price_label: priceLabel,
+    source_folder: "marketing/metraiyux-0s",
+    source_file: "marketing/metraiyux-0s/media-over-london.html",
+    brain_owner: "media-over-london",
+    includes: [
+      "Media Over London is the canonical catalog owner",
+      "SkyePay proof receipt",
+      "Gate session required",
+      ...includes
+    ],
+    owner_approval_required: true,
+    activation_path: activationPath
+  };
+}
+
+const MEDIA_OVER_LONDON_OFFERS = [
+  {
+    id: "media-over-london-static-preview-page",
+    plan_name: "media-over-london-static-preview-page",
+    title: "Media Over London Single / Drop Landing Page",
+    family: "media-over-london",
+    description: "Static preview and QR-ready campaign landing surface for a single artist drop, product, logo, client picture, or focused offer.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["media_over_london_static_preview_page"],
+    line_items: [{ id: "static-preview-page", name: "Media Over London Static Preview Page", amount_cents: cents(239), type: "one_time", lookup_key: "media_over_london_static_preview_page" }],
+    store_category: "Media Over London",
+    store_rank: 46,
+    badge: "Static preview",
+    source_folder: "marketing/metraiyux-0s",
+    source_file: "marketing/metraiyux-0s/media-over-london.html",
+    brain_owner: "media-over-london",
+    includes: ["Static preview page", "QR-ready handoff", "Client asset placement", "SkyePay proof receipt", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_media_intake"
+  },
+  {
+    id: "media-over-london-floating-orb-gallery",
+    plan_name: "media-over-london-floating-orb-gallery",
+    title: "Media Over London Floating Orb Gallery",
+    family: "media-over-london",
+    description: "Floating picture orbit gallery for artists, stores, founders, products, and campaigns with gallery, EPK/media, booking/contact, and proof-ready surface.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["media_over_london_floating_orb_gallery"],
+    line_items: [{ id: "floating-orb-gallery", name: "Media Over London Floating Orb Gallery", amount_cents: cents(444), type: "one_time", lookup_key: "media_over_london_floating_orb_gallery" }],
+    store_category: "Media Over London",
+    store_rank: 47,
+    badge: "Floating orb",
+    source_folder: "marketing/metraiyux-0s",
+    source_file: "marketing/metraiyux-0s/media-over-london.html",
+    brain_owner: "media-over-london",
+    includes: ["Floating image orbit", "Gallery/EPK section", "Booking/media contact lane", "Client assets packaged", "SkyePay proof receipt", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_media_intake"
+  },
+  {
+    id: "media-over-london-video-rotator-page",
+    plan_name: "media-over-london-video-rotator-page",
+    title: "Media Over London Multi-Video Rotator",
+    family: "media-over-london",
+    description: "Animated landing or visualizer page with multi-video rotator treatment, image stack, and campaign-ready checkout handoff.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    lookup_keys: ["media_over_london_video_rotator_page"],
+    line_items: [{ id: "video-rotator-page", name: "Media Over London Multi-Video Rotator", amount_cents: cents(796), type: "one_time", lookup_key: "media_over_london_video_rotator_page" }],
+    store_category: "Media Over London",
+    store_rank: 48,
+    badge: "Video rotator",
+    source_folder: "marketing/metraiyux-0s",
+    source_file: "marketing/metraiyux-0s/media-over-london.html",
+    brain_owner: "media-over-london",
+    includes: ["Animated landing/visualizer", "Multi-video rotator surface", "Poster/image stack", "Campaign CTA/booking lane", "SkyePay proof receipt", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "paid_pending_media_intake"
+  },
+  {
+    id: "media-over-london-campaign-universe",
+    plan_name: "media-over-london-campaign-universe",
+    title: "Media Over London Custom Campaign Universe",
+    family: "media-over-london",
+    description: "Custom campaign universe like the SupaBoy-level artist build or full client media world, quoted manually after scope with a starting SkyePay floor.",
+    currency: DEFAULT_CURRENCY,
+    mode: "payment",
+    status: "approved_floor",
+    lookup_keys: ["media_over_london_campaign_universe"],
+    line_items: [{ id: "campaign-universe", name: "Media Over London Custom Campaign Universe", amount_cents: cents(1197), type: "one_time", lookup_key: "media_over_london_campaign_universe" }],
+    store_category: "Media Over London",
+    store_rank: 49,
+    badge: "Custom universe",
+    source_folder: "marketing/metraiyux-0s",
+    source_file: "marketing/metraiyux-0s/media-over-london.html",
+    brain_owner: "media-over-london",
+    includes: ["Custom media universe", "Asset mining", "Artist/store/founder motion system", "Checkout/contact/booking lane", "Manual quote above starting floor", "SkyePay proof receipt", "Gate session required"],
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_media_scope"
+  },
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-launch-page",
+    title: "Media Over London Launch Page",
+    description: "One high-converting launch page with up to eight sections, core copy, contact form, mobile QA, deployment, and launch handoff.",
+    storeRank: 50,
+    badge: "Launch page",
+    priceLabel: "$799 one-time",
+    prices: [{ id: "launch-page", name: "Media Over London Launch Page", amount: 799, type: "one_time", lookupKey: "media_over_london_launch_page" }],
+    includes: ["Up to eight sections", "Core copy", "Contact form", "Mobile QA", "Deployment handoff"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-business-site",
+    title: "Media Over London Business Site",
+    description: "Up to five pages with service sections, trust blocks, SEO foundation, form handling, performance pass, and handoff.",
+    storeRank: 51,
+    badge: "Business site",
+    priceLabel: "$2,250 one-time",
+    prices: [{ id: "business-site", name: "Media Over London Business Site", amount: 2250, type: "one_time", lookupKey: "media_over_london_business_site" }],
+    includes: ["Up to five pages", "Service sections", "Trust blocks", "SEO foundation", "Performance pass"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-authority-suite",
+    title: "Media Over London Authority Suite",
+    description: "Up to ten pages with deeper positioning, expanded FAQs, stronger proof sections, premium visual polish, and launch checklist.",
+    storeRank: 52,
+    badge: "Authority suite",
+    priceLabel: "$4,750 one-time",
+    prices: [{ id: "authority-suite", name: "Media Over London Authority Suite", amount: 4750, type: "one_time", lookupKey: "media_over_london_authority_suite" }],
+    includes: ["Up to ten pages", "Expanded FAQs", "Proof sections", "Premium visual polish", "Launch checklist"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-managed-host",
+    title: "Media Over London Managed Host",
+    description: "Hosting, SSL, CDN-backed delivery, lightweight form routing, and one small edit monthly.",
+    storeRank: 53,
+    badge: "Managed host",
+    priceLabel: "$29/mo",
+    prices: [{ id: "monthly", name: "Media Over London Managed Host", amount: 29, type: "recurring", interval: "month", lookupKey: "media_over_london_managed_host_monthly" }],
+    includes: ["Hosting", "SSL", "CDN-backed delivery", "Form routing", "One small edit monthly"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-host-care",
+    title: "Media Over London Host + Care",
+    description: "Up to four small edits monthly, quarterly tune-up, priority response window, and status note.",
+    storeRank: 54,
+    badge: "Host + care",
+    priceLabel: "$59/mo",
+    prices: [{ id: "monthly", name: "Media Over London Host + Care", amount: 59, type: "recurring", interval: "month", lookupKey: "media_over_london_host_care_monthly" }],
+    includes: ["Up to four small edits monthly", "Quarterly tune-up", "Priority response window", "Status note"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-host-growth",
+    title: "Media Over London Host + Growth",
+    description: "Care plus meaningful page or section expansion support and monthly growth recommendations.",
+    storeRank: 55,
+    badge: "Host + growth",
+    priceLabel: "$99/mo",
+    prices: [{ id: "monthly", name: "Media Over London Host + Growth", amount: 99, type: "recurring", interval: "month", lookupKey: "media_over_london_host_growth_monthly" }],
+    includes: ["Care lane", "Page or section expansion support", "Monthly growth recommendations"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-starter-content-engine",
+    title: "Media Over London Starter Content Engine",
+    description: "Two content assets monthly plus basic optimization on existing pages.",
+    storeRank: 56,
+    badge: "Content starter",
+    priceLabel: "$249/mo",
+    prices: [{ id: "monthly", name: "Media Over London Starter Content Engine", amount: 249, type: "recurring", interval: "month", lookupKey: "media_over_london_starter_content_engine_monthly" }],
+    includes: ["Two content assets monthly", "Basic optimization on existing pages"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-growth-content-engine",
+    title: "Media Over London Growth Content Engine",
+    description: "Four content assets monthly with stronger service, city, FAQ, offer, and trust-building work.",
+    storeRank: 57,
+    badge: "Content growth",
+    priceLabel: "$499/mo",
+    prices: [{ id: "monthly", name: "Media Over London Growth Content Engine", amount: 499, type: "recurring", interval: "month", lookupKey: "media_over_london_growth_content_engine_monthly" }],
+    includes: ["Four content assets monthly", "Service/city/FAQ work", "Offer and trust-building content"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-authority-engine",
+    title: "Media Over London Authority Engine",
+    description: "Editorial cadence, larger service/city/topic expansion, and deeper credibility reinforcement.",
+    storeRank: 58,
+    badge: "Authority content",
+    status: "approved_floor",
+    priceLabel: "from $1,250/mo",
+    prices: [{ id: "monthly", name: "Media Over London Authority Engine Floor", amount: 1250, type: "recurring", interval: "month", lookupKey: "media_over_london_authority_engine_monthly" }],
+    includes: ["Editorial cadence", "Service/city/topic expansion", "Credibility reinforcement"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-starter-ppc-management",
+    title: "Media Over London Starter PPC Management",
+    description: "One simple campaign lane with basic monthly optimization and reporting. Ad spend is separate.",
+    storeRank: 59,
+    badge: "Starter PPC",
+    priceLabel: "$399/mo + ad spend",
+    prices: [{ id: "monthly", name: "Media Over London Starter PPC Management", amount: 399, type: "recurring", interval: "month", lookupKey: "media_over_london_starter_ppc_management_monthly" }],
+    includes: ["One simple campaign lane", "Basic monthly optimization", "Reporting", "Ad spend separate"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-local-lead-campaigns",
+    title: "Media Over London Local Lead Campaigns",
+    description: "Landing page support, tracking plan, campaign iteration, and conversion reporting. Ad spend is separate.",
+    storeRank: 60,
+    badge: "Local leads",
+    priceLabel: "$799/mo + ad spend",
+    prices: [{ id: "monthly", name: "Media Over London Local Lead Campaigns", amount: 799, type: "recurring", interval: "month", lookupKey: "media_over_london_local_lead_campaigns_monthly" }],
+    includes: ["Landing page support", "Tracking plan", "Campaign iteration", "Conversion reporting", "Ad spend separate"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-multi-channel-growth",
+    title: "Media Over London Multi-Channel Growth",
+    description: "Google, Meta, retargeting, offer testing, deeper reporting, and campaign coordination. Ad spend is separate.",
+    storeRank: 61,
+    badge: "Multi-channel",
+    status: "approved_floor",
+    priceLabel: "from $1,500/mo + ad spend",
+    prices: [{ id: "monthly", name: "Media Over London Multi-Channel Growth Floor", amount: 1500, type: "recurring", interval: "month", lookupKey: "media_over_london_multi_channel_growth_monthly" }],
+    includes: ["Google/Meta coordination", "Retargeting", "Offer testing", "Deeper reporting", "Ad spend separate"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-campaign-buildout",
+    title: "Media Over London Campaign Buildout",
+    description: "Landing page, tracking, creative, and setup work based on complexity. Checkout is the starting floor before final scope.",
+    storeRank: 62,
+    badge: "Campaign setup",
+    status: "approved_floor",
+    priceLabel: "from $500",
+    prices: [{ id: "campaign-buildout", name: "Media Over London Campaign Buildout Floor", amount: 500, type: "one_time", lookupKey: "media_over_london_campaign_buildout" }],
+    includes: ["Landing page", "Tracking setup", "Creative setup", "Scope floor"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-gbp-cleanup",
+    title: "Media Over London GBP Cleanup",
+    description: "Profile audit, cleanup recommendations, services/categories, description, links, and basic fix list.",
+    storeRank: 63,
+    badge: "GBP cleanup",
+    priceLabel: "$299 one-time",
+    prices: [{ id: "gbp-cleanup", name: "Media Over London GBP Cleanup", amount: 299, type: "one_time", lookupKey: "media_over_london_gbp_cleanup" }],
+    includes: ["Profile audit", "Services/categories", "Description and links", "Basic fix list"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-gbp-monthly-ops",
+    title: "Media Over London GBP Monthly Ops",
+    description: "Posts, photos, offers, Q&A, service updates, and monthly activity summary.",
+    storeRank: 64,
+    badge: "GBP monthly",
+    priceLabel: "$199/mo",
+    prices: [{ id: "monthly", name: "Media Over London GBP Monthly Ops", amount: 199, type: "recurring", interval: "month", lookupKey: "media_over_london_gbp_monthly_ops_monthly" }],
+    includes: ["Posts/photos/offers", "Q&A", "Service updates", "Monthly activity summary"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-local-trust-system",
+    title: "Media Over London Local Trust System",
+    description: "GBP Ops plus review engine, local pages, and trust-content coordination.",
+    storeRank: 65,
+    badge: "Local trust",
+    status: "approved_floor",
+    priceLabel: "from $499/mo",
+    prices: [{ id: "monthly", name: "Media Over London Local Trust System Floor", amount: 499, type: "recurring", interval: "month", lookupKey: "media_over_london_local_trust_system_monthly" }],
+    includes: ["GBP Ops", "Review engine", "Local pages", "Trust-content coordination"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-review-setup",
+    title: "Media Over London Review Setup",
+    description: "Review link, QR asset, request templates, and staff instruction sheet.",
+    storeRank: 66,
+    badge: "Review setup",
+    priceLabel: "$199 one-time",
+    prices: [{ id: "review-setup", name: "Media Over London Review Setup", amount: 199, type: "one_time", lookupKey: "media_over_london_review_setup" }],
+    includes: ["Review link", "QR asset", "Request templates", "Staff instruction sheet"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-review-engine",
+    title: "Media Over London Review Engine",
+    description: "Monthly request support, testimonial capture, and reputation report.",
+    storeRank: 67,
+    badge: "Review engine",
+    priceLabel: "$149/mo",
+    prices: [{ id: "monthly", name: "Media Over London Review Engine", amount: 149, type: "recurring", interval: "month", lookupKey: "media_over_london_review_engine_monthly" }],
+    includes: ["Monthly request support", "Testimonial capture", "Reputation report"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-reputation-ops",
+    title: "Media Over London Reputation Ops",
+    description: "Review engine plus GBP posts, response guidance, and trust-content reuse.",
+    storeRank: 68,
+    badge: "Reputation ops",
+    status: "approved_floor",
+    priceLabel: "from $399/mo",
+    prices: [{ id: "monthly", name: "Media Over London Reputation Ops Floor", amount: 399, type: "recurring", interval: "month", lookupKey: "media_over_london_reputation_ops_monthly" }],
+    includes: ["Review engine", "GBP posts", "Response guidance", "Trust-content reuse"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-lead-rescue-setup",
+    title: "Media Over London Lead Rescue Setup",
+    description: "Missed-call flow, auto-response copy, booking/quote link, alerts, and test proof.",
+    storeRank: 69,
+    badge: "Lead rescue",
+    priceLabel: "$399 one-time",
+    prices: [{ id: "lead-rescue-setup", name: "Media Over London Lead Rescue Setup", amount: 399, type: "one_time", lookupKey: "media_over_london_lead_rescue_setup" }],
+    includes: ["Missed-call flow", "Auto-response copy", "Booking/quote link", "Alerts", "Test proof"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-lead-recovery-ops",
+    title: "Media Over London Lead Recovery Ops",
+    description: "Monitoring support, script updates, lead summaries, and monthly missed-lead report.",
+    storeRank: 70,
+    badge: "Lead recovery",
+    priceLabel: "$199/mo",
+    prices: [{ id: "monthly", name: "Media Over London Lead Recovery Ops", amount: 199, type: "recurring", interval: "month", lookupKey: "media_over_london_lead_recovery_ops_monthly" }],
+    includes: ["Monitoring support", "Script updates", "Lead summaries", "Monthly missed-lead report"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-crm-setup",
+    title: "Media Over London CRM Setup",
+    description: "Pipeline, fields, stages, lead forms, templates, and basic staff handoff. Checkout is the starting floor.",
+    storeRank: 71,
+    badge: "CRM setup",
+    status: "approved_floor",
+    priceLabel: "from $750",
+    prices: [{ id: "crm-setup", name: "Media Over London CRM Setup Floor", amount: 750, type: "one_time", lookupKey: "media_over_london_crm_setup" }],
+    includes: ["Pipeline", "Fields/stages", "Lead forms", "Templates", "Staff handoff"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-follow-up-ops",
+    title: "Media Over London Follow-Up Ops",
+    description: "Template maintenance, reactivation campaigns, pipeline cleanup, and monthly summary.",
+    storeRank: 72,
+    badge: "Follow-up ops",
+    priceLabel: "$299/mo",
+    prices: [{ id: "monthly", name: "Media Over London Follow-Up Ops", amount: 299, type: "recurring", interval: "month", lookupKey: "media_over_london_follow_up_ops_monthly" }],
+    includes: ["Template maintenance", "Reactivation campaigns", "Pipeline cleanup", "Monthly summary"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-monthly-operator-report",
+    title: "Media Over London Monthly Operator Report",
+    description: "Executive summary, shipped-work log, key metrics, blockers, and next recommendations.",
+    storeRank: 73,
+    badge: "Operator report",
+    priceLabel: "$149/mo",
+    prices: [{ id: "monthly", name: "Media Over London Monthly Operator Report", amount: 149, type: "recurring", interval: "month", lookupKey: "media_over_london_monthly_operator_report_monthly" }],
+    includes: ["Executive summary", "Shipped-work log", "Key metrics", "Blockers", "Recommendations"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-lead-dashboard",
+    title: "Media Over London Lead Dashboard",
+    description: "Dashboard setup and monthly maintenance for available sources.",
+    storeRank: 74,
+    badge: "Lead dashboard",
+    priceLabel: "$399 setup + $99/mo",
+    prices: [
+      { id: "setup", name: "Media Over London Lead Dashboard Setup", amount: 399, type: "one_time", lookupKey: "media_over_london_lead_dashboard_setup" },
+      { id: "monthly", name: "Media Over London Lead Dashboard", amount: 99, type: "recurring", interval: "month", lookupKey: "media_over_london_lead_dashboard_monthly" }
+    ],
+    includes: ["Dashboard setup", "Monthly maintenance", "Available-source reporting"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-growth-command",
+    title: "Media Over London Growth Command",
+    description: "Hosting + care, GBP support, review engine, basic reporting, and monthly recommendations.",
+    storeRank: 75,
+    badge: "Growth command",
+    priceLabel: "$399/mo",
+    prices: [{ id: "monthly", name: "Media Over London Growth Command", amount: 399, type: "recurring", interval: "month", lookupKey: "media_over_london_growth_command_monthly" }],
+    includes: ["Hosting + care", "GBP support", "Review engine", "Basic reporting", "Monthly recommendations"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-lead-engine",
+    title: "Media Over London Lead Engine",
+    description: "Landing page support, paid traffic management, tracking, review flow, and monthly conversion report. Ad spend is separate.",
+    storeRank: 76,
+    badge: "Lead engine",
+    priceLabel: "$799/mo + ad spend",
+    prices: [{ id: "monthly", name: "Media Over London Lead Engine", amount: 799, type: "recurring", interval: "month", lookupKey: "media_over_london_lead_engine_monthly" }],
+    includes: ["Landing page support", "Paid traffic management", "Tracking", "Review flow", "Ad spend separate"]
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-revenue-ops",
+    title: "Media Over London Revenue Ops",
+    description: "CRM pipeline, missed-call recovery, booking flow, content, PPC coordination, dashboard, and reputation system. Tools and ad spend are separate.",
+    storeRank: 77,
+    badge: "Revenue ops",
+    status: "approved_floor",
+    priceLabel: "from $1,500/mo + tools/ad spend",
+    prices: [{ id: "monthly", name: "Media Over London Revenue Ops Floor", amount: 1500, type: "recurring", interval: "month", lookupKey: "media_over_london_revenue_ops_monthly" }],
+    includes: ["CRM pipeline", "Missed-call recovery", "Booking flow", "Content/PPC coordination", "Tools and ad spend separate"],
+    activationPath: "owner_approved_after_media_scope"
+  }),
+  mediaOverLondonCheckoutOffer({
+    id: "media-over-london-embedded-growth-operator",
+    title: "Media Over London Embedded Growth Operator",
+    description: "Website, content, ads, vendors, automation, review ops, reporting, offer calendar, and strategy cadence.",
+    storeRank: 78,
+    badge: "Embedded operator",
+    status: "approved_floor",
+    priceLabel: "from $3,000/mo",
+    prices: [{ id: "monthly", name: "Media Over London Embedded Growth Operator Floor", amount: 3000, type: "recurring", interval: "month", lookupKey: "media_over_london_embedded_growth_operator_monthly" }],
+    includes: ["Website/content/ads coordination", "Vendor coordination", "Automation", "Review ops/reporting", "Strategy cadence"],
+    activationPath: "owner_approved_after_media_scope"
+  })
 ];
 
 export const SKYPAY_OFFERS = [
@@ -1333,6 +1905,274 @@ export const SKYPAY_OFFERS = [
       paidRpd: 120,
       monthlyCapCents: 3500
     })
+  },
+  {
+    id: "skyenet-edge-starter",
+    plan_name: "skyenet-edge-starter",
+    title: "SkyeNet Edge Starter",
+    family: "skyenet",
+    description: "Owner-approved SkyeNet starter hosting lane for one static surface, shared-gate deploy control, route registration, observability receipts, and capped Free99-safe usage.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    zero_upfront_trial: false,
+    trial_days: 0,
+    status: "approved",
+    storefront: true,
+    store_category: "SkyeNet deploy lanes",
+    store_rank: 19.1,
+    badge: "Deploy starter",
+    skyemerit_discountable: false,
+    lookup_keys: ["skyenet_edge_starter_setup", "skyenet_edge_starter_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "SkyeNet Edge Starter Setup",
+        amount_cents: cents(297),
+        type: "one_time",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_edge_starter_setup"
+      },
+      {
+        id: "monthly",
+        name: "SkyeNet Edge Starter",
+        amount_cents: cents(97),
+        type: "recurring",
+        interval: "month",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_edge_starter_monthly"
+      }
+    ],
+    included_usage: [
+      "1 SkyeNet static surface",
+      "1 routed host/path record",
+      "25 MB default build target",
+      "10,000 monthly request target",
+      "Shared 0S gate required"
+    ],
+    includes: [
+      "Static build drop lane",
+      "SkyeNet asset vault storage",
+      "Route registry entry",
+      "Observability receipts",
+      "Owner-approved activation"
+    ],
+    source_folder: "metraiyux_0s_site/skyenet",
+    source_file: "metraiyux_0s_site/skyenet/PLATFORM_TRUTH.json",
+    brain_owner: "celeste-monroe-brain",
+    owner_approval_required: true,
+    activation_path: "paid_pending_owner_approval",
+    gate_policy: {
+      monthly_cap_cents: 15000,
+      default_rpm_limit: 30,
+      default_rpd_limit: 1000,
+      max_devices_per_key: 2,
+      require_install_id: true,
+      vault_storage_mb: 2048,
+      vault_file_limit: 500,
+      vault_workspace_limit: 1,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 1, paidPlatformsEnabled: true, paidRpm: 30, paidRpd: 1000 })
+    }
+  },
+  {
+    id: "skyenet-edge-growth",
+    plan_name: "skyenet-edge-growth",
+    title: "SkyeNet Edge Growth",
+    family: "skyenet",
+    description: "Owner-approved SkyeNet growth lane for multiple routed surfaces, deployment receipts, custom route support, managed platform functions, and stronger usage guardrails.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    zero_upfront_trial: false,
+    trial_days: 0,
+    status: "approved",
+    storefront: true,
+    store_category: "SkyeNet deploy lanes",
+    store_rank: 19.2,
+    badge: "Growth hosting",
+    skyemerit_discountable: false,
+    lookup_keys: ["skyenet_edge_growth_setup", "skyenet_edge_growth_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "SkyeNet Edge Growth Setup",
+        amount_cents: cents(997),
+        type: "one_time",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_edge_growth_setup"
+      },
+      {
+        id: "monthly",
+        name: "SkyeNet Edge Growth",
+        amount_cents: cents(297),
+        type: "recurring",
+        interval: "month",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_edge_growth_monthly"
+      }
+    ],
+    included_usage: [
+      "3 SkyeNet static surfaces",
+      "Up to 5 routed host/path records",
+      "150 MB combined build target",
+      "50,000 monthly request target",
+      "Managed function route review"
+    ],
+    includes: [
+      "Multi-surface SkyeNet hosting",
+      "Custom route setup",
+      "Managed SkyeNet function route support",
+      "Cost and traffic receipt review",
+      "Owner-approved activation"
+    ],
+    source_folder: "metraiyux_0s_site/skyenet",
+    source_file: "metraiyux_0s_site/skyenet/PLATFORM_TRUTH.json",
+    brain_owner: "celeste-monroe-brain",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_route_scope",
+    gate_policy: {
+      monthly_cap_cents: 50000,
+      default_rpm_limit: 90,
+      default_rpd_limit: 5000,
+      max_devices_per_key: 5,
+      require_install_id: true,
+      vault_storage_mb: 10240,
+      vault_file_limit: 2500,
+      vault_workspace_limit: 3,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 2, paidPlatformsEnabled: true, paidRpm: 60, paidRpd: 2500 })
+    }
+  },
+  {
+    id: "skyenet-functions-managed",
+    plan_name: "skyenet-functions-managed",
+    title: "SkyeNet Functions Managed",
+    family: "skyenet",
+    description: "Managed SkyeNet Functions lane for Netlify-compatible function intake, conversion, inspection, signing, staging, and platform-owned execution support under owner-approved limits.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    zero_upfront_trial: false,
+    trial_days: 0,
+    status: "approved",
+    storefront: true,
+    store_category: "SkyeNet deploy lanes",
+    store_rank: 19.3,
+    badge: "Functions lane",
+    skyemerit_discountable: false,
+    lookup_keys: ["skyenet_functions_managed_setup", "skyenet_functions_managed_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "SkyeNet Functions Managed Setup",
+        amount_cents: cents(1500),
+        type: "one_time",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_functions_managed_setup"
+      },
+      {
+        id: "monthly",
+        name: "SkyeNet Functions Managed",
+        amount_cents: cents(497),
+        type: "recurring",
+        interval: "month",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_functions_managed_monthly"
+      }
+    ],
+    included_usage: [
+      "Netlify-compatible function bundle intake",
+      "Conversion proof for netlify/functions",
+      "Signed staging bundle receipt",
+      "Managed SkyeNet execution lane",
+      "Owner-approved runtime caps"
+    ],
+    includes: [
+      "Function bundle conversion",
+      "Handler compatibility review",
+      "Managed route mounting",
+      "Runtime receipt ledger",
+      "Owner-approved activation"
+    ],
+    source_folder: "tools/skyenet-functions-convert.mjs",
+    source_file: "docs/SKYENET_FUNCTIONS_NETLIFY_PARITY.md",
+    brain_owner: "celeste-monroe-brain",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_function_scope",
+    gate_policy: {
+      monthly_cap_cents: 100000,
+      default_rpm_limit: 120,
+      default_rpd_limit: 8000,
+      max_devices_per_key: 8,
+      require_install_id: true,
+      vault_storage_mb: 20480,
+      vault_file_limit: 5000,
+      vault_workspace_limit: 5,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 3, paidPlatformsEnabled: true, paidRpm: 90, paidRpd: 4000 })
+    }
+  },
+  {
+    id: "skyenet-sovereign-runtime-reserve",
+    plan_name: "skyenet-sovereign-runtime-reserve",
+    title: "SkyeNet Sovereign Runtime Reserve",
+    family: "skyenet",
+    description: "Owner-scoped SkyeNet capacity reserve for isolated customer-uploaded functions, private runtime admission, secret boundaries, egress policy, abuse controls, and billing cutoffs.",
+    currency: DEFAULT_CURRENCY,
+    mode: "subscription",
+    zero_upfront_trial: false,
+    trial_days: 0,
+    status: "approved_floor",
+    storefront: true,
+    store_category: "SkyeNet deploy lanes",
+    store_rank: 19.4,
+    badge: "Sovereign reserve",
+    skyemerit_discountable: false,
+    lookup_keys: ["skyenet_sovereign_runtime_setup", "skyenet_sovereign_runtime_monthly"],
+    line_items: [
+      {
+        id: "setup",
+        name: "SkyeNet Sovereign Runtime Setup Reserve",
+        amount_cents: cents(5000),
+        type: "one_time",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_sovereign_runtime_setup"
+      },
+      {
+        id: "monthly",
+        name: "SkyeNet Sovereign Runtime Reserve",
+        amount_cents: cents(997),
+        type: "recurring",
+        interval: "month",
+        skyemerit_discountable: false,
+        lookup_key: "skyenet_sovereign_runtime_monthly"
+      }
+    ],
+    included_usage: [
+      "Private runtime capacity scoping",
+      "Isolated uploaded-function admission plan",
+      "Secret and egress policy setup",
+      "Abuse and billing cutoff rules",
+      "Written owner approval before live arbitrary code"
+    ],
+    includes: [
+      "Sovereign runtime readiness plan",
+      "Tenant isolation checklist",
+      "CPU and memory cap policy",
+      "Billing guardrails",
+      "Owner-approved activation"
+    ],
+    source_folder: "docs/SKYENET_HYBRID_RELEASE_ARCHITECTURE.md",
+    source_file: "docs/SKYENET_FUNCTIONS_NETLIFY_PARITY.md",
+    brain_owner: "celeste-monroe-brain",
+    owner_approval_required: true,
+    activation_path: "owner_approved_after_sovereign_runtime_scope",
+    gate_policy: {
+      monthly_cap_cents: 200000,
+      default_rpm_limit: 180,
+      default_rpd_limit: 12000,
+      max_devices_per_key: 12,
+      require_install_id: true,
+      vault_storage_mb: 51200,
+      vault_file_limit: 10000,
+      vault_workspace_limit: 10,
+      ...free99PlatformUsagePolicy({ paidPlatformLanes: 4, paidPlatformsEnabled: true, paidRpm: 120, paidRpd: 6000 })
+    }
   },
   {
     id: "metraiyux-starter-command",
@@ -1929,6 +2769,7 @@ export const SKYPAY_OFFERS = [
     activation_path: "owner_approved_after_gate_scope"
   },
   ...SKYEMUSICNEXUS_OFFERS,
+  ...MEDIA_OVER_LONDON_OFFERS,
   {
     id: "skygatefs27-managed-control-plane",
     plan_name: "skygatefs27-managed",
@@ -2427,6 +3268,22 @@ export const SKYPAY_PLATFORM_ROUTES = [
     note: "JobPing has its own reserved SkyPay runtime pricing. The 0S surface inherits the shared gate and blocks provider-backed matching until the real runtime is mounted and payment entitlement is confirmed."
   },
   {
+    platform_id: "skyenet",
+    title: "SkyeNet Deploy",
+    route: "/skyepay-store.html?client=metraiyux-0s&offer=skyenet-edge-starter",
+    default_offer_id: "skyenet-edge-starter",
+    wiring_status: "stripe_gate_ready_owner_approved",
+    note: "SkyeNet deploy hosting and functions now route through named SkyePay offers with real Stripe lookup-key prices. Free99 remains capped; paid SkyeNet activation stays owner-approved."
+  },
+  {
+    platform_id: "media-over-london",
+    title: "Media Over London Campaign Builds",
+    route: "/skyepay.html?client=metraiyux-0s&offer=media-over-london-floating-orb-gallery",
+    default_offer_id: "media-over-london-floating-orb-gallery",
+    wiring_status: "stripe_gate_ready_owner_approved",
+    note: "Media Over London campaign surfaces now route through static preview, floating orb, multi-video rotator, and custom campaign universe SkyePay offers."
+  },
+  {
     platform_id: "skyeopsconsole",
     title: "SkyeOpsConsole Free99",
     route: "/platforms/free99/skyeopsconsole",
@@ -2491,6 +3348,184 @@ export function getSkyePayOffer(id) {
   return SKYPAY_OFFERS.find((offer) => offer.id === safeText(id, 100)) || null;
 }
 
+export function buildSkyCartOffer({ offer, addOnOffer }) {
+  if (!offer || !addOnOffer) return null;
+  if (offer.mode !== "payment" || addOnOffer.mode !== "payment") return null;
+  if (offer.id === addOnOffer.id) return null;
+  const addOnItems = (Array.isArray(addOnOffer.line_items) ? addOnOffer.line_items : [])
+    .filter((item) => item.type !== "recurring")
+    .map((item) => {
+      const original = Number(item.amount_cents || 0);
+      const saleAmount = Math.max(50, Math.round(original * (10000 - SKYCART_ADD_ON_DISCOUNT_BPS) / 10000));
+      return {
+        ...item,
+        id: `skyecart-addon-${item.id}`,
+        name: `${item.name} - SkyeCart 31% add-on`,
+        amount_cents: saleAmount,
+        skyecart_add_on: true,
+        skyecart_original_amount_cents: original,
+        skyecart_sale_discount_bps: SKYCART_ADD_ON_DISCOUNT_BPS,
+        skyemerit_discountable: true
+      };
+    });
+  if (!addOnItems.length) return null;
+  const primaryItems = (Array.isArray(offer.line_items) ? offer.line_items : []).map((item) => ({
+    ...item,
+    skyecart_primary: true,
+    skyemerit_discountable: false
+  }));
+  return hydrateOffer({
+    ...offer,
+    id: `${offer.id}__skyecart__${addOnOffer.id}`.slice(0, 140),
+    plan_name: `${offer.plan_name || offer.id}__skyecart__${addOnOffer.plan_name || addOnOffer.id}`.slice(0, 140),
+    title: `${offer.title} + ${addOnOffer.title}`,
+    description: `${offer.description || ""} SkyeCart includes the accepted add-on ${addOnOffer.title} with a 31% add-on sale and the 31% SkyeCart Add-On Merit applied to the add-on portion.`,
+    mode: "payment",
+    lookup_keys: [
+      ...(Array.isArray(offer.lookup_keys) ? offer.lookup_keys : []),
+      ...(Array.isArray(addOnOffer.lookup_keys) ? addOnOffer.lookup_keys : [])
+    ],
+    line_items: [...primaryItems, ...addOnItems],
+    price_label: null,
+    badge: offer.badge || "SkyeCart",
+    skyemerit_default_code: SKYEMERIT_CART_ADD_ON_CODE,
+    skyemerit_pack_id: "SKYEMERIT-SKYCART-PACK",
+    skyemerit_expires_at: null,
+    launch_window_ends_on: null,
+    skyecart: {
+      active: true,
+      primary_offer_id: offer.id,
+      add_on_offer_id: addOnOffer.id,
+      add_on_title: addOnOffer.title,
+      add_on_sale_discount_bps: SKYCART_ADD_ON_DISCOUNT_BPS,
+      additional_skyemerit_code: SKYEMERIT_CART_ADD_ON_CODE,
+      additional_skyemerit_bps: 3100,
+      owner_free_checkout_override_required: true
+    }
+  });
+}
+
+function positiveCentInt(value, fallback = 0) {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function normalizedCurrency(value) {
+  const currency = safeText(value || DEFAULT_CURRENCY, 12).toLowerCase();
+  return /^[a-z]{3}$/.test(currency) ? currency : DEFAULT_CURRENCY;
+}
+
+function dynamicLineItemsFromCommerce(commerce = {}) {
+  const rawLines = Array.isArray(commerce.line_items)
+    ? commerce.line_items
+    : Array.isArray(commerce.lines)
+      ? commerce.lines
+      : [];
+  return rawLines.slice(0, 50).map((item, index) => {
+    const quantity = Math.max(1, Math.min(999, parseInt(item.quantity || 1, 10) || 1));
+    const unitAmount = positiveCentInt(item.unit_amount_cents ?? item.unitAmountCents ?? item.unitPriceCents ?? item.unit_price_cents, 0);
+    const lineAmount = positiveCentInt(item.amount_cents ?? item.amountCents, unitAmount * quantity);
+    const name = safeText(item.name || item.title || `Commerce item ${index + 1}`, 140);
+    if (!name || lineAmount <= 0) return null;
+    return {
+      id: safeText(item.id || item.product_id || item.productId || `commerce-line-${index + 1}`, 100),
+      name,
+      amount_cents: lineAmount,
+      type: "one_time",
+      interval: null,
+      lookup_key: "",
+      skyemerit_discountable: false,
+      skyecommerce_product_id: safeText(item.product_id || item.productId || "", 120),
+      skyecommerce_variant_id: safeText(item.variant_id || item.variantId || "", 120),
+      skyecommerce_sku: safeText(item.sku || "", 120)
+    };
+  }).filter(Boolean);
+}
+
+export function normalizeSkyeCommerceDynamicCheckoutBody(body = {}) {
+  const commerce = objectOrNull(body.skyecommerce) || objectOrNull(body.commerce) || {};
+  const source = safeText(body.source || commerce.source || "", 80).toLowerCase();
+  const active = body.skyecommerce_dynamic === true
+    || body.skyecommerce_dynamic === "true"
+    || source === "skyecommerce"
+    || Boolean(objectOrNull(body.skyecommerce));
+  if (!active) return { active: false, ok: false, error: "" };
+
+  const amountCents = positiveCentInt(body.amount_cents ?? body.amountCents ?? commerce.amount_cents ?? commerce.amountCents, 0);
+  const currency = normalizedCurrency(body.currency || commerce.currency);
+  const lineItems = dynamicLineItemsFromCommerce(commerce);
+  const lineTotal = lineItems.reduce((sum, item) => sum + Number(item.amount_cents || 0), 0);
+  if (!amountCents) return { active: true, ok: false, error: "SkyeCommerce dynamic checkout requires amount_cents." };
+  if (!lineItems.length) return { active: true, ok: false, error: "SkyeCommerce dynamic checkout requires at least one positive line item." };
+  if (lineItems.length > 50) return { active: true, ok: false, error: "SkyeCommerce dynamic checkout supports at most 50 line items." };
+  if (lineTotal !== amountCents) {
+    return {
+      active: true,
+      ok: false,
+      error: "SkyeCommerce dynamic checkout line total must equal amount_cents.",
+      lineTotal,
+      amountCents
+    };
+  }
+  return {
+    active: true,
+    ok: true,
+    amountCents,
+    currency,
+    lineItems,
+    commerce: {
+      source: "skyecommerce",
+      merchant_id: safeText(commerce.merchant_id || commerce.merchantId || "", 120),
+      merchant_slug: safeText(commerce.merchant_slug || commerce.merchantSlug || body.workspace_slug || body.workspace || "", 120).toLowerCase(),
+      merchant_brand_name: safeText(commerce.merchant_brand_name || commerce.merchantBrandName || body.company_name || body.company || "", 180),
+      order_id: safeText(commerce.order_id || commerce.orderId || "", 120),
+      order_number: safeText(commerce.order_number || commerce.orderNumber || "", 120),
+      payment_transaction_id: safeText(commerce.payment_transaction_id || commerce.paymentTransactionId || "", 120),
+      checkout_token: safeText(commerce.checkout_token || commerce.checkoutToken || "", 120),
+      amount_cents: amountCents,
+      currency,
+      subtotal_cents: positiveCentInt(commerce.subtotal_cents ?? commerce.subtotalCents, 0),
+      shipping_cents: positiveCentInt(commerce.shipping_cents ?? commerce.shippingCents, 0),
+      tax_cents: positiveCentInt(commerce.tax_cents ?? commerce.taxCents, 0),
+      discount_cents: positiveCentInt(commerce.discount_cents ?? commerce.discountCents, 0),
+      gift_card_cents: positiveCentInt(commerce.gift_card_cents ?? commerce.giftCardCents, 0),
+      line_items: lineItems,
+      product_items: Array.isArray(commerce.product_items) ? commerce.product_items.slice(0, 50) : []
+    }
+  };
+}
+
+export function buildSkyeCommerceDynamicOffer(body = {}) {
+  const dynamic = normalizeSkyeCommerceDynamicCheckoutBody(body);
+  if (!dynamic.active) return null;
+  if (!dynamic.ok) return dynamic;
+  const merchantSlug = dynamic.commerce.merchant_slug || safeText(body.workspace_slug || body.workspace || "skyecommerce", 120).toLowerCase();
+  const orderRef = dynamic.commerce.order_id || dynamic.commerce.order_number || cleanRequestToken(body.idempotency_key || body.request_id, 120) || "order";
+  const brandName = dynamic.commerce.merchant_brand_name || safeText(body.company_name || body.company || merchantSlug || "SkyeCommerce merchant", 180);
+  const offer = hydrateOffer({
+    id: safeText(`skyecommerce-${merchantSlug}-${orderRef}`, 140).toLowerCase(),
+    plan_name: safeText(`skyecommerce_${merchantSlug}_${orderRef}`, 140).toLowerCase(),
+    title: safeText(`${brandName} order ${dynamic.commerce.order_number || orderRef}`, 180),
+    description: "Dynamic SkyeCommerce order checkout. Stripe settlement lands in SkyPay while SkyeCommerce tracks the merchant receivable ledger.",
+    family: "skyecommerce",
+    currency: dynamic.currency,
+    mode: "payment",
+    status: "approved_dynamic",
+    storefront: false,
+    store_category: "SkyeCommerce dynamic checkout",
+    store_rank: 999,
+    badge: "SkyeCommerce",
+    owner_approval_required: false,
+    activation_path: "skyecommerce_order_payment_confirmed",
+    skyemerit_discountable: false,
+    source_folder: "metraiyux_0s_site/SkyeCommerce",
+    source_file: "SkyeCommerce/src/lib/skyepay.js",
+    catalog_source: "skyecommerce_dynamic_runtime",
+    line_items: dynamic.lineItems
+  });
+  return { ...dynamic, offer };
+}
+
 export function getSkyePayClient(slug) {
   const key = safeText(slug || "bobs-smoke-shop", 120).toLowerCase() || "bobs-smoke-shop";
   return SKYPAY_CLIENTS[key] || {
@@ -2526,6 +3561,26 @@ export function publicOffer(offer, client = null) {
   const trialDays = resolveSkyePayTrialDays(offer, client);
   const todayCents = trialDays > 0 ? 0 : setup + recurring;
   const deferredOneTimeCents = trialDays > 0 ? setup : 0;
+  const discountableFromLineItems = trialDays > 0
+    ? 0
+    : (Array.isArray(offer.line_items) ? offer.line_items : []).reduce((sum, item) => {
+      if (offer.mode === "subscription" && item.type === "recurring") return sum;
+      if (item.skyemerit_discountable === false) return sum;
+      return sum + Number(item.amount_cents || 0);
+    }, 0);
+  const skyemeritDiscountableCents = offer.skyemerit_discountable === false
+    ? 0
+    : discountableFromLineItems;
+  const defaultSkyeMeritCode = safeText(offer.skyemerit_default_code || "", 120);
+  const defaultSkyeMerit = defaultSkyeMeritCode
+    ? buildSkyeMeritCheckout({
+      offer,
+      trialDays,
+      code: defaultSkyeMeritCode,
+      packId: offer.skyemerit_pack_id || SKYEMERIT_FIRST_TIME_PACK_ID,
+      firstTimeEligible: true
+    })
+    : null;
   return {
     id: offer.id,
     plan_name: offer.plan_name,
@@ -2548,10 +3603,18 @@ export function publicOffer(offer, client = null) {
     post_trial_cents: recurring,
     deferred_one_time_cents: deferredOneTimeCents,
     skyemerit: {
-      eligible: true,
+      eligible: skyemeritDiscountableCents > 0,
       auto_code: SKYEMERIT_AUTO_CODE,
       first_time_pack_id: SKYEMERIT_FIRST_TIME_PACK_ID,
-      discountable_cents: trialDays > 0 ? 0 : offer.mode === "subscription" ? setup : setup + recurring,
+      default_code: defaultSkyeMeritCode || null,
+      default_pack_id: offer.skyemerit_pack_id || null,
+      default_title: defaultSkyeMerit?.title || null,
+      default_expires_at: offer.skyemerit_expires_at || defaultSkyeMerit?.expires_at || null,
+      launch_window_ends_on: offer.launch_window_ends_on || null,
+      discountable_cents: skyemeritDiscountableCents,
+      estimated_discount_cents: defaultSkyeMerit?.applied_discount_cents || 0,
+      estimated_payable_today_cents: defaultSkyeMerit?.adjusted_due_cents ?? todayCents,
+      listed_value_cents: setup + recurring,
       no_stripe_promo_stack_when_applied: true,
       gate_required: true
     },
@@ -2565,6 +3628,10 @@ export function publicOffer(offer, client = null) {
     source_file: offer.source_file || null,
     brain_owner: offer.brain_owner || null,
     catalog_note: offer.catalog_note || null,
+    skye_merit_delivery: Array.isArray(offer.skye_merit_delivery) ? offer.skye_merit_delivery : [],
+    relay13_inbox_delivery: offer.relay13_inbox_delivery === true,
+    launch_window_ends_on: offer.launch_window_ends_on || null,
+    skyecart: objectOrNull(offer.skyecart),
     includes: Array.isArray(offer.includes) ? offer.includes.slice(0, 8) : [],
     credits: Array.isArray(offer.credits) ? offer.credits : [],
     gate_policy: offer.gate_policy || null,
@@ -2601,7 +3668,11 @@ export function publicOffer(offer, client = null) {
       amount_cents: item.amount_cents,
       type: item.type,
       interval: item.interval || null,
-      lookup_key: item.lookup_key
+      lookup_key: item.lookup_key,
+      skyecart_add_on: item.skyecart_add_on === true,
+      skyecart_primary: item.skyecart_primary === true,
+      skyecart_original_amount_cents: item.skyecart_original_amount_cents || null,
+      skyecart_sale_discount_bps: item.skyecart_sale_discount_bps || null
     })),
     owner_approval_required: offer.owner_approval_required,
     activation_path: offer.activation_path
@@ -2703,6 +3774,7 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
   const recurring = sumLineItems(offer, "recurring");
   const activeTrialDays = clampTrialDays(trialDays || resolveSkyePayTrialDays(offer, client));
   const skyeMeritCheckout = body.skyeMeritCheckout || body.skyemerit_checkout || null;
+  const commerce = objectOrNull(body.skyecommerce) || objectOrNull(body.commerce) || null;
   const adjustedDueToday = activeTrialDays > 0
     ? 0
     : Number(skyeMeritCheckout?.adjusted_due_cents ?? setup + recurring);
@@ -2731,6 +3803,22 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
     zero_upfront_trial: String(activeTrialDays > 0),
     amount_due_today_cents: String(adjustedDueToday),
     original_amount_due_today_cents: String(originalDueToday),
+    skyecart_active: String(offer.skyecart?.active === true),
+    skyecart_primary_offer_id: safeText(offer.skyecart?.primary_offer_id || body.skyecart_primary_offer_id || "", 140),
+    skyecart_add_on_offer_id: safeText(offer.skyecart?.add_on_offer_id || body.skyecart_add_on_offer_id || "", 140),
+    skyecart_add_on_title: safeText(offer.skyecart?.add_on_title || "", 180),
+    skyecart_add_on_discount_bps: String(Number(offer.skyecart?.add_on_sale_discount_bps || 0)),
+    skyecart_additional_skyemerit_code: safeText(offer.skyecart?.additional_skyemerit_code || "", 120),
+    skyecommerce_dynamic: String(body.skyecommerce_dynamic === true || commerce?.source === "skyecommerce" || offer.family === "skyecommerce"),
+    skyecommerce_merchant_id: safeText(commerce?.merchant_id || commerce?.merchantId || "", 120),
+    skyecommerce_merchant_slug: safeText(commerce?.merchant_slug || commerce?.merchantSlug || "", 120),
+    skyecommerce_order_id: safeText(commerce?.order_id || commerce?.orderId || "", 120),
+    skyecommerce_order_number: safeText(commerce?.order_number || commerce?.orderNumber || "", 120),
+    skyecommerce_payment_transaction_id: safeText(commerce?.payment_transaction_id || commerce?.paymentTransactionId || "", 120),
+    skyecommerce_checkout_token: safeText(commerce?.checkout_token || commerce?.checkoutToken || "", 120),
+    skyecommerce_amount_cents: String(Number(commerce?.amount_cents || commerce?.amountCents || 0)),
+    skyecommerce_currency: safeText(commerce?.currency || "", 12),
+    skyecommerce_line_item_count: String(Array.isArray(commerce?.line_items) ? commerce.line_items.length : 0),
     deferred_one_time_cents: String(activeTrialDays > 0 ? setup : 0),
     recurring_cents: String(recurring),
     gate_policy_id: safeText(offer.gate_policy?.policy_id, 140),
@@ -2745,6 +3833,7 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
     catalog_source: safeText(offer.catalog_source || "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js", 180),
     brain_owner: safeText(offer.brain_owner || "", 120),
     special_offer: safeText(client.special_offer, 450),
+    ...legalAcceptanceMetadata(body, "skypay"),
     ...skyeMeritMetadata(skyeMeritCheckout)
   };
 }
@@ -2768,11 +3857,13 @@ export function makeDemoSession({ client, offer, body = {}, origin }) {
   statusUrl.searchParams.set("demo_session", orderId);
   statusUrl.searchParams.set("offer", offer.id);
   const trialDays = resolveSkyePayTrialDays(offer, client);
+  const offerDefaultSkyeMeritCode = safeText(offer.skyemerit_default_code || "", 120);
+  const offerDefaultSkyeMeritPack = safeText(offer.skyemerit_pack_id || "", 120);
   const skyeMeritCheckout = buildSkyeMeritCheckout({
     offer,
     trialDays,
-    code: body.skyemerit_apply === false ? "" : (body.skyemerit_code || SKYEMERIT_AUTO_CODE),
-    packId: body.skyemerit_pack_id || SKYEMERIT_FIRST_TIME_PACK_ID,
+    code: body.skyemerit_apply === false ? "" : (body.skyemerit_code || offerDefaultSkyeMeritCode || SKYEMERIT_AUTO_CODE),
+    packId: body.skyemerit_pack_id || offerDefaultSkyeMeritPack || SKYEMERIT_FIRST_TIME_PACK_ID,
     firstTimeEligible: body.skyemerit_first_time !== false
   });
   const bodyWithMerit = { ...body, skyeMeritCheckout };
@@ -2818,9 +3909,14 @@ export function normalizeSkyePayCheckoutBody(body) {
     cancel_url: safeText(body?.cancel_url || body?.cancelUrl, 1000),
     idempotency_key: cleanRequestToken(body?.idempotency_key || body?.request_id, 180),
     skyemerit_code: cleanRequestToken(body?.skyemerit_code || body?.skyemerit || "", 120),
-    skyemerit_pack_id: cleanRequestToken(body?.skyemerit_pack_id || SKYEMERIT_FIRST_TIME_PACK_ID, 120),
+    skyemerit_pack_id: cleanRequestToken(body?.skyemerit_pack_id || "", 120),
     skyemerit_apply: !(body?.skyemerit_apply === false || body?.skyemerit_apply === "false"),
-    skyemerit_first_time: !(body?.skyemerit_first_time === false || body?.skyemerit_first_time === "false")
+    skyemerit_first_time: !(body?.skyemerit_first_time === false || body?.skyemerit_first_time === "false"),
+    skyecart_add_on_offer_id: safeText(body?.skyecart_add_on_offer_id || body?.skyecart_add_on || "", 140),
+    skyecart_add_on_accepted: body?.skyecart_add_on_accepted === true || body?.skyecart_add_on_accepted === "true",
+    skyecommerce_dynamic: body?.skyecommerce_dynamic === true || body?.skyecommerce_dynamic === "true",
+    skyecommerce: objectOrNull(body?.skyecommerce) || null,
+    legal_acceptance: normalizeLegalAcceptance(body, "skypay")
   };
 }
 

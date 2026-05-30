@@ -1,0 +1,33 @@
+{
+  "base_id": "dispute-committee/legal-skyes-notice-of-dispute",
+  "slug": "legal-skyes-notice-of-dispute",
+  "title": "Legal Skyes Notice of Dispute",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "high",
+  "not_legal_advice": true,
+  "use_case": "Customer-facing notice form for Legal Skyes in-house dispute committee intake.",
+  "questionnaire": [
+    { "key": "customer_name", "label": "Customer Name", "type": "text", "required": true },
+    { "key": "customer_email", "label": "Customer Email", "type": "email", "required": true },
+    { "key": "order_id", "label": "Order ID", "type": "text", "required": true },
+    { "key": "account_or_workspace", "label": "Account or Workspace", "type": "text", "required": false },
+    { "key": "product_or_service", "label": "Product or Service", "type": "text", "required": true },
+    { "key": "amount_paid", "label": "Amount Paid", "type": "text", "required": true },
+    { "key": "issue_timeline", "label": "Issue Timeline", "type": "textarea", "required": true },
+    { "key": "prior_support_contacts", "label": "Prior Support Contacts", "type": "textarea", "required": false },
+    { "key": "requested_remedy", "label": "Requested Remedy", "type": "textarea", "required": true },
+    { "key": "evidence_list", "label": "Evidence List", "type": "textarea", "required": false }
+  ],
+  "sections": [
+    { "heading": "Internal Review Boundary", "body": "The Legal Skyes in-house dispute committee is an internal company review process. It is not a court, law firm, legal representation, neutral arbitration forum, judicial judgment, or arbitral award." },
+    { "heading": "Notice", "body": "Customer {{customer_name}} gives notice of a dispute for order {{order_id}}, account/workspace {{account_or_workspace}}, product or service {{product_or_service}}, and amount paid {{amount_paid}}." },
+    { "heading": "Facts and Timeline", "body": "{{issue_timeline}}" },
+    { "heading": "Prior Support and Requested Remedy", "body": "Prior support contacts: {{prior_support_contacts}}. Requested remedy: {{requested_remedy}}." },
+    { "heading": "Evidence", "body": "Evidence listed by customer: {{evidence_list}}. Sensitive credentials, private keys, payment card numbers, and unrelated personal data should be redacted before submission." },
+    { "heading": "Rights Preserved", "body": "Nothing in this notice process prohibits truthful lawful reviews, good-faith consumer reports, regulator reports, law-enforcement reports, small-claims filings where available, payment-network rights, or other rights that cannot legally be waived." }
+  ],
+  "review": { "requires_attorney_review": true, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "notice", "high"]
+}

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes hero video universe with the original orbiting video stage separated into its own fast-loading room.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Hero Video Universe</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="room-page hero-room-page">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes hero video universe">
+      <a href="index.html">Hub</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="orbit.html">Song Orbit</a>
+      <a href="video-rooms.html">Videos</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <div class="command-strip" aria-label="Hero room quick controls">
+    <a class="button" href="index.html">Hub</a>
+    <a class="button" href="orbit.html">Song Orbit</a>
+    <a class="button" href="video-rooms.html">Video Rooms</a>
+    <a class="button" href="release.html">Release</a>
+    <a class="button" href="founder-storyscape.html">Artist Card</a>
+  </div>
+
+  <main>
+    <section class="hero universe-hero hero-universe-room" id="hero">
+      <iframe class="scene-frame" src="scenes/gray-base64-scene.html" title="Gray Skyes encoded visual world"></iframe>
+      <div class="stage-canvas gray-video-stage" aria-label="Orbiting Gray Skyes video selector">
+        <video id="heroStageVideo" class="hero-stage-video" muted loop playsinline controls preload="metadata" poster="media/images/gray-red-portrait.jpg"></video>
+        <div class="floating-video-world" id="floatingVideoWorld" aria-live="polite"></div>
+        <div class="hero-stage-panel">
+          <p class="eyebrow" id="heroStageLane">feature room</p>
+          <strong id="heroStageTitle">Chicago's Underground Trap Metal King</strong>
+          <span id="heroStageSource">Select any orbiting video card to move the main player.</span>
+        </div>
+        <div class="stage-controls stage-orbit-controls" aria-label="Video orbit controls">
+          <button type="button" class="primary" id="videoSpin">Spin</button>
+          <button type="button" id="videoHold">Hold</button>
+          <button type="button" id="videoPrev">Previous</button>
+          <button type="button" id="videoNext">Next</button>
+          <button type="button" id="videoReset">Reset</button>
+        </div>
+      </div>
+      <div class="hero-copy">
+        <p class="eyebrow">hero room / orbiting video universe</p>
+        <h1 class="neon-gradient-text">Gray Skyes</h1>
+        <p class="lede">The original heavy hero lives here now: encoded background, full video orbit, Chicago underground footage, Blades, live recap, archive loop, and direct routes back into the full artist hub.</p>
+        <div class="button-row">
+          <a class="button primary" href="video-rooms.html">Open video rooms</a>
+          <a class="button" href="orbit.html">Spin songs</a>
+          <a class="button" href="release.html">Package release</a>
+          <a class="button" href="index.html">Back to hub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">Back to Gray Skyes hub</a></p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

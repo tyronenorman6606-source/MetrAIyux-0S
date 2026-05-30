@@ -1,6 +1,12 @@
 import { wrap } from "./_lib/wrap.js";
 import { buildCors, json, badRequest, getBearer, monthKeyUTC } from "./_lib/http.js";
 import { resolveAuth } from "./_lib/authz.js";
+import {
+  SKYPAY_LEGAL_ACCEPTANCE_URLS,
+  legalAcceptanceMetadata,
+  missingLegalAcceptance
+} from "./_lib/legalAcceptance.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
 
 /**
  * Customer self-serve top-up.
@@ -17,22 +23,25 @@ export default wrap(async (req) => {
   const keyRow = await resolveAuth(token);
   if (!keyRow) return json(401, { error: "Invalid or revoked key" }, cors);
 
-  const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret) return json(501, { error: "Stripe not configured (missing STRIPE_SECRET_KEY)" }, cors);
-
   let body;
   try { body = await req.json(); } catch { return badRequest("Invalid JSON", cors); }
 
   const amount_cents = parseInt(body.amount_cents, 10);
   const month = (body.month || monthKeyUTC()).toString();
+  const missingLegal = missingLegalAcceptance(body);
 
   if (!Number.isFinite(amount_cents) || amount_cents <= 0) return badRequest("amount_cents must be > 0", cors);
   if (amount_cents < 100) return badRequest("Minimum top-up is 100 cents ($1)", cors);
   if (amount_cents > 500000) return badRequest("Top-up too large", cors);
   if (!/^\d{4}-\d{2}$/.test(month)) return badRequest("Invalid month", cors);
-
-  const Stripe = (await import("stripe")).default;
-  const stripe = new Stripe(secret, { apiVersion: "2024-06-20" });
+  if (missingLegal.length) {
+    return json(403, {
+      error: "Legal Skyes transaction acceptance is required before checkout.",
+      code: "LEGAL_ACCEPTANCE_REQUIRED",
+      missing: missingLegal,
+      legal_urls: SKYPAY_LEGAL_ACCEPTANCE_URLS
+    }, cors);
+  }
 
   const origin = req.headers.get("origin") || process.env.PUBLIC_APP_ORIGIN || "";
   const success_url = process.env.STRIPE_SUCCESS_URL || (origin ? `${origin}/dashboard.html?billing=success` : undefined);
@@ -42,7 +51,7 @@ export default wrap(async (req) => {
     return json(400, { error: "Missing STRIPE_SUCCESS_URL/STRIPE_CANCEL_URL (or Origin header)" }, cors);
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const params = {
     mode: "payment",
     customer_email: keyRow.customer_email || undefined,
     success_url,
@@ -60,9 +69,22 @@ export default wrap(async (req) => {
     metadata: {
       customer_id: String(keyRow.customer_id),
       month,
-      amount_cents: String(amount_cents)
+      amount_cents: String(amount_cents),
+      ...legalAcceptanceMetadata(body, "user-topup-checkout")
     }
+  };
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "stripe",
+    action: "stripe.checkout.create",
+    app_id: "skygatefs27-user-topup",
+    workspace_id: `customer:${keyRow.customer_id}`,
+    customer_id: String(keyRow.customer_id),
+    client_id: keyRow.customer_email || "",
+    usage_lane: "fs27:user-topup-checkout",
+    payload: { params }
   });
+  if (!runtime.ok) return json(runtime.status || 502, { error: "Stripe provider runtime failed", code: "STRIPE_PROVIDER_RUNTIME_FAILED", provider_runtime: publicProviderRuntime(runtime.receipt) }, cors);
+  const session = runtime.receipt?.provider_result || {};
 
-  return json(200, { ok: true, url: session.url }, cors);
+  return json(200, { ok: true, url: session.url, id: session.id, provider_runtime: publicProviderRuntime(runtime.receipt) }, cors);
 });

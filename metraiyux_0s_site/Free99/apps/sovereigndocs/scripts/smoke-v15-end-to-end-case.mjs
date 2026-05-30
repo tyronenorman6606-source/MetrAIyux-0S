@@ -11,7 +11,7 @@ for(const rel of [
   'case-command-center/index.html',
   'assets/workflow-ui.js',
   'data/case-records.json',
-  'skye-docx-max/app/sd-bridge.js'
+  'server/editor-adapter.mjs'
 ]) must(rel);
 const pkg = JSON.parse(fs.readFileSync(path.join(ROOT,'package.json'),'utf8'));
 if(!['15.0.0','16.0.0','17.0.0','18.0.0','19.0.0','20.0.0'].includes(pkg.version)) fail('package version is not v15-v20'); else ok('package version is v15-v20 compatible');
@@ -47,7 +47,7 @@ try{
     acceptUserFactsResponsibility:true
   });
   const started = JSON.parse(start.text);
-  if(start.status !== 201 || !started.case?.id || !started.handoff?.id || !started.launchUrl?.startsWith('/skye-docx-max/app/?sd_handoff=')) fail(`case start failed: ${start.text}`); else ok('case start creates case, packet/document records, and SkyeDocxMax launch');
+  if(start.status !== 201 || !started.case?.id || !started.handoff?.id || !started.launchUrl?.includes('/Marketing-Made-Easy/SkyeDocxMax/editor.html') || !started.launchUrl?.includes('sd_handoff=')) fail(`case start failed: ${start.text}`); else ok('case start creates case, packet/document records, and canonical SkyeDocxMax launch');
   if(!started.packet?.id || started.documents?.length !== 2 || !started.reviewSubmissionIds?.length) fail('case start did not create packet/documents/review submission'); else ok('case start creates packet documents and legal-review submission');
   const highRiskDoc = started.documents.find(d => d.templateId.includes('single-member-llc-operating-agreement'));
   if(!highRiskDoc || highRiskDoc.gate.exportClass !== 'prep_worksheet') fail('high-risk member was not downgraded to prep worksheet in case packet'); else ok('high-risk case member downgrades to prep worksheet');

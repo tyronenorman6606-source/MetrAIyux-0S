@@ -1,5 +1,5 @@
 const { query } = require("./_db");
-const { json, parseJson, requireEnv, getSiteUrl, requireBasicAuth } = require("./_utils");
+const { json, parseJson, requireEnv, getSiteUrl } = require("./_utils");
 const { hybridEncryptWithPublicKeyPem } = require("./_hybrid");
 
 async function resendSend({ to, subject, html }){
@@ -27,6 +27,25 @@ function getHeaderValue(headers, name){
   if(!Array.isArray(headers)) return "";
   const h = headers.find(x => x && String(x.Name || "").toLowerCase() === n);
   return h ? String(h.Value || "") : "";
+}
+
+function getEventHeader(event, name) {
+  const wanted = String(name || "").toLowerCase();
+  for (const [key, value] of Object.entries(event.headers || {})) {
+    if (String(key).toLowerCase() === wanted) return String(value || "");
+  }
+  return "";
+}
+
+function requirePostmarkWebhook(event) {
+  const expected = String(process.env.POSTMARK_WEBHOOK_TOKEN || process.env.INBOUND_POSTMARK_WEBHOOK_TOKEN || "").trim();
+  if (!expected) return;
+  const actual = getEventHeader(event, "x-postmark-token") || getEventHeader(event, "x-skymail-webhook-token");
+  if (actual !== expected) {
+    const error = new Error("Invalid inbound webhook token.");
+    error.statusCode = 401;
+    throw error;
+  }
 }
 
 function stripHtml(html){
@@ -64,8 +83,7 @@ exports.handler = async (event) => {
   try{
     if(event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
 
-    // Optional Basic Auth guard (recommended)
-    requireBasicAuth(event);
+    requirePostmarkWebhook(event);
 
     const payload = parseJson(event);
 
@@ -151,9 +169,9 @@ exports.handler = async (event) => {
       const html = `
         <div style="font-family:Arial,sans-serif;line-height:1.5">
           <h2>New imported email</h2>
-          <p>A new email was received for <b>${escapeHtml(user.handle)}</b> and imported into Skye Mail Vault.</p>
+          <p>A new email was received for <b>${escapeHtml(user.handle)}</b> and imported into SkyeMail Citadel.</p>
           <p>From: <b>${escapeHtml(fromName || "")}</b> &lt;${escapeHtml(fromEmail)}&gt;</p>
-          <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in Skye Mail Vault</a></p>
+          <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in SkyeMail Citadel</a></p>
           <p style="color:#666;font-size:12px">Content is encrypted at rest in the Vault database. This notification does not include message content.</p>
         </div>
       `;

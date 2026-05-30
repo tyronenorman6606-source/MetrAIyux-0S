@@ -1,0 +1,20 @@
+[classification]
+pass = ["canonical-real-app", "support-only-folder"]
+warn = ["partial-app-needs-owner-manual-check", "marketing-to-app-handoff"]
+block = ["nested-real-app-blocker", "docked-menu-shell", "static-marketing-shell", "duplicate-canonical-component", "app-local-auth-lane"]
+
+[signals.blockers]
+nested_app_links = ["app.html", "public/index.html", "dashboard.html", "workspace.html", "editor.html"]
+shell_phrases = ["Imported App", "Open Imported App", "command lane", "standalone platform truth", "static-safe entry", "runtime unavailable", "Static mode is active"]
+duplicate_component_terms = ["local editor", "built-in editor", "local CRM", "local billing", "local proof ledger"]
+app_local_auth_terms = ["admin password", "founder password", "owner password", "client admin password", "workspace password", "local operator login", "auth-signup", "auth-login", "admin-login", "password_hash", "bcrypt.compare", "createWorkspaceSession", "issueSession", "local proof bootstrap", "SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP", "Basic Auth", "PIN login"]
+
+[minimum_real_app]
+requires_role_context = true
+requires_domain_actions = true
+requires_create_or_edit_path = true
+requires_save_or_export_path = true
+requires_error_empty_loading_states = true
+requires_shared_gate_auth = true
+requires_mobile_browser_proof = false
+requires_owner_manual_live_check = true

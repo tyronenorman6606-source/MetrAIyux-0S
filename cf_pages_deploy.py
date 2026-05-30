@@ -26,13 +26,6 @@ def main() -> int:
     env.setdefault("PAGES_BRANCH", "main")
     env.setdefault("PAGES_COMMIT_MESSAGE", f"Direct upload {project}")
 
-    if not env.get("CLOUDFLARE_API_TOKEN"):
-        print("Missing CLOUDFLARE_API_TOKEN. Export a local token; do not hardcode it in this file.")
-        return 2
-    if not env.get("CLOUDFLARE_ACCOUNT_ID"):
-        print("Missing CLOUDFLARE_ACCOUNT_ID. Export the Cloudflare account ID.")
-        return 2
-
     return subprocess.call(["node", "tools/cloudflare-pages-direct-upload.mjs"], env=env)
 
 

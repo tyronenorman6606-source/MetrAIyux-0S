@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SupaBoy SkyeNet Proof</title>
+  <meta name="description" content="FS27 SkyeNet proof surface for the SupaBoy artist-universe build and reusable Artist Universe Builder Agent.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #06070d;
+      --ink: #f8f5ec;
+      --muted: #b9c0cf;
+      --gold: #ffd86d;
+      --cyan: #31e5ff;
+      --pink: #ff4e88;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 10%, rgba(255, 216, 109, .18), transparent 30%),
+        radial-gradient(circle at 82% 20%, rgba(49, 229, 255, .18), transparent 34%),
+        radial-gradient(circle at 52% 86%, rgba(255, 78, 136, .16), transparent 38%),
+        var(--bg);
+    }
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 64px 0;
+    }
+    .hero {
+      min-height: 72vh;
+      display: grid;
+      align-content: center;
+      gap: 24px;
+    }
+    .eyebrow {
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(48px, 9vw, 120px);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+    p {
+      max-width: 780px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .actions, .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    a {
+      color: inherit;
+    }
+    .button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,.06);
+      text-decoration: none;
+      font-weight: 850;
+    }
+    .button.primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--gold), var(--cyan));
+      color: #061014;
+    }
+    .card {
+      flex: 1 1 250px;
+      min-height: 180px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      padding: 22px;
+      background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: 0 26px 80px rgba(0,0,0,.36);
+    }
+    .card b {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--gold);
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    code {
+      color: #effbff;
+      background: rgba(0,0,0,.28);
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">FS27 SkyeNet proof</p>
+      <h1>SupaBoy is live on SkyeNet.</h1>
+      <p>The artist-universe build is mounted from FS27 SkyeNet deployment <code>dep_20260523071848</code>. This proof surface also records the reusable Artist Universe Builder Agent now wired into the 0S brain.</p>
+      <div class="actions">
+        <a class="button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY/">Open SupaBoy</a>
+        <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/supaboy/">Lowercase route</a>
+        <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/gate-proofx.html">FS27 proof surface</a>
+      </div>
+    </section>
+    <section class="grid" aria-label="Proof receipts">
+      <article class="card">
+        <b>Deployment</b>
+        <p>Project <code>supaboy</code> completed with 26 deployed files and R2 asset prefix <code>deployments/supaboy/dep_20260523071848</code>.</p>
+      </article>
+      <article class="card">
+        <b>Routes</b>
+        <p>Active mounts: <code>/SUPABOY/</code> and <code>/supaboy/</code>, both public and served by FS27 SkyeNet.</p>
+      </article>
+      <article class="card">
+        <b>0S Brain</b>
+        <p>Agent card: <code>metraiyux_0s_site/brain/artist-universe-builder-agent.json</code>. Operator commands: <code>artist-universe:agent-card</code> and <code>artist-universe:checklist</code>.</p>
+      </article>
+      <article class="card">
+        <b>Receipts</b>
+        <p>Deployment receipts live at <code>.1/supaboy-merser31/FS27_SKYNET_DEPLOY_RECEIPT.json</code> and <code>test-artifacts/supaboy-fs27-skynet-deploy/fs27-skynet-deploy-receipt.json</code>.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

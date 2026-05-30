@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All City Towing | Tempe Light duty towing</title>
+  <meta name="description" content="All City Towing is a Valley Verified light duty towing profile at 2031 W. 1st St., Tempe, AZ 85281, highlighting Light duty towing, Heavy duty towing, and.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f8f2dc;
+      --muted: #d0c8ad;
+      --road: #171716;
+      --black: #0d0d0c;
+      --yellow: #f3c318;
+      --orange: #e36e2c;
+      --line: rgba(248, 242, 220, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(90deg, transparent 0 34px, rgba(243, 195, 24, 0.1) 34px 36px),
+        var(--road);
+      line-height: 1.5;
+    }
+
+    main {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    .warning {
+      background: var(--yellow);
+      color: var(--black);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 900;
+    }
+
+    .warning img {
+      width: 44px;
+      height: 44px;
+      padding: 7px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    header {
+      min-height: 540px;
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      background:
+        linear-gradient(140deg, rgba(13, 13, 12, 0.96), rgba(33, 32, 28, 0.96)),
+        var(--black);
+      border: 1px solid var(--line);
+      border-top: 0;
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.32);
+    }
+
+    .hero {
+      padding: clamp(28px, 5vw, 62px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .kicker {
+      margin: 0 0 18px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(3.4rem, 9vw, 8.6rem);
+      line-height: 0.84;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 24px 0 0;
+      color: var(--muted);
+      max-width: 650px;
+      font-size: 1.1rem;
+    }
+
+    .dispatch {
+      border-left: 1px solid var(--line);
+      background: rgba(243, 195, 24, 0.06);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .dispatch b {
+      display: block;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      margin-bottom: 8px;
+    }
+
+    .phone {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 900;
+      font-size: clamp(1.9rem, 4vw, 3.4rem);
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+
+    .address {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panels {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    section {
+      background: rgba(13, 13, 12, 0.82);
+      border: 1px solid var(--line);
+      padding: 24px;
+    }
+
+    h2 {
+      margin: 0 0 15px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.9rem;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .fact b {
+      display: block;
+      color: var(--orange);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      background: var(--yellow);
+      color: var(--black);
+      padding: 8px 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    a {
+      color: var(--yellow);
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      header,
+      .panels,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .dispatch {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="warning">
+      <span>Valley Verified / Auto Services</span>
+      <img src="assets/logo.svg" alt="">
+    </div>
+
+    <header>
+      <div class="hero">
+        <p class="kicker">Towing / Vehicle Emergency Services</p>
+        <h1>All City Towing</h1>
+        <p class="lead">All City Towing serves Tempe and the greater Phoenix area with 24/7 light-duty towing, heavy-duty towing, specialized transport, private-property towing, emergency recovery, accident towing, and vehicle storage.</p>
+      </div>
+
+      <aside class="dispatch" aria-label="Contact facts">
+        <div>
+          <b>Public Phone</b>
+          <a class="phone" href="tel:+14808337278">(480) 833-7278</a>
+        </div>
+        <p class="address">2031 W. 1st St.<br>Tempe, AZ 85281</p>
+      </aside>
+    </header>
+
+    <div class="panels">
+      <section aria-labelledby="facts-heading">
+        <h2 id="facts-heading">Local Details</h2>
+        <div class="facts">
+          <div class="fact"><b>Category</b>Auto Services</div>
+          <div class="fact"><b>Niche</b>Towing / Vehicle Emergency Services</div>
+          <div class="fact"><b>Language</b>English</div>
+          <div class="fact"><b>Pricing</b>Contact for quote</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="evidence-heading">
+        <h2 id="evidence-heading">Valley Verified Notes</h2>
+        <p>All City Towing is presented as a finished Tempe light duty towing profile. All City Towing is presented with public local business facts and clean customer-facing context. Public evidence is summarized below. The profile is kept current with public business evidence. <a href="https://business.phoenixchamber.com/list/ql/automotive-marine-4">Phoenix Chamber automotive directory</a>.</p>
+        <div class="tags" aria-label="Tags">
+          <span class="tag">Towing / vehicle emergency services</span>
+          <span class="tag">Automotive</span>
+          <span class="tag">Local towing/service business / public phone listed</span>
+          <span class="tag">Automotive Services</span>
+        </div>
+      </section>
+    </div>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-all-city-towing-tempe-85281-c1a23d8">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-all-city-towing-tempe-85281-c1a23d8">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says All City Towing is Valley Verified because official, Chamber, City of Tempe, and BBB materials all point to a substantial Arizona towing operation. The evidence includes service since 1992, more than 60 service units, more than 100 trained team members, five Valley storage facilities, Tempe contracted impound work, and BBB accreditation with an A+ rating.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Light duty towing, Heavy duty towing, Specialized transport, and Private property towing</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>Drivers needing towing or accident recovery, Commercial fleets, and Property managers</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>2031 W. 1st St., Tempe, AZ 85281; (480) 833-7278</span></div>
+      </div>
+      <p class="vv-note-text">Official, BBB, and Chamber materials support this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

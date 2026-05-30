@@ -66,9 +66,9 @@ const SkygateAuthBridge = (() => {
 
   async function introspect(value = token(), origin = endpoint()) {
     const bearer = String(value || '').trim();
-    if (!bearer) return { ok: false, error: 'Sign into the 0S/SkyGate session first. Admin bearer paste is legacy fallback only.' };
+    if (!bearer) return { ok: false, error: 'Sign into the 0S/SkyGate session first.' };
 
-    const paths = ['/api/admin/auth/introspect', '/api/skygate/auth-introspect'];
+    const paths = ['/api/skygate/auth-introspect'];
     let last = null;
     for (const path of paths) {
       try {
@@ -115,7 +115,7 @@ const SkygateAuthBridge = (() => {
     sessionStorage.setItem(claimsKey, JSON.stringify(result.skygate || result));
     window.MetrAIyuxGateBridge?.persist?.({
       token: value,
-      source: result.via === 'legacy_admin_token' ? 'legacy-admin-imported-into-0s-gate' : 'skygate-admin-introspect',
+      source: 'skygate-admin-introspect',
       platform_id: 'metraiyux-0s-admin',
       usage_lane: '0meg4kai-admin-security',
       role: 'admin',
@@ -128,7 +128,7 @@ const SkygateAuthBridge = (() => {
         { id: 'skyerunners', name: 'SkyeRunners', scope: 'runner-orchestration' }
       ]
     });
-    const source = result.via === 'legacy_admin_token' ? 'legacy ADMIN_TOKEN' : 'Skyegate FS27';
+    const source = 'Skyegate FS27';
     const who = actor();
     showStatus(statusId, `Admin token accepted by ${source}. Active operator: ${who}.`);
     return result;

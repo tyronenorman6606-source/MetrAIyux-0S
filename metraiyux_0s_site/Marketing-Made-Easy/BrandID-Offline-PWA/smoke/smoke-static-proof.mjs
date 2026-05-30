@@ -19,14 +19,9 @@ for (const rel of [
 }
 
 const indexHtml = readFileSync(path.join(root, "index.html"), "utf8");
-const html = readFileSync(path.join(root, "app.html"), "utf8");
-for (const needle of [
-  "BrandID Offline PWA now has routed surfaces",
-  'href="./app.html"',
-]) {
-  if (!indexHtml.includes(needle)) {
-    throw new Error(`BrandID route shell is missing required proof marker: ${needle}`);
-  }
+const html = indexHtml;
+if (existsSync(path.join(root, "app.html"))) {
+  throw new Error("app.html should not exist; BrandID Offline PWA must use one canonical root app");
 }
 for (const needle of [
   'navigator.serviceWorker.register("./sw.js"',

@@ -1,11 +1,15 @@
 [proof]
-required = true
-mode = "headed-live-browser"
+required = false
+mode = "owner-manual-live-browser-only"
 production_url_only = true
 headless_allowed = false
 localhost_counts_as_production = false
 text_smoke_only_allowed = false
 screenshot_only_allowed = false
+codex_may_open_browser = false
+playwright_may_run = false
+disabled_by_owner_admin = true
+replacement_gate = "deploy + static validation + API smoke + authenticated HTTP stress; owner performs live browser verification manually."
 
 [human_interaction]
 click_primary_navigation = true
@@ -21,8 +25,8 @@ minimum_actions_per_viewport = 12
 minimum_distinct_controls_per_viewport = 8
 
 [browser_stress]
-required = true
-mode = "headed-human-style-repeated-interaction"
+required = false
+mode = "disabled-owner-manual"
 minimum_cycles_per_viewport = 3
 minimum_total_actions_per_viewport = 24
 minimum_form_edits_per_viewport = 3
@@ -38,12 +42,12 @@ fail_on_uncaught_exception = true
 fail_on_unhandled_rejection = true
 
 [regression_loop]
-required = true
+required = false
 run_until_pass_or_blocked = true
 max_fix_verify_cycles = 5
 rerun_after_every_code_change = true
 rerun_after_deploy = true
-do_not_final_until_clean_or_blocked = true
+do_not_final_until_clean_or_blocked = false
 blocked_requires_specific_reason = true
 blocked_requires_latest_receipt = true
 
@@ -97,10 +101,11 @@ include_failures = true
 
 [final_answer]
 must_name_receipt_when_passed = true
-must_say_not_ready_when_unpassed = true
-must_not_present_live_links_as_ready_without_pass = true
+must_say_not_ready_when_unpassed = false
+must_not_present_live_links_as_ready_without_pass = false
 must_use_clickable_markdown_links = true
 plain_url_only_allowed = false
+must_state_owner_manual_browser_check = true
 
 [handoff_format]
 required_for = [

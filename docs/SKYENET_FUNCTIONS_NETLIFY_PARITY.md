@@ -1,6 +1,6 @@
 # SkyeNet Functions Netlify-Parity Runtime
 
-Last updated: 2026-05-24
+Last updated: 2026-05-28
 
 ## Product Decision
 
@@ -34,8 +34,10 @@ Later parity targets:
 
 Control plane:
 
-- 0S gated console: `/skyenet/index.html`.
-- 0S API proxy: `/api/skyenet/*`.
+- Standalone SkyeNet console: `https://skyenet.graylondonskyes.workers.dev/console`.
+- Standalone SkyeNet API shape: `https://skyenet.graylondonskyes.workers.dev/api/skyenet/*`.
+- 0S gated console: `/skyenet/index.html` for legacy/internal operator access.
+- 0S API proxy: `/api/skyenet/*` remains active for shared-gate control and compatibility.
 - FS27 deploy API: `/deploy/*`.
 - Function bundle conversion: `tools/skyenet-functions-convert.mjs`.
 - Function runtime proof server: `tools/skyenet-functions-runtime.mjs`.

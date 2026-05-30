@@ -79,7 +79,13 @@ const osBase = choose(
   rootEnv.METRAIYUX_0S_FULL_SYSTEM_URL,
   "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
 );
-const vaultUrl = choose(rootEnv.SKYEVAULT_DROP_URL, vaultEnv.URL, "https://skyevault-drop.graylondonskyes.workers.dev");
+const vaultUrl = choose(
+  rootEnv.SKYEVAULT_DROP_WORKER_URL,
+  rootEnv.SKYEVAULT_DROP_CLOUDFLARE_URL,
+  rootEnv.SKYEVAULT_DROP_URL,
+  vaultEnv.URL,
+  "https://skyevault-drop.graylondonskyes.workers.dev"
+);
 
 const desired = {
   SKYESECURE_WRITE_SECRET: skysecureWriteSecret,

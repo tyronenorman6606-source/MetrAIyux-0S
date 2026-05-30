@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Complete Health | Valley Verified</title>
+  <meta name="description" content="Arizona Complete Health in Tempe, AZ: health plan and care organization listed in Valley Verified.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #12211f;
+      --paper: #fcfffd;
+      --teal: #0b8f8a;
+      --leaf: #75b843;
+      --sun: #f0bd3f;
+      --rose: #e85f6a;
+      --line: rgba(18, 33, 31, .16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(135deg, rgba(11,143,138,.08) 0 2px, transparent 2px 54px),
+        var(--paper);
+      overflow-wrap: anywhere;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { background: #fff; border-bottom: 1px solid var(--line); }
+    .bar { min-height: 72px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .brand { font-weight: 900; text-transform: uppercase; letter-spacing: .1em; font-size: .78rem; }
+    .location { background: var(--teal); color: #fff; padding: 10px 14px; font-weight: 900; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      padding: 58px 0 36px;
+    }
+    .eyebrow { margin: 0 0 14px; color: var(--teal); font-weight: 900; text-transform: uppercase; letter-spacing: .12em; font-size: .82rem; }
+    h1 { margin: 0; font-size: 3.75rem; line-height: .98; letter-spacing: 0; }
+    .lead { margin: 22px 0 0; max-width: 680px; font-size: 1.13rem; line-height: 1.72; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 2px solid var(--ink);
+      background: var(--teal);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+    }
+    .button.alt { color: var(--ink); background: #fff; }
+    .care-map {
+      min-height: 420px;
+      border: 2px solid var(--ink);
+      background:
+        linear-gradient(90deg, transparent 0 44%, var(--leaf) 44% 50%, transparent 50%),
+        linear-gradient(0deg, transparent 0 44%, var(--sun) 44% 50%, transparent 50%),
+        #e8fbf8;
+      position: relative;
+      box-shadow: 12px 12px 0 rgba(232,95,106,.92);
+    }
+    .care-map::before {
+      content: "Health Plan / Care Organization";
+      position: absolute;
+      left: 26px;
+      top: 26px;
+      right: 26px;
+      padding: 18px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      font-weight: 900;
+      text-align: center;
+    }
+    .care-map::after {
+      content: "1850 W. Rio Salado Pkwy.";
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 26px;
+      padding: 18px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 900;
+      text-align: center;
+    }
+    .facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr .8fr;
+      gap: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      margin: 20px 0 42px;
+    }
+    .fact { padding: 20px; border-right: 1px solid var(--line); }
+    .fact:last-child { border-right: 0; }
+    .label { margin: 0 0 8px; color: #60706d; font-size: .74rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .value { margin: 0; line-height: 1.48; font-weight: 800; }
+    .section {
+      display: grid;
+      grid-template-columns: .85fr 1.15fr;
+      gap: 34px;
+      padding: 38px 0 60px;
+      border-top: 1px solid var(--line);
+    }
+    h2 { margin: 0; font-size: 2rem; line-height: 1.04; }
+    .copy { margin: 0; line-height: 1.78; font-size: 1.02rem; }
+    .tags { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .tag { padding: 10px 12px; background: #fff; border-left: 6px solid var(--leaf); box-shadow: 0 0 0 1px var(--line); font-weight: 900; }
+    footer { background: #fff; border-top: 1px solid var(--line); padding: 24px 0; color: #60706d; }
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 860px) {
+      .hero, .section { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      .fact:nth-child(2) { border-right: 0; }
+      h1 { font-size: 2.7rem; }
+      .care-map { min-height: 310px; box-shadow: 7px 7px 0 rgba(232,95,106,.92); }
+    }
+    @media (max-width: 520px) {
+      .bar, .actions { flex-direction: column; align-items: stretch; }
+      .facts { grid-template-columns: 1fr; }
+      .fact { border-right: 0; border-bottom: 1px solid var(--line); }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <div class="brand">Valley Verified</div>
+      <div class="location">Tempe, AZ 85281</div>
+    </div>
+  </header>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Health Care / Care Organization</p>
+        <h1>Arizona Complete Health</h1>
+        <p class="lead">Arizona Complete Health is listed as a Tempe health plan and care organization with business phone contact at its Rio Salado Parkway office.</p>
+        <div class="actions">
+          <a class="button" href="tel:+14805679083">Call (480) 567-9083 ext. 26883</a>
+          <a class="button alt" href="https://business.phoenixchamber.com/list/ql/health-care-11">Chamber evidence</a>
+        </div>
+      </div>
+      <div class="care-map" aria-hidden="true"></div>
+    </section>
+    <section class="wrap facts" aria-label="Business facts">
+      <div class="fact"><p class="label">Category</p><p class="value">Health And Care</p></div>
+      <div class="fact"><p class="label">Niche</p><p class="value">Health Plan / Care Organization</p></div>
+      <div class="fact"><p class="label">Address</p><p class="value">1850 W. Rio Salado Pkwy., Ste. 211, Tempe, AZ 85281-5713</p></div>
+      <div class="fact"><p class="label">Directory Date</p><p class="value">May 19, 2026</p></div>
+    </section>
+    <section class="wrap section">
+      <h2>Care Profile</h2>
+      <div>
+        <p class="copy">The public record identifies Arizona Complete Health under Health Care / Health Plan / Care Organization and notes a healthcare organization with business phone contact listed. Contact the provider directly for availability, scope, and pricing.</p>
+        <div class="tags" aria-label="Business tags">
+          <span class="tag">Health Care</span>
+          <span class="tag">Healthcare / Wellness</span>
+          <span class="tag">English</span>
+          <span class="tag">Quote-based service</span>
+        </div>
+      </div>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Arizona Complete Health earns Valley Verified placement as a Tempe health plan and care organization profile with a Rio Salado Parkway office at 1850 W. Rio Salado Pkwy., Suite 211 and a published phone extension for local contact.</p>
+        <ul>
+          <li>The category is health plan and care organization inside the health-care space.</li>
+          <li>The profile is useful for patients, families, and local Phoenix-area residents looking for the correct Tempe contact point.</li>
+          <li>Greater Phoenix Chamber health-care category evidence supports the business identity, address, and phone path.</li>
+        </ul>
+      </section>
+
+  </main>
+  <footer>
+    <div class="wrap">Valley Verified local business record for Arizona Complete Health.</div>
+  </footer>
+</body>
+</html>

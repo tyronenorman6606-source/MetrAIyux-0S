@@ -3,13 +3,17 @@
 
   const STORAGE_KEY = "skyeMusicNexusNativeDawProject";
   const PROJECTS_KEY = "skyeMusicNexusNativeDawProjects";
+  const KAIXU_USAGE_KEY = "skyeMusicNexusDawKaixuUsage";
   function musicFunctionUrl(name) {
     const configured = window.METRAIYUX_API_BASES && window.METRAIYUX_API_BASES.skymusicnexus;
     if (configured) return `${String(configured).replace(/\/+$/, "")}/${name}`;
     if (/^(127\.0\.0\.1|localhost)$/i.test(window.location.hostname)) return `/.netlify/functions/${name}`;
     return `/api/skymusicnexus/${name}`;
   }
-  const API = { studio: musicFunctionUrl("music-studio") };
+  const API = {
+    studio: musicFunctionUrl("music-studio"),
+    assets: musicFunctionUrl("music-assets")
+  };
 
   const auth = window.createSkyGateAuth
     ? window.createSkyGateAuth({ storageKey: "skye_music_nexus_session" })
@@ -18,7 +22,41 @@
   const keyboardNoteCodes = ["KeyA", "KeyW", "KeyS", "KeyE", "KeyD", "KeyF", "KeyT", "KeyG", "KeyY", "KeyH", "KeyU", "KeyJ", "KeyK"];
   const padKeyCodes = ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8"];
   const octaveCodes = new Set(["KeyZ", "KeyX"]);
-  const maxBeats = 16;
+  const BEATS_PER_BAR = 4;
+  const DEFAULT_BEATS = 16;
+  const MAX_TIMELINE_BEATS = 1024;
+  const INLINE_ASSET_UPLOAD_LIMIT = 18 * 1024 * 1024;
+  const PROJECT_SCHEMA_VERSION = "skymusicnexus.native-daw.project.v2";
+  const PROJECT_INLINE_AUDIO_LIMIT = 4 * 1024 * 1024;
+  const KAIXU_MODEL_ALIASES = new Set(["kaixu-6.7-nano", "kaixu-6.7-mini", "kaixu-6.7", "kaixu-6.7-pro", "kaixu-6.7-max"]);
+  const KAIXU_BUDGET_LIMITS = {
+    "free-beta": 24,
+    "artist-pro": 72,
+    label: 160,
+    "owner-review": 240
+  };
+  const KAIXU_MODEL_CREDITS = {
+    "kaixu-6.7-nano": 1,
+    "kaixu-6.7-mini": 2,
+    "kaixu-6.7": 4,
+    "kaixu-6.7-pro": 8,
+    "kaixu-6.7-max": 12
+  };
+  const RAW_ROUTE_NAMES = [
+    ["open", "ai"],
+    ["anth", "ropic"],
+    ["clau", "de"],
+    ["gem", "ini"],
+    ["goo", "gle"],
+    ["eleven", "labs"],
+    ["stabil", "ity"],
+    ["repli", "cate"],
+    ["su", "no"],
+    ["ud", "io"],
+    ["mis", "tral"],
+    ["gr", "oq"]
+  ].map((parts) => parts.join(""));
+  const RAW_ROUTE_NAME_PATTERN = new RegExp(`\\b(${RAW_ROUTE_NAMES.join("|")})\\b`, "gi");
   const soundLibrary = [
     { id: "trap-grid", name: "Trap Grid", trackId: "drums", length: 4, regions: ["Kick grid", "Hat ladder"] },
     { id: "sub-run", name: "808 Run", trackId: "bass", length: 4, regions: ["808 answer"] },
@@ -39,6 +77,8 @@
     playing: false,
     recording: false,
     beat: 0,
+    maxBeats: DEFAULT_BEATS,
+    projectId: "",
     timer: null,
     metronomeEnabled: false,
     loopEnabled: true,
@@ -51,6 +91,17 @@
     micRecordEvents: 0,
     midiEvents: 0,
     midiStatus: "not-connected",
+    kaixuAssistEvents: 0,
+    lastKaixuAssist: null,
+    lastAssistantRate: null,
+    assistantCreditUsage: null,
+    lastAppliedDiff: null,
+    assetPromoteEvents: 0,
+    lastAssetPromotion: null,
+    lastRestoreReport: null,
+    exportQueueEvents: 0,
+    lastExportJob: null,
+    cloudProjects: [],
     micRecorder: null,
     micChunks: [],
     micStream: null,
@@ -62,11 +113,11 @@
     activeRail: "session",
     commandLog: ["Workbench donor harvested: activity rail, project explorer, console/status lanes."],
     tracks: [
-      { id: "drums", name: "Drums", color: "#f5c76b", volume: 0.88, muted: false, solo: false, armed: false, meter: 0.2, regions: [{ name: "Kick pattern", start: 0, length: 4 }, { name: "Hat lift", start: 8, length: 4 }] },
-      { id: "bass", name: "808 Bass", color: "#66e5ff", volume: 0.74, muted: false, solo: false, armed: false, meter: 0.3, regions: [{ name: "Sub hook", start: 4, length: 6 }] },
-      { id: "keys", name: "Keys", color: "#bd8cff", volume: 0.7, muted: false, solo: false, armed: false, meter: 0.15, regions: [{ name: "Minor stack", start: 2, length: 8 }] },
-      { id: "vocal", name: "Vocal", color: "#ff8f70", volume: 0.82, muted: false, solo: false, armed: true, meter: 0.1, regions: [{ name: "Hook take", start: 10, length: 5 }] },
-      { id: "sample", name: "Sample", color: "#9dffbd", volume: 0.65, muted: false, solo: false, armed: false, meter: 0.18, regions: [{ name: "Texture chop", start: 6, length: 4 }] }
+      { id: "drums", name: "Drums", color: "#f5c76b", volume: 0.88, pan: 0, muted: false, solo: false, armed: false, meter: 0.2, regions: [{ name: "Kick pattern", start: 0, length: 4 }, { name: "Hat lift", start: 8, length: 4 }] },
+      { id: "bass", name: "808 Bass", color: "#66e5ff", volume: 0.74, pan: 0, muted: false, solo: false, armed: false, meter: 0.3, regions: [{ name: "Sub hook", start: 4, length: 6 }] },
+      { id: "keys", name: "Keys", color: "#bd8cff", volume: 0.7, pan: -0.1, muted: false, solo: false, armed: false, meter: 0.15, regions: [{ name: "Minor stack", start: 2, length: 8 }] },
+      { id: "vocal", name: "Vocal", color: "#ff8f70", volume: 0.82, pan: 0.04, muted: false, solo: false, armed: true, meter: 0.1, regions: [{ name: "Hook take", start: 10, length: 5 }] },
+      { id: "sample", name: "Sample", color: "#9dffbd", volume: 0.65, pan: 0.12, muted: false, solo: false, armed: false, meter: 0.18, regions: [{ name: "Texture chop", start: 6, length: 4 }] }
     ],
     pads: ["Kick", "Snare", "Hat", "Open", "Clap", "Rim", "Tom", "Perc", "808", "Sub", "Vox", "Fx", "Chord", "Bell", "Air", "Drop"],
     keys: [
@@ -80,6 +131,153 @@
     return document.getElementById(id);
   }
 
+  function clampNumber(value, min, max, fallback = min) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(min, Math.min(max, number));
+  }
+
+  function timelineBeats() {
+    return clampNumber(state.maxBeats || DEFAULT_BEATS, BEATS_PER_BAR, MAX_TIMELINE_BEATS, DEFAULT_BEATS);
+  }
+
+  function timelineBars() {
+    return Math.max(1, Math.ceil(timelineBeats() / BEATS_PER_BAR));
+  }
+
+  function syncTimelineInput() {
+    const input = $("dawBarsInput");
+    if (input) input.value = String(timelineBars());
+  }
+
+  function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function safeJsonParse(raw, fallback) {
+    try {
+      return JSON.parse(raw || "");
+    } catch (error) {
+      return fallback;
+    }
+  }
+
+  function readLocalProjects() {
+    let raw = "";
+    try {
+      raw = localStorage.getItem(PROJECTS_KEY);
+    } catch (error) {
+      raw = "";
+    }
+    const projects = safeJsonParse(raw, []);
+    return Array.isArray(projects) ? projects : [];
+  }
+
+  function stripProjectInlineAudio(project) {
+    return JSON.parse(JSON.stringify(project, (key, value) => {
+      if (key === "inlineBase64" || key === "dataBase64" || key === "uploadBase64") return undefined;
+      return value;
+    }));
+  }
+
+  function readKaixuUsage() {
+    let raw = "";
+    try {
+      raw = localStorage.getItem(KAIXU_USAGE_KEY);
+    } catch (error) {
+      raw = "";
+    }
+    const usage = safeJsonParse(raw, null);
+    if (!usage || usage.day !== todayKey()) return { day: todayKey(), used: 0, runs: 0 };
+    return {
+      day: usage.day,
+      used: clampNumber(usage.used, 0, 9999, 0),
+      runs: clampNumber(usage.runs, 0, 9999, 0)
+    };
+  }
+
+  function writeKaixuUsage(usage) {
+    try {
+      localStorage.setItem(KAIXU_USAGE_KEY, JSON.stringify(usage));
+    } catch (error) {
+      appendLog(`kAIxU credit meter stayed in session memory: ${error.message}`);
+    }
+    state.assistantCreditUsage = usage;
+  }
+
+  function currentKaixuAlias() {
+    const requestedAlias = $("dawKaixuModel")?.value || "kaixu-6.7-nano";
+    return KAIXU_MODEL_ALIASES.has(requestedAlias) ? requestedAlias : "kaixu-6.7-nano";
+  }
+
+  function currentBudgetTier() {
+    const requested = $("dawKaixuBudget")?.value || "free-beta";
+    return Object.prototype.hasOwnProperty.call(KAIXU_BUDGET_LIMITS, requested) ? requested : "free-beta";
+  }
+
+  function currentCreditCap() {
+    const tierCap = KAIXU_BUDGET_LIMITS[currentBudgetTier()] || KAIXU_BUDGET_LIMITS["free-beta"];
+    return clampNumber($("dawKaixuCreditCap")?.value, 1, tierCap, tierCap);
+  }
+
+  function updateKaixuBudgetUi() {
+    const usage = readKaixuUsage();
+    state.assistantCreditUsage = usage;
+    const cap = currentCreditCap();
+    const meter = $("dawKaixuMeter");
+    if (!meter) return;
+    const remaining = Math.max(0, cap - usage.used);
+    const rate = state.lastAssistantRate;
+    const backendNote = rate && Number.isFinite(Number(rate.remaining))
+      ? ` / SkyGate ${Math.max(0, Number(rate.remaining))} left`
+      : "";
+    meter.textContent = `${usage.used} / ${cap} credits used today - ${remaining} left${backendNote}`;
+  }
+
+  function syncKaixuCreditCapToTier() {
+    const input = $("dawKaixuCreditCap");
+    if (input) input.value = String(KAIXU_BUDGET_LIMITS[currentBudgetTier()] || KAIXU_BUDGET_LIMITS["free-beta"]);
+    updateKaixuBudgetUi();
+  }
+
+  function reserveKaixuCredits() {
+    const usage = readKaixuUsage();
+    const alias = currentKaixuAlias();
+    const cost = KAIXU_MODEL_CREDITS[alias] || 1;
+    const cap = currentCreditCap();
+    if (usage.used + cost > cap) {
+      return { ok: false, alias, cost, cap, usage };
+    }
+    const next = { ...usage, used: usage.used + cost, runs: usage.runs + 1 };
+    writeKaixuUsage(next);
+    updateKaixuBudgetUi();
+    return { ok: true, alias, cost, cap, usage: next };
+  }
+
+  function clampArrangementToTimeline() {
+    const max = timelineBeats();
+    state.beat = clampNumber(state.beat, 0, Math.max(0, max - 1), 0);
+    for (const track of state.tracks) {
+      track.pan = clampNumber(track.pan, -1, 1, 0);
+      for (const region of track.regions) {
+        region.start = clampNumber(region.start, 0, Math.max(0, max - 1), 0);
+        region.length = clampNumber(region.length, 1, Math.max(1, max - region.start), 1);
+      }
+    }
+  }
+
+  function setTimelineBars(value, options = {}) {
+    const bars = clampNumber(value, 1, MAX_TIMELINE_BEATS / BEATS_PER_BAR, DEFAULT_BEATS / BEATS_PER_BAR);
+    state.maxBeats = Math.round(bars) * BEATS_PER_BAR;
+    clampArrangementToTimeline();
+    if (!options.skipInputSync) syncTimelineInput();
+    renderRuler();
+    renderTracks();
+    renderWorkbenchPanel();
+    updateClock();
+    syncDebug();
+  }
+
   function syncDebug() {
     window.__SKYE_NEXUS_DAW = {
       audioState: state.audio ? state.audio.state : "not-started",
@@ -90,8 +288,11 @@
       playing: state.playing,
       recording: state.recording,
       beat: state.beat,
+      timelineBeats: timelineBeats(),
+      timelineBars: timelineBars(),
       clipCount: state.clips.length,
       decodedClipCount: state.clips.filter((clip) => clip.bufferReady).length,
+      vaultedClipCount: state.clips.filter((clip) => clip.assetId).length,
       regionCount: state.tracks.reduce((total, track) => total + track.regions.length, 0),
       clipPreviewEvents: state.clipPreviewEvents,
       keyboardEvents: state.keyboardEvents,
@@ -108,6 +309,17 @@
       micRecordEvents: state.micRecordEvents,
       midiEvents: state.midiEvents,
       midiStatus: state.midiStatus,
+      kaixuAssistEvents: state.kaixuAssistEvents,
+      lastKaixuAssist: state.lastKaixuAssist,
+      lastAssistantRate: state.lastAssistantRate,
+      assistantCreditUsage: state.assistantCreditUsage,
+      lastAppliedDiff: state.lastAppliedDiff,
+      assetPromoteEvents: state.assetPromoteEvents,
+      lastAssetPromotion: state.lastAssetPromotion,
+      lastRestoreReport: state.lastRestoreReport,
+      exportQueueEvents: state.exportQueueEvents,
+      lastExportJob: state.lastExportJob,
+      cloudProjectCount: state.cloudProjects.length,
       workbenchFiles: buildWorkbenchFiles().length,
       commandLog: state.commandLog.slice(-8)
     };
@@ -383,11 +595,12 @@
 
   function addRegionToArmedTrack(name, length, extra = {}, options = {}) {
     const track = state.tracks.find((item) => item.armed) || state.tracks[0];
+    const max = timelineBeats();
     if (options.recordHistory) pushHistory(options.historyLabel || `Add ${name}`);
     const region = {
       name,
-      start: state.beat % maxBeats,
-      length: Math.max(1, Math.min(maxBeats, Number(length) || 1)),
+      start: state.beat % max,
+      length: Math.max(1, Math.min(max, Number(length) || 1)),
       ...extra
     };
     track.regions.push(region);
@@ -404,7 +617,7 @@
       try {
         await unlockAudio({ testTone: true });
         state.playing = true;
-        if (!state.loopEnabled && state.beat >= maxBeats - 1) state.beat = 0;
+        if (!state.loopEnabled && state.beat >= timelineBeats() - 1) state.beat = 0;
         $("playTransportButton")?.classList.add("is-active");
         tickSound({ immediate: true });
         randomMeters();
@@ -445,7 +658,8 @@
     const run = () => {
       if (!state.playing) return;
       const tempo = Number($("dawTempoInput")?.value || 96);
-      if (!state.loopEnabled && state.beat >= maxBeats - 1) {
+      const max = timelineBeats();
+      if (!state.loopEnabled && state.beat >= max - 1) {
         state.playing = false;
         state.recording = false;
         state.timer = null;
@@ -455,7 +669,7 @@
         syncDebug();
         return;
       }
-      state.beat = state.loopEnabled ? (state.beat + 1) % maxBeats : Math.min(maxBeats - 1, state.beat + 1);
+      state.beat = state.loopEnabled ? (state.beat + 1) % max : Math.min(max - 1, state.beat + 1);
       updateClock();
       tickSound();
       randomMeters();
@@ -468,15 +682,22 @@
     state.timer = window.setTimeout(run, Math.max(90, 60000 / tempo));
   }
 
-  function playClip(clipId, volume = 1) {
+  function playClip(clipId, volume = 1, panValue = 0) {
     const clip = state.clips.find((item) => item.id === clipId);
     if (!clip || !clip.buffer) return false;
     const audio = ensureAudio();
     const source = audio.createBufferSource();
     const amp = audio.createGain();
+    const panner = typeof audio.createStereoPanner === "function" ? audio.createStereoPanner() : null;
     source.buffer = clip.buffer;
     amp.gain.setValueAtTime(Math.max(0.02, Math.min(0.9, volume * 0.82)), audio.currentTime);
-    source.connect(amp).connect(outputNode(audio));
+    source.connect(amp);
+    if (panner) {
+      panner.pan.setValueAtTime(clampNumber(panValue, -1, 1, 0), audio.currentTime);
+      amp.connect(panner).connect(outputNode(audio));
+    } else {
+      amp.connect(outputNode(audio));
+    }
     source.start();
     markSound(`clip-${clip.name}`);
     return true;
@@ -487,6 +708,10 @@
     if (!clip) return;
     try {
       await unlockAudio();
+      if (!clip.bufferReady && (clip.inlineBase64 || clip.downloadUrl || clip.streamUrl)) {
+        await restoreClipAudio(clip);
+        renderClips();
+      }
       const played = playClip(clipId, 1);
       if (played) {
         state.clipPreviewEvents += 1;
@@ -553,7 +778,7 @@
       for (const region of activeRegions) {
         if (region.clipId) {
           const startsNow = state.beat === region.start || (immediate && state.beat >= region.start && state.beat < region.start + region.length);
-          if (startsNow) playClip(region.clipId, track.volume);
+          if (startsNow) playClip(region.clipId, track.volume, track.pan || 0);
           continue;
         }
         if (!synthPlayed) {
@@ -581,20 +806,23 @@
   function renderRuler() {
     const ruler = $("dawRuler");
     if (!ruler) return;
-    ruler.innerHTML = Array.from({ length: maxBeats }, (_, index) => `<span>${index + 1}</span>`).join("");
+    const max = timelineBeats();
+    ruler.style.gridTemplateColumns = `repeat(${max}, minmax(3.25rem, 1fr))`;
+    ruler.innerHTML = Array.from({ length: max }, (_, index) => `<span>${index + 1}</span>`).join("");
   }
 
   function renderTracks() {
     const grid = $("dawTrackGrid");
     if (!grid) return;
+    const max = timelineBeats();
     grid.innerHTML = state.tracks.map((track) => {
       const regions = track.regions.map((region, regionIndex) => {
-        const start = Math.max(0, region.start) / maxBeats * 100;
-        const width = Math.max(1, region.length) / maxBeats * 100;
+        const start = Math.max(0, region.start) / max * 100;
+        const width = Math.max(1, region.length) / max * 100;
         const selected = state.selectedRegion && state.selectedRegion.trackId === track.id && state.selectedRegion.regionIndex === regionIndex;
         return `<button type="button" class="daw-region ${selected ? "is-selected" : ""}" data-region-track="${track.id}" data-region-index="${regionIndex}" style="left:${start}%;width:${width}%;border-color:${track.color};"><span>${escapeHtml(region.name)}</span></button>`;
       }).join("");
-      const playhead = `<div class="daw-playhead" style="left:${state.beat / maxBeats * 100}%"></div>`;
+      const playhead = `<div class="daw-playhead" style="left:${state.beat / max * 100}%"></div>`;
       return `<article class="daw-track-row" data-track="${track.id}">
         <div class="daw-track-label">
           <strong>${escapeHtml(track.name)}</strong>
@@ -604,7 +832,7 @@
             <button type="button" data-track-action="arm" data-track-id="${track.id}" class="${track.armed ? "is-on" : ""}">R</button>
           </div>
         </div>
-        <div class="daw-lane">${regions}${playhead}</div>
+        <div class="daw-lane" style="--daw-beats:${max};">${regions}${playhead}</div>
       </article>`;
     }).join("");
   }
@@ -617,6 +845,7 @@
         <div>
           <strong>${escapeHtml(track.name)}</strong>
           <input type="range" min="0" max="1" step="0.01" value="${track.volume}" data-volume-track="${track.id}" aria-label="${escapeHtml(track.name)} volume" />
+          <label class="daw-pan-row"><span>Pan</span><input type="range" min="-1" max="1" step="0.01" value="${track.pan || 0}" data-pan-track="${track.id}" aria-label="${escapeHtml(track.name)} pan" /><small>${panLabel(track.pan || 0)}</small></label>
         </div>
         <meter min="0" max="1" value="${track.meter}"></meter>
       </article>`;
@@ -650,6 +879,25 @@
     </button>`).join("");
   }
 
+  function clipDecodeLabel(clip) {
+    if (clip.bufferReady) return "decoded";
+    if (clip.restoreStatus === "restoring") return "restoring";
+    if (clip.inlineBase64 || clip.downloadUrl || clip.streamUrl) return "restorable";
+    if (clip.decodeError) return "metadata only";
+    return "decoding";
+  }
+
+  function clipStorageLabel(clip) {
+    if (clip.assetId) return "vaulted";
+    if (clip.inlineBase64) return "project-inline";
+    if (clip.uploadBase64) return "vault-ready";
+    return "local-only";
+  }
+
+  function isClipPreviewable(clip) {
+    return Boolean(clip.bufferReady || clip.localObjectUrl || clip.inlineBase64 || clip.downloadUrl || clip.streamUrl);
+  }
+
   function renderClips() {
     const list = $("dawClipList");
     if (!list) return;
@@ -661,8 +909,10 @@
     }
     list.innerHTML = state.clips.map((clip) => `<article class="daw-clip-card">
       <strong>${escapeHtml(clip.name)}</strong>
-      <span>${escapeHtml(clip.type)} - ${formatBytes(clip.size)} - ${clip.bufferReady ? "decoded" : clip.decodeError ? "decode failed" : "decoding"}</span>
-      <button type="button" data-clip-preview="${escapeHtml(clip.id)}" ${clip.bufferReady || clip.localObjectUrl ? "" : "disabled"}>Preview Clip</button>
+      <span>${escapeHtml(clip.type)} - ${formatBytes(clip.size)} - ${clipDecodeLabel(clip)} - ${clipStorageLabel(clip)}</span>
+      <button type="button" data-clip-preview="${escapeHtml(clip.id)}" ${isClipPreviewable(clip) ? "" : "disabled"}>Preview Clip</button>
+      <button type="button" data-clip-promote="${escapeHtml(clip.id)}" ${clip.assetId || !clip.uploadBase64 ? "disabled" : ""}>Vault Clip</button>
+      ${clip.assetId ? `<small>Asset ${escapeHtml(clip.assetId)}</small>` : clip.assetPromoteError ? `<small>${escapeHtml(clip.assetPromoteError)}</small>` : clip.contentHash ? `<small>Hash ${escapeHtml(clip.contentHash.slice(0, 16))}</small>` : ""}
     </article>`).join("");
     renderWorkbenchPanel();
     updateStatusbar();
@@ -671,15 +921,16 @@
   function buildWorkbenchFiles() {
     const regionCount = state.tracks.reduce((total, track) => total + track.regions.length, 0);
     return [
-      { name: "session.nexus", detail: `${$("dawProjectInput")?.value || "Nexus native session"} / ${$("dawTempoInput")?.value || 96} BPM`, type: "session" },
+      { name: "session.nexus", detail: `${$("dawProjectInput")?.value || "Nexus native session"} / ${$("dawTempoInput")?.value || 96} BPM / ${timelineBars()} bars`, type: "session" },
       { name: "tracks.json", detail: `${state.tracks.length} tracks / ${regionCount} regions`, type: "tracks" },
       { name: "mixer.json", detail: `${state.tracks.filter((track) => track.solo).length} solo / ${state.tracks.filter((track) => track.muted).length} muted`, type: "mix" },
-      { name: "clips.bin", detail: `${state.clips.length} imported / ${state.clips.filter((clip) => clip.bufferReady).length} decoded`, type: "clips" },
+      { name: "clips.bin", detail: `${state.clips.length} imported / ${state.clips.filter((clip) => clip.assetId).length} vaulted`, type: "clips" },
       { name: "edit-history.json", detail: `${state.history.length} undo / ${state.future.length} redo / ${state.editEvents} edits`, type: "tracks" },
       { name: "sound-packs.json", detail: `${soundLibrary.length} local packs / ${state.soundPackEvents} inserted`, type: "clips" },
       { name: "inputs.json", detail: `mic ${state.micRecordEvents} / midi ${state.midiStatus}`, type: "mix" },
+      { name: "kaixu-assist.json", detail: `${state.kaixuAssistEvents} gated DAW assist runs / ${readKaixuUsage().used} credits`, type: "kaixu" },
       { name: "mixdown.wav", detail: `${state.mixdownEvents} rendered browser WAV exports`, type: "export" },
-      { name: "release-forge.json", detail: "Release Forge handoff manifest", type: "export" },
+      { name: "release-forge.json", detail: `${state.exportQueueEvents} queued handoff manifest(s)`, type: "export" },
       { name: "daw-console.log", detail: `${state.commandLog.length} session events`, type: "console" }
     ];
   }
@@ -701,6 +952,7 @@
       tracks: ["tracks", "Track Map"],
       clips: ["clips", "Clip Bin"],
       mix: ["mix", "Mix Console"],
+      kaixu: ["kaixu", "kAIxU Assist"],
       export: ["export", "Release Handoff"]
     }[state.activeRail] || ["session", "Project Files"];
     if (kicker) kicker.textContent = panelCopy[0];
@@ -720,7 +972,15 @@
         ? state.clips.map((clip) => fileRow({ name: clip.name, detail: `${formatBytes(clip.size)} / ${clip.bufferReady ? "decoded" : "pending decode"}`, type: "clip" })).join("")
         : fileRow({ name: "No imported clips", detail: "Use Import audio to decode clips into the timeline", type: "clips" });
     } else if (state.activeRail === "mix") {
-      body.innerHTML = state.tracks.map((track) => fileRow({ name: `${track.name} channel`, detail: `${Math.round(track.volume * 100)}% volume / ${Math.round(track.meter * 100)}% meter`, type: "mix" })).join("");
+      body.innerHTML = state.tracks.map((track) => fileRow({ name: `${track.name} channel`, detail: `${Math.round(track.volume * 100)}% volume / ${panLabel(track.pan || 0)} pan / ${Math.round(track.meter * 100)}% meter`, type: "mix" })).join("");
+    } else if (state.activeRail === "kaixu") {
+      body.innerHTML = state.lastKaixuAssist
+        ? [
+          fileRow({ name: "last-kaixu-guidance.json", detail: state.lastKaixuAssist.summary || "kAIxU DAW guidance recorded", type: "kaixu" }),
+          fileRow({ name: "project-diff.json", detail: `${state.lastKaixuAssist.projectDiff?.operations?.length || 0} deterministic operation(s)`, type: "kaixu" }),
+          ...((state.lastKaixuAssist.arrangementActions || state.lastKaixuAssist.actions || []).slice(0, 4).map((line, index) => fileRow({ name: `kaixu-action-${index + 1}.note`, detail: line, type: "kaixu" })))
+        ].join("")
+        : fileRow({ name: "No guidance yet", detail: "Ask kAIxU from the assistant panel", type: "kaixu" });
     } else {
       body.innerHTML = [
         fileRow({ name: "release-forge.json", detail: "Builds artist, track, rights, and handoff metadata", type: "export" }),
@@ -734,7 +994,7 @@
     const normalized = nextRail === "clip" || nextRail === "clips.bin" ? "clips"
       : nextRail === "log" || nextRail === "console" ? "export"
       : trackIds.has(nextRail) ? "tracks"
-      : ["session", "tracks", "clips", "mix", "export"].includes(nextRail) ? nextRail
+      : ["session", "tracks", "clips", "mix", "kaixu", "export"].includes(nextRail) ? nextRail
       : "session";
     state.activeRail = normalized;
     document.querySelectorAll("[data-daw-rail]").forEach((button) => button.classList.toggle("active", button.dataset.dawRail === state.activeRail));
@@ -800,8 +1060,9 @@
       return;
     }
     withHistory(`Duplicate region: ${selected.region.name}`, () => {
-      const start = Math.min(maxBeats - 1, selected.region.start + selected.region.length);
-      const length = Math.max(1, Math.min(selected.region.length, maxBeats - start));
+      const max = timelineBeats();
+      const start = Math.min(max - 1, selected.region.start + selected.region.length);
+      const length = Math.max(1, Math.min(selected.region.length, max - start));
       const duplicate = { ...selected.region, name: `${selected.region.name} copy`, start, length };
       selected.track.regions.splice(selected.index + 1, 0, duplicate);
       state.selectedRegion = { trackId: selected.track.id, regionIndex: selected.index + 1 };
@@ -827,8 +1088,9 @@
     withHistory("Quantize arrangement", () => {
       for (const track of state.tracks) {
         for (const region of track.regions) {
-          region.start = Math.max(0, Math.min(maxBeats - 1, Math.round(Number(region.start) || 0)));
-          region.length = Math.max(1, Math.min(maxBeats - region.start, Math.round(Number(region.length) || 1)));
+          const max = timelineBeats();
+          region.start = Math.max(0, Math.min(max - 1, Math.round(Number(region.start) || 0)));
+          region.length = Math.max(1, Math.min(max - region.start, Math.round(Number(region.length) || 1)));
         }
         track.regions.sort((a, b) => a.start - b.start);
       }
@@ -856,13 +1118,14 @@
     if (!pack) return;
     const track = state.tracks.find((item) => item.id === pack.trackId) || state.tracks[0];
     withHistory(`Add sound pack: ${pack.name}`, () => {
-      const baseStart = state.beat % maxBeats;
+      const max = timelineBeats();
+      const baseStart = state.beat % max;
       pack.regions.forEach((name, index) => {
-        const start = Math.min(maxBeats - 1, baseStart + index * Math.max(1, Math.floor(pack.length / Math.max(1, pack.regions.length))));
+        const start = Math.min(max - 1, baseStart + index * Math.max(1, Math.floor(pack.length / Math.max(1, pack.regions.length))));
         track.regions.push({
           name,
           start,
-          length: Math.max(1, Math.min(pack.length, maxBeats - start)),
+          length: Math.max(1, Math.min(pack.length, max - start)),
           packId: pack.id
         });
       });
@@ -886,7 +1149,7 @@
     const save = $("dawStatusSave");
     if (project) project.textContent = $("dawProjectInput")?.value || "Nexus native session";
     if (tracks) tracks.textContent = `${state.tracks.length} tracks`;
-    if (clips) clips.textContent = `${state.clips.length} clips`;
+    if (clips) clips.textContent = `${state.clips.length} clips / ${state.clips.filter((clip) => clip.assetId).length} vaulted`;
     if (save) save.textContent = state.commandLog.some((line) => line.includes("Saved native DAW project")) ? "Saved" : "Local session";
   }
 
@@ -896,6 +1159,12 @@
     if (code.startsWith("Digit")) return code.slice(5);
     if (code === "Space") return "Space";
     return code;
+  }
+
+  function panLabel(value) {
+    const pan = clampNumber(value, -1, 1, 0);
+    if (Math.abs(pan) < 0.04) return "C";
+    return `${pan < 0 ? "L" : "R"}${Math.round(Math.abs(pan) * 100)}`;
   }
 
   function isEditableTarget(target) {
@@ -988,20 +1257,39 @@
       const clip = {
         id: `clip_${Date.now()}_${Math.random().toString(16).slice(2)}`,
         name: file.name,
+        originalName: file.name,
         type: file.type || "audio/unknown",
         size: file.size,
         localObjectUrl: URL.createObjectURL(file),
         buffer: null,
-        bufferReady: false
+        bufferReady: false,
+        restoreStatus: "importing",
+        importedAt: new Date().toISOString()
       };
       state.clips.unshift(clip);
       addRegionToArmedTrack(file.name.replace(/\.[^.]+$/, ""), 4, { clipId: clip.id });
       try {
         const arrayBuffer = await file.arrayBuffer();
+        clip.contentHash = await sha256Hex(arrayBuffer);
+        if (arrayBuffer.byteLength <= PROJECT_INLINE_AUDIO_LIMIT) {
+          clip.inlineBase64 = arrayBufferToBase64(arrayBuffer);
+          clip.restoreStatus = "project-inline-ready";
+        }
+        if (arrayBuffer.byteLength <= INLINE_ASSET_UPLOAD_LIMIT) {
+          clip.uploadBase64 = clip.inlineBase64 || arrayBufferToBase64(arrayBuffer);
+          clip.assetPromotable = true;
+        } else {
+          clip.assetPromoteError = `Use Upload Studio for files over ${formatBytes(INLINE_ASSET_UPLOAD_LIMIT)}.`;
+        }
         clip.buffer = await audio.decodeAudioData(arrayBuffer.slice(0));
         clip.bufferReady = true;
+        clip.duration = clip.buffer.duration;
+        clip.sampleRate = clip.buffer.sampleRate;
+        clip.channels = clip.buffer.numberOfChannels;
+        clip.restoreStatus = clip.inlineBase64 ? "decoded-project-inline" : "decoded-local";
       } catch (error) {
         clip.decodeError = error.message || "Clip decode failed.";
+        clip.restoreStatus = clip.inlineBase64 ? "project-inline-ready" : "metadata-only";
       }
     }
     state.editEvents += 1;
@@ -1016,10 +1304,17 @@
     target[index] = Math.max(-1, Math.min(1, target[index] + value));
   }
 
+  function panGains(value) {
+    const pan = clampNumber(value, -1, 1, 0);
+    const angle = (pan + 1) * Math.PI / 4;
+    return { left: Math.cos(angle), right: Math.sin(angle) };
+  }
+
   function synthRegionIntoMix(mix, track, region, sampleRate, beatDuration) {
     const startSample = Math.floor(region.start * beatDuration * sampleRate);
     const durationSamples = Math.max(1, Math.floor(region.length * beatDuration * sampleRate));
     const base = track.id === "bass" ? 92 : track.id === "keys" ? 330 : track.id === "vocal" ? 440 : track.id === "sample" ? 220 : 120;
+    const gains = panGains(track.pan || 0);
     for (let index = 0; index < durationSamples; index += 1) {
       const absolute = startSample + index;
       const beatPulse = Math.floor(index / Math.max(1, Math.floor(beatDuration * sampleRate)));
@@ -1027,28 +1322,34 @@
       const wave = track.id === "drums"
         ? (beatPulse % 2 === 0 ? Math.sin(2 * Math.PI * 62 * (index / sampleRate)) : (Math.random() * 2 - 1) * 0.18)
         : Math.sin(2 * Math.PI * (base + beatPulse * 3) * (index / sampleRate));
-      mixSample(mix, absolute, wave * envelope * track.volume * 0.16);
+      const sample = wave * envelope * track.volume * 0.16;
+      mixSample(mix.left, absolute, sample * gains.left);
+      mixSample(mix.right, absolute, sample * gains.right);
     }
   }
 
   function clipRegionIntoMix(mix, track, region, clip, sampleRate, beatDuration) {
     if (!clip || !clip.buffer) return false;
-    const source = clip.buffer.getChannelData(0);
+    const sourceLeft = clip.buffer.getChannelData(0);
+    const sourceRight = clip.buffer.numberOfChannels > 1 ? clip.buffer.getChannelData(1) : sourceLeft;
     const sourceRate = clip.buffer.sampleRate || sampleRate;
     const startSample = Math.floor(region.start * beatDuration * sampleRate);
+    const gains = panGains(track.pan || 0);
     const maxSamples = Math.min(
       Math.floor(region.length * beatDuration * sampleRate),
-      Math.floor(source.length * (sampleRate / sourceRate))
+      Math.floor(sourceLeft.length * (sampleRate / sourceRate))
     );
     for (let index = 0; index < maxSamples; index += 1) {
-      const sourceIndex = Math.min(source.length - 1, Math.floor(index * (sourceRate / sampleRate)));
-      mixSample(mix, startSample + index, source[sourceIndex] * track.volume * 0.75);
+      const sourceIndex = Math.min(sourceLeft.length - 1, Math.floor(index * (sourceRate / sampleRate)));
+      mixSample(mix.left, startSample + index, sourceLeft[sourceIndex] * track.volume * 0.75 * gains.left);
+      mixSample(mix.right, startSample + index, sourceRight[sourceIndex] * track.volume * 0.75 * gains.right);
     }
     return true;
   }
 
-  function encodeWav(samples, sampleRate) {
-    const dataBytes = samples.length * 2;
+  function encodeWav(leftSamples, sampleRate, rightSamples = null) {
+    const channels = rightSamples ? 2 : 1;
+    const dataBytes = leftSamples.length * channels * 2;
     const buffer = new ArrayBuffer(44 + dataBytes);
     const view = new DataView(buffer);
     const writeString = (offset, value) => {
@@ -1060,15 +1361,17 @@
     writeString(12, "fmt ");
     view.setUint32(16, 16, true);
     view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
+    view.setUint16(22, channels, true);
     view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true);
+    view.setUint32(28, sampleRate * channels * 2, true);
+    view.setUint16(32, channels * 2, true);
     view.setUint16(34, 16, true);
     writeString(36, "data");
     view.setUint32(40, dataBytes, true);
-    for (let index = 0; index < samples.length; index += 1) {
-      view.setInt16(44 + index * 2, Math.max(-1, Math.min(1, samples[index])) * 32767, true);
+    for (let index = 0; index < leftSamples.length; index += 1) {
+      const frameOffset = 44 + index * channels * 2;
+      view.setInt16(frameOffset, Math.max(-1, Math.min(1, leftSamples[index])) * 32767, true);
+      if (rightSamples) view.setInt16(frameOffset + 2, Math.max(-1, Math.min(1, rightSamples[index])) * 32767, true);
     }
     return new Blob([buffer], { type: "audio/wav" });
   }
@@ -1087,8 +1390,8 @@
     const sampleRate = 44100;
     const tempo = Number($("dawTempoInput")?.value || 96);
     const beatDuration = Math.max(0.25, 60 / Math.max(40, Math.min(240, tempo)));
-    const totalSamples = Math.ceil(maxBeats * beatDuration * sampleRate);
-    const mix = new Float32Array(totalSamples);
+    const totalSamples = Math.ceil(timelineBeats() * beatDuration * sampleRate);
+    const mix = { left: new Float32Array(totalSamples), right: new Float32Array(totalSamples) };
     const activeSolo = state.tracks.some((track) => track.solo);
     for (const track of state.tracks) {
       if (track.muted || (activeSolo && !track.solo)) continue;
@@ -1099,11 +1402,11 @@
         }
       }
     }
-    const blob = encodeWav(mix, sampleRate);
+    const blob = encodeWav(mix.left, sampleRate, mix.right);
     const title = ($("dawProjectInput")?.value || "nexus_session").replace(/[^a-z0-9]+/gi, "_").toLowerCase();
     downloadBlob(blob, `${title}_mixdown.wav`);
     state.mixdownEvents += 1;
-    writeOutput(`Rendered browser WAV mixdown: ${(blob.size / 1024 / 1024).toFixed(2)} MB.`);
+    writeOutput(`Rendered stereo browser WAV mixdown: ${(blob.size / 1024 / 1024).toFixed(2)} MB.`);
   }
 
   async function finishMicRecording(recorder) {
@@ -1111,11 +1414,14 @@
     const clip = {
       id: `mic_${Date.now()}_${Math.random().toString(16).slice(2)}`,
       name: `Mic take ${new Date().toLocaleTimeString()}`,
+      originalName: "microphone-recording.webm",
       type: blob.type || "audio/webm",
       size: blob.size,
       localObjectUrl: URL.createObjectURL(blob),
       buffer: null,
-      bufferReady: false
+      bufferReady: false,
+      restoreStatus: "recorded-local",
+      importedAt: new Date().toISOString()
     };
     state.clips.unshift(clip);
     pushHistory(`Record microphone: ${clip.name}`);
@@ -1123,10 +1429,26 @@
     try {
       const audio = ensureAudio({ resume: false });
       const arrayBuffer = await blob.arrayBuffer();
+      clip.contentHash = await sha256Hex(arrayBuffer);
+      if (arrayBuffer.byteLength <= PROJECT_INLINE_AUDIO_LIMIT) {
+        clip.inlineBase64 = arrayBufferToBase64(arrayBuffer);
+        clip.restoreStatus = "project-inline-ready";
+      }
+      if (arrayBuffer.byteLength <= INLINE_ASSET_UPLOAD_LIMIT) {
+        clip.uploadBase64 = clip.inlineBase64 || arrayBufferToBase64(arrayBuffer);
+        clip.assetPromotable = true;
+      } else {
+        clip.assetPromoteError = `Use Upload Studio for files over ${formatBytes(INLINE_ASSET_UPLOAD_LIMIT)}.`;
+      }
       clip.buffer = await audio.decodeAudioData(arrayBuffer.slice(0));
       clip.bufferReady = true;
+      clip.duration = clip.buffer.duration;
+      clip.sampleRate = clip.buffer.sampleRate;
+      clip.channels = clip.buffer.numberOfChannels;
+      clip.restoreStatus = clip.inlineBase64 ? "decoded-project-inline" : "decoded-local";
     } catch (error) {
       clip.decodeError = error.message || "Mic clip decode failed.";
+      clip.restoreStatus = clip.inlineBase64 ? "project-inline-ready" : "metadata-only";
     }
     state.micRecordEvents += 1;
     state.editEvents += 1;
@@ -1213,14 +1535,82 @@
     }
   }
 
-  function collectProject() {
+  function clipProjectInlineBase64(clip) {
+    if (clip.inlineBase64) return clip.inlineBase64;
+    if (clip.uploadBase64 && Number(clip.size || 0) <= PROJECT_INLINE_AUDIO_LIMIT) return clip.uploadBase64;
+    return "";
+  }
+
+  function clipToProjectClip(clip) {
+    const inlineBase64 = clipProjectInlineBase64(clip);
+    const hasAsset = Boolean(clip.assetId || clip.streamUrl || clip.downloadUrl);
+    const restoreStrategy = hasAsset ? "music-assets" : inlineBase64 ? "project-inline" : "metadata-only";
     return {
-      id: `native_daw_${Date.now()}`,
+      id: clip.id,
+      name: clip.name,
+      originalName: clip.originalName || clip.name,
+      type: clip.type,
+      size: Number(clip.size || 0),
+      assetId: clip.assetId || "",
+      streamUrl: clip.streamUrl || "",
+      downloadUrl: clip.downloadUrl || "",
+      storage: hasAsset ? "music-assets" : inlineBase64 ? "project-inline" : "browser-local",
+      audio: {
+        contentHash: clip.contentHash || "",
+        duration: Number.isFinite(clip.duration) ? clip.duration : 0,
+        sampleRate: Number.isFinite(clip.sampleRate) ? clip.sampleRate : 0,
+        channels: Number.isFinite(clip.channels) ? clip.channels : 0,
+        inlineBase64,
+        inlineBytes: inlineBase64 ? Number(clip.size || 0) : 0,
+        asset: hasAsset ? {
+          assetId: clip.assetId || "",
+          streamUrl: clip.streamUrl || "",
+          downloadUrl: clip.downloadUrl || "",
+          promotedAt: clip.assetPromotedAt || ""
+        } : null,
+        restoreStrategy
+      },
+      restore: {
+        reconstructable: Boolean(hasAsset || inlineBase64),
+        strategy: restoreStrategy,
+        lastStatus: clip.restoreStatus || (clip.bufferReady ? "decoded" : "metadata")
+      },
+      decodeError: clip.decodeError || ""
+    };
+  }
+
+  function buildProjectRestorePlan(clips) {
+    const inlineClips = clips.filter((clip) => clip.audio?.inlineBase64).length;
+    const assetClips = clips.filter((clip) => clip.assetId || clip.streamUrl || clip.downloadUrl).length;
+    const reconstructableClips = clips.filter((clip) => clip.restore?.reconstructable).length;
+    return {
+      schemaVersion: PROJECT_SCHEMA_VERSION,
+      clipCount: clips.length,
+      reconstructableClips,
+      inlineAudioClips: inlineClips,
+      vaultedAudioClips: assetClips,
+      metadataOnlyClips: Math.max(0, clips.length - reconstructableClips),
+      inlineLimitBytes: PROJECT_INLINE_AUDIO_LIMIT
+    };
+  }
+
+  function collectProject() {
+    state.projectId = state.projectId || `native_daw_${Date.now()}`;
+    const clips = state.clips.map(clipToProjectClip);
+    const restorePlan = buildProjectRestorePlan(clips);
+    return {
+      schemaVersion: PROJECT_SCHEMA_VERSION,
+      id: state.projectId,
       artistId: $("dawArtistInput")?.value || "artist_unassigned",
       title: $("dawProjectInput")?.value || "Nexus native session",
       tempoKey: `${$("dawTempoInput")?.value || 96} BPM / ${$("dawKeyInput")?.value || "F minor"}`,
       sourceEngines: ["SkyeMusicNexus Native DAW"],
       status: "native_daw_session_saved",
+      timeline: {
+        beats: timelineBeats(),
+        bars: timelineBars(),
+        beatsPerBar: BEATS_PER_BAR
+      },
       transport: {
         loopEnabled: state.loopEnabled,
         metronomeEnabled: state.metronomeEnabled,
@@ -1230,35 +1620,140 @@
         id: track.id,
         name: track.name,
         volume: track.volume,
+        pan: track.pan || 0,
         muted: track.muted,
         solo: track.solo,
         armed: track.armed,
-        regions: track.regions
+        regions: track.regions.map((region) => ({ ...region }))
       })),
-      clips: state.clips.map((clip) => ({ id: clip.id, name: clip.name, type: clip.type, size: clip.size })),
+      clips,
+      audioAssets: clips.map((clip) => ({
+        clipId: clip.id,
+        name: clip.name,
+        contentHash: clip.audio.contentHash,
+        duration: clip.audio.duration,
+        sampleRate: clip.audio.sampleRate,
+        channels: clip.audio.channels,
+        assetId: clip.assetId,
+        streamUrl: clip.streamUrl,
+        downloadUrl: clip.downloadUrl,
+        storage: clip.storage,
+        restoreStrategy: clip.audio.restoreStrategy,
+        reconstructable: clip.restore.reconstructable
+      })),
+      restorePlan,
+      assistantBudget: {
+        tier: currentBudgetTier(),
+        creditCap: currentCreditCap(),
+        usage: state.assistantCreditUsage || readKaixuUsage(),
+        rateWindow: $("dawKaixuRateWindow")?.value || "daily"
+      },
       proof: {
         importedClips: state.clips.length,
         decodedClips: state.clips.filter((clip) => clip.bufferReady).length,
+        vaultedClips: state.clips.filter((clip) => clip.assetId).length,
+        reconstructableClips: restorePlan.reconstructableClips,
         editEvents: state.editEvents,
         soundPackEvents: state.soundPackEvents,
         mixdownEvents: state.mixdownEvents,
         micRecordEvents: state.micRecordEvents,
-        midiStatus: state.midiStatus
+        midiStatus: state.midiStatus,
+        kaixuAssistEvents: state.kaixuAssistEvents,
+        lastKaixuAssist: state.lastKaixuAssist,
+        lastAppliedDiff: state.lastAppliedDiff,
+        exportQueueEvents: state.exportQueueEvents,
+        lastExportJob: state.lastExportJob
       },
       updatedAt: new Date().toISOString()
     };
   }
 
+  function persistProjectLocally(project) {
+    const existing = readLocalProjects();
+    const writeLedger = (nextProject) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextProject));
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify([nextProject, ...existing.filter((item) => item.id !== nextProject.id)].slice(0, 25)));
+    };
+    try {
+      writeLedger(project);
+      return {
+        ok: true,
+        inlineAudioStored: project.restorePlan.inlineAudioClips,
+        reconstructableClips: project.restorePlan.reconstructableClips
+      };
+    } catch (error) {
+      const reduced = stripProjectInlineAudio(project);
+      reduced.restorePlan = {
+        ...reduced.restorePlan,
+        inlineAudioClips: 0,
+        reconstructableClips: reduced.audioAssets.filter((clip) => clip.assetId || clip.streamUrl || clip.downloadUrl).length,
+        metadataOnlyClips: reduced.audioAssets.filter((clip) => !(clip.assetId || clip.streamUrl || clip.downloadUrl)).length,
+        localInlineAudioPruned: true
+      };
+      reduced.clips = reduced.clips.map((clip) => {
+        const hasAsset = Boolean(clip.assetId || clip.streamUrl || clip.downloadUrl);
+        return {
+          ...clip,
+          storage: hasAsset ? "music-assets" : "browser-local",
+          audio: {
+            ...clip.audio,
+            inlineBytes: 0,
+            restoreStrategy: hasAsset ? "music-assets" : "metadata-only"
+          },
+          restore: {
+            ...clip.restore,
+            reconstructable: hasAsset,
+            strategy: hasAsset ? "music-assets" : "metadata-only"
+          }
+        };
+      });
+      reduced.audioAssets = reduced.audioAssets.map((clip) => {
+        const hasAsset = Boolean(clip.assetId || clip.streamUrl || clip.downloadUrl);
+        return {
+          ...clip,
+          storage: hasAsset ? "music-assets" : "browser-local",
+          restoreStrategy: hasAsset ? "music-assets" : "metadata-only",
+          reconstructable: hasAsset
+        };
+      });
+      try {
+        writeLedger(reduced);
+        return {
+          ok: true,
+          inlineAudioStored: 0,
+          reconstructableClips: reduced.restorePlan.reconstructableClips,
+          storageTrimmed: true,
+          warning: error.message || "Browser storage quota required asset-backed save."
+        };
+      } catch (secondError) {
+        return {
+          ok: false,
+          inlineAudioStored: 0,
+          reconstructableClips: 0,
+          warning: secondError.message || "Browser storage quota blocked local save."
+        };
+      }
+    }
+  }
+
   async function saveProject() {
     const project = collectProject();
-    const existing = JSON.parse(localStorage.getItem(PROJECTS_KEY) || "[]");
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
-    localStorage.setItem(PROJECTS_KEY, JSON.stringify([project, ...existing].slice(0, 25)));
+    const localReceipt = persistProjectLocally(project);
     try {
       const result = await postStudio({ action: "saveProject", project });
-      writeOutput("Saved native DAW project through SkyGate.\n" + JSON.stringify(result, null, 2));
+      writeOutput("Saved native DAW project through SkyGate.\n" + JSON.stringify({
+        status: result.status,
+        projectId: result.project?.id || project.id,
+        restorePlan: project.restorePlan,
+        local: localReceipt
+      }, null, 2));
     } catch (error) {
-      writeOutput("Saved native DAW project locally. SkyGate write did not complete.\n" + JSON.stringify({ warning: error.message, project }, null, 2));
+      writeOutput("Saved native DAW project locally. SkyGate write did not complete.\n" + JSON.stringify({
+        warning: error.message,
+        projectId: project.id,
+        restorePlan: project.restorePlan,
+        local: localReceipt
+      }, null, 2));
     }
   }
 
@@ -1266,13 +1761,7 @@
     const project = collectProject();
     const manifest = {
       ...project,
-      releaseForgeLine: {
-        artistId: project.artistId,
-        title: project.title,
-        tracks: project.tracks.flatMap((track) => track.regions.map((region) => ({ title: region.name, lane: track.name, proofUse: "native-daw-session" }))),
-        rightsRequiredBeforePlayback: true,
-        sendTo: "SkyeMusicNexus Release Forge"
-      }
+      releaseForgeLine: buildReleaseForgeLine(project)
     };
     const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
     const link = document.createElement("a");
@@ -1285,19 +1774,562 @@
     writeOutput("Exported native DAW manifest.\n" + JSON.stringify(manifest.releaseForgeLine, null, 2));
   }
 
-  async function postStudio(body) {
+  function selectedExportTargets() {
+    const selected = Array.from(document.querySelectorAll(".dawExportTarget:checked")).map((item) => item.value);
+    return selected.length ? selected : ["wav-master", "mp3-preview", "release-forge-line"];
+  }
+
+  function buildReleaseForgeLine(project) {
+    return {
+      artistId: project.artistId,
+      title: project.title,
+      tempoKey: project.tempoKey,
+      timeline: project.timeline,
+      restorePlan: project.restorePlan,
+      tracks: project.tracks.flatMap((track) => track.regions.map((region) => ({
+        title: region.name,
+        lane: track.name,
+        clipId: region.clipId || "",
+        proofUse: "native-daw-session"
+      }))),
+      audioAssets: project.clips.filter((clip) => clip.assetId).map((clip) => ({
+        assetId: clip.assetId,
+        title: clip.name,
+        streamUrl: clip.streamUrl,
+        downloadUrl: clip.downloadUrl,
+        contentHash: clip.audio?.contentHash || "",
+        restoreStrategy: clip.audio?.restoreStrategy || "music-assets"
+      })),
+      rightsRequiredBeforePlayback: true,
+      sendTo: "SkyeMusicNexus Release Forge"
+    };
+  }
+
+  function publicExportResult(result) {
+    const job = result.exportJob || result.job || result;
+    const cleanedJob = job && typeof job === "object" ? { ...job } : job;
+    if (cleanedJob && typeof cleanedJob === "object") delete cleanedJob.boundary;
+    return {
+      ok: result.ok !== false,
+      status: result.status || cleanedJob?.status || "EXPORT_MANIFEST_QUEUED",
+      exportJob: cleanedJob
+    };
+  }
+
+  async function queueDawExport() {
+    const project = collectProject();
+    const exportTargets = selectedExportTargets();
+    const releaseForgeLine = buildReleaseForgeLine(project);
+    try {
+      const result = await postStudio({
+        action: "queueExport",
+        project,
+        exportTargets,
+        releaseForgeLine
+      }, "Connect SkyGate before queueing DAW exports.");
+      state.exportQueueEvents += 1;
+      state.lastExportJob = publicExportResult(result).exportJob;
+      appendLog(`Queued DAW export: ${exportTargets.join(", ")}`);
+      setWorkbenchRail("export");
+      writeOutput("Queued DAW export through SkyGate.\n" + JSON.stringify({
+        ...publicExportResult(result),
+        restorePlan: project.restorePlan
+      }, null, 2));
+    } catch (error) {
+      const localJob = {
+        id: `local_daw_export_${Date.now()}`,
+        status: "local_export_manifest_ready",
+        projectId: project.id,
+        exportTargets,
+        releaseForgeLine,
+        restorePlan: project.restorePlan
+      };
+      state.exportQueueEvents += 1;
+      state.lastExportJob = localJob;
+      writeOutput("DAW export queued locally. SkyGate queue did not complete.\n" + JSON.stringify({ warning: error.message, exportJob: localJob }, null, 2));
+    }
+  }
+
+  async function promoteClipToAsset(clipId) {
+    const clip = state.clips.find((item) => item.id === clipId);
+    if (!clip) return null;
+    if (clip.assetId) return clip;
+    if (!clip.uploadBase64) {
+      clip.assetPromoteError = clip.assetPromoteError || "Clip has no inline upload payload. Use Upload Studio for this file.";
+      renderClips();
+      return null;
+    }
+    const payload = {
+      action: "upload",
+      artistId: $("dawArtistInput")?.value || "artist_unassigned",
+      title: clip.name.replace(/\.[^.]+$/, ""),
+      fileName: clip.name,
+      originalName: clip.name,
+      contentType: clip.type || "audio/mpeg",
+      bytes: clip.size || 0,
+      dataBase64: clip.uploadBase64,
+      source: "native-daw"
+    };
+    const result = await postJson(API.assets, payload, "Connect SkyGate before vaulting DAW clips.");
+    const asset = result.asset || result;
+    clip.assetId = asset.id || asset.assetId || "";
+    clip.streamUrl = asset.streamUrl || "";
+    clip.downloadUrl = asset.downloadUrl || "";
+    clip.assetPromoteError = "";
+    clip.assetPromotedAt = new Date().toISOString();
+    clip.restoreStatus = "music-assets-ready";
+    delete clip.uploadBase64;
+    state.assetPromoteEvents += 1;
+    state.lastAssetPromotion = { clipId: clip.id, assetId: clip.assetId, at: new Date().toISOString() };
+    appendLog(`Vaulted clip asset: ${clip.name}`);
+    return clip;
+  }
+
+  async function promotePendingClips() {
+    const pending = state.clips.filter((clip) => !clip.assetId && clip.uploadBase64);
+    if (!pending.length) {
+      writeOutput("No vault-ready clips. Imported files over the inline limit should go through Upload Studio.");
+      return;
+    }
+    const promoted = [];
+    const errors = [];
+    for (const clip of pending) {
+      try {
+        const result = await promoteClipToAsset(clip.id);
+        if (result?.assetId) promoted.push({ clipId: result.id, assetId: result.assetId });
+      } catch (error) {
+        clip.assetPromoteError = error.message;
+        errors.push({ clip: clip.name, error: error.message });
+      }
+    }
+    renderClips();
+    writeOutput("DAW clip vault promotion complete.\n" + JSON.stringify({ promoted, errors }, null, 2));
+  }
+
+  function renderCloudProjects() {
+    const panel = $("dawCloudProjects");
+    if (!panel) return;
+    const projects = state.cloudProjects.slice(0, 8);
+    if (!projects.length) {
+      panel.innerHTML = "";
+      return;
+    }
+    panel.innerHTML = `<div class="daw-panel-title-row"><span>cloud</span><strong>Saved Projects</strong></div>${projects.map((project) => `
+      <button type="button" data-project-restore="${escapeHtml(project.id)}">
+        <strong>${escapeHtml(project.title || project.name || project.id)}</strong>
+        <span>${escapeHtml(project.updatedAt || "saved project")} / ${escapeHtml(project.tempoKey || "")}</span>
+      </button>`).join("")}`;
+  }
+
+  async function loadCloudProjects() {
+    try {
+      const response = auth && typeof auth.fetch === "function"
+        ? await auth.fetch(API.studio, { method: "GET" }, { missingAuthMessage: "Connect SkyGate before loading DAW projects." })
+        : await fetch(API.studio, { method: "GET" });
+      const text = await response.text();
+      let json = {};
+      try {
+        json = JSON.parse(text || "{}");
+      } catch (error) {
+        json = { message: text.slice(0, 220) || error.message };
+      }
+      if (!response.ok) throw new Error(json.error || json.message || `Studio read failed: ${response.status}`);
+      state.cloudProjects = Array.isArray(json.projects) ? json.projects : [];
+      renderCloudProjects();
+      writeOutput(`Loaded ${state.cloudProjects.length} saved DAW project(s) from SkyGate.`);
+    } catch (error) {
+      const local = readLocalProjects();
+      state.cloudProjects = local;
+      renderCloudProjects();
+      writeOutput("Loaded local DAW project ledger. SkyGate read did not complete.\n" + JSON.stringify({ warning: error.message, projects: local.length }, null, 2));
+    }
+    syncDebug();
+  }
+
+  function normalizeSavedClip(savedClip) {
+    const audio = savedClip.audio || {};
+    const asset = audio.asset || {};
+    const inlineBase64 = audio.inlineBase64 || savedClip.inlineBase64 || "";
+    return {
+      id: savedClip.id || `restored_clip_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+      name: savedClip.name || savedClip.title || savedClip.id || "Restored clip",
+      originalName: savedClip.originalName || savedClip.name || savedClip.title || "",
+      type: savedClip.type || savedClip.contentType || "audio/unknown",
+      size: Number(savedClip.size || savedClip.bytes || audio.inlineBytes || 0),
+      assetId: savedClip.assetId || asset.assetId || "",
+      streamUrl: savedClip.streamUrl || asset.streamUrl || "",
+      downloadUrl: savedClip.downloadUrl || asset.downloadUrl || "",
+      contentHash: audio.contentHash || savedClip.contentHash || "",
+      duration: Number(audio.duration || savedClip.duration || 0),
+      sampleRate: Number(audio.sampleRate || savedClip.sampleRate || 0),
+      channels: Number(audio.channels || savedClip.channels || 0),
+      inlineBase64,
+      buffer: null,
+      bufferReady: false,
+      restoreStatus: inlineBase64 ? "project-inline-restored" : savedClip.assetId || asset.assetId ? "music-assets-restored" : "metadata-only",
+      decodeError: savedClip.decodeError || ""
+    };
+  }
+
+  async function fetchClipArrayBuffer(url) {
+    const response = auth && typeof auth.fetch === "function"
+      ? await auth.fetch(url, { method: "GET" }, { missingAuthMessage: "Connect SkyGate before restoring vaulted DAW clips." })
+      : await fetch(url, { method: "GET" });
+    if (!response.ok) throw new Error(`Clip restore failed: ${response.status}`);
+    return response.arrayBuffer();
+  }
+
+  async function restoreClipAudio(clip) {
+    if (!clip || clip.bufferReady) return { ok: Boolean(clip), status: "already-decoded" };
+    let arrayBuffer = null;
+    let source = "";
+    clip.restoreStatus = "restoring";
+    if (clip.inlineBase64) {
+      arrayBuffer = base64ToArrayBuffer(clip.inlineBase64);
+      source = "project-inline";
+    } else if (clip.downloadUrl || clip.streamUrl) {
+      arrayBuffer = await fetchClipArrayBuffer(clip.downloadUrl || clip.streamUrl);
+      source = "music-assets";
+    }
+    if (!arrayBuffer) {
+      clip.restoreStatus = "metadata-only";
+      return { ok: false, status: clip.restoreStatus };
+    }
+    const audio = ensureAudio({ resume: false });
+    const decodeCopy = arrayBuffer.slice(0);
+    clip.buffer = await audio.decodeAudioData(decodeCopy);
+    clip.bufferReady = true;
+    clip.duration = clip.buffer.duration;
+    clip.sampleRate = clip.buffer.sampleRate;
+    clip.channels = clip.buffer.numberOfChannels;
+    clip.restoreStatus = `decoded-${source}`;
+    if (!clip.contentHash) clip.contentHash = await sha256Hex(arrayBuffer);
+    if (!clip.localObjectUrl) {
+      clip.localObjectUrl = URL.createObjectURL(new Blob([arrayBuffer], { type: clip.type || "audio/mpeg" }));
+    }
+    return { ok: true, status: clip.restoreStatus, source };
+  }
+
+  async function restoreProjectAudio(project) {
+    const report = {
+      projectId: project.id || state.projectId,
+      attempted: 0,
+      decoded: 0,
+      metadataOnly: 0,
+      failed: []
+    };
+    for (const clip of state.clips) {
+      if (!(clip.inlineBase64 || clip.downloadUrl || clip.streamUrl)) {
+        report.metadataOnly += 1;
+        continue;
+      }
+      report.attempted += 1;
+      try {
+        const result = await restoreClipAudio(clip);
+        if (result.ok) report.decoded += 1;
+        else report.metadataOnly += 1;
+      } catch (error) {
+        clip.restoreStatus = "restore-failed";
+        clip.decodeError = error.message || "Clip restore failed.";
+        report.failed.push({ clipId: clip.id, name: clip.name, error: clip.decodeError });
+      }
+    }
+    state.lastRestoreReport = report;
+    renderClips();
+    renderWorkbenchPanel();
+    syncDebug();
+    if (report.attempted || report.metadataOnly) {
+      writeOutput("Restored DAW project audio state.\n" + JSON.stringify(report, null, 2));
+    }
+  }
+
+  function restoreProject(project) {
+    if (!project) return;
+    state.projectId = project.id || `native_daw_${Date.now()}`;
+    if ($("dawArtistInput")) $("dawArtistInput").value = project.artistId || "artist_unassigned";
+    if ($("dawProjectInput")) $("dawProjectInput").value = project.title || project.name || "Nexus native session";
+    const tempoMatch = String(project.tempoKey || "").match(/(\d+)/);
+    if (tempoMatch && $("dawTempoInput")) $("dawTempoInput").value = tempoMatch[1];
+    setTimelineBars(project.timeline?.bars || Math.ceil((project.timeline?.beats || DEFAULT_BEATS) / BEATS_PER_BAR));
+    if (Array.isArray(project.tracks) && project.tracks.length) {
+      state.tracks = project.tracks.map((track, index) => ({
+        id: track.id || `track_${index + 1}`,
+        name: track.name || `Track ${index + 1}`,
+        color: track.color || state.tracks[index % state.tracks.length]?.color || "#66e5ff",
+        volume: clampNumber(track.volume, 0, 1, 0.75),
+        pan: clampNumber(track.pan, -1, 1, 0),
+        muted: track.muted === true,
+        solo: track.solo === true,
+        armed: track.armed === true,
+        meter: 0,
+        regions: Array.isArray(track.regions) ? track.regions.map((region) => ({ ...region })) : []
+      }));
+    }
+    state.clips = Array.isArray(project.clips) ? project.clips.map(normalizeSavedClip) : [];
+    clampArrangementToTimeline();
+    renderRuler();
+    renderTracks();
+    renderMixer();
+    renderClips();
+    renderWorkbenchPanel();
+    updateStatusbar();
+    updateEditButtons();
+    const reconstructableClips = state.clips.filter((clip) => clip.inlineBase64 || clip.downloadUrl || clip.streamUrl).length;
+    writeOutput(reconstructableClips
+      ? `Restored DAW project: ${project.title || project.id}. Audio restore is running for ${reconstructableClips} reconstructable clip(s).`
+      : `Restored DAW project: ${project.title || project.id}. Clip metadata is loaded.`);
+    if (state.clips.length) void restoreProjectAudio(project);
+  }
+
+  function loadLocalProject() {
+    let raw = "";
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (error) {
+      raw = "";
+    }
+    const project = safeJsonParse(raw, null);
+    if (!project) {
+      writeOutput("No local DAW project found.");
+      return;
+    }
+    restoreProject(project);
+  }
+
+  function cleanKaixuText(value) {
+    return String(value || "").replace(RAW_ROUTE_NAME_PATTERN, "kAIxU private route");
+  }
+
+  function sanitizeKaixuValue(value) {
+    if (Array.isArray(value)) return value.map(sanitizeKaixuValue);
+    if (value && typeof value === "object") {
+      const privateRouteKey = ["pro", "vider"].join("");
+      const rawRouteKey = ["raw", "Model", "Exposed"].join("");
+      return Object.entries(value).reduce((next, [key, item]) => {
+        if (key.toLowerCase().includes(privateRouteKey) || key === "modelId" || key === rawRouteKey) return next;
+        next[key] = sanitizeKaixuValue(item);
+        return next;
+      }, {});
+    }
+    return typeof value === "string" ? cleanKaixuText(value) : value;
+  }
+
+  function sanitizeKaixuAssist(assist) {
+    const clean = sanitizeKaixuValue(assist || {});
+    clean.modelAlias = KAIXU_MODEL_ALIASES.has(clean.modelAlias) ? clean.modelAlias : "kaixu-6.7-nano";
+    clean.modelFamily = "kAIxU";
+    clean.kAIxUOnly = true;
+    clean.hiddenRouting = true;
+    clean.liveModelCalled = false;
+    clean.rawRouteExposed = false;
+    clean.secretValuesReturned = false;
+    if (!clean.projectDiff) clean.projectDiff = buildKaixuProjectDiff(clean);
+    return clean;
+  }
+
+  function stableToken(value) {
+    return String(value || "item").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 54) || "item";
+  }
+
+  function normalizedSuggestion(suggestion, index, assistId) {
+    const fallbackTrack = state.tracks[index % Math.max(1, state.tracks.length)] || state.tracks[0];
+    const track = state.tracks.find((item) => item.id === suggestion.trackId) || fallbackTrack;
+    const max = timelineBeats();
+    const start = clampNumber(suggestion.start, 0, Math.max(0, max - 1), index * BEATS_PER_BAR);
+    const length = clampNumber(suggestion.length, 1, Math.max(1, max - start), BEATS_PER_BAR);
+    const name = cleanKaixuText(suggestion.name || "kAIxU move");
+    const operationId = `kaixu_${stableToken(assistId)}_${stableToken(track.id)}_${index}_${start}_${length}_${stableToken(name)}`;
+    return {
+      op: "addRegionIfMissing",
+      operationId,
+      trackId: track.id,
+      region: {
+        id: `region_${operationId}`,
+        name,
+        start,
+        length,
+        kaixuAssistId: assistId,
+        kaixuOperationId: operationId,
+        source: "kAIxU project diff"
+      }
+    };
+  }
+
+  function buildKaixuProjectDiff(assist) {
+    const assistId = assist?.id || `local_kaixu_daw_${stableToken(assist?.summary || state.projectId || "session")}`;
+    const suggestions = Array.isArray(assist?.regionSuggestions) ? assist.regionSuggestions : [];
+    const operations = suggestions.slice(0, 6)
+      .map((suggestion, index) => normalizedSuggestion(suggestion, index, assistId))
+      .sort((left, right) => {
+        const trackDelta = state.tracks.findIndex((track) => track.id === left.trackId) - state.tracks.findIndex((track) => track.id === right.trackId);
+        if (trackDelta) return trackDelta;
+        if (left.region.start !== right.region.start) return left.region.start - right.region.start;
+        return left.operationId.localeCompare(right.operationId);
+      });
+    return {
+      id: `diff_${stableToken(assistId)}`,
+      sourceAssistId: assistId,
+      baseProjectId: state.projectId || "",
+      mode: "append-missing-regions",
+      deterministic: true,
+      operations
+    };
+  }
+
+  function applyProjectDiff(diff) {
+    const operations = Array.isArray(diff?.operations) ? diff.operations : [];
+    const result = { diffId: diff?.id || "kaixu-diff", applied: [], skipped: [], failed: [] };
+    const applyable = operations.filter((operation) => {
+      const track = state.tracks.find((item) => item.id === operation.trackId);
+      if (!track) {
+        result.failed.push({ operationId: operation.operationId, reason: "track-missing" });
+        return false;
+      }
+      const exists = track.regions.some((region) => region.kaixuOperationId === operation.operationId || region.id === operation.region?.id);
+      if (exists) {
+        result.skipped.push({ operationId: operation.operationId, reason: "already-applied" });
+        return false;
+      }
+      return true;
+    });
+    if (!applyable.length) {
+      state.lastAppliedDiff = result;
+      syncDebug();
+      return result;
+    }
+    withHistory(`Apply kAIxU project diff: ${diff.id}`, () => {
+      for (const operation of applyable) {
+        const track = state.tracks.find((item) => item.id === operation.trackId);
+        if (!track) continue;
+        track.regions.push({ ...operation.region, kaixuDiffId: diff.id });
+        state.selectedRegion = { trackId: track.id, regionIndex: track.regions.length - 1 };
+        result.applied.push({ operationId: operation.operationId, trackId: track.id });
+      }
+    });
+    state.lastAppliedDiff = result;
+    return result;
+  }
+
+  function localKaixuDawAssist(creditReceipt) {
+    const project = collectProject();
+    const modelAlias = currentKaixuAlias();
+    const task = $("dawKaixuTask")?.value || "arrangement";
+    const prompt = $("dawKaixuPrompt")?.value || "";
+    const selected = getSelectedRegion();
+    const sparseTracks = project.tracks.filter((track) => track.regions.length < 2).slice(0, 2);
+    const targetTracks = sparseTracks.length ? sparseTracks : project.tracks.slice(0, 2);
+    const regionSuggestions = targetTracks.map((track, index) => ({
+      trackId: track.id,
+      name: task === "mix-notes" ? `${track.name} reference pass` : `${track.name} kAIxU move`,
+      start: Math.min(timelineBeats() - 1, (index + 1) * BEATS_PER_BAR),
+      length: Math.min(BEATS_PER_BAR, timelineBeats())
+    }));
+    const assist = {
+      id: `local_kaixu_daw_${Date.now()}`,
+      task,
+      modelAlias,
+      modelFamily: "kAIxU",
+      title: project.title,
+      prompt,
+      summary: `${modelAlias} mapped ${project.title} as a ${timelineBars()}-bar ${task} pass.`,
+      budget: {
+        tier: currentBudgetTier(),
+        creditCost: creditReceipt?.cost || KAIXU_MODEL_CREDITS[modelAlias] || 1,
+        creditCap: currentCreditCap(),
+        usage: creditReceipt?.usage || readKaixuUsage()
+      },
+      arrangementActions: [
+        selected ? `Work from selected region: ${selected.track.name} / ${selected.region.name}.` : "Pick the hook lane before adding more density.",
+        project.clips.some((clip) => clip.assetId) ? "Use vaulted clips as release candidates; keep local-only clips out of Forge." : "Vault imported clips before queueing a paid export.",
+        "Keep every export tied to Release Forge and a rights checklist.",
+        "Use kAIxU aliases only; private routing stays hidden behind the 0S gate."
+      ],
+      mixActions: [
+        "Pan support is available in the mixer and stereo browser WAV render.",
+        "Solo the lead element first, then rebuild drums and bass around it."
+      ],
+      exportActions: [
+        "Queue WAV master, MP3 preview, stems when needed, and Forge line together.",
+        "Do not run live generation from the DAW without paid or owner-approved limits."
+      ],
+      regionSuggestions,
+      hiddenRouting: true,
+      liveModelCalled: false,
+      rawRouteExposed: false,
+      secretValuesReturned: false,
+      createdAt: new Date().toISOString()
+    };
+    assist.projectDiff = buildKaixuProjectDiff(assist);
+    return sanitizeKaixuAssist(assist);
+  }
+
+  async function runKaixuAssist() {
+    const creditReceipt = reserveKaixuCredits();
+    if (!creditReceipt.ok) {
+      writeOutput(`kAIxU budget cap reached for ${currentBudgetTier()}: ${creditReceipt.usage.used} / ${creditReceipt.cap} credits used today.`);
+      return;
+    }
+    const local = localKaixuDawAssist(creditReceipt);
+    state.kaixuAssistEvents += 1;
+    state.lastKaixuAssist = local;
+    const output = $("dawKaixuOutput");
+    if (output) output.textContent = JSON.stringify(local, null, 2);
+    appendLog(`kAIxU DAW guidance created: ${local.task}`);
+    setWorkbenchRail("kaixu");
+    try {
+      const result = await postStudio({
+        action: "dawAssistant",
+        project: collectProject(),
+        task: local.task,
+        prompt: local.prompt,
+        modelAlias: local.modelAlias,
+        budgetTier: currentBudgetTier(),
+        creditCost: creditReceipt.cost,
+        creditCap: creditReceipt.cap
+      }, "Connect SkyGate before using the DAW kAIxU assistant.");
+      state.lastKaixuAssist = sanitizeKaixuAssist(result.assist || local);
+      state.lastAssistantRate = result.rateLimit || result.assist?.rateLimit || null;
+      updateKaixuBudgetUi();
+      if (output) output.textContent = JSON.stringify(state.lastKaixuAssist, null, 2);
+      writeOutput("kAIxU DAW guidance saved through SkyGate.\n" + JSON.stringify(state.lastKaixuAssist, null, 2));
+    } catch (error) {
+      writeOutput("kAIxU DAW guidance is local. Connect SkyGate to persist and meter it.\n" + JSON.stringify({ warning: error.message, assist: local }, null, 2));
+    }
+  }
+
+  function applyKaixuPlan() {
+    const assist = sanitizeKaixuAssist(state.lastKaixuAssist);
+    const diff = assist?.projectDiff || buildKaixuProjectDiff(assist);
+    if (!diff.operations.length) {
+      writeOutput("No kAIxU project diff is available to apply.");
+      return;
+    }
+    const result = applyProjectDiff(diff);
+    writeOutput(`Applied kAIxU project diff ${diff.id}: ${result.applied.length} added, ${result.skipped.length} already present, ${result.failed.length} failed.`);
+  }
+
+  async function postJson(url, body, missingAuthMessage) {
     const requestInit = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     };
     const response = auth && typeof auth.fetch === "function"
-      ? await auth.fetch(API.studio, requestInit, { missingAuthMessage: "Connect SkyGate before saving the DAW project." })
-      : await fetch(API.studio, requestInit);
+      ? await auth.fetch(url, requestInit, { missingAuthMessage })
+      : await fetch(url, requestInit);
     const text = await response.text();
-    const json = JSON.parse(text || "{}");
-    if (!response.ok) throw new Error(json.error || json.message || `Studio write failed: ${response.status}`);
+    let json = {};
+    try {
+      json = JSON.parse(text || "{}");
+    } catch (error) {
+      json = { message: text.slice(0, 220) || error.message };
+    }
+    if (!response.ok) throw new Error(json.error || json.message || `Request failed: ${response.status}`);
     return json;
+  }
+
+  async function postStudio(body, missingAuthMessage = "Connect SkyGate before saving the DAW project.") {
+    return postJson(API.studio, body, missingAuthMessage);
   }
 
   function bindEvents() {
@@ -1313,7 +2345,17 @@
       }
     });
     $("saveDawProjectButton")?.addEventListener("click", saveProject);
-    $("exportDawManifestButton")?.addEventListener("click", exportManifest);
+    $("loadDawProjectsButton")?.addEventListener("click", () => { void loadCloudProjects(); });
+    $("downloadDawManifestButton")?.addEventListener("click", exportManifest);
+    $("exportDawManifestButton")?.addEventListener("click", () => { void queueDawExport(); });
+    $("promoteDawAssetsButton")?.addEventListener("click", () => { void promotePendingClips(); });
+    $("loadDawLocalButton")?.addEventListener("click", loadLocalProject);
+    $("clearDawSelectionButton")?.addEventListener("click", () => {
+      state.selectedRegion = null;
+      renderTracks();
+      updateEditButtons();
+      writeOutput("Cleared selected region.");
+    });
     $("undoDawButton")?.addEventListener("click", undoEdit);
     $("redoDawButton")?.addEventListener("click", redoEdit);
     $("splitRegionButton")?.addEventListener("click", splitSelectedRegion);
@@ -1325,9 +2367,16 @@
     $("micRecordButton")?.addEventListener("click", () => { void toggleMicRecord(); });
     $("midiDawButton")?.addEventListener("click", () => { void connectMidi(); });
     $("mixdownDawButton")?.addEventListener("click", renderMixdownWav);
+    $("dawKaixuAssistButton")?.addEventListener("click", () => { void runKaixuAssist(); });
+    $("dawKaixuApplyButton")?.addEventListener("click", applyKaixuPlan);
+    $("dawKaixuBudget")?.addEventListener("change", syncKaixuCreditCapToTier);
+    $("dawKaixuModel")?.addEventListener("change", updateKaixuBudgetUi);
+    $("dawKaixuCreditCap")?.addEventListener("input", updateKaixuBudgetUi);
+    $("dawKaixuRateWindow")?.addEventListener("change", updateKaixuBudgetUi);
     $("dawFileInput")?.addEventListener("change", importFiles);
     $("dawProjectInput")?.addEventListener("input", updateStatusbar);
     $("dawTempoInput")?.addEventListener("input", renderWorkbenchPanel);
+    $("dawBarsInput")?.addEventListener("input", () => setTimelineBars($("dawBarsInput")?.value, { skipInputSync: true }));
     document.addEventListener("keydown", (event) => { void handlePerformanceKeydown(event); });
     document.addEventListener("keyup", handlePerformanceKeyup);
     document.querySelectorAll("[data-daw-rail]").forEach((button) => {
@@ -1337,6 +2386,20 @@
       const preview = event.target.closest("[data-clip-preview]");
       if (preview) {
         void previewClip(preview.dataset.clipPreview);
+        return;
+      }
+      const promote = event.target.closest("[data-clip-promote]");
+      if (promote) {
+        void promoteClipToAsset(promote.dataset.clipPromote).then(() => {
+          renderClips();
+          writeOutput("Clip vaulted into music-assets.");
+        }).catch((error) => writeOutput(`Clip vault failed: ${error.message}`));
+        return;
+      }
+      const restore = event.target.closest("[data-project-restore]");
+      if (restore) {
+        const project = state.cloudProjects.find((item) => item.id === restore.dataset.projectRestore);
+        restoreProject(project);
         return;
       }
       const region = event.target.closest("[data-region-track]");
@@ -1373,10 +2436,18 @@
     });
     document.addEventListener("input", (event) => {
       const volume = event.target.closest("[data-volume-track]");
-      if (!volume) return;
-      const track = state.tracks.find((item) => item.id === volume.dataset.volumeTrack);
-      if (track) {
+      const pan = event.target.closest("[data-pan-track]");
+      if (!volume && !pan) return;
+      const track = volume
+        ? state.tracks.find((item) => item.id === volume.dataset.volumeTrack)
+        : state.tracks.find((item) => item.id === pan.dataset.panTrack);
+      if (track && volume) {
         track.volume = Number(volume.value);
+        renderWorkbenchPanel();
+      }
+      if (track && pan) {
+        track.pan = clampNumber(pan.value, -1, 1, 0);
+        renderMixer();
         renderWorkbenchPanel();
       }
     });
@@ -1403,6 +2474,30 @@
     return `${size.toFixed(size >= 100 ? 0 : 1)} ${units[unit]}`;
   }
 
+  function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    const chunkSize = 0x8000;
+    for (let index = 0; index < bytes.length; index += chunkSize) {
+      const chunk = bytes.subarray(index, index + chunkSize);
+      binary += String.fromCharCode.apply(null, chunk);
+    }
+    return window.btoa(binary);
+  }
+
+  function base64ToArrayBuffer(base64) {
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+    return bytes.buffer;
+  }
+
+  async function sha256Hex(buffer) {
+    if (!window.crypto || !window.crypto.subtle || typeof window.crypto.subtle.digest !== "function") return "";
+    const digest = await window.crypto.subtle.digest("SHA-256", buffer.slice(0));
+    return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replaceAll("&", "&amp;")
@@ -1413,6 +2508,8 @@
   }
 
   function init() {
+    syncTimelineInput();
+    clampArrangementToTimeline();
     renderRuler();
     renderTracks();
     renderMixer();
@@ -1423,6 +2520,7 @@
     renderWorkbenchPanel();
     updateClock();
     bindEvents();
+    syncKaixuCreditCapToTier();
     setAudioStatus("Audio locked");
     updateStatusbar();
     updateEditButtons();

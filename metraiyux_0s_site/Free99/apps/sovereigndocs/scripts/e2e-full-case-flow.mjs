@@ -48,7 +48,7 @@ try{
   const overview = await api(`/api/v17/cases/${encodeURIComponent(caseId)}/overview`);
   assert(overview.documents?.length >= 1, 'case overview returns document records');
   const open = await api(`/api/v17/cases/${encodeURIComponent(caseId)}/open-in-skye-docx-max`, { method:'POST', body:JSON.stringify({}) });
-  assert(open.launchUrl?.includes('/skye-docx-max/app/'), 'case can launch SkyeDocx Max from v17 route');
+  assert(open.launchUrl?.includes('/Marketing-Made-Easy/SkyeDocxMax/editor.html') && open.launchUrl?.includes('sd_handoff='), 'case can launch canonical SkyeDocx Max from v17 route');
   const map = await api(`/api/v17/editor/skye-docx-max/handoff/${encodeURIComponent(open.handoff.id)}/map`);
   assert(Array.isArray(map.sectionMap), 'SkyeDocx Max map exposes section map');
   await api(`/api/editor/skye-docx-max/session/${encodeURIComponent(open.handoff.id)}/opened`, { method:'POST', body:JSON.stringify({}) });

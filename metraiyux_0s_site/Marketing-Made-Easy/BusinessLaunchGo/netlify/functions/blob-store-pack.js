@@ -17,7 +17,7 @@ function mkHeaders() {
   return {
     "content-type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "content-type,authorization,x-kaixu-app,x-kaixu-build",
+    "Access-Control-Allow-Headers": "content-type,authorization,x-skye-gate-session,x-skygate-session,x-free99-gate-session,x-kaixu-app,x-kaixu-build",
     "Access-Control-Allow-Methods": "POST,OPTIONS"
   };
 }
@@ -29,6 +29,8 @@ function json(statusCode, body) {
 export async function handler(event) {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: mkHeaders(), body: "" };
   if (event.httpMethod !== "POST") return json(405, { ok: false, error: "Method Not Allowed" });
+  const gate = await requireSharedGate(event);
+  if (!gate.ok) return json(gate.statusCode, gate.body);
 
   let payload = {};
   try { payload = event.body ? JSON.parse(event.body) : {}; }
@@ -63,4 +65,45 @@ export async function handler(event) {
   } catch (err) {
     return json(500, { ok:false, error: String(err && err.message ? err.message : err) });
   }
+}
+
+function bearer(event) {
+  const headers = event.headers || {};
+  const raw = headers.authorization || headers.Authorization || headers["x-skye-gate-session"] || headers["x-skygate-session"] || headers["x-free99-gate-session"] || "";
+  return String(raw || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+}
+
+async function requireSharedGate(event) {
+  const token = bearer(event);
+  if (!token) {
+    return {
+      ok: false,
+      statusCode: 401,
+      body: {
+        ok: false,
+        error: "shared_gate_required",
+        message: "BusinessLaunchGo artifact storage requires the shared 0S Gate session."
+      }
+    };
+  }
+  const origin = String(process.env.SKYGATEFS27_ORIGIN || process.env.SKYGATE_ORIGIN || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev").replace(/\/+$/, "");
+  const response = await fetch(`${origin}/auth-introspect`, {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+    body: JSON.stringify({ token })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.active !== true) {
+    return {
+      ok: false,
+      statusCode: response.status || 401,
+      body: {
+        ok: false,
+        error: "shared_gate_invalid",
+        message: "The supplied 0S Gate session is not active.",
+        skygate: data && typeof data === "object" ? { active: data.active === true, source: data.source || data.iss || null } : null
+      }
+    };
+  }
+  return { ok: true, data };
 }

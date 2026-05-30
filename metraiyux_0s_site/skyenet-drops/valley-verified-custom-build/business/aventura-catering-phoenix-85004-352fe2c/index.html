@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aventura Catering | Phoenix Catering</title>
+  <meta name="description" content="Aventura Catering in Phoenix: Valley Verified business profile with researched services, local presence, audience fit, and trust signals.">
+  <style>
+    :root {
+      --ink: #2a2019;
+      --wine: #7b2430;
+      --leaf: #355f3f;
+      --cream: #fff8ed;
+      --gold: #d99b3d;
+      --line: rgba(42, 32, 25,.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(120deg, rgba(123, 36, 48,.08) 0 1px, transparent 1px 36px),
+        linear-gradient(#fffdf8, #f8efe1);
+    }
+
+    a { color: inherit; }.menu {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 46px;
+    }.mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 22px;
+      min-height: 560px;
+    }.board {
+      background: var(--wine);
+      color: #fff;
+      padding: 44px;
+      display: grid;
+      align-content: space-between;
+      gap: 34px;
+      border: 1px solid rgba(123, 36, 48,.35);
+      position: relative;
+      overflow: hidden;
+    }.board:before {
+      content: "";
+      position: absolute;
+      inset: 24px;
+      border: 1px solid rgba(255,255,255,.24);
+    }.board > * { position: relative; z-index: 1; }.eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--gold);
+      color: #29170e;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing:.08em;
+    }
+
+    h1 {
+      margin: 22px 0 16px;
+      max-width: 730px;
+      font-size: clamp(48px, 8vw, 96px);
+      line-height:.9;
+      letter-spacing: 0;
+    }.summary {
+      max-width: 680px;
+      margin: 0;
+      color: #f9e8dd;
+      font-size: 19px;
+      line-height: 1.58;
+    }.contact-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.35fr;
+      gap: 12px;
+    }.contact {
+      min-height: 126px;
+      padding: 18px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.26);
+      display: grid;
+      align-content: center;
+      text-decoration: none;
+      font-style: normal;
+    }.contact.website {
+      background: #fff;
+      color: var(--wine);
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--gold);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing:.08em;
+    }.contact span {
+      font-size: 20px;
+      line-height: 1.3;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }.side {
+      display: grid;
+      grid-template-rows: 240px 1fr;
+      gap: 18px;
+    }.mark {
+      display: grid;
+      place-items: center;
+      background: var(--cream);
+      border: 1px solid var(--line);
+    }.mark img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }.service {
+      padding: 24px;
+      background: var(--leaf);
+      color: #fff;
+      display: grid;
+      align-content: center;
+    }.service b { color: #dfefc9; }.service p {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.28;
+      font-weight: 800;
+    }.facts {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns:.9fr 1.1fr 1fr 1fr;
+      gap: 12px;
+    }.fact {
+      min-height: 132px;
+      padding: 18px;
+      background: rgba(255,248,237,.9);
+      border: 1px solid var(--line);
+    }.fact span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 930px) {.mast,.contact-row { grid-template-columns: 1fr; }.facts { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {.menu { width: min(100% - 20px, 1080px); }.board { padding: 28px; }.board:before { inset: 12px; }.facts { grid-template-columns: 1fr; }
+    }.vv-proof {
+      width: min(1120px, calc(100% - 32px));
+      margin: 30px auto 56px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line, rgba(17, 24, 39,.16));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.88);
+      box-shadow: 0 18px 50px rgba(17, 24, 39,.08);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink, #111827);
+    }.vv-proof-eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted, #5f6574);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+    }.vv-proof h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-transform: none;
+    }.vv-proof p {
+      max-width: 920px;
+      margin: 0;
+      color: var(--muted, #4b5563);
+      font-size: 1rem;
+      line-height: 1.72;
+    }.vv-proof p + p {
+      margin-top: 14px;
+    }.vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }.vv-proof-card {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line, rgba(17, 24, 39,.14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.72);
+    }.vv-proof-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--leaf, var(--green, var(--magenta, #0f766e))));
+      font-size: 12px;
+      letter-spacing:.1em;
+      text-transform: uppercase;
+    }.vv-proof-card span {
+      color: var(--muted, #4b5563);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {.vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="menu">
+    <section class="mast" aria-label="Aventura Catering profile">
+      <div class="board">
+        <div>
+          <span class="eyebrow">Catering</span>
+          <h1>Aventura Catering</h1>
+          <p class="summary">A Phoenix catering profile in the Restaurants/Food category with a downtown address, listed phone, official website route, and event-service relevance.</p>
+        </div>
+
+        <div class="contact-row" aria-label="Aventura Catering contact information">
+          <a class="contact" href="tel:+16025348607"><b>Phone</b><span>(602) 534-8607</span></a>
+          <a class="contact website" href="https://www.aventuracatering.com"><b>Website</b><span>aventuracatering.com</span></a>
+          <address class="contact"><b>Address</b><span>100 N. 3rd St.<br>Phoenix, AZ 85004</span></address>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="Aventura Catering mark">
+        </div>
+        <div class="service">
+          <b>Valley Verified Network</b>
+          <p>Restaurants/Food / Catering</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Aventura Catering facts">
+      <div class="fact"><b>Category</b><span>Food And Events</span></div>
+      <div class="fact"><b>Niche</b><span>Catering</span></div>
+      <div class="fact"><b>Pricing</b><span>Quote-based service</span></div>
+      <div class="fact"><b>Profile date</b><span>May 19, 2026</span></div>
+    </section>
+  
+    <section class="vv-proof" aria-labelledby="vv-proof-heading">
+      <p class="vv-proof-eyebrow">Skyes Over London Review</p>
+      <h2 id="vv-proof-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Aventura Catering is included in Valley Verified because the research ties the business to catering, the Restaurants/Food category, an official website at aventuracatering.com, 100 N. 3rd St. in Phoenix, and the listed phone number (602) 534-8607.</p>
+      <p>Skyes Over London highlights Aventura for local guests, families, event visitors, and planners who need a real Phoenix catering contact. The official site and Greater Phoenix Chamber food-service category give the profile a concrete public evidence trail.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Best for</strong><span>Phoenix event planners, local guests, families, and food-service buyers considering catering support.</span></div>
+        <div class="vv-proof-card"><strong>Local presence</strong><span>100 N. 3rd St., Phoenix, AZ 85004 with listed phone (602) 534-8607.</span></div>
+        <div class="vv-proof-card"><strong>Proof signals</strong><span>Official Aventura Catering website and Greater Phoenix Chamber restaurants and food category evidence.</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Artist Store</title>
+  <meta name="description" content="SkyeMusicNexus artist store for products, order intents, fulfillment, and SkyePay checkout routes." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
+  <script defer src="./neo-nexus.js"></script>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body data-app="skye-music-nexus" data-mode="store" data-room="store">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Artist Store</p>
+      <h1>Products, order intents, payout boundaries, and fan support in the same protected artist lane.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
+    <a href="./index.html">Workspace</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./achievements.html">Awards</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./artist-apps.html">Artist Apps</a><a class="active" href="./store.html" aria-current="page">Store</a><a href="./brain.html">Brain</a>
+  </nav>
+
+  <main class="nexus-shell admin-shell storefront-command-shell">
+    <section class="ops-hero panel-xl storefront-command-hero">
+      <div>
+        <p class="eyebrow">artist commerce / SkyePay intent / fulfillment trail</p>
+        <h2>Nexus storefronts built like artist business command rooms.</h2>
+        <p class="lede">Digital access, merch, tickets, tips, memberships, private delivery, bookings, and order intents stay attached to artist records and shared access sessions.</p>
+        <div class="storefront-action-row">
+          <a class="primary" href="../artist-storefronts/">Open Artist Storefront Folder</a>
+          <a class="ghost" href="../docs/ARTIST_STOREFRONT_GUIDE.md">Operator Guide</a>
+          <a class="ghost" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/">SkyeCommerce Bridge</a>
+        </div>
+      </div>
+      <div id="storeSummary" class="social-summary"></div>
+    </section>
+
+    <section class="panel-xl founder-storefront-panel">
+      <div class="section-head"><div><p class="micro">Founder storefronts</p><h3>Built-in artist stores</h3></div><a class="ghost mini" href="../artist-storefronts/ARTIST_STOREFRONT_MANIFEST.json">Manifest</a></div>
+      <div id="founderStorefronts" class="founder-storefront-grid"></div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Store Profile</p><h3>Artist storefront</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <form id="storeProfileForm" class="field-grid">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Artist name<input name="artistName" placeholder="stage name" /></label>
+          <label class="wide">Store name<input name="name" placeholder="Artist Nexus Store" /></label>
+          <label>Status<select name="status"><option value="active">Active</option><option value="draft">Draft</option><option value="paused">Paused</option></select></label>
+          <label>Fee mode<select name="feeMode"><option value="buyer_covered">Buyer covers 13%</option><option value="artist_absorbed">Artist absorbs 13%</option></select></label>
+          <label>Storefront plan<select name="storefrontPlan"><option value="free99-lite">Free99 Lite: 3 active products</option><option value="storefront-starter">Starter: 10 products + SkyeNet publish</option><option value="artist-host">Artist Host: 25 products</option><option value="artist-collective">Collective: 150 products</option><option value="managed">Managed</option></select></label>
+          <label>Fulfillment email<input name="fulfillmentEmail" type="email" placeholder="artist@example.com" /></label>
+          <label class="wide">Support URL<input name="supportUrl" placeholder="https://..." /></label>
+          <label class="wide">Store bio<textarea name="bio" rows="4" placeholder="Store positioning, fulfillment notes, fan access lane."></textarea></label>
+          <button class="primary wide" type="submit">Save Store</button>
+        </form>
+        <div id="storeProfileResult" class="result-card compact">Store bay idle.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Stores</p><h3>Artist commerce nodes</h3></div>
+        <div id="storeList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="panel-xl">
+      <div class="section-head"><div><p class="micro">SkyeNet release</p><h3>Publish artist storefront URL</h3></div><span class="tag">Owner gated</span></div>
+      <form id="storePublishForm" class="field-grid thin">
+        <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+        <label>Clean URL name<input name="routeSlug" required placeholder="gray-skyes-prime" /></label>
+        <label class="wide">Project ID<input name="projectId" placeholder="optional custom project id" /></label>
+        <button class="primary wide" type="submit">Publish To SkyeNet</button>
+      </form>
+      <div id="storePublishResult" class="result-card compact">No storefront published yet.</div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Product Builder</p><h3>Access, merch, bookings, tips, and tickets</h3></div><a class="ghost mini" href="./drops.html">Attach Drop</a><a class="ghost mini" href="../docs/ARTIST_STOREFRONT_GUIDE.md">How to use</a></div>
+        <form id="storeProductForm" class="field-grid">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Artist name<input name="artistName" placeholder="optional" /></label>
+          <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+          <label>Drop ID<input name="dropId" placeholder="optional drop id" /></label>
+          <label class="wide">Title<input name="title" required placeholder="Digital drop access" /></label>
+          <label>Type<select name="productType"><option value="digital">Digital</option><option value="merch">Merch</option><option value="ticket">Ticket</option><option value="tip">Tip</option><option value="booking">Booking</option><option value="membership">Membership</option><option value="private_access">Private access</option></select></label>
+          <label>Price cents<input name="priceCents" type="number" min="0" step="1" value="1300" /></label>
+          <label>Currency<input name="currency" value="USD" /></label>
+          <label>Inventory<input name="inventory" type="number" min="0" step="1" placeholder="blank for unlimited" /></label>
+          <label>Fulfillment<select name="fulfillmentType"><option value="manual">Manual</option><option value="digital-link">Digital link</option><option value="private-delivery">Private delivery</option><option value="team-assisted">Team assisted</option></select></label>
+          <label>Status<select name="status"><option value="active">Active</option><option value="draft">Draft</option><option value="sold-out">Sold out</option></select></label>
+          <label class="wide">Image URL<input name="imageUrl" placeholder="https://..." /></label>
+          <label class="wide">Description<textarea name="description" rows="4" placeholder="What fans receive."></textarea></label>
+          <button class="primary wide" type="submit">Create Product</button>
+        </form>
+        <div id="storeProductResult" class="result-card compact">No product created yet.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Products</p><h3>Live store inventory</h3></div>
+        <div id="storeProductList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Order Intent</p><h3>SkyePay checkout route</h3></div><span class="tag">13% platform fee policy</span></div>
+        <form id="storeOrderForm" class="field-grid thin">
+          <label class="wide">Product<select name="productId" required><option value="">Select product</option></select></label>
+          <label>Quantity<input name="quantity" type="number" min="1" max="100" value="1" /></label>
+          <label>Fee mode<select name="feeMode"><option value="buyer_covered">Buyer covers fee</option><option value="artist_absorbed">Artist absorbs fee</option></select></label>
+          <label class="wide">Buyer email<input name="buyerEmail" type="email" placeholder="fan@example.com" /></label>
+          <label class="wide">Fan note<textarea name="fanNote" rows="3" placeholder="Optional note"></textarea></label>
+          <button class="primary wide" type="submit">Create Order Intent</button>
+        </form>
+        <div id="storeOrderResult" class="result-card compact">Order intent bay idle.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Orders</p><h3>Checkout and fulfillment trail</h3></div>
+        <div id="storeOrderList" class="constellation-list"></div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

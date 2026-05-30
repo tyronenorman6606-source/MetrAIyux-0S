@@ -1,3 +1,5 @@
+import { executeZeroOsAutomationAction } from './zero-os-automation-spine.mjs';
+
 function text(value = '', max = 1200) {
   return String(value || '').trim().slice(0, max);
 }
@@ -8,6 +10,35 @@ function array(value) {
 
 function unique(value) {
   return [...new Set(array(value).map((item) => String(item || '').trim()).filter(Boolean))];
+}
+
+function envFlag(env, names = []) {
+  return names.some((name) => /^(1|true|yes|on)$/i.test(String(env?.[name] || '').trim()));
+}
+
+async function runOpenAiChatRuntime(env, payload = {}) {
+  const sandbox = envFlag(env, ['CLIENT_APP_FACTORY_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX', '0S_PROVIDER_SANDBOX']);
+  const execution = await executeZeroOsAutomationAction(env, {}, {
+    app_id: 'client-app-factory',
+    provider_id: 'openai',
+    action: 'openai.chat.complete',
+    workspace_id: payload.workspace_id || 'client-app-factory',
+    customer_id: payload.customer_id || 'factory-auren',
+    client_id: payload.client_id || 'auren',
+    usage_lane: 'client-app-factory:auren-chat',
+    owner_approved: true,
+    live: !sandbox,
+    sandbox,
+    payload
+  }, {
+    actor: 'client-app-factory-auren',
+    identity: { role: 'system', email: 'auren@metraiyux.local' }
+  }, { operator_ok: true });
+  const receipt = execution?.response?.receipt || null;
+  if (execution?.response?.ok !== true) {
+    throw new Error(receipt?.error || execution?.response?.error || 'openai_chat_runtime_failed');
+  }
+  return receipt?.provider_result || {};
 }
 
 function clientNiche(record = {}) {
@@ -305,12 +336,10 @@ function deterministicReply(message = '', record = {}, reports = {}, room = 'ove
 
 async function maybeCallOpenAI({ message = '', record = {}, reports = {}, room = 'overview', env = {}, allowLiveAi = false } = {}) {
   if (!allowLiveAi) return null;
-  const apiKey = env.OPENAI_API_KEY || env.openaiApiKey || '';
   const disable = String(env.VANTA_DISABLE_LIVE_AI ?? env.disableLiveAi ?? '0') === '1';
   const allow = String(env.VANTA_ALLOW_LIVE_AI ?? env.allowLiveAi ?? '0') === '1' || Boolean(env.forceLiveAi);
-  if (!apiKey || disable || !allow) return null;
+  if (disable || !allow) return null;
 
-  const baseUrl = String(env.OPENAI_BASE_URL || env.openaiBaseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '');
   const model = String(env.OPENAI_MODEL || env.openaiModel || 'gpt-4.1-mini');
   const draft = deterministicReply(message, record, reports, room);
   const system = [
@@ -330,35 +359,21 @@ async function maybeCallOpenAI({ message = '', record = {}, reports = {}, room =
     currentIssues: collectIssues(record, reports)
   };
 
-  const response = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.35,
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: JSON.stringify(user) }
-      ]
-    })
+  const result = await runOpenAiChatRuntime(env, {
+    model,
+    temperature: 0.35,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: JSON.stringify(user) }
+    ]
   });
-
-  if (!response.ok) {
-    const error = await response.text().catch(() => '');
-    throw new Error(`OpenAI ${response.status}: ${error || response.statusText}`);
-  }
-
-  const json = await response.json();
-  const content = json.choices?.[0]?.message?.content || '{}';
+  const content = result.message_content || '{}';
   const parsed = JSON.parse(content);
   return {
     ok: true,
     assistant: 'Auren',
-    engine: `openai:${model}`,
+    engine: `0s-provider-runtime:openai:${result.model || model}`,
     reply: text(parsed.reply, 2800) || draft.reply,
     context: draft.context,
     issues: array(parsed.issues).map((issue) => ({

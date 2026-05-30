@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -255,5 +255,6 @@
     (function() { const canvas = document.querySelector('.command-canvas'); if (!canvas || !canvas.getContext) return; const ctx = canvas.getContext('2d'); const P = Array.from({ length: 72 }, (_, i) => ({ x: Math.random(), y: Math.random(), speed: 0.00045 + Math.random() * 0.0007, phase: i * 0.72, color: i % 5 === 0 ? '#f8cb5e' : i % 3 === 0 ? '#a88cff' : '#64d9ff' })); function resize() { const r = window.devicePixelRatio || 1; canvas.width = Math.floor(window.innerWidth * r); canvas.height = Math.floor(window.innerHeight * r); canvas.style.width = window.innerWidth + 'px'; canvas.style.height = window.innerHeight + 'px'; ctx.setTransform(r, 0, 0, r, 0, 0); } function draw(t) { const w = window.innerWidth, h = window.innerHeight; ctx.clearRect(0, 0, w, h); ctx.lineWidth = 1; P.forEach((p, i) => { p.y -= p.speed * 2.4; if (p.y < -0.08) p.y = 1.08; const x = p.x * w + Math.sin(t * 0.00045 + p.phase) * 26, y = p.y * h; ctx.beginPath(); ctx.arc(x, y, i % 7 === 0 ? 2.1 : 1.2, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.globalAlpha = i % 5 === 0 ? 0.72 : 0.46; ctx.fill(); const n = P[(i + 9) % P.length], nx = n.x * w, ny = n.y * h, d = Math.hypot(nx - x, ny - y); if (d < 180) { ctx.globalAlpha = Math.max(0, 0.2 - d / 900); ctx.strokeStyle = p.color; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke(); } }); ctx.globalAlpha = 1; requestAnimationFrame(draw); } resize(); window.addEventListener('resize', resize); requestAnimationFrame(draw); })();
   </script>
   <script src="site-search.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>

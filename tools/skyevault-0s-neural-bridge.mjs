@@ -130,12 +130,14 @@ function repoKey(event) {
 const outDir = resolvePath(argValue('--out-dir'), path.join(root, '.skyevault-out'));
 const remoteLedgerPath = resolvePath(argValue('--remote-ledger'), path.join(outDir, 'git-remote-ledger.jsonl'));
 const uploadLedgerPath = resolvePath(argValue('--upload-ledger'), path.join(outDir, 'vault-ledger.jsonl'));
+const autosyncLedgerPath = resolvePath(argValue('--autosync-ledger'), path.join(outDir, 'autosync-ledger.jsonl'));
 const outputPath = resolvePath(argValue('--output'), path.join(root, 'metraiyux_0s_site', 'brain', 'skyevault-vault-map.json'));
 const workspaceDir = resolvePath(argValue('--workspace-dir'), path.join(root, 'metraiyux_0s_site', 'brain', 'skyevault-workspaces'));
 const maxEvents = Number.parseInt(argValue('--max-events') || '500', 10);
 
 const remoteEvents = sortByTime(readJsonl(remoteLedgerPath).filter((event) => event.event && event.event !== 'parse-error' && event.workspaceId && event.repoId)).slice(-maxEvents);
 const uploadEvents = sortByTime(readJsonl(uploadLedgerPath).filter((event) => event.event && event.event !== 'parse-error')).slice(-maxEvents);
+const autosyncEvents = sortByTime(readJsonl(autosyncLedgerPath).filter((event) => event.event && event.event !== 'parse-error')).slice(-maxEvents);
 const receipts = readReceipts(outDir).slice(-200);
 const safeUploads = receipts.map((receipt) => ({
   receipt_ref: safeRef('receipt', receipt.receiptId),
@@ -254,6 +256,19 @@ for (const receipt of receipts) {
   addLink(links, 'skyevault:hub', uploadNode, 'upload-receipt', 1);
 }
 
+for (const event of autosyncEvents.slice(-80)) {
+  const scanNode = `autosync:${safeRef('scan', `${event.recordedAt || ''}:${event.digest || ''}`)}`;
+  addNode(nodes, {
+    id: scanNode,
+    label: event.event || 'autosync',
+    type: 'autosync-scan',
+    group: 'autosync',
+    size: event.event === 'autosync.failed' ? 13 : 10,
+    summary: cleanText(`${event.event || 'autosync'} mode ${event.mode || 'unknown'} branch ${event.branch || 'unknown'} dirty ${Boolean(event.dirty)} local-only ${event.localOnlyCriticalCount ?? 'n/a'} digest ${shortSha(event.digest) || 'unknown'}`)
+  });
+  addLink(links, 'skyevault:hub', scanNode, event.event || 'autosync', event.event === 'autosync.failed' ? 1.6 : 1);
+}
+
 const repoList = [...repos.values()]
   .sort((a, b) => String(b.latest_event_at || '').localeCompare(String(a.latest_event_at || '')))
   .map((repo) => ({
@@ -295,6 +310,14 @@ const chunks = [
     text: `Vault receipt ${receipt.receipt_ref} uploaded ${receipt.fileName || 'archive'} to ${receipt.destination || 'vault'} with size ${bytes(receipt.fileSize)} and sha256 prefix ${receipt.sha256_prefix || 'unknown'}.`,
     source: 'brain/skyevault-vault-map.json',
     tags: ['skyevault', 'upload', 'receipt']
+  })),
+  ...autosyncEvents.slice(-20).map((event) => ({
+    id: `skyevault-autosync-${safeRef('scan', `${event.recordedAt || ''}:${event.digest || ''}`)}`,
+    title: 'SkyeVault Autosync Scan',
+    heading: event.event || 'autosync',
+    text: `Autosync event ${event.event || 'unknown'} ran in mode ${event.mode || 'unknown'} on branch ${event.branch || 'unknown'} at ${event.recordedAt || 'unknown time'}. Dirty state was ${Boolean(event.dirty)} with ${event.localOnlyCriticalCount ?? 'unknown'} local-only critical paths and digest prefix ${shortSha(event.digest) || 'unknown'}.`,
+    source: 'brain/skyevault-vault-map.json',
+    tags: ['skyevault', 'autosync', event.mode || 'mode-unknown']
   }))
 ];
 
@@ -304,12 +327,14 @@ const payload = {
   sources: {
     remote_ledger: safeSourcePath(remoteLedgerPath),
     upload_ledger: safeSourcePath(uploadLedgerPath),
+    autosync_ledger: safeSourcePath(autosyncLedgerPath),
     receipts_dir: safeSourcePath(outDir)
   },
   safety: 'public-safe summary: absolute paths, raw tokens, raw session IDs, full receipt IDs, author emails, and private file bodies are not emitted',
   repo_count: repoList.length,
   remote_event_count: remoteEvents.length,
   upload_event_count: uploadEvents.length,
+  autosync_event_count: autosyncEvents.length,
   receipt_count: receipts.length,
   total_receipt_bytes: receipts.reduce((sum, item) => sum + Number(item.fileSize || 0), 0),
   total_receipt_human: bytes(receipts.reduce((sum, item) => sum + Number(item.fileSize || 0), 0)),

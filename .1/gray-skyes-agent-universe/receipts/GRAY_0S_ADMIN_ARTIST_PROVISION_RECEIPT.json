@@ -1,0 +1,94 @@
+{
+  "schema": "gray-skyes.0s-admin-artist-provision-receipt.v1",
+  "generatedAt": "2026-05-23T16:28:07Z",
+  "artist": "Gray Skyes",
+  "artistId": "444666666666",
+  "workspaceId": "gray-skyes-0s-founder-workspace",
+  "workspaceSlug": "gray-skyes-founder",
+  "status": "seeded-for-shared-gate-provision",
+  "authRule": {
+    "lane": "FS27/SkyGate/Free99 shared gate",
+    "appSpecificFounderPasswordCreated": false,
+    "appSpecificAdminPasswordCreated": false,
+    "acceptedGateHeaders": [
+      "Authorization",
+      "x-admin-token",
+      "x-free99-admin-code",
+      "x-free99-gate-session",
+      "x-skye-gate-session"
+    ],
+    "sharedHelpersRequired": [
+      "requireGateAuth",
+      "requireOperatorAuth",
+      "shared owner-admin session helpers"
+    ]
+  },
+  "access": {
+    "tier": "unlimited",
+    "role": "president-founder-artist",
+    "ownerAccess": "all-0s-admin",
+    "platformLimits": "none",
+    "scopes": [
+      "0s.admin",
+      "skye-music-nexus.admin",
+      "artist.release.write",
+      "artist.visuals.write",
+      "artist.dashboard.write",
+      "artist.analytics.read",
+      "relay13.inbox.write",
+      "skyenet.deploy.write"
+    ]
+  },
+  "artistIdReservation": {
+    "mode": "founder-selected",
+    "id": "444666666666",
+    "immutable": true,
+    "collisionStatus": "reserved",
+    "displayLine": "SOLE Boosted, reaching Over every Skye."
+  },
+  "linkedBuild": {
+    "folder": ".1/gray-skyes-agent-universe",
+    "hub": "index.html",
+    "songOrbit": "orbit.html",
+    "fieldNotes": "field-notes.html",
+    "heroRoom": "hero-video-universe.html",
+    "artistCard": "founder-storyscape.html",
+    "dashboard": "dashboard.html",
+    "profileSeed": "data/artist-profile.json"
+  },
+  "notifications": [
+    {
+      "channel": "0s-inbox",
+      "recipient": "gray-skyes-founder-workspace",
+      "subject": "Gray Skyes founder artist workspace provisioned",
+      "status": "queued"
+    },
+    {
+      "channel": "email",
+      "recipient": "graylondonskyes@gmail.com",
+      "subject": "Gray Skyes paperwork and payments setup",
+      "status": "queued"
+    }
+  ],
+  "paperwork": [
+    {
+      "id": "gray-payments-paperwork",
+      "href": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/public/settings.html",
+      "status": "pending-artist-review"
+    },
+    {
+      "id": "gray-contractor-packet",
+      "href": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/",
+      "status": "pending-artist-review"
+    },
+    {
+      "id": "gray-release-tracking",
+      "href": "dashboard.html",
+      "status": "active-local-build"
+    }
+  ],
+  "notes": [
+    "This receipt records the platform seed and gate contract. It does not create any app-specific password.",
+    "Runtime production activation must accept the existing shared 0S/FS27 owner session before rendering mounted admin surfaces."
+  ]
+}

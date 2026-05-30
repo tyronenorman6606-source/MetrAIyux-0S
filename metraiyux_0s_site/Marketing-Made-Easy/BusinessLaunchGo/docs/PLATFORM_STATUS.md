@@ -1,19 +1,15 @@
 # BusinessLaunchGo Platform Status
 
-Generated: 2026-05-09
+Updated: 2026-05-24
 
-This folder is promoted as the local platform truth for BusinessLaunchGo. The app payload, routed surfaces, proof metadata, runtime contract, local visual asset, and smoke check live inside this folder so the platform can be carried forward without reading from the original import location.
+This folder is the canonical BusinessLaunchGo app surface. The working launch-pack generator now lives directly at `index.html`; the old docked shell pages and nested `app.html` entry were removed so the 0S mount opens the real workflow first.
 
 ## Included Surfaces
 
-- Command: `index.html`
-- Dashboard: `dashboard.html`
-- Workflows: `workflows.html`
-- Records: `records.html`
-- Proof: `proof.html`
-- Runtime: `runtime.html`
-- Settings: `settings.html`
-- Imported App: `app.html`
+- Canonical app: `index.html`
+- Local runtime contract: `runtime/local-runtime.mjs`
+- Service worker: `sw.js`
+- Manifest: `manifest.webmanifest`
 
 ## Runtime Proof
 

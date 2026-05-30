@@ -1,94 +1,438 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BusinessLaunchGo Command</title>
-  <meta name="description" content="Live command surface, operating state, launch path, and proof status.">
-  <link rel="stylesheet" href="./platform.css">
-  <script defer src="./platform.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2b0a3d" />
+  <meta name="description" content="Business Launch Kit (AZ) Pack — generator → ZIP + PDF. Netlify Drop-ready." />
+
+  <title>Business Launch Kit (AZ) Pack</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icon-192.png" />
+  <link rel="apple-touch-icon" href="./assets/icon-192.png" />
+
+  <link rel="stylesheet" href="./assets/svs.css" />
+
+  <!-- Optional CDNs: richer ZIP/PDF output when available; local fallbacks still work -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script defer src="./assets/zip.js"></script>
+  <script defer src="./assets/app.js"></script>
 </head>
-<body data-platform-hardening="p1-routed" data-page="index.html" data-platform-id="businesslaunchgo">
-  <aside class="rail">
-    <a class="brand" href="./index.html">
-      <img src="./assets/platform-mark.svg" alt="">
-      <span>BusinessLaunchGo</span>
-    </a>
-    <nav><a class="active" href="./index.html"><span>command</span><strong>Command</strong></a><a href="./dashboard.html"><span>dashboard</span><strong>Dashboard</strong></a><a href="./workflows.html"><span>flow</span><strong>Workflows</strong></a><a href="./records.html"><span>records</span><strong>Records</strong></a><a href="./proof.html"><span>proof</span><strong>Proof</strong></a><a href="./runtime.html"><span>runtime</span><strong>Runtime</strong></a><a href="./settings.html"><span>settings</span><strong>Settings</strong></a><a href="./app.html"><span>app</span><strong>Imported App</strong></a></nav>
-  </aside>
-  <main class="surface">
-    <header class="topbar">
-      <div>
-        <p class="kicker">command lane</p>
-        <h1>Command</h1>
-        <p>Live command surface, operating state, launch path, and proof status.</p>
+
+<body class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;min-height:0;overflow:hidden;pointer-events:none;margin:0"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;display:block;pointer-events:none;margin:0"></canvas><div class="skyesol-grain" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;margin:0"></div><div class="skyesol-scanline" aria-hidden="true" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;margin:0"></div>
+  <!-- SOL Platform Nav -->
+  <div id="sol-platnav" style="position:fixed;bottom:18px;right:18px;z-index:99999;display:flex;flex-direction:column;gap:6px;font-family:ui-sans-serif,system-ui,sans-serif;">
+    <a href="/index.html" style="padding:8px 15px;border-radius:999px;background:rgba(5,4,10,.92);border:1px solid rgba(255,255,255,.16);color:#f2f0ff;text-decoration:none;backdrop-filter:blur(12px);white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.15px;box-shadow:0 10px 34px rgba(0,0,0,.55);display:block;text-align:center;" onmouseover="this.style.borderColor='rgba(184,107,255,.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,.16)'">&#8592; SOL Home</a>
+    <a href="/Platforms-Apps-Infrastructure/" style="padding:8px 15px;border-radius:999px;background:rgba(5,4,10,.92);border:1px solid rgba(255,255,255,.16);color:#f2f0ff;text-decoration:none;backdrop-filter:blur(12px);white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.15px;box-shadow:0 10px 34px rgba(0,0,0,.55);display:block;text-align:center;" onmouseover="this.style.borderColor='rgba(59,214,255,.6)'" onmouseout="this.style.borderColor='rgba(255,255,255,.16)'">&#11043; All Platforms</a>
+  </div>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+  <div class="bg-watermark" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="./assets/logo.png" alt="Skyes Over London" />
+      <div class="brand-meta">
+        <div class="brand-title">Business Launch Kit (AZ) Pack</div>
+        <div class="brand-sub">Generator → ZIP Pack + Branded PDF • PWA • Diagnostics • Error Reporting</div>
       </div>
-      <a class="primary" href="./app.html">Open Imported App</a>
-    </header>
-    <section class="hero">
-      <div>
-        <p class="kicker">standalone platform truth</p>
-        <h2>BusinessLaunchGo now has routed surfaces, local proof, and same-folder runtime contracts.</h2>
+    </div>
+
+    <div class="top-actions">
+      <button id="btnInstall" class="btn btn-ghost" type="button" title="Install PWA" disabled>Install</button>
+      <a class="btn btn-ghost" href="/SkyeMediaCenter/index.html">Media Center</a>
+      <button id="btnDiagnostics" class="btn btn-ghost" type="button">Diagnostics</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card hero">
+      <div class="hero-left">
+        <div class="kicker">Arizona launch workflow — fast, clean, and trackable</div>
+        <h1 class="neon-gradient-text">Generate a client-ready launch pack in seconds.</h1>
+        <p class="muted">
+          Fill in basics, follow the checklist, then export a ZIP pack (docs + templates) and a branded PDF summary.
+          Everything persists locally so you can iterate without losing progress.
+        </p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="businessName">Business name</label>
+            <input id="businessName" type="text" placeholder="e.g., North Star Office & Accounting" autocomplete="organization" />
+          </div>
+
+          <div class="field">
+            <label for="city">City (AZ)</label>
+            <input id="city" type="text" placeholder="e.g., Phoenix" autocomplete="address-level2" />
+          </div>
+
+          <div class="field">
+            <label for="industry">Industry</label>
+            <input id="industry" type="text" placeholder="e.g., Accounting, Logistics, Marketing" />
+          </div>
+
+          <div class="field">
+            <label for="ownersCount">Owners count</label>
+            <input id="ownersCount" type="number" min="1" max="50" step="1" value="1" />
+          </div>
+
+          <div class="field field-row">
+            <div class="toggle">
+              <input id="hireEmployees" type="checkbox" />
+              <label for="hireEmployees">Plan to hire employees (yes/no)</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>&nbsp;</label>
+            <button id="btnSave" class="btn btn-primary" type="button">Save Inputs</button>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button id="btnGenerateZip" class="btn btn-gold" type="button">Generate ZIP Pack</button>
+          <button id="btnExportPdf" class="btn btn-primary" type="button">Export Branded PDF Summary</button>
+        </div>
+
+        <div class="tiny muted">
+          Build: <span id="buildId"></span> • Local-first • Netlify Drop-ready
+        </div>
       </div>
-      <div class="metrics">
-        <strong>8</strong><span>routes</span>
-        <strong>6</strong><span>modules</span>
-        <strong>1</strong><span>truth folder</span>
+
+      <div class="hero-right">
+        <div class="panel">
+          <div class="panel-title">Report Summary</div>
+          <div id="reportSummary" class="report"></div>
+          <div class="panel-actions">
+            <button id="btnCreateLaunchPlan" class="btn btn-primary" type="button">Save Local Launch Plan</button>
+            <button id="btnRefreshRuntime" class="btn btn-ghost" type="button">Refresh Runtime</button>
+            <button id="btnReset" class="btn btn-ghost" type="button">Reset Local Data</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Local Ops Runtime</div>
+          <div id="runtimeLaneStatus" class="tiny muted">Checking same-folder runtime…</div>
+          <pre id="runtimeLaneCounts" class="pre"></pre>
+          <div class="tiny muted">Uses local SkyeHands-style runtime storage for leads, launch plans, and pack activity when this folder is served through its local runtime.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">System Handoff Archive</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="handoffLabel">Packet label</label>
+              <input id="handoffLabel" type="text" placeholder="e.g., Phoenix launch handoff" />
+            </div>
+            <div class="field">
+              <label for="handoffTargets">Downstream targets</label>
+              <input id="handoffTargets" type="text" placeholder="SkyeMediaCenter, SkyeWebCreatorMax, AE-FlowPro" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="handoffNotes">Operator notes</label>
+            <textarea id="handoffNotes" rows="3" placeholder="What should the next operator or platform do first?"></textarea>
+          </div>
+          <div class="panel-actions">
+            <button id="btnCreateHandoffPack" class="btn btn-primary" type="button">Create System Handoff Pack</button>
+            <button id="btnRefreshHandoffPacks" class="btn btn-ghost" type="button">Refresh Archive</button>
+          </div>
+          <pre id="handoffArchive" class="pre"></pre>
+          <div class="tiny muted">Persists launch-ready packets in the same-folder runtime so the work can move into downstream SkyeHands systems instead of stopping at a checklist.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">SkyeMediaCenter Bridge</div>
+          <div class="tiny muted">Launches need logos, photos, social media, proof files, promo clips, and delivery assets. Route those into the shared media center instead of burying them in a launch checklist.</div>
+          <div class="panel-actions">
+            <a class="btn btn-primary" href="/SkyeMediaCenter/public/index.html">Upload Launch Assets</a>
+            <a class="btn btn-ghost" href="/SkyeMediaCenter/public/admin.html">Open Operator Theater</a>
+            <a class="btn btn-ghost" href="/SkyeMediaCenter/index.html">Search Media Center</a>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Handoff Review Board</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="reviewOwner">Owner</label>
+              <input id="reviewOwner" type="text" placeholder="e.g., launch-ops" />
+            </div>
+            <div class="field">
+              <label for="reviewStatus">Status</label>
+              <select id="reviewStatus">
+                <option value="draft">Draft</option>
+                <option value="ready">Ready</option>
+                <option value="approved">Approved</option>
+                <option value="blocked">Blocked</option>
+                <option value="dispatched">Dispatched</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="reviewCheckpoint">Checkpoint</label>
+              <input id="reviewCheckpoint" type="text" placeholder="e.g., storefront prep approved" />
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button id="btnAdvanceReview" class="btn btn-ghost" type="button">Advance Latest Review</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="reviewNotes">Review notes</label>
+            <textarea id="reviewNotes" rows="3" placeholder="What is next before this launch pack is dispatched?"></textarea>
+          </div>
+          <div class="panel-actions">
+            <button id="btnSaveHandoffReview" class="btn btn-primary" type="button">Save Latest Handoff Review</button>
+            <button id="btnRefreshReviewBoard" class="btn btn-ghost" type="button">Refresh Review Board</button>
+          </div>
+          <pre id="handoffReviewBoard" class="pre"></pre>
+          <div class="tiny muted">Tracks local operator readiness on each archived handoff pack so the launch work can be reviewed, approved, blocked, or dispatched inside this folder runtime.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Launch Execution Board</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="executionOwner">Owner</label>
+              <input id="executionOwner" type="text" placeholder="e.g., launch-ops" />
+            </div>
+            <div class="field">
+              <label for="executionStatus">Status</label>
+              <select id="executionStatus">
+                <option value="queued">Queued</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="executionCheckpoint">Checkpoint</label>
+              <input id="executionCheckpoint" type="text" placeholder="e.g., storefront draft approved" />
+            </div>
+            <div class="field">
+              <label for="executionDueAt">Due at</label>
+              <input id="executionDueAt" type="text" placeholder="e.g., 2026-05-03T18:00:00Z" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="executionNextAction">Next action</label>
+            <input id="executionNextAction" type="text" placeholder="e.g., dispatch website build and invoicing setup" />
+          </div>
+          <div class="field">
+            <label for="executionTargets">Execution targets</label>
+            <input id="executionTargets" type="text" placeholder="Comma-separated downstream targets" />
+          </div>
+          <div class="field">
+            <label for="executionNotes">Execution notes</label>
+            <textarea id="executionNotes" rows="3" placeholder="Who owns the downstream execution and what still blocks it?"></textarea>
+          </div>
+          <div class="panel-actions">
+            <button id="btnSaveExecution" class="btn btn-primary" type="button">Save Latest Execution</button>
+            <button id="btnAdvanceExecution" class="btn btn-ghost" type="button">Advance Latest Execution</button>
+            <button id="btnRefreshExecutionBoard" class="btn btn-ghost" type="button">Refresh Execution Board</button>
+          </div>
+          <pre id="handoffExecutionBoard" class="pre"></pre>
+          <div class="tiny muted">Carries launch work past review into owned downstream execution so the pack does not die at approval time.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Launch Dispatch Board</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="dispatchOwner">Owner</label>
+              <input id="dispatchOwner" type="text" placeholder="e.g., launch-dispatch" />
+            </div>
+            <div class="field">
+              <label for="dispatchStatus">Status</label>
+              <select id="dispatchStatus">
+                <option value="queued">Queued</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="dispatchCheckpoint">Checkpoint</label>
+              <input id="dispatchCheckpoint" type="text" placeholder="e.g., storefront + finance handoff opened" />
+            </div>
+            <div class="field">
+              <label for="dispatchDueAt">Due at</label>
+              <input id="dispatchDueAt" type="text" placeholder="e.g., 2026-05-03T20:00:00Z" />
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="dispatchTarget">Primary target</label>
+              <input id="dispatchTarget" type="text" placeholder="e.g., AE-FlowPro" />
+            </div>
+            <div class="field">
+              <label for="dispatchChannel">Dispatch channel</label>
+              <input id="dispatchChannel" type="text" placeholder="e.g., downstream-launch-dispatch" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="dispatchNextAction">Next action</label>
+            <input id="dispatchNextAction" type="text" placeholder="e.g., confirm owner acceptance across downstream lanes" />
+          </div>
+          <div class="field">
+            <label for="dispatchNotes">Dispatch notes</label>
+            <textarea id="dispatchNotes" rows="3" placeholder="What is still left before the launch pack is fully handed off?"></textarea>
+          </div>
+          <div class="panel-actions">
+            <button id="btnSaveDispatch" class="btn btn-primary" type="button">Save Latest Dispatch</button>
+            <button id="btnAdvanceDispatch" class="btn btn-ghost" type="button">Advance Latest Dispatch</button>
+            <button id="btnRefreshDispatchBoard" class="btn btn-ghost" type="button">Refresh Dispatch Board</button>
+          </div>
+          <pre id="handoffDispatchBoard" class="pre"></pre>
+          <div class="tiny muted">Tracks owned dispatch into downstream systems so the launch packet closes the loop instead of stalling at execution.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Workflow Timeline</div>
+          <div class="panel-actions">
+            <button id="btnRefreshWorkflowTimeline" class="btn btn-ghost" type="button">Refresh Workflow Timeline</button>
+          </div>
+          <pre id="handoffWorkflowTimeline" class="pre"></pre>
+          <div class="tiny muted">Persists the archive, review, execution, and dispatch trail for the latest launch packs in the same-folder runtime.</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Lead Form</div>
+          <form id="leadForm" name="lead" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="lead" />
+            <p class="hidden">
+              <label>Don’t fill this out: <input name="bot-field" /></label>
+            </p>
+
+            <div class="grid-2">
+              <div class="field">
+                <label for="leadName">Name</label>
+                <input id="leadName" name="name" type="text" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="leadEmail">Email</label>
+                <input id="leadEmail" name="email" type="email" autocomplete="email" />
+              </div>
+              <div class="field">
+                <label for="leadPhone">Phone</label>
+                <input id="leadPhone" name="phone" type="tel" autocomplete="tel" />
+              </div>
+              <div class="field">
+                <label for="leadCompany">Company</label>
+                <input id="leadCompany" name="company" type="text" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="leadMessage">Message</label>
+              <textarea id="leadMessage" name="message" rows="3" placeholder="What are you building? What’s the deadline?"></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit Lead</button>
+            <div class="tiny muted">Netlify Forms compatible (no extra functions required).</div>
+          </form>
+        </div>
       </div>
     </section>
-    <section class="grid"><article class="panel">
-      <span class="badge">Command 01</span>
-      <h3>Launch checklist</h3>
-      <p>Launch checklist is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="queue-0">Queue</button>
-    </article><article class="panel">
-      <span class="badge">Command 02</span>
-      <h3>Entity setup</h3>
-      <p>Entity setup is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="verify-1">Verify</button>
-    </article><article class="panel">
-      <span class="badge">Command 03</span>
-      <h3>Offer stack</h3>
-      <p>Offer stack is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="queue-2">Queue</button>
-    </article><article class="panel">
-      <span class="badge">Command 04</span>
-      <h3>Site handoff</h3>
-      <p>Site handoff is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="verify-3">Verify</button>
-    </article><article class="panel">
-      <span class="badge">Command 05</span>
-      <h3>Proof packet</h3>
-      <p>Proof packet is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="queue-4">Queue</button>
-    </article><article class="panel">
-      <span class="badge">Command 06</span>
-      <h3>Runtime</h3>
-      <p>Runtime is part of the imported BusinessLaunchGo package now managed from this standalone folder.</p>
-      <button data-action="verify-5">Verify</button>
-    </article></section>
-    <section class="split">
-      <article class="panel">
-        <h3>Runtime Contract</h3>
-        <p>The local contract is kept under <code>src/runtime-contract.json</code> with the route map and endpoint boundary used by smoke proof.</p>
-        <a href="./src/runtime-contract.json">Open Contract</a>
-      </article>
-      <article class="panel">
-        <h3>Proof</h3>
-        <p>Smoke proof lives beside the platform and checks direct pages, truth metadata, assets, docs, and runtime files.</p>
-        <a href="./smoke/businesslaunchgo-p1-smoke.mjs">Open Smoke</a>
-      </article>
-      <article class="panel">
-        <h3>Imported App</h3>
-        <p>The original advanced app entry is preserved as <code>app.html</code> so the functional surface stays inside the promoted folder.</p>
-        <a href="./app.html">Open App</a>
-      </article>
-      <article class="panel">
-        <h3>Operator State</h3>
-        <p>Queue and proof actions on this surface write to browser-local state so repeated checks do not need an external folder.</p>
-        <button data-action="proof-sync">Sync Local Proof</button>
-      </article>
+
+    <section class="card">
+      <div class="section-title">
+        <div>
+          <h2>Launch Checklist (AZ)</h2>
+          <div class="muted">Toggle items as you complete them. Progress is saved locally.</div>
+        </div>
+        <div class="section-actions">
+          <button id="btnMarkCore" class="btn btn-ghost" type="button">Mark Core Done</button>
+          <button id="btnExportJson" class="btn btn-ghost" type="button">Export Progress JSON</button>
+        </div>
+      </div>
+
+      <div id="checklist" class="checklist"></div>
+
+      <div class="disclaimer">
+        This kit is operational guidance and templates, not legal or tax advice. For legal/tax decisions, use a licensed professional.
+      </div>
     </section>
   </main>
+
+  <footer class="footer">
+    <div>© 2026 Skyes Over London LC • SVS UI</div>
+    <div class="tiny muted">Offline-first PWA • Error reporting via Netlify Functions</div>
+  </footer>
+
+  <dialog id="diagModal" class="modal">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">Diagnostics</div>
+          <div class="muted tiny">Troubleshooting, self-test, and error queue.</div>
+        </div>
+        <button id="btnCloseDiag" class="btn btn-ghost" type="button">Close</button>
+      </div>
+
+      <div class="modal-grid">
+        <div class="panel">
+          <div class="panel-title">Status</div>
+          <pre id="diagStatus" class="pre"></pre>
+          <div class="panel-actions">
+            <button id="btnSelfTest" class="btn btn-primary" type="button">Run Self-Test</button>
+            <button id="btnNeonPing" class="btn btn-ghost" type="button">Neon Ping</button>
+            <button id="btnSendTestError" class="btn btn-ghost" type="button">Send Test Error</button>
+          </div>
+
+          <div class="tiny muted" style="margin-top:10px;">
+            <b>Neon Data API Config (client fallback)</b><br/>
+            <span>Use this only if Functions aren't deploying (Drop mode). Stored locally in your browser.</span>
+          </div>
+          <div class="grid-2" style="margin-top:10px;">
+            <div class="field">
+              <label for="neonDataApiUrl">NEON_DATA_API_URL</label>
+              <input id="neonDataApiUrl" type="text" placeholder="https://your-data-api-endpoint" />
+            </div>
+            <div class="field">
+              <label for="neonJwt">NEON_DATA_API_JWT</label>
+              <input id="neonJwt" type="password" placeholder="JWT (must include sub if RLS enabled)" />
+            </div>
+            <div class="field" style="grid-column:1/-1;">
+              <button id="btnSaveNeonCfg" class="btn btn-primary" type="button">Save Neon Config</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Recent Client Errors (local)</div>
+          <pre id="diagErrors" class="pre"></pre>
+          <div class="panel-actions">
+            <button id="btnFlushQueue" class="btn btn-primary" type="button">Flush Error Queue</button>
+            <button id="btnClearErrors" class="btn btn-ghost" type="button">Clear Local Errors</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tiny muted">
+        Endpoint: <code>/.netlify/functions/client-error-report</code> • Headers: <code>x-kaixu-app</code>, <code>x-kaixu-build</code>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Netlify Forms pre-render hook (keeps static detection reliable) -->
+  <form name="lead" data-netlify="true" hidden>
+    <input type="text" name="name" />
+    <input type="email" name="email" />
+    <input type="tel" name="phone" />
+    <input type="text" name="company" />
+    <textarea name="message"></textarea>
+  </form>
 </body>
 </html>

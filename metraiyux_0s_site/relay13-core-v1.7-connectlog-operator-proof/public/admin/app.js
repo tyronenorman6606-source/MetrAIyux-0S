@@ -1,5 +1,5 @@
 const $ = (id) => document.getElementById(id);
-let token = localStorage.getItem('r13_admin_token') || '';
+let token = '';
 let workspaces = [];
 let conversations = [];
 let activeWorkspace = '';
@@ -23,9 +23,11 @@ function relayApiPath(path){
   return `/api/relay13/${raw.replace(/^\/+/,'')}`;
 }
 async function api(path, options={}){
-  token=gateToken()||token;
+  token=gateToken();
   const bridgeHeaders=gateBridge()?.headers?.({'x-skye-platform':'relay13-console','x-skye-usage-lane':'messaging-admin'})||{};
-  const r=await fetch(relayApiPath(path),{...options,headers:{'content-type':'application/json',...bridgeHeaders,authorization:`Bearer ${token}`,...(options.headers||{})}});
+  if(!token&&!bridgeHeaders.authorization&&!bridgeHeaders['x-skye-gate-session']&&!bridgeHeaders['x-free99-gate-session']) throw new Error('0S/SkyGate session required');
+  const gateHeaders=token?{authorization:`Bearer ${token}`,'x-skye-gate-session':token,'x-free99-gate-session':token}:{};
+  const r=await fetch(relayApiPath(path),{...options,headers:{'content-type':'application/json',...bridgeHeaders,...gateHeaders,...(options.headers||{})}});
   const d=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(d.error||`Request failed ${r.status}`);
   return d;
@@ -42,7 +44,7 @@ function setAdminRoom(room){
   });
 }
 document.querySelectorAll('[data-admin-room-target]').forEach((button)=>button.addEventListener('click',()=>setAdminRoom(button.dataset.adminRoomTarget)));
-async function loadAll(){token=gateToken()||token;if(!token)throw new Error('0S/SkyGate session required');localStorage.setItem('r13_admin_token',token);await loadWorkspaces();if(activeWorkspace)await Promise.all([loadStats(),loadDomains(),loadGuardrails(),loadConversations()]);renderSnippet();}
+async function loadAll(){token=gateToken();if(!token)throw new Error('0S/SkyGate session required');localStorage.removeItem('r13_admin_token');await loadWorkspaces();if(activeWorkspace)await Promise.all([loadStats(),loadDomains(),loadGuardrails(),loadConversations()]);renderSnippet();}
 async function loadWorkspaces(){const d=await api('/api/admin/workspaces');workspaces=d.workspaces||[];if(!activeWorkspace&&workspaces[0])activeWorkspace=workspaces[0].id;$('workspaceSelect').innerHTML=workspaces.map(w=>`<option value="${esc(w.id)}" ${w.id===activeWorkspace?'selected':''}>${esc(w.name)} · ${esc(w.slug)}</option>`).join('');}
 async function loadStats(){if(!activeWorkspace)return;const d=await api(`/api/admin/dashboard?workspace_id=${encodeURIComponent(activeWorkspace)}`);const s=d.stats||{};$('stats').innerHTML=[['Open',s.open_count||0],['Pending',s.pending_count||0],['Unread',s.unread_for_operator||0],['Messages',s.total_messages||0]].map(([k,v])=>`<div class="stat"><strong>${Number(v||0)}</strong><span>${esc(k)}</span></div>`).join('')}
 async function loadDomains(){if(!activeWorkspace)return;const d=await api(`/api/admin/workspace-domains?workspace_id=${encodeURIComponent(activeWorkspace)}`);const domains=d.domains||[];$('domainList').innerHTML=domains.length?domains.map(x=>`<span class="chip">${esc(x.domain)} · ${esc(x.status)}</span>`).join(' '):'No domains set. Until you add one, the widget is permissive for easier first setup.'}
@@ -54,7 +56,7 @@ function renderGuardrails(){if(!guardrails){$('guardrailPanel').textContent='No 
 async function openConversation(id){activeConversation=conversations.find(c=>c.id===id);renderProfile();renderConversations();$('replyText').disabled=false;$('replyButton').disabled=false;const d=await api(`/api/v1/conversations/${id}/messages?workspace_id=${encodeURIComponent(activeWorkspace)}`);activeMessages=d.messages||[];renderMessages();connect();await Promise.all([loadStats(),loadConversations()]);}
 function renderMessages(){$('messages').innerHTML='';if(!activeMessages.length){$('messages').innerHTML='<div class="empty"><strong>No messages yet.</strong><span>When this thread receives a real message it appears here.</span></div>';return}activeMessages.forEach(addMessage)}
 function addMessage(m){const holder=$('messages');const empty=holder.querySelector('.empty');if(empty)holder.innerHTML='';const div=document.createElement('div');div.className=`msg ${m.sender_role==='operator'||m.sender_role==='system'?'me':'them'}`;div.innerHTML=`${esc(m.body)}<small>${esc(m.sender_name||m.sender_role)} · ${esc(m.created_at||'')}</small>`;holder.appendChild(div);holder.scrollTop=holder.scrollHeight}
-function connect(){if(ws)ws.close();if(!activeConversation)return;const path=relayApiPath(`/api/ws/${activeConversation.id}?role=operator&workspace_id=${encodeURIComponent(activeWorkspace)}&token=${encodeURIComponent(token)}&name=Operator`);const url=path.startsWith('http')?path.replace(/^http/,'ws'):`${location.protocol==='https:'?'wss:':'ws:'}//${location.host}${path}`;ws=new WebSocket(url);status('connecting');ws.onopen=()=>status('live');ws.onclose=()=>status('offline',true);ws.onerror=()=>status('socket error',true);ws.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='message'){activeMessages.push(d);addMessage(d);loadStats().catch(()=>{})}if(d.type==='presence')status(`${d.online} online`)}}
+function connect(){if(ws)ws.close();if(!activeConversation)return;const path=relayApiPath(`/api/ws/${activeConversation.id}?role=operator&workspace_id=${encodeURIComponent(activeWorkspace)}&name=Operator`);const url=path.startsWith('http')?path.replace(/^http/,'ws'):`${location.protocol==='https:'?'wss:':'ws:'}//${location.host}${path}`;ws=new WebSocket(url);status('connecting');ws.onopen=()=>status('live');ws.onclose=()=>status('offline',true);ws.onerror=()=>status('socket error',true);ws.onmessage=e=>{const d=JSON.parse(e.data);if(d.type==='message'){activeMessages.push(d);addMessage(d);loadStats().catch(()=>{})}if(d.type==='presence')status(`${d.online} online`)}}
 function renderSnippet(){const ws=currentWorkspace();$('installSnippet').textContent=ws?`<script src="${location.origin}/widget/embed.js" data-workspace="${ws.slug}" async></script>`:''}
 $('saveToken').onclick=()=>loadAll().catch(e=>alert(e.message));
 $('bootstrap').onclick=async()=>{await api('/api/bootstrap',{method:'POST'});await loadAll()};
@@ -63,7 +65,7 @@ $('createWorkspace').onclick=async()=>{const name=$('workspaceName').value.trim(
 $('addDomain').onclick=async()=>{const domain=$('domainName').value.trim();if(!activeWorkspace||!domain)return;await api('/api/admin/workspace-domains',{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,domain})});$('domainName').value='';await loadDomains()};
 $('refresh').onclick=()=>Promise.all([loadStats(),loadDomains(),loadGuardrails(),loadConversations()]).catch(e=>alert(e.message));
 $('statusFilter').onchange=()=>loadConversations().catch(e=>alert(e.message));
-$('createKey').onclick=async()=>{if(!activeWorkspace)return;const d=await api('/api/admin/api-keys',{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,name:$('keyName').value||'Workspace key',scopes:['conversations:create','conversations:read','messages:read','messages:write','widget:read']})});$('newKey').textContent=`Copy now:\n${d.api_key.key}\n\nPrefix: ${d.api_key.key_prefix}`};
+$('createKey').onclick=()=>{$('newKey').textContent='Browser key minting is disabled on the 0S mount. Use the shared FS27/SkyGate session; server-side helpers mint and revoke short-lived Relay13 keys only when a backend workflow requires it.'};
 $('publishWidget').onclick=async()=>{if(!activeWorkspace)return;await api('/api/admin/widget-configs/publish',{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,brand_name:$('brandName').value||currentWorkspace()?.name||'Messages',welcome_text:$('welcomeText').value||'Send us a message. We will reply here.',launcher_text:'Message us',operator_name:'Operator',primary_color:'#f6c85f',accent_color:'#9a6cff'})});alert('Widget config published')};
 $('enforceGuardrails').onclick=async()=>{if(!activeWorkspace)return;const d=await api('/api/admin/guardrails',{method:'POST',body:JSON.stringify({workspace_id:activeWorkspace,ai_mode:'draft_only',allow_ai_auto_reply:false,allow_web_search:false,per_ip_message_window_minutes:10,per_ip_message_limit:24,per_ip_conversation_limit:8})});guardrails=d.guardrails;renderGuardrails();alert('Guardrails enforced: app knowledge only, web search off.')};
 $('saveThread').onclick=async()=>{if(!activeConversation)return;await api(`/api/admin/conversations/${activeConversation.id}`,{method:'PATCH',body:JSON.stringify({workspace_id:activeWorkspace,status:$('threadStatus').value,assigned_to:$('assignedTo').value})});await loadConversations();activeConversation=conversations.find(c=>c.id===activeConversation.id)||activeConversation;renderProfile()};

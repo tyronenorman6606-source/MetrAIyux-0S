@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./open-source-studio.css" />
   <link rel="stylesheet" href="./nexus-daw.css" />
   <script defer src="./skygate-auth.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="./nexus-daw.js"></script>
 </head>
 <body class="native-daw-body" data-app="skye-music-nexus" data-mode="artist" data-room="native-daw">
@@ -26,16 +26,18 @@
         <button id="recordTransportButton" type="button" aria-label="Record">Record</button>
         <button id="audioEngineButton" type="button" aria-label="Start audio engine">Audio</button>
         <label>BPM<input id="dawTempoInput" type="number" min="40" max="220" value="96" /></label>
+        <label>Bars<input id="dawBarsInput" type="number" min="4" max="256" value="4" /></label>
         <label>Key<select id="dawKeyInput"><option>F minor</option><option>C minor</option><option>A minor</option><option>G minor</option><option>D minor</option><option>C major</option><option>G major</option></select></label>
         <span id="dawClock" class="daw-clock">001:01</span>
         <span id="dawAudioStatus" class="daw-audio-status">Audio locked</span>
       </section>
       <section class="daw-project-actions" aria-label="Project actions">
         <button id="saveDawProjectButton" type="button">Save</button>
+        <button id="loadDawProjectsButton" type="button">Cloud</button>
+        <button id="downloadDawManifestButton" type="button">Manifest</button>
         <button id="exportDawManifestButton" type="button">Export</button>
         <a href="./exports.html">Forge</a>
-        <a href="./command-dashboard.html">Dashboard</a>
-        <a href="../proof.html">Readiness</a>
+        <a href="./index.html">Workspace</a>
       </section>
     </header>
 
@@ -45,6 +47,7 @@
         <button type="button" data-daw-rail="tracks" aria-label="Track map">T</button>
         <button type="button" data-daw-rail="clips" aria-label="Clip bin">C</button>
         <button type="button" data-daw-rail="mix" aria-label="Mix console">M</button>
+        <button type="button" data-daw-rail="kaixu" aria-label="kAIxU assistant">K</button>
         <button type="button" data-daw-rail="export" aria-label="Release export">E</button>
       </aside>
 
@@ -55,7 +58,7 @@
         </div>
         <div class="daw-beta-note" role="status">
           <strong>Native DAW beta.</strong>
-          <span>Audio import, edit actions, pads, keys, save/export, and browser mixdown are smoke-proven. Use Upload Studio, Release Forge, Rights, and Drops for production release operations.</span>
+          <span>Audio import, edit actions, pads, keys, save/export, and browser mixdown are available now. Use Upload Studio, Release Forge, Rights, and Drops for the release workflow.</span>
         </div>
         <div class="daw-quickstart" aria-label="DAW quick start">
           <article><span>1</span><strong>Start Audio</strong><small>Click Audio before playback or recording.</small></article>
@@ -66,6 +69,59 @@
         <label>Artist ID<input id="dawArtistInput" value="artist_unassigned" /></label>
         <label>Project<input id="dawProjectInput" value="Nexus native session" /></label>
         <label>Import audio<input id="dawFileInput" type="file" accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm" multiple /></label>
+        <div class="daw-kaixu-assist" aria-label="kAIxU DAW assistant">
+          <div class="daw-panel-title-row">
+            <span>kAIxU</span>
+            <strong>DAW copilot</strong>
+          </div>
+          <div class="daw-kaixu-grid">
+            <label>Tier<select id="dawKaixuModel">
+              <option value="kaixu-6.7-nano">kAIxU 6.7 Nano</option>
+              <option value="kaixu-6.7-mini">kAIxU 6.7 Mini</option>
+              <option value="kaixu-6.7">kAIxU 6.7</option>
+              <option value="kaixu-6.7-pro">kAIxU 6.7 Pro</option>
+              <option value="kaixu-6.7-max">kAIxU 6.7 Max</option>
+            </select></label>
+            <label>Task<select id="dawKaixuTask">
+              <option value="arrangement">Arrangement</option>
+              <option value="mix-notes">Mix notes</option>
+              <option value="lyrics">Lyrics</option>
+              <option value="release-pack">Release pack</option>
+              <option value="export">Export plan</option>
+            </select></label>
+            <label>Budget<select id="dawKaixuBudget">
+              <option value="free-beta">Free beta</option>
+              <option value="artist-pro">Artist Pro</option>
+              <option value="label">Label</option>
+              <option value="owner-review">Owner review</option>
+            </select></label>
+          </div>
+          <div class="daw-kaixu-budget-panel" aria-label="kAIxU budget and rate controls">
+            <label>Credit cap<input id="dawKaixuCreditCap" type="number" min="1" max="240" value="24" /></label>
+            <label>Rate window<select id="dawKaixuRateWindow">
+              <option value="daily">Daily</option>
+              <option value="session">Session</option>
+            </select></label>
+            <output id="dawKaixuMeter">0 / 24 credits used today</output>
+          </div>
+          <label>Instruction<textarea id="dawKaixuPrompt" rows="3"></textarea></label>
+          <div class="daw-kaixu-actions">
+            <button id="dawKaixuAssistButton" type="button">Ask</button>
+            <button id="dawKaixuApplyButton" type="button">Apply Diff</button>
+          </div>
+          <output id="dawKaixuOutput">kAIxU guidance stays on kAIxU aliases and behind SkyGate.</output>
+        </div>
+        <div class="daw-cloud-actions" aria-label="Cloud project and asset actions">
+          <button id="promoteDawAssetsButton" type="button">Vault Clips</button>
+          <button id="loadDawLocalButton" type="button">Load Local</button>
+          <button id="clearDawSelectionButton" type="button">Clear Selection</button>
+        </div>
+        <div class="daw-export-targets" aria-label="Export queue targets">
+          <label><input class="dawExportTarget" type="checkbox" value="wav-master" checked /> WAV master</label>
+          <label><input class="dawExportTarget" type="checkbox" value="mp3-preview" checked /> MP3 preview</label>
+          <label><input class="dawExportTarget" type="checkbox" value="stem-archive" /> Stems</label>
+          <label><input class="dawExportTarget" type="checkbox" value="release-forge-line" checked /> Forge line</label>
+        </div>
         <div class="daw-edit-tools" aria-label="DAW edit tools">
           <button id="undoDawButton" type="button" aria-label="Undo edit">Undo</button>
           <button id="redoDawButton" type="button" aria-label="Redo edit">Redo</button>
@@ -93,6 +149,7 @@
           </div>
           <div id="dawWorkbenchBody" class="daw-workbench-body"></div>
         </div>
+        <div class="daw-cloud-projects" id="dawCloudProjects" aria-label="Saved DAW projects"></div>
         <div class="daw-browser-list" id="dawClipList" aria-label="Imported clips"></div>
       </aside>
 

@@ -1,0 +1,269 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "roman-sable-neon-glass-relay",
+  "title": "Neon Glass Relay",
+  "project": "",
+  "createdAt": "2026-05-25T23:36:08.172Z",
+  "provider": {
+    "id": "openai-tts",
+    "model": "gpt-4o-mini-tts",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 2082432,
+    "promptStored": true,
+    "generatedText": ""
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "artist_live_browser_20260524113443",
+      "slug": "artist-live-browser-20260524113443",
+      "stageName": "Roman Glass"
+    },
+    {
+      "artistId": "artist_network_20260524122314",
+      "slug": "artist-network-20260524122314",
+      "stageName": "Sable June"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "artist_live_browser_20260524113443",
+    "slug": "artist-live-browser-20260524113443",
+    "stageName": "Roman Glass"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/audio/neon-glass-relay.mp3",
+    "audioSha256": "b1c3e5ba8cbbcfbd3479a5fb205c21381a3f0bec37375a1fc7e06279778add12",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/",
+    "productId": "prod_artist_live_browser_20260524113443_neon_glass_relay",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "artist_live_browser_20260524113443",
+      "name": "Roman Glass",
+      "shareBps": 5000,
+      "role": "collaborator"
+    },
+    {
+      "artistId": "artist_network_20260524122314",
+      "name": "Sable June",
+      "shareBps": 5000,
+      "role": "collaborator"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_13282ae353dbb3dc",
+      "metadata": {
+        "artist_names": [
+          "Roman Glass",
+          "Sable June"
+        ],
+        "audio_sha256": "b1c3e5ba8cbbcfbd3479a5fb205c21381a3f0bec37375a1fc7e06279778add12",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/singles/neon-glass-relay",
+        "fs27_tracked": true,
+        "primary_artist": "Roman Glass",
+        "product_id": "prod_artist_live_browser_20260524113443_neon_glass_relay",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/",
+        "release": "",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 2082432,
+      "package_name": "neon-glass-relay.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/audio/neon-glass-relay.mp3",
+      "package_sha256": "b1c3e5ba8cbbcfbd3479a5fb205c21381a3f0bec37375a1fc7e06279778add12",
+      "schema": "skye.submission.job",
+      "slug": "neon-glass-relay",
+      "title": "Neon Glass Relay",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 2082432,
+      "package_name": "neon-glass-relay.mp3",
+      "package_sha256": "b1c3e5ba8cbbcfbd3479a5fb205c21381a3f0bec37375a1fc7e06279778add12",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "neon-glass-relay",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Neon Glass Relay",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_13282ae353dbb3dc",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_13282ae353dbb3dc",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "neon-glass-relay:sub_13282ae353dbb3dc",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "neon-glass-relay",
+      "submitted_at": "2026-05-25T23:36:08.172Z",
+      "title": "Neon Glass Relay",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_b1c3e5ba8cbbcfbd",
+      "upload_sha256": "b1c3e5ba8cbbcfbd3479a5fb205c21381a3f0bec37375a1fc7e06279778add12",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/artist-live-browser-20260524113443/drops/neon-glass-relay/",
+    "productId": "prod_artist_live_browser_20260524113443_neon_glass_relay"
+  }
+}

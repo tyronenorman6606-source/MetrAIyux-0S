@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Business Workspace Flyer - MetrAIyux 0S</title>
+  <meta name="description" content="Printable leave-behind flyer for the free MetrAIyux 0S business workspace pilot.">
+  <link rel="canonical" href="https://metraiyux-0s-marketing.pages.dev/business-owner-free-stack-flyer">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    :root {
+      --ink: #101417;
+      --muted: #4f5961;
+      --line: #d8dde2;
+      --gold: #b57b12;
+      --cyan: #007d9f;
+      --paper: #fffdf8;
+      --panel: #f4f7f8;
+      --dark: #071014;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #d9dde1;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    .flyer-actions {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(7, 16, 20, 0.92);
+    }
+    .flyer-actions a,
+    .flyer-actions button {
+      min-height: 38px;
+      border: 1px solid rgba(255,255,255,0.24);
+      border-radius: 8px;
+      padding: 8px 13px;
+      color: #fff;
+      background: transparent;
+      font: 700 13px "Space Grotesk", system-ui, sans-serif;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .flyer-actions button {
+      color: #071014;
+      border-color: #f4c75b;
+      background: linear-gradient(135deg, #f4c75b, #73ddff);
+    }
+    .sheet {
+      width: min(8.5in, calc(100vw - 20px));
+      min-height: 11in;
+      margin: 18px auto;
+      padding: 0.38in;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(181,123,18,0.13), transparent 34%),
+        linear-gradient(315deg, rgba(0,125,159,0.12), transparent 36%),
+        var(--paper);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+    }
+    .top {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 4px solid var(--dark);
+    }
+    .logo {
+      width: 78px;
+      height: 78px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      object-fit: contain;
+      background: #fff;
+      padding: 8px;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--gold);
+      font: 700 13px "Rajdhani", system-ui, sans-serif;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 6.8in;
+      font: 900 clamp(34px, 5vw, 54px)/0.98 "Orbitron", system-ui, sans-serif;
+      letter-spacing: 0;
+      color: var(--dark);
+    }
+    .sub {
+      max-width: 7.2in;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.42;
+    }
+    .callout {
+      margin: 18px 0;
+      padding: 18px;
+      border: 2px solid var(--dark);
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, #071014, #13262d);
+    }
+    .callout strong {
+      display: block;
+      margin-bottom: 8px;
+      font: 900 24px "Orbitron", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    .callout span {
+      display: block;
+      color: #dce9ee;
+      font-size: 16px;
+      line-height: 1.48;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .box {
+      min-height: 112px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: rgba(255,255,255,0.72);
+    }
+    .box b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--dark);
+      font: 800 16px "Rajdhani", system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    .box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.42;
+    }
+    .limits {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-top: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--panel);
+    }
+    .panel h2 {
+      margin: 0 0 10px;
+      font: 900 20px "Orbitron", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+    .panel ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.44;
+    }
+    .panel li { margin: 0 0 6px; }
+    .savings {
+      border-color: rgba(181,123,18,0.42);
+      background: #fff8e3;
+    }
+    .savings strong {
+      color: var(--gold);
+      font-size: 24px;
+    }
+    .footer {
+      display: grid;
+      grid-template-columns: 1fr 1.72in auto;
+      gap: 18px;
+      align-items: end;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 3px solid var(--dark);
+    }
+    .footer p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.8px;
+      line-height: 1.4;
+    }
+    .url {
+      font-weight: 800;
+      color: var(--cyan);
+      overflow-wrap: anywhere;
+    }
+    .qr-card {
+      display: grid;
+      gap: 7px;
+      justify-items: center;
+      align-self: stretch;
+      border: 2px solid var(--dark);
+      border-radius: 8px;
+      padding: 9px;
+      background: #fff;
+      text-align: center;
+    }
+    .qr-card b {
+      color: var(--dark);
+      font: 900 13px "Rajdhani", system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    .qr-code {
+      width: 1.36in;
+      height: 1.36in;
+      display: grid;
+      place-items: center;
+    }
+    .qr-code svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .qr-fallback {
+      color: var(--muted);
+      font-size: 9.5px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+    .stamp {
+      min-width: 1.72in;
+      border: 2px solid var(--dark);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      color: var(--dark);
+      background: #fff;
+      font: 900 14px "Rajdhani", system-ui, sans-serif;
+      text-transform: uppercase;
+    }
+    @page { size: letter; margin: 0.25in; }
+    @media print {
+      body { background: #fff; }
+      .flyer-actions { display: none; }
+      .sheet {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+      }
+      a { text-decoration: none; }
+    }
+    @media (max-width: 700px) {
+      .top, .grid, .limits, .footer { grid-template-columns: 1fr; }
+      .sheet { padding: 18px; }
+      h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="flyer-actions" aria-label="Flyer actions">
+    <button type="button" onclick="window.print()">Print / Save PDF</button>
+    <a href="business-owner-free-stack.html">Review Free Pilot</a>
+  </div>
+
+  <main class="sheet">
+    <section class="top">
+      <img class="logo" src="/assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <div>
+        <p class="eyebrow">Free founder pilot for local businesses</p>
+        <h1>Free business workspace + landing experience</h1>
+        <p class="sub">Gray Skyes built you a starter business lane: a landing page, workspace chat, hosted email, CRM notes, and backup receipts. Keep it, edit it, or ask for it to be removed.</p>
+      </div>
+    </section>
+
+    <section class="callout">
+      <strong>This is not a reseller seat.</strong>
+      <span>It runs on sovereign MetrAIyux 0S infrastructure: hosted web surfaces, FS27/SkyGate shared auth, ConnectLog workspace memory, Relay13 realtime chat, SkyeMail, AE FlowPro/VantaCore CRM, and CitadelDB backup receipts.</span>
+    </section>
+
+    <section class="grid" aria-label="Included pilot value">
+      <div class="box">
+        <b>Landing experience</b>
+        <p>A custom first screen for your business, services, contact flow, and offer. If the first version misses, it can be edited or removed.</p>
+      </div>
+      <div class="box">
+        <b>ConnectLog workspace</b>
+        <p>Customer requests, conversation context, workspace notes, and relationship history in one workspace lane.</p>
+      </div>
+      <div class="box">
+        <b>Relay13 live chat</b>
+        <p>Realtime customer intake chat and assisted workspace rooms powered by first-party Worker infrastructure.</p>
+      </div>
+      <div class="box">
+        <b>SkyeMail inbox/outbox</b>
+        <p>A hosted mail lane on an approved address or domain for lightweight business send/receive work.</p>
+      </div>
+      <div class="box">
+        <b>CRM + Citadel backup</b>
+        <p>Owner CRM notes through AE FlowPro/VantaCore, with a biweekly export, mirror, or backup receipt into CitadelDB.</p>
+      </div>
+      <div class="box">
+        <b>Workspace assistance</b>
+        <p>Gray Skyes or a disclosed 0S AE assistant can help organize the workspace. AI drafts stay owner-reviewed by default.</p>
+      </div>
+    </section>
+
+    <section class="limits">
+      <div class="panel">
+        <h2>Free pilot limits</h2>
+        <ul>
+          <li>1 landing experience and 1 workspace.</li>
+          <li>Up to 3 named workspace users through shared gate access.</li>
+          <li>2 active assisted rooms or intake threads.</li>
+          <li>250 monthly owner/workspace actions.</li>
+          <li>1 SkyeMail hosted mailbox on an approved address/domain.</li>
+          <li>Biweekly backup/export/mirror receipt.</li>
+        </ul>
+      </div>
+      <div class="panel savings">
+        <h2>Simple savings math</h2>
+        <p><strong>$855/year</strong></p>
+        <p>That is the rough annual published-price baseline for 5 people on Slack Pro annual plus Google Workspace Business Starter annual, checked May 26, 2026. This pilot is not full Slack or Google feature parity. It covers the practical starter lane: web presence, intake, chat, inbox/outbox, CRM notes, and backups.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <p><strong>Decision maker not here?</strong> No problem. Scan the QR code to review what is included, what is live, and how to request access to the free pilot.</p>
+        <p class="url">metraiyux-0s-marketing.pages.dev/business-owner-free-stack</p>
+        <p>Contact: MediaOverLondon@solenterprises.org · 1-(800)-484-4783</p>
+      </div>
+      <div class="qr-card">
+        <b>Scan to review</b>
+        <div class="qr-code" id="pitch-qr" aria-label="QR code for the free pilot review page"></div>
+        <span class="qr-fallback">metraiyux-0s-marketing.pages.dev/business-owner-free-stack</span>
+      </div>
+      <div class="stamp">Built by<br>Gray Skyes<br>Skyes Over London</div>
+    </footer>
+  </main>
+  <script src="assets/vendor/qrcode-generator.js"></script>
+  <script>
+    (function () {
+      var target = document.getElementById('pitch-qr');
+      if (!target || typeof qrcode !== 'function') return;
+      var url = 'https://metraiyux-0s-marketing.pages.dev/business-owner-free-stack';
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      target.innerHTML = qr.createSvgTag({
+        scalable: true,
+        margin: 2,
+        title: { text: 'Scan for the free business workspace pilot review page' },
+        alt: { text: 'QR code linking to the MetrAIyux 0S free business workspace pilot review page' }
+      });
+    })();
+  </script>
+</body>
+</html>

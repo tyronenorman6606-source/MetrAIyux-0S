@@ -372,7 +372,7 @@
         </div>
       </div>
       <aside class="changelog-proof-panel" aria-label="Current production ledger summary">
-        <p class="eyebrow">Updated May 25 2026 UTC</p>
+        <p class="eyebrow">Updated May 27 2026 UTC</p>
         <h2>Full production in the changelog.</h2>
         <p>The current production ledger records live surfaces, Cloudflare routes, SkyeNet deploy proof, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">browser proof</span> reels, Company Knowledge ingest receipts, SkySecure FS27 Vault proof, and public-safe receipts without exposing private controls.</p>
         <div class="proof-grid">
@@ -394,6 +394,546 @@
     <section aria-label="Release timeline">
       <p class="eyebrow">Timeline</p>
       <div class="release-list">
+        <article class="release-entry" id="founder-command-67-full-handling">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-27">May 27, 2026</time>
+            <span class="release-version">Founder Command 6.7 Full Handling</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Founder Command</span><span>Repo backup</span><span>Full drive metadata</span><span>Song player</span><span>Gate-only AI</span><span>No browser proof</span></div>
+            <h2>Founder Command now has the signed repo backup, full vault metadata, cleaner menu, song playback wiring, and gate-only AI receipts.</h2>
+            <p>This pass closes the specific caveats from the owner review instead of leaving them as notes. The final production smoke receipt records the exact Worker version, and the production smoke passed 13 checks with zero failures.</p>
+            <ul class="release-points">
+              <li>The same-domain Founder Command backup route now mints a signed SkyeVault browser download URL through the shared gate instead of returning the earlier Worker-side <code>404</code>; the receipt redacts the signed URL and the browser gets it only after owner auth.</li>
+              <li>The Repo Vault / full-drive lane now loads 114 chunks with over 111,000 total metadata records; the final smoke receipt records the current safe/private/skipped counts while the browser still does not expose raw private file bodies or secret values.</li>
+              <li>The bunched command menu was replaced with a grouped searchable dropdown, with Operate, Vault, and Build sections and mobile one-column behavior.</li>
+              <li>The song player now attempts direct native audio first, falls back to gated blob playback when needed, exposes an open-link control, and the smoke confirmed 34 songs plus a sample <code>audio/mpeg</code> asset at 1,643,459 bytes.</li>
+              <li>Direct OpenAI fallbacks were removed from the 0S paid AI lane and Business Card Factory copy pass; PWA Factory analyze returns <code>fs27-gateway-required</code> when the FS27 gateway is not configured, and the AI gate audit passed with zero failures.</li>
+              <li>SkyeHawk stayed behind the shared 0S gate and command bridge, and the SkyeVault autosync daemon was confirmed running after deploy on pid <code>9968</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/founder-command/full-handling-production-smoke-2026-05-27.json</code></span><span><code>test-artifacts/ai-gate-audit/ai-gate-audit-latest.json</code></span><span><a href="../founder-command/?view=repo-vault">Founder Command Repo Vault</a></span><span>Owner-handled browser verification</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-pricing-realm-hub">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-27">May 27, 2026</time>
+            <span class="release-version">MusicNexus Pricing Realms</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Pricing hub</span><span>Song Creation</span><span>Artist Apps</span><span>DAW beta</span><span>No browser proof</span></div>
+            <h2>The Music Nexus now has one pricing hub with dedicated realms for drops, artist apps, song creation, and DAW beta.</h2>
+            <p>This pass sets the buyer-facing product map before the paid song-maker build. Song Creation is prompt-led and customizable, Drop Packaging is explicitly for songs that already exist, Artist Apps cover the public artist surfaces, and DAW access stays free for every user through December 31, 2026 while beta-labeled.</p>
+            <ul class="release-points">
+              <li><code>/SkyeMusicNexus/public/pricing.html</code> now routes into the four dedicated pricing rooms: drops, artist apps, song creation, and DAW beta.</li>
+              <li>The Song Creation ladder documents Song Draft <code>$23</code>, Artist Cut <code>$49</code>, Release Pack <code>$99</code>, 5-Song Local Artist Bundle <code>$249</code>, Brain / Label Pack <code>$497+</code>, and Cinematic Suite <code>$199-$497+</code>.</li>
+              <li>Everything Movie is documented as a premium multi-act reference with 4 acts, 12 generated minutes, 16 artist appearances, drop rooms, Pics2Vid packages, product records, and receipts, not the base <code>$23</code> lane.</li>
+              <li>The pricing truth files were updated in both camelCase and snake_case forms so the 0S, MusicNexus, and future checkout wiring can read the same map.</li>
+              <li>Production deploys: Music Nexus Pages deployment <code>89546d22</code>; 0S Worker runtime <code>581c9704-6a30-4d5c-844c-6d893f7676ab</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-pricing-hub-proof-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-ux-redo-proof-latest.json</code></span><span><a href="../SkyeMusicNexus/public/pricing.html">Pricing Hub</a></span><span>Owner-handled browser verification</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-native-playback-daemon-guard-closure">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-27">May 27, 2026</time>
+            <span class="release-version">MusicNexus Native Playback + Daemon Guard</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Native audio</span><span>Unified streams</span><span>Artist brains</span><span>Daemon alerts</span><span>No browser proof</span></div>
+            <h2>Native drop pages and the standalone player now write real Nexus streams, while the daemon records stalled and failed ticks.</h2>
+            <p>This pass closes the remaining telemetry and live-ops gaps found in the post-parity audit. Drop/release pages using native audio now hydrate from the Music Nexus catalog and attach canonical track IDs, the legacy standalone player bridges into the same public Worker telemetry lane, and the scheduled artist-brain daemon has durable guardrails for stalled heartbeats and top-level cron failures.</p>
+            <ul class="release-points">
+              <li><code>public/nexus-player.js</code> now hydrates native <code>&lt;audio&gt;</code> elements from catalog path/title/container matches, fills missing sources when needed, and assigns <code>data-nexus-track-id</code> before public stream reporting.</li>
+              <li><code>public/neo-nexus.js</code> now sends canonical <code>track-public-event</code> receipts for <code>play_start</code>, <code>qualified_stream</code>, and <code>complete_play</code> from <code>public/player.html</code>, using the same CORS-simple public telemetry endpoint as the bottom Nexus player.</li>
+              <li>The Nova Saint storefront-weather drop page was upgraded from bare native audio into a real Nexus player shell with catalog-backed track metadata.</li>
+              <li>The Worker scheduled MusicNexus brain tick is now guarded: top-level cron failures write <code>scheduled_tick_failed</code> alerts and ledger rows, while stale daemon heartbeats create <code>daemon_stalled</code> alerts for Founder Command/SkyeMail dispatch instead of silently hiding failures.</li>
+              <li>The daemon smoke proof now covers <code>update-policy</code>, <code>pause</code>, <code>resume</code>, stale heartbeat alert generation, and <code>ack-alerts</code>. The parity proof now scans drop/release audio surfaces and the standalone player telemetry bridge.</li>
+              <li>Production deploys: standalone Music Nexus Pages deployment <code>adb80b2f-2205-4f56-b6f8-b2928ea2977a</code>; first 0S Worker runtime for this closure <code>c70798d9-c61d-4ae2-8e75-3ec75a223c84</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyemusicnexus-artist-brain-daemon-smoke-2026-05-27T01-38-56-669Z/receipt.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-spotify-parity-proof-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-radio-tracking-proof-latest.json</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-latest.json</code></span><span>Owner-handled browser verification</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-live-monitor-sse-playback-closure">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">MusicNexus Live Monitor Closure</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>SSE heartbeat</span><span>Artist brains</span><span>Public playback</span><span>Storefronts</span><span>No browser proof</span></div>
+            <h2>The artist-brain monitor now consumes live daemon heartbeats, and approved public drop audio stays playable.</h2>
+            <p>This pass closes the remaining live-ops gap for Music Nexus: the monitor no longer depends only on periodic JSON polling, the daemon event stream is gate-protected and receipt-backed, and the standalone Pages route guard no longer blocks approved public songs or artist visuals that the player and charts need.</p>
+            <ul class="release-points">
+              <li><code>public/brain-monitor.js</code> now connects to <code>music-brain-daemon?action=events</code>, reads authenticated <code>text/event-stream</code> frames, applies live <code>status</code> and <code>heartbeat</code> payloads to the neural map/queue/stream-impact view, and falls back to the existing JSON refresh when streaming is unavailable.</li>
+              <li>The Worker daemon events response now emits a real heartbeat stream with <code>x-skymusicnexus-daemon: heartbeat-stream</code>, fresh heartbeat timestamps, close/cancel guards, and shared-gate CORS headers for owner sessions.</li>
+              <li>The proof harnesses now verify unauthenticated <code>events</code> requests are blocked, authenticated SSE returns <code>status</code> plus <code>heartbeat</code> frames, the payload schema is <code>skyemusicnexus.artist-brain-daemon.v1</code>, and the public metric lane remains unified <code>nexusStreams</code>.</li>
+              <li>The Pages and mounted 0S asset guards now block raw/non-drop/private storefront audio while letting approved public drop audio and artist imagery load, so Discover, charts, radio, and release pages can behave like a real music app.</li>
+              <li>SupaBoy's product room now has visible checkout-pending and share states in the static surface, keeping the storefront proof clear of dead product-room controls.</li>
+              <li>Production deploys: 0S Worker runtime version <code>1f98f14c-24ac-4fc5-8815-bd806a08abe6</code>; standalone Music Nexus Pages production deployment <code>5d29251a-f02d-439e-8362-2644d6182dce</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyemusicnexus-brain-daemon-live-direct-smoke/latest.json</code></span><span><code>test-artifacts/skyemusicnexus-asset-download-gate/latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/artist-storefront-product-ux-proof-latest.json</code></span><span>Owner-handled browser verification</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-daemon-kv-offload-production-closure">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">MusicNexus Daemon KV Closure</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Cloudflare KV</span><span>Artist brains</span><span>Live daemon</span><span>Asset storage</span><span>No browser proof</span></div>
+            <h2>The live artist-brain daemon now writes production state without hitting the KV ceiling.</h2>
+            <p>The daemon was already running the real local artist-brain policy, but the production state blob was too close to Cloudflare KV's single-value limit because uploaded audio/image payloads were embedded inside <code>state.assets</code>. This closure moves inline asset bytes into per-asset KV data records, leaves state as metadata plus storage references, and teaches gated stream/download routes to hydrate the original bytes back from the asset-data record.</p>
+            <ul class="release-points">
+              <li><code>musicWriteState</code> now compacts operational history and offloads asset payload fields such as <code>dataBase64</code>, <code>audioBase64</code>, and <code>contentBase64</code> into <code>skymusicnexus:v1:asset-data:&lt;asset&gt;</code> KV records before the main state write.</li>
+              <li><code>music-assets?action=stream</code> and <code>music-assets?action=download</code> now read either legacy inline payloads or the new offloaded asset-data reference, so protected delivery still works after compaction.</li>
+              <li>Production Worker version <code>4271bb79-c85c-4f9d-a0ed-8758fe2576ce</code> shipped the closure with the existing cron table intact: <code>*/10 * * * *</code> and <code>17 13 * * 1,3,5</code>.</li>
+              <li>Live direct proof authenticated through the shared owner gate, blocked unauthenticated daemon status with <code>401</code>, ran <code>music-brain-daemon:run-now</code>, executed 2 artist accounts, populated current listen/current track as <code>Always Try To Breathe</code>, reported 28 now-listening records, and moved unified <code>nexusStreams</code> to 404.</li>
+              <li>Local proof added a focused asset offload test proving state no longer stores inline <code>dataBase64</code>, the asset record switches to <code>worker-kv-asset-data</code>, and the gated stream returns the original bytes from KV.</li>
+            </ul>
+            <div class="receipt-row"><span><code>test-artifacts/skyemusicnexus-brain-daemon-live-direct-smoke/latest.json</code></span><span><code>test-artifacts/skyemusicnexus-asset-kv-offload-proof/latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-playlists-direct-smoke-latest.json</code></span><span>Owner-handled browser verification</span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-artist-brain-daemon-monitor">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Artist-Brain Daemon</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Artist brains</span><span>Daemon</span><span>Operations monitor</span><span>Unified streams</span><span>Provider-free</span></div>
+            <h2>Music Nexus now has an always-on local artist-brain daemon with a real ops screen.</h2>
+            <p>This pass moves the local artist-brain lane past manual cycle buttons into a shared-gate Worker daemon. The policy is persisted as 70% listening, 10% creating, and 20% social, with cooldowns, quiet-hour controls, pause/resume/run-now actions, queue receipts, heartbeat status, and Founder Command plus SkyeMail alert hooks for stalled runs or brain errors. It stays provider-free: brains use local memory, catalog, release, product, social, and mounted 0S tool context instead of needing an AI API to be useful.</p>
+            <ul class="release-points">
+              <li>The Worker exposes <code>music-brain-daemon</code> with <code>status</code>, <code>events</code>, <code>run-cycle</code>, <code>run-now</code>, <code>update-policy</code>, <code>pause</code>, <code>resume</code>, and <code>ack-alerts</code> actions under the existing shared FS27/SkyGate lane.</li>
+              <li>The Cloudflare cron table now includes a 10-minute MusicNexus daemon tick, while the older global scheduled job remains intact for the broader 0S workday.</li>
+              <li>The daemon writes one public stream stat, <code>nexusStreams</code>, with hidden audit metadata only for operator diagnosis; public dashboards and charts no longer expose separate human, radio, local-brain, or duplicate qualified stream counters.</li>
+              <li><code>public/brain-monitor.html</code>, <code>public/brain-monitor.css</code>, and <code>public/brain-monitor.js</code> show who is listening now, current track, last action, next action, errors, queue backlog, per-brain activity mix, stream impact, recent receipts, and neural-map visuals with a tight heartbeat/SSE-compatible status path.</li>
+              <li>The public hub, Brain room, Stream Room, artist dashboard, and walkthrough now link into the monitor so the operations lane is discoverable without burying it behind a fake dashboard.</li>
+              <li>Local proof passed Worker/player/monitor syntax, daemon smoke, allocation proof, artist-brain tooling proof, Spotify-level proof, Spotify parity proof, radio tracking proof, mounted Worker stress, and MCP mining with only the optional <code>design_luxury_audit</code> miss. Headed live-browser proof was owner-waived for this closeout.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/public/brain-monitor.html">Mounted Monitor</a></span><span><a href="https://skye-music-nexus.pages.dev/public/brain-monitor.html" target="_blank" rel="noopener">Standalone Monitor</a></span><span><code>test-artifacts/skyemusicnexus-artist-brain-daemon-smoke-2026-05-26T06-20-17-760Z/receipt.json</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-artist-brain-allocation-latest.json</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-artist-brain-tooling-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="superide-command-bridge-skyehawk-sovereign-stack">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SuperIDE Command Bridge + Sovereign Stack Promotion</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SuperIDE</span><span>0S discovery</span><span>Command Bridge</span><span>SkyErrors</span><span>Skye Hawk</span><span>Gate-only AI</span></div>
+            <h2>SuperIDE is now promoted into gated 0S discovery with command-bridge memory and shared runtime signals.</h2>
+            <p>This pass keeps SuperIDE behind the shared FS27/SkyGate/Free99 lane, adds a curated SkyWay and 0S launcher entry, wires publishing actions into the 0S command bridge, and extends the copied Skye Hawk living-field source from a marketing-only asset into the greater 0S. SkyErrors is registered as sovereign observability backed by Helper K4i, KV, command bridge observability, and CitadelDB mirroring. The earlier SKNore placeholder was removed after source search found no real mounted payload.</p>
+            <ul class="release-points">
+              <li><code>SuperIDE / DeVisional Riftx</code>, <code>0S Command Bridge</code>, <code>SkyErrors</code>, and <code>Skye Hawk Source Cockpit</code> are now discoverable through the 0S launcher and SkyWay while staying under the 0S gate.</li>
+              <li><code>/assets/js/0s-command-bridge.js</code> now forwards shared gate headers from Free99/SkyGate/MetrAIyux sessions before posting events, so app signals do not create their own auth lane.</li>
+              <li>SuperIDE now emits gate-owned command-bridge events for preview builds, author packages, blog packages, SkyPay checkout intents, signed workspace exports, diagnostics, publishing smokes, and accepted gate sessions.</li>
+              <li><code>marketing/assets/skyehawk-os.js</code> is now copied byte-for-byte into <code>/skyehawk/source/skyehawk-os.original.js</code>, and <code>/assets/js/skyehawk-os.js</code> preserves the original <code>mountSkyeSolLivingBackground</code> contract while adding shared 0S command bridge capture.</li>
+              <li>The Worker command bridge catalog now names the route <code>Skye Hawk Source Cockpit</code> with source-copy, living-field, and surface-attention records instead of the earlier generic runtime label; the dead <code>/sknore</code> placeholder was removed instead of advertised.</li>
+              <li>The live surface registry and platform integration ledger were updated with the SuperIDE, SkyErrors, and Skye Hawk boundaries, with SKNore removed because no real source exists in the current workspace.</li>
+              <li>The main 0S home and SkyErrors surface now also load the shared command bridge and Skye Hawk runtime, so the broader 0S shell emits the same gate-owned surface signals as the launcher, SkyWay, and SuperIDE.</li>
+              <li>end-to-end infra proof confirmed <code>/api/skyerrors/status</code>, <code>/api/helper-k4i/status</code>, <code>/api/citadel/health</code>, <code>POST /api/skyerrors/events</code>, and Citadel mirror storage are live through the shared gate.</li>
+              <li>Non-browser verification passed for JS syntax, Worker syntax, JSON registries, SkyWay manual routes, SuperIDE build, gateway-only policy, external AI endpoint ban, secure defaults, provider-string ban, and protected app manifest refresh. Browser verification remains owner-handled per the repo policy.</li>
+              <li>Production HTTP smoke passed with the Worker version recorded in the end-to-end receipt: unauthenticated gated routes redirect to owner login, authenticated SuperIDE/SkyWay/launcher/Skye Hawk pages render, command bridge status lists the real surfaces, and SuperIDE, Skye Hawk, and SkyErrors events post successfully.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../DeVisional%20Riftx/app/">Open SuperIDE</a></span><span><a href="../founder-command/apps/0s-command-bridge/index.html">Open Command Bridge</a></span><span><a href="../skyehawk/">Open Skye Hawk Source Cockpit</a></span><span><code>metraiyux_0s_site/DeVisional Riftx/MCP_TOOLING_RECEIPT.json</code></span><span><code>test-artifacts/direct-mcp/DeVisional Riftx-mcp-tooling-receipt.json</code></span><span><code>test-artifacts/superide-command-bridge/end-to-end-production-2026-05-26.json</code></span><span><code>test-artifacts/skyehawk-source-cockpit/production-smoke-2026-05-26.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="founder-command-0meg4command-67-repo-vault-song-vault">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">0meg4Command 6.7 Founder Command Recovery Pass</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Founder Command</span><span>0meg4Command 6.7</span><span>Dropdown menu</span><span>Song Vault</span><span>Repo Vault</span><span>SkyeVault</span><span>Production smoke</span></div>
+            <h2>Founder Command now has the cleaner dropdown, browser-playable song vault, full-drive repo index, and a backup download lane.</h2>
+            <p>This pass moved the owner recovery assets into the Founder Command browser surface and shipped the cleaner menu requested for 0meg4Command 6.7. The same-domain Worker mint route is still recorded as a Worker-to-Worker 404 in the production smoke receipt, so the live full-backup button now falls back through SkyeVault Drop from the browser with the shared gate bearer. Short-lived signed URLs stay out of the changelog and receipts.</p>
+            <ul class="release-points">
+              <li>The bunched Founder Command navigation is now a dropdown, with Command, Songs, Repo Vault, Repo Memory, Backup, clients, mailboxes, and the other owner rooms reachable without crowding the header.</li>
+              <li><code>metraiyux_0s_site/founder-command/song-vault/</code> now holds 34 browser-downloadable songs totaling 142,152,449 bytes. Playback fetches gated audio as blobs before handing it to the player, and each song has direct browser download controls.</li>
+              <li><code>im-the-man.wav</code> remains too large for direct Worker asset upload, so its deploy-safe split parts are staged under <code>song-vault/parts/audio/original-masters/im-the-man.wav/</code> while the manifest keeps the source recorded.</li>
+              <li>Repo Vault now exposes the autosync proof, proof log, vault map, full manifest summary, and 66 chunked project-manifest files, with <strong>Load Full Drive</strong> and <strong>Download Loaded Index</strong> controls in Founder Command.</li>
+              <li>The full repo backup button targets receipt <code>cdv_5c8b6219ee8bcdee269c1e4e</code> for <code>MetrAIyux-0S-full-repo-20260526T020348Z.tar.zst.enc</code>, a 1,436,808,128 byte encrypted backup kept in SkyeVault custody.</li>
+              <li>The 0S deploy stager now explicitly includes proof JSON, Repo Vault manifest chunks, and the vault map; the Founder Command static route serves the current Worker asset bundle instead of the stale SkyeNet mount.</li>
+              <li>Production smoke confirmed the browser fallback minted a signed backup link through the shared gate lane, while preserving the honest caveat that the same-domain mint route still returned 404 during the receipt run.</li>
+              <li>The vault autosync daemon was confirmed running with PID <code>9968</code>; the latest full success at verification time was <code>2026-05-26T02:30:26.226Z</code>, and the deployed Worker version was <code>c70fe812-3083-4c7c-b672-1e4fe372b2b1</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../founder-command/?view=repo-vault">Open Founder Repo Vault</a></span><span><a href="../founder-command/?view=songs">Open Song Vault</a></span><span><a href="../api/founder-command/repo-vault">Repo Vault API</a></span><span><code>test-artifacts/founder-command/0meg4command-full-repo-backup-download-prod-smoke-2026-05-26.json</code></span><span><code>test-artifacts/founder-command/0meg4command-song-playback-prod-smoke-2026-05-26.json</code></span><span><code>test-artifacts/founder-command/0meg4command-menu-full-drive-prod-smoke-2026-05-26.json</code></span><span><code>metraiyux_0s_site/founder-command/MCP_TOOLING_RECEIPT.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-social-pr-contest-parity">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Social PR Contest Parity</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Social feed</span><span>PR brain</span><span>Contests</span><span>Featured blogs</span><span>SkyeNet queue</span></div>
+            <h2>Music Nexus now has a real social and public-relations lane around the music platform.</h2>
+            <p>The feed side now works as a living artist network: posts, stories, reactions, comments, follows, saves, boosts, connected publishing queues, contest entries, winner packages, and feature-blog drafts all sit beside the canonical player and artist storefronts.</p>
+            <ul class="release-points">
+              <li><code>public/feed.html</code> now carries the user-facing social room with story rail, feed composer, feed cards, artist actions, trending releases, connector status, PR brain controls, contest controls, and publish queues.</li>
+              <li><code>public/contests.html</code> adds a focused contest command center for opening featured-artist contests, taking artist/fan entries, drawing winners, preparing feature packages, and queueing owner-approved PR outputs.</li>
+              <li>The 0S Worker now exposes <code>music-contests</code> next to <code>music-social</code>, stores social/contest state in the Music Nexus hub envelope, rejects unsafe submitted URLs, and keeps contest backlinks marked pending review with <code>ugc nofollow</code> handling.</li>
+              <li>The local PR brain can turn a release, artist, or contest winner into a featured blog packet, social feed post, marketing package, and SkyeNet deployment intent without requiring an AI provider.</li>
+              <li>Headed browser proof found and fixed the required contest-entry/draw select flow: newly created contests and packages now auto-select in required next-step forms while optional PR contest selectors stay blank until chosen.</li>
+              <li>Connected social publishing is explicit about provider-token readiness: missing Pixelfed/Mastodon-compatible tokens return <code>provider-token-required</code> receipts instead of pretending a remote publish happened.</li>
+              <li>Cloudflare Pages deployed preview <code>https://3ab8d100.skye-music-nexus.pages.dev</code>; production is <code>https://skye-music-nexus.pages.dev</code>. The 0S Worker feature/API deploy shipped as version <code>e10973fb-a40a-47f5-8c9d-d3d8f0fbddd4</code> before changelog closeout.</li>
+              <li>Proof passed Worker syntax, browser JS syntax, <code>node metraiyux_0s_site/tests/skyemusicnexus-social-pr-parity-proof.mjs</code>, direct production smoke, and headed live browser proof with desktop/mobile clicks, forms, scroll stops, screenshots, console/network inspection, and mounted-gate redirect proof.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="https://skye-music-nexus.pages.dev/public/feed.html">Open Social Feed</a></span><span><a href="https://skye-music-nexus.pages.dev/public/contests.html">Open Contests</a></span><span><a href="https://skye-music-nexus.pages.dev/public/ads.html">Open Ads</a></span><span><a href="https://skye-music-nexus.pages.dev/public/library.html">Open Library</a></span><span><a href="https://3ab8d100.skye-music-nexus.pages.dev/public/feed.html">Preview Feed</a></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-social-pr-parity-latest.json</code></span><span><code>test-artifacts/live-browser-verifier/skyemusicnexus-social-pr-parity-latest.json</code></span><span><code>test-artifacts/cloudflare-pages/skye-music-nexus-direct-upload-receipt.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-spotify-level-parity">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Spotify-Level Parity</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Spotify parity</span><span>Player</span><span>Library</span><span>Artist stats</span><span>Cloudflare</span></div>
+            <h2>Music Nexus now behaves like a streaming platform instead of a collection of loose rooms.</h2>
+            <p>The platform pass adds a real app shell, persistent canonical player, shared saved library, user playlists, system playlists, artist dashboards, owner stats, achievement rewards, ad proof, local-brain/workforce proof, and one unified Nexus stream count.</p>
+            <ul class="release-points">
+              <li><code>SkyeMusicNexus/index.html</code>, <code>public/nexus-home.css</code>, and <code>public/nexus-home.js</code> now make the first screen a Browse/Library/Create music app with playable shelves, stations, queue rail, live stats, and artist/store/studio handoffs.</li>
+              <li><code>public/library.html</code>, <code>public/library.css</code>, and <code>public/library.js</code> add saved tracks, personal playlists, import/export, system playlist handoffs, and a shared <code>skymusicnexus.playerLibrary.v1</code> schema with the player and Discover.</li>
+              <li><code>public/nexus-player.js</code> persists current track, queue, radio mode, playback time, and resume state while posting browser-safe public telemetry to the real 0S Worker stream summary.</li>
+              <li><code>public/artist-dashboard.html</code> and <code>public/artist-dashboard.js</code> now show artists and Gray Gang ownership live stream totals, top tracks, readiness state, milestone badges, and stale-data status from <code>traffic-summary</code>.</li>
+              <li>The Worker keeps a single <code>nexusStreams</code> stat, with play starts, completed plays, and listen seconds as supporting receipts; no public or internal chart path exposes split listener buckets.</li>
+              <li>Cloudflare Pages deployed preview <code>https://270d0633.skye-music-nexus.pages.dev</code>; production is <code>https://skye-music-nexus.pages.dev</code>. The 0S Worker feature/API deploy shipped as version <code>53bdf2ce-d3ec-49b2-99c3-7a65ed763eca</code>.</li>
+              <li>Proof passed the Spotify-level proof, playlist proof, UX redo proof, Spotify parity proof, radio tracking proof, achievements proof, ad-layer proof, mounted Worker stress, artist-brain tooling, and workforce bridge proof. MCP mining wrote a receipt; only the optional <code>design_luxury_audit</code> failed.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="https://skye-music-nexus.pages.dev/">Open Music Nexus</a></span><span><a href="https://skye-music-nexus.pages.dev/public/library.html">Open Library</a></span><span><a href="https://skye-music-nexus.pages.dev/public/artist-dashboard.html">Open Artist Stats</a></span><span><a href="https://skye-music-nexus.pages.dev/public/stream-analytics.html">Open Streams</a></span><span><a href="https://270d0633.skye-music-nexus.pages.dev/">Preview Deploy</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-spotify-level-proof-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-mounted-worker-stress-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-ad-layer-latest.json</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-artist-brain-tooling-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-workforce-bridge-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-artist-first-ux-closeout">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Artist-First UX Closeout</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Artists</span><span>Streams</span><span>Discovery</span><span>Cloudflare Pages</span><span>0S handoffs</span></div>
+            <h2>Music Nexus now opens like an artist-first music product instead of a scattered room list.</h2>
+            <p>The public front door was rebuilt into an app-style hub with navigation, search, discovery, charts, live artist stats, Gray Gang owner pulse, social/store/upload/DAW handoffs, and canonical player actions directly in the first screen.</p>
+            <ul class="release-points">
+              <li><code>SkyeMusicNexus/index.html</code>, <code>public/nexus-home.css</code>, and <code>public/nexus-home.js</code> now merge the playable catalog, the 30-app artist registry, and the 30-member Gray Gang collective registry into one organized front door.</li>
+              <li><code>public/artist-dashboard.html</code> and <code>public/artist-dashboard.js</code> give every artist, including local artist brains, a live stats room sourced from the real Worker <code>traffic-summary</code>; Gray/collective owner view sees the full roster pulse.</li>
+              <li>Stream analytics and achievements read public stats with <code>credentials: 'omit'</code>, keeping browser CORS from making real streams look like zeroes.</li>
+              <li>Standalone Pages 404 cleanup added local bridge shims, the missing <code>assets/og-card.svg</code> cover fallback, full Worker URLs for broader 0S handoffs, and a Pages Worker guard proving no browser-only globals remain in <code>_worker.js</code>.</li>
+              <li>Cloudflare Pages redeployed at preview <code>https://2c6eca03.skye-music-nexus.pages.dev</code>; production is <code>https://skye-music-nexus.pages.dev</code>.</li>
+              <li>Live direct production smoke wrote a stream event and read back <code>nexusStreams: 19</code>, 25 top tracks, and 6 top artists from the real Worker summary.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="https://skye-music-nexus.pages.dev/">Open Music Nexus</a></span><span><a href="https://skye-music-nexus.pages.dev/public/artist-dashboard.html">Open Artist Stats</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-ux-redo-live-direct-smoke-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-browser-stream-write-fix">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Browser Stream Write Fix</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Streams</span><span>Player</span><span>CORS</span><span>Cloudflare Pages</span></div>
+            <h2>The public player now writes stream events through the browser-safe production lane.</h2>
+            <p>The Worker could accept stream writes, but the public Pages player was sending credentialed cross-origin JSON telemetry. Browser CORS rules can reject that shape before the event becomes durable, leaving the local player ledger ahead of the real platform stats.</p>
+            <ul class="release-points">
+              <li><code>SkyeMusicNexus/public/nexus-player.js</code> now posts public telemetry with <code>credentials: 'omit'</code> and <code>text/plain;charset=UTF-8</code>, keeping the payload CORS-simple while still writing to the shared 0S Worker.</li>
+              <li>The local outbox retry path uses the same browser-safe transport, and the fallback beacon no longer sends JSON telemetry.</li>
+              <li>The focused radio tracking proof now posts a public-origin <code>qualified_stream</code> event as <code>text/plain</code> and proves the Worker summary increments <code>nexusStreams</code> for a real Gray Skyes track.</li>
+              <li>Production Pages redeployed at preview <code>https://82b785f1.skye-music-nexus.pages.dev</code>; live direct proof confirmed the production player file contains the new transport and a live stream write reads back through <code>traffic-summary</code>.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="https://skye-music-nexus.pages.dev/public/radio.html">Open Radio</a></span><span><a href="https://skye-music-nexus.pages.dev/public/stream-analytics.html">Open Streams</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-radio-tracking-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-unified-stream-counter">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-26">May 26, 2026</time>
+            <span class="release-version">SkyeMusicNexus Unified Stream Counter</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Streams</span><span>Charts</span><span>Radio</span><span>Artist brains</span><span>Cloudflare</span></div>
+            <h2>Music Nexus now carries one stream stat across player, charts, radio, and artist-brain listening.</h2>
+            <p>The platform stream model was corrected so every in-platform listener, including local artist brains, increments the same <code>nexusStreams</code> count. The UI no longer displays split human, radio, native-player, local-brain, or duplicate qualified-stream counters.</p>
+            <ul class="release-points">
+              <li><code>SkyeMusicNexus/public/nexus-player.js</code>, <code>radio.html</code>, <code>discover.html</code>, and <code>stream-analytics.html</code> now read and render one stream total while retaining play-start, completed-play, and listen-second movement receipts.</li>
+              <li><code>/api/skymusicnexus/music-drops?action=traffic-summary</code> now summarizes traffic with <code>nexusStreams</code> only; artist-brain listen actions still run and award the same stream counter.</li>
+              <li>The playlist catalog rebuilt to 48 tracks, 14 artists, 3 genre charts, and 5 system playlists with stream stat keys limited to <code>nexusStreams</code>, <code>playStarts</code>, <code>completePlays</code>, and <code>listenSeconds</code>.</li>
+              <li>The ElevenLabs route now prefers the old root key first, with key 2 retained only as fallback.</li>
+              <li>The standalone Pages edge guard was repaired by removing browser-only script code from <code>SkyeMusicNexus/_worker.js</code>, so Cloudflare Pages compiles the Worker cleanly.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/public/discover.html">Open Playlists</a></span><span><a href="../SkyeMusicNexus/public/radio.html">Open Radio</a></span><span><a href="../SkyeMusicNexus/public/stream-analytics.html">Open Streams</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-radio-tracking-proof-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-playlists-direct-smoke-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-two-more-gray-vox-duets">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">Two More Gray x Vox Duets</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Gray Skyes</span><span>Vox Selene</span><span>R&amp;B duets</span><span>Product rooms</span><span>Playlists</span></div>
+            <h2>Gray and Vox now have two more duet records where Gray sings too.</h2>
+            <p><code>Slow Rain Reply</code> and <code>Stay Through Static</code> extend the Vox Gray Modes lane with two more clean English duet songs. Both were generated as full 180-second records, with Gray singing in hooks/pre-hooks/bridge sections and Vox staying present as a co-lead instead of a background feature.</p>
+            <ul class="release-points">
+              <li><code>Slow Rain Reply</code> is a 2,881,455-byte Gray x Vox slow-ballad duet with Gray sung hook moments, Vox answer lines, shared hook, drop room, product records, split sheet, Pics2Vid package, and song-creation receipt.</li>
+              <li><code>Stay Through Static</code> is a 2,880,619-byte Gray x Vox cinematic R&amp;B duet with Gray sung pre-hooks/final hook, Vox lead bridge, drop room, product records, split sheet, Pics2Vid package, and song-creation receipt.</li>
+              <li>The Vox Gray Modes release is now a 6-track package; the playlist catalog is now 46 tracks, 13 artists, 3 genre charts, and 5 system playlists.</li>
+              <li>The R&amp;B/Soul chart now classifies <code>Midnight R&amp;B Mode</code>, <code>Slow Rain Reply</code>, and <code>Stay Through Static</code> as R&amp;B/Soul instead of inheriting Gray's rock/industrial profile lane.</li>
+              <li>Gray and Vox product rooms were rebuilt so the new products open as fan-facing product surfaces instead of raw product JSON.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/slow-rain-reply/">Open Slow Rain Reply</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/stay-through-static/">Open Stay Through Static</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/vox-gray-modes/">Open Vox Gray Modes</a></span><span><code>test-artifacts/reflection-and-collective-drops/execute-1779745959645.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-vox-gray-modes-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-canonical-player-streams-midnight-duet">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">Music Nexus Player, Streams, and Midnight R&amp;B Duet Repair</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Canonical player</span><span>Realtime streams</span><span>Charts</span><span>Vox Selene</span><span>Gray Skyes</span></div>
+            <h2>Music Nexus now has the site-wide player, real chart art, stream telemetry, and a rebuilt Gray x Vox R&amp;B duet.</h2>
+            <p>This pass replaces the weak Midnight R&amp;B Mode generation with a lyric-first Gray Skyes x Vox Selene duet and tightens the platform mechanics around playback. The catalog now uses real artist/drop images, chart rows can open the canonical player, stream events write through the Music Nexus telemetry lane, and the stream room renders live neural-map style visuals from local and Worker-backed listener events.</p>
+            <ul class="release-points">
+              <li><code>Midnight R&amp;B Mode</code> was regenerated as a 180-second English duet with explicit back-and-forth lyrics, Vox as a co-lead, Gray as the melodic male lead, and a 90s slow-jam / dark alt-R&amp;B direction without naming or imitating any real artist.</li>
+              <li>The new audio checksum is shared across the Gray drop, Vox Gray Modes release copy, and song-creation bin; the prompt, creation receipt, FS27/DeVisional Riftx submission receipt, storefront product, and Pics2Vid package remain attached.</li>
+              <li><code>SkyeMusicNexus/public/nexus-player.js</code> and <code>nexus-player.css</code> add a canonical bottom player, queue drawer, next-track behavior, saved local library, media-session metadata, canvas visualizer, and stream ledger.</li>
+              <li><code>SkyeMusicNexus/public/stream-analytics.html</code> adds the realtime Stream Room with a neural-map canvas, remote traffic summary reads, local stream ledger merge, top tracks, top artists, and event feed.</li>
+              <li>The playlist builder now emits 44 tracks, 13 artists, 3 genre charts, 5 system playlists, real cover images, public Pages audio URLs, local audio mirrors, product ids, and stream telemetry metadata.</li>
+              <li>The Worker now records public listener events through <code>/api/skymusicnexus/music-drops</code> using the <code>track-public-event</code> action while keeping artist-brain system discovery listens separate from public stream counts and payout logic.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/public/discover.html">Open Playlists</a></span><span><a href="../SkyeMusicNexus/public/stream-analytics.html">Open Streams</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/midnight-r-and-b-mode/">Open Midnight R&amp;B Mode</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/vox-gray-modes/">Open Vox Gray Modes</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-spotify-parity-proof-latest.json</code></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-vox-gray-modes-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-vox-gray-modes-release">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeMusicNexus Vox Gray Modes Release</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Vox Selene</span><span>Gray Skyes</span><span>Gray Skyes Brain</span><span>R&B Mode</span><span>Pics2Vid</span></div>
+            <h2>Vox Selene and Gray Skyes shipped a four-song mode pack.</h2>
+            <p><strong>Vox Gray Modes</strong> adds a Vox solo single, a Vox x both Grays collaboration, a Gray x Vox trap-metal/ragecore record, and a Gray x Vox hip-hop/R&B record.</p>
+            <ul class="release-points">
+              <li>Generated and packaged <code>Soft Ghost Protocol</code>, <code>Mirror Chat</code>, <code>Redline Heart</code>, and <code>Midnight R&amp;B Mode</code>.</li>
+              <li>Added Gray's Hip-Hop R&amp;B Mode to the public Gray Skyes profile and personality profile.</li>
+              <li>Published storefront products, drop PWAs, creation receipts, Pics2Vid packages, and playlist entries for all four songs.</li>
+              <li>Kept Worker raw MP3 delivery SkyPay-protected while the release/drop players use public Pages audio URLs for playable browser playback.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/vox-gray-modes/">Open Vox Gray Modes</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/artist-live-browser-20260523062845/drops/soft-ghost-protocol/">Open Vox Single</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/midnight-r-and-b-mode/">Open Gray R&amp;B Drop</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-vox-gray-modes-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-crooked-reflection-gray-gang-release">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeMusicNexus Crooked Reflection Gray Gang Release</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Gray Gang</span><span>Crooked Reflection</span><span>Artist Storefronts</span><span>Cloudflare Pages Routing</span><span>Pics2Vid</span></div>
+            <h2>Gray Gang now has a bundled Crooked Reflection release, new collab songs, product-count storefront cards, and Pages prefix routing.</h2>
+            <p>This pass generated three new real audio drops, packaged them as storefront products with split-aware collaborator records and Pics2Vid handoffs, then bundled the active Gray Gang catalog into <code>Crooked Reflection</code> by Gray Gang Collective, a partner of the Skye Music Nexus.</p>
+            <ul class="release-points">
+              <li>Generated <code>Skyline Pact</code> for Gray Skyes x Gray Skyes Brain x Music 4u x Jessa Walsh, <code>Neon Drift Relay</code> for Kairo Vale x Kaiya Drift x Lena Flux x Music 4u, and <code>Close The Mirror</code> as the closing Gray Skyes solo track.</li>
+              <li>Wrote PWA drop rooms, real MP3 files, product records, collaborator product records, split sheets, feed/store registrations, and Pics2Vid packages for all three songs.</li>
+              <li>Built <code>artist-storefronts/gray-skyes-collective/releases/crooked-reflection/</code> as a 31-track collective release room with the three new Crooked Reflection cuts pinned first.</li>
+              <li>Added Cloudflare Pages redirects so <code>/SkyeMusicNexus/*</code> links on <code>skye-music-nexus.pages.dev</code> resolve into the standalone Pages route instead of a dead/plain-text path.</li>
+              <li>Rebuilt the storefront registry cards so each artist portrait displays product count and live product count while keeping fan links on live storefront/product/drop surfaces.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/crooked-reflection/">Open Crooked Reflection</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/">Open Artist Stores</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-crooked-reflection-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-playlists-charts-user-queues">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeMusicNexus Playlists, Genre Charts, and User Queues</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Playlists</span><span>Charts</span><span>Genres</span><span>Artist Storefronts</span><span>Local Library</span></div>
+            <h2>Discover is now a real playlist and chart surface backed by active artist storefront products.</h2>
+            <p>The Music Nexus Discover room now builds its catalog from actual storefront product records and playable audio instead of placeholder songs. It exposes an overall Nexus playlist, trending, new drops, Gray x Gray signal, Pics2Vid-ready queue, genre charts, artist movement, playable track rows, drop/store links, and user-created playlists stored locally with import/export.</p>
+            <ul class="release-points">
+              <li>Added <code>tools/founder-command/build-skyemusicnexus-playlists.mjs</code> to scan artist storefront products and publish <code>SkyeMusicNexus/public/data/playlists.json</code>.</li>
+              <li>Generated a catalog with 36 playable tracks, 13 active artists, 3 genre chart buckets, and 5 system playlists.</li>
+              <li>Rebuilt <code>SkyeMusicNexus/public/discover.html</code> into a queue/player surface with search, system playlists, genre tabs, artist charts, store/drop/visual links, and local user playlist creation.</li>
+              <li>Added proof coverage in <code>metraiyux_0s_site/tests/skyemusicnexus-playlists-proof.mjs</code> to confirm real audio file references, schema, controls, and no old placeholder tracks.</li>
+              <li>Added the Playlists lane to the Music Nexus front door hero and room grid.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/public/discover.html">Open Playlists</a></span><span><a href="../SkyeMusicNexus/public/data/playlists.json">Catalog JSON</a></span><span><code>test-artifacts/reflection-and-collective-drops/skyemusicnexus-playlists-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-gray-x-gray-collabs-pics2vid">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeMusicNexus Gray x Gray Collabs + Pics2Vid Packaging</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Gray Gang</span><span>Reflection</span><span>ElevenLabs</span><span>Still2Vid</span><span>SkyePics</span></div>
+            <h2>Two more Gray Skyes x Gray Skyes Brain collabs are generated and packaged with artist-image visual handoffs.</h2>
+            <p>The Reflection project now has seven tracks. <code>Twin Signal</code> and <code>Proof Engine</code> were generated as real <code>audio/mpeg</code> drops, registered as active $4.44 storefront products for both Gray Skyes and Gray Skyes Brain, copied into the Reflection project audio folder, and packaged with artist images for the visual-drop lane.</p>
+            <ul class="release-points">
+              <li>Added <code>new-gray-collabs</code> scope to the Founder Command drop factory so the requested Gray x Gray collabs can be generated without rerendering the whole project.</li>
+              <li>Generated <code>Twin Signal</code> and <code>Proof Engine</code> as real audio files, each with drop PWA pages, manifests, service workers, product records, collaborator split sheets, and Music Nexus feed registration.</li>
+              <li>Added a Pics2Vid/Still2Vid release package to each new drop with seven real Gray/Brain image assets, audio reference, package JSON, visual package page, Still2Vid Forge handoff, and SkyePics handoff.</li>
+              <li>Rebuilt the Gray Skyes and Gray Skyes Brain product rooms so eligible products expose a fan-safe <code>Visual Pack</code> action instead of hiding the visual package in raw data.</li>
+              <li>Updated the Reflection project page and manifest to show seven tracks and visual-package links for the new collabs.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/artist-storefronts/reflection/">Open Reflection</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/twin-signal/">Open Twin Signal</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/drops/proof-engine/">Open Proof Engine</a></span><span><code>test-artifacts/reflection-and-collective-drops/latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-artist-storefront-product-room-redo">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeMusicNexus Artist Storefront Product Room Redo</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Artist Storefronts</span><span>Product Rooms</span><span>SkyePay</span><span>PWA Drops</span><span>Static Proof</span></div>
+            <h2>Artist storefront product clicks now route to real product rooms instead of raw JSON records.</h2>
+            <p>This pass rebuilds the artist commerce packaging layer across the storefront registry, artist-app registry, local artist rollups, and every artist product lane. Fan-facing actions now resolve to preview, drop/PWA, SkyePay checkout, and share controls, while product JSON stays as a backing record only.</p>
+            <ul class="release-points">
+              <li>Generated <code>products/index.html</code> product rooms for all 31 artist lanes, including queued artists with no product file yet.</li>
+              <li>Rebuilt the root storefront registry and artist-app registry so primary cards open product rooms and working storefront/app surfaces.</li>
+              <li>Removed public <code>Live Product Record</code>, <code>Product Blueprint</code>, and <code>products/products.json</code> hrefs from artist storefront HTML.</li>
+              <li>Added product-room styling for catalog selectors, preview audio, drop links, SkyePay checkout, share actions, and queued checkout states.</li>
+              <li>Added a proof guard that scans 115 storefront HTML files and verifies product-room links, labels, and local route targets.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeMusicNexus/artist-storefronts/">Open Artist Stores</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/dj-ajay/products/">Open DJ Ajay Products</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes/products/">Open Gray Products</a></span><span><code>node metraiyux_0s_site/tests/skyemusicnexus-artist-storefront-product-ux-proof.mjs</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="founder-command-superide-skyecalendar-skyedocx-blog">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">Founder Command SuperIDE SkyeCalendar + SkyeDocx Blog Promotion</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Founder Command</span><span>SuperIDE SkyeCalendar</span><span>SkyeDocx Blog</span><span>Skyeway</span><span>FS27 Gate</span><span>Direct Smoke</span></div>
+            <h2>The 0S now serves the copied SuperIDE SkyeCalendar and a promoted SkyeDocx Blog lane without exposing SuperIDE in Skyeway.</h2>
+            <p>This pass replaces the earlier native substitute with the actual SuperIDE SkyeCalendar source, mounts the served copy into Founder Command, and promotes the missing SuperIDE SkyeBlog idea into Marketing Made Easy as SkyeDocx Blog. DeVisional/SuperIDE remains gated and private while only the needed suite pieces are surfaced.</p>
+            <ul class="release-points">
+              <li>Copied the actual SuperIDE SkyeCalendar source from <code>SuperIDEv3.zip</code> into <code>DeVisional Riftx/public/SkyeCalendar/</code> and mounted the adapted copy at <code>/founder-command/apps/0s-calendar/</code>.</li>
+              <li>Removed the old standalone SuperIDE auth scripts and Google font provider call from the served mount, replacing them with the shared FS27/SkyGate/Free99 lane and the Founder Command calendar API.</li>
+              <li>Kept SuperIDE's month/week/agenda, recurring events, drag scheduling, conflict gate, dependency timeline, workload heatmap, reminder audit, and importable <code>.ics</code> export.</li>
+              <li>Added <code>/Marketing-Made-Easy/SkyeDocxBlog/</code> as a provider-free editorial package builder for SkyeDocxMax, SovereignDocs, DeVisional, and SkyeNet handoffs.</li>
+              <li>Updated SkyeDocxMax so its SkyeBlog push opens the new SkyeDocx Blog route and passes drafts through <code>skye.blog.bridgeDraft</code>.</li>
+              <li>Regenerated Skyeway route inventory so <code>SkyeDocxBlog</code> and <code>0s-calendar</code> are discoverable while <code>DeVisional</code> and <code>devisional-riftx</code> are not.</li>
+              <li>Deployed the current 0S Worker and completed direct HTTP smoke for gate redirects, authenticated app loads, route inventory, and calendar API ledger reads. Headed browser proof was intentionally skipped for this pass because owner live verification was requested.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../founder-command/apps/0s-calendar/">Open SuperIDE SkyeCalendar</a></span><span><a href="../Marketing-Made-Easy/SkyeDocxBlog/">Open SkyeDocx Blog</a></span><span><code>npm run 0s:calendar:proof</code></span><span><code>npm run 0s:skyedocx-blog:proof</code></span><span><code>metraiyux_0s_site/docs/HANDOFF_2026-05-25_SUPERIDE_CALENDAR_MUSIC_NEXT.md</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="zero-os-command-bridge-crm-spine">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">0S Command Bridge CRM Spine</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>Founder Command</span><span>CRM</span><span>Nexus</span><span>SkyeCommerce</span><span>SkyeMusicNexus</span><span>Stress</span></div>
+            <h2>The 0S now has a shared command bridge for CRM, audit, intent, and app awareness.</h2>
+            <p>This pass turns the neural-bridge idea into a live shared 0S surface: Founder Command can see cross-app CRM events, product intent, music activity, storefront visits, and commerce audit signals from one gated owner lane.</p>
+            <ul class="release-points">
+              <li>Added <code>/api/0s-command-bridge/status</code>, <code>/events</code>, <code>/graph</code>, and <code>/crm-ledger</code> on the main Worker behind shared 0S gate/operator auth.</li>
+              <li>Added the Founder Command app at <code>/founder-command/apps/0s-command-bridge/</code> and listed it in the owner command catalog.</li>
+              <li>Added the shared browser capture shim at <code>/assets/js/0s-command-bridge.js</code> and wired it into Nexus CRM, SkyeCommerce public surfaces, SkyeMusicNexus root pages, artist storefronts, and PWA Factory.</li>
+              <li>Mirrored Nexus receipt creation, SkyeMusicNexus runtime events, and SkyeCommerce audit events into the shared <code>SITE_EVENTS_KV</code> command bridge ledger without exposing raw private profile payloads.</li>
+              <li>Direct live proof passed every check, including unauthenticated gate redirect, app load, bridge script deployment, Nexus/artist linkage, changelog/valuation updates, manual event write, MusicNexus bridge event, SkyeCommerce product audit mirror, graph/status APIs, and stress traffic. The latest receipt records the exact Worker version and run metrics.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../founder-command/apps/0s-command-bridge/">Open 0S Command Bridge</a></span><span><a href="../nexus/crm-records.html">Nexus CRM</a></span><span><a href="../SkyeCommerce/">SkyeCommerce</a></span><span><a href="../SkyeMusicNexus/artist-storefronts/gray-skyes-collective/">Gray Gang Collective</a></span><span><code>test-artifacts/0s-command-bridge/live-direct-proof-latest.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="devisional-riftx-copied-source-fs27">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">DeVisional Riftx Copied Source FS27 Mount</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>DeVisional Riftx</span><span>FS27</span><span>SkyPay</span><span>0S Gate</span><span>Copied Source</span></div>
+            <h2>DeVisional Riftx is now a copied 0S platform source, not a wrapper around a donor zip.</h2>
+            <p>The full SuperIDEv2 Sovereign Author Publishing System source now lives inside <code>metraiyux_0s_site/DeVisional Riftx</code>. The copied platform code owns its app shell, platform modules, server routes, scripts, fixtures, and proof assets while authentication, payment, and external dispatch boundaries are rerouted through the shared 0S lanes.</p>
+            <ul class="release-points">
+              <li>Removed app-local passphrase/JWT ownership and added an FS27/SkyGate/Free99 gate module for shared bearer sessions.</li>
+              <li>Replaced direct provider payment execution with SkyPay checkout handoffs and FS27-tracked commerce receipts.</li>
+              <li>Replaced external vendor portal dispatch with FS27 owner-approval publishing receipts and SkyeNet package handoff planning.</li>
+              <li>Mounted the real copied browser app in the 0S catalog and Worker asset stage at <code>/DeVisional%20Riftx/app/</code>, with <code>/devisional-riftx</code> as the gated shortcut.</li>
+              <li>Published the copied browser app through SkyeNet at <code>/skyenet/devisional-riftx/</code> and marked that route as a private 0S surface so shared FS27 gate context reaches the runtime.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../DeVisional%20Riftx/app/">Open DeVisional Riftx</a></span><span><a href="../skyenet/devisional-riftx/">SkyeNet route</a></span><span><code>npm run 0s:devisional-riftx:proof</code></span><span><code>metraiyux_0s_site/DeVisional Riftx/CHANGELOG.md</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyecommerce-owner-commerce-spine">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">SkyeCommerce Owner Commerce Spine</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeCommerce</span><span>SkyPay</span><span>Music Nexus</span><span>SkyeNet</span><span>Workforce</span><span>Stress</span></div>
+            <h2>SkyeCommerce now behaves like the 0S commerce replacement lane, not a detached store app.</h2>
+            <p>This pass connects the storefront question back to the real 0S operating model: shared Gate onboarding, SkyPay collection into the company account, merchant/order receivable identifiers, internal payout readiness, Music Nexus attachment, plan-limited storefront usage, SkyeNet publish intent caps, SovereignDocs support, and 0S app bridge links.</p>
+            <ul class="release-points">
+              <li>Merchant Command now exposes a launch wizard powered by <code>/api/merchant/onboarding-readiness</code>, with direct bridge links into Gate, SkyPay, Workforce packet intake, packet inbox, SovereignDocs, SkyeNet, Music Nexus, SkyeRouteX, and canonical AE Flow.</li>
+              <li>SkyeCommerce keeps the sovereign money model: customers pay through SkyPay/Stripe-backed checkout, funds land with Skyes Over London, and SkyeCommerce tracks merchant/store/order/payment identifiers plus internal payout readiness instead of forcing merchants into Stripe Connect.</li>
+              <li>Music Nexus store now exposes artist storefront analytics and a plan-limited <code>publish-skynet-storefront</code> action, blocking Free99 SkyeNet publish and enforcing paid monthly publish caps.</li>
+              <li>The storefront received a restrained SKrucible-style visual pass with tighter radii, gold/mint command accents, stronger store hero treatment, and launch-readiness/0S-bridge controls.</li>
+              <li>The artist storefront guide now explains the non-technical first-run path: profile, store plan, product, SkyeCommerce attachment, SovereignDocs, contractor/vendor paperwork, SkyPay checkout, fulfillment, and SkyeNet publish review.</li>
+              <li>0S Worker version <code>3cf4d670-7885-4c7d-a7b5-f13d55f147d1</code> is deployed. Full SkyeCommerce tests passed <code>155/155</code>; post-deploy SkyeCommerce stress passed with <code>0</code> failed requests and p95 <code>138 ms</code>; Music Nexus mounted Worker stress passed <code>216</code> workflow actions and <code>72</code> read-stress requests.</li>
+              <li>Boundary remains honest: third-party outbound PayPal/CashApp execution is still operator/company payout execution, while the 0S records payout methods, paperwork readiness, receivables, and disbursement state.</li>
+            </ul>
+            <div class="receipt-row"><span><a href="../SkyeCommerce/merchant/">Merchant Command</a></span><span><a href="../SkyeMusicNexus/public/store.html">Music Store</a></span><span><a href="../SkyeMusicNexus/docs/ARTIST_STOREFRONT_GUIDE.md">Artist Guide</a></span><span><code>test-artifacts/skyecommerce-live-production-stress/2026-05-25T06-38-42-512Z-stress.json</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-mounted-worker-stress-2026-05-25T06-38-41-273Z.json</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-artist-brain-local-tooling">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">Music Nexus Artist Brain Tooling</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>Artist brains</span><span>Local intelligence</span><span>Brand tools</span><span>WebCreator</span><span>SkyeMeter</span><span>Shared gate</span></div>
+            <h2>Artist brains now build useful local assets and interact with the network instead of posting filler.</h2>
+            <p>The Music Nexus brain lane now treats artists as living 0S participants. Without requiring an external AI provider, a brain can use artist memory, release records, store products, and network activity to create brand kits, logo briefs, landing-page plans, campaign briefs, press-kit drafts, and RouteX launch-package handoffs.</p>
+            <ul class="release-points">
+              <li><code>/api/skymusicnexus/music-brain</code> now returns a mounted 0S tool catalog plus retained <code>toolRuns</code>, and supports <code>build-tool-asset</code>/<code>run-tool</code>/<code>create-tool-run</code> for provider-free local assets.</li>
+              <li>Generated posts and replies now use release/store/memory/tool context, ask concrete questions, and avoid the old generic filler phrases.</li>
+              <li>Local brain cycles can build tool assets, publish a useful feed post, stream another artist release, leave a meaningful network comment, and award SkyeMeter points for tool and stream activity.</li>
+              <li>The Brain room UI now exposes mounted tool handoffs for BrandID Offline PWA, kAIxU BrandKit, SkyeWebCreatorMax, BrandForge local intelligence, SkyeDocxMax, and RouteXFlow.</li>
+            </ul>
+            <div class="receipt-row"><span><code>npm run 0s:skyemusicnexus:brain-tools</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-artist-brain-tooling-latest.json</code></span><span><code>node --check metraiyux_0s_site/cloudflare/worker.js</code></span><span><code>node --check metraiyux_0s_site/SkyeMusicNexus/public/neo-nexus.js</code></span></div>
+          </div>
+        </article>
+
+        <article class="release-entry" id="skyemusicnexus-workforce-command-bridge">
+          <div class="release-meta">
+            <time class="release-date" datetime="2026-05-25">May 25, 2026</time>
+            <span class="release-version">Music Nexus Workforce Bridge</span>
+          </div>
+          <div class="release-body">
+            <div class="tag-row"><span>SkyeMusicNexus</span><span>SkyeRouteX</span><span>Workforce jobs</span><span>Assignments</span><span>Proof</span><span>Payout ledger</span><span>Shared gate</span></div>
+            <h2>Music Nexus can now create real Workforce Command jobs instead of only talking about RouteXFlow.</h2>
+            <p>The bridge is first-party inside the 0S Worker: Music Nexus owns the artist, release, drop, and package context while RouteX owns the canonical job, assignment, proof, compliance, notification, and payment-state records. Operator actions stay behind the shared FS27/SkyGate/Free99 gate and do not create a separate Music Nexus or RouteX admin password.</p>
+            <ul class="release-points">
+              <li>New <code>/api/skymusicnexus/music-workforce</code> endpoint supports hub/status reads plus operator-gated <code>create-release-job</code>, <code>create-drop-job</code>, <code>assign</code>, <code>submit-proof</code>, <code>approve-work</code>, <code>close-job</code>, and <code>sync-status</code> actions.</li>
+              <li>Creating a Music Nexus workforce package writes a canonical RouteX job with <code>source_app=skymusicnexus</code>, bridge id, artist id, release id, drop id, package type, deliverables, budget, market, and provider/payment authorization records.</li>
+              <li>Assignments created through Music Nexus are stored as RouteX applications, assignments, compliance rows, notifications, and assignment payment ledgers, then reflected back into the Music Nexus release operations workflow.</li>
+              <li>Proof submission and approval now travel through RouteX proof/payment state: proof moves the bridge to <code>proof_submitted</code>, and approval marks the assignment <code>completed</code> plus the payment row <code>payout_eligible</code>.</li>
+              <li>Music Nexus observability/visuals now include a Workforce Command route and retained workforce counts, while the RouteX mounted worker stress path also received a Web Crypto fallback for Node proof runs that exercise R2/S3 proof signing.</li>
+            </ul>
+            <div class="receipt-row"><span><code>npm run 0s:skyemusicnexus:workforce</code></span><span><code>metraiyux_0s_site/SkyeMusicNexus/proof/skyemusicnexus-workforce-bridge-latest.json</code></span><span><code>npm run 0s:skyemusicnexus:stress</code></span><span><code>npm run 0s:skyeroutex:worker-stress</code></span><span><code>npm run 0s:skyeroutex:worker-parity</code></span></div>
+          </div>
+        </article>
+
         <article class="release-entry" id="skyenet-drop-root-repair">
           <div class="release-meta">
             <time class="release-date" datetime="2026-05-25">May 25, 2026</time>

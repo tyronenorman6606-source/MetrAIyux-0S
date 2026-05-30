@@ -1,19 +1,12 @@
 # AE-FlowPro Platform Status
 
-Generated: 2026-05-09
+Generated: 2026-05-24
 
-This folder is promoted as the local platform truth for AE-FlowPro. The app payload, routed surfaces, proof metadata, runtime contract, local visual asset, and smoke check live inside this folder so the platform can be carried forward without reading from the original import location.
+This folder is the single canonical platform truth for AE-FlowPro. The real CRM/PWA surface, proof metadata, runtime contract, local runtime lane, and smoke checks live at the root entrypoint. There is no second imported app entrypoint.
 
 ## Included Surfaces
 
-- Command: `index.html`
-- Dashboard: `dashboard.html`
-- Workflows: `workflows.html`
-- Records: `records.html`
-- Proof: `proof.html`
-- Runtime: `runtime.html`
-- Settings: `settings.html`
-- Imported App: `app.html`
+- Canonical platform: `index.html`
 
 ## Runtime Proof
 

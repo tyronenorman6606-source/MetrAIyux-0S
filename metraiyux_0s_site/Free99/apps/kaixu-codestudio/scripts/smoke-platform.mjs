@@ -134,6 +134,26 @@ try{
     return {providerId:res.providerId, route:res.route, runId:res.runId};
   });
 
+  await check('twilio sms fixture executes and voice stays blocked until implemented', async () => {
+    const claims = {roles:['owner'], projectRoles:{default:['owner']}};
+    const install = await post('/api/platform/projects/default/provider-packs/twilio/install', {claims, enabled:true, secretRef:'vault:default:twilio:smoke'});
+    assert(install.ok === true && install.install?.enabled === true, 'twilio fixture install failed');
+    const sms = await post('/api/platform/provider-packs/twilio/actions/sms.send/run', {
+      claims,
+      projectId:'default',
+      input:{to:'+15550100000', body:'Fixture SMS proof from CodeStudio smoke.'}
+    });
+    assert(sms.ok === true && sms.result?.fixture === true && sms.result?.action === 'sms.send', 'twilio sms fixture did not execute');
+    const voice = await post('/api/platform/provider-packs/twilio/actions/voice.call/run', {
+      claims,
+      projectId:'default',
+      input:{to:'+15550100000', body:'Voice should not masquerade as SMS.'}
+    }).catch(e => e.payload);
+    const voiceReason = voice.steps?.[0]?.result?.reason || voice.result?.reason || '';
+    assert(voice.ok === false && voiceReason === 'voice_call_not_implemented', 'twilio voice must stay blocked until a real voice adapter exists');
+    return {smsMessageSid:sms.result.messageSid, voiceReason};
+  });
+
   await check('static app route serves platform UI', async () => {
     const res = await fetch(base + '/app/');
     const text = await res.text();

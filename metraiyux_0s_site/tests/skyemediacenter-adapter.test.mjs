@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import siteWorker from '../cloudflare/worker.js';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 class MemoryKV {
   constructor() { this.map = new Map(); }
@@ -67,7 +70,10 @@ async function call(e, path, options = {}) {
 test('MEDIA-01 keeps SkyeMediaCenter as the gated Free99 API model', async () => {
   const e = env();
 
-  const health = await call(e, '/api/media/health');
+  const publicHealth = await call(e, '/api/media/health');
+  assert.equal(publicHealth.response.status, 401);
+
+  const health = await call(e, '/api/media/health', {token:'media-token'});
   assert.equal(health.response.status, 200);
   assert.equal(health.body.app_id, 'media');
   assert.equal(health.body.status, 'LIVE/GATED');
@@ -76,8 +82,8 @@ test('MEDIA-01 keeps SkyeMediaCenter as the gated Free99 API model', async () =>
 
   const blocked = await call(e, '/api/media/assets?action=list');
   assert.equal(blocked.response.status, 401);
-  assert.equal(blocked.body.free99, true);
-  assert.equal(blocked.body.gateSessionRequired, true);
+  assert.equal(blocked.body.ok, false);
+  assert.equal(blocked.response.headers.get('x-0s-gate'), 'fs27-required');
 
   const session = await call(e, '/api/media/session', {token:'media-token'});
   assert.equal(session.response.status, 200);
@@ -88,9 +94,10 @@ test('MEDIA-01 keeps SkyeMediaCenter as the gated Free99 API model', async () =>
 
   const localBootstrap = await call(e, '/api/media/session', {
     method:'POST',
+    token:'media-token',
     body:{subject:'local-proof'}
   });
-  assert.equal(localBootstrap.response.status, 503);
+  assert.equal(localBootstrap.response.status, 410);
   assert.equal(localBootstrap.body.productionGate, true);
 });
 
@@ -102,8 +109,8 @@ test('MEDIA-02 blocks legacy Netlify media function URLs while /api/media remain
     '/.netlify/functions/media-assets'
   ]) {
     const response = await siteWorker.fetch(req(path), e, ctx());
-    assert.equal(response.status, 404, path);
-    assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow', path);
+    assert.equal(response.status, 302, path);
+    assert.match(response.headers.get('location') || '', /\/admin\/login\.html/, path);
   }
 
   const live = await call(e, '/api/media/assets?action=list', {token:'media-token'});
@@ -230,6 +237,6 @@ test('MEDIA-03 browser surfaces default to /api/media instead of legacy function
   assert.doesNotMatch(platform, /\$\{API\}\/media-(assets|search|stats)/);
   assert.match(authHelper, /\/api\/media\/session/);
   assert.match(gateHelper, /\/api\/media\/session/);
-  assert.match(intakeHtml, /\/api\/media\/assets/);
+  assert.match(intakeHtml, /media-experience\.js/);
   assert.doesNotMatch(intakeHtml, /\/\.netlify\/functions\/media-assets/);
 });

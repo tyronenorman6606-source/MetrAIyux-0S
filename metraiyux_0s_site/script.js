@@ -16,6 +16,10 @@ const HOMEPAGE_SURFACE_INDEX = [
   { group: 'Core 0S', title: 'Pricing', href: 'pricing/index.html', text: '0S offers, SaaS plans, and price-card routing.' },
   { group: 'Core 0S', title: 'SkyeMerit', href: 'saas/skyemerit.html', text: 'Protected first-time merit wallet with capped discount math and owner approval boundaries.' },
   { group: 'Core 0S', title: 'SkyePay Store', href: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s', text: 'FS27 storefront for approved 0S offers, RouteX, vault access, SkyeCard usage, and music add-ons.' },
+  { group: 'Core 0S', title: '0S Gate Signup', href: 'gate/signup/', text: 'Canonical 0S signup with Skye ID, SkyEmail claim, phone, profile, Gate session, and SkyEmail platform binding.' },
+  { group: 'Core 0S', title: 'SkyeMail', href: 'live/SkyeMail/index.html', text: 'Gate-bound SkyEmail platform home with inbox, compose, contacts, settings, proof, pricing, and generator routes.' },
+  { group: 'Core 0S', title: 'SkyEmail Generator', href: 'skyegate/source/SkyeGateFS27/generators/SKYEMAIL-GEN/index.html', text: 'SkyEmail generator for artist, client, operator, and 0S identity onboarding.' },
+  { group: 'Core 0S', title: 'Skye ID Generator', href: 'skyegate/source/SkyeGateFS27/generators/Skye-ID/index.html', text: 'Shared Skye ID generator for artist identity, profile photo, and cross-app 0S account handoff.' },
   { group: 'Business Network', title: 'Valley Verified', href: 'valley-verified/', text: 'Business discovery network and local app-build proof lane.' },
   { group: 'Business Network', title: "Bob's Smoke Shop", href: 'valley-verified/business/bobs-smoke-shop-litchfield-park/', text: 'Valley Verified business profile and local app-build example.' },
   { group: 'Business Network', title: 'Empire Pallets', href: 'valley-verified/business/empire-pallets-phoenix/', text: 'Valley Verified business profile and B2B app-build example.' },
@@ -113,6 +117,7 @@ const SURFACE_STATUS_HINTS = [
   ['sovereigndocs', /sovereigndocs/i],
   ['kaixu-codestudio', /codestudio|skaixu code evaluator/i],
   ['skymusicnexus', /skymusicnexus|music/i],
+  ['skyemail', /skyemail|skyemail gen|skyemail generator|skyemail platform|skyemail onboarding|skyemail-gen|skyemail gen|skyemail|skymail|skyemail|skye id generator|skye-id|mailbox/i],
   ['skyemediacenter', /skyemediacenter|media/i],
   ['skyeprofitconsole', /skyeprofitconsole|profit/i],
   ['skyeroutex', /skyeroutex|routex|workforce/i],
@@ -2813,6 +2818,77 @@ function mountSkyeSolLivingBackground({
   });
 })();
 // END quantumskyes:neon-motion-chrome-vanilla-js
+
+(function(){
+  if(window.__metraiyux0sBrandBackdrop) return;
+  window.__metraiyux0sBrandBackdrop = true;
+
+  const fallbackBrandLogos = [
+    { name: 'MetrAIyux 0S', kind: 'platform', src: '/assets/metraiyux-0s-logo-transparent.png', x: '5%', y: '16%', size: '118px', dx: '42px', dy: '-26px', duration: '22s' },
+    { name: 'MetrAIyux Emblem', kind: 'platform', src: '/assets/metraiyux-0s-emblem-transparent.png', x: '80%', y: '10%', size: '102px', dx: '-36px', dy: '32px', duration: '24s' },
+    { name: 'SkyeMusicNexus', kind: 'platform', src: '/SkyeMusicNexus/assets/skye-music-nexus-logo.png', x: '60%', y: '35%', size: '112px', dx: '34px', dy: '42px', duration: '26s' },
+    { name: 'Valley Verified', kind: 'client', src: '/valley-verified/assets/valley-verified-logo.png', x: '3%', y: '82%', size: '112px', dx: '56px', dy: '-38px', duration: '30s' }
+  ];
+
+  function ready(callback){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', callback, { once: true });
+    } else {
+      callback();
+    }
+  }
+
+  async function loadBrandLogos(){
+    try{
+      const response = await fetch('/assets/brand-backdrop-logos.json', { cache: 'no-store' });
+      if(!response.ok) throw new Error(`brand backdrop status ${response.status}`);
+      const data = await response.json();
+      return Array.isArray(data.logos) && data.logos.length ? data.logos : fallbackBrandLogos;
+    } catch(_error){
+      return fallbackBrandLogos;
+    }
+  }
+
+  function makeBrandImage(logo, index){
+    const image = document.createElement('img');
+    image.src = logo.src;
+    image.alt = '';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.dataset.logoName = logo.name || `brand-${index + 1}`;
+    image.dataset.logoKind = logo.kind || 'platform';
+    image.style.setProperty('--x', logo.x || `${(index * 17) % 92}%`);
+    image.style.setProperty('--y', logo.y || `${(index * 23) % 88}%`);
+    image.style.setProperty('--s', logo.size || logo.s || '108px');
+    image.style.setProperty('--dx', logo.dx || '38px');
+    image.style.setProperty('--dy', logo.dy || '-28px');
+    image.style.setProperty('--d', logo.duration || logo.d || `${22 + index}s`);
+    return image;
+  }
+
+  async function mountBrandBackdrop(){
+    const shouldMount = document.body.matches('.skyesol-living-page') && document.body.dataset.brandBackdrop !== 'off';
+    const explicitTargets = Array.from(document.querySelectorAll('[data-brand-backdrop]'));
+    if(!shouldMount && !explicitTargets.length) return;
+    if(document.querySelector('.brand-backdrop')) return;
+
+    const target = explicitTargets[0] || document.body;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'brand-backdrop';
+    backdrop.setAttribute('aria-hidden', 'true');
+    const logos = await loadBrandLogos();
+    logos.forEach((logo, index) => backdrop.appendChild(makeBrandImage(logo, index)));
+
+    if(target === document.body){
+      document.body.insertBefore(backdrop, document.body.firstElementChild);
+    } else {
+      target.replaceWith(backdrop);
+    }
+    document.body.classList.add('brand-backdrop-mounted');
+  }
+
+  ready(mountBrandBackdrop);
+})();
 
 (function(){
   if(window.__metraiyux0sRelay13ChatBoot) return;

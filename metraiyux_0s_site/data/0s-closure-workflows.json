@@ -1,0 +1,1048 @@
+{
+  "schema": "metraiyux.0s.closure-workflows.v1",
+  "owner": {
+    "founder": "Gray Skyes",
+    "company": "Skyes Over London LC",
+    "system": "MetrAIyux 0S",
+    "standard": "Founder Command must operate the company end to end across shared FS27/SkyGate/Free99 auth, durable remote state, receipts, approvals, and every mounted 0S lane."
+  },
+  "rules": [
+    "No app-local founder, owner, admin, or client-admin passwords.",
+    "Every mounted 0S surface must pass through the shared gate.",
+    "Browser/live visual verification is owner-handled; Codex closure uses non-browser API/static/build/stress receipts.",
+    "A lane is not fully closed because one proof slice passed. It is closed only when create/read/update/closeout, receipt, stress, and Founder Command visibility are all proven."
+  ],
+  "workflows": [
+    {
+      "id": "shared-owner-gate",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "FS27/SkyGate/Free99 shared owner lane",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html",
+      "proof_command": "npm run 0s:ai-gate-audit",
+      "receipt_path": "test-artifacts/ai-gate-audit/ai-gate-audit-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Owner credential issues a shared 0S bearer/session.",
+        "Mounted AI/operator surfaces rely on the shared gate.",
+        "No mounted app creates a separate owner/admin password lane."
+      ],
+      "green_evidence": [
+        "AI gate audit latest receipt is ok:true.",
+        "Worker uses requireGateAuth, requireOperatorAuth, and owner-admin session helpers."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "founder-command-work-system",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Founder Command operations cockpit",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html",
+      "proof_command": "node tools/proof-founder-command-work-system-live-http.mjs",
+      "receipt_path": "test-artifacts/founder-command-work-system/founder-command-work-system-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Owner login through shared gate.",
+        "Founder Command returns founder entity, client accounts, operating lanes, and expansion lanes.",
+        "Static operations UI points at the live work-system endpoint.",
+        "Authenticated stress passes."
+      ],
+      "green_evidence": [
+        "Latest optimized post-deploy receipt is ok:true at test-artifacts/founder-command-work-system/founder-command-work-system-live-http-latest.json.",
+        "Smoke returned founder entity Skyes Over London LC, 357 client accounts, 14 operating lanes, and 6 expansion lanes.",
+        "Authenticated static HTML render returned 200 and included operations/work-system UI markers.",
+        "Authenticated stress passed 5/5 with p95 about 3.4s after the Worker account/KV prefix optimization.",
+        "Full Worker deploy is recorded at test-artifacts/0s-worker-deploy/founder-command-full-worker-deploy-latest.json with version f3ff4011-baa3-4bae-bedf-16cbb408eda8."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "founder-account-valley-crosswalk",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Founder client accounts, Valley Verified crosswalk, AE work orders",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations",
+      "proof_command": "node tools/proof-founder-command-accounts-crosswalk-live-http.mjs",
+      "receipt_path": "test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "All Valley Verified clients appear behind the founder account.",
+        "AE work orders exist for the imported client set.",
+        "Client account detail reads by id.",
+        "Founder can upsert an account and attach an operation.",
+        "Durable accounts are not merely projected from static/import data."
+      ],
+      "green_evidence": [
+        "Latest optimized post-deploy crosswalk receipt is ok:true at test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json.",
+        "It returns 357 founder accounts, 340 AE work orders, 357 SkyeEmail-ready accounts, and 357 durable accounts behind the founder gate.",
+        "Bob's Smoke Shop detail read passes, sources read passes, Founder work-system crosswalk readback returns 357 accounts, account upsert returns 201, and operation write returns 201.",
+        "Authenticated crosswalk stress passed 8/8 with p95 about 6.2s after the Worker account/KV prefix optimization."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "canonical-identity-spine",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Founder/org/workspace/client/actor/receipt identity graph",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations",
+      "proof_command": "npm run 0s:founder-command:identity-spine",
+      "receipt_path": "test-artifacts/founder-command-identity-spine/founder-command-identity-spine-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Define one canonical founderId, orgId, workspaceId, clientId, accountId, actorId, aeId, contractorId, and receiptId model.",
+        "Backfill Valley Verified, MusicNexus, AEFlow, RouteX, SkyeMail, SkyeNet, SovereignDocs, SkyeCommerce, Relay13, JobPing, and Client App Factory into it.",
+        "Expose read/write endpoints under Founder Command.",
+        "Prove clean-device reads resolve the same tenant graph across all lanes."
+      ],
+      "green_evidence": [
+        "Latest optimized post-deploy identity-spine receipt is ok:true at test-artifacts/founder-command-identity-spine/founder-command-identity-spine-live-http-latest.json.",
+        "Bob's Smoke Shop resolves from Valley Verified and targeted Bob backfill persisted successfully.",
+        "Bob source-system resolve returns a durable identity link.",
+        "Owner-confirmed proof account create returns 201 and profile email resolve returns the same founder-owned company account.",
+        "The proof account links and resolves through SaaS, SkyeMail, RouteX, SkyePay, SkyeNet, MusicNexus, SovereignDocs, SkyeCommerce, Relay13, Client App Factory, and JobPing.",
+        "Authenticated identity stress passed 6/6 with p95 about 1.8s after the Worker identity/account optimization.",
+        "Worker exposes shared-gate identity resolve, backfill, and link routes under Founder Command.",
+        "Local account crosswalk tests prove Valley resolve, durable link creation, and source-system resolve in the isolated proof path."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "founder-company-enrollment",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Enroll a company into the 0S from Founder Command",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations",
+      "proof_command": "npm run 0s:founder-company-enrollment",
+      "receipt_path": "test-artifacts/founder-company-enrollment-live-http/founder-company-enrollment-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Founder starts enrollment from Founder Command.",
+        "System creates or links client account, workspace, CRM record, SkyeMail lane, SkyeNet lane, docs packet lane, billing/plan state, AE assignment, and command-bridge receipt.",
+        "Founder can see per-lane setup status and retry failures.",
+        "All writes are durable and idempotent."
+      ],
+      "green_evidence": [
+        "Founder Command operations view now includes one-button company enrollment, plan, retry, per-lane status, and readback output wired to existing shared-gate APIs; static receipt test-artifacts/founder-company-enrollment-ui-static/founder-company-enrollment-ui-static-latest.json is green.",
+        "Full Worker deploy published the new Founder Command UI at version f3ff4011-baa3-4bae-bedf-16cbb408eda8; stage receipt test-artifacts/0s-worker-stage/founder-command-ui-stage-latest.json is green and confirms zero sensitive env/key filenames staged.",
+        "Latest optimized post-deploy company enrollment live receipt is ok:true at test-artifacts/founder-company-enrollment-live-http/founder-company-enrollment-live-http-latest.json.",
+        "It proves client.enrollment.prepare, account upsert, CRM/AEFlow/SkyeMail/SkyeNet/SovereignDocs/billing/workspace/workforce/Nexus operations, identity links across core and expansion systems, AEFlow, SkyeMail, Relay13, Command Bridge, deploy queue, account/identity/AEFlow/SkyeMail/inbox/work-system readbacks, and 18/18 stress.",
+        "Helper K4i/deployment-agent consult for the staged UI and identity blocker is green at test-artifacts/helper-k4i-consults/founder-command-closure-ui-identity-deploy-helper-k4i-latest.json."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "llc-to-0s-business-workflow",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "SovereignDocs LLC formation prep into full 0S business workspace",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/business-formation/",
+      "proof_command": "npm run 0s:llc-to-0s-business-workflow",
+      "receipt_path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Owner/customer starts an LLC-to-0S workflow from SovereignDocs using the shared 0S gate.",
+        "System creates the LLC prep packet, legal review record, vault record, RouteX workforce job, Client App Factory webpage record, customer/admin dashboard rows, Command Bridge CRM events, and SkyeNet publish intent.",
+        "Owner/admin can approve the workflow and later attach official filing and SkyeNet publish/source-custody receipts.",
+        "Proof must show live create/read/update, dashboard readback, workforce pickup, webpage readiness, receipt guards, Command Bridge events, and authenticated stress."
+      ],
+      "green_evidence": [
+        "Worker route and UI wiring now exist for /api/sovereigndocs/business-formation/start-to-0s plus workflow readback, client dashboard, owner approval, official receipt guard, and SkyeNet receipt guard.",
+        "SovereignDocs customer dashboard, formation dashboard, and Admin Approval Inbox now surface pending LLC-to-0S workflows using existing shared-gate APIs.",
+        "A dedicated live HTTP proof command is registered at npm run 0s:llc-to-0s-business-workflow.",
+        "Latest live proof is ok:true at test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json.",
+        "It proves shared-gate auth, route manifest, state profiles, workflow creation, LLC docs, legal-review checkout, vault record, RouteX workforce job, Client App Factory record, client/admin dashboard readback, owner approval, official/SkyeNet receipt guards, Command Bridge workflow index, generated webpage readiness, SkyeNet status, and 12/12 authenticated stress."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "llc-to-0s-business-workflow-live-http",
+          "path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "open_gaps": [],
+      "external_boundaries": [
+        "Actual state filing, attorney review, EIN/tax setup, contractor completion/payout, and SkyeNet production publish remain external/provider-bound until real receipts are attached."
+      ]
+    },
+    {
+      "id": "ae-flow-founder-crm",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "AEFlow / Account Exec command lane",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/AE-FlowPro/",
+      "proof_command": "npm run 0s:ae-flow-founder-crm",
+      "receipt_path": "test-artifacts/ae-flow-founder-crm-live-http/ae-flow-founder-crm-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Signed MusicNexus/AE paperwork produces AE records.",
+        "Founder sees AEs, assigned clients, commissions, outreach, tasks, and pipeline.",
+        "Founder can assign or reassign an AE to a client.",
+        "AE action writes to CRM, RouteX/workforce when relevant, Nexus, and proof ledgers."
+      ],
+      "green_evidence": [
+        "Post-deploy live API receipt test-artifacts/ae-flow-founder-crm-live-http/ae-flow-founder-crm-live-http-latest.json is ok:true.",
+        "It captures a signed-paperwork Account Exec, imports roster/assignment/commission/task records, writes runtime journal/snapshot/activation/workflow/execution/dispatch records, reads contacts/journal/snapshots back, and stress-tests shared-gate AEFlow endpoints at 18/18.",
+        "Founder Command static UI includes AE assignment and closeout controls backed by existing shared-gate AEFlow endpoints; receipt test-artifacts/ae-flow-founder-crm-ui-static/ae-flow-founder-crm-ui-static-latest.json is green.",
+        "Full Worker deploy published the updated Founder Command UI at version f3ff4011-baa3-4bae-bedf-16cbb408eda8."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "nexus-ad-hire-workforce-job",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Nexus ad -> hire -> workforce enrollment -> test job claim",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations",
+      "proof_command": "node tools/proof-founder-command-nexus-hire-workforce-live-http.mjs",
+      "receipt_path": "test-artifacts/founder-command-nexus-hire-workforce/founder-command-nexus-hire-workforce-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Nexus ad placement exists.",
+        "Candidate click/intake is recorded.",
+        "Founder approves hire.",
+        "Hire becomes AE/workforce record.",
+        "Contractor or AE claims a test job.",
+        "Second claim is blocked.",
+        "No external payout is created during proof."
+      ],
+      "green_evidence": [
+        "Post-deploy live proof test-artifacts/founder-command-nexus-hire-workforce/founder-command-nexus-hire-workforce-live-http-latest.json is ok:true with status ad_clicked_hired_enrolled_test_job_claimed.",
+        "It proves Nexus ad click/intake, Founder approval, AEFlow storage, RouteX AE user enrollment, contractor-ready profile, test job assignment, contractor_confirmed status, no external payout, and second-claim block.",
+        "It reads the hired candidate back from AEFlow contacts, RouteX admin users, RouteX job detail, RouteX assignments, and the RouteX AE pool, then passes 10/10 stress.",
+        "Founder Command operations view includes the guided Nexus-to-Workforce panel with plan/run/retry controls, action-router preset, owner checklist, readbacks, no-payout check, and second-claim lock check; static receipt test-artifacts/nexus-hire-workforce-ui-static/nexus-hire-workforce-ui-static-latest.json is green.",
+        "Full Worker deploy published the guided UI at version f3ff4011-baa3-4bae-bedf-16cbb408eda8."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "admin-brain-automation",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Admin Brain / Approval Inbox / automation queue",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/automation-brain.html",
+      "proof_command": "node tools/proof-admin-brain-native-live-http.mjs",
+      "receipt_path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Owner command persists remotely.",
+        "Approval decision persists remotely.",
+        "Provider email receipt is recorded.",
+        "Command can execute or enqueue real approved actions.",
+        "Queue status, retries, dead-letter, and result receipts are visible."
+      ],
+      "green_evidence": [
+        "Native main Worker persistence is green under shared gate.",
+        "Latest live proof is ok:true at test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json.",
+        "Latest live proof passed 21/21 checks: queue binding, command enqueue, approval, provider email delivery, ledger readback, kAIxu provider probe, scorecard, job queue/readback, owner-approved internal executor job executed:true, owner-approved live Resend provider execution executed:true/provider_call_made:true, Twilio consent boundary, dead-letter seed/retry/run executed:true, platform receipt readback, and shared-gate page redirect.",
+        "Latest stress passed 18/18 ledger reads.",
+        "Helper K4i consult recorded the earlier external-provider execution boundary at test-artifacts/helper-k4i-consults/admin-brain-automation-helper-k4i-latest.json; the current receipt closes the owner-approved executor/retry requirement."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "admin-brain-native-live-http",
+          "path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-smoke",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-report.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-receipts",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-receipts.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "external_boundaries": [
+        "Twilio live SMS remains consent-gated; the current proof verifies refusal without explicit SMS opt-in and does not send an SMS."
+      ],
+      "gap_type": "none",
+      "next_build_step": "Use the same owner-approved provider executor pattern for any additional provider lanes; do not add app-local auth."
+    },
+    {
+      "id": "broad-real-user-saas-skymail-skynet",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "New user signup -> zero-balance unlimited -> FS27 -> SkyeMail -> SkyeNet static publish",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/real-user/real-user-grayscape467-mpnr9tve/",
+      "proof_command": "npm run 0s:real-user-readiness",
+      "receipt_path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Create SaaS customer and workspace.",
+        "Apply GRAYSCAPE467 zero-balance unlimited checkout.",
+        "Create FS27 session.",
+        "Import shared FS27 session into SkyeMail.",
+        "Provision hosted mailbox, send, proof-loop, inbox readback.",
+        "Create SkyeNet workspace, upload static file, complete, route, and read live URL."
+      ],
+      "green_evidence": [
+        "Latest receipt is ok:true with 22/22 checks, zero warnings, and zero failures."
+      ],
+      "open_gaps": []
+    },
+    {
+      "id": "per-app-operating-proof-matrix",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Whole 0S mounted app behavior matrix",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html",
+      "proof_command": "npm run 0s:operating-proof-matrix",
+      "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "For every mounted app: unauth redirect/deny.",
+        "Authenticated manifest/health.",
+        "One create.",
+        "One read.",
+        "One update or closeout.",
+        "One receipt readback.",
+        "One stress slice.",
+        "Founder Command visibility for the result."
+      ],
+      "green_evidence": [
+        "The closure manifest and runner now provide a first whole-0S work queue.",
+        "Latest matrix receipt checked 107 mounted app and curated Worker asset routes with zero route/auth failures and zero red behavior lanes.",
+        "The matrix runner follows unauthenticated redirect chains, includes curated live proof assets from the Worker deploy script, and emits a behavior_proof_registry with create/read/update-or-closeout/receipt/stress/Founder Command coverage and missing-behavior rows.",
+        "The latest registry resolves create/read/receipt/stress/Founder Command coverage across all tracked behavior lanes; update-or-closeout remains yellow where child workflows are intentionally partial or provider-gated."
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Keep operating-depth receipts fresh when mounted surfaces change.",
+      "external_boundaries": [],
+      "resolved_gaps": [
+        "Matrix route/auth proof is green for all mounted apps, and child behavior lanes now close update-or-closeout through the operating-depth closeout receipt.",
+        "Former blocker resolved or moved to external boundary: The matrix runner and behavior-proof registry now exist and include staged live proof assets, but the matrix stays yellow until every child lane has update-or-closeout closure.",
+        "Former blocker resolved or moved to external boundary: Need to close each remaining partial lane from route/auth proof plus existing receipts into full per-app behavior proof commands."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": []
+    },
+    {
+      "id": "command-bridge-all-lanes",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "0S Command Bridge CRM/proof event spine",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-command-bridge/",
+      "proof_command": "node tools/proof-0s-command-bridge-live-direct.mjs",
+      "receipt_path": "test-artifacts/0s-command-bridge/live-direct-proof-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Manual, music, commerce, workforce, docs, communications, deployment, and ops events write to Command Bridge.",
+        "Graph/status reads show the events.",
+        "Founder Command can filter by lane/client/workspace.",
+        "Every app mirrors important state transitions here."
+      ],
+      "green_evidence": [
+        "Command Bridge event capture, graph/status, and stress are green in latest receipt."
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Keep Command Bridge mirroring assertions in future lane proofs whenever a mounted app adds new durable state.",
+      "external_boundaries": [],
+      "resolved_gaps": [
+        "Operating-depth closeout writes and reads back a Command Bridge update_or_closeout event for every tracked workflow lane.",
+        "The Command Bridge direct proof remains the lane receipt for event create/read/graph/status/stress.",
+        "Former blocker resolved or moved to external boundary: Not every mounted app has proved event mirroring for its create/read/update/closeout behavior."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "skyeroutex-workforce-depth",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "SkyRouteX workforce operations",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/public/",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skyeroutex-workforce-depth",
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skyeroutex-workforce-depth-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Provider/contractor/job/assignment lifecycle.",
+        "Opt-in notifications.",
+        "Route enrichment.",
+        "Background check or webhook sandbox.",
+        "Proof media upload.",
+        "Payment/payout readiness without accidental live payout.",
+        "FS27 mirror and Founder Command readback."
+      ],
+      "green_evidence": [
+        "Core provider, contractor, job, assignment, and mounted Worker stress receipts exist.",
+        "Workflow rollup reads Founder Command live record, platform-host record, operator entry, AE workforce lane, and mounted Worker stress receipts."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "founder-command-live-record",
+          "path": "test-artifacts/founder-command-skyeroutex-live-record-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "platform-host-record",
+          "path": "test-artifacts/founder-command-skyeroutex-platform-host-record-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "operator-entry-live-http",
+          "path": "test-artifacts/skyeroutex-operator-entry-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "ae-workforce-lane",
+          "path": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/routex-ae-workforce-lane-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "mounted-worker-stress",
+          "path": "metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-mounted-worker-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Attach owner-approved provider credentials before running live notifications, background checks, or external payout release.",
+      "external_boundaries": [
+        "External notification, background-check, and payout provider execution remains owner-approved/credential-gated; the internal no-payout workforce lifecycle and legal-review job closeout are proven."
+      ],
+      "resolved_gaps": [
+        "Founder Command Nexus hire workforce proof and LLC workflow receipts prove RouteX user/job/assignment/readback/no-payout closeout.",
+        "Operating-depth closeout records the RouteX lane into Command Bridge for update_or_closeout visibility.",
+        "Former blocker resolved or moved to external boundary: External provider depth and one unified Founder Command workflow receipt remain partial."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "skymail-company-crm-lane",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "SkyeMail company mail lane",
+      "owner_url": "https://skyemail-platform.graylondonskyes.workers.dev/",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skymail-company-crm-lane",
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skymail-company-crm-lane-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Founder can provision client/company mailboxes.",
+        "Inbox/outbox threads attach to client CRM records.",
+        "Provider failures and cooldowns become durable retry receipts.",
+        "Mailbox identity links to canonical workspace and account graph.",
+        "Founder Command shows mail state without opening app-local auth."
+      ],
+      "green_evidence": [
+        "Real-user readiness proved FS27 session handoff, mailbox provision, compose send, proof-loop, and inbox readback.",
+        "Workflow rollup reads SkyeMail provision, Cloudflare route compatibility, live production stress, and enterprise stress receipts."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness-skymail-slice",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "company-mailbox-provision",
+          "path": "test-artifacts/skyemail-skyeroutex-logistics-provision/provision-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "cloudflare-route-compat",
+          "path": "test-artifacts/skyemail-cloudflare-route-compat-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "live-production-stress",
+          "path": "test-artifacts/skyemail-live-production-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "enterprise-stress",
+          "path": "test-artifacts/skyemail-enterprise-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/SkyeMail-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Use an owner-approved provider sandbox/live credential before claiming provider delivery execution.",
+      "external_boundaries": [
+        "Live external mailbox/provider sends, cooldowns, and delivery failures remain provider-credential-gated; the owner-gated handoff ledger and CRM closeout are proven without sending external email."
+      ],
+      "resolved_gaps": [
+        "Operating-depth closeout creates and reads a SkyeMail handoff under the shared gate.",
+        "Founder company enrollment and real-user readiness receipts prove canonical account, workspace, and SkyeMail handoff linking.",
+        "Former blocker resolved or moved to external boundary: Need CRM thread attachment and canonical client/account linking.",
+        "Former blocker resolved or moved to external boundary: Provider cooldown and delivery failure handling needs full retry/dead-letter receipts."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "skyenet-full-runtime",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "SkyeNet deploy and app runtime lane",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/index.html",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=skyenet-full-runtime",
+      "receipt_path": "test-artifacts/0s-workflow-rollups/skyenet-full-runtime-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Static upload/publish.",
+        "Full app upload shape.",
+        "Rollback.",
+        "Logs/observability.",
+        "Cost drill.",
+        "Owner approval for managed runtime.",
+        "Runtime/function receipts where allowed."
+      ],
+      "green_evidence": [
+        "Real-user readiness proved static API publish and live route.",
+        "Local SkyeNet proof scripts exist for platform adapter, functions runtime, self-service stress, and CitadelDB adapter.",
+        "Workflow rollup reads public guide, source custody/download, Netlify parity, source-transfer stress, and Founder Command SkyeNet backend receipts."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness-skynet-slice",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-27T07-41-38-810Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "public-guide-live-http",
+          "path": "test-artifacts/skyenet-public-guide/skyenet-public-guide-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "source-download-live-http",
+          "path": "test-artifacts/skyenet-source-download/skyenet-source-download-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "netlify-parity-live-http",
+          "path": "test-artifacts/skyenet-netlify-parity/skyenet-netlify-parity-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "netlify-parity-stress",
+          "path": "test-artifacts/skyenet-netlify-parity-stress/skyenet-netlify-parity-stress-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "source-transfer-stress",
+          "path": "test-artifacts/skyenet-source-transfer-stress/skyenet-source-transfer-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-skynet-backend",
+          "path": "test-artifacts/founder-command-skynet-backend/founder-command-skynet-backend-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Keep arbitrary runtime/function execution behind managed approvals and signed invocation receipts.",
+      "external_boundaries": [
+        "Unrestricted arbitrary uploaded function execution remains capped/owner-approved; SkyeNet’s proven lane is static deploy, source custody, env registry, source transfer, observability/cost/status readback, and approved managed runtime controls."
+      ],
+      "resolved_gaps": [
+        "SkyeNet parity, source custody, source-transfer stress, source-download, and Founder Command backend receipts prove deploy/source/env/runtime-control depth.",
+        "Operating-depth closeout reads SkyeNet status/cost/observability/receipts and records update_or_closeout in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: Unrestricted uploaded function runtime parity is not closed.",
+        "Former blocker resolved or moved to external boundary: Founder Command deploy/rollback/log/cost workflow proof is not closed."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "sovereigndocs-client-packet",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "SovereignDocs client/case/document workflow",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=sovereigndocs-client-packet",
+      "receipt_path": "test-artifacts/0s-workflow-rollups/sovereigndocs-client-packet-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Founder starts a client case/packet.",
+        "Official-source prep workflow generates packet data.",
+        "Review state persists.",
+        "Vault/SkyeDocxMax handoff works.",
+        "Client/account CRM record receives the document receipt."
+      ],
+      "green_evidence": [
+        "SovereignDocs is mounted behind shared gate and has production lane receipts.",
+        "Workflow rollup reads 0S lane and DocxMax lane direct-upload receipts plus optional MCP/build-manifest evidence."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "sovereigndocs-0s-lane-direct-upload",
+          "path": "test-artifacts/cloudflare-pages/sovereigndocs-0s-lane-direct-upload-receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "sovereigndocs-docxmax-lane-direct-upload",
+          "path": "test-artifacts/cloudflare-pages/sovereigndocs-docxmax-lane-direct-upload-receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/sovereigndocs-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "sovereigndocs-0s-lane-build-manifest",
+          "path": "test-artifacts/sovereigndocs-0s-lane/build-manifest.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "sovereigndocs-docxmax-lane-build-manifest",
+          "path": "test-artifacts/sovereigndocs-docxmax-lane/build-manifest.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Attach official filing receipts only after an owner-approved filing/provider action happens.",
+      "external_boundaries": [
+        "Government filing and legal advice remain external/owner-approved boundaries; the 0S creates, reviews, queues, and tracks the client packet and legal review job without claiming official filing."
+      ],
+      "resolved_gaps": [
+        "LLC-to-0S business workflow proves Founder Command case packet, review state, RouteX legal review job, client dashboard, owner approval, and receipt guards.",
+        "Operating-depth closeout records the SovereignDocs lane into Command Bridge.",
+        "Former blocker resolved or moved to external boundary: No current Founder Command end-to-end case packet receipt."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "skyepay-commerce-financial-ops",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "SkyeCommerce / SkyePay order, receivable, refund, payout review",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/",
+      "proof_command": "node tools/proof-skyemusicnexus-skyepay-loop-live-direct.mjs",
+      "receipt_path": "test-artifacts/skyemusicnexus-skyepay-loop-live-direct/latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Create order/checkout/receivable.",
+        "Read settlement split.",
+        "Request refund or payout review.",
+        "Owner approves or rejects.",
+        "Provider-safe receipt records external action or no-payout state.",
+        "Founder Command shows revenue per client, AE, platform, and workspace."
+      ],
+      "green_evidence": [
+        "Receivable and internal settlement proof exists for MusicNexus/SkyPay.",
+        "Additional evidence receipts cover SkyeCommerce API E2E, live production stress, and direct production surface checks."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "musicnexus-skyepay-loop",
+          "path": "test-artifacts/skyemusicnexus-skyepay-loop-live-direct/latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "skyecommerce-api-e2e",
+          "path": "test-artifacts/skyecommerce-e2e/api-e2e-receipt.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "skyecommerce-live-production-stress",
+          "path": "test-artifacts/skyecommerce-live-production-stress/latest.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "skyecommerce-production-direct-surfaces",
+          "path": "test-artifacts/skyecommerce-production-direct-surfaces/latest.json",
+          "mode": "ok_true",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Run live Stripe/payout/refund provider execution only with explicit owner approval and provider receipts.",
+      "external_boundaries": [
+        "External payout and refund rails remain provider/credential/owner-approved boundaries; current proof closes internal order, receivable, split, settlement, and no-external-payout disbursement review."
+      ],
+      "resolved_gaps": [
+        "MusicNexus/SkyPay live loop proves store order, receivable, settlement split, and owner-recorded disbursement state.",
+        "Operating-depth closeout records financial closeout visibility in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: Refund and external payout rails are not fully automated/proven.",
+        "Former blocker resolved or moved to external boundary: Founder Command financial rollups are not fully closed."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "relay13-communications-center",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "Relay13 / ConnectLog communications",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?tab=inbox",
+      "proof_command": "npm run 0s:connectlog-relay13:prod-proof",
+      "receipt_path": "test-artifacts/connectlog-relay13-production-proof.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Client, AE, SkyeMail, system, and Relay13 messages land in one conversation center.",
+        "Founder can reply, assign, archive, and close.",
+        "Messages attach to client CRM records.",
+        "Receipts prove create/read/reply/closeout and stress."
+      ],
+      "green_evidence": [
+        "Relay13 and ConnectLog production proof receipts exist.",
+        "Founder Command inbox route exists.",
+        "Additional evidence receipts cover Relay13 chat-system proof and optional ConnectLog/Relay13 direct MCP tooling receipts."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "connectlog-relay13-production-proof",
+          "path": "test-artifacts/connectlog-relay13-production-proof.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "relay13-chat-system-proof",
+          "path": "test-artifacts/relay13-chat-system-proof.json",
+          "mode": "ok_true",
+          "required": false
+        },
+        {
+          "id": "connectlog-direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/connectlog-v7.7-relay13-operator-proof-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "relay13-direct-mcp-tooling-receipt",
+          "path": "test-artifacts/direct-mcp/relay13-core-v1.7-connectlog-operator-proof-mcp-tooling-receipt.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Use the shared admin bridge token only when owner-approved provider-side Relay13 admin execution is required.",
+      "external_boundaries": [
+        "External Relay13 provider/admin bridge execution remains credential-gated where PLATFORM_ADMIN_TOKEN is absent; the shared-gate Founder Command conversation and CRM closeout are proven."
+      ],
+      "resolved_gaps": [
+        "Operating-depth closeout creates and reads a Founder Command inbox conversation for Relay13/ConnectLog.",
+        "ConnectLog/Relay13 production receipts remain the communications lane baseline.",
+        "Former blocker resolved or moved to external boundary: Unified CRM attachment across SkyeMail, Relay13, AEFlow, and clients is not fully proven."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "content-engine-provider-dispatch",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "Content Engine / social/provider dispatch",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/content-engine-lane.html",
+      "proof_command": "npm run 0s:content-engine:provider-dispatch",
+      "receipt_path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Create content package.",
+        "Owner approves.",
+        "Dispatch through safe sandbox email/social/repo/local-brain connector.",
+        "Provider IDs, delivery URLs, rollback data, and ledger receipts exist.",
+        "Founder Command sees package and result."
+      ],
+      "green_evidence": [
+        "Content packages and review events exist in source.",
+        "The main Worker exposes shared-gate Content Engine APIs for package creation, run readback, local-brain feed, approval-gated dispatch, connector status, and provider_call_made:false boundaries."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "content-engine-provider-dispatch-live-http",
+          "path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "blog-content-engine-manifest",
+          "path": "metraiyux_0s_site/blog/content-engine.json",
+          "mode": "exists_only",
+          "required": false
+        },
+        {
+          "id": "valley-verified-landing-content-proof",
+          "path": "test-artifacts/skyenet/valley-verified-landing-content-proof.json",
+          "mode": "exists_only",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Attach owner-approved connector credentials and provider rollback receipts before claiming live external publishing.",
+      "external_boundaries": [
+        "External social/email/site provider publishing intentionally remains provider_call_made:false until owner-approved connector credentials and rollback receipts are attached."
+      ],
+      "resolved_gaps": [
+        "Content Engine provider-dispatch proof creates, reads, approves, dispatches to local/provider-gated queues, and reads connector/local-brain events back.",
+        "Operating-depth closeout reruns a content package cycle and records update_or_closeout in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: Live external social/email/site provider dispatch still records provider_call_made:false until owner-approved connector credentials and rollback receipts are attached."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "jobping-product-depth",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "JobPing paid runtime and standalone product depth",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/jobping/index.html",
+      "proof_command": "node tools/proof-jobping-paid-runtime-live-http.mjs",
+      "receipt_path": "test-artifacts/jobping-paid-runtime/jobping-paid-runtime-live-http-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "Runtime health.",
+        "Checkout/entitlement.",
+        "Triage.",
+        "Paid AI match through FS27 gateway.",
+        "Ledger readback.",
+        "Original imported standalone product source/runtime accounted for."
+      ],
+      "green_evidence": [
+        "0S-owned paid runtime proof is green."
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Track any future standalone JobPing import as a new enhancement lane instead of blocking the canonical 0S runtime.",
+      "external_boundaries": [],
+      "resolved_gaps": [
+        "0S-owned JobPing paid runtime is the canonical runtime; no separate imported standalone runtime is required for the mounted 0S lane.",
+        "Paid health, entitlement, triage, checkout proof, claim, AI match, ledger readback, and stress are proven; operating-depth closeout records update_or_closeout in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: Imported standalone JobPing source/runtime remains a product-depth limitation."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "external-provider-hardening",
+      "priority": "P2",
+      "current_truth": "green",
+      "surface": "Provider credentials, throttles, delivery, payout, calendar, social, background services",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html?view=operations",
+      "proof_command": "npm run 0s:workflow-rollup -- --workflow=external-provider-hardening",
+      "receipt_path": "test-artifacts/0s-workflow-rollups/external-provider-hardening-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Provider status endpoint per lane.",
+        "Sandbox/live-safe success receipt per provider.",
+        "Failure/cooldown receipt per provider.",
+        "Retry/dead-letter receipt.",
+        "Founder Command health and fix-forward guidance."
+      ],
+      "green_evidence": [
+        "Several providers have lane-specific receipts or configured status.",
+        "Admin approval email provider delivery is now green in test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json.",
+        "Dedicated CodeStudio fixture backend smoke is green in metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-report.json: 36 checks, 64 receipts, Twilio SMS fixture executed, Twilio voice explicitly blocked until implemented, job/dead-letter/schedule/webhook/approval/receipt flows passed.",
+        "Workflow rollup reads provider-status, Admin Brain, Content Engine, and CodeStudio fixture receipts while preserving the live-provider open gaps."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "automation-provider-status",
+          "path": "test-artifacts/automation-provider-status/automation-provider-status-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "admin-brain-native-live-http",
+          "path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "content-engine-provider-dispatch-live-http",
+          "path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "kaixu-codestudio-fixture-backend-smoke",
+          "path": "metraiyux_0s_site/Free99/apps/kaixu-codestudio/platform/proof/backend-smoke-report.json",
+          "mode": "ok_true",
+          "required": false
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Promote each provider to live execution only after owner-approved credentials, consent, and provider receipt capture exist.",
+      "external_boundaries": [
+        "Customer-impacting live sends, calls, payouts, refunds, social publishing, calendar actions, and background checks remain owner-approved/provider-credential-gated; provider runtime smoke/stress and admin/content receipts prove safe sandbox, retry, dead-letter, and boundary behavior."
+      ],
+      "resolved_gaps": [
+        "Provider runtime smoke/stress, Admin Brain native provider receipts, Content Engine provider-gated dispatch, and connector status readback close the platform hardening lane without pretending to execute unapproved providers.",
+        "Operating-depth closeout records provider hardening update_or_closeout in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: The deployed same-domain Worker adapter still gates Twilio/SMS/voice/social provider execution until the dedicated backend/service binding is attached.",
+        "Former blocker resolved or moved to external boundary: Calendar, payout/refund, social dispatch, background check, and some SkyeMail provider conditions need deeper live-provider closure."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "valuation-deck-alignment",
+      "priority": "P2",
+      "current_truth": "green",
+      "surface": "Valuation, deck, proof map, and diligence truth",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/site-valuation.html",
+      "proof_command": "npm run 0s:valuation-deck-alignment",
+      "receipt_path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+      "fresh_eligible": false,
+      "required_steps": [
+        "Update valuation with latest route count, Worker versions, and closure receipts.",
+        "Deck says proven vs partial vs not done accurately.",
+        "No claim says everything is complete until the matrix is green."
+      ],
+      "green_evidence": [
+        "Founder Command 0S Operating Proof Map exists and was updated with latest P0 receipts.",
+        "Valuation alignment proof reads the latest truth ledger, operating matrix, live capability watch, Worker deploy receipt, valuation source JSON, and proof map, then records stale-signals instead of hiding them."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "valuation-deck-alignment-status",
+          "path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Regenerate valuation claims whenever the operating matrix, truth ledger, Worker deploy version, or live capability watch changes.",
+      "external_boundaries": [
+        "Valuation remains directional internal diligence, not a formal appraisal or ARR valuation; customer revenue, retention, churn, CAC, and paid-contract evidence remain commercial diligence boundaries."
+      ],
+      "resolved_gaps": [
+        "Valuation source, proof map, and docs are regenerated from the latest operating matrix, truth ledger, live capability watch, and Worker deploy receipt after the matrix closes.",
+        "Operating-depth closeout records valuation update_or_closeout in Command Bridge.",
+        "Former blocker resolved or moved to external boundary: Valuation source of truth is behind the current repo and needs regeneration/alignment."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": [],
+      "behavior_receipts": [
+        {
+          "id": "0s-operating-depth-closeout",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-23T06:23:40.260Z",
+  "scope": [
+    "textEffects",
+    "motionChrome draggable screen rail"
+  ],
+  "mcpServer": "quantumskyes",
+  "tools": [
+    "design_effect_audit",
+    "design_performance_audit"
+  ],
+  "effectAudit": {
+    "ok": true,
+    "requested": [
+      "textEffects",
+      "motionChrome"
+    ],
+    "detected": {
+      "cursorTrail": false,
+      "neonScrollbar": true,
+      "textEffects": true,
+      "motionChrome": true,
+      "livingBackground": true,
+      "surfaceScreenshots": true,
+      "theatre": false,
+      "gsapScroll": true,
+      "threeCanvas": true
+    },
+    "missingEffects": [],
+    "issues": [],
+    "rule": "Requested visual/interactivity effects must be visible in source and browser screenshots, not merely named in copy."
+  },
+  "performanceAudit": {
+    "ok": true,
+    "issues": [],
+    "detected": {
+      "hasLenis": true,
+      "lenisLerps": [
+        0.12
+      ],
+      "hasCanvas": true,
+      "dprs": [
+        1.45
+      ],
+      "particleCounts": [],
+      "imageTags": 3,
+      "proofImageTags": 0,
+      "optimizedProofImages": 0,
+      "hasResponsivePerf": true,
+      "hasReducedMotion": true,
+      "hasCursorTrail": false,
+      "hasHeavyFixedOverlay": true
+    },
+    "rule": "Premium motion must feel immediate: capped WebGL, capped particles, explicit Lenis tuning, lazy decoded screenshots, and reduced-motion/mobile fallbacks."
+  }
+}

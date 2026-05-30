@@ -15,6 +15,8 @@
     <div class="nav-links">
       <a href="/">Home</a>
       <a href="/live-proof">Live Proof</a>
+      <a href="/security">Security</a>
+      <a href="/tech-stack">Tech Stack</a>
       <a href="/changelog">Changelog</a>
       <a href="/pricing">Pricing</a>
       <a href="/login">Login</a>
@@ -38,6 +40,85 @@
 
     <section class="section timeline">
       <article class="release-card current">
+        <p class="eyebrow">2026-05-25 • Live</p>
+        <h2>Founder Command Pocket SkyeMail and workspace handoffs are deployed.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li><code>/workspace-mailbox-summary</code> now returns owner mailbox status, unread counts, aliases, active key state, and recent message summaries through a service-token route.</li>
+              <li>Founder Command now includes a Pocket SkyeMail mini inbox and a Core Apps mobile dock for SkyeMail, FS27/SkyGate, SkyePay, SkyeNet, business card generators, Client App Factory, Valley CRM, and owner shortcuts.</li>
+              <li>Workspace handoff packets now cover QR payloads, welcome URLs, safe claim/reset credential receipts, optional welcome email delivery, and SkyeMerit launch prompts.</li>
+              <li>The main 0S Worker now binds SkyeMail internally as <code>SKYEMAIL_PLATFORM_WORKER</code>, so owner sync does not depend on public cross-worker HTTP.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>SkyeMail Worker release <code>d35c324d-7b27-4a9c-8fc2-7363d4b2b870</code> is deployed.</li>
+              <li>Main 0S Worker release <code>576fb7cd-24eb-4c59-a986-65a9a947860a</code> is deployed with the SkyeMail service binding.</li>
+              <li>Live owner-auth smoke passed Founder Command status, Pocket SkyeMail, and workspace handoffs.</li>
+              <li>SkyeMail live stress passed 32/32 requests with p95 <code>85ms</code>; SkyeNet live stress passed 12 baseline checks and 72 stress requests with p95 <code>1041ms</code>.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: Pocket SkyeMail is a synced owner cockpit. Full inbox, compose, and mailbox operations still open in the real SkyeMail app behind the shared FS27/0S gate.</div>
+      </article>
+
+      <article class="release-card current">
+        <p class="eyebrow">2026-05-25 • Live</p>
+        <h2>Fresh-user claim flow and 0S readiness proof are deployed.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li>SaaS workspace provisioning can create a SkyeMail identity first, then the same person can claim it through the shared FS27/SkyGate session.</li>
+              <li>The claim path upgrades the placeholder service identity into a real password login, links the shared gate identity, and writes the active sovereign key.</li>
+              <li>Citadel-capacity blocks now fall back to the SkyeMail local inbox route instead of stopping account setup.</li>
+              <li>The 0S readiness check now covers the full no-account-to-working-account proof.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>SkyeMail Worker code release <code>d6cae58d-66c4-4ea4-b2bc-5ae01d7bf469</code> is deployed; changelog-only asset deploys may carry newer Worker IDs.</li>
+              <li>The first full readiness audit passed 17 checks with zero failures before the final redeploy.</li>
+              <li>Final redeploy reruns prove SaaS signup, zero-balance checkout, FS27 signup, SkyeMail claim/login/send/inbox records, route compatibility, and live stress.</li>
+              <li>Remaining proof boundary: latest headed SkyeNet folder-drop reruns are blocked by local Playwright/Chromium hangs, while the shared-auth SkyeNet publish workflow still returns a live route.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: SkyeMail stays on the shared 0S gate. The Citadel/SkyeNet mail lane remains behind the SkyeMail product name, and SkyeMail keeps the inbox route active when SkyeNet capacity needs more seats.</div>
+      </article>
+
+      <article class="release-card current">
+        <p class="eyebrow">2026-05-24 • Live</p>
+        <h2>Enterprise inbox sync, hosted replies, and production stress are deployed.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li>Thread replies now use the same hosted <code>/mail-send</code> lane as compose instead of the stale Gmail-only route.</li>
+              <li><code>/mail-sync</code> imports sovereign inbox deltas into SkyeMail before mailbox reads.</li>
+              <li>A SkyeNet scheduled job runs sovereign mail sync every 15 minutes for inbox freshness.</li>
+              <li>Gmail-compatible mutation routes now cover label updates, trash, batch delete, and attachment lookups for the inbox UI.</li>
+              <li>CC, BCC, HTML body, sender alias, reply/thread IDs, and attachment metadata survive the hosted send lane and FS27/Citadel backup receipts.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>SkyeMail Worker version <code>4e761bf8-fcec-4fc0-bef9-b48337a8aac7</code> is deployed.</li>
+              <li>Local enterprise stress passed 500 runtime contract assertions and sovereign asset packaging checks.</li>
+              <li>Live production stress passed 8 baseline HTTP checks and 32 stress reads.</li>
+              <li>SkyeMail status reports Citadel mail routing, organization, and provisioning readiness behind the SkyeMail product name.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: SkyeMail now has hosted send/read proof, inbox import, reply routing, mutation compatibility, and cron sync. SkyDocxMax rich-text email editing is the next mount target, not part of this release.</div>
+      </article>
+
+      <article class="release-card current">
         <p class="eyebrow">2026-05-24 • Live</p>
         <h2>Founder identity and contact routing corrected.</h2>
         <div class="grid two">
@@ -54,7 +135,7 @@
             <h3>Verified</h3>
             <ul class="feature-list">
               <li>Deployed on the latest SkyeMail production Worker release for this correction.</li>
-              <li>Live HTTP smoke on <code>/founder</code> returned <code>200</code> from Cloudflare.</li>
+              <li>Live HTTP smoke on <code>/founder</code> returned <code>200</code> from the production route.</li>
               <li>The live response contains Gray Skyes and the updated contact set.</li>
               <li>The live response no longer contains the stale identity string or the old contact emails.</li>
             </ul>
@@ -65,28 +146,28 @@
 
       <article class="release-card current">
         <p class="eyebrow">2026-05-24 • Live</p>
-        <h2>Zoho-backed inbox send/read proof is deployed.</h2>
+        <h2>Citadel-backed inbox send/read proof is deployed.</h2>
         <div class="grid two">
           <div>
             <h3>Shipped</h3>
             <ul class="feature-list">
-              <li>The live proof runner now follows the active SkyeMail provider instead of assuming the old Resend-only proof lane.</li>
-              <li>Zoho proof mode refreshes the provider token, discovers the hosted mailbox, sends proof mail, and reads it back from the provider-backed inbox.</li>
-              <li>The deployed proof page now publishes the sanitized provider/inbox result without exposing OAuth tokens, private keys, passphrases, or mailbox secrets.</li>
+              <li>The live proof runner now follows the Citadel/SkyeNet SkyeMail lane instead of assuming the old external-only proof lane.</li>
+              <li>Citadel proof mode refreshes the sovereign mail lane, discovers the hosted mailbox, sends proof mail, and reads it back from the sovereign-backed inbox.</li>
+              <li>The deployed proof page now publishes the sanitized sovereign inbox result without exposing OAuth tokens, private keys, passphrases, or mailbox secrets.</li>
               <li>The Worker asset build now includes the public proof JSON, proof video, and proof screenshot.</li>
             </ul>
           </div>
           <div>
             <h3>Verified</h3>
             <ul class="feature-list">
-              <li>The dedicated SkyeMail Worker is deployed and serving the provider-backed proof lane.</li>
-              <li>Run <code>codex-20260524-zoho-live-final</code> passed with both proof messages visible in the provider-backed inbox.</li>
-              <li><code>/.netlify/functions/mailbox-domains</code> reports Zoho API, org, and provisioning readiness.</li>
-              <li>Local smokes passed for standalone proof, proof surface, and Zoho provider readiness.</li>
+              <li>The dedicated SkyeMail Worker is deployed and serving the sovereign proof lane.</li>
+              <li>Run <code>codex-20260524-citadel-live-final</code> passed with both proof messages visible in the sovereign-backed inbox.</li>
+              <li><code>/.netlify/functions/mailbox-domains</code> reports Citadel mail routing, org, and provisioning readiness.</li>
+              <li>Local smokes passed for standalone proof, proof surface, and Citadel readiness.</li>
             </ul>
           </div>
         </div>
-        <div class="notice-strip">Production truth: SkyeMail is the public product. Zoho is the active hosted-mail implementation behind the SkyeMail lane for this release.</div>
+        <div class="notice-strip">Production truth: SkyeMail is the public product. Citadel and SkyeNet are the active sovereign implementation behind the SkyeMail lane for this release.</div>
       </article>
 
       <article class="release-card current">
@@ -102,7 +183,7 @@
               <li>SkyeMail ID, workspace ID, FS27 customer, and FS27 gate card linkage.</li>
               <li>Mailbox provisioning records, primary alias records, and same-inbox alias foundation.</li>
               <li><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Browser proof</span> loop that creates sent and received records under the FS27-backed workspace.</li>
-              <li>Cloudflare compatibility endpoints for mailbox labels and runtime board reads.</li>
+              <li>Worker compatibility endpoints for mailbox labels and runtime board reads.</li>
             </ul>
           </div>
           <div>
@@ -118,7 +199,7 @@
             </ul>
           </div>
         </div>
-        <div class="notice-strip">Production truth: provider-backed SkyeMail inbox routing is active now. Stalwart is optional later for traditional hosted mailbox-server features such as IMAP/SMTP/JMAP accounts.</div>
+        <div class="notice-strip">Production truth: sovereign-backed SkyeMail inbox routing is active now. Stalwart is optional later for traditional hosted mailbox-server features such as IMAP/SMTP/JMAP accounts.</div>
       </article>
 
       <article class="release-card">

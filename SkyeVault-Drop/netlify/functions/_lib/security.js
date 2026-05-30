@@ -145,6 +145,64 @@ function bearerToken(event) {
   return String(raw || '').replace(/^Bearer\s+/i, '').trim();
 }
 
+const SHARED_GATE_CREDENTIAL_ENV_NAMES = [
+  'ZERO_OS_GATE_CODE',
+  'ZERO_OS_ADMIN_CODE',
+  'ZERO_OS_OWNER_CODE',
+  'METRAIYUX_OWNER_ADMIN_CODE',
+  'METRAIYUX_ADMIN_CODE',
+  'OWNER_ADMIN_CODE',
+  'OWNER_ADMIN_PASSWORD',
+  'FREE99_ADMIN_CODE',
+  'FREE99_ADMIN_PASSWORD',
+  'FREE99_GATE_CODE',
+  'FREE99_GATE_PASSWORD',
+  'FREE99_OWNER_CODE',
+  'FREE99_OWNER_PASSWORD',
+  'FS27_ADMIN_CODE',
+  'FS27_ADMIN_PASSWORD',
+  'FS27_OWNER_CODE',
+  'FS27_OWNER_PASSWORD',
+  'SKYGATE_ADMIN_CODE',
+  'SKYGATE_ADMIN_PASSWORD',
+  'SKYGATE_OWNER_CODE',
+  'SKYGATE_OWNER_PASSWORD',
+  'SKYGATEFS27_ADMIN_CODE',
+  'SKYGATEFS27_ADMIN_PASSWORD',
+  'SKYGATEFS27_OWNER_CODE',
+  'SKYGATEFS27_OWNER_PASSWORD',
+  'SKYE_GATE_ADMIN_CODE',
+  'SKYE_GATE_ADMIN_PASSWORD',
+  'SKYE_GATE_OWNER_CODE',
+  'SKYE_GATE_OWNER_PASSWORD'
+];
+
+function rawEnvValue(name) {
+  const value = process.env[name] ?? workerEnv()[name] ?? '';
+  return typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
+}
+
+function resolvedEnvValue(name, seen = new Set()) {
+  if (seen.has(name)) return '';
+  seen.add(name);
+  const value = rawEnvValue(name);
+  const reference = /^\$\{([A-Z0-9_]+)\}$/.exec(value);
+  if (reference) return resolvedEnvValue(reference[1], seen);
+  return value;
+}
+
+function sharedGateCredentialValues() {
+  return Array.from(new Set(SHARED_GATE_CREDENTIAL_ENV_NAMES
+    .map((name) => resolvedEnvValue(name))
+    .filter((value) => value && !/^\$\{[^}]+\}$/.test(value))));
+}
+
+function matchesSharedGateCredential(token) {
+  const provided = String(token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!provided) return false;
+  return sharedGateCredentialValues().some((candidate) => constantTimeEqual(provided, candidate));
+}
+
 function skygateOrigin() {
   return String(
     process.env.SKYGATEFS27_ORIGIN
@@ -276,15 +334,6 @@ export function requireAdmin(event) {
 
 export async function requireAdminAccess(event) {
   assertAllowedOrigin(event);
-  const configured = process.env.ADMIN_TOKEN;
-  const provided = getHeader(event, 'x-admin-token');
-  if (configured && provided && constantTimeEqual(provided, configured)) {
-    return publicAdminActor('legacy-admin-token', { role: 'admin', sub: 'legacy-admin-token' });
-  }
-  if (hasValidOperatorSession(event)) {
-    return publicAdminActor('operator-session', { role: 'admin', sub: 'operator-session' });
-  }
-
   const bearer = bearerToken(event);
   if (bearer) {
     const gate = await introspectSkygateBearer(event);
@@ -299,6 +348,15 @@ export async function requireAdminAccess(event) {
       throw error;
     }
     return publicAdminActor('fs27-skygate', gate.claims);
+  }
+
+  const configured = process.env.ADMIN_TOKEN;
+  const provided = getHeader(event, 'x-admin-token');
+  if (configured && provided && constantTimeEqual(provided, configured)) {
+    return publicAdminActor('legacy-admin-token', { role: 'admin', sub: 'legacy-admin-token' });
+  }
+  if (hasValidOperatorSession(event)) {
+    return publicAdminActor('operator-session', { role: 'admin', sub: 'operator-session' });
   }
 
   const error = new Error('Admin token, protected operator session, or FS27 admin bearer is invalid or missing.');
@@ -343,6 +401,28 @@ function workspaceKeyMatches(provided, workspace) {
   return false;
 }
 
+function ownerAdminPortalAccess(body = {}, admin = {}) {
+  return {
+    type: 'owner-admin',
+    workspaceId: safeId(body.workspaceId || admin.workspaceId || 'owner-admin'),
+    developerId: safeId(body.developerId || admin.subject || admin.actor || 'owner-admin'),
+    developerName: cleanText(body.developerName || admin.email || admin.actor || 'Owner Admin', 120),
+    clientName: cleanText(body.clientName || 'Owner Admin', 180),
+    clientEmail: cleanText(body.clientEmail || admin.email || 'owner-admin@metraiyux.local', 180).toLowerCase(),
+    projectName: cleanText(body.projectName || 'Owner Admin Vault', 180),
+    maxFilesPerSubmission: 1000000,
+    maxTotalSubmissionGb: 5000,
+    maxFileSizeGb: 5000,
+    repoPushPlan: 'owner-unlimited',
+    repoPushMode: 'unlimited',
+    repoPushesPerWindow: 0,
+    repoPushWindowDays: 30,
+    subscriptionStatus: 'active',
+    planName: 'owner-admin-unlimited',
+    admin
+  };
+}
+
 export async function resolvePortalAccess(event, body = {}) {
   assertAllowedOrigin(event);
   const adminMaterial = getHeader(event, 'authorization')
@@ -351,28 +431,19 @@ export async function resolvePortalAccess(event, body = {}) {
     || getHeader(event, 'x-free99-gate-session')
     || getHeader(event, 'x-free99-admin-code');
   if (adminMaterial) {
+    const sharedGateToken = bearerToken(event) || getHeader(event, 'x-admin-token');
+    if (matchesSharedGateCredential(sharedGateToken)) {
+      recordPortalKeySuccess(event);
+      return ownerAdminPortalAccess(body, publicAdminActor('shared-0s-gate', {
+        role: 'owner',
+        sub: 'shared-0s-gate',
+        scope: ['skyevault.admin', 'gateway.invoke']
+      }));
+    }
     try {
       const admin = await requireAdminAccess(event);
       recordPortalKeySuccess(event);
-      return {
-        type: 'owner-admin',
-        workspaceId: safeId(body.workspaceId || admin.workspaceId || 'owner-admin'),
-        developerId: safeId(body.developerId || admin.subject || admin.actor || 'owner-admin'),
-        developerName: cleanText(body.developerName || admin.email || admin.actor || 'Owner Admin', 120),
-        clientName: cleanText(body.clientName || 'Owner Admin', 180),
-        clientEmail: cleanText(body.clientEmail || admin.email || 'owner-admin@metraiyux.local', 180).toLowerCase(),
-        projectName: cleanText(body.projectName || 'Owner Admin Vault', 180),
-        maxFilesPerSubmission: 1000000,
-        maxTotalSubmissionGb: 5000,
-        maxFileSizeGb: 5000,
-        repoPushPlan: 'owner-unlimited',
-        repoPushMode: 'unlimited',
-        repoPushesPerWindow: 0,
-        repoPushWindowDays: 30,
-        subscriptionStatus: 'active',
-        planName: 'owner-admin-unlimited',
-        admin
-      };
+      return ownerAdminPortalAccess(body, admin);
     } catch {
       // A non-admin bearer may still be paired with a valid portal key below.
     }

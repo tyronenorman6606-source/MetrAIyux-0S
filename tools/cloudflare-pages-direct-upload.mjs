@@ -103,11 +103,20 @@ function addCredentialCandidate(candidates, candidate) {
   candidates.push(candidate);
 }
 
+function rootEnvFiles() {
+  const files = [
+    process.env.ROOT_ENV_FILE,
+    process.env.METRAIYUX_ROOT_ENV,
+    path.join(repoRoot, ".env"),
+    path.join(repoRoot, "env.txt"),
+    "/workspaces/MetrAIyux-0S/.env",
+    "/workspaces/MetrAIyux-0S/env.txt"
+  ].filter(Boolean);
+  return [...new Set(files.map((file) => path.resolve(file)))].filter((file) => fs.existsSync(file));
+}
+
 function readCloudflareCredentialCandidates() {
-  const rootEnvPath = path.resolve(process.env.ROOT_ENV_FILE || ".env");
-  const lines = fs.existsSync(rootEnvPath) ? fs.readFileSync(rootEnvPath, "utf8").split(/\r?\n/) : [];
   const candidates = [];
-  const formal = {};
 
   addCredentialCandidate(candidates, {
     source: "process-env:CLOUDFLARE_API_TOKEN",
@@ -117,51 +126,64 @@ function readCloudflareCredentialCandidates() {
     account: process.env.CLOUDFLARE_ACCOUNT_ID || process.env.CF_ACCOUNT_ID
   });
 
-  lines.forEach((raw, index) => {
-    const line = index + 1;
-    const assignment = raw.trim().match(/^(?:export\s+)?(CLOUDFLARE_API_TOKEN|CLOUDFLARE_ACCOUNT_ID|CF_API_TOKEN|CF_ACCOUNT_ID|METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID)\s*=\s*(.*)$/);
-    if (assignment) formal[assignment[1]] = { value: unquote(assignment[2]), line };
+  for (const envPath of rootEnvFiles()) {
+    const labelPrefix = path.relative(repoRoot, envPath) || path.basename(envPath);
+    const lines = fs.readFileSync(envPath, "utf8").split(/\r?\n/);
+    const formal = {};
 
-    const proseToken = raw.match(/Your API Token\s*=\s*"([^"]+)"/i);
-    if (!proseToken) return;
+    lines.forEach((raw, index) => {
+      const line = index + 1;
+      const assignment = raw.trim().match(/^(?:export\s+)?(CLOUDFLARE_API_TOKEN|CLOUDFLARE_DEPLOY_API_TOKEN|CLOUDFLARE_MANAGEMENT_API_TOKEN|CLOUDFLARE_ACCOUNT_ID|CF_API_TOKEN|CF_ACCOUNT_ID|METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID)\s*=\s*(.*)$/);
+      if (assignment) formal[assignment[1]] = { value: unquote(assignment[2]), line };
 
-    let proseAccount = "";
-    let accountLine = null;
-    for (let offset = 1; offset <= 4; offset += 1) {
-      const accountMatch = (lines[index + offset] || "").match(/Account ID\s*=\s*"([^"]+)"/i);
-      if (accountMatch) {
-        proseAccount = accountMatch[1];
-        accountLine = line + offset;
-        break;
+      const proseToken = raw.match(/Your API Token\s*=\s*"([^"]+)"/i);
+      if (!proseToken) return;
+
+      let proseAccount = "";
+      let accountLine = null;
+      for (let offset = 1; offset <= 4; offset += 1) {
+        const accountMatch = (lines[index + offset] || "").match(/Account ID\s*=\s*"([^"]+)"/i);
+        if (accountMatch) {
+          proseAccount = accountMatch[1];
+          accountLine = line + offset;
+          break;
+        }
       }
-    }
 
-    const label = lines.slice(Math.max(0, index - 4), index).reverse().find((item) => item.trim())?.trim() || "root-env-prose-token";
-    addCredentialCandidate(candidates, {
-      source: `root-env-prose:${label.slice(0, 64)}`,
-      line,
-      accountLine,
-      score: /super\s+api\s+token|pages/i.test(label) ? 120 : 60,
-      token: proseToken[1],
-      account: proseAccount
+      const label = lines.slice(Math.max(0, index - 4), index).reverse().find((item) => item.trim())?.trim() || `${labelPrefix}-prose-token`;
+      addCredentialCandidate(candidates, {
+        source: `${labelPrefix}:prose:${label.slice(0, 64)}`,
+        line,
+        accountLine,
+        score: /super\s+api\s+token|pages|deploy|worker/i.test(label) ? 120 : 60,
+        token: proseToken[1],
+        account: proseAccount
+      });
     });
-  });
 
-  const formalAccount = formal.CLOUDFLARE_ACCOUNT_ID?.value || formal.CF_ACCOUNT_ID?.value || formal.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID?.value;
-  addCredentialCandidate(candidates, {
-    source: "root-env:CLOUDFLARE_API_TOKEN",
-    line: formal.CLOUDFLARE_API_TOKEN?.line,
-    score: 90,
-    token: formal.CLOUDFLARE_API_TOKEN?.value,
-    account: formalAccount
-  });
-  addCredentialCandidate(candidates, {
-    source: "root-env:CF_API_TOKEN",
-    line: formal.CF_API_TOKEN?.line,
-    score: 80,
-    token: formal.CF_API_TOKEN?.value,
-    account: formalAccount
-  });
+    const formalAccount = formal.CLOUDFLARE_ACCOUNT_ID?.value || formal.CF_ACCOUNT_ID?.value || formal.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID?.value;
+    addCredentialCandidate(candidates, {
+      source: `${labelPrefix}:CLOUDFLARE_DEPLOY_API_TOKEN`,
+      line: formal.CLOUDFLARE_DEPLOY_API_TOKEN?.line,
+      score: 115,
+      token: formal.CLOUDFLARE_DEPLOY_API_TOKEN?.value,
+      account: formalAccount
+    });
+    addCredentialCandidate(candidates, {
+      source: `${labelPrefix}:CLOUDFLARE_API_TOKEN`,
+      line: formal.CLOUDFLARE_API_TOKEN?.line,
+      score: 90,
+      token: formal.CLOUDFLARE_API_TOKEN?.value,
+      account: formalAccount
+    });
+    addCredentialCandidate(candidates, {
+      source: `${labelPrefix}:CF_API_TOKEN`,
+      line: formal.CF_API_TOKEN?.line,
+      score: 80,
+      token: formal.CF_API_TOKEN?.value,
+      account: formalAccount
+    });
+  }
 
   return candidates.sort((a, b) => b.score - a.score || (b.line || 0) - (a.line || 0));
 }
@@ -185,8 +207,6 @@ async function probeCloudflareCredential(candidate, endpoint) {
 }
 
 async function resolveCloudflareCredentials() {
-  if (accountId && apiToken) return;
-
   const candidates = readCloudflareCredentialCandidates();
   const failures = [];
 
@@ -248,11 +268,59 @@ const contentTypes = new Map([
   [".xml", "application/xml; charset=utf-8"]
 ]);
 
-const ignoredNames = new Set(["_headers", "_redirects", "_routes.json", "_worker.js", ".DS_Store"]);
+const ignoredNames = new Set(["_headers", "_redirects", "_routes.json", ".DS_Store"]);
+const skyeMusicProtectedExtensions = new Set([
+  ".mp3",
+  ".wav",
+  ".flac",
+  ".m4a",
+  ".aac",
+  ".ogg",
+  ".zip",
+  ".rar",
+  ".7z",
+  ".psd",
+  ".ai",
+  ".aep",
+  ".prproj",
+  ".logicx",
+  ".als",
+  ".flp",
+  ".stem",
+  ".stems",
+  ".pdf",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".gif",
+  ".mp4",
+  ".mov",
+  ".webm"
+]);
+const skyeMusicApprovedReleaseAssetPrefixes = [
+  "artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/",
+  "artist-storefronts/gray-skyes/drops/skyline-pact/"
+];
+
+function isSkyeMusicNexusUpload() {
+  return projectName === "skye-music-nexus" || fs.existsSync(path.join(distDir, "SkyeMusicNexus.html")) || fs.existsSync(path.join(distDir, "artist-storefronts"));
+}
+
+function isSkyeMusicProtectedAsset(relativePath) {
+  if (!isSkyeMusicNexusUpload()) return false;
+  const webPath = relativePath.split(path.sep).join("/");
+  if (webPath.startsWith("song-creation-bin/")) return true;
+  if (!webPath.startsWith("artist-storefronts/")) return false;
+  if (skyeMusicApprovedReleaseAssetPrefixes.some((prefix) => webPath.startsWith(prefix))) return false;
+  if (webPath.endsWith("/pics2vid/package.json")) return true;
+  return skyeMusicProtectedExtensions.has(path.extname(webPath).toLowerCase());
+}
 
 function shouldIgnore(relativePath) {
   const parts = relativePath.split(path.sep);
   if (ignoredNames.has(parts.at(-1))) return true;
+  if (isSkyeMusicProtectedAsset(relativePath)) return true;
   return parts.includes("node_modules") || parts.includes(".git") || parts.includes(".wrangler") || parts[0] === "functions";
 }
 
@@ -383,7 +451,7 @@ async function deploy() {
   for (const specialFile of ["_headers", "_redirects"]) {
     const specialPath = path.join(distDir, specialFile);
     if (fs.existsSync(specialPath)) {
-      formData.append(specialFile, new File([fs.readFileSync(specialPath)], specialFile));
+      formData.append(specialFile, new Blob([fs.readFileSync(specialPath)]), specialFile);
     }
   }
 

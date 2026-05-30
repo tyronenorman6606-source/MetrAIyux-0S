@@ -35,7 +35,7 @@
       <div class="panel">
         <p class="eyebrow">Marketing key gate</p>
         <h1>Devs Playbook access.</h1>
-        <p>Enter an email to open the playbook. The gate records the access under the campaign key <code id="key-label">skdevpbk</code>.</p>
+        <p>Enter an email to record the campaign touch, then continue through the shared 0S Gate.</p>
         <form id="gate-form" autocomplete="on">
           <label>Email
             <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
@@ -54,7 +54,7 @@
         <p class="eyebrow">Tracking</p>
         <h2>Every signup gets tagged.</h2>
         <p>The Worker stores the record in the <code>marketing_keys</code> ledger with a gate user shaped like <code>emailname-skdevpbk</code>.</p>
-        <p class="note">This gate does not create owner/admin access and does not unlock the rest of the 0S.</p>
+        <p class="note">This page does not create a local playbook session. The FS27/SkyGate session is the only unlock.</p>
       </aside>
     </section>
   </main>
@@ -99,8 +99,8 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Email gate failed.');
-        setStatus('Gate accepted for ' + (data.gate_user && data.gate_user.id ? data.gate_user.id : key) + '.', 'ok');
-        setTimeout(() => location.assign(data.returnTo || returnTo), 220);
+        setStatus('Recorded for ' + (data.gate_user && data.gate_user.id ? data.gate_user.id : key) + '. Opening the 0S Gate...', 'ok');
+        setTimeout(() => location.assign(data.gateUrl || ('/gate/signup/?return=' + encodeURIComponent(data.returnTo || returnTo))), 220);
       } catch (error) {
         setStatus(error.message || 'Could not open playbook.', 'bad');
       }

@@ -1,17 +1,86 @@
 {
-  "primary": {
-    "host": "cloudflare",
-    "url": "https://dink-and-dine-pickle-park.pages.dev/",
-    "envKey": "DINK_AND_DINE_PICKLE_PARK_PRODUCTION_URL"
+  "schema": "skyenet.static-surface.deploy-target.v1",
+  "updatedAt": "2026-05-30T18:16:28.568Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "lane": "skye-clients",
+  "purpose": "pickleball, food, events, memberships, and reservations app",
+  "projectId": "dink-and-dine-pickle-park",
+  "workspaceId": "dink-and-dine-pickle-park",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530181453",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/dink-and-dine-pickle-park/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/dink-and-dine-pickle-park",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "Skye-Clients/dink-and-dine-pickle-park-app",
+  "publicBuildDir": "Skye-Clients/dink-and-dine-pickle-park-app",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=dink-and-dine-pickle-park&project_id=dink-and-dine-pickle-park&deployment_id=dep_20260530181453",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "latestDeployment": {
-    "host": "cloudflare",
-    "url": "https://2140986b.dink-and-dine-pickle-park.pages.dev",
-    "deployedAt": "2026-05-19"
-  },
-  "qr": {
-    "target": "https://dink-and-dine-pickle-park.pages.dev/",
-    "asset": "/assets/live-site/dink-preview-qr.png",
-    "printAsset": "/assets/live-site/dink-preview-qr.png"
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "route": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/dink-and-dine-pickle-park",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/dink-and-dine-pickle-park",
+          "url_mode": "path",
+          "workspace_id": "dink-and-dine-pickle-park",
+          "project_id": "dink-and-dine-pickle-park",
+          "active_deployment_id": "dep_20260530181453",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/dink-and-dine-pickle-park/dep_20260530181453",
+          "updated_at": "2026-05-30T18:16:04.221Z"
+        },
+        "elapsed_ms": 600.09
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/dink-and-dine-pickle-park/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/dink-and-dine-pickle-park",
+        "elapsed_ms": 2049.4
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 204.99,
+        "bytes": 13731,
+        "title": "Dink &amp; Dine Pickle Park | Operations App",
+        "error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=dink-and-dine-pickle-park&project_id=dink-and-dine-pickle-park&deployment_id=dep_20260530181453",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 304.35
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 135131,
+        "read_truncated": true,
+        "elapsed_ms": 2979.82,
+        "error": ""
+      }
+    }
   }
 }

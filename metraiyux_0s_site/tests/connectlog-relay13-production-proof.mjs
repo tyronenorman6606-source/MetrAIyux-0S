@@ -1,8 +1,11 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 const root = path.resolve(process.cwd());
+const require = createRequire(import.meta.url);
+const WebSocketCtor = globalThis.WebSocket || require('ws');
 const reportPath = path.join(root, 'test-artifacts', 'connectlog-relay13-production-proof.json');
 const origin = (process.env.RELAY13_ORIGIN || 'https://relay13-core.graylondonskyes.workers.dev').replace(/\/$/, '');
 
@@ -59,11 +62,11 @@ function sanitizeData(data) {
 
 function waitForWebSocket(url, label) {
   return new Promise((resolve, reject) => {
-    if (typeof WebSocket === 'undefined') {
-      reject(new Error('Global WebSocket is not available in this Node runtime.'));
+    if (typeof WebSocketCtor !== 'function') {
+      reject(new Error('WebSocket client is not available in this Node runtime.'));
       return;
     }
-    const ws = new WebSocket(url);
+    const ws = new WebSocketCtor(url);
     const messages = [];
     const timer = setTimeout(() => {
       try { ws.close(); } catch {}

@@ -54,7 +54,7 @@ async function resendGet(path){
   const text = await res.text();
   let data = null;
   try{ data = text ? JSON.parse(text) : null; }catch(e){ data = { raw: text }; }
-  if(!res.ok) throw new Error((data && data.message) || (data && data.error) || text || `Resend GET failed (${res.status})`);
+  if(!res.ok) throw new Error((data && data.message) || (data && data.error) || text || `Mail lane GET failed (${res.status})`);
   return data;
 }
 

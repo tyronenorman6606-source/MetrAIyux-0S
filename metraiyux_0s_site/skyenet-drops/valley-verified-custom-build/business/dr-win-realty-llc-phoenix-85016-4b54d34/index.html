@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dr. Win Realty LLC. | Valley Verified</title>
+  <meta name="description" content="Dr. Win Realty LLC. is a Phoenix real estate listing at 2345 E. Thomas Rd. suite 400.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15212d;
+      --paper: #f4f7f1;
+      --sky: #b7d7e8;
+      --leaf: #3e7a5f;
+      --clay: #c27043;
+      --line: rgba(21, 33, 45, .15);
+      --white: #fffdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(0deg, rgba(62, 122, 95, .1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(21, 33, 45, .08) 1px, transparent 1px),
+        var(--paper);
+      background-size: 42px 42px;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    .bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--leaf);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 18px;
+      margin-top: 22px;
+      align-items: stretch;
+    }
+
+    .listing {
+      padding: 38px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      box-shadow: 0 20px 60px rgba(21, 33, 45, .08);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 9px 12px;
+      background: var(--sky);
+      color: var(--ink);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 54px 0 18px;
+      font-size: 5.2rem;
+      line-height: .95;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 660px;
+      margin: 0;
+      color: #40505d;
+      font-size: 1.18rem;
+    }
+
+    .lot {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line);
+    }
+
+    .lot div {
+      min-height: 118px;
+      padding: 18px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+    }
+
+    .lot div:last-child { border-right: 0; }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--clay);
+      text-transform: uppercase;
+    }
+
+    .lot span {
+      display: block;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 14px;
+    }
+
+    .map {
+      position: relative;
+      min-height: 320px;
+      padding: 24px;
+      background:
+        linear-gradient(90deg, transparent 0 47%, rgba(255, 255, 255, .85) 47% 53%, transparent 53%),
+        linear-gradient(0deg, transparent 0 47%, rgba(255, 255, 255, .85) 47% 53%, transparent 53%),
+        var(--leaf);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .map:after {
+      content: "85016";
+      position: absolute;
+      right: 18px;
+      bottom: 10px;
+      color: rgba(255, 255, 255, .28);
+      font-size: 4.8rem;
+      font-weight: 900;
+    }
+
+    .contact-card {
+      padding: 22px;
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .contact-card a {
+      display: block;
+      color: var(--sky);
+      font-size: 1.7rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    address {
+      margin-top: 16px;
+      font-style: normal;
+      color: #d9e4e8;
+    }
+
+    .source {
+      margin-top: 18px;
+      padding: 18px;
+      border-left: 8px solid var(--leaf);
+      background: rgba(255, 253, 248, .92);
+    }
+
+    @media (max-width: 880px) {
+      .hero { grid-template-columns: 1fr; }
+      h1 { font-size: 4rem; }
+    }
+
+    @media (max-width: 600px) {
+      .bar { display: grid; }
+      .listing { padding: 26px; }
+      h1 { margin-top: 38px; font-size: 3rem; }
+      .lot { grid-template-columns: 1fr; }
+      .lot div { border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="bar">
+      <span>Valley Verified Network</span>
+      <span>Phoenix real estate</span>
+    </header>
+
+    <section class="hero" aria-label="Dr. Win Realty profile">
+      <div class="listing">
+        <span class="pill">Real Estate</span>
+        <h1>Dr. Win Realty LLC.</h1>
+        <p class="lede">Dr. Win Realty LLC gives Phoenix homeowners, buyers, rental owners, and property clients a real estate contact at 2345 E. Thomas Rd. Suite 400.</p>
+        <div class="lot" aria-label="Business facts">
+          <div><b>Category</b><span>Real Estate And Property</span></div>
+          <div><b>License type</b><span>Real Estate/Contractors / Real Estate</span></div>
+          <div><b>Languages</b><span>English</span></div>
+        </div>
+      </div>
+      <aside class="contact" aria-label="Contact information">
+        <div class="map"><b>Office area</b><span>Phoenix, AZ</span></div>
+        <div class="contact-card">
+          <b>Call</b>
+          <a href="tel:+14806969886">(480) 696-9886</a>
+          <address>2345 E. Thomas Rd. suite 400<br>Phoenix, AZ 85016</address>
+        </div>
+      </aside>
+    </section>
+
+    <section class="source">
+      <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Dr. Win Realty LLC belongs in Valley Verified because the research anchors a Phoenix real estate business to a public phone number, Thomas Road suite address, real estate category, and Greater Phoenix Chamber real estate profile. That gives local property clients a clean starting point for real estate conversations in central Phoenix.</p>
+    </section>
+  </main>
+</body>
+</html>

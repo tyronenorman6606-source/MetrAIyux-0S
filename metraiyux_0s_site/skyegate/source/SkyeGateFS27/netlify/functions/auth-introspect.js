@@ -89,6 +89,7 @@ export default wrap(async (req) => {
   const session = await verifySessionToken(cleanToken);
   if (session) {
     const claims = session.payload;
+    const subjectIdentity = userIdentityFields(session.user);
     if (session.session?.session_kind === "password_reset" || session.user?.password_reset_required || claims.password_reset_required) {
       return json(200, {
         active: false,
@@ -100,9 +101,10 @@ export default wrap(async (req) => {
         sub_type: claims.sub_type || null,
         customer_id: claims.customer_id,
         session_id: claims.sid,
-        email: claims.email,
-        email_verified: claims.email_verified,
-        reason: "password_reset_required"
+      email: claims.email,
+      email_verified: claims.email_verified,
+      ...subjectIdentity,
+      reason: "password_reset_required"
       }, cors);
     }
     return json(200, {
@@ -122,6 +124,7 @@ export default wrap(async (req) => {
       api_key_id: claims.api_key_id,
       email: claims.email,
       email_verified: claims.email_verified,
+      ...subjectIdentity,
       org: claims.customer_id,
       gate_card_id: gateCardId(claims.sub, claims.email, claims.customer_id),
       gate_card: gateCard({
@@ -145,22 +148,24 @@ export default wrap(async (req) => {
         return json(200, { active: false }, cors);
       }
     }
+    let accessUser = null;
     if (claims.sub_type === "user" && claims.sub) {
-      const user = await getUserById(claims.sub);
-      if (!user || !user.is_active) return json(200, { active: false }, cors);
-      if (user.password_reset_required || claims.password_reset_required) {
+      accessUser = await getUserById(claims.sub);
+      if (!accessUser || !accessUser.is_active) return json(200, { active: false }, cors);
+      if (accessUser.password_reset_required || claims.password_reset_required) {
         return json(200, {
           active: false,
           password_reset_required: true,
           scope: scopeString(claims.scope),
           token_type: "Bearer",
           sub: claims.sub,
-          role: claims.role || user.role || null,
+          role: claims.role || accessUser.role || null,
           sub_type: claims.sub_type || null,
           customer_id: claims.customer_id,
           session_id: claims.sid,
-          email: claims.email || user.email,
+          email: claims.email || accessUser.email,
           email_verified: claims.email_verified,
+          ...userIdentityFields(accessUser),
           reason: "password_reset_required"
         }, cors);
       }
@@ -182,6 +187,7 @@ export default wrap(async (req) => {
       api_key_id: claims.api_key_id,
       email: claims.email,
       email_verified: claims.email_verified,
+      ...userIdentityFields(accessUser),
       org: claims.customer_id,
       gate_card_id: gateCardId(claims.sub, claims.email, claims.customer_id),
       gate_card: gateCard({
@@ -236,6 +242,33 @@ export default wrap(async (req) => {
 
   return json(200, { active: false }, cors);
 });
+
+function parseProfile(profile) {
+  if (!profile) return {};
+  if (typeof profile === "object") return profile;
+  try {
+    const parsed = JSON.parse(profile);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function userIdentityFields(user) {
+  if (!user) return {};
+  const profile = parseProfile(user.profile);
+  const identity = profile.identity && typeof profile.identity === "object" ? profile.identity : {};
+  return {
+    display_name: user.display_name || profile.display_name || identity.display_name || identity.name || null,
+    communication_email: user.communication_email || profile.communication_email || null,
+    skyemail: user.skyemail || profile.skyemail || profile.skyemail_claim?.email || null,
+    phone: profile.phone || identity.phone || null,
+    profile_type: profile.profile_type || identity.profileType || null,
+    skye_id: profile.skye_id || identity.skyeId || identity.idNumber || null,
+    identity,
+    profile
+  };
+}
 
 function scopeString(scope) {
   if (!scope) return "";

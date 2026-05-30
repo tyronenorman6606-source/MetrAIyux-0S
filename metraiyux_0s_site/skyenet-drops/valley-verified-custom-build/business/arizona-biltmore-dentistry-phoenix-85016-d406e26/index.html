@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Biltmore Dentistry | Phoenix Dentist</title>
+  <meta name="description" content="Arizona Biltmore Dentistry is a Phoenix dental office profile at 2777 E. Camelback Road, Suite 101 with direct phone and Chamber health-care evidence.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #142224;
+      --muted: #5d6d6f;
+      --line: #d8e3df;
+      --wash: #f3f8f5;
+      --paper: #fffdf8;
+      --teal: #0c776f;
+      --copper: #b96f3d;
+      --sage: #dce9df;
+      --shadow: 0 24px 80px rgba(20, 34, 36, .16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(120deg, rgba(220, 233, 223, .72), transparent 34%),
+        linear-gradient(180deg, var(--paper) 0%, #eef5f2 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    img,
+    video {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .shell {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 118px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 18px rgba(20, 34, 36, .09));
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .call-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid rgba(12, 119, 111, .24);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .8);
+      color: var(--teal);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 12px 34px rgba(20, 34, 36, .08);
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+      align-items: center;
+      gap: 48px;
+      padding: 44px 0 70px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--copper);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 2px;
+      background: var(--copper);
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(3rem, 8vw, 6.8rem);
+      line-height: .88;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 620px;
+      margin: 26px 0 0;
+      color: #31484b;
+      font-size: clamp(1.08rem, 2vw, 1.36rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 22px;
+      border-radius: 999px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--teal);
+      color: white;
+      box-shadow: 0 14px 32px rgba(12, 119, 111, .28);
+    }
+
+    .button.secondary {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .68);
+      color: var(--ink);
+    }
+
+    .media-stack {
+      position: relative;
+      min-height: 620px;
+    }
+
+    .media-card {
+      position: absolute;
+      overflow: hidden;
+      background: white;
+      border: 1px solid rgba(255, 255, 255, .82);
+      box-shadow: var(--shadow);
+    }
+
+    .media-card.main {
+      inset: 0 0 auto auto;
+      width: 78%;
+      aspect-ratio: 4 / 5;
+      border-radius: 38px 38px 10px 38px;
+    }
+
+    .media-card.main video,
+    .media-card.main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-card.doctor {
+      left: 0;
+      top: 46%;
+      width: 48%;
+      aspect-ratio: 1.15 / 1;
+      border-radius: 28px 8px 28px 28px;
+    }
+
+    .media-card.office {
+      right: 8%;
+      bottom: 0;
+      width: 56%;
+      aspect-ratio: 1.45 / 1;
+      border-radius: 8px 28px 28px 28px;
+    }
+
+    .media-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .floating-note {
+      position: absolute;
+      left: 6%;
+      top: 8%;
+      width: min(210px, 42vw);
+      padding: 18px;
+      border: 1px solid rgba(12, 119, 111, .22);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, .88);
+      box-shadow: 0 18px 48px rgba(20, 34, 36, .12);
+      backdrop-filter: blur(16px);
+    }
+
+    .floating-note strong {
+      display: block;
+      font-size: 1.02rem;
+    }
+
+    .floating-note span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .info-band {
+      padding: 48px 0 70px;
+      background: rgba(255, 255, 255, .46);
+      border-top: 1px solid rgba(216, 227, 223, .8);
+    }
+
+    .facts {
+      display: grid;
+      grid-profile-columns: 1fr 1fr 1fr;
+      gap: 18px;
+    }
+
+    .fact {
+      min-height: 150px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, .82);
+    }
+
+    .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .fact strong {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(1.08rem, 1.7vw, 1.36rem);
+      line-height: 1.28;
+    }
+
+    .contact-panel {
+      display: grid;
+      grid-profile-columns: 1.15fr .85fr;
+      gap: 32px;
+      align-items: center;
+      margin-top: 34px;
+      padding: 30px;
+      border: 1px solid rgba(12, 119, 111, .18);
+      border-radius: 8px;
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 20px 70px rgba(20, 34, 36, .18);
+    }
+
+    .contact-panel h2 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .contact-panel p {
+      margin: 14px 0 0;
+      color: rgba(255, 255, 255, .74);
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .contact-list li {
+      display: grid;
+      grid-profile-columns: 96px 1fr;
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(255, 255, 255, .16);
+    }
+
+    .contact-list span {
+      color: rgba(255, 255, 255, .58);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .contact-list strong {
+      font-size: 1rem;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 26px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .footer a {
+      color: var(--teal);
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      .shell {
+        width: min(100% - 28px, 720px);
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero {
+        grid-profile-columns: 1fr;
+        gap: 34px;
+        padding-top: 20px;
+      }
+
+      .media-stack {
+        min-height: auto;
+        display: grid;
+        grid-profile-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .media-card,
+      .floating-note {
+        position: relative;
+        inset: auto;
+      }
+
+      .media-card.main {
+        grid-column: 1 / -1;
+        width: 100%;
+        aspect-ratio: 16 / 11;
+      }
+
+      .media-card.doctor,
+      .media-card.office {
+        width: 100%;
+      }
+
+      .floating-note {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+
+      .facts,
+      .contact-panel {
+        grid-profile-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .button,
+      .call-pill {
+        width: 100%;
+      }
+
+      .media-stack {
+        grid-profile-columns: 1fr;
+      }
+
+      .contact-list li {
+        grid-profile-columns: 1fr;
+        gap: 4px;
+      }
+
+      .footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="shell topbar" aria-label="Business contact">
+      <div class="brand">
+        <img src="assets/real/logo.png" alt="Arizona Biltmore Dentistry logo">
+        <span>Phoenix dentist</span>
+      </div>
+      <a class="call-pill" href="tel:+16029578200">(602) 957-8200</a>
+    </header>
+
+    <section class="shell hero">
+      <div>
+        <p class="eyebrow">Camelback Road dental office</p>
+        <h1>Arizona Biltmore Dentistry</h1>
+        <p class="lead">Arizona Biltmore Dentistry gives Phoenix patients a Camelback Road dental office contact with a clear address, direct phone, and health-care category evidence.</p>
+        <div class="hero-actions" aria-label="Primary contact actions">
+          <a class="button primary" href="tel:+16029578200">Call the office</a>
+          <a class="button secondary" href="#details">View profile details</a>
+        </div>
+      </div>
+
+      <div class="media-stack" aria-label="Arizona Biltmore Dentistry photos">
+        <figure class="media-card main">
+          <video autoplay muted loop playsinline poster="assets/real/hero.png">
+            <profile src="assets/real/hero-video.mp4" type="video/mp4">
+            <img src="assets/real/hero.png" alt="Arizona Biltmore Dentistry visual">
+          </video>
+        </figure>
+        <figure class="media-card doctor">
+          <img src="assets/real/doctor.jpg" alt="Arizona Biltmore Dentistry provider image">
+        </figure>
+        <figure class="media-card office">
+          <img src="assets/real/office.jpg" alt="Arizona Biltmore Dentistry office image">
+        </figure>
+        <aside class="floating-note">
+          <strong>Business profile checked May 19, 2026</strong>
+          <span>Health Care / Dentist, Phoenix 85016</span>
+        </aside>
+      </div>
+    </section>
+
+    <section class="info-band" id="details">
+      <div class="shell">
+        <div class="facts" aria-label="Business facts">
+          <article class="fact">
+            <span>Category</span>
+            <strong>Health Care / Dentist</strong>
+          </article>
+          <article class="fact">
+            <span>Contact path</span>
+            <strong>Phone listed: <a href="tel:+16029578200">(602) 957-8200</a></strong>
+          </article>
+          <article class="fact">
+            <span>Pricing</span>
+            <strong>Use the listed phone to start the next care conversation.</strong>
+          </article>
+        </div>
+
+        <section class="contact-panel" aria-label="Arizona Biltmore Dentistry location">
+          <div>
+            <h2>Direct Phoenix office details</h2>
+            <p>The listed phone number is the direct public contact route for this Phoenix dental office.</p>
+          </div>
+          <ul class="contact-list">
+            <li>
+              <span>Address</span>
+              <strong>2777 E. Camelback Road Ste. 101, Phoenix, AZ 85016</strong>
+            </li>
+            <li>
+              <span>Language</span>
+              <strong>English</strong>
+            </li>
+            <li>
+              <span>Profile</span>
+              <strong><a href="https://business.phoenixchamber.com/list/ql/health-care-11">Public Phoenix Chamber profile</a></strong>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </section>
+
+    <footer class="shell footer">
+      <span>Phoenix, AZ Valley Verified profile.</span>
+    </footer>
+      <section class="sky-vv" aria-labelledby="vv-arizona-biltmore-dentistry-phoenix-85016-d406e26" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-arizona-biltmore-dentistry-phoenix-85016-d406e26" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Arizona Biltmore Dentistry is Valley Verified because the profile connects a Phoenix dental provider with the essentials patients need before they reach out. The public facts place the office at 2777 E. Camelback Road Ste. 101, Phoenix, AZ 85016 and list (602) 957-8200.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The Greater Phoenix Chamber health-care profile supports the dentist category and local contact details. Valley Verified keeps the page focused on what is solid: dental care category, Camelback corridor location, direct phone, and Phoenix patient audience.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Arizona Biltmore Dentistry belongs in Valley Verified because a neighborhood dental decision starts with trustable local identity, and this profile gives patients a straightforward way to recognize and contact the Phoenix office.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Dental care provider profile for the Camelback Road area.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Phoenix patients, families, and local residents looking for dentist contact information.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Chamber health-care category evidence, Phoenix address, direct phone, and Valley Verified business profile.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

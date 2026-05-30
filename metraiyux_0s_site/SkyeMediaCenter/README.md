@@ -6,7 +6,7 @@ SkyeMediaCenter has been rebuilt from a static command/dashboard package into a 
 
 - Replaced the generic dashboard UI with a custom visual system: orbital media core, signal atlas, workflow reactor, vault loom, runtime spine, proof forge, and control core.
 - Preserved the working Netlify Functions runtime for local proof and added the 0S Cloudflare Worker production adapter for media assets, file delivery, publishing, search, stats, and FS27/SkyGate sessions.
-- Rebuilt the public intake portal as an Asset Drop Reactor with drag/drop upload, tagging, draft/published status, progress visualization, local operator login, proof session bootstrap, and recent asset rendering.
+- Rebuilt the public intake portal as an Asset Drop Reactor with drag/drop upload, tagging, draft/published status, progress visualization, shared gate session attachment, proof session bootstrap, and recent asset rendering.
 - Rebuilt the admin surface as an Operator Theater with asset search, quick upload, file opening, publish, archive, Operator Review Board, Execution Board, Dispatch Board, and Workflow Timeline controls.
 - Added `manifest.webmanifest`, refreshed the floating transparent SVG mark, and added experiential docs.
 - Updated smoke proof to verify both the new surface layer and the preserved function contracts.
@@ -20,14 +20,7 @@ cd SkyeMediaCenter
 netlify dev
 ```
 
-For local proof sessions, set these environment variables before running function smoke or protected browser flows:
-
-```bash
-SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP=1
-SKYGATE_LOCAL_OPERATOR_EMAIL=operator@example.com
-SKYGATE_LOCAL_OPERATOR_PASSWORD='replace-with-strong-password'
-SKYGATE_LOCAL_OPERATOR_ROLE=admin
-```
+For local proof sessions, use the canonical 0S/FS27/SkyGate/Free99 bearer or owner session issued by the main Worker. SkyeMediaCenter does not mint an app-local identity.
 
 The smoke script generates its own proof keys and temp data directory, so it can be run directly:
 

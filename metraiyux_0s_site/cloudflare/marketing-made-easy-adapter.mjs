@@ -1,4 +1,5 @@
 import { generateWebCreatorAurenReply } from './webcreator-auren-core.mjs';
+import { executeZeroOsAutomationAction } from './zero-os-automation-spine.mjs';
 
 const MME_BASE = '/api/marketing-made-easy';
 const MME_PUBLIC_BASE = '/Marketing-Made-Easy';
@@ -252,6 +253,45 @@ function mmeAeVendorEmailFrom(env) {
   return String(env.RESEND_FROM_EMAIL || env.NOTIFY_EMAIL_FROM || env.RESEND_FROM || '').trim();
 }
 
+function mmeEnvFlag(env, names = []) {
+  return names.some((name) => /^(1|true|yes|on)$/i.test(String(env?.[name] || '').trim()));
+}
+
+function mmeProviderRuntimeReceipt(receipt = null) {
+  if (!receipt) return null;
+  return {
+    receipt_id: receipt.id || '',
+    provider_id: receipt.provider_id || '',
+    action: receipt.action || '',
+    status: receipt.status || '',
+    executed: receipt.executed === true,
+    provider_call_made: receipt.provider_call_made === true,
+    http_status: receipt.http_status || null,
+    error: receipt.error || '',
+    provider_result: receipt.provider_result || null
+  };
+}
+
+async function mmeRunProviderAction(env, envelope = {}, auth = {}) {
+  const execution = await executeZeroOsAutomationAction(env, {}, {
+    app_id: 'marketing-made-easy',
+    owner_approved: true,
+    ...envelope
+  }, {
+    actor: auth.actor || auth.identity?.email || 'marketing-made-easy',
+    identity: auth.identity || { role: auth.role || 'system' }
+  }, { operator_ok: true });
+  const receipt = execution?.response?.receipt || null;
+  return {
+    ok: execution?.response?.ok === true,
+    status: execution?.status || receipt?.http_status || 0,
+    receipt,
+    provider_runtime: mmeProviderRuntimeReceipt(receipt),
+    provider_result: receipt?.provider_result || null,
+    error: receipt?.error || execution?.response?.error || ''
+  };
+}
+
 function mmeEscapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -284,15 +324,14 @@ async function mmeRequireOwnerAdmin(request, env, helpers, label) {
 }
 
 async function mmeSendAeVendorOwnerEmail(env, request, packet, auth) {
-  const apiKey = String(env.RESEND_API_KEY || '').trim();
   const from = mmeAeVendorEmailFrom(env);
   const to = mmeAeVendorOwnerRecipients(env);
-  if (!apiKey || !from || !to.length) {
+  if (!from || !to.length) {
     return {
       ok: false,
       skipped: true,
       provider: 'resend',
-      reason: 'RESEND_API_KEY, RESEND_FROM_EMAIL, and owner recipient are required.'
+      reason: 'RESEND_FROM_EMAIL and owner recipient are required.'
     };
   }
   const origin = new URL(request.url).origin;
@@ -329,24 +368,29 @@ async function mmeSendAeVendorOwnerEmail(env, request, packet, auth) {
     <p><strong>Security:</strong> W-9, bank, tax, and identity material is not included in this email. Review restricted material only through the gated 0S packet store.</p>
   `;
   try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({ from, to, subject, text, html })
-    });
-    const data = await response.json().catch(() => ({}));
+    const runtimeSandbox = mmeEnvFlag(env, ['MARKETING_MADE_EASY_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX', '0S_PROVIDER_SANDBOX']);
+    const runtime = await mmeRunProviderAction(env, {
+      provider_id: 'resend',
+      action: 'resend.email.send',
+      workspace_id: packet.workspaceId || 'marketing-made-easy',
+      customer_id: packet.contractor.email || packet.id,
+      client_id: packet.contractor.email || packet.submissionId,
+      usage_lane: 'marketing-made-easy:ae-vendor-owner-email',
+      live: !runtimeSandbox,
+      sandbox: runtimeSandbox,
+      payload: { from, to, subject, text, html }
+    }, auth);
+    const data = runtime.provider_result || {};
     return {
-      ok: response.ok,
+      ok: runtime.ok,
       skipped: false,
       provider: 'resend',
-      status: response.status,
+      status: runtime.status,
       id: data.id || null,
-      error: response.ok ? null : (data.error || data.message || `HTTP ${response.status}`),
+      error: runtime.ok ? null : (runtime.error || data.error || data.message || `HTTP ${runtime.status}`),
       recipientCount: to.length,
-      sentAt: mmeNow()
+      sentAt: mmeNow(),
+      provider_runtime: runtime.provider_runtime
     };
   } catch (error) {
     return {
@@ -379,6 +423,11 @@ function mmeSlug(value = 'marketing-made-easy') {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
   return slug || 'marketing-made-easy';
+}
+
+function mmeOptionalSlug(value = '') {
+  const text = mmeText(value, 180);
+  return text ? mmeSlug(text) : '';
 }
 
 function mmeId(prefix = 'mme') {
@@ -504,14 +553,45 @@ function mmeNormalizeWorkspace(workspace = {}) {
 
 function mmeNormalizeBrief(brief = {}) {
   const now = mmeNow();
+  const sourceSnapshot = brief.sourceSnapshot && typeof brief.sourceSnapshot === 'object' ? brief.sourceSnapshot : {};
   return {
     id: mmeText(brief.id, 120) || mmeId('mme_brief'),
+    projectId: mmeText(brief.projectId, 160) || mmeText(brief.id, 120) || '',
+    projectName: mmeText(brief.projectName, 220) || mmeText(brief.clientName, 220) || mmeText(brief.title, 220) || 'Untitled project',
     workspaceSlug: mmeSlug(brief.workspaceSlug || brief.workspace || 'marketing-made-easy-ops'),
     title: mmeText(brief.title, 220) || 'Untitled brief',
     status: mmeText(brief.status, 80) || 'queued',
     moduleId: mmeText(brief.moduleId, 120) || 'skyewebcreatormax',
     clientName: mmeText(brief.clientName, 220),
     summary: mmeText(brief.summary, 4000),
+    target: mmeText(brief.target, 160) || 'ae-commandhub',
+    label: mmeText(brief.label, 220),
+    notes: mmeText(brief.notes, 4000),
+    files: Array.isArray(brief.files) ? brief.files.map((item) => mmeText(item, 160)).filter(Boolean) : Object.keys(sourceSnapshot),
+    sourceSnapshot,
+    review: brief.review && typeof brief.review === 'object' ? {
+      owner: mmeText(brief.review.owner, 220),
+      status: mmeText(brief.review.status, 80) || 'draft',
+      checkpoint: mmeText(brief.review.checkpoint, 500),
+      notes: mmeText(brief.review.notes, 4000),
+      updatedAt: mmeText(brief.review.updatedAt, 80) || now
+    } : { owner: '', status: 'draft', checkpoint: '', notes: '', updatedAt: now },
+    execution: brief.execution && typeof brief.execution === 'object' ? {
+      owner: mmeText(brief.execution.owner, 220),
+      status: mmeText(brief.execution.status, 80) || 'queued',
+      checkpoint: mmeText(brief.execution.checkpoint, 500),
+      notes: mmeText(brief.execution.notes, 4000),
+      targets: mmeArray(brief.execution.targets),
+      updatedAt: mmeText(brief.execution.updatedAt, 80) || now
+    } : { owner: '', status: 'queued', checkpoint: '', notes: '', targets: [], updatedAt: now },
+    dispatch: brief.dispatch && typeof brief.dispatch === 'object' ? {
+      owner: mmeText(brief.dispatch.owner, 220),
+      status: mmeText(brief.dispatch.status, 80) || 'queued',
+      checkpoint: mmeText(brief.dispatch.checkpoint, 500),
+      notes: mmeText(brief.dispatch.notes, 4000),
+      targets: mmeArray(brief.dispatch.targets),
+      updatedAt: mmeText(brief.dispatch.updatedAt, 80) || now
+    } : { owner: '', status: 'queued', checkpoint: '', notes: '', targets: [], updatedAt: now },
     requestedBy: mmeText(brief.requestedBy, 240),
     createdAt: mmeText(brief.createdAt, 80) || now,
     updatedAt: mmeText(brief.updatedAt, 80) || now
@@ -697,6 +777,7 @@ function mmeAeVendorValidateFile(file) {
 }
 
 function mmeAeVendorSummary(packet) {
+  const context = packet.onboardingContext || {};
   return {
     id: packet.id,
     submissionId: packet.submissionId,
@@ -705,6 +786,13 @@ function mmeAeVendorSummary(packet) {
     email: packet.contractor?.email || packet.email || '',
     roleLane: packet.contractor?.roleLane || packet.roleLane || '',
     workspaceSlug: packet.workspaceSlug,
+    sourceApp: context.sourceApp || packet.sourceApp || '',
+    artistSlug: context.artistSlug || packet.artistSlug || '',
+    artistId: context.artistId || packet.artistId || '',
+    stageName: context.stageName || packet.stageName || '',
+    companyOnboardingLane: context.companyOnboardingLane || packet.companyOnboardingLane || '',
+    founderCommandCopy: context.founderCommandCopy === true || packet.founderCommandCopy === true,
+    founderCommandRoute: context.founderCommandRoute || packet.founderCommandRoute || '/api/founder-command/contractor-packets',
     paymentMethod: packet.paymentProfile?.method || packet.paymentMethod || '',
     payoutStatus: packet.payoutLedger?.status || packet.payoutStatus || '',
     storageProvider: packet.storage?.provider || 'cloudflare_worker_kv_encrypted_packet_store',
@@ -715,6 +803,35 @@ function mmeAeVendorSummary(packet) {
 
 function mmeAeVendorMissingFields(fields) {
   return MME_AE_VENDOR_REQUIRED_FIELDS.filter((key) => !fields[key]);
+}
+
+function mmeTruthy(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || '').trim());
+}
+
+function mmeAeVendorOnboardingContext(fields = {}) {
+  const sourceApp = mmeText(fields.source_app || fields.sourceApp || fields.source || '', 120);
+  const artistSlug = mmeOptionalSlug(fields.artist_slug || fields.artist || fields.artistSlug || '');
+  const artistId = mmeText(fields.artist_id || fields.artistId || fields.music_artist_id || '', 80);
+  const stageName = mmeText(fields.stage_name || fields.stageName || fields.artist_name || '', 160);
+  const isMusicArtist = Boolean(artistSlug || artistId || /skye\s*music|skyemusicnexus|music nexus/i.test(sourceApp));
+  const context = {
+    sourceApp: sourceApp || (isMusicArtist ? 'SkyeMusicNexus' : ''),
+    artistSlug,
+    artistId,
+    stageName,
+    companyOnboardingLane: mmeText(fields.company_onboarding_lane || fields.companyOnboardingLane || '', 240) || (isMusicArtist ? 'Skyes Over London LC artist/vendor contractor onboarding' : ''),
+    musicNexusReleaseLane: mmeText(fields.music_nexus_release_lane || fields.musicNexusReleaseLane || '', 240),
+    founderCommandCopy: mmeTruthy(fields.founder_command_copy || fields.founderCommandCopy) || isMusicArtist,
+    founderCommandRoute: mmeText(fields.founder_command_route || fields.founderCommandRoute || '/api/founder-command/contractor-packets', 320),
+    contractorPacketInboxRoute: mmeText(fields.contractor_packet_inbox_route || fields.contractorPacketInboxRoute || '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html', 320),
+    aeCommandRoute: mmeText(fields.ae_command_route || fields.aeCommandRoute || '', 320),
+    workforceCommandRoute: mmeText(fields.workforce_command_route || fields.workforceCommandRoute || '', 320),
+    skyePayTrackingRef: mmeText(fields.skye_pay_tracking_ref || fields.skyePayTrackingRef || '', 160),
+    rightsReviewRequired: mmeTruthy(fields.rights_review_required || fields.rightsReviewRequired) || isMusicArtist,
+    payoutHoldReason: mmeText(fields.payout_hold_reason || fields.payoutHoldReason || '', 500) || (isMusicArtist ? 'Artist payout and checkout stay blocked until paperwork, rights/audio ownership review, payout destination verification, and owner approval clear.' : '')
+  };
+  return Object.fromEntries(Object.entries(context).filter(([, value]) => value === true || Boolean(value)));
 }
 
 async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
@@ -757,6 +874,7 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
   const packetId = mmeId('ae_vendor');
   const submissionId = `ae-vendor-${createdAt.replace(/[-:.TZ]/g, '').slice(0, 14)}-${packetId.slice(-8)}`;
   const workspaceSlug = mmeSlug(fields.entity_name || fields.legal_name || packetId);
+  const onboardingContext = mmeAeVendorOnboardingContext(fields);
   const sensitiveKeys = [
     'bank_account_type',
     'bank_name',
@@ -856,6 +974,23 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
       encryptedStorageKey: paymentProfileKey,
       payoutDestinationVerified: false
     },
+    onboardingContext,
+    companyOnboarding: {
+      lane: onboardingContext.companyOnboardingLane || 'Skyes Over London LC contractor onboarding',
+      sourceApp: onboardingContext.sourceApp || 'Marketing Made Easy',
+      aeCommandRoute: onboardingContext.aeCommandRoute || '',
+      workforceCommandRoute: onboardingContext.workforceCommandRoute || '',
+      contractorPacketInboxRoute: onboardingContext.contractorPacketInboxRoute || '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html',
+      founderCommandRoute: onboardingContext.founderCommandRoute || '/api/founder-command/contractor-packets',
+      ownerReviewRequired: true,
+      payoutHoldRequired: true
+    },
+    founderCommand: {
+      copyEnabled: onboardingContext.founderCommandCopy === true,
+      route: onboardingContext.founderCommandRoute || '/api/founder-command/contractor-packets',
+      packetInboxRoute: onboardingContext.contractorPacketInboxRoute || '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html',
+      status: onboardingContext.founderCommandCopy === true ? 'visible_through_founder_command_contractor_packets_alias' : 'marketing_made_easy_packet_store_only'
+    },
     legalAndVendorDocs: MME_AE_VENDOR_DOCS,
     storage: {
       provider: 'cloudflare_worker_kv_encrypted_packet_store',
@@ -899,6 +1034,7 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
     id: adminNotification.id || null,
     error: adminNotification.error || null,
     reason: adminNotification.reason || null,
+    provider_runtime: adminNotification.provider_runtime || null,
     recipientCount: adminNotification.recipientCount || 0,
     sentAt: adminNotification.sentAt || mmeNow()
   };
@@ -923,6 +1059,11 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
           submission_id: submissionId,
           workspace_slug: workspaceSlug,
           role_lane: packet.contractor.roleLane,
+          source_app: onboardingContext.sourceApp || null,
+          artist_slug: onboardingContext.artistSlug || null,
+          artist_id: onboardingContext.artistId || null,
+          founder_command_copy: onboardingContext.founderCommandCopy === true,
+          company_onboarding_lane: onboardingContext.companyOnboardingLane || null,
           storage_provider: packet.storage.provider,
           owner_resend_notification: packet.adminNotification.ok ? 'sent' : (packet.adminNotification.skipped ? 'skipped' : 'failed')
         }
@@ -960,6 +1101,9 @@ async function mmeCreateAeVendorPacket(request, env, auth, helpers = {}) {
     storage: packet.storage,
     paymentProfile: packet.paymentProfile,
     payoutLedger: packet.payoutLedger,
+    onboardingContext: packet.onboardingContext,
+    companyOnboarding: packet.companyOnboarding,
+    founderCommand: packet.founderCommand,
     adminNotification: packet.adminNotification,
     gateMirror: packet.gateMirror,
     legalAndVendorDocs: packet.legalAndVendorDocs,
@@ -1021,11 +1165,86 @@ function mmeStateRequiresStorage(env) {
 function mmeBriefBuckets(state) {
   const briefs = Array.isArray(state.briefs) ? state.briefs : [];
   return {
-    queue: briefs.filter((item) => ['queued', 'intake', 'ready'].includes(item.status)),
-    review: briefs.filter((item) => ['review', 'blocked'].includes(item.status)),
+    queue: briefs.filter((item) => ['queued', 'intake', 'draft', 'ready'].includes(item.status)),
+    review: briefs.filter((item) => ['review', 'approved', 'blocked'].includes(item.status)),
     execution: briefs.filter((item) => ['active', 'building', 'execution'].includes(item.status)),
     dispatch: briefs.filter((item) => ['dispatch', 'complete', 'delivered'].includes(item.status))
   };
+}
+
+function mmeWebCreatorPacks(state) {
+  return (Array.isArray(state.briefs) ? state.briefs : [])
+    .filter((item) => item.moduleId === 'skyewebcreatormax' || item.source === 'skyewebcreatormax' || item.sourceApp === 'skyewebcreator')
+    .map((brief) => ({
+      id: brief.id,
+      projectId: brief.projectId || brief.id,
+      projectName: brief.projectName || brief.clientName || brief.title,
+      label: brief.label || brief.title,
+      title: brief.title,
+      status: brief.status,
+      target: brief.target || 'ae-commandhub',
+      files: brief.files || Object.keys(brief.sourceSnapshot || {}),
+      sourceSnapshot: brief.sourceSnapshot || {},
+      review: brief.review || { status: 'draft' },
+      execution: brief.execution || { status: 'queued' },
+      dispatch: brief.dispatch || { status: 'queued' },
+      targets: brief.targets || brief.execution?.targets || brief.dispatch?.targets || [],
+      notes: brief.notes || brief.summary || '',
+      createdAt: brief.createdAt,
+      updatedAt: brief.updatedAt
+    }));
+}
+
+function mmeCountBy(items, selector, statuses) {
+  return Object.fromEntries(statuses.map((status) => [
+    status,
+    items.filter((item) => selector(item) === status).length
+  ]));
+}
+
+function mmeWebCreatorBoard(state) {
+  const items = mmeWebCreatorPacks(state);
+  return {
+    ok: true,
+    items,
+    summary: {
+      ...mmeCountBy(items, (item) => item.review?.status || 'draft', ['draft', 'ready', 'approved', 'blocked']),
+      dispatched: items.filter((item) => item.dispatch?.status === 'delivered' || item.review?.status === 'dispatched').length
+    },
+    executionSummary: mmeCountBy(items, (item) => item.execution?.status || 'queued', ['queued', 'active', 'fulfilled', 'blocked']),
+    dispatchSummary: mmeCountBy(items, (item) => item.dispatch?.status || 'queued', ['queued', 'active', 'delivered', 'blocked'])
+  };
+}
+
+function mmeWebCreatorWorkflowTimeline(state) {
+  const board = mmeWebCreatorBoard(state);
+  return {
+    ok: true,
+    workflowTimeline: {
+      summary: {
+        archive: board.items.length,
+        review: board.summary.draft + board.summary.ready + board.summary.approved + board.summary.blocked,
+        execution: board.executionSummary.queued + board.executionSummary.active + board.executionSummary.fulfilled + board.executionSummary.blocked,
+        dispatch: board.dispatchSummary.queued + board.dispatchSummary.active + board.dispatchSummary.delivered + board.dispatchSummary.blocked
+      },
+      items: board.items.map((item) => ({
+        id: item.id,
+        projectName: item.projectName,
+        review: item.review?.status || 'draft',
+        execution: item.execution?.status || 'queued',
+        dispatch: item.dispatch?.status || 'queued',
+        updatedAt: item.updatedAt
+      }))
+    }
+  };
+}
+
+function mmeApplyWebCreatorPackUpdate(state, packId, updater) {
+  const index = state.briefs.findIndex((item) => item.id === packId || item.projectId === packId);
+  if (index < 0) return null;
+  const next = mmeNormalizeBrief(updater({ ...state.briefs[index] }));
+  state.briefs[index] = next;
+  return next;
 }
 
 function mmeRoute(pathname, matchedBase) {
@@ -1256,6 +1475,22 @@ async function mmeHandleGatedGet(request, env, mount, path, helpers) {
       workspace_route: `${MME_PUBLIC_BASE}/index.html?workspace=:slug`
     });
   }
+  if (path === '/webcreator-runtime/delivery-board' || path === '/webcreator-runtime/execution-board' || path === '/webcreator-runtime/dispatch-board') {
+    return mmeJson(mmeWebCreatorBoard(state));
+  }
+  if (path === '/webcreator-runtime/workflow-timeline') {
+    return mmeJson(mmeWebCreatorWorkflowTimeline(state));
+  }
+  if (path === '/webcreator-runtime/delivery-packs') {
+    return mmeJson({ ok: true, items: mmeWebCreatorPacks(state) });
+  }
+  const webCreatorPackMatch = path.match(/^\/webcreator-runtime\/delivery-packs\/([^/]+)$/);
+  if (webCreatorPackMatch) {
+    const packId = decodeURIComponent(webCreatorPackMatch[1]);
+    const item = mmeWebCreatorPacks(state).find((pack) => pack.id === packId || pack.projectId === packId);
+    if (!item) return mmeJson({ ok: false, error: 'webcreator_delivery_pack_not_found', packId }, 404);
+    return mmeJson({ ok: true, item });
+  }
   if (path === '/workspaces') {
     return mmeJson({
       ok: true,
@@ -1284,9 +1519,18 @@ async function mmeHandleGatedGet(request, env, mount, path, helpers) {
       return mmeJson({ ok: false, error: 'Owner/admin session required to read contractor packet inbox.' }, 403);
     }
     const limit = Math.min(500, Math.max(1, Number(url.searchParams.get('limit') || 100)));
+    const artistSlug = mmeOptionalSlug(url.searchParams.get('artist') || url.searchParams.get('artist_slug') || '');
+    const artistId = mmeText(url.searchParams.get('artistId') || url.searchParams.get('artist_id') || '', 80);
+    let packets = (await mmeAeVendorListPackets(env, limit)).map(mmeAeVendorSummary);
+    if (artistSlug || artistId) {
+      packets = packets.filter((packet) => (
+        (artistSlug && packet.artistSlug === artistSlug)
+        || (artistId && packet.artistId === artistId)
+      ));
+    }
     return mmeJson({
       ok: true,
-      packets: (await mmeAeVendorListPackets(env, limit)).map(mmeAeVendorSummary),
+      packets,
       ...mmeAeVendorStorageStatus(env)
     });
   }
@@ -1343,6 +1587,78 @@ async function mmeHandleMutation(request, env, mount, path, helpers) {
   const storageBlocked = mmeStateRequiresStorage(env);
   if (storageBlocked) return storageBlocked;
   const state = await mmeReadState(env);
+
+  if (path === '/webcreator-runtime/delivery-packs' && request.method === 'POST') {
+    const now = mmeNow();
+    const brief = mmeNormalizeBrief({
+      id: body.id || body.packId || mmeId('swc_pack'),
+      projectId: body.projectId || body.id || '',
+      projectName: body.projectName || body.label || 'SkyeWebCreatorMax project',
+      workspaceSlug: body.workspaceSlug || body.workspace || 'build-room',
+      title: body.label || body.projectName || 'SkyeWebCreatorMax delivery pack',
+      status: body.review?.status || 'draft',
+      moduleId: 'skyewebcreatormax',
+      clientName: body.projectName || body.label || '',
+      summary: body.notes || '',
+      target: body.target || 'ae-commandhub',
+      label: body.label || '',
+      notes: body.notes || '',
+      files: Array.isArray(body.files) ? body.files : Object.keys(body.sourceSnapshot || {}),
+      sourceSnapshot: body.sourceSnapshot || {},
+      review: { ...(body.review || {}), updatedAt: now },
+      execution: { status: 'queued', owner: '', checkpoint: '', notes: '', targets: [], updatedAt: now },
+      dispatch: { status: 'queued', owner: '', checkpoint: '', notes: '', targets: [], updatedAt: now },
+      requestedBy: auth.actor,
+      createdAt: now,
+      updatedAt: now
+    });
+    state.briefs = [brief, ...state.briefs.filter((item) => item.id !== brief.id)];
+    state.auditEvents.unshift({ id: mmeId('mme_evt'), type: 'webcreator_delivery_pack_created', actor: auth.actor, briefId: brief.id, createdAt: now });
+    state.ledger.unshift({ id: mmeId('mme_ledger'), type: 'webcreator_delivery_pack_created', message: `${auth.actor} packaged ${brief.projectName}`, workspace: brief.workspaceSlug, createdAt: now });
+    await mmeWriteState(env, state);
+    if (helpers.mirrorSkygateEvent) {
+      await helpers.mirrorSkygateEvent(env, {
+        type: 'marketing_made_easy.webcreator_delivery_pack_created',
+        meta: { pack_id: brief.id, project_id: brief.projectId, workspace_slug: brief.workspaceSlug, target: brief.target }
+      }, auth.gate || auth);
+    }
+    return mmeJson({ ok: true, item: mmeWebCreatorPacks(state).find((item) => item.id === brief.id) }, 201);
+  }
+
+  const webCreatorRuntimeMutation = path.match(/^\/webcreator-runtime\/delivery-packs\/([^/]+)\/(review|execution|dispatch)$/);
+  if (webCreatorRuntimeMutation && request.method === 'POST') {
+    const packId = decodeURIComponent(webCreatorRuntimeMutation[1]);
+    const lane = webCreatorRuntimeMutation[2];
+    const updated = mmeApplyWebCreatorPackUpdate(state, packId, (brief) => {
+      const now = mmeNow();
+      const currentLane = brief[lane] && typeof brief[lane] === 'object' ? brief[lane] : {};
+      brief[lane] = {
+        ...currentLane,
+        owner: body.owner || currentLane.owner || '',
+        status: body.status || currentLane.status || (lane === 'review' ? 'draft' : 'queued'),
+        checkpoint: body.checkpoint || currentLane.checkpoint || '',
+        notes: body.notes || currentLane.notes || '',
+        targets: mmeArray(body.targets || currentLane.targets),
+        updatedAt: now
+      };
+      if (lane === 'review') brief.status = body.status === 'approved' ? 'approved' : body.status || brief.status;
+      if (lane === 'execution') brief.status = body.status === 'fulfilled' ? 'complete' : 'execution';
+      if (lane === 'dispatch') brief.status = body.status === 'delivered' ? 'delivered' : 'dispatch';
+      brief.updatedAt = now;
+      return brief;
+    });
+    if (!updated) return mmeJson({ ok: false, error: 'webcreator_delivery_pack_not_found', packId }, 404);
+    state.auditEvents.unshift({ id: mmeId('mme_evt'), type: `webcreator_${lane}_updated`, actor: auth.actor, briefId: updated.id, createdAt: mmeNow() });
+    state.ledger.unshift({ id: mmeId('mme_ledger'), type: `webcreator_${lane}_updated`, message: `${auth.actor} updated ${lane} for ${updated.projectName}`, workspace: updated.workspaceSlug, createdAt: mmeNow() });
+    await mmeWriteState(env, state);
+    const board = mmeWebCreatorBoard(state);
+    const item = board.items.find((entry) => entry.id === updated.id);
+    return mmeJson({
+      ok: true,
+      item,
+      summary: lane === 'review' ? board.summary : lane === 'execution' ? board.executionSummary : board.dispatchSummary
+    });
+  }
 
   if (path === '/workspaces' && request.method === 'POST') {
     const workspace = mmeNormalizeWorkspace({

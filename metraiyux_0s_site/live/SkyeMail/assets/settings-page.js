@@ -1,5 +1,5 @@
 (async function(){
-  const boot = await SMV.withBoot('settings', 'Settings', 'Profile, aliases, signatures, and vacation responder');
+  const boot = await SMV.withBoot('settings', 'Settings', 'Profile, aliases, signatures, and auto reply');
   if(!boot) return;
   const statusEl = qs('#statusText');
   const aliasStatusEl = qs('#aliasCreateStatus');
@@ -87,8 +87,8 @@
       if(settings.profile?.preferred_from_alias) qs('#preferred_from_alias').value = settings.profile.preferred_from_alias;
       const hostedMailbox = settings.hosted?.mailbox?.mailbox_email || '';
       qs('#gmailStatus').textContent = hostedMailbox ? `Connected mailbox • ${hostedMailbox}` : (settings.gmail?.connected ? `Connected mailbox • ${settings.gmail.google_email}` : 'No SkyeMail mailbox provisioned');
-      qs('#scopeStatus').textContent = hostedMailbox ? 'SkyeMail mailbox settings are ready.' : (settings.gmail?.signature_scope_ready ? 'Mailbox settings scope is ready.' : (settings.gmail?.scope_note || 'Reconnect Google to grant mailbox settings access.'));
-      qs('#contactsScope').textContent = settings.gmail?.connected ? `Contacts sync ${settings.gmail.contacts_last_sync_at ? `ready • last sync ${fmtDate(settings.gmail.contacts_last_sync_at)}` : 'ready • never synced yet'}` : 'Hosted SkyeMail aliases are managed here; Google contact sync is optional.';
+      qs('#scopeStatus').textContent = hostedMailbox ? 'SkyeMail mailbox settings are ready.' : (settings.gmail?.signature_scope_ready ? 'Mailbox settings scope is ready.' : (settings.gmail?.scope_note || 'Provision SkyeMail to manage mailbox settings.'));
+      qs('#contactsScope').textContent = settings.gmail?.connected ? `Contacts sync ${settings.gmail.contacts_last_sync_at ? `ready • last sync ${fmtDate(settings.gmail.contacts_last_sync_at)}` : 'ready • never synced yet'}` : 'Citadel/SkyeNet aliases and contact records are managed here.';
       renderAliases([...(settings.hosted?.aliases || []), ...(settings.gmail?.aliases || [])]);
       const vacation = settings.gmail?.vacation || {};
       qs('#vacation_enabled').checked = !!vacation.enableAutoReply;
@@ -126,6 +126,7 @@
       });
       qs('#aliasLocalPart').value = '';
       aliasNote(`${alias_email} is now routed into this inbox.`, 'ok');
+      SMV.trackGame('alias_create');
       await loadHostedAliasesOnly();
     }catch(err){ aliasNote(err.message || 'Alias creation failed.', 'danger'); }
   }
@@ -152,14 +153,15 @@
         vacation_end: qs('#vacation_end').value,
       };
       const data = await apiFetch('/mail-settings-save', { method:'POST', body: JSON.stringify(payload) });
-      if(data.gmail_error){ note(`Settings saved, but Google sync failed: ${data.gmail_error}`, 'danger'); }
-      else note(syncGmail ? 'Settings, signature, and vacation responder synced.' : 'Settings saved.', 'ok');
+      if(data.gmail_error){ note(`Settings saved, but hosted settings sync reported: ${data.gmail_error}`, 'danger'); }
+      else note(syncGmail ? 'Settings, signature, and auto reply synced.' : 'Settings saved.', 'ok');
+      SMV.trackGame(syncGmail ? 'settings_sync' : 'settings_save');
       await load();
     }catch(err){ note(err.message || 'Settings save failed.', 'danger'); }
   }
   qs('#saveBtn').onclick = ()=> save(false);
   qs('#syncBtn').onclick = ()=> save(true);
-  qs('#connectBtn').onclick = ()=> SMV.connectGoogle('/settings.html');
+  qs('#connectBtn').onclick = ()=> (window.SMVRuntime || { redirect: (value) => { location.href = value; } }).redirect('onboarding.html');
   qs('#disconnectBtn').onclick = async ()=> { if(!confirm('Disconnect the SkyeMail mailbox from this workspace?')) return; try{ await SMV.disconnectGoogle(); await load(); note('Mailbox disconnected.', 'ok'); }catch(err){ note(err.message || 'Disconnect failed.', 'danger'); } };
   qs('#watchBtn').onclick = async ()=> { try{ const data = await SMV.enableWatch(); note(`Push watch active until ${fmtDate(data.watch?.expiration || '')}.`, 'ok'); }catch(err){ note(err.message || 'Push watch failed.', 'danger'); } };
   qs('#createAliasBtn').onclick = createAlias;

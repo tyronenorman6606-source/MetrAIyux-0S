@@ -1,0 +1,29 @@
+{
+  "base_id": "dispute-committee/final-internal-decision",
+  "slug": "final-internal-decision",
+  "title": "Final Internal Decision",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "high",
+  "not_legal_advice": true,
+  "use_case": "Final company remedy decision and closure packet for a Legal Skyes dispute committee case.",
+  "questionnaire": [
+    { "key": "case_id", "label": "Case ID", "type": "text", "required": true },
+    { "key": "decision_maker", "label": "Decision Maker", "type": "text", "required": true },
+    { "key": "outcome", "label": "Outcome", "type": "textarea", "required": true },
+    { "key": "refund_or_credit", "label": "Refund or Credit", "type": "textarea", "required": false },
+    { "key": "payment_timing", "label": "Payment Timing", "type": "textarea", "required": false },
+    { "key": "reason_summary", "label": "Reason Summary", "type": "textarea", "required": true },
+    { "key": "reconsideration_window", "label": "Reconsideration Window", "type": "text", "required": false }
+  ],
+  "sections": [
+    { "heading": "Final Internal Company Position", "body": "Case {{case_id}} decision by {{decision_maker}}. Outcome: {{outcome}}." },
+    { "heading": "Refund, Credit, or Service Fix", "body": "{{refund_or_credit}}. Payment timing: {{payment_timing}}." },
+    { "heading": "Reason Summary", "body": "{{reason_summary}}" },
+    { "heading": "Rights Preserved", "body": "This is the company's internal remedy decision, not a judicial judgment or arbitral award. External rights that cannot legally be waived remain preserved." },
+    { "heading": "Reconsideration Window", "body": "{{reconsideration_window}}" }
+  ],
+  "review": { "requires_attorney_review": true, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "final-decision", "high"]
+}

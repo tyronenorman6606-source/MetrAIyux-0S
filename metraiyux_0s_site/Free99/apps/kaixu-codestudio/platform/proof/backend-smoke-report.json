@@ -1,13 +1,13 @@
 {
   "ok": true,
-  "ts": "2026-05-20T10:06:36.995Z",
+  "ts": "2026-05-28T00:19:08.489Z",
   "mode": "fixture",
-  "base": "http://127.0.0.1:45725",
+  "base": "http://127.0.0.1:40121",
   "checks": [
     {
       "name": "health route returns provider probes",
       "ok": true,
-      "ts": "2026-05-20T10:06:36.996Z",
+      "ts": "2026-05-28T00:19:08.489Z",
       "detail": {
         "providers": [
           "stripe",
@@ -24,7 +24,7 @@
     {
       "name": "provider probe route is executable",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.101Z",
+      "ts": "2026-05-28T00:19:08.621Z",
       "detail": {
         "mode": "fixture",
         "providerCount": 8
@@ -33,7 +33,7 @@
     {
       "name": "OpenAPI document and action registry are exposed",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.114Z",
+      "ts": "2026-05-28T00:19:08.629Z",
       "detail": {
         "pathCount": 53,
         "actionCount": 55,
@@ -48,7 +48,7 @@
     {
       "name": "active storage adapter verifies with real write/read contract",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.247Z",
+      "ts": "2026-05-28T00:19:08.644Z",
       "detail": {
         "active": "json",
         "adapters": [
@@ -64,7 +64,7 @@
     {
       "name": "signed upstream claims are verified when secret is present",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.436Z",
+      "ts": "2026-05-28T00:19:08.670Z",
       "detail": {
         "verifiedProject": "signed-smoke-project",
         "badStatus": 401
@@ -73,7 +73,7 @@
     {
       "name": "file-based provider pack catalog loads",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.476Z",
+      "ts": "2026-05-28T00:19:08.689Z",
       "detail": {
         "packCount": 8,
         "filePackCount": 8
@@ -82,7 +82,7 @@
     {
       "name": "provider-pack routes are registered as first-class actions",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.502Z",
+      "ts": "2026-05-28T00:19:08.700Z",
       "detail": {
         "registeredProviderPackActions": 38
       }
@@ -90,7 +90,7 @@
     {
       "name": "project control plane creates and lists projects",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.521Z",
+      "ts": "2026-05-28T00:19:08.707Z",
       "detail": {
         "projectCount": 2,
         "store": {
@@ -115,14 +115,14 @@
           "entitlements": 0,
           "records": 0,
           "forms": 0,
-          "updatedAt": "2026-05-20T10:06:37.530Z"
+          "updatedAt": "2026-05-28T00:19:08.710Z"
         }
       }
     },
     {
       "name": "provider packs install per project",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.544Z",
+      "ts": "2026-05-28T00:19:08.720Z",
       "detail": {
         "enabled": [
           "openai_gateway",
@@ -135,7 +135,7 @@
     {
       "name": "file provider pack install endpoint works",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.613Z",
+      "ts": "2026-05-28T00:19:08.784Z",
       "detail": {
         "providerId": "twilio",
         "enabled": false,
@@ -149,17 +149,26 @@
     {
       "name": "provider-pack declared action runs through action registry",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.627Z",
+      "ts": "2026-05-28T00:19:08.801Z",
       "detail": {
         "providerId": "stripe",
         "route": "checkout.create",
-        "runId": "run_mpdwdbaw_bad814adaa"
+        "runId": "run_mpoqwmfe_155492923d"
+      }
+    },
+    {
+      "name": "twilio sms fixture executes and voice stays blocked until implemented",
+      "ok": true,
+      "ts": "2026-05-28T00:19:08.832Z",
+      "detail": {
+        "smsMessageSid": "SM_mpoqwmgz_ce4e64ff58",
+        "voiceReason": "voice_call_not_implemented"
       }
     },
     {
       "name": "static app route serves platform UI",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.734Z",
+      "ts": "2026-05-28T00:19:08.896Z",
       "detail": {
         "status": 200,
         "bytes": 9249
@@ -168,7 +177,7 @@
     {
       "name": "workflow preflight enforces upstream claims",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.738Z",
+      "ts": "2026-05-28T00:19:08.902Z",
       "detail": {
         "blocked": true
       }
@@ -176,59 +185,60 @@
     {
       "name": "checkout_email_link executes fixture adapter chain",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.742Z",
+      "ts": "2026-05-28T00:19:08.908Z",
       "detail": {
-        "paymentLink": "fixture://stripe/checkout/cs_mpdwdbcj_b86e42d19e",
-        "receiptId": "rcpt_mpdwdbct_d52014a3cd"
+        "paymentLink": "fixture://stripe/checkout/cs_mpoqwmid_8e47a8239d",
+        "receiptId": "rcpt_mpoqwmin_c7ac68f2ae"
       }
     },
     {
       "name": "database + AI summary executes fixture adapter chain",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.765Z",
+      "ts": "2026-05-28T00:19:08.936Z",
       "detail": {
-        "receiptId": "rcpt_mpdwdbdk_de872aa093"
+        "receiptId": "rcpt_mpoqwmjg_2f0a91e5c0"
       }
     },
     {
       "name": "metering records workflow provider usage",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.791Z",
+      "ts": "2026-05-28T00:19:08.963Z",
       "detail": {
-        "totalEvents": 5,
+        "totalEvents": 6,
         "providers": [
           "openai_gateway",
           "neon",
           "resend",
-          "stripe"
+          "stripe",
+          "twilio"
         ]
       }
     },
     {
       "name": "provider routing optimizer selects a ready route",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.796Z",
+      "ts": "2026-05-28T00:19:08.969Z",
       "detail": {
         "selected": "resend",
-        "decisionId": "route_mpdwdbee_ac2b4e6a7f"
+        "decisionId": "route_mpoqwmk4_12bba1305c"
       }
     },
     {
       "name": "usage invoice generator builds invoice from meters",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.832Z",
+      "ts": "2026-05-28T00:19:08.988Z",
       "detail": {
-        "invoiceNumber": "KX-1779271597836",
-        "totalCents": 52,
-        "lines": 4
+        "invoiceNumber": "KX-1779927548993",
+        "totalCents": 65,
+        "lines": 5
       }
     },
     {
       "name": "visual workflow graph builder validates and compiles graph",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.858Z",
+      "ts": "2026-05-28T00:19:09.006Z",
       "detail": {
-        "graphId": "graph_mpdwdbfo_8bae4f1387",
+        "graphId": "graph_mpoqwmky_324e7bba39",
         "nodes": 3,
         "compiledProviders": [
           "openai_gateway",
@@ -239,27 +249,27 @@
     {
       "name": "visual workflow graph runner executes compiled graph steps",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.885Z",
+      "ts": "2026-05-28T00:19:09.019Z",
       "detail": {
-        "graphId": "graph_mpdwdbfo_8bae4f1387",
-        "runId": "run_mpdwdbgm_ea19747e37",
+        "graphId": "graph_mpoqwmky_324e7bba39",
+        "runId": "run_mpoqwmle_45557f9475",
         "steps": 2
       }
     },
     {
       "name": "forms, records, and submission workflow are executable",
       "ok": true,
-      "ts": "2026-05-20T10:06:37.982Z",
+      "ts": "2026-05-28T00:19:09.047Z",
       "detail": {
-        "formId": "form_mpdwdbjf_a5576a90e9",
-        "recordId": "rec_mpdwdbn4_7e3badcd6a",
+        "formId": "form_mpoqwmm3_e230b47744",
+        "recordId": "rec_mpoqwmmf_f85df38496",
         "workflowOk": true
       }
     },
     {
       "name": "entitlement gates meter usage and open incidents on hard blocks",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.183Z",
+      "ts": "2026-05-28T00:19:09.093Z",
       "detail": {
         "entitlementKey": "workflow_runs",
         "firstOk": true,
@@ -269,46 +279,46 @@
     {
       "name": "incident center and audit trail persist operational receipts",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.257Z",
+      "ts": "2026-05-28T00:19:09.125Z",
       "detail": {
-        "incidentId": "inc_mpdwdbqq_1714664694",
+        "incidentId": "inc_mpoqwmo8_69d0c0513d",
         "auditEvents": 8
       }
     },
     {
       "name": "project scorecard summarizes platform health from real state",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.296Z",
+      "ts": "2026-05-28T00:19:09.159Z",
       "detail": {
-        "score": 97,
-        "runSuccessRate": 100,
+        "score": 95,
+        "runSuccessRate": 85.71,
         "openIncidents": 1
       }
     },
     {
       "name": "job queue can enqueue and execute workflow jobs",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.297Z",
+      "ts": "2026-05-28T00:19:09.165Z",
       "detail": {
-        "jobId": "job_mpdwdbrv_39bdc74c9d",
+        "jobId": "job_mpoqwmpb_554288c6c0",
         "status": "completed"
       }
     },
     {
       "name": "queue lock lease can be extended for a running job",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.357Z",
+      "ts": "2026-05-28T00:19:09.220Z",
       "detail": {
-        "jobId": "job_mpdwdbtj_3a0e3d053b",
-        "lockExpiresAt": "2026-05-20T10:08:38.376Z"
+        "jobId": "job_mpoqwmqu_409e779a7d",
+        "lockExpiresAt": "2026-05-28T00:21:09.242Z"
       }
     },
     {
       "name": "queue supports cancellation and stale-lock recovery routes",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.390Z",
+      "ts": "2026-05-28T00:19:09.267Z",
       "detail": {
-        "cancelled": "job_mpdwdbuh_265b99e109",
+        "cancelled": "job_mpoqwms5_f2e35c2868",
         "recovered": 0,
         "deadLetters": 0
       }
@@ -316,18 +326,18 @@
     {
       "name": "dead-letter jobs can be retried as new queued jobs",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.413Z",
+      "ts": "2026-05-28T00:19:09.304Z",
       "detail": {
-        "deadLetterId": "dead_mpdwdbwq_a43a048897",
-        "retryJobId": "job_mpdwdbxg_fbf4e10952"
+        "deadLetterId": "dead_mpoqwmu0_6b34e758b8",
+        "retryJobId": "job_mpoqwmui_67a2361438"
       }
     },
     {
       "name": "schedules tick into queued jobs and drain",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.504Z",
+      "ts": "2026-05-28T00:19:09.364Z",
       "detail": {
-        "scheduleId": "sched_mpdwdbxm_9d83e22691",
+        "scheduleId": "sched_mpoqwmuw_e65e5c8e51",
         "enqueued": 1,
         "drained": 1
       }
@@ -335,11 +345,11 @@
     {
       "name": "webhook ingest verifies/idempotency-gates and replay writes receipts",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.577Z",
+      "ts": "2026-05-28T00:19:09.434Z",
       "detail": {
-        "eventId": "evt_mpdwdbzp_e7fa981a40",
+        "eventId": "evt_mpoqwmwu_4ce3cf85df",
         "duplicate": true,
-        "replayReceiptId": "rcpt_mpdwdc1c_2b15e5525e",
+        "replayReceiptId": "rcpt_mpoqwmyj_21fc0be3a6",
         "verification": {
           "ok": true,
           "provider": "stripe",
@@ -352,45 +362,45 @@
     {
       "name": "webhook replay dispatches mapped workflow instead of only flipping status",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.643Z",
+      "ts": "2026-05-28T00:19:09.501Z",
       "detail": {
         "ruleId": "stripe-checkout-completed-to-crm-note",
         "workflowId": "db_query_ai_summary",
-        "runId": "run_mpdwdc1t_81c44edd9b"
+        "runId": "run_mpoqwmyz_5235c03983"
       }
     },
     {
       "name": "workflow run history and webhook queue are persisted",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.699Z",
+      "ts": "2026-05-28T00:19:09.548Z",
       "detail": {
-        "runCount": 10,
+        "runCount": 12,
         "webhookCount": 2
       }
     },
     {
       "name": "approval queue opens for blocked expensive workflow",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.706Z",
+      "ts": "2026-05-28T00:19:09.555Z",
       "detail": {
-        "approvalId": "appr_mpdwdc3g_d1a9cf5ad8",
+        "approvalId": "appr_mpoqwn0b_938e371928",
         "approvalCount": 1
       }
     },
     {
       "name": "project export/import bundle migration works",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.738Z",
+      "ts": "2026-05-28T00:19:09.583Z",
       "detail": {
-        "bundleId": "bundle_mpdwdc4e_6775213101",
-        "importId": "import_mpdwdc74_822a63ca00",
-        "hash": "cc26578cecb1"
+        "bundleId": "bundle_mpoqwn12_3fb61ed033",
+        "importId": "import_mpoqwn2f_9800f9dbb7",
+        "hash": "909171b86383"
       }
     },
     {
       "name": "receipt list includes executable proof",
       "ok": true,
-      "ts": "2026-05-20T10:06:38.883Z",
+      "ts": "2026-05-28T00:19:09.652Z",
       "detail": {
         "receiptCount": 20,
         "receiptTypes": [
@@ -411,5 +421,5 @@
       }
     }
   ],
-  "receiptCount": 61
+  "receiptCount": 64
 }

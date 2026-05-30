@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Became the Owner Source Origin | DevodeRator</title>
+  <meta name="description" content="Gray London Skyes records the May 30 SkyeVault owner source custody closure: encrypted full baseline, additive delta packs, and clone-proved Git origin.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-30-skyevault-sovereign-source-origin.html">SkyeVault Origin</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 30, 2026 · SkyeVault · sovereign source custody · Git origin · encrypted baseline · delta journal</p>
+    <h1>SkyeVault became the owner source origin today.</h1>
+    <p class="lede">
+      The real requirement was never "make a smaller export." The requirement was: if the workspace disappears, I still have the repo, the local work, the receipts, and a way to restore from my own custody lane.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        Codespaces is compute. SkyeVault is custody. That is the line I needed the system to respect.
+      </blockquote>
+
+      <h2>What changed.</h2>
+      <p>
+        The 17.3GB encrypted full-repo artifact is now treated as the baseline instead of something the daemon repeats every ten minutes. After that baseline exists, ordinary daemon wakes move through additive encrypted delta packs. If I add three lines in one file and twelve in another, the custody lane advances those changed files and tombstones instead of creating another huge full artifact.
+      </p>
+      <p>
+        That still was not enough by itself. A full artifact restores everything, but I also needed a Git-shaped origin I could clone from a terminal. So the owner Git origin became a real service lane.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Owner source custody facts</strong>
+        <ul>
+          <li>Full encrypted baseline: <code>MetrAIyux-0S-full-repo-20260529T213111Z.tar.zst.enc</code></li>
+          <li>Baseline size: <code>17,323,174,736</code> bytes</li>
+          <li>Baseline SHA-256: <code>9ad319fd784a06ce458a6e04b73f67dd0c4f684ef31a36bef335a30e9da0b0e6</code></li>
+          <li>Artifact receipt: <code>cdv_1cf38e5689280e988baf684e</code></li>
+          <li>Control receipt: <code>cdv_509b88a877b464c28b63d596</code></li>
+          <li>Owner workspace: <code>metraiyux-0s-owner</code></li>
+          <li>Custody scope: <code>owner-private</code>; client vault visibility is off.</li>
+          <li>Latest additive delta receipt during the correction: <code>cdv_397abe8f5ede4977141112fc</code></li>
+          <li>Earlier catch-up delta receipt: <code>cdv_ebe84f35641c71e201ffff51</code></li>
+        </ul>
+      </div>
+
+      <h2>The origin is cloneable.</h2>
+      <p>
+        I added the owner Git origin wrapper and proved it against this repo. The service runs locally at <code>127.0.0.1:8787</code>, stores its private service token under ignored local state, seeds a bare Git repo under SkyeVault output, and exposes a clean clone URL without putting the token in the URL.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Owner Git origin proof</strong>
+        <ul>
+          <li>Clone URL: <code>http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git</code></li>
+          <li>Token file: <code>.skyevault-out/git-remote/owner-git-origin.env</code></li>
+          <li>Storage root: <code>.skyevault-out/git-remote/storage</code></li>
+          <li>Seed receipt: <code>.skyevault-out/git-remote/owner-git-origin-sync.json</code></li>
+          <li>Proof receipt: <code>.skyevault-out/git-remote/owner-git-origin-proof.json</code></li>
+          <li>Remote <code>main</code> head: <code>6336a975e8702e50e06ed26da1cb026ba06290d6</code></li>
+          <li>Proof result: fresh clone matched local <code>HEAD</code> and <code>git fsck --connectivity-only</code> passed.</li>
+        </ul>
+      </div>
+
+      <h2>How the daemon is supposed to behave now.</h2>
+      <p>
+        The daemon wakes on the interval and checks the current repo state. If the full baseline already covers the baseline modes, it does not make another 17GB upload. It creates an encrypted delta pack for changed workspace state, syncs the owner Git origin for committed refs, writes receipts, and goes back to sleep.
+      </p>
+      <p>
+        That gives me two restore shapes. For Git history and normal terminal workflows, clone the owner origin. For the whole workspace, download the encrypted full baseline and apply the encrypted additive delta receipts. The point is not to replace Git with a random pile of folders. The point is to give Git parity plus all-bytes custody under my owner account.
+      </p>
+
+      <blockquote>
+        The product value here is not only backup. It is sovereign source custody: owner account, shared gate, encrypted baseline, additive delta, cloneable origin, and receipts that say exactly what happened.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · build receipts, proof journals, and sovereign infrastructure notes.</footer>
+</body>
+</html>

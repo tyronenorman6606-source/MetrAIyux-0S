@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B3 Strategies, LLC | Phoenix Strategy / Public Affairs</title>
+  <meta name="description" content="B3 Strategies, LLC is a Valley Verified strategy / public affairs profile at 1642 E. Culver St., Phoenix, AZ 85006, highlighting Strategy / Public.">
+  <style>
+    :root {
+      --ink: #141719;
+      --charcoal: #20282c;
+      --lime: #b8d659;
+      --teal: #1f8076;
+      --paper: #f7f8f2;
+      --line: rgba(20, 23, 25, .17);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(135deg, rgba(31, 128, 118, .12) 0 1px, transparent 1px 42px),
+        #eef2ec;
+    }
+
+    a { color: inherit; }
+
+    .desk {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 350px;
+      min-height: 570px;
+      gap: 20px;
+    }
+
+    .blackboard {
+      background: var(--charcoal);
+      color: #fff;
+      padding: 44px;
+      display: grid;
+      align-content: space-between;
+      gap: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blackboard:after {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border: 1px dashed rgba(184, 214, 89, .48);
+    }
+
+    .blackboard > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--lime);
+      color: var(--charcoal);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 22px 0 16px;
+      font-size: clamp(46px, 8vw, 94px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 690px;
+      margin: 0;
+      color: #dce3df;
+      font-size: 19px;
+      line-height: 1.58;
+    }
+
+    .contact-row {
+      display: grid;
+      grid-template-columns: minmax(220px, .65fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .contact {
+      min-height: 126px;
+      padding: 20px;
+      display: grid;
+      align-content: center;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      text-decoration: none;
+      font-style: normal;
+    }
+
+    .contact.primary {
+      background: var(--teal);
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--lime);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .contact span {
+      display: block;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .side {
+      display: grid;
+      grid-template-rows: 250px 1fr;
+      gap: 20px;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      background: var(--paper);
+      border: 1px solid var(--line);
+    }
+
+    .mark img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+    }
+
+    .brief {
+      padding: 24px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    .brief p {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .facts {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .fact {
+      min-height: 126px;
+      padding: 18px;
+      background: rgba(247,248,242,.9);
+      border: 1px solid var(--line);
+    }
+
+    .fact b { color: var(--teal); }
+
+    .fact span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 880px) {
+      .mast, .contact-row { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {
+      .desk { width: min(100% - 20px, 1120px); }
+      .blackboard { padding: 28px; }
+      .blackboard:after { inset: 12px; }
+      .facts { grid-template-columns: 1fr; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="desk">
+    <section class="mast" aria-label="B3 Strategies profile">
+      <div class="blackboard">
+        <div>
+          <span class="eyebrow">Strategy / Public Affairs</span>
+          <h1>B3 Strategies, LLC</h1>
+          <p class="summary">B3 Strategies, LLC gives homeowners, property managers, and local service callers a practical Phoenix connection for Strategy / Public Affairs, Advertising &amp; Media / Strategy / Public Affairs, Advertising &amp; Media, and Creative / Media Services. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+        </div>
+
+        <div class="contact-row" aria-label="B3 Strategies contact information">
+          <a class="contact primary" href="tel:+16026879017"><b>Phone</b><span>(602) 687-9017</span></a>
+          <address class="contact"><b>Address</b><span>1642 E. Culver St.<br>Phoenix, AZ 85006</span></address>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="B3 Strategies mark">
+        </div>
+        <div class="brief">
+          <b>Valley Verified Network</b>
+          <p>Advertising &amp; Media / Strategy / Public Affairs</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="B3 Strategies facts">
+      <div class="fact"><b>Category</b><span>Creative Services</span></div>
+      <div class="fact"><b>Niche</b><span>Strategy / Public Affairs</span></div>
+      <div class="fact"><b>Pricing</b><span>Contact for quote</span></div>
+      <div class="fact"><b>Profile date</b><span>May 19, 2026</span></div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-b3-strategies-llc-phoenix-85006-d05362a">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-b3-strategies-llc-phoenix-85006-d05362a">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>B3 Strategies, LLC earns this Valley Verified placement because public business evidence connects a real strategy / public affairs operation to 1642 E. Culver St., Phoenix, AZ 85006 and (602) 687-9017. Greater Phoenix Chamber directory evidence supports this local profile. For homeowners, property managers, and local service callers, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Strategy / Public Affairs, Advertising &amp; Media / Strategy / Public Affairs, Advertising &amp; Media, and Creative / Media Services</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>homeowners, property managers, and local service callers</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>1642 E. Culver St., Phoenix, AZ 85006; (602) 687-9017</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

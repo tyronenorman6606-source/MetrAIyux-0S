@@ -1,6 +1,6 @@
 {
-  "version": "2026-05-19-skyevaultos-skysecure-vault-console",
-  "updated_at": "2026-05-20T00:29:00Z",
+  "version": "2026-05-26-superide-command-bridge-sovereign-stack",
+  "updated_at": "2026-05-26T04:56:53.311Z",
   "source_changelogs": [
     "SkyeGateFS27/docs/CHANGELOG.md",
     "metraiyux_0s_site/changelog/index.html",
@@ -11,10 +11,79 @@
     "marketing/metraiyux-0s/phxverified_platform_v23_source_only_no_dist/MCP_TOOLING_RECEIPT.json",
     "metraiyux_0s_site/valley-verified/MOUNTED_IN_0S.json",
     "test-artifacts/marketing-public-surfaces-skysecure-proof-2026-05-19.json",
-    "test-artifacts/vaultos-about-to-delete-proof/vaultos-about-to-delete-proof-report.json"
+    "test-artifacts/vaultos-about-to-delete-proof/vaultos-about-to-delete-proof-report.json",
+    "metraiyux_0s_site/SkyeCommerce/STATUS.md",
+    "metraiyux_0s_site/docs/SKYECOMMERCE_0S_SKYEPAY_SOVEREIGNDOCS_LIVE_REPORT.md",
+    "test-artifacts/skyecommerce-live-production-stress/2026-05-24T23-02-25-441Z-stress.json",
+    "test-artifacts/skyecommerce-skyepay-loop-stress/2026-05-24T23-02-18-121Z-stress.json",
+    "metraiyux_0s_site/brain/live-surface-registry.json",
+    "metraiyux_0s_site/assets/js/0s-command-bridge.js",
+    "metraiyux_0s_site/assets/js/skyehawk-os.js",
+    "metraiyux_0s_site/DeVisional Riftx/app/index.html",
+    "metraiyux_0s_site/skyehawk/index.html"
   ],
   "rule": "Every platform named in the changelog, Free99 intake, or Valley Verified app-build lane must have a system surface, buyer route, advertising angle, integration boundary, proof path, and platform_id usage boundary. Free99 means no charge only; it never means anonymous access, owner-control bypass, or paid-app checkout without approval.",
   "platforms": [
+    {
+      "id": "skyecommerce-shopify-replacement-foundation",
+      "name": "SkyeCommerce Shopify Replacement Foundation",
+      "status": "mounted_in_0s_stress_backed_skyepay_sovereigndocs_bridge",
+      "source_change": "SkyeCommerce was unpacked into the 0S, wired to the shared FS27/Free99 gate, retired its isolated AE lane into canonical AE-FlowPro, connected dynamic checkout to SkyPay/FS27, added merchant receivable ledger support, and added a SovereignDocs + SkyeDocxMax Document Desk for commerce policies and seller docs.",
+      "system_surfaces": [
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/merchant/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/design/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/store/?slug=metraiyux-0s-commerce",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/docs/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/api/docs/sovereigndocs-kit",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/ae/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/AE-FlowPro/",
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s",
+        "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay/offers?client=metraiyux-0s"
+      ],
+      "integration_points": [
+        "Shared 0S FS27/Free99 gate only; app-local owner/admin lane remains blocked",
+        "Cloudflare Worker mount through metraiyux-0s-full-system with SKYECOMMERCE_DB D1 binding",
+        "SkyPay dynamic cart checkout through SKYGATEFS27_WORKER service binding and signed HMAC payloads",
+        "Merchant payout ledger records gross, fee, net receivable, provider session, and SkyPay status",
+        "SovereignDocs website-digital-commerce category bridge and SkyeDocxMax editor handoff",
+        "SkyeCommerce /ae retired to canonical Marketing-Made-Easy AE-FlowPro instead of isolated AE auth"
+      ],
+      "advertising": {
+        "buyer_signal": "A business needs an owned commerce operating room, storefront, checkout, policies, and payout accounting without renting the whole business identity from Shopify.",
+        "headline": "SkyeCommerce gives merchants a gated 0S commerce profile, storefront, SkyPay checkout lane, and document desk in one platform.",
+        "cta": "Open SkyeCommerce",
+        "safe_claims": [
+          "Mounted in the 0S behind the shared FS27/Free99 gate.",
+          "Production HTTP stress passed for overview, merchant command, design studio, storefront, document desk, health, shared auth, SovereignDocs kit, and blocked app-local owner auth.",
+          "Dynamic SkyPay checkout payload construction, HMAC signing, service-binding dispatch, paid-status mapping, and merchant receivable ledger math are test-backed.",
+          "SovereignDocs integration is self-help document automation and SkyeDocxMax drafting handoff, not a law-firm/legal-advice claim."
+        ],
+        "avoid_claims": [
+          "Do not claim automatic PayPal/CashApp/bank provider payout execution is complete; current production path records Skyes Over London merchant-of-record receivables, internal split settlements, payout methods, and owner-reviewed disbursements.",
+          "Do not claim SkyPay-originated refund automation is finished; digital SkyPay refunds remain blocked pending provider-safe refund lane.",
+          "Do not claim live browser verification from this automation run; owner live verification is separate."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm test -- --test-reporter=spec (inside metraiyux_0s_site/SkyeCommerce)",
+          "node --test ./tests/skyepay-dynamic-commerce.test.mjs (inside SkyeGateFS27)",
+          "npm --prefix metraiyux_0s_site/skyegate/source/SkyeGateFS27 run check:worker",
+          "node tools/run-root-wrangler.mjs d1 migrations apply skyecommerce-foundation --remote --config metraiyux_0s_site/wrangler.toml",
+          "node tools/run-root-wrangler.mjs deploy --config metraiyux_0s_site/skyegate/source/SkyeGateFS27/wrangler.toml",
+          "node tools/run-root-wrangler.mjs deploy --config metraiyux_0s_site/wrangler.toml",
+          "SKYE_COMMERCE_STRESS_CYCLES=30 SKYE_COMMERCE_STRESS_CONCURRENCY=18 node metraiyux_0s_site/tests/skyecommerce-live-production-stress.mjs",
+          "SKYECOMMERCE_SKYEPAY_STRESS_TOTAL=240 SKYECOMMERCE_SKYEPAY_STRESS_CONCURRENCY=32 node metraiyux_0s_site/tests/skyecommerce-skyepay-loop-stress.mjs"
+        ],
+        "receipts": [
+          "test-artifacts/skyecommerce-live-production-stress/2026-05-24T23-02-25-441Z-stress.json",
+          "test-artifacts/skyecommerce-skyepay-loop-stress/2026-05-24T23-02-18-121Z-stress.json",
+          "test-artifacts/skyecommerce-production-direct-surfaces/2026-05-24T23-00-38-602Z.json",
+          "test-artifacts/ae-flowpro-production-stress/2026-05-24T22-22-20-217Z-receipt.json"
+        ]
+      }
+    },
     {
       "id": "skyevaultos-skysecure-vault-console",
       "name": "SkyeVaultOS / SkySecure Vault Console",
@@ -720,6 +789,90 @@
           "metraiyux_0s_site/Free99/MCP_TOOLING_RECEIPT.json",
           "test-artifacts/direct-mcp/Free99-mcp-tooling-receipt.json"
         ]
+      }
+    },
+    {
+      "id": "superide-devisional-riftx-sovereign-publishing",
+      "name": "SuperIDE / DeVisional Riftx Sovereign Publishing IDE",
+      "status": "mounted_in_0s_discoverable_gate_only_command_bridge_ready",
+      "source_change": "SuperIDE was promoted from private mounted import to curated 0S discovery through SkyWay and the 0S launcher while keeping donor internals skipped. The UI now loads the shared command bridge and Skye Hawk runtime, and publishing actions emit gate-owned command events.",
+      "system_surfaces": [
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/DeVisional%20Riftx/app/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-command-bridge/index.html"
+      ],
+      "integration_points": [
+        "Shared FS27/SkyGate/Free99 gate only; no app-local founder/admin/client password lane",
+        "SuperIDE package, checkout, export, diagnostics, and publishing-smoke events post to /api/0s-command-bridge/events with gate headers",
+        "SkyPay remains the checkout/money-movement owner; SuperIDE creates handoff intents and receipts",
+        "SkyWay route builder includes one curated app route while still skipping donor/proof internals"
+      ],
+      "advertising": {
+        "buyer_signal": "A founder or author needs a protected publishing cockpit that turns source files into signed packages, checkout handoffs, and owner-reviewable proof.",
+        "headline": "SuperIDE gives the 0S a gate-owned publishing IDE with command-bridge memory.",
+        "safe_claims": [
+          "Mounted behind the shared 0S gate.",
+          "Discoverable through SkyWay and the 0S launcher.",
+          "No app-local AI/provider credentials or separate admin password lane are added."
+        ],
+        "avoid_claims": [
+          "Do not claim autonomous external publishing/provider dispatch is complete without owner-approved proof.",
+          "Do not claim live browser verification from Codex; owner handles browser verification in this repo."
+        ]
+      },
+      "proof": {
+        "commands": [
+          "npm run mcp:mine -- metraiyux_0s_site/DeVisional\\ Riftx",
+          "npm --prefix \"metraiyux_0s_site/DeVisional Riftx\" run check:gateway-only",
+          "npm --prefix \"metraiyux_0s_site/DeVisional Riftx\" run check:external-endpoints",
+          "npm --prefix \"metraiyux_0s_site/DeVisional Riftx\" run check:secure-defaults",
+          "node --check \"metraiyux_0s_site/DeVisional Riftx/app/app.js\""
+        ],
+        "receipts": [
+          "test-artifacts/direct-mcp/SuperIDEv2-Sovereign-Author-Publishing-System-mcp-tooling-receipt.json"
+        ]
+      }
+    },
+    {
+      "id": "skyerrors-sovereign-observability",
+      "name": "SkyErrors Sovereign Observability",
+      "status": "live_gated_citadeldb_command_bridge_observability",
+      "source_change": "SkyErrors is explicitly registered as sovereign observability infrastructure in the Worker catalog, SkyWay, 0S launcher, live surface registry, and command bridge surface catalog.",
+      "system_surfaces": [
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyerrors/",
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skyerrors"
+      ],
+      "integration_points": [
+        "Shared gate headers instead of app-specific DSN secrets",
+        "Helper K4i, SkyErrors KV, command bridge observability, and CitadelDB mirroring boundary",
+        "0S launcher and SkyWay discovery cards"
+      ],
+      "proof": {
+        "commands": [
+          "node --check metraiyux_0s_site/cloudflare/worker.js"
+        ],
+        "receipts": []
+      }
+    },
+    {
+      "id": "skyehawk-0s-runtime",
+      "name": "Skye Hawk Source Cockpit",
+      "status": "copied_source_restructured_command_bridge_ready",
+      "source_change": "Skye Hawk's original marketing living-field runtime was copied byte-for-byte into /skyehawk/source/skyehawk-os.original.js, then restructured through the shared /assets/js/skyehawk-os.js 0S adapter and gated source cockpit.",
+      "system_surfaces": [
+        "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyehawk/"
+      ],
+      "integration_points": [
+        "Byte-identical /skyehawk/source/skyehawk-os.original.js source copy",
+        "Shared /assets/js/skyehawk-os.js 0S adapter",
+        "Surface-ready and living-field command bridge events",
+        "0S gate prefix /skyehawk",
+        "Preserved mountSkyeSolLivingBackground contract"
+      ],
+      "proof": {
+        "commands": [
+          "node --check metraiyux_0s_site/assets/js/skyehawk-os.js"
+        ],
+        "receipts": []
       }
     }
   ],

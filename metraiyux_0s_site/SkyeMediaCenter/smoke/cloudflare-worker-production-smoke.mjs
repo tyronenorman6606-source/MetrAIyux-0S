@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import path from 'node:path';
+import { webcrypto } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 function assert(condition, message){ if(!condition) throw new Error(message); }
+globalThis.crypto ||= webcrypto;
 
 class MemoryKV {
   constructor(){ this.rows = new Map(); }
@@ -67,7 +69,7 @@ async function call(pathname, { method='GET', token=validToken, body } = {}){
 }
 
 const legacyFunctionBlocked = await call('/.netlify/functions/media-assets?action=list', { token:'' });
-assert(legacyFunctionBlocked.status === 404, `legacy root media function should be blocked, got ${legacyFunctionBlocked.status}`);
+assert([302, 404].includes(legacyFunctionBlocked.status), `legacy root media function should be blocked or gate-redirected, got ${legacyFunctionBlocked.status}`);
 
 const blocked = await call('/api/media/assets?action=list', { token:'' });
 assert(blocked.status === 401, `unauthenticated media list returned ${blocked.status}`);
@@ -76,7 +78,7 @@ const session = await parse(await call('/api/media/session'));
 assert(session.productionGate === true && session.activeSession?.source === 'fs27-skygate-session', 'production session did not resolve through FS27 gate');
 
 const bootstrap = await call('/api/media/session', { method:'POST', body:{ subject:'local-proof' } });
-assert(bootstrap.status === 503, `production local bootstrap should be disabled, got ${bootstrap.status}`);
+assert(bootstrap.status === 410, `production app-local session minting should be removed, got ${bootstrap.status}`);
 
 const upload = await parse(await call('/api/media/assets', {
   method:'POST',

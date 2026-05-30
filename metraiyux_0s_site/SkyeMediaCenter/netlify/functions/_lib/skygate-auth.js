@@ -1,9 +1,9 @@
 'use strict';
 
 const crypto = require('node:crypto');
-const { createLocalIdentity } = require('./local-identity');
+const { createGateStatusProvider } = require('./local-identity');
 
-const localIdentity = createLocalIdentity({
+const gateStatusProvider = createGateStatusProvider({
   dataDirEnv: 'MEDIA_CENTER_DATA_DIR',
   defaultDataDirName: 'skye-media-center',
   issuer: 'local://skye-media-center/session',
@@ -81,8 +81,9 @@ function verifyExternalSkyGateToken(token, options = {}) {
 function verifySkyGateBearer(event, options = {}) {
   const token = bearer(event);
   if (!token) return { ok: false, statusCode: 401, error: 'Missing bearer token.' };
-  const local = localIdentity.verifySessionToken(token, options);
-  if (local.ok || !token.includes('.')) return local;
+  if (!token.includes('.')) {
+    return { ok: false, statusCode: 401, error: 'Shared FS27/SkyGate bearer required. Local Media Center sessions are disabled on mounted 0S routes.' };
+  }
   return verifyExternalSkyGateToken(token, options);
 }
 function requireSkyGate(event, options) {
@@ -90,4 +91,4 @@ function requireSkyGate(event, options) {
   return guard.ok ? null : json(guard.statusCode || 401, { ok: false, error: guard.error || 'Unauthorized.' });
 }
 
-module.exports = { requireSkyGate, verifySkyGateBearer, localIdentity };
+module.exports = { requireSkyGate, verifySkyGateBearer, gateStatusProvider };

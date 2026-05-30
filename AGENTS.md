@@ -10,34 +10,103 @@ If a new app needs owner access, wire it into FS27/Gate/Free99 and store/reuse t
 
 Every app, platform, and sub-platform path mounted inside `metraiyux_0s_site` must pass through `enforceZeroOsGate` before it reaches `env.ASSETS` or a proxied API. The Worker is default-deny: `ZERO_OS_GATE_PREFIXES` is the named-surface manifest, not the only protection. The only public entrypoints are the owner login/introspection endpoints needed to issue or verify the shared FS27/Free99 session plus tiny browser metadata such as `favicon.ico`, `robots.txt`, and `sitemap.xml`. When adding a new 0S surface, add its prefix to the gate table and prove unauthenticated requests redirect to `/admin/login.html?return=...` while authenticated requests render normally.
 
-## Live Browser Verification Gate
+## SkyeNet Platform Deployment Rule
 
-For this repo, a production-facing web/app change is not done until it has been checked in a live headed browser after deployment. This applies to frontend changes, client apps, landing pages, Valley Verified pages, public live links, and production deploys.
+SkyeNet is the platform. Its shared Worker origin and control console currently live at:
 
-Hard rule:
+```bash
+https://skyenet.graylondonskyes.workers.dev
+```
 
-1. Open the deployed production URL in a headed browser session. Headless Playwright, `curl`, `fetch`, static scans, Lighthouse output, and screenshots alone do not count.
-2. Perform human-style interactions in the browser: click primary navigation or CTAs, open menus, exercise forms/workspace handoffs when present, use tabs/filters/toggles when present, and verify the resulting screen/state.
-3. Scroll the full rendered page like a human user on both desktop and mobile. Check the hero, every major section/anchor, all route/tab states opened during the run, and the page bottom.
-4. At every scroll stop, prove the visible viewport is not blank or visually dead. A text-only smoke check is not enough: visible text, loaded images/video/canvas/SVG/background media, broken media, sticky overlays, and empty white/black sections must be inspected.
-5. Check desktop and mobile viewports.
-6. Inspect console errors and failed network requests.
-7. Save a proof receipt with URLs, statuses, viewport sizes, actions performed, route/tab states, scroll stops, per-stop screenshot paths, visual nonblank metrics, console/network results, and failures.
-8. If this gate has not passed, the final answer must say the work was not live-browser-checked and must not present live links as ready.
+That shared Worker origin is infrastructure. For public company/customer-facing deployments, the canonical public link must be a platform-native SkyeNet hostname, not a shared Worker origin with a path mount. Use company-native hostnames such as:
 
-The enforceable browser proof policy is stored at:
+```bash
+https://skyenet.skyeroutex-logistics/
+https://skyenet.skyesol/
+https://skyenet.solenterprises/
+```
+
+Register these routes as host-native SkyeNet records with `hostname: "skyenet.<company-slug>"`, `mount_path: ""` or `/`, `url_mode: "subdomain"`/host-native mode, and `public_access: true`. The shared `https://skyenet.graylondonskyes.workers.dev/<project>/` shape may be used as an origin, fallback, proof, or temporary staging route, but do not present it as the final public company URL unless the owner explicitly approves it. Do not publish new customer-facing apps as primary routes under `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/<project>/` unless the owner explicitly asks for temporary 0S-hosted staging.
+
+The 0S `/api/skyenet/*` lane stays active as the shared-gate control/proxy API. The SkyeNet shared Worker `/api/skyenet/*` lane stays active as the platform API. Public copy, Founder Command records, QR targets, sitemaps, robots, JSON-LD, and cross-links must use the platform-native company hostname after proof.
+
+Default public company deploy shape:
+
+```bash
+npm run skyenet:deploy -- \
+  --dir <client-facing-build-folder> \
+  --source-root <full-project-folder> \
+  --project <project-slug> \
+  --workspace <workspace-slug> \
+  --host skyenet.<company-slug> \
+  --mount / \
+  --url-mode subdomain \
+  --public \
+  --concurrency 4
+```
+
+Generic demos, temporary staging, or non-company examples may still use the shared SkyeNet origin with a path mount when that is explicitly the intended target:
+
+```bash
+npm run skyenet:deploy -- \
+  --dir <client-facing-build-folder> \
+  --source-root <full-project-folder> \
+  --project <project-slug> \
+  --workspace <workspace-slug> \
+  --host skyenet.graylondonskyes.workers.dev \
+  --mount /<project-slug> \
+  --public \
+  --concurrency 4
+```
+
+Use `SKYENET_AUTH`, `ZERO_OS_GATE_SESSION`, or an owner-issued shared gate bearer for deploy control. Never commit or print bearer tokens. Do not create SkyeNet-specific founder/admin/client passwords.
+
+SkyeNet deploys now have two custody lanes. `--dir` is the public build/app bundle that SkyeNet serves. `--source-root` is the private full project package that gated account download returns. The standalone SkyeNet console also has a Publish package screen that sends the selected public build folder to `/api/skyenet/deploy/upload` and the selected private full source folder to `/api/skyenet/source-upload` plus `/api/skyenet/source-complete`. Do not upload private source files into the public asset route to make downloads work. Use `/api/skyenet/env` for project environment variables; the console shows redacted previews only. After changing SkyeNet publish/source-custody behavior, run `npm run skyenet:netlify-parity:proof` and `npm run skyenet:netlify-parity:stress`.
+
+When migrating an existing 0S `/skyenet/<project>/` app to real SkyeNet:
+
+1. Archive the old 0S source/surface to SkyeVault/SkyDrive before deleting or redirecting anything.
+2. Deploy the client-facing bundle to a platform-native SkyeNet hostname.
+3. Prove the platform-native live URL, key assets, routes, gated/account flows, source download API, and source-transfer receipt API through non-browser HTTP/API checks.
+4. Update Founder Command/client records, public flyers, QR targets, sitemaps, robots, JSON-LD, and cross-links to the platform-native SkyeNet hostname.
+5. Convert the old 0S `/skyenet/<project>/` route into a redirect to the platform-native SkyeNet hostname only after proof and archive receipts exist.
+
+Current path-route reference implementation: Bob's Smoke Shop is live at `https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/` with founder-owned source custody. Bob is a shared-origin path-route example, not the default public-company hostname pattern. Bob gets the hosted app; source download stays account-scoped to the founder/admin deployment record unless a founder-approved transfer is recorded through `/api/skyenet/source-transfer`.
+
+Detailed deployment and migration instructions live in:
+
+```bash
+docs/SKYENET_UPLOAD_URL_MODEL.md
+docs/SKYENET_PUBLIC_POSTING_GUIDE.md
+docs/SKYENET_SOURCE_CUSTODY_AND_TRANSFER.md
+docs/SKYENET_STANDALONE_MIGRATION_DIRECTIVE.md
+```
+
+## Owner-Manual Browser Verification Rule
+
+The owner/admin has disabled Codex-run browser proof in this repo. Codex must not open headed browsers, run Playwright live verification, spawn browser-verifier agents, or spend implementation time on browser proof unless the owner explicitly re-enables it in the current task.
+
+Production-facing work is now completed by build/deploy plus non-browser verification:
+
+1. Run static checks, build checks, JSON validation, API smoke, gate checks, and authenticated HTTP stress as appropriate.
+2. Save receipts for deploys, smoke checks, stress checks, and any blocked items.
+3. Provide direct production links for the owner to live-check manually.
+4. State clearly that browser verification is owner-handled when reporting readiness.
+5. Do not call `npm run proof:live-browser` expecting a browser. The script is intentionally disabled and returns a no-browser receipt.
+
+The browser-proof disablement policy is stored at:
 
 ```bash
 .agents/live-browser-verifier/browser-proof-policy.toml
 ```
 
-Reusable verifier agent:
+Disabled verifier shim:
 
 ```bash
 npm run proof:live-browser -- --url <production-url> --expect "<text that must be visible>"
 ```
 
-Agent prompt and checklist live in:
+Historical verifier prompt and checklist live in:
 
 ```bash
 .agents/live-browser-verifier/AGENTS.md

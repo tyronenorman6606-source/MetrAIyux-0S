@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Beer &amp; Wine Distributors of Arizona: Beer and wine distributor trade association in Phoenix, AZ 85003. Valley Verified profile.">
+  <title>Beer &amp; Wine Distributors of Arizona | Valley Verified Phoenix, AZ 85003</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #201c18;
+      --olive: #566b2f;
+      --cranberry: #8f2438;
+      --amber: #d99a28;
+      --foam: #fff9ed;
+      --line: rgba(32, 28, 24, .17);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(86, 107, 47, .12) 0 50%, rgba(143, 36, 56, .1) 50%),
+        var(--foam);
+    }
+
+    a { color: inherit; }
+
+    .sheet {
+      width: min(1140px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 30px 0 46px;
+    }
+
+    .hero {
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      min-height: 390px;
+    }
+
+    .copy {
+      padding: 36px;
+      display: grid;
+      align-content: space-between;
+      border-top: 12px solid var(--olive);
+    }
+
+    .copy p {
+      margin: 0;
+      color: var(--cranberry);
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: 66px;
+      line-height: .98;
+    }
+
+    .deck {
+      margin: 18px 0 0;
+      max-width: 660px;
+      color: #554b40;
+      font-size: 19px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      background: var(--cranberry);
+    }
+
+    .mark img {
+      width: 136px;
+      height: 136px;
+      background: #fff;
+      padding: 8px;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.25fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .block {
+      min-height: 126px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 20px;
+      border-bottom: 7px solid var(--amber);
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--olive);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .block a {
+      font-size: 22px;
+      line-height: 1.18;
+      font-weight: 900;
+      text-decoration: none;
+      color: var(--cranberry);
+      overflow-wrap: anywhere;
+    }
+
+    address { font-style: normal; font-size: 17px; line-height: 1.45; }
+
+    .matrix {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .fact {
+      min-height: 132px;
+      padding: 18px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid var(--line);
+    }
+
+    .fact strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #6e5f49;
+      font-size: 13px;
+    }
+
+    .fact span { display: block; font-size: 18px; line-height: 1.28; font-weight: 800; }
+
+    .note {
+      margin-top: 18px;
+      padding: 22px;
+      background: #fff;
+      border-left: 8px solid var(--cranberry);
+      color: #51473c;
+      line-height: 1.62;
+    }
+
+    @media (max-width: 900px) {
+      .hero, .contact { grid-template-columns: 1fr; }
+      .mark { min-height: 180px; }
+      .matrix { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 44px; }
+    }
+
+    @media (max-width: 560px) {
+      .matrix { grid-template-columns: 1fr; }
+      .copy { padding: 24px; }
+      h1 { font-size: 35px; }
+    }
+    .vv-page { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; color: var(--ink, #17201c); }
+    .vv-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0 22px; color: var(--muted, #5f6863); font-size: 14px; }
+    .vv-brand { display: flex; align-items: center; gap: 12px; min-width: 0; font-weight: 900; color: var(--accent, var(--green, #245f49)); }
+    .vv-brand img { width: 48px; height: 48px; padding: 7px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: var(--panel, var(--paper, #fff)); object-fit: contain; }
+    .vv-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 390px); gap: 32px; align-items: center; min-height: 58vh; padding: 36px 0 46px; }
+    .vv-eyebrow { display: inline-flex; width: fit-content; margin: 0 0 18px; padding: 8px 11px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-left: 5px solid var(--accent, var(--green, #245f49)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .vv-page h1 { margin: 0; max-width: 850px; font-size: clamp(42px, 7vw, 84px); line-height: .94; letter-spacing: 0; }
+    .vv-lead { max-width: 730px; margin: 24px 0 0; color: var(--muted, #47524c); font-size: clamp(18px, 2.1vw, 23px); line-height: 1.48; }
+    .vv-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .vv-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 12px 17px; border: 1px solid var(--accent, var(--green, #245f49)); border-radius: 8px; text-decoration: none; font-weight: 900; }
+    .vv-button.primary { background: var(--accent, var(--green, #245f49)); color: #fff; }
+    .vv-button.secondary { background: rgba(255,255,255,.78); color: var(--accent, var(--green, #245f49)); }
+    .vv-card, .vv-panel { border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.86); box-shadow: 0 18px 54px rgba(0,0,0,.10); }
+    .vv-card { padding: 24px; }
+    .vv-card h2, .vv-panel h2 { margin: 0 0 14px; color: var(--accent, var(--green, #245f49)); font-size: clamp(20px, 2.4vw, 28px); line-height: 1.1; letter-spacing: 0; text-transform: none; }
+    .vv-card dl { display: grid; gap: 14px; margin: 0; }
+    .vv-card dt { color: var(--muted, #5f6863); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+    .vv-card dd { margin: 4px 0 0; line-height: 1.45; }
+    .vv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 0 38px; }
+    .vv-panel { padding: 22px; }
+    .vv-panel p { margin: 10px 0 0; color: var(--muted, #47524c); line-height: 1.58; }
+    .vv-wide { grid-column: span 2; }
+    .vv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .vv-chip { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 800; }
+    .vv-footer { padding: 18px 0 0; border-top: 1px solid var(--line, rgba(0,0,0,.14)); color: var(--muted, #5f6863); font-size: 14px; }
+    @media (max-width: 840px) { .vv-top, .vv-hero, .vv-grid { display: block; } .vv-top span:last-child { display: block; margin-top: 8px; } .vv-card { margin-top: 24px; } .vv-panel { margin-bottom: 14px; } .vv-wide { grid-column: auto; } .vv-page h1 { font-size: 42px; } }
+  </style>
+</head>
+<body>
+  <main class="vv-page">
+    <header class="vv-top" aria-label="Valley Verified business heading">
+      <div class="vv-brand"><img src="assets/logo.svg" alt=""><span>Valley Verified</span></div>
+      <span>Phoenix, AZ 85003</span>
+    </header>
+
+    <section class="vv-hero" aria-labelledby="business-title">
+      <div>
+        <p class="vv-eyebrow">Beer and wine distributor trade association</p>
+        <h1 id="business-title">Beer &amp; Wine Distributors of Arizona</h1>
+        <p class="vv-lead">Beer &amp; Wine Distributors of Arizona represents a Phoenix-based trade association lane for beverage distribution and business advocacy.</p>
+        <div class="vv-actions">
+          <a class="vv-button primary" href="tel:+16024456345">Call (602) 445-6345</a>
+          <a class="vv-button secondary" href="https://bwdaz.com/">Visit official website</a>
+        </div>
+      </div>
+
+      <aside class="vv-card" aria-label="Local business details">
+        <h2>Local Details</h2>
+        <dl>
+          <div><dt>Focus</dt><dd>Beer and wine distributor trade association</dd></div>
+          <div><dt>Address / Area</dt><dd>826 N. Third Ave., Phoenix, AZ 85003</dd></div>
+          <div><dt>Phone</dt><dd><a href="tel:+16024456345">(602) 445-6345</a></dd></div>
+          <div><dt>Website</dt><dd><a href="https://bwdaz.com/">bwdaz.com</a></dd></div>
+          <div><dt>Audience</dt><dd>Relevant for distributors, beverage industry partners, policymakers, hospitality operators, and business teams connected to Arizona alcohol distribution.</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="vv-grid" aria-label="Valley Verified profile sections">
+      <article class="vv-panel">
+        <h2>What They Do</h2>
+        <p>The organization is listed at 826 N. Third Ave. with a public phone number and trade association/distributors category. Its official website supports the beverage-distribution association identity.</p>
+        <div class="vv-tags">
+          <span class="vv-chip">Trade association</span>
+          <span class="vv-chip">Beverage distribution</span>
+          <span class="vv-chip">Phoenix 85003</span>
+          <span class="vv-chip">Official website</span>
+        </div>
+      </article>
+      <article class="vv-panel">
+        <h2>Trust Signals</h2>
+        <p>The official BWD AZ website and Greater Phoenix Chamber business services evidence support the association name, Phoenix address, phone, and distributor trade category.</p>
+      </article>
+      <article class="vv-panel vv-wide">
+        <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Skyes Over London says Beer &amp; Wine Distributors of Arizona is Valley Verified because it represents a specific local industry with a public Phoenix office and official web presence. The business belongs here as a trade association that connects beverage distribution to the broader Valley business and hospitality economy.</p>
+      </article>
+    </section>
+
+    <footer class="vv-footer">Beer &amp; Wine Distributors of Arizona | Beer and wine distributor trade association | Phoenix, AZ 85003 | Valley Verified public business profile.</footer>
+  </main>
+</body>
+</html>

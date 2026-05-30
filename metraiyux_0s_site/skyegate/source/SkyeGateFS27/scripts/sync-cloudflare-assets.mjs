@@ -109,6 +109,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
 await copyDirectoryFiltered('assets');
 await copyDirectoryFiltered('admin');
 await copyDirectoryFiltered(path.join('apps', 'skyeroutex'));
+await copyDirectoryFiltered('generators');
 await copyDirectoryFiltered('openapi');
 await copyDirectoryFiltered('pricing');
 

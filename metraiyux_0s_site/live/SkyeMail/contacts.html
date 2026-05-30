@@ -6,9 +6,9 @@
   <script defer src="assets/app.js"></script>
   <script defer src="assets/mail-ui.js"></script>
   <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Contacts — SkyeMail Vault</title>
+  <title>Contacts — SkyeMail Citadel</title>
 </head>
-<body data-page-id="contacts" data-page-name="Contacts" data-page-hint="Google synced people and quick compose lane">
+<body data-page-id="contacts" data-page-name="Contacts" data-page-hint="SkyeMail people and quick compose lane">
 <div class="wrap">
   <div id="pageTopbar"></div>
   <div class="layout">
@@ -18,9 +18,9 @@
       <section class="hero">
         <section class="card">
           <h1 class="h1">Contacts</h1>
-          <p class="sub">Keep people inside the vault, sync real Google Contacts, and convert mailbox-discovered correspondents into reusable client records.</p>
+          <p class="sub">Keep people inside Citadel, sync SkyeMail contacts, and convert mailbox-discovered correspondents into reusable client records.</p>
           <div class="btnrow">
-            <button class="btn gold" id="syncBtn" type="button">Sync Google Contacts</button>
+            <button class="btn gold" id="syncBtn" type="button">Sync SkyeMail Contacts</button>
             <button class="btn" id="applySearchBtn" type="button">Search</button>
             <button class="btn" id="clearSearchBtn" type="button">Clear</button>
           </div>
@@ -42,7 +42,7 @@
             </div>
             <div class="fieldgrid" style="margin-top:12px">
               <div><label for="favorite">Favorite</label><div class="toggleline"><input id="favorite" type="checkbox" />Mark as favorite</div></div>
-              <div><label for="sync_google">Google sync</label><div class="toggleline"><input id="sync_google" type="checkbox" />Save this contact into Google Contacts too</div></div>
+              <div><label for="sync_google">Hosted contact sync</label><div class="toggleline"><input id="sync_google" type="checkbox" />Save this contact into the hosted contact lane too</div></div>
             </div>
             <label for="notes">Notes</label><textarea id="notes" placeholder="Notes for this contact."></textarea>
             <div class="btnrow"><button class="btn gold" id="saveBtn" type="button">Save Contact</button><button class="btn" id="newBtn" type="button">New Contact</button></div>
@@ -50,7 +50,7 @@
         </aside>
       </section>
       <section class="grid2">
-        <section class="card"><div class="toolbar"><div><h2 style="margin:0">Saved and synced contacts</h2><div class="mini">Local contacts and Google-synced client records</div></div></div><div class="contact-list" id="savedContacts"><div class="empty">Loading contacts…</div></div></section>
+        <section class="card"><div class="toolbar"><div><h2 style="margin:0">Saved and synced contacts</h2><div class="mini">Local contacts and hosted client records</div></div></div><div class="contact-list" id="savedContacts"><div class="empty">Loading contacts…</div></div></section>
         <section class="card"><div class="toolbar"><div><h2 style="margin:0">Recent correspondents</h2><div class="mini">Discovered from mailbox traffic and ready for fast compose</div></div></div><div class="contact-list" id="recentContacts"><div class="empty">Loading recent correspondents…</div></div></section>
       </section>
 

@@ -1,13 +1,36 @@
 {
-  "name": "MetrAIyux 0S Launcher",
-  "short_name": "0S Launcher",
+  "name": "MetrAIyux 0S Browser",
+  "short_name": "0S Browser",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",
   "display_override": ["fullscreen", "standalone", "window-controls-overlay", "browser"],
   "background_color": "#03070b",
   "theme_color": "#03070b",
-  "description": "A full-screen operating shell for the MetrAIyux 0S app ecosystem.",
+  "description": "A full-screen 0S browser shell for owned apps, customer workspaces, offer lanes, and routed business tools.",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "shortcuts": [
+    {
+      "name": "Start Here",
+      "short_name": "Start",
+      "url": "./index.html#customer-path",
+      "description": "Open the guided customer launch path."
+    },
+    {
+      "name": "Offer Engine",
+      "short_name": "Offers",
+      "url": "./index.html#offer-engine",
+      "description": "Open the free-to-upgrade product and ad rail."
+    },
+    {
+      "name": "Free Stack Pitch",
+      "short_name": "Free Stack",
+      "url": "../sales/free-business-stack.html",
+      "description": "Open the client-facing free business stack pitch."
+    }
+  ],
   "icons": [
     {
       "src": "../assets/metraiyux-0s-icon-512.png",

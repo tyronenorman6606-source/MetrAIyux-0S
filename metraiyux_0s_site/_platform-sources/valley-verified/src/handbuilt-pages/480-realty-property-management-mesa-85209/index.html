@@ -1,0 +1,558 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>480 Realty &amp; Property Management | Valley Verified</title>
+  <meta name="description" content="Valley Verified static landing page for 480 Realty &amp; Property Management in Mesa, with owner-researched contact facts, source details, and SkyEmail acceptance.">
+  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/480-realty-property-management-mesa-85209/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #151820;
+      --muted: #606978;
+      --paper: #f7f8f4;
+      --panel: #ffffff;
+      --line: #232933;
+      --sage: #8aa17a;
+      --clay: #c96742;
+      --navy: #24476f;
+      --gold: #efc04b;
+      --aqua: #dff1f0;
+      --shadow: 0 20px 46px rgba(21, 24, 32, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(36, 71, 111, 0.08) 0 10px, transparent 10px 30px),
+        linear-gradient(180deg, #fbfaf2 0%, #eef6f2 50%, #f7f8fb 100%);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 2px solid var(--line);
+      background: #fff;
+    }
+
+    .brand small,
+    .navline {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .hero,
+    .panel,
+    .route,
+    .skymail {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      min-height: 560px;
+      padding: 34px;
+      display: grid;
+      align-content: space-between;
+      background:
+        radial-gradient(circle at 90% 8%, rgba(201, 103, 66, 0.24), transparent 28%),
+        linear-gradient(145deg, #ffffff 0%, #f7f1df 48%, #e0f2ed 100%);
+    }
+
+    .kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .kicker span,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .kicker span:first-child {
+      background: var(--gold);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 20px;
+      font-size: clamp(2.8rem, 8vw, 5.8rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 720px;
+      color: #2b3542;
+      font-size: 1.12rem;
+      line-height: 1.65;
+    }
+
+    .handoff {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .handoff div {
+      min-height: 118px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .handoff strong {
+      font-size: 1.02rem;
+    }
+
+    .handoff span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      padding: 26px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .score div {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--aqua);
+      padding: 16px;
+      min-height: 116px;
+    }
+
+    .score strong {
+      display: block;
+      font-size: 2.2rem;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .score span,
+    dt {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .facts {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+
+    .facts div {
+      display: grid;
+      grid-template-columns: 142px 1fr;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid #dce2ea;
+    }
+
+    .facts dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .button.primary {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .button.gold {
+      background: var(--gold);
+    }
+
+    .route {
+      margin-top: 22px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: #fff;
+    }
+
+    .route div {
+      border-left: 5px solid var(--sage);
+      padding: 10px 12px;
+      background: #f4f8ef;
+      border-radius: 6px;
+    }
+
+    .route strong,
+    .route span {
+      display: block;
+    }
+
+    .route span {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .flag {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff2df;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .skymail {
+      margin-top: 22px;
+      padding: 28px;
+      background:
+        linear-gradient(135deg, rgba(36, 71, 111, 0.12), transparent 38%),
+        #ffffff;
+    }
+
+    .skymail-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid #dce2ea;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .steps b {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--clay);
+      color: #fff;
+    }
+
+    .notice {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff4d7;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .mast,
+      .grid,
+      .skymail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .route {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .handoff,
+      .score,
+      .route {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: min(100% - 20px, 1160px);
+      }
+
+      .topbar,
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .hero,
+      .panel,
+      .skymail {
+        padding: 20px;
+      }
+
+      .facts div {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      h1 {
+        font-size: 2.72rem;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "@id": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/480-realty-property-management-mesa-85209/#business",
+      "name": "480 Realty & Property Management",
+      "description": "Mesa-based residential property management for rental analysis, owner reporting, tenant portal handoff, maintenance coordination, inspections, turns, and leasing support.",
+      "url": "https://480-realty-property-management.pages.dev/",
+      "telephone": "(480) 282-1234",
+      "email": "mario@480realtypm.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "7205 E Southern Ave #102",
+        "addressLocality": "Mesa",
+        "addressRegion": "AZ",
+        "postalCode": "85209",
+        "addressCountry": "US"
+      },
+      "areaServed": "Mesa, AZ",
+      "sameAs": [
+        "https://480realtypm.com/"
+      ]
+    }
+  </script>
+</head>
+<body data-static-hand-page="true" class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
+  <main class="page">
+    <header class="topbar" aria-label="Valley Verified business header">
+      <a class="brand" href="/valley-verified/">
+        <img src="/assets/valley-verified-logo.png" alt="">
+        <span>
+          <strong>Valley Verified</strong><br>
+          <small>Owner-researched local record</small>
+        </span>
+      </a>
+      <div class="navline">Mesa / Real Estate And Property / Property Management</div>
+    </header>
+
+    <section class="mast" aria-labelledby="realty-title">
+      <div class="hero">
+        <div>
+          <ul class="kicker" aria-label="Listing status">
+            <li><span>Owner-researched verified status</span></li>
+            <li><span>Business verified</span></li>
+            <li><span>Featured listing</span></li>
+            <li><span>Live operations app</span></li>
+          </ul>
+          <h1 id="realty-title" class="neon-gradient-text">480 Realty &amp; Property Management</h1>
+          <p class="lead">A Mesa residential property management record for rental analysis, owner reporting, tenant portal handoff, maintenance coordination, inspections, turns, leasing support, and a direct move into the live owner operations app.</p>
+        </div>
+        <div class="handoff" aria-label="Service highlights">
+          <div><strong>Rental analysis</strong><span>Owner intake</span></div>
+          <div><strong>Portal handoff</strong><span>Tenant and owner flow</span></div>
+          <div><strong>Maintenance coordination</strong><span>Property operations</span></div>
+        </div>
+      </div>
+
+      <aside class="panel" aria-labelledby="realty-contact">
+        <div>
+          <p class="pill">Mesa 85209</p>
+          <h2 id="realty-contact">Contact and source facts</h2>
+        </div>
+        <div class="score">
+          <div><strong>63</strong><span>Verification score</span></div>
+          <div><strong>Quote</strong><span>Pricing mode</span></div>
+        </div>
+        <dl class="facts">
+          <div><dt>Business</dt><dd>480 Realty &amp; Property Management</dd></div>
+          <div><dt>Category</dt><dd>Real Estate And Property / Property Management</dd></div>
+          <div><dt>Address</dt><dd>7205 E Southern Ave #102, Mesa, AZ 85209</dd></div>
+          <div><dt>Phone</dt><dd><a href="tel:+14802821234">(480) 282-1234</a></dd></div>
+          <div><dt>Email</dt><dd><a href="mailto:mario@480realtypm.com">mario@480realtypm.com</a></dd></div>
+          <div><dt>Website</dt><dd><a href="https://480-realty-property-management.pages.dev/" rel="noopener">480-realty-property-management.pages.dev</a></dd></div>
+          <div><dt>Booking</dt><dd><a href="https://realty480pm.appfolio.com/" rel="noopener">realty480pm.appfolio.com</a></dd></div>
+          <div><dt>Source</dt><dd>dist/data/businesses.json, seed/businesses/clients.json, hash 2483cbbd5908</dd></div>
+          <div><dt>Checked</dt><dd>Last verified 2026-05-19; claim status unclaimed</dd></div>
+        </dl>
+        <div class="actions">
+          <a class="button primary" href="https://480-realty-property-management.pages.dev/" rel="noopener">Open live app</a>
+          <a class="button" href="https://realty480pm.appfolio.com/" rel="noopener">AppFolio portal</a>
+          <a class="button" href="https://480realtypm.com/" rel="noopener">Source site</a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="route" aria-label="Management workflow summary">
+      <div><strong>Owner reporting</strong><span>Portfolio status and management proof.</span></div>
+      <div><strong>Leasing support</strong><span>Marketing, lease-up, and application route.</span></div>
+      <div><strong>Inspections and turns</strong><span>Make-ready coordination and property condition flow.</span></div>
+      <div><strong>HOA compliance</strong><span>Community requirements are part of the listed service lane.</span></div>
+    </section>
+
+    <section class="grid" aria-label="Business details">
+      <article class="panel">
+        <h2>What property owners can use</h2>
+        <p class="lead">The listing sends owners from local discovery into a working operations route: rental analysis, owner intake, AppFolio handoff, maintenance coordination, inspections, turns, and leasing or marketing support.</p>
+        <dl class="facts">
+          <div><dt>Pricing note</dt><dd>Management scope, property type, leasing support, and service-area needs affect pricing.</dd></div>
+          <div><dt>Policy note</dt><dd>Confirm onboarding, portal setup, and service timing directly with 480 Realty.</dd></div>
+          <div><dt>Tags</dt><dd>Skye Client, Rental Analysis, Owner Reporting, Tenant Portal Handoff, Maintenance Coordination.</dd></div>
+        </dl>
+      </article>
+      <article class="panel">
+        <h2>Valley Verified record</h2>
+        <p class="lead">This public page keeps the business facts visible while owner/admin access stays on the shared 0S gate lane. No separate local admin credential is introduced for this listing.</p>
+        <dl class="facts">
+          <div><dt>Primary key</dt><dd>domain:480-realty-property-management.pages.dev</dd></div>
+          <div><dt>Strong signals</dt><dd>Domain, phone, and email.</dd></div>
+          <div><dt>Source URL</dt><dd><a href="https://480realtypm.com/" rel="noopener">480realtypm.com</a></dd></div>
+        </dl>
+        <p class="flag">Moderation flag from source data: source URL domain differs from website.</p>
+      </article>
+    </section>
+
+    <section class="skymail" aria-labelledby="realty-skymail">
+      <div class="skymail-grid">
+        <div>
+          <p class="pill">SkyEmail acceptance</p>
+          <h2 id="realty-skymail">Accept the free SkyEmail account for 480 Realty &amp; Property Management.</h2>
+          <p class="lead">Use the shared 0S/SkyGate sign-in path, then notify the owner to provision the workspace. Team activation starts within 24 hours after provisioning.</p>
+          <div class="actions">
+            <a class="button primary" href="/admin/login.html?return=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html%3Fworkspace=valley-verified%26business=480-realty-property-management-mesa-85209">Accept free SkyEmail account</a>
+            <a class="button gold" href="mailto:owner@metraiyux.com?subject=Provision%20SkyEmail%20for%20480%20Realty%20%26%20Property%20Management&amp;body=Please%20provision%20the%20Valley%20Verified%20SkyEmail%20workspace%20for%20480%20Realty%20%26%20Property%20Management.">Notify owner to provision workspace</a>
+          </div>
+        </div>
+        <div>
+          <ol class="steps">
+            <li><b>1</b><span>Sign in through shared 0S/SkyGate; do not create an app-specific owner password.</span></li>
+            <li><b>2</b><span>Owner provisions the SkyEmail workspace and returns the shared account route.</span></li>
+            <li><b>3</b><span>Team activation is expected within 24 hours after provisioning.</span></li>
+            <li><b>4</b><span>K4i escalation starts after 24 hours if activation has not landed.</span></li>
+          </ol>
+          <p class="notice">Seats: 9 left. Warn at 2 seats remaining. Buy seats in groups of 5 so the workspace never stalls during onboarding.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

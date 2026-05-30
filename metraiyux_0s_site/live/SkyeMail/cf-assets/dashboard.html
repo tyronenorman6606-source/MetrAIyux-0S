@@ -6,7 +6,7 @@
   <script defer src="assets/app.js"></script>
   <script defer src="assets/mail-ui.js"></script>
   <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Inbox — SkyeMail Vault</title>
+  <title>Inbox — SkyeMail Citadel</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Inbox" data-page-hint="Primary mailbox command center" data-label="INBOX">
 <div class="wrap">
@@ -21,11 +21,12 @@
           <h1 class="h1">Inbox</h1>
           <p class="sub">Your primary <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> inbox, with left-rail navigation, bulk actions, and real thread access.</p>
           <div class="btnrow">
-            <a class="btn gold" href="compose.html">Compose</a>
-            <button class="btn" id="refreshBtn" type="button">Refresh</button>
+	            <a class="btn gold" href="compose.html">Compose</a>
+	            <a class="btn" href="brain.html">Brain</a>
+	            <button class="btn" id="refreshBtn" type="button">Refresh</button>
             <button class="btn ok" id="watchBtn" type="button">Enable Push Watch</button>
             <button class="btn" id="proofLoopBtn" type="button">Send + Receive Proof</button>
-            <button class="btn" id="connectBtn" type="button">Connect Google</button>
+            <button class="btn" id="connectBtn" type="button">Connect Mailbox</button>
             <button class="btn danger" id="disconnectBtn" type="button">Disconnect</button>
           </div>
           <div class="hr"></div>
@@ -48,7 +49,10 @@
             <h2 style="margin:0 0 4px">Mailbox list</h2>
             <div class="mini">Hosted mailbox message listing with selection actions and thread open.</div>
           </div>
-          <div class="mini" id="statusText">Waiting for mailbox load…</div>
+          <div class="btnrow" style="margin-top:0">
+            <button class="btn" id="refreshListBtn" type="button">Refresh Inbox</button>
+            <div class="mini" id="statusText">Waiting for mailbox load…</div>
+          </div>
         </div>
         <div class="searchbar">
           <div><label for="q">Search query</label><input id="q" type="text" placeholder="from:someone@internal.invalid OR project keyword" /></div>
@@ -59,6 +63,50 @@
         <div class="bulkbar" id="bulkBar"></div>
         <div class="mailtable" id="mailList"><div class="empty">Loading mailbox…</div></div>
         <div class="pagination"><div class="mini" id="pageTokenText"></div><button class="btn" id="prevBtn" type="button">Previous</button><button class="btn" id="nextBtn" type="button">Next</button></div>
+      </section>
+
+      <section class="card" id="calendar">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">0S Calendar</h2>
+            <div class="mini">Founder Command calendar lane.</div>
+          </div>
+          <div class="btnrow" style="margin-top:0">
+            <button class="btn" id="refreshCalendarBtn" type="button">Refresh Calendar</button>
+            <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/?view=calendar" target="_blank" rel="noopener">Founder Calendar</a>
+            <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-calendar/" target="_blank" rel="noopener">SkyeCalendar</a>
+          </div>
+        </div>
+        <div class="mini" id="calendarStatus">Waiting for calendar sync…</div>
+        <div class="hr"></div>
+        <div class="fieldgrid">
+          <div>
+            <label for="calendarTopic">Topic</label>
+            <input id="calendarTopic" type="text" placeholder="Client follow-up" />
+          </div>
+          <div>
+            <label for="calendarAttendee">Attendee email</label>
+            <input id="calendarAttendee" type="email" placeholder="client@example.com" />
+          </div>
+        </div>
+        <div class="fieldgrid" style="margin-top:12px">
+          <div>
+            <label for="calendarStart">Start</label>
+            <input id="calendarStart" type="datetime-local" />
+          </div>
+          <div>
+            <label for="calendarEnd">End</label>
+            <input id="calendarEnd" type="datetime-local" />
+          </div>
+        </div>
+        <label for="calendarNotes" style="margin-top:12px">Notes</label>
+        <textarea id="calendarNotes" placeholder="Agenda, context, or mail follow-up details."></textarea>
+        <div class="btnrow">
+          <button class="btn gold" id="saveCalendarBtn" type="button">Save Calendar Item</button>
+          <label class="toggleline" for="calendarLedgerOnly"><input id="calendarLedgerOnly" type="checkbox" checked />Ledger only</label>
+        </div>
+        <div class="hr"></div>
+        <div class="mailtable" id="calendarList"><div class="empty">Loading calendar…</div></div>
       </section>
 
       <section class="card">
@@ -76,7 +124,18 @@
           </div>
           <div>
             <label for="handoffTargets">Downstream targets</label>
-            <select id="handoffTargets" multiple size="5">
+            <select id="handoffTargets" multiple size="10">
+              <option value="SkyeDocxMax">SkyeDocxMax</option>
+              <option value="SovereignDocs">SovereignDocs</option>
+              <option value="SkyeCalendar">0S Calendar</option>
+              <option value="VantaCoreCRM">VantaCore CRM</option>
+              <option value="SkyeProfitConsole">Profit Console</option>
+              <option value="SkyeSplitEngine">Split Engine</option>
+              <option value="SkyeProofAudit">Audit Ledger</option>
+              <option value="SaaSLaunchPacket">SaaS Launch Packet</option>
+              <option value="GovernmentCaseCommand">Government Case Command</option>
+              <option value="SkyeVaultPro">SkyeVault Pro</option>
+              <option value="PwaFactory">PWA Factory</option>
               <option value="SkyeLeadVault">SkyeLeadVault</option>
               <option value="AE-FlowPro">AE-FlowPro</option>
               <option value="skyeroutex-workforce-command-v0.4.0">Workforce Command</option>

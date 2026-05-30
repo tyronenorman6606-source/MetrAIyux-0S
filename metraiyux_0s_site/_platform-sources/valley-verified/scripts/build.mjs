@@ -13,10 +13,9 @@ const steps = [
   ['v18-enhance', ['scripts/v18-enhance.mjs']],
   ['v19-enhance', ['scripts/v19-enhance.mjs']],
   ['v20-enhance', ['scripts/v20-enhance.mjs']],
-  ['v21-enhance', ['scripts/v21-enhance.mjs']],
   ['v22-enhance', ['scripts/v22-enhance.mjs']],
   ['v23-enhance', ['scripts/v23-enhance.mjs']],
-  ['sync-northstar-overrides', ['scripts/sync-northstar-overrides.mjs']]
+  ['client-facing-copy', ['scripts/client-facing-copy.mjs']]
 ];
 
 for (const [label, args] of steps) {

@@ -27,6 +27,13 @@ function verifyFingerprint(body, appProperties, manifest) {
   if (manifest?.policy?.streamingMultipart === true && !driveFingerprint?.value && bodyFingerprint?.value) {
     return bodyFingerprint;
   }
+  if (!driveFingerprint?.value && bodyFingerprint?.value) {
+    const manifestSize = Number(manifest?.file?.size || 0);
+    const bodySize = Number(body.fileSize || bodyFingerprint.bytesHashed || 0);
+    if (!manifestSize || !bodySize || manifestSize === bodySize) {
+      return bodyFingerprint;
+    }
+  }
   if (!driveFingerprint?.value) fail('Vault object is missing the expected file fingerprint metadata.', 403);
   if (String(driveFingerprint.value).toLowerCase() !== String(expected.value || '').toLowerCase()) {
     fail('Vault object fingerprint metadata does not match the upload manifest.', 409);
@@ -207,6 +214,16 @@ export async function handler(event) {
       developerId: verifiedText(manifestIntake.developerId, props.developerId || body.developerId, 120),
       developerName: verifiedText(manifestIntake.developerName, body.developerName, 120),
       accessType: verifiedText(manifestIntake.accessType, portalAccess.type || body.accessType, 40),
+      custodyScope: verifiedText(manifestIntake.custodyScope, props.custodyScope || body.custodyScope, 80),
+      vaultVisibility: verifiedText(manifestIntake.vaultVisibility, props.vaultVisibility || body.vaultVisibility, 80),
+      ownerAccountId: verifiedText(manifestIntake.ownerAccountId, props.ownerAccountId || body.ownerAccountId, 120),
+      ownerSubject: verifiedText(manifestIntake.ownerSubject, props.ownerSubject || body.ownerSubject, 120),
+      ownerEmail: verifiedText(manifestIntake.ownerEmail, body.ownerEmail, 180),
+      ownerWorkspaceId: verifiedText(manifestIntake.ownerWorkspaceId, props.ownerWorkspaceId || body.ownerWorkspaceId, 120),
+      ownerWorkspaceSlug: verifiedText(manifestIntake.ownerWorkspaceSlug, body.ownerWorkspaceSlug, 120),
+      accessPolicy: verifiedText(manifestIntake.accessPolicy, body.accessPolicy, 160),
+      clientVaultVisible: manifestIntake.clientVaultVisible === false ? false : body.clientVaultVisible !== false,
+      clientVaultDownloadAllowed: manifestIntake.clientVaultDownloadAllowed === false ? false : body.clientVaultDownloadAllowed !== false,
       destinationId: verified.destinationId,
       destinationName: cleanText(body.destinationName || verified.destination.name, 180),
       clientName: verifiedText(manifestIntake.clientName, props.clientName || body.clientName, 180),
@@ -272,7 +289,17 @@ export async function handler(event) {
           workspaceId: entry.workspaceId,
           developerId: entry.developerId,
           developerName: entry.developerName,
-          accessType: entry.accessType
+          accessType: entry.accessType,
+          custodyScope: entry.custodyScope,
+          vaultVisibility: entry.vaultVisibility,
+          ownerAccountId: entry.ownerAccountId,
+          ownerSubject: entry.ownerSubject,
+          ownerEmail: entry.ownerEmail,
+          ownerWorkspaceId: entry.ownerWorkspaceId,
+          ownerWorkspaceSlug: entry.ownerWorkspaceSlug,
+          accessPolicy: entry.accessPolicy,
+          clientVaultVisible: entry.clientVaultVisible,
+          clientVaultDownloadAllowed: entry.clientVaultDownloadAllowed
         },
         policy: { scan }
       });

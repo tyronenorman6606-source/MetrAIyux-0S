@@ -59,7 +59,7 @@ Successful repo helper pushes also return a short-lived signed download link and
 SkyeGateFS27 needs these environment values:
 
 ```bash
-SKYEVAULT_DROP_URL=https://skyevault-drop.netlify.app
+SKYEVAULT_DROP_URL=https://skyevault-drop.graylondonskyes.workers.dev
 SKYEVAULT_PROVISIONING_SECRET=the-same-long-shared-secret
 SKYEVAULT_DEFAULT_DESTINATION_ID=primary
 ```
@@ -71,7 +71,7 @@ When a SkyeVault subscription offer is paid, the Stripe webhook provisions or up
 In a developer workspace, use the repo helper with these local environment values:
 
 ```bash
-SKYEVAULT_DROP_URL=https://skyevault-drop.netlify.app
+SKYEVAULT_DROP_URL=https://skyevault-drop.graylondonskyes.workers.dev
 SKYEVAULT_PORTAL_KEY=long-random-dev-upload-code
 SKYEVAULT_WORKSPACE_ID=acme-dev
 SKYEVAULT_DEVELOPER_ID=jordan

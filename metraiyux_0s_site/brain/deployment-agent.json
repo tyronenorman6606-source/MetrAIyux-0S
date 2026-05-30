@@ -1,0 +1,39 @@
+{
+  "id": "skyenet-deployment-agent",
+  "name": "SkyeNet Deployment Agent",
+  "display_name": "SkyeNet Deployment Agent",
+  "version": "skyenet-deployment-agent-v1",
+  "created_at": "2026-05-24T00:00:00Z",
+  "purpose": "0S-owned deployment agent for Cloudflare Pages/Workers authority checks, SkyeNet production deploy handoffs, secret-rotation planning, smoke receipts, stress receipts, and changelog readiness.",
+  "relationship_to_main_brain": "The Deployment Agent supports Gray Skyes Brain, Helper K4i, 0meg4kAI, and the Site Operator Brain by diagnosing production authority before deployments are called green.",
+  "owned_routes": [
+    "/api/helper-k4i/deploy-authority",
+    "/api/helper-k4i/deploy-assist",
+    "/api/helper-k4i/secret-rotation-plan"
+  ],
+  "local_commands": [
+    "node tools/deployment-agent.mjs diagnose --project=devooderator --worker=metraiyux-0s-full-system",
+    "node tools/deployment-agent.mjs deploy-pages --project=devooderator --dir=marketing/devooderator",
+    "node tools/deployment-agent.mjs smoke-devooderator",
+    "node tools/deployment-agent.mjs stress-devooderator"
+  ],
+  "capabilities": [
+    "Probe Cloudflare Pages project access without printing tokens.",
+    "Probe 0S Worker service access without printing tokens.",
+    "Select a valid deploy credential candidate when the first local token is stale.",
+    "Deploy Cloudflare Pages through the SkyeNet deployment lane.",
+    "Write smoke and stress receipts into test-artifacts/deployment-agent.",
+    "Ask Helper K4i for secret-rotation and deploy-assist receipts."
+  ],
+  "hard_boundaries": [
+    "Uses shared 0S/FS27/SkyGate/Free99 operator auth for Worker routes.",
+    "Does not expose bearer tokens, Cloudflare API tokens, database URLs, Resend keys, or owner credentials.",
+    "Does not mark production ready until deployment, smoke, and stress receipts pass.",
+    "Does not perform direct Cloudflare token creation or Worker secret mutation unless an owner-scoped management token is explicitly configured."
+  ],
+  "observability": {
+    "worker_receipts": "CitadelDB + SITE_EVENTS_KV through Helper K4i",
+    "local_receipts": "test-artifacts/deployment-agent",
+    "cloudflare_receipts": "test-artifacts/cloudflare-pages"
+  }
+}

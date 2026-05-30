@@ -135,19 +135,27 @@ function delay(ms) {
 
 async function api(path, options = {}, attempt = 0) {
   const headers = authHeaders(options.headers || {});
+  const timeoutMs = Number(options.timeoutMs || 45000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const { timeoutMs: _timeoutMs, ...fetchOptions } = options;
   let response = null;
   try {
     response = await fetch(path, {
-      ...options,
+      ...fetchOptions,
       headers,
-      credentials: 'include'
+      credentials: 'include',
+      signal: controller.signal
     });
   } catch (error) {
     if (attempt < 2) {
       await delay(650 * (attempt + 1));
       return api(path, options, attempt + 1);
     }
-    throw error;
+    const timedOut = error?.name === 'AbortError';
+    throw new Error(timedOut ? `SkyeNet request timed out after ${timeoutMs}ms: ${path}` : error.message);
+  } finally {
+    clearTimeout(timer);
   }
   let body = null;
   const contentType = response.headers.get('content-type') || '';

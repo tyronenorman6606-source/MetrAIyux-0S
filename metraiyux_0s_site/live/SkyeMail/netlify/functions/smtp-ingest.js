@@ -204,7 +204,7 @@ exports.handler = async (event) => {
         <h2>New encrypted message received</h2>
         <p>A new message arrived for <b>${escapeHtml(user.handle)}</b>.</p>
         <p>Sender: <b>${escapeHtml(from_name || "")}</b> &lt;${escapeHtml(from_email)}&gt;</p>
-        <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in Skye Mail Vault</a></p>
+        <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in SkyeMail Citadel</a></p>
         <p style="color:#666;font-size:12px">Message content is not included in this email to preserve end-to-end confidentiality.</p>
       </div>
     `;

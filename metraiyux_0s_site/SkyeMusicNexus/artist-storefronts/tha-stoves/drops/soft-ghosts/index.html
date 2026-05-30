@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soft Ghosts - Gray Gang Drop</title>
+  <meta name="theme-color" content="#ffd86b">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root{color-scheme:dark;--gold:#ffd86b;--cyan:#43e7ff;--ink:#fff8e7;--muted:#b8b2a7;--line:rgba(255,255,255,.16)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#050506,#131018 55%,#050506);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+    body:before{content:"";position:fixed;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+    main{position:relative;width:min(980px,calc(100% - 28px));margin:0 auto;padding:22px 0 58px}header{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding:12px 0}
+    a{color:inherit}.brand{font-weight:950;text-decoration:none}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:rgba(255,255,255,.06);text-decoration:none;font-weight:900}.btn.primary{color:#050506;background:linear-gradient(90deg,#fff,var(--gold),var(--cyan))}
+    .hero{padding:clamp(42px,8vw,92px) 0 24px}.micro{margin:0 0 10px;color:var(--gold);font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.18em}h1{margin:0;font-size:clamp(52px,11vw,122px);line-height:.82}.lede{color:var(--muted);font-size:clamp(17px,2vw,22px);line-height:1.45}
+    .player,.receipt{border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.42);padding:16px;margin-top:14px}audio{width:100%;min-height:46px}code{color:var(--cyan);overflow-wrap:anywhere}
+  </style>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body>
+  <main>
+    <header><a class="brand" href="../../">Artist Storefront</a><a class="btn primary" href="../../products/">SkyePay Unlock</a></header>
+    <section class="hero"><p class="micro">Skye Radio / packaged PWA</p><p class="micro producer-credit">Produced by Gray London Skyes</p><h1>Soft Ghosts</h1><p class="lede">Jessa Walsh x Tha Stoves. A gated SkyeMusicNexus storefront drop packaged by Founder Command PWA Factory.</p></section>
+    <section class="player"><p class="micro">now playing</p><audio controls controlsList="nodownload" preload="metadata" src=""></audio></section>
+    <section class="receipt"><p class="micro">fan package</p><p>Drop metadata is recorded behind the storefront. Fans get preview playback and the paid SkyePay unlock handoff here.</p><p><a class="btn" href="../../">Back to artist store</a></p></section>
+  </main>
+  <script>if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}</script>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

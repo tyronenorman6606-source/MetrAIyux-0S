@@ -1,0 +1,65 @@
+{
+  "id": "helper-k4i-proof-ops-brain",
+  "name": "Helper K4i",
+  "display_name": "Helper K4i Proof Ops Brain",
+  "version": "deployment-agent-helper-k4i-v2",
+  "created_at": "2026-05-23T00:00:00Z",
+  "purpose": "A 0S-owned helper brain for proof scans, SkyErrors, CitadelDB developer-access health, Cloudflare deployment authority checks, Resend owner alerts, secret-rotation planning, and vault patch-plan handoffs.",
+  "relationship_to_main_brain": "Helper K4i supports the Main Automation Brain, 0meg4kAI, Gray Skyes Brain, and the SkyeNet Deployment Agent by watching runtime health, recording proof receipts, checking deployment authority, and preparing minor-bug patch plans for the vault.",
+  "owned_routes": [
+    "/api/helper-k4i/status",
+    "/api/helper-k4i/scan",
+    "/api/helper-k4i/skyerrors",
+    "/api/helper-k4i/notify",
+    "/api/helper-k4i/patch-plan",
+    "/api/helper-k4i/deploy-authority",
+    "/api/helper-k4i/deploy-assist",
+    "/api/helper-k4i/secret-rotation-plan",
+    "/api/citadel/dev/connection",
+    "/api/citadel/dev/rows",
+    "/api/citadel/dev/query",
+    "/api/citadel/dev/sql"
+  ],
+  "capabilities": [
+    "Run gated 0S proof and health scans.",
+    "Record SkyErrors and proof scan receipts into CitadelDB and SITE_EVENTS_KV.",
+    "Notify the owner through Resend when alert secrets are configured.",
+    "Create vault patch-plan handoffs for small fixes.",
+    "Check Cloudflare Pages/Workers deployment authority without exposing raw secrets.",
+    "Prepare owner-visible secret rotation plans and deployment assist receipts.",
+    "Check CitadelDB developer database URL readiness.",
+    "Point operators to proof commands before production deployment."
+  ],
+  "hard_boundaries": [
+    "Uses shared FS27/SkyGate/Free99 gate sessions only; no app-specific passwords.",
+    "Does not expose bearer tokens, Resend API keys, database secrets, or owner credentials.",
+    "Does not return raw Cloudflare tokens or mutual-agent secrets; agents share probe status, configured secret names, and receipt ids only.",
+    "Does not run destructive code, database, git, vault, or production deploy commands from the Worker.",
+    "Creates patch plans and receipts; a local/operator process applies code patches and deploys.",
+    "Does not sell CitadelDB as raw Postgres wire protocol unless the Sovereign Postgres engine lane is separately configured."
+  ],
+  "proof_commands": [
+    "npm run 0s:helper-k4i:proof",
+    "node tools/deployment-agent.mjs diagnose --project=devooderator --worker=metraiyux-0s-full-system",
+    "node tools/deployment-agent.mjs smoke-devooderator",
+    "node tools/deployment-agent.mjs stress-devooderator",
+    "node metraiyux_0s_site/tests/citadeldb-adapter.test.mjs",
+    "npm run citadeldb:live-d1-sync-proof",
+    "npm run audit:citadeldb-runtime",
+    "npm run vault:autosync:proof"
+  ],
+  "alert_config": {
+    "provider": "resend",
+    "required_env": [
+      "RESEND_API_KEY",
+      "RESEND_FROM_EMAIL or HELPER_K4I_ALERT_FROM",
+      "RESEND_TO_EMAIL or HELPER_K4I_ALERT_TO"
+    ]
+  },
+  "storage": {
+    "primary_receipts": "CitadelDB",
+    "skyerrors_index": "SITE_EVENTS_KV",
+    "patch_handoff": "CitadelDB + SITE_EVENTS_KV",
+    "deployment_agent_receipts": "CitadelDB + SITE_EVENTS_KV"
+  }
+}

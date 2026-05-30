@@ -5,6 +5,8 @@
     "skye0s.skyemail.claim.v1",
     "SMV_ONBOARDING_CLAIM",
     "kx.onboarding.emailDraft",
+    "metraiyux.gate.profile.v1",
+    "METRAIYUX_GATE_PROFILE",
   ];
 
   function readJson(key) {
@@ -21,6 +23,21 @@
       const value = readJson(key);
       if (!value) continue;
       if (value.mailbox && (value.mailbox.requested_email || value.mailbox.local_part)) return value;
+      if (value.skyemail_claim?.mailbox) return {
+        source: value.source || key,
+        mailbox: value.skyemail_claim.mailbox,
+        profile: {
+          display_name: value.display_name || value.identity?.display_name || value.identity?.name || "",
+          org_name: value.profile_type || "",
+          recovery_email: value.user?.email || value.skyemail_claim?.profile?.recovery_email || "",
+          phone: value.phone || "",
+        },
+      };
+      if (value.skyemail?.mailbox) return {
+        source: value.source || key,
+        mailbox: value.skyemail.mailbox,
+        profile: value.skyemail.profile || value.profile || {},
+      };
       if (value.email) {
         const parts = String(value.email).toLowerCase().split("@");
         return {
@@ -73,7 +90,7 @@
     notice.className = "notice";
     notice.style.marginBottom = "12px";
     notice.textContent =
-      "SkyeGate FS27 staged this mailbox claim. SkyeMail will now bind it to the backend workspace, alias route, and provider or local proof lane.";
+      "SkyeGate FS27 staged this mailbox claim. SkyeMail will now bind it to the backend workspace, alias route, and Citadel or local proof lane.";
     target.insertBefore(notice, target.firstChild);
   }
 
@@ -92,6 +109,7 @@
     setValue("#handle", localPart);
     setValue("#mailboxLocalPart", localPart);
     setSelectValue("#mailboxDomain", domain);
+    setValue("#email", profile.recovery_email || profile.email || "");
     setValue("#display_name", profile.display_name || localPart);
     setValue("#profile_company", profile.org_name || "");
     setValue("#preferred_from_alias", mailbox.requested_email || "");

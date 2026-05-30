@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accounting Launchpad | Phoenix Accounting services</title>
+  <meta name="description" content="Accounting Launchpad is a Valley Verified accounting services profile at Phoenix, AZ 85016, highlighting Accounting services, Tax preparation and.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #101820;
+      --muted: #5b6670;
+      --paper: #f8faf7;
+      --navy: #123047;
+      --green: #2f7d59;
+      --gold: #c9972b;
+      --card: #ffffff;
+      --line: #d8e0d6;
+      --blue: #dcebf3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.5;
+      background:
+        linear-gradient(90deg, rgba(18, 48, 71, .04) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(18, 48, 71, .04) 1px, transparent 1px),
+        var(--paper);
+      background-size: 72px 72px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .ledger {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 0;
+      border-bottom: 3px double var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 58px;
+      height: 58px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--green);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .top a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      background: var(--navy);
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(340px, .78fr);
+      gap: 32px;
+      align-items: center;
+      min-height: 72vh;
+      padding: 48px 0;
+    }
+
+    .stamp {
+      display: inline-flex;
+      margin-bottom: 18px;
+      padding: 9px 12px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      background: #fff;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(45px, 8vw, 94px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 660px;
+      margin: 24px 0 0;
+      color: #3b4854;
+      font-size: clamp(18px, 2.2vw, 24px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 18px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .button.secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--navy);
+    }
+
+    .balance-sheet {
+      border: 1px solid var(--line);
+      background: white;
+      box-shadow: 0 24px 70px rgba(16, 24, 32, .13);
+    }
+
+    .balance-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--blue);
+    }
+
+    .balance-head img {
+      width: 86px;
+      height: 86px;
+      padding: 8px;
+      background: white;
+      border: 1px solid var(--line);
+    }
+
+    .balance-head strong {
+      color: var(--navy);
+      font-size: 22px;
+    }
+
+    .line-item {
+      display: grid;
+      grid-template-columns: 42% 1fr;
+      gap: 12px;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .line-item:last-child {
+      border-bottom: 0;
+    }
+
+    .line-item span {
+      color: var(--green);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding-bottom: 52px;
+    }
+
+    .note {
+      padding: 22px;
+      border-left: 8px solid var(--gold);
+      background: white;
+      box-shadow: 0 14px 42px rgba(16, 24, 32, .07);
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .note p {
+      margin: 0;
+      color: #3b4854;
+    }
+
+    .note p + p {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 20px 0 34px;
+      border-top: 3px double var(--line);
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .top,
+      .hero,
+      .sections {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .line-item {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 46px;
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ledger">
+    <header class="top">
+      <div class="brand">
+        <img src="assets/logo.svg" alt="">
+        <div>
+          <span>Valley Verified Legal And Financial</span>
+          <strong>Accounting Launchpad</strong>
+        </div>
+      </div>
+      <a href="tel:+14807883137">(480) 788-3137</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <span class="stamp">Accounting / Tax / Fractional CFO</span>
+          <h1>Accounting Launchpad</h1>
+          <p class="lead">Accounting Launchpad pairs CPA-led tax preparation, bookkeeping, financial reporting, fractional CFO support, systems integration, analytics, and data automation for Phoenix businesses that want cleaner financial operations without losing the tax details.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14807883137">Call (480) 788-3137 </a>
+            <a class="button secondary" href="https://business.phoenixchamber.com/list/ql/finance-insurance-10">View public category</a>
+          </div>
+        </div>
+
+        <aside class="balance-sheet">
+          <div class="balance-head">
+            <img src="assets/logo.svg" alt="">
+            <strong>Verified Snapshot</strong>
+          </div>
+          <div class="line-item"><span>Address</span><div>Phoenix AZ 85016</div></div>
+          <div class="line-item"><span>Category</span><div>Legal And Financial</div></div>
+          <div class="line-item"><span>License type</span><div>Finance &amp; Insurance / Accounting / Tax / Fractional CFO</div></div>
+          <div class="line-item"><span>Language</span><div>English</div></div>
+        </aside>
+      </section>
+
+      <section class="sections">
+        <div class="note">
+          <strong>Tags</strong>
+          <p>Accounting / tax / fractional CFO, Finance &amp; Insurance, Local service business, Legal / Financial Services.</p>
+          <p>Call the listed business line for current accounting services availability and scope.</p>
+        </div>
+        <div class="note">
+          <strong>Public Proof</strong>
+          <p>Accounting Launchpad is presented with public-facing Phoenix business facts and a buyer-ready summary.</p>
+          <p>The page focuses on service fit, local evidence, and practical customer context.</p>
+          <p>The contact path stays with public business facts and avoids invented outreach details.</p>
+        </div>
+      </section>
+    </main>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-accounting-launchpad-phoenix-85016-261fe8f">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-accounting-launchpad-phoenix-85016-261fe8f">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says Accounting Launchpad is Valley Verified because the company is backed by an official website, a Greater Phoenix Chamber profile, and an IRS e-file provider listing for Accounting Launchpad PLLC in Phoenix 85016. The public evidence connects Nicholas Scrogham, CPA, to a practice that serves businesses, nonprofits, hospitality, media, sports and leisure, estates, trusts, and tax-resolution clients with both accounting fundamentals and modern financial systems work.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Accounting services, Tax preparation and planning, Bookkeeping and financial reporting, and Fractional CFO services</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>Businesses needing accounting and tax support, Nonprofits, and Hospitality businesses</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>Phoenix, AZ 85016; (480) 788-3137</span></div>
+      </div>
+      <p class="vv-note-text">Official website and Greater Phoenix Chamber evidence support this local profile.</p>
+    </section>
+
+
+
+
+    <footer><div class="vv-footer-inner">Accounting Launchpad in Phoenix - Valley Verified local business profile.</div></footer>
+  </div>
+</body>
+</html>

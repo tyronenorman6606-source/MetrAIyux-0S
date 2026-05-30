@@ -18,6 +18,7 @@ Google Drive folder links are not upload credentials. A folder URL can identify 
 ## What is stronger in v2.3
 
 - v2.3 adds the Git-level SkyeVault remote lane beside the archive upload lane: smart HTTP push/fetch/clone against persistent bare repos, Gate-scoped workspace auth, role boundaries, branch policy, protected tag handling, quota APIs, verified snapshots, bundle exports, restore verification, CLI commands, Git credential helper, SSH forced-command wrapper, and per-workspace 0S neural maps.
+- v2.3 adds the encrypted delta journal beside the full source-custody autosync lane: changed/untracked/local-critical files and deletion tombstones can be sealed into a smaller `.skyesecrets` pack before the heavier full snapshot catches up.
 - A developer downloading from the Git remote gets a normal full clone of the pushed repository refs, not a loose folder dump.
 - SkyeVault can now represent each workspace as its own account graph: repos, ref changes, upload receipts, graph nodes, tracked bytes, and change timeline stay attached to that workspace instead of being merged into a single global customer blob.
 
@@ -97,11 +98,13 @@ SkyeVault-Drop can receive a whole source repository as one sanitized zip packag
 In a source repo that has the helper installed:
 
 ```bash
+npm run vault:delta:dry-run -- --env-file=env.txt
+npm run vault:delta:upload -- --env-file=env.txt
 npm run vault:dry-run
 npm run vault:push
 ```
 
-The helper:
+The delta journal helper encrypts the fast dirty-work boundary first. The classic sanitized archive helper:
 
 - stages a sanitized copy of the workspace,
 - excludes `.env*`, `.git`, `node_modules`, `.netlify`, `.wrangler`, backups, database dumps, WAL archives, private keys, existing archive bundles, and generated test artifacts,
@@ -113,8 +116,8 @@ The helper:
 Required local values for the source repo:
 
 ```bash
-SKYEVAULT_DROP_URL=https://skyevault-drop.netlify.app
-SKYEVAULT_UPLOAD_ORIGIN=https://client-drop-vault-r2.netlify.app
+SKYEVAULT_DROP_URL=https://skyevault-drop.graylondonskyes.workers.dev
+SKYEVAULT_UPLOAD_ORIGIN=https://skyevault-drop.graylondonskyes.workers.dev
 SKYEVAULT_PORTAL_KEY=replace-with-client-upload-code
 SKYEVAULT_CLIENT_NAME="Repository Operator"
 SKYEVAULT_CLIENT_EMAIL=operator@example.com

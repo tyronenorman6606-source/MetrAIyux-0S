@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coding in Color | Technology Education and Services in Avondale</title>
+  <meta name="description" content="Coding in Color in Avondale, AZ is listed for technology education and services at 11010 W. Buchanan St. with public phone (602) 516-8317.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #171925;
+      --muted: #676c77;
+      --purple: #6950a1;
+      --teal: #0e8b8b;
+      --orange: #df7a39;
+      --lime: #6c9349;
+      --paper: #fffaf4;
+      --line: rgba(23, 25, 37, .15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(105, 80, 161, .12), transparent 32%),
+        linear-gradient(180deg, transparent 0 68%, rgba(14, 139, 139, .12) 68% 100%),
+        var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--purple);
+      font-weight: 800;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .95fr);
+      gap: 32px;
+      align-items: center;
+      min-height: 72vh;
+      padding: 30px 0 60px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: var(--orange);
+      color: white;
+      font-size: .86rem;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      font-size: 4.55rem;
+      line-height: .95;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: #3d4150;
+      font-size: 1.24rem;
+      line-height: 1.55;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--purple);
+      background: white;
+      color: var(--purple);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--purple);
+      color: white;
+    }
+
+    .codeboard {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #181a27;
+      color: white;
+      overflow: hidden;
+      box-shadow: 0 18px 52px rgba(23, 25, 37, .24);
+    }
+
+    .codebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 18px;
+      background: #232637;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .dot:nth-child(2) { background: var(--teal); }
+    .dot:nth-child(3) { background: var(--lime); }
+
+    .codebody {
+      padding: 28px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .codebody img {
+      width: 76px;
+      height: 76px;
+      padding: 8px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .line {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 14px;
+      align-items: center;
+      color: rgba(255, 255, 255, .82);
+      font-family: Consolas, Monaco, monospace;
+      font-size: .95rem;
+    }
+
+    .line span:first-child {
+      color: rgba(255, 255, 255, .38);
+      text-align: right;
+    }
+
+    .token-a { color: #91f2df; }
+    .token-b { color: #f6b26b; }
+    .token-c { color: #c9a7ff; }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding-bottom: 58px;
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .84);
+      padding: 20px;
+      min-height: 155px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .fact p {
+      margin: 0;
+      color: #424653;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .top,
+      .hero,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .hero { min-height: auto; }
+      h1 { font-size: 3.1rem; }
+    }
+
+    @media (max-width: 560px) {
+      .top { flex-direction: column; align-items: flex-start; }
+      h1 { font-size: 2.35rem; }
+      .lead { font-size: 1.05rem; }
+      .line { grid-template-columns: 42px 1fr; font-size: .82rem; }
+      .codebody { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <img src="assets/logo.svg" alt="Coding in Color mark">
+          <span>Coding in Color</span>
+        </div>
+        <span>Valley Verified Business Services</span>
+      </header>
+
+      <section class="hero" aria-labelledby="business-name">
+        <div>
+          <div class="eyebrow">Computers/Telecom / Technology Education</div>
+          <h1 id="business-name">Technology education services in Avondale.</h1>
+          <p class="lead">Coding in Color gives Avondale and West Valley teams a local technology education and services profile, with a public phone number and W. Buchanan Street address tied to computers and telecom categories.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+16025168317">Call (602) 516-8317</a>
+            <a class="button" href="https://business.phoenixchamber.com/list/ql/computers-telecommunications-6">Chamber technology profile</a>
+          </div>
+        </div>
+
+        <aside class="codeboard" aria-label="Technology education listing panel">
+          <div class="codebar" aria-hidden="true">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="codebody">
+            <img src="assets/logo.svg" alt="">
+            <div class="line"><span>01</span><span><span class="token-a">name</span>: Coding in Color</span></div>
+            <div class="line"><span>02</span><span><span class="token-b">city</span>: Avondale, AZ 85323</span></div>
+            <div class="line"><span>03</span><span><span class="token-c">niche</span>: Technology Education / Services</span></div>
+            <div class="line"><span>04</span><span><span class="token-a">phone</span>: (602) 516-8317</span></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="facts" aria-label="Business facts">
+        <article class="fact">
+          <span class="label">Address</span>
+          <p>11010 W. Buchanan St., Avondale, AZ 85323</p>
+        </article>
+        <article class="fact">
+          <span class="label">Audience</span>
+          <p>Local businesses, operators, and professional teams.</p>
+        </article>
+        <article class="fact">
+          <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+          <p>Coding in Color belongs in Valley Verified because the research anchors a technology education and services provider to a real Avondale address, public phone route, and computers/telecom category. That makes the page useful for West Valley professionals looking for a local tech-education contact.</p>
+        </article>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

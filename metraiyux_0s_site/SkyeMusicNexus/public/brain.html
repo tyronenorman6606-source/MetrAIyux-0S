@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Artist Brain</title>
+  <meta name="description" content="SkyeMusicNexus artist brain room for artist memory, engagement cycles, SkyeMeter, merits, and giveaways." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
+  <script defer src="./neo-nexus.js"></script>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body data-app="skye-music-nexus" data-mode="brain" data-room="brain">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Artist Brain</p>
+      <h1>Artist memory, social motion, media, brand, offers, network streams, SkyeMeter, merits, and giveaways.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
+    <a href="./index.html">Workspace</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./artist-apps.html">Artist Apps</a><a href="./store.html">Store</a><a class="active" href="./brain.html" aria-current="page">Brain</a><a href="./brain-monitor.html">Monitor</a>
+  </nav>
+
+  <main class="nexus-shell admin-shell">
+    <section class="ops-hero panel-xl">
+      <div>
+        <p class="eyebrow">artist rules / artist memory / network motion</p>
+        <h2>Artist brains act inside the Nexus with clear artist rules.</h2>
+        <p class="lede">Seed memory chunks, run artist cycles, post to the site feed, stream other artists, reply to fans, route store work, build media and brand handoffs, and keep engagement visible through SkyeMeter.</p>
+      </div>
+      <div id="brainSummary" class="social-summary"></div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><div><p class="micro">Brain Profile</p><h3>Artist playbook</h3></div><button class="ghost mini" data-action="refresh-records">Refresh</button></div>
+        <form id="artistBrainForm" class="field-grid">
+          <label>Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Artist name<input name="artistName" placeholder="stage name" /></label>
+          <label>Status<select name="status"><option value="active">Active</option><option value="paused">Paused</option><option value="draft">Draft</option></select></label>
+          <label>Autopilot<select name="autopilot"><option value="false">Manual cycle</option><option value="true">Ready for scheduled cycle</option></select></label>
+          <label class="wide">Tone<input name="tone" value="direct, grateful, release-focused" /></label>
+          <label class="wide">Objectives<input name="objectives" value="post release updates, reply to fans with useful answers, route fans to store, build brand assets locally, stream network releases" /></label>
+          <label class="wide">Banned claims<input name="bannedClaims" value="guaranteed streams, fake chart claims, rights claims not approved" /></label>
+          <label>Seed memory<select name="seedMemory"><option value="true">Seed memory</option><option value="false">Profile only</option></select></label>
+          <button class="primary wide" type="submit">Seed Artist Brain</button>
+        </form>
+        <div id="artistBrainResult" class="result-card compact">Brain profile bay idle.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Brain Profiles</p><h3>Artist playbooks</h3></div>
+        <div id="brainProfileList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="operator-grid">
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Artist Cycle</p><h3>Plan or execute</h3></div>
+        <form id="artistBrainCycleForm" class="field-grid thin">
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Limit<input name="limit" type="number" min="1" max="8" value="5" /></label>
+          <label>Mode<select name="execute"><option value="true">Execute cycle</option><option value="false">Plan only</option></select></label>
+          <label class="wide">Goal<input name="goal" value="stream network releases, post update, route store, reply to fans" /></label>
+          <button class="primary wide" type="submit">Run Artist Cycle</button>
+        </form>
+        <div id="artistBrainCycleResult" class="result-card compact">Cycle idle.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Memory Chunk</p><h3>Artist facts</h3></div>
+        <form id="artistBrainMemoryForm" class="field-grid thin">
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label class="wide">Title<input name="title" required placeholder="Release story" /></label>
+          <label class="wide">Text<textarea name="text" rows="4" required placeholder="Memory text"></textarea></label>
+          <label>Tags<input name="tags" placeholder="voice, rollout, fans" /></label>
+          <label>Source<input name="source" value="artist-team" /></label>
+          <button class="secondary wide" type="submit">Add Memory</button>
+        </form>
+        <div id="artistBrainMemoryResult" class="result-card compact">Memory bay idle.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Post Plan</p><h3>Draft a local post</h3></div>
+        <form id="artistBrainPostForm" class="field-grid thin">
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label class="wide">Release ID<input name="releaseId" placeholder="optional release id" /></label>
+          <label class="wide">Title<input name="title" placeholder="Artist brain feed post" /></label>
+          <label class="wide">Caption<textarea name="caption" rows="4" placeholder="Leave blank for local rule caption."></textarea></label>
+          <label class="wide">Hashtags<input name="hashtags" value="musicnexus,newmusic" /></label>
+          <button class="secondary wide" type="submit">Plan Post</button>
+        </form>
+        <div id="artistBrainPostResult" class="result-card compact">Post planner idle.</div>
+      </article>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">0S Launch Asset</p><h3>Build something useful</h3></div>
+        <form id="artistBrainToolForm" class="field-grid thin">
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Tool<select name="toolId"><option value="media_asset_pack">Media asset pack</option><option value="brand_kit">BrandID brand kit</option><option value="logo_brief">kAIxU logo brief</option><option value="launch_offer">BusinessLaunchGo offer</option><option value="web_creator_landing">Landing page</option><option value="campaign_brief">Campaign brief</option><option value="press_kit">Press kit</option><option value="workforce_launch_package">RouteX launch package</option></select></label>
+          <label>Publish<select name="publishToFeed"><option value="true">Post to feed</option><option value="false">Build only</option></select></label>
+          <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+          <label>Product ID<input name="productId" placeholder="optional product id" /></label>
+          <label class="wide">Brief<textarea name="brief" rows="3" placeholder="Specific direction for this asset"></textarea></label>
+          <button class="primary wide" type="submit">Build Local Asset</button>
+        </form>
+        <div id="artistBrainToolResult" class="result-card compact">Tool bay idle.</div>
+      </article>
+
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Launch Integrations</p><h3>Artist handoffs</h3></div>
+        <div id="brainToolCatalog" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="panel-xl">
+      <div class="section-head"><p class="micro">Tool Runs</p><h3>Local assets the artist brain built</h3></div>
+      <div id="brainToolRunList" class="constellation-list wide-list"></div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Actions</p><h3>Posts, streams, replies, tasks</h3></div>
+        <div id="brainActionList" class="constellation-list"></div>
+      </article>
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Memory</p><h3>Local chunks</h3></div>
+        <div id="brainMemoryList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="ops-hero panel-xl">
+      <div>
+        <p class="eyebrow">SkyeMeter / merits / giveaways</p>
+        <h2>Network activity fills the meter.</h2>
+        <p class="lede">Streams, comments, posts, store work, brain cycles, giveaway entries, and team awards generate meter events. Every full meter issues a SkyeMerit.</p>
+      </div>
+      <div id="skyeMeterSummary" class="social-summary"></div>
+    </section>
+
+    <section class="operator-grid">
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Activity</p><h3>Manual meter event</h3></div>
+        <form id="skyeActivityForm" class="field-grid thin">
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label>Activity<select name="activityType"><option value="stream_other_artist">Stream artist</option><option value="feed_comment">Comment</option><option value="feed_like">Like</option><option value="feed_save">Save</option><option value="feed_boost">Boost</option><option value="store_product">Store product</option><option value="brain_cycle">Brain cycle</option><option value="operator_award">Team award</option></select></label>
+          <label>Points<input name="points" type="number" min="0" max="500" placeholder="auto" /></label>
+          <label>Release ID<input name="releaseId" placeholder="optional" /></label>
+          <label>Target artist<input name="targetArtistId" placeholder="optional" /></label>
+          <label>Post ID<input name="postId" placeholder="optional" /></label>
+          <label class="wide">Note<input name="note" placeholder="event note" /></label>
+          <button class="primary wide" type="submit">Record Activity</button>
+        </form>
+        <div id="skyeActivityResult" class="result-card compact">Meter event bay idle.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Giveaway</p><h3>Prize lane</h3></div>
+        <form id="giveawayForm" class="field-grid thin">
+          <label class="wide">Title<input name="title" required value="Content Launch Drop Package Giveaway" /></label>
+          <label>Prize<select name="prizeType"><option value="content_launch_drop_package">Content launch package</option><option value="new_drop_package">New drop package</option><option value="artist_store_makeover">Store makeover</option><option value="agentic_website_boost">Agentic website boost</option><option value="featured_feed_push">Featured feed push</option><option value="studio_session_pack">Studio session pack</option></select></label>
+          <label>Sponsor artist<input name="sponsorArtistId" placeholder="optional" /></label>
+          <label>Entry points<input name="entryCostPoints" type="number" min="0" value="0" /></label>
+          <label>Max entries<input name="maxEntries" type="number" min="1" value="250" /></label>
+          <label class="wide">Prize description<textarea name="prizeDescription" rows="3" placeholder="Owner-approved content launch, new drop, or agentic website growth package."></textarea></label>
+          <button class="primary wide" type="submit">Open Giveaway</button>
+        </form>
+        <div id="giveawayResult" class="result-card compact">Giveaway bay idle.</div>
+      </article>
+
+      <article class="panel action-console">
+        <div class="section-head"><p class="micro">Entry + Draw</p><h3>Artists in the pool</h3></div>
+        <form id="giveawayEntryForm" class="field-grid thin">
+          <label class="wide">Giveaway<select name="giveawayId" required><option value="">Select giveaway</option></select></label>
+          <label class="wide">Artist ID<input name="artistId" required placeholder="artist id" /></label>
+          <label class="wide">Note<input name="note" placeholder="entry note" /></label>
+          <button class="secondary wide" type="submit">Enter Giveaway</button>
+        </form>
+        <div id="giveawayEntryResult" class="result-card compact">No entry yet.</div>
+        <form id="giveawayDrawForm" class="field-grid thin" style="margin-top:14px">
+          <label class="wide">Giveaway<select name="giveawayId" required><option value="">Select giveaway</option></select></label>
+          <label>Winner index<input name="winnerIndex" type="number" min="0" value="0" /></label>
+          <button class="primary wide" type="submit">Draw Winner</button>
+        </form>
+        <div id="giveawayDrawResult" class="result-card compact">No draw yet.</div>
+      </article>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">SkyeMeters</p><h3>Artist engagement meters</h3></div>
+        <div id="skyeMeterList" class="constellation-list"></div>
+      </article>
+      <article class="panel-xl">
+        <div class="section-head"><p class="micro">Giveaways</p><h3>Prize pools</h3></div>
+        <div id="giveawayList" class="constellation-list"></div>
+      </article>
+    </section>
+
+    <section class="panel-xl">
+      <div class="section-head"><p class="micro">Meter Events</p><h3>Streams, follows, posts, store work, and brain cycles</h3></div>
+      <div id="skyeMeterEventList" class="constellation-list wide-list"></div>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

@@ -56,7 +56,7 @@
         <div class="hero-copy-stack">
           <span class="eyebrow">Secure client email <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">command center</span></span>
           <h1 class="glow-text"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> opens as the working email platform, not a brochure.</h1>
-          <p class="hero-copy">The first screen is the command surface: live inbox routing, compose handoff, sender posture, vault keys, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, and the real standalone SkyeMail pages sitting behind the suite.</p>
+          <p class="hero-copy">The first screen is the command surface: live inbox routing, compose handoff, sender posture, sovereign keys, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">proof receipts</span>, and the real standalone SkyeMail pages sitting behind the suite.</p>
           <div class="hero-actions">
             <a class="platform-button magnetic" data-nav="mailbox" href="apps/mailbox/index.html">Open Mailbox Control</a>
             <a class="platform-button ghost magnetic" data-nav="templates" href="apps/templates/index.html">Open Compose Studio</a>
@@ -80,7 +80,7 @@
           <div class="command-lanes">
             <a data-nav="mailbox" href="apps/mailbox/index.html"><b>Inbox</b><span>triage and selected-message packets</span></a>
             <a data-nav="templates" href="apps/templates/index.html"><b>Compose</b><span>stage to the real send lane</span></a>
-            <a data-nav="ops" href="apps/ops/index.html"><b>Vault/Ops</b><span>keys, onboarding, sender posture</span></a>
+            <a data-nav="ops" href="apps/ops/index.html"><b>Citadel/Ops</b><span>keys, onboarding, sender posture</span></a>
           </div>
         </aside>
       </section>
@@ -138,9 +138,9 @@
             <h2>What still depends on runtime vars</h2>
           </div>
           <div class="mini-grid">
-            <div class="mini-card"><strong>Provider Auth</strong><span>Mailbox provider credentials, inbound webhooks, and database credentials still come from env.</span></div>
+            <div class="mini-card"><strong>Citadel Auth</strong><span>Mailbox Citadel credentials, inbound webhooks, and database credentials still come from env.</span></div>
             <div class="mini-card"><strong>Route Safety</strong><span>The suite is now self-contained under `suite/` and can also mount under `/SkyeMail/...`.</span></div>
-            <div class="mini-card"><strong>State Model</strong><span>Suite drafts, campaigns, and ops notes persist locally even before provider wiring is live.</span></div>
+            <div class="mini-card"><strong>State Model</strong><span>Suite drafts, campaigns, and ops notes persist locally even before Citadel wiring is live.</span></div>
             <div class="mini-card"><strong>Real Surfaces</strong><span>The command deck now opens the actual standalone pages instead of dead `/api/skymail-*` mock routes.</span></div>
           </div>
         </article>

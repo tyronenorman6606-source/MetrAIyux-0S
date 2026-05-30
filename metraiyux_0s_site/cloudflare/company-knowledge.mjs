@@ -592,6 +592,7 @@ async function mirrorKnowledgeEvent(env, event = {}, deps = {}) {
       operation: event.type?.includes('deleted') ? 'delete' : 'upsert',
       primary: event.primary || {},
       payloadRef: event.item?.objectKey || event.primary?.receiptId || '',
+      payload: event.item || event.base || null,
       note: `${event.type || 'company_knowledge.event'} for ${event.base?.id || event.item?.baseId || 'unknown-base'}`
     }, event.actor?.actor || 'company-knowledge');
     if (deps?.mirrorSkygateEvent) {

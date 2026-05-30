@@ -1,0 +1,74 @@
+{
+  "channel": "skymusicnexus_audio_asset",
+  "delivery_mode": "fs27-ledger",
+  "draft_id": "draft_sub_5948add8f860da67",
+  "endpoint": "fs27://skymusicnexus-song-assets",
+  "job_id": "sub_5948add8f860da67",
+  "normalized_channel": "generic",
+  "ok": true,
+  "portal_session_id": null,
+  "remote_receipt": {
+    "external_vendor_dispatch": false,
+    "fs27_tracked": true,
+    "ok": true,
+    "owner_approval_required": true,
+    "status": "queued"
+  },
+  "remote_reference": "velvet-ledger:sub_5948add8f860da67",
+  "remote_status": "queued_for_fs27_owner_approval",
+  "request_body_kind": "json",
+  "request_schema": "skye.generic.fs27-submission",
+  "schema": "skye.submission.receipt",
+  "slug": "velvet-ledger",
+  "submitted_at": "2026-05-25T23:46:52.934Z",
+  "title": "Velvet Ledger",
+  "transport_history": [
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.fs27.gate.verification",
+      "step": "verify_fs27_gate_session",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.generic.fs27-submission",
+      "step": "record_package_receipt",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.owner.approval.request",
+      "step": "queue_owner_approval",
+      "transport_status": 202
+    },
+    {
+      "body_kind": "json",
+      "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+      "method": "POST",
+      "remote_status": "queued",
+      "request_schema": "skye.skyenet.package.handoff",
+      "step": "prepare_skyenet_handoff",
+      "transport_status": 202
+    }
+  ],
+  "transport_status": 202,
+  "upload_reference": "fs27pkg_3e46312cfc8a6988",
+  "upload_sha256": "3e46312cfc8a6988ef77c2ec7cdc7b2a30f2b7c0b4ade175d100b23062ddb0dd",
+  "version": "4.0.0",
+  "workflow_step_count": 4,
+  "workflow_steps": [
+    "verify_fs27_gate_session",
+    "record_package_receipt",
+    "queue_owner_approval",
+    "prepare_skyenet_handoff"
+  ]
+}

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { requireSkyGate } = require('./_lib/skygate-auth');
+const { verifySkyGateBearer } = require('./_lib/skygate-auth');
 
 const R2_SERVICE = 's3';
 const R2_REGION = 'auto';
@@ -12,6 +12,7 @@ const MUSIC_NEXUS_DIR =
   process.env.MUSIC_NEXUS_DATA_DIR || path.join(os.tmpdir(), 'skye-music-nexus');
 const MAX_UPLOAD_BYTES = Math.max(1024 * 1024, Number(process.env.MUSIC_NEXUS_MAX_UPLOAD_BYTES || 50 * 1024 * 1024));
 const MAX_DIRECT_UPLOAD_BYTES = Math.max(MAX_UPLOAD_BYTES, Number(process.env.MUSIC_NEXUS_MAX_DIRECT_UPLOAD_BYTES || 5 * 1024 * 1024 * 1024));
+const MAX_FALLBACK_EMAIL_ATTACHMENT_BYTES = Math.max(1024 * 1024, Number(process.env.MUSIC_NEXUS_UPLOAD_FALLBACK_MAX_EMAIL_BYTES || 8 * 1024 * 1024));
 
 const ALLOWED_AUDIO_TYPES = new Map([
   ['audio/mpeg', '.mp3'],
@@ -29,12 +30,46 @@ function env(name, fallback = '') {
   return String(process.env[name] || fallback).trim();
 }
 
+function csvEnv(...names) {
+  return names
+    .map((name) => env(name))
+    .filter(Boolean)
+    .join(',')
+    .split(/[,\s;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function fallbackEmailRecipients() {
+  return csvEnv(
+    'MUSIC_NEXUS_UPLOAD_FALLBACK_EMAIL',
+    'MUSIC_NEXUS_FOUNDER_EMAIL',
+    'MUSIC_NEXUS_DROPS_APPROVAL_EMAIL',
+    'ADMIN_EMAILS',
+    'ADMIN_NOTIFICATION_EMAIL',
+    'NOTIFY_EMAIL_TO',
+    'CLIENT_RECEIPT_EMAILS'
+  );
+}
+
+function fallbackEmailConfigured() {
+  return Boolean(env('RESEND_API_KEY') && (env('RESEND_FROM_EMAIL') || env('FROM_EMAIL')) && fallbackEmailRecipients().length);
+}
+
 function assetsDir() {
   return path.join(MUSIC_NEXUS_DIR, 'uploaded-audio');
 }
 
 function assetsFile() {
   return path.join(MUSIC_NEXUS_DIR, 'music-assets.json');
+}
+
+function commerceFile() {
+  return path.join(MUSIC_NEXUS_DIR, 'commerce-spine.json');
+}
+
+function uploadFailureFile() {
+  return path.join(MUSIC_NEXUS_DIR, 'music-upload-failures.json');
 }
 
 function ensureFile(filePath, defaultValue) {
@@ -53,9 +88,36 @@ function loadAssets() {
   }
 }
 
+function loadCommerce() {
+  ensureFile(commerceFile(), { stores: [], products: [], orders: [], fulfillments: [] });
+  try {
+    const commerce = JSON.parse(fs.readFileSync(commerceFile(), 'utf8'));
+    return {
+      products: Array.isArray(commerce.products) ? commerce.products : [],
+      orders: Array.isArray(commerce.orders) ? commerce.orders : [],
+    };
+  } catch {
+    return { products: [], orders: [] };
+  }
+}
+
 function saveAssets(assets) {
   ensureFile(assetsFile(), []);
   fs.writeFileSync(assetsFile(), JSON.stringify(assets, null, 2) + '\n', 'utf8');
+}
+
+function loadUploadFailures() {
+  ensureFile(uploadFailureFile(), []);
+  try {
+    return JSON.parse(fs.readFileSync(uploadFailureFile(), 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
+function saveUploadFailures(rows) {
+  ensureFile(uploadFailureFile(), []);
+  fs.writeFileSync(uploadFailureFile(), JSON.stringify(rows, null, 2) + '\n', 'utf8');
 }
 
 function storageMode() {
@@ -406,6 +468,19 @@ function decodeBase64Audio(payload) {
   }
 }
 
+function decodeFallbackAttachment(payload) {
+  const raw = String(payload.dataBase64 || payload.base64 || payload.data || '');
+  if (!raw || raw.length > MAX_FALLBACK_EMAIL_ATTACHMENT_BYTES * 2) return null;
+  const base64 = raw.includes(',') ? raw.split(',').pop() : raw;
+  try {
+    const buffer = Buffer.from(base64, 'base64');
+    if (!buffer.length || buffer.length > MAX_FALLBACK_EMAIL_ATTACHMENT_BYTES) return null;
+    return { buffer, base64: buffer.toString('base64') };
+  } catch {
+    return null;
+  }
+}
+
 function storageSummary() {
   return {
     mode: storageMode(),
@@ -416,6 +491,10 @@ function storageSummary() {
     maxBase64UploadBytes: MAX_UPLOAD_BYTES,
     maxDirectUploadBytes: MAX_DIRECT_UPLOAD_BYTES,
     r2Prefix: isR2Storage() ? r2Prefix() : '',
+    uploadFailureFallback: {
+      emailConfigured: fallbackEmailConfigured(),
+      maxEmailAttachmentBytes: MAX_FALLBACK_EMAIL_ATTACHMENT_BYTES,
+    },
   };
 }
 
@@ -476,6 +555,8 @@ async function handleUpload(payload) {
     sha256,
     storage: 'pending',
     streamUrl: `/.netlify/functions/music-assets?action=stream&id=${encodeURIComponent(id)}`,
+    downloadUrl: `/.netlify/functions/music-assets?action=download&id=${encodeURIComponent(id)}`,
+    downloadPolicy: 'artist_or_paid_skypay_entitlement',
     createdAt: nowIso(),
   };
   asset = { ...asset, ...(await putAudioObject(asset, buffer, ext)) };
@@ -485,6 +566,74 @@ async function handleUpload(payload) {
   await saveAssetIndex(assets);
 
   return respond(201, { ok: true, asset });
+}
+
+async function sendUploadFailureEmail(report, attachment) {
+  const apiKey = env('RESEND_API_KEY');
+  const from = env('RESEND_FROM_EMAIL') || env('FROM_EMAIL');
+  const to = fallbackEmailRecipients();
+  if (!apiKey || !from || !to.length) {
+    return { attempted: false, provider: 'resend', reason: 'fallback email env not configured' };
+  }
+
+  const emailPayload = {
+    from,
+    to,
+    subject: `SkyeMusicNexus upload fallback: ${report.fileName || report.reportId}`,
+    text: [
+      `MusicNexus upload fallback: ${report.reportId}`,
+      `Artist: ${report.artistId || 'missing'}`,
+      `Release: ${report.releaseId || 'missing'}`,
+      `Title: ${report.title || 'missing'}`,
+      `File: ${report.fileName || 'missing'}`,
+      `Bytes: ${report.bytes || 0}`,
+      `Content type: ${report.contentType || 'unknown'}`,
+      `Error: ${report.error || 'not provided'}`,
+      `Attached file: ${attachment ? 'yes' : 'no'}`,
+      '',
+      'This email contains no secret values. If the file is not attached, it exceeded the configured email fallback attachment limit and needs manual/direct upload handling.',
+    ].join('\n'),
+  };
+
+  if (attachment) {
+    emailPayload.attachments = [{
+      filename: report.fileName || `${report.reportId}.audio`,
+      content: attachment.base64,
+    }];
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+    body: JSON.stringify(emailPayload),
+  });
+  const result = await response.json().catch(() => ({}));
+  return { attempted: true, provider: 'resend', ok: response.ok, status: response.status, id: result.id || '' };
+}
+
+async function handleReportUploadFailure(payload) {
+  const reportId = `upload_fail_${makeId()}`;
+  const attachment = decodeFallbackAttachment(payload);
+  const report = {
+    reportId,
+    artistId: clean(payload.artistId || '', 80),
+    releaseId: clean(payload.releaseId || '', 80),
+    title: clean(payload.title || '', 160),
+    fileName: sanitizeFileName(payload.fileName || payload.name || 'failed-upload'),
+    contentType: clean(payload.contentType || payload.type || '', 100),
+    bytes: Number(payload.bytes || payload.fileSize || (attachment && attachment.buffer.length) || 0) || 0,
+    error: clean(payload.error || payload.message || 'Upload failed before completion.', 1000),
+    attachmentIncluded: Boolean(attachment),
+    maxEmailAttachmentBytes: MAX_FALLBACK_EMAIL_ATTACHMENT_BYTES,
+    createdAt: nowIso(),
+  };
+
+  const reports = loadUploadFailures();
+  reports.push(report);
+  saveUploadFailures(reports.slice(-250));
+
+  const email = await sendUploadFailureEmail(report, attachment);
+  return respond(202, { ok: true, report, email });
 }
 
 async function handleCreateUploadSession(payload) {
@@ -521,6 +670,8 @@ async function handleCreateUploadSession(payload) {
     bucket: r2BucketName(),
     status: 'awaiting-direct-upload',
     streamUrl: `/.netlify/functions/music-assets?action=stream&id=${encodeURIComponent(id)}`,
+    downloadUrl: `/.netlify/functions/music-assets?action=download&id=${encodeURIComponent(id)}`,
+    downloadPolicy: 'artist_or_paid_skypay_entitlement',
     createdAt: nowIso(),
     directUpload: {
       requestedAt: nowIso(),
@@ -570,12 +721,56 @@ async function handleCompleteUpload(payload) {
   return respond(200, { ok: true, asset: completed });
 }
 
-async function handleStream(params) {
+function accessIdentity(claims = {}) {
+  const user = claims.user || {};
+  return {
+    email: clean(claims.email || claims.username || user.email || claims.sub || '', 180).toLowerCase(),
+    artistId: clean(claims.artistId || claims.artist_id || user.artistId || user.artist_id || '', 120),
+    role: clean(claims.role || user.role || '', 80).toLowerCase(),
+  };
+}
+
+function paidOrderStatus(order = {}) {
+  const status = clean(order.status || '', 80).toLowerCase();
+  const paymentStatus = clean(order.paymentStatus || order.payment_status || '', 80).toLowerCase();
+  return ['paid', 'succeeded', 'confirmed', 'fulfilled', 'paid_pending_fulfillment'].includes(status) || ['paid', 'succeeded', 'confirmed'].includes(paymentStatus);
+}
+
+function assetProducts(asset) {
+  const commerce = loadCommerce();
+  return commerce.products.filter((product) => {
+    if (asset.id && (product.assetId === asset.id || product.asset_id === asset.id)) return true;
+    if (asset.releaseId && product.releaseId === asset.releaseId) return true;
+    return false;
+  });
+}
+
+function paidOrderForAsset(asset, claims, params = {}) {
+  const actor = accessIdentity(claims);
+  const buyerEmail = clean(actor.email || '', 180).toLowerCase();
+  if (!buyerEmail) return null;
+  const productIds = new Set(assetProducts(asset).map((product) => product.productId || product.id).filter(Boolean));
+  if (!productIds.size) return null;
+  const commerce = loadCommerce();
+  return commerce.orders.find((order) => productIds.has(order.productId || order.product_id) && paidOrderStatus(order) && clean(order.buyerEmail || '', 180).toLowerCase() === buyerEmail) || null;
+}
+
+function canDownloadAsset(asset, claims, params = {}) {
+  const actor = accessIdentity(claims);
+  if (asset.artistId && actor.artistId && actor.artistId === asset.artistId) return { ok: true, reason: 'artist_owner' };
+  const order = paidOrderForAsset(asset, claims, params);
+  if (order) return { ok: true, reason: 'paid_skypay_entitlement', orderId: order.orderId || order.id };
+  return { ok: false, code: 'SKYEPAY_ASSET_PURCHASE_REQUIRED', error: 'Download requires the artist account or a paid SkyePay entitlement for this asset.' };
+}
+
+async function handleStream(params, claims) {
   const id = clean(params.id || '', 80);
   if (!id) return respond(400, { ok: false, error: 'id is required' });
   const asset = (await loadAssetIndex()).find((item) => item.id === id);
   if (!asset) return respond(404, { ok: false, error: 'Audio asset not found.' });
   if (asset.status === 'awaiting-direct-upload') return respond(409, { ok: false, error: 'Audio asset is still awaiting direct upload completion.' });
+  const allowed = canDownloadAsset(asset, claims, params);
+  if (!allowed.ok) return respond(402, { ok: false, ...allowed });
   const body = await readAudioObject(asset);
   if (!body) return respond(404, { ok: false, error: 'Audio file is missing from configured storage.' });
   return {
@@ -583,8 +778,35 @@ async function handleStream(params) {
     headers: {
       'content-type': asset.contentType || 'application/octet-stream',
       'cache-control': 'private, no-store',
+      'content-disposition': 'inline',
       'content-length': String(body.length),
       'x-skye-music-asset-id': asset.id,
+      'x-skye-download-gate': 'artist-or-paid-skypay',
+    },
+    isBase64Encoded: true,
+    body: body.toString('base64'),
+  };
+}
+
+async function handleDownload(params, claims) {
+  const id = clean(params.id || '', 80);
+  if (!id) return respond(400, { ok: false, error: 'id is required' });
+  const asset = (await loadAssetIndex()).find((item) => item.id === id);
+  if (!asset) return respond(404, { ok: false, error: 'Audio asset not found.' });
+  if (asset.status === 'awaiting-direct-upload') return respond(409, { ok: false, error: 'Audio asset is still awaiting direct upload completion.' });
+  const allowed = canDownloadAsset(asset, claims, params);
+  if (!allowed.ok) return respond(402, { ok: false, ...allowed });
+  const body = await readAudioObject(asset);
+  if (!body) return respond(404, { ok: false, error: 'Audio file is missing from configured storage.' });
+  return {
+    statusCode: 200,
+    headers: {
+      'content-type': asset.contentType || 'application/octet-stream',
+      'cache-control': 'private, no-store',
+      'content-disposition': `attachment; filename="${clean(asset.originalName || asset.fileName || asset.title || asset.id || 'skymusicnexus-asset', 160).replace(/["\r\n]/g, '') || 'skymusicnexus-asset'}"`,
+      'content-length': String(body.length),
+      'x-skye-music-asset-id': asset.id,
+      'x-skye-download-gate': 'artist-or-paid-skypay',
     },
     isBase64Encoded: true,
     body: body.toString('base64'),
@@ -604,8 +826,8 @@ async function handleDelete(payload, params) {
 
 module.exports.handler = async (event) => {
   try {
-    const denied = requireSkyGate(event);
-    if (denied) return denied;
+    const gate = verifySkyGateBearer(event);
+    if (!gate.ok) return respond(gate.statusCode || 401, { ok: false, error: gate.error || 'Unauthorized.' });
 
     const method = (event.httpMethod || 'GET').toUpperCase();
     const params = event.queryStringParameters || {};
@@ -614,7 +836,8 @@ module.exports.handler = async (event) => {
     if (method === 'GET') {
       if (action === 'list') return await handleList(params);
       if (action === 'storage-status') return respond(200, { ok: true, storage: storageSummary() });
-      if (action === 'stream') return await handleStream(params);
+      if (action === 'stream') return await handleStream(params, gate.claims || {});
+      if (action === 'download') return await handleDownload(params, gate.claims || {});
       return respond(400, { ok: false, error: `Unknown GET action: ${action}` });
     }
 
@@ -625,6 +848,7 @@ module.exports.handler = async (event) => {
       if (postAction === 'upload') return await handleUpload(payload);
       if (postAction === 'create-upload-session') return await handleCreateUploadSession(payload);
       if (postAction === 'complete-upload') return await handleCompleteUpload(payload);
+      if (postAction === 'report-upload-failure') return await handleReportUploadFailure(payload);
       if (postAction === 'delete') return await handleDelete(payload, params);
       return respond(400, { ok: false, error: `Unknown POST action: ${postAction}` });
     }

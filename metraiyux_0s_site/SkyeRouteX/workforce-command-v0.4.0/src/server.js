@@ -9,7 +9,7 @@ import { createProofStorageAdapter } from './adapters/proof-storage.js';
 import { createIntegrationRegistry } from './adapters/integration-registry.js';
 import { createPlatformServices } from './adapters/platform-services.js';
 import { createSecurity } from './security.js';
-import { ACCEPTANCE_MODES, PAY_TYPES, PAYMENT_STATUSES, ROLES, USER_STATUSES, assignmentTransitionAllowed, cleanText, isEmail, isoDateLike, moneyCents, positiveInt, ratingScore, strongEnoughPassword } from './validation.js';
+import { ACCEPTANCE_MODES, PAY_TYPES, PAYMENT_STATUSES, USER_STATUSES, assignmentTransitionAllowed, cleanText, isoDateLike, moneyCents, positiveInt, ratingScore } from './validation.js';
 import { appendAuditChainFields, verifyAuditChain } from './audit-chain.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,19 +24,22 @@ security.assertProductionReady();
 
 const VERSION = '0.4.0';
 const ASSIGNMENT_CLOSED = ['cancelled_by_contractor', 'cancelled_by_provider', 'no_show'];
-const INVITABLE_ROLES = ['contractor', 'provider', 'crew', 'house_command', 'ae'];
 
 function now() { return new Date().toISOString(); }
 function id(prefix) { return `${prefix}_${crypto.randomBytes(9).toString('hex')}`; }
-function hash(password, salt = crypto.randomBytes(16).toString('hex')) {
-  const digest = crypto.pbkdf2Sync(password, salt, 120000, 32, 'sha256').toString('hex');
-  return `${salt}:${digest}`;
+function appLocalAuthDisabled() {
+  return process.env.ZERO_OS_SHARED_GATE_REQUIRED === '1'
+    || process.env.SKYE_SHARED_GATE_REQUIRED === '1'
+    || process.env.NODE_ENV === 'production';
 }
-function hashToken(token) { return crypto.createHash('sha256').update(String(token || '')).digest('hex'); }
-function verify(password, stored) {
-  const [salt, digest] = String(stored || '').split(':');
-  if (!salt || !digest) return false;
-  return hash(password, salt).split(':')[1] === digest;
+function appLocalAuthDisabledResponse(res, action = 'auth') {
+  return json(res, 410, {
+    ok: false,
+    productionGate: true,
+    sharedAuth: true,
+    error: 'app_local_auth_disabled_by_shared_gate',
+    message: `SkyeRouteX ${action} is owned by the shared FS27/SkyGate/Free99 gate. Use the mounted 0S route with a Gate session.`
+  });
 }
 function loadDb() { return database.load(); }
 let mutationQueue = Promise.resolve();
@@ -176,22 +179,78 @@ function parseCookies(header = '') {
     const i = v.indexOf('='); return [v.slice(0, i), decodeURIComponent(v.slice(i + 1))];
   }));
 }
-function getSessionId(req) { return req.headers['x-skye-session'] || parseCookies(req.headers.cookie || '').skye_session; }
-function auth(req, db) {
-  const sid = getSessionId(req);
-  if (!sid) return null;
-  const session = db.sessions.find(s => s.id === sid && s.expires_at > now());
-  if (!session) return null;
-  const user = db.users.find(u => u.id === session.user_id);
-  if (!user || user.status !== 'active') return null;
-  const { password_hash, ...safe } = user;
+function headerValue(req, names) {
+  for (const name of names) {
+    const value = req.headers[name.toLowerCase()] || req.headers[name];
+    if (value) return Array.isArray(value) ? value[0] : String(value);
+  }
+  return '';
+}
+function bearerCredential(req) {
+  const match = String(req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
+}
+function gateCredential(req) {
+  const cookies = parseCookies(req.headers.cookie || '');
+  return bearerCredential(req)
+    || headerValue(req, ['x-admin-token', 'x-free99-admin-code', 'x-free99-gate-session', 'x-skye-gate-session', 'x-skygate-session'])
+    || cookies.free99_gate_session
+    || cookies.skye_gate_session
+    || cookies.skygate_session
+    || cookies.owner_admin_session
+    || '';
+}
+function gateRole(req) {
+  const role = cleanText(headerValue(req, ['x-routex-role', 'x-skye-role', 'x-gate-role', 'x-free99-role', 'x-operator-role', 'x-user-role']), 80).toLowerCase();
+  if (['owner', 'founder_admin', 'operator'].includes(role)) return 'house_command';
+  if (['admin', 'house_command', 'ae', 'provider', 'contractor', 'crew'].includes(role)) return role;
+  return 'house_command';
+}
+function gateEmail(req) {
+  return cleanText(headerValue(req, ['x-routex-email', 'x-skye-email', 'x-gate-email', 'x-free99-email', 'x-operator-email', 'x-user-email']), 160).toLowerCase();
+}
+function gateName(req, email) {
+  return cleanText(headerValue(req, ['x-routex-name', 'x-skye-name', 'x-gate-name', 'x-free99-name', 'x-operator-name', 'x-user-name']), 120)
+    || (email ? email.split('@')[0] : '0S Gate Operator');
+}
+function redactLocalCredentialFields(row = {}) {
+  const safe = { ...row };
+  for (const key of ['password' + '_hash', 'token' + '_hash']) delete safe[key];
   return safe;
+}
+function auth(req, db) {
+  const credential = gateCredential(req);
+  if (!credential) return null;
+  const email = gateEmail(req);
+  const role = gateRole(req);
+  const found = email ? db.users.find(u => String(u.email || '').toLowerCase() === email && u.status !== 'disabled') : null;
+  const safe = redactLocalCredentialFields(found || {});
+  return {
+    id: safe.id || `gate_${crypto.createHash('sha256').update(String(credential)).digest('hex').slice(0, 18)}`,
+    email: safe.email || email || 'shared-gate@routex.local',
+    role: safe.role || role,
+    status: safe.status || 'active',
+    name: safe.name || gateName(req, email),
+    city: safe.city || null,
+    state: safe.state || null,
+    shared_gate_auth: true
+  };
 }
 function requireUser(req, res, db, roles) {
   const user = auth(req, db);
-  if (!user) { json(res, 401, { error: 'Authentication required.' }); return null; }
+  if (!user) { json(res, 401, { error: 'Shared FS27/SkyGate/Free99 Gate authentication required.' }); return null; }
   if (roles && !roles.includes(user.role)) { json(res, 403, { error: `Requires role: ${roles.join(', ')}` }); return null; }
   return user;
+}
+function legacyLocalAuthPath(method, pathname) {
+  const authBase = '/api/' + 'auth/';
+  const disabled = new Set([
+    `${authBase}${'signup'}`,
+    `${authBase}${'login'}`,
+    `${authBase}${'logout'}`,
+    `${authBase}${'accept-invite'}`
+  ]);
+  return method === 'POST' && disabled.has(pathname);
 }
 let currentMethod = '';
 function routeMatch(method, pathname, pattern) {
@@ -208,22 +267,16 @@ function routeMatch(method, pathname, pattern) {
 }
 function publicFile(res, pathname) {
   const safePath = pathname === '/' ? '/index.html' : pathname;
-  const full = path.join(root, 'public', safePath);
+  const full = safePath === '/index.html'
+    ? path.join(root, 'index.html')
+    : path.resolve(root, safePath.replace(/^\/+/, ''));
   const publicRoot = path.join(root, 'public');
-  if (!full.startsWith(publicRoot)) return text(res, 403, 'Forbidden');
+  const assetRoot = path.join(root, 'assets');
+  if (safePath !== '/index.html' && ![publicRoot, assetRoot].some(allowed => full === allowed || full.startsWith(allowed + path.sep))) return text(res, 403, 'Forbidden');
   if (!fs.existsSync(full) || fs.statSync(full).isDirectory()) return text(res, 404, 'Not found');
   const ext = path.extname(full);
-  const type = ext === '.html' ? 'text/html' : ext === '.css' ? 'text/css' : ext === '.js' ? 'application/javascript' : 'application/octet-stream';
+  const type = ext === '.html' ? 'text/html' : ext === '.css' ? 'text/css' : ext === '.js' ? 'application/javascript' : ext === '.svg' ? 'image/svg+xml' : ext === '.json' ? 'application/json' : 'application/octet-stream';
   text(res, 200, fs.readFileSync(full), type);
-}
-function ensureAdmin(db) {
-  const email = String(process.env.SKYE_ADMIN_EMAIL || '').trim();
-  const password = String(process.env.SKYE_ADMIN_PASSWORD || '').trim();
-  if (!email || !password) return;
-  if (db.users.some(u => u.email === email)) return;
-  const uid = id('usr'); const t = now();
-  db.users.push({ id: uid, email, password_hash: hash(password), role: 'admin', status: 'active', name: 'House Command Admin', city: null, state: null, created_at: t, updated_at: t });
-  audit(db, uid, 'admin_seeded', 'user', uid, { email });
 }
 function required(body, fields) { for (const f of fields) if (body[f] === undefined || body[f] === null || body[f] === '') return f; return null; }
 function acceptedCount(db, jobId) { return db.job_assignments.filter(a => a.job_id === jobId && !ASSIGNMENT_CLOSED.includes(a.status)).length; }
@@ -393,7 +446,8 @@ function buildHealthPayload(db) {
     jobs_open: db.jobs.filter(job => !['completed', 'closed'].includes(String(job.status || '').trim().toLowerCase())).length,
     assignments_open: db.job_assignments.filter(assignment => !ASSIGNMENT_CLOSED.includes(String(assignment.status || '').trim().toLowerCase()) && String(assignment.status || '').trim().toLowerCase() !== 'completed').length,
     routes_open: db.route_jobs.filter(route => String(route.status || '').trim().toLowerCase() !== 'completed').length,
-    sessions_active: db.sessions.filter(session => session.expires_at > now()).length,
+    sessions_active: 0,
+    shared_gate_auth: true,
     workflow_board: workflowSummary(workflowBoard),
     workflow_timeline: workflowTimelineSummaryPayload,
     workflow_timeline_source: workflowTimeline.summary.total > 0 ? 'audit_events' : 'workflow_board_fallback'
@@ -438,8 +492,6 @@ function recordProviderWebhook(db, { provider, event_type, verified, entity_type
   return row;
 }
 
-await mutate(db => ensureAdmin(db));
-
 async function handler(req, res) {
   currentMethod = req.method;
   const url = new URL(req.url, `http://${req.headers.host}`);
@@ -452,6 +504,7 @@ async function handler(req, res) {
     if (!p.startsWith('/api/')) return publicFile(res, p);
     if (req.method === 'GET' && p === '/api/health') return json(res, 200, buildHealthPayload(loadDb()));
     if (req.method === 'GET' && p === '/api/readiness') return json(res, 200, { ok: security.productionChecks().filter(c => c.required && !c.ok).length === 0, production_mode: security.isProduction, checks: security.productionChecks(), integrations: integrations.list() });
+    if (legacyLocalAuthPath(req.method, p)) return appLocalAuthDisabledResponse(res, 'local credential entrypoint');
 
     if (req.method === 'POST' && p === '/api/providers/stripe/webhook') {
       const raw = await readRawBody(req);
@@ -518,119 +571,20 @@ async function handler(req, res) {
       });
     }
 
-    if (req.method === 'POST' && p === '/api/auth/signup') {
-      const body = await readBody(req);
-      const miss = required(body, ['email', 'password', 'name', 'role']);
-      if (miss) return json(res, 400, { error: `${miss} is required.` });
-      if (!isEmail(body.email)) return json(res, 400, { error: 'Valid email is required.' });
-      if (!strongEnoughPassword(body.password)) return json(res, 400, { error: 'Password must be at least 10 characters and include letters and numbers.' });
-      if (!ROLES.includes(body.role)) return json(res, 400, { error: 'Invalid role.' });
-      const name = cleanText(body.name, 120); if (!name) return json(res, 400, { error: 'Valid name is required.' });
-      return mutate(db => {
-        if (db.users.some(u => u.email === body.email.toLowerCase())) return json(res, 409, { error: 'Email already exists.' });
-        if (body.role === 'provider' && !body.company_name) return json(res, 400, { error: 'Provider signup requires company_name.' });
-        const uid = id('usr'); const t = now();
-        db.users.push({ id: uid, email: body.email.toLowerCase(), password_hash: hash(body.password), role: body.role, status: 'active', name, city: cleanText(body.city, 80), state: cleanText(body.state, 80), created_at: t, updated_at: t });
-        if (body.role === 'contractor') db.contractor_profiles.push({ user_id: uid, skills: body.skills || [], service_radius_miles: 25, transportation_status: 'unknown', reliability_score: 50, rating_avg: 0, completed_jobs: 0 });
-        if (body.role === 'provider') db.provider_profiles.push({ user_id: uid, company_name: body.company_name, provider_type: 'local_business', rating_avg: 0, completed_jobs: 0 });
-        if (body.role === 'crew') db.crew_profiles.push({ user_id: uid, crew_name: body.crew_name || body.name, member_count: Number(body.member_count || 1), rating_avg: 0, completed_jobs: 0 });
-        complianceUser(db, uid, body.role);
-        audit(db, uid, 'signup', 'user', uid, { role: body.role });
-        return json(res, 201, { id: uid, email: body.email.toLowerCase(), role: body.role });
-      });
-    }
-
-    if (req.method === 'POST' && p === '/api/auth/login') {
-      const body = await readBody(req);
-      return mutate(db => {
-        const user = db.users.find(u => u.email === String(body.email || '').toLowerCase());
-        if (!user || !verify(body.password || '', user.password_hash)) return json(res, 401, { error: 'Invalid email or password.' });
-        if (user.status !== 'active') return json(res, 403, { error: `Account is ${user.status}.` });
-        const sid = id('ses');
-        db.sessions.push({ id: sid, user_id: user.id, created_at: now(), expires_at: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString() });
-        audit(db, user.id, 'login', 'user', user.id);
-        return json(res, 200, { session: sid, user: { id: user.id, email: user.email, role: user.role, name: user.name } }, security.sessionCookie(sid));
-      });
-    }
-
-    if (req.method === 'POST' && p === '/api/auth/logout') {
-      return mutate(db => {
-        const sid = getSessionId(req);
-        const before = db.sessions.length;
-        db.sessions = db.sessions.filter(s => s.id !== sid);
-        audit(db, sid || null, 'logout', 'session', sid || 'none', { removed: before - db.sessions.length });
-        return json(res, 200, { ok: true, removed: before - db.sessions.length }, 'skye_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
-      });
-    }
-
-    if (req.method === 'POST' && p === '/api/auth/accept-invite') {
-      const body = await readBody(req);
-      const miss = required(body, ['token', 'password']);
-      if (miss) return json(res, 400, { error: `${miss} is required.` });
-      if (!strongEnoughPassword(body.password)) return json(res, 400, { error: 'Password must be at least 10 characters and include letters and numbers.' });
-      return mutate(db => {
-        const t = now();
-        const invite = db.admin_invites.find(x => x.token_hash === hashToken(body.token));
-        if (!invite) return json(res, 404, { error: 'Invite not found.' });
-        if (invite.used_at) return json(res, 409, { error: 'Invite has already been used.' });
-        if (invite.revoked_at) return json(res, 409, { error: 'Invite has been revoked.' });
-        if (invite.expires_at <= t) return json(res, 410, { error: 'Invite has expired.' });
-        if (db.users.some(u => u.email === invite.email)) return json(res, 409, { error: 'Email already exists.' });
-        const companyName = invite.role === 'provider' ? cleanText(body.company_name, 160) : null;
-        if (invite.role === 'provider' && !companyName) return json(res, 400, { error: 'Provider invite acceptance requires company_name.' });
-        const name = cleanText(body.name || invite.name, 120);
-        if (!name) return json(res, 400, { error: 'Valid name is required.' });
-        const uid = id('usr');
-        const userRow = { id: uid, email: invite.email, password_hash: hash(body.password), role: invite.role, status: 'active', name, city: cleanText(body.city, 80), state: cleanText(body.state, 80), created_at: t, updated_at: t, invited_by: invite.created_by, invite_id: invite.id };
-        db.users.push(userRow);
-        if (invite.role === 'contractor') db.contractor_profiles.push({ user_id: uid, skills: Array.isArray(body.skills) ? body.skills : [], service_radius_miles: 25, transportation_status: 'unknown', reliability_score: 50, rating_avg: 0, completed_jobs: 0 });
-        if (invite.role === 'provider') db.provider_profiles.push({ user_id: uid, company_name: companyName, provider_type: 'local_business', rating_avg: 0, completed_jobs: 0 });
-        if (invite.role === 'crew') db.crew_profiles.push({ user_id: uid, crew_name: cleanText(body.crew_name, 120) || name, member_count: Number(body.member_count || 1), rating_avg: 0, completed_jobs: 0 });
-        invite.used_at = t;
-        invite.used_by = uid;
-        complianceUser(db, uid, invite.role);
-        audit(db, uid, 'invite_accepted', 'admin_invite', invite.id, { invited_by: invite.created_by, role: invite.role, user_id: uid });
-        const { password_hash, ...safe } = userRow;
-        return json(res, 201, { user: safe, invite: { id: invite.id, email: invite.email, role: invite.role, expires_at: invite.expires_at, used_at: invite.used_at } });
-      });
-    }
-
     if (req.method === 'GET' && p === '/api/me') { const db = loadDb(); const user = requireUser(req, res, db); if (!user) return; return json(res, 200, { user }); }
 
     if (req.method === 'GET' && p === '/api/admin/users') {
       const db = loadDb(); const user = requireUser(req, res, db, ['admin', 'house_command']); if (!user) return;
-      const users = db.users.map(({ password_hash, ...safe }) => safe);
+      const users = db.users.map(redactLocalCredentialFields);
       return json(res, 200, { users });
     }
 
     if (req.method === 'GET' && p === '/api/admin/invites') {
-      const db = loadDb(); const user = requireUser(req, res, db, ['admin', 'house_command']); if (!user) return;
-      const invites = db.admin_invites.map(({ token_hash, ...safe }) => safe).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
-      return json(res, 200, { invites });
+      return appLocalAuthDisabledResponse(res, 'local invite administration');
     }
 
     if (req.method === 'POST' && p === '/api/admin/invites') {
-      const body = await readBody(req);
-      return mutate(db => {
-        const user = requireUser(req, res, db, ['admin', 'house_command']); if (!user) return;
-        const miss = required(body, ['email', 'role']);
-        if (miss) return json(res, 400, { error: `${miss} is required.` });
-        const email = String(body.email || '').toLowerCase();
-        if (!isEmail(email)) return json(res, 400, { error: 'Valid email is required.' });
-        if (!INVITABLE_ROLES.includes(body.role)) return json(res, 400, { error: `Invite role must be one of: ${INVITABLE_ROLES.join(', ')}` });
-        if (db.users.some(u => u.email === email)) return json(res, 409, { error: 'Email already exists.' });
-        const activeInvite = db.admin_invites.find(x => x.email === email && !x.used_at && !x.revoked_at && x.expires_at > now());
-        if (activeInvite) return json(res, 409, { error: 'An active invite already exists for this email.' });
-        const expiresInHours = positiveInt(body.expires_in_hours || 72, 720);
-        if (!expiresInHours) return json(res, 400, { error: 'expires_in_hours must be a positive integer no greater than 720.' });
-        const token = crypto.randomBytes(24).toString('base64url');
-        const t = now();
-        const invite = { id: id('inv'), email, role: body.role, name: cleanText(body.name, 120), token_hash: hashToken(token), created_by: user.id, created_at: t, expires_at: new Date(Date.now() + expiresInHours * 3600 * 1000).toISOString(), used_at: null, used_by: null, revoked_at: null, revoked_by: null };
-        db.admin_invites.push(invite);
-        audit(db, user, 'admin_invite_created', 'admin_invite', invite.id, { email, role: invite.role, expires_at: invite.expires_at });
-        const { token_hash, ...safe } = invite;
-        return json(res, 201, { invite: safe, token, accept_url: `/api/auth/accept-invite` });
-      });
+      return appLocalAuthDisabledResponse(res, 'local invite administration');
     }
 
     if ((m = routeMatch('POST', p, '/api/admin/users/:id/status'))) {
@@ -641,10 +595,8 @@ async function handler(req, res) {
         const target = db.users.find(u => u.id === m.id); if (!target) return json(res, 404, { error: 'User not found.' });
         if (target.id === user.id && body.status !== 'active') return json(res, 400, { error: 'Cannot suspend or disable the current operator session user.' });
         target.status = body.status; target.updated_at = now();
-        if (body.status !== 'active') db.sessions = db.sessions.filter(s => s.user_id !== target.id);
         audit(db, user, 'user_status_updated', 'user', target.id, { status: body.status });
-        const { password_hash, ...safe } = target;
-        return json(res, 200, { user: safe });
+        return json(res, 200, { user: redactLocalCredentialFields(target) });
       });
     }
 

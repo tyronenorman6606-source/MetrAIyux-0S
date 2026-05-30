@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Private School Association | Scottsdale Education Association</title>
+  <meta name="description" content="Arizona Private School Association in Scottsdale, AZ. Valley Verified profile for an education association at 9375 E Shea Blvd Suite 100.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15171b;
+      --muted: #53606c;
+      --rose: #be123c;
+      --cyan: #0891b2;
+      --gold: #d9a441;
+      --paper: #fffdf7;
+      --soft: #f3f7f7;
+      --line: rgba(21, 23, 27, .15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(190, 18, 60, .09), transparent 34%),
+        linear-gradient(180deg, rgba(8, 145, 178, .12), transparent 360px),
+        #fbfbf5;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .mast {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 22px;
+      align-items: stretch;
+      min-height: 72vh;
+    }
+
+    .rail {
+      display: grid;
+      align-content: space-between;
+      justify-items: center;
+      padding: 18px 0;
+      border-left: 10px solid var(--rose);
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .rail img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+    }
+
+    .rail span {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      color: var(--cyan);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, .55fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .intro {
+      display: grid;
+      align-content: center;
+      gap: 28px;
+      padding: clamp(28px, 5vw, 58px);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      bottom: -100px;
+      width: 260px;
+      height: 260px;
+      border: 28px solid rgba(8, 145, 178, .16);
+      border-radius: 50%;
+    }
+
+    .kicker {
+      color: var(--rose);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 860px;
+      font-size: clamp(42px, 8vw, 92px);
+      line-height: .95;
+    }
+
+    .lead {
+      max-width: 700px;
+      margin: 0;
+      color: #394653;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.48;
+    }
+
+    .contact {
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+      padding: 24px;
+      border-radius: 8px;
+      background: #11242b;
+      color: #fff;
+    }
+
+    .contact img {
+      width: 118px;
+      height: 118px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .contact b,
+    .fact b,
+    .note b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .contact b { color: #9fe8f6; }
+
+    .contact a {
+      display: block;
+      width: fit-content;
+      margin-top: 8px;
+      padding: 13px 16px;
+      border-radius: 7px;
+      background: var(--gold);
+      color: #111;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    address {
+      font-style: normal;
+      line-height: 1.45;
+      color: #e8f8fb;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .fact {
+      min-height: 128px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .fact b,
+    .note b {
+      color: var(--cyan);
+    }
+
+    .fact span {
+      display: block;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .note {
+      margin-top: 14px;
+      padding: 22px;
+      border-left: 8px solid var(--rose);
+      background: rgba(255, 255, 255, .78);
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 920px) {
+      .mast,
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .rail {
+        min-height: auto;
+        grid-template-columns: auto 1fr;
+        justify-items: start;
+        gap: 14px;
+        padding: 14px;
+        border-left-width: 8px;
+      }
+
+      .rail span {
+        writing-mode: horizontal-tb;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .facts { grid-template-columns: 1fr; }
+      .intro { padding: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="mast" aria-label="Arizona Private School Association profile">
+      <aside class="rail">
+        <img src="assets/logo.svg" alt="Arizona Private School Association profile mark">
+        <span>Valley Verified Network</span>
+      </aside>
+
+      <div>
+        <section class="hero">
+          <div class="intro">
+            <div class="kicker">Scottsdale education association</div>
+            <h1>Arizona Private School Association</h1>
+            <p class="lead">An education association listed for Scottsdale, serving the private school community from an East Shea Boulevard office record.</p>
+          </div>
+
+          <div class="contact">
+            <img src="assets/logo.svg" alt="">
+            <div>
+              <b>Contact</b>
+              <a href="tel:+16022545199">(602) 254-5199</a>
+            </div>
+            <div>
+              <b>Address</b>
+              <address>9375 E Shea Blvd Suite 100<br>Scottsdale, AZ 85260</address>
+            </div>
+          </div>
+        </section>
+
+        <section class="facts" aria-label="Business facts">
+          <div class="fact">
+            <b>Category</b>
+            <span>Education And Childcare</span>
+          </div>
+          <div class="fact">
+            <b>Focus</b>
+            <span>Education Association</span>
+          </div>
+          <div class="fact">
+            <b>Pricing</b>
+            <span>Quote-based service</span>
+          </div>
+        </section>
+
+        <section class="note">
+          <b>Profile Details</b>
+          Valley Verified lists this published local business profile with English language support, a business and professional services license type, and a last refreshed date of May 19, 2026.
+        </section>
+      </div>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Arizona Private School Association stands out in Valley Verified because it has served as a recognized voice for Arizona private postsecondary education since 1967, with a Scottsdale office at 9375 E. Shea Blvd., Suite 100.</p>
+        <ul>
+          <li>APSA supports independent postsecondary schools, colleges, administrators, education vendors, and eligible Arizona students.</li>
+          <li>Official pages describe membership, institutional assistance, licensing and accreditation guidance, conferences, workshops, training, referrals, and scholarship programs.</li>
+          <li>The official site confirms Executive Director Susan Ciardullo, phone 602-254-5199, scholarship pathways, and an Online Training Center with more than 100 courses.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

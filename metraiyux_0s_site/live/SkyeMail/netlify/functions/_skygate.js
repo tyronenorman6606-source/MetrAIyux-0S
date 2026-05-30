@@ -1,6 +1,4 @@
-const jwt = require("jsonwebtoken");
 const { query } = require("./_db");
-const { requireEnv, randomToken } = require("./_utils");
 const {
   normalizeEmail,
   normalizeHandle,
@@ -22,10 +20,54 @@ function getHeader(event, name) {
   return "";
 }
 
+function getCookie(event, name) {
+  const header = getHeader(event, "cookie");
+  if (!header) return "";
+  const wanted = String(name || "").trim();
+  return header
+    .split(";")
+    .map((part) => part.trim())
+    .map((part) => {
+      const idx = part.indexOf("=");
+      return idx >= 0 ? [part.slice(0, idx), part.slice(idx + 1)] : [part, ""];
+    })
+    .find(([key]) => key === wanted)?.[1] || "";
+}
+
 function getBearer(event) {
   const h = getHeader(event, "authorization");
   const m = h.match(/^Bearer\s+(.+)$/i);
-  return m ? m[1].trim() : "";
+  if (m) return m[1].trim();
+  const directHeaders = [
+    "x-admin-token",
+    "x-free99-admin-code",
+    "x-free99-gate-session",
+    "x-skye-gate-session",
+    "x-skygate-session",
+    "x-0s-gate-session"
+  ];
+  for (const name of directHeaders) {
+    const value = getHeader(event, name).replace(/^Bearer\s+/i, "").trim();
+    if (value) return value;
+  }
+  const cookieNames = [
+    "free99_gate_session",
+    "skye_gate_session",
+    "skygate_session",
+    "FREE99_PLATFORM_GATE_SESSION",
+    "METRAIYUX_GATE_SESSION"
+  ];
+  for (const name of cookieNames) {
+    const value = decodeURIComponent(getCookie(event, name) || "").replace(/^Bearer\s+/i, "").trim();
+    if (!value) continue;
+    try {
+      const parsed = JSON.parse(value);
+      const token = String(parsed.token || parsed.session || parsed.sessionToken || "").replace(/^Bearer\s+/i, "").trim();
+      if (token) return token;
+    } catch (_err) {}
+    return value;
+  }
+  return "";
 }
 
 function fs27Origin() {
@@ -167,22 +209,20 @@ async function ensureSkyeMailUser(claims = {}) {
   const handle = await uniqueHandle(email);
   const skymailId = makeSkyeMailId({ email, handle, fs27Sub });
   const workspaceId = makeWorkspaceId({ email, handle, fs27CustomerId, fs27Sub });
-  const passwordHash = `fs27:${claims.sub || claims.session_id || randomToken(16)}`;
   const inserted = await query(
     `insert into users(
-       handle, email, password_hash, skymail_id, workspace_id,
+       handle, email, skymail_id, workspace_id,
        fs27_sub, fs27_customer_id, fs27_gate_card_id, fs27_card_json
      )
-     values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
+     values($1,$2,$3,$4,$5,$6,$7,$8::jsonb)
      returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id`,
-    [handle, email, passwordHash, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, card ? JSON.stringify(card) : null]
+    [handle, email, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, card ? JSON.stringify(card) : null]
   );
   return inserted.rows[0];
 }
 
-function mintSkyeMailSession(user, claims = {}) {
-  const secret = requireEnv("JWT_SECRET");
-  return jwt.sign({
+function sessionFromGateUser(user, claims = {}, token = "") {
+  return {
     sub: user.id,
     handle: user.handle,
     email: user.email,
@@ -192,8 +232,10 @@ function mintSkyeMailSession(user, claims = {}) {
     fs27_sub: claims.sub || null,
     fs27_customer_id: claims.customer_id || claims.org || null,
     fs27_gate_card_id: user.fs27_gate_card_id || claims.gate_card_id || null,
-    fs27_role: claims.role || null
-  }, secret, { expiresIn: "14d" });
+    fs27_role: claims.role || null,
+    gate_token: token || null,
+    fs27_claims: claims
+  };
 }
 
 async function mirrorPlatformEvent(payload = {}) {
@@ -228,6 +270,6 @@ module.exports = {
   requireFs27,
   isAdminLike,
   ensureSkyeMailUser,
-  mintSkyeMailSession,
+  sessionFromGateUser,
   mirrorPlatformEvent
 };

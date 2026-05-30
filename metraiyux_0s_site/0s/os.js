@@ -3,6 +3,334 @@ import { animate as framerAnimate } from "framer-motion";
 
 const SITE_ROOT = "/workspaces/MetrAIyux-0S/metraiyux_0s_site/";
 
+const SOUNDTRACK = [
+  {
+    id: "founder-command",
+    title: "Founder Command / Founder Static",
+    artist: "Gray Skyes",
+    src: "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/founder-static/audio/founder-static.mp3"
+  },
+  {
+    id: "everything-movie-act-i",
+    title: "Everything Movie Act I: Birth of Static",
+    artist: "Gray Skyes",
+    src: "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-act-i-birth-of-static/audio/everything-movie-act-i-birth-of-static.mp3"
+  },
+  {
+    id: "everything-movie-act-ii",
+    title: "Everything Movie Act II: Gate Argument",
+    artist: "Gray Skyes",
+    src: "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-act-ii-gate-argument/audio/everything-movie-act-ii-gate-argument.mp3"
+  },
+  {
+    id: "everything-movie-act-iii",
+    title: "Everything Movie Act III: Betrayal Parade",
+    artist: "Gray Skyes",
+    src: "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-act-iii-betrayal-parade/audio/everything-movie-act-iii-betrayal-parade.mp3"
+  },
+  {
+    id: "everything-movie-act-iv",
+    title: "Everything Movie Act IV: Founder Walkout",
+    artist: "Gray Skyes",
+    src: "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-act-iv-founder-walkout/audio/everything-movie-act-iv-founder-walkout.mp3"
+  }
+];
+
+const CUSTOMER_PATH_STEPS = [
+  {
+    step: "01",
+    title: "Show the business its landing experience",
+    text: "Open the client-facing profile, app preview, or pitch page first. The offer is simple: the business can keep it, edit it, or ask for removal.",
+    actions: [
+      { label: "Open Free Stack Pitch", route: "free-stack-pitch" },
+      { label: "Open Print Flyer", route: "free-stack-flyer" },
+      { label: "Open Valley Verified", route: "valley-verified" },
+      { label: "Open Business Card Factory", route: "business-card-factory" }
+    ]
+  },
+  {
+    step: "02",
+    title: "Claim the free workspace",
+    text: "Move the owner into the shared 0S gate so their workspace, SkyEmail, CRM, chat, and proof events all stay under one identity lane.",
+    actions: [
+      { label: "Start Gate Signup", route: "gate-signup" },
+      { label: "Open Customer SaaS", route: "saas" }
+    ]
+  },
+  {
+    step: "03",
+    title: "Activate team communication",
+    text: "ConnectLog and Relay13 give the team a live relationship/chat lane with room to grow into managed inbox and AI response upgrades.",
+    actions: [
+      { label: "Open ConnectLog", route: "connectlog" },
+      { label: "Open Relay13", route: "relay13" }
+    ]
+  },
+  {
+    step: "04",
+    title: "Hand them the business inbox",
+    text: "SkyeMail provides the real inbox/outbox lane. Handles can stay on the current SkyEmail domain now and move to custom-domain mail later.",
+    actions: [
+      { label: "Open SkyeMail", route: "skyemail" },
+      { label: "Open SkyGate", route: "gate" }
+    ]
+  },
+  {
+    step: "05",
+    title: "Run the CRM and backup promise",
+    text: "AE-FlowPro tracks leads and follow-up. CitadelDB backup posture turns the free workspace into a serious business asset.",
+    actions: [
+      { label: "Open AE-FlowPro", route: "ae-flowpro" },
+      { label: "Open Founder Command", route: "founder-command" }
+    ]
+  },
+  {
+    step: "06",
+    title: "Let the upgrades appear naturally",
+    text: "The offer engine shows ads, managed workspace, content, video, commerce, custom mail, and higher-capacity lanes only when the buyer needs them.",
+    actions: [
+      { label: "Open Offer Engine", launch: "offer-engine" },
+      { label: "Open 0S Browser", launch: "browser" }
+    ]
+  }
+];
+
+const FREE_STACK = [
+  {
+    title: "Landing / app experience",
+    included: "Client-facing page, profile, QR pitch handoff, and edit-or-remove path.",
+    limit: "Free first activation; deeper campaign work becomes a managed growth lane.",
+    route: "free-stack-pitch"
+  },
+  {
+    title: "ConnectLog + Relay13",
+    included: "Team relationship workspace, live rooms, inbox bridge, and owner-reviewed messaging path.",
+    limit: "Free workspace limits apply; upgrades add seats, history, AI response, and managed inbox.",
+    route: "connectlog"
+  },
+  {
+    title: "SkyeMail",
+    included: "Business inbox/outbox lane with a reserved SkyEmail handle, rename request path, and confirmation routing.",
+    limit: "Current handles stay on the SkyEmail domain and confirmed changes persist; custom domain mail can become a paid setup.",
+    route: "skyemail"
+  },
+  {
+    title: "AE-FlowPro CRM",
+    included: "Lead board, follow-up rail, close path, snapshots, and activation packs.",
+    limit: "Free use covers the starter workspace; managed AE operations and automations upgrade.",
+    route: "ae-flowpro"
+  },
+  {
+    title: "CitadelDB backup posture",
+    included: "Biweekly backup promise for the free workspace where the lane is activated.",
+    limit: "Daily backup, restore drills, and compliance retention become managed infrastructure.",
+    route: "citadeldb"
+  },
+  {
+    title: "0S Browser shell",
+    included: "Fullscreen installable launcher for owned apps, routes, and customer workspaces.",
+    limit: "Desktop packaging, branded browser builds, and device rollout are custom infrastructure.",
+    launch: "browser"
+  }
+];
+
+const REVENUE_LANES = [
+  {
+    title: "Free Business Stack",
+    badge: "front-door offer",
+    free: "Landing/app experience, workspace claim, ConnectLog/Relay13 room, SkyeMail, AE-FlowPro, and biweekly CitadelDB backup posture.",
+    upgrade: "Managed AE, daily backups, more seats, more message history, custom domains, and higher-capacity workspace operations.",
+    routes: ["free-stack-pitch", "free-stack-flyer", "customer-path", "gate-signup", "saas"]
+  },
+  {
+    title: "Valley Verified Exposure",
+    badge: "ad system",
+    free: "Business profile, featured proof route, app-build examples, and QR pitch handoff.",
+    upgrade: "Sponsored placement, category boosts, lead-routing, local ads, and managed profile upgrades.",
+    routes: ["valley-verified", "../valley-verified/advertise/", "../valley-verified/sponsor/"]
+  },
+  {
+    title: "Owned Messaging",
+    badge: "chat + inbox",
+    free: "ConnectLog workspace, Relay13 preview, relationship memory, and live team rooms where activated.",
+    upgrade: "AI response starter, managed inbox, higher message caps, priority follow-up, and operator review.",
+    routes: ["connectlog", "relay13", "relay13-inbox"]
+  },
+  {
+    title: "SkyeMail + Domain Mail",
+    badge: "mail lane",
+    free: "SkyEmail handle, inbox/outbox, mailbox proof, and owner notification routing.",
+    upgrade: "Custom domain mail, extra aliases, higher send volume, mailbox migration, and managed setup.",
+    routes: ["skyemail", "gate"]
+  },
+  {
+    title: "AE Flow CRM",
+    badge: "sales ops",
+    free: "Lead flow, offer queue, follow-up rail, AE proof, close path, snapshots, and activation packs.",
+    upgrade: "Managed AE, automations, campaign sprints, daily reporting, and done-for-you pipeline cleanup.",
+    routes: ["ae-flowpro", "businesslaunchgo"]
+  },
+  {
+    title: "Marketing + Media",
+    badge: "growth engine",
+    free: "Marketing Made Easy, Media Center, Content Forge, document tools, brand tools, and intake paths.",
+    upgrade: "Custom video, cinematic logo assets, content calendars, ad creative, managed publishing, and launch campaigns.",
+    routes: ["marketing", "media", "content-forge", "skyedocxmax"]
+  },
+  {
+    title: "Commerce + Payments",
+    badge: "checkout",
+    free: "SkyePay offer routing and storefront-ready lanes inside the 0S catalog.",
+    upgrade: "SkyeCommerce setup, recurring plans, product pages, checkout wiring, inventory, and payout reporting.",
+    routes: ["skyecommerce", "pricing", "../sales/pricing-offer-router.html"]
+  },
+  {
+    title: "Creator + Music Ops",
+    badge: "music",
+    free: "SkyeMusicNexus Lite, drops, discover, feed, upload, player, and artist stage routes.",
+    upgrade: "EPK pages, paid drops, release content kits, visualizers, managed campaigns, and artist universe builds.",
+    routes: ["music", "music-drops", "music-discover", "music-feed"]
+  },
+  {
+    title: "Operations + Workforce",
+    badge: "ops",
+    free: "SkyeRouteX, HouseOperations, Split Engine, Profit Console, and proof-safe work lanes.",
+    upgrade: "Managed dispatch, workforce command, routing ops, money-move support, and operations reporting.",
+    routes: ["routex", "houseoperations", "split", "profit"]
+  },
+  {
+    title: "Sovereign Infrastructure",
+    badge: "owned stack",
+    free: "Shared 0S/SkyGate auth, SkyeVaultOS, SkyeBox, company knowledge, and protected event proof.",
+    upgrade: "Custom gate policies, restore points, white-label lanes, staff training, and dedicated operator support.",
+    routes: ["gate", "skyevaultos", "company-knowledge", "skyebox-authenticator"]
+  }
+];
+
+const TIER_OPTIONS = [
+  {
+    name: "Free Claim Stack",
+    price: "$0 first claim",
+    text: "The door opener: give the owner immediate value without making them decode the platform.",
+    includes: ["Landing/app experience", "Workspace claim", "ConnectLog + Relay13", "SkyeMail", "AE-FlowPro", "Biweekly backup posture"]
+  },
+  {
+    name: "Starter Command",
+    price: "$397/mo + $1,500 setup",
+    text: "The first clean upgrade when a business wants the workspace operated instead of only claimed.",
+    includes: ["1 workspace", "ConnectLog seat", "Relay13 ready", "SkyeBox vault", "HouseOps preview", "Proof receipts"]
+  },
+  {
+    name: "Growth Cabinet",
+    price: "$997/mo + $3,500 setup",
+    text: "The main small-business money lane after the free stack proves value.",
+    includes: ["3 workspaces", "3 ConnectLog seats", "Relay13 workspace", "HouseOps workspace", "3 SkyeBox vaults", "Weekly review"]
+  },
+  {
+    name: "Autonomous Office",
+    price: "$2,497/mo + $7,500 setup",
+    text: "For buyers who need managed workflows, approval inboxes, digests, owned messaging, and deeper connector readiness.",
+    includes: ["8 workspaces", "8 ConnectLog seats", "3 Relay13 workspaces", "Managed HouseOps", "8 SkyeBox vaults", "Operating digests"]
+  },
+  {
+    name: "Enterprise / Managed Gate",
+    price: "$3,997/mo + $15,000 setup",
+    text: "For bigger customers that want the 0S shaped around their domain, staff, policies, and operating model.",
+    includes: ["Custom limits", "Custom gate policy", "Managed Relay13", "White-label scope", "Training packet", "Written terms"]
+  }
+];
+
+const PRODUCT_ADS = [
+  {
+    slot: "start free",
+    title: "Free Business Stack",
+    text: "Client-facing pitch plus landing, workspace, live rooms, SkyEmail, CRM, and backup posture in one guided claim path.",
+    route: "free-stack-pitch"
+  },
+  {
+    slot: "leave behind",
+    title: "QR Flyer",
+    text: "Printable handout with QR links for the full pitch page and the installable 0S Browser workspace lane.",
+    route: "free-stack-flyer"
+  },
+  {
+    slot: "natural upgrade",
+    title: "Valley Verified Exposure",
+    text: "Profile upgrades, sponsored placements, category boosts, and lead-routing after the business sees value.",
+    route: "../valley-verified/advertise/"
+  },
+  {
+    slot: "owned browser",
+    title: "0S Browser",
+    text: "Installable fullscreen app browser for your own hosted apps, customer workspaces, and offer routes.",
+    launch: "browser"
+  },
+  {
+    slot: "current offers",
+    title: "Pricing Router",
+    text: "Approved plans, Free99 boundaries, SkyePay handoffs, quote-only lanes, and add-on paths in one place.",
+    route: "pricing"
+  }
+];
+
+const AD_PLACEMENTS = [
+  {
+    title: "Lobby takeover",
+    text: "The first window pushes Start Here, Offer Engine, and 0S Browser before the wider app grid.",
+    action: { label: "Open Lobby", launch: "command" }
+  },
+  {
+    title: "Browser home rail",
+    text: "Every route search starts beside the free stack, Valley Verified, and owned-browser offer cards.",
+    action: { label: "Open Browser", launch: "browser" }
+  },
+  {
+    title: "Customer path close",
+    text: "The free promise ends with the next paid lane already framed as a useful continuation.",
+    action: { label: "Start Path", launch: "customer-path" }
+  },
+  {
+    title: "Offer search",
+    text: "The searchable money map keeps every product lane discoverable without dumping a customer into raw pricing.",
+    action: { label: "Open Offers", launch: "offer-engine" }
+  }
+];
+
+const PLATFORM_GROUPS = [
+  {
+    title: "Client Acquisition",
+    text: "Walk-in sales, QR handoff, local discovery, custom app previews, and proof-backed landing experiences.",
+    apps: ["free-stack-pitch", "free-stack-flyer", "valley-verified", "business-card-factory", "pricing", "skyewebcreatormax", "webgrowthoperator", "arizona-growth-index"]
+  },
+  {
+    title: "Workspace + Messaging",
+    text: "Shared gate signup, ConnectLog, Relay13, SkyeMail, inbox proof, and owner-visible customer communications.",
+    apps: ["gate-signup", "connectlog", "relay13", "relay13-inbox", "skyemail", "gate"]
+  },
+  {
+    title: "Sales Operations",
+    text: "CRM follow-up, lead boards, AE support, campaign queues, business launch packs, and operator command review.",
+    apps: ["ae-flowpro", "businesslaunchgo", "pricing", "commercial-terms", "founder-command", "0s-command-bridge", "marketing"]
+  },
+  {
+    title: "Commerce + Money",
+    text: "Storefronts, checkout lanes, offer routing, splits, profit tracking, subscriptions, and payout visibility.",
+    apps: ["skyecommerce", "kaixu-storefront", "split", "profit"]
+  },
+  {
+    title: "Media + Creator Stack",
+    text: "Content Forge, media review, music drops, artist storefronts, publishing rooms, and release operations.",
+    apps: ["content-forge", "media", "music", "music-drops", "music-feed", "devisional-riftx"]
+  },
+  {
+    title: "Sovereign Infrastructure",
+    text: "Vaults, CitadelDB posture, company knowledge, error capture, deploy lanes, authenticators, and API controls.",
+    apps: ["citadeldb", "skyevaultos", "skyevaultpro", "company-knowledge", "skyerrors", "skyenet", "skyeapi-aegiscore"]
+  }
+];
+
+const REVEAL_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+
 const APP_DEFS = [
   {
     id: "command",
@@ -15,21 +343,51 @@ const APP_DEFS = [
     size: [900, 600]
   },
   {
+    id: "customer-path",
+    name: "Start Here",
+    icon: "GO",
+    kind: "customer path",
+    summary: "Guided customer launch path for the free stack, workspace claim, chat, mail, CRM, backups, and natural upgrades.",
+    view: "customer-path",
+    dock: true,
+    size: [1080, 720]
+  },
+  {
+    id: "offer-engine",
+    name: "Offer Engine",
+    icon: "AD",
+    kind: "revenue",
+    summary: "0S product/ad rail that explains free value, upgrade lanes, platform inventory, and tier options without stale pricing.",
+    view: "offer-engine",
+    dock: true,
+    size: [1080, 720]
+  },
+  {
     id: "terminal",
     name: "0S Terminal",
     icon: ">_",
     kind: "shell",
-    summary: "Interactive launcher shell for apps, windows, live surfaces, and the repo command allowlist.",
+    summary: "Interactive launcher shell for panels, mounted routes, live surfaces, and the repo command allowlist.",
     view: "terminal",
     dock: true,
     size: [860, 540]
+  },
+  {
+    id: "browser",
+    name: "0S Browser",
+    icon: "0B",
+    kind: "navigator",
+    summary: "Top-level 0S route navigator for mounted apps, local paths, and external URLs.",
+    view: "browser",
+    dock: true,
+    size: [920, 600]
   },
   {
     id: "atlas",
     name: "Surface Atlas",
     icon: "AT",
     kind: "registry",
-    summary: "Apps and live surfaces wrapped into the 0S desktop.",
+    summary: "Mounted apps and live surfaces routed by the 0S desktop.",
     view: "atlas",
     dock: true,
     size: [980, 640]
@@ -43,6 +401,26 @@ const APP_DEFS = [
     view: "commands",
     dock: true,
     size: [940, 600]
+  },
+  {
+    id: "gate-signup",
+    name: "Gate Signup",
+    icon: "ID",
+    kind: "core",
+    summary: "Canonical 0S signup with Skye ID, SkyEmail, profile, phone, and shared Gate session.",
+    url: "../gate/signup/",
+    dock: true,
+    size: [980, 720]
+  },
+  {
+    id: "skyemail",
+    name: "SkyeMail",
+    icon: "SM",
+    kind: "core",
+    summary: "Gate-bound mailbox, vault key setup, hosted mailbox provisioning, inbox, compose, and proof relay.",
+    url: "../live/SkyeMail/index.html",
+    dock: true,
+    size: [1060, 720]
   },
   {
     id: "admin",
@@ -63,6 +441,106 @@ const APP_DEFS = [
     url: "../operator/index.html",
     dock: true,
     size: [1040, 680]
+  },
+  {
+    id: "skyenet",
+    name: "SkyeNet Deploy",
+    icon: "SN",
+    kind: "gated platform",
+    summary: "Drop-build hosting, route registry, observability, and internal cost controls.",
+    url: "../skyenet/index.html",
+    dock: true,
+    size: [1100, 720]
+  },
+  {
+    id: "founder-calendar",
+    name: "SuperIDE SkyeCalendar",
+    icon: "CL",
+    kind: "founder",
+    summary: "Copied SuperIDE calendar mounted through Founder Command, backed by the 0S ledger, shared gate, local shadow sync, and ICS export.",
+    url: "../founder-command/apps/0s-calendar/index.html",
+    dock: true,
+    size: [1120, 740]
+  },
+  {
+    id: "founder-command",
+    name: "Founder Command",
+    icon: "FC",
+    kind: "founder",
+    summary: "Founder command center for owner workspace oversight, command bridge review, reminders, and operational control.",
+    url: "../founder-command/index.html",
+    dock: false,
+    size: [1120, 740]
+  },
+  {
+    id: "business-card-factory",
+    name: "Business Card Factory",
+    icon: "QR",
+    kind: "sales",
+    summary: "Flyer, QR, card, and handoff factory for walking into a business with a client-facing offer.",
+    url: "../business-card-factory/index.html",
+    dock: false,
+    size: [1040, 680]
+  },
+  {
+    id: "free-stack-pitch",
+    name: "Free Stack Pitch",
+    icon: "FS",
+    kind: "sales",
+    summary: "Client-facing free business stack pitch for landing, workspace, live rooms, SkyeMail, CRM, backup posture, limits, and upgrades.",
+    url: "../sales/free-business-stack.html",
+    dock: false,
+    size: [1120, 740]
+  },
+  {
+    id: "free-stack-flyer",
+    name: "Free Stack Flyer",
+    icon: "FL",
+    kind: "sales",
+    summary: "Printable leave-behind flyer with QR links to the full pitch page and 0S Browser workspace launcher.",
+    url: "../sales/free-business-stack-flyer.html",
+    dock: false,
+    size: [980, 720]
+  },
+  {
+    id: "citadeldb",
+    name: "CitadelDB",
+    icon: "DB",
+    kind: "infra",
+    summary: "Database and backup posture lane for workspace evidence, tenant state, and operational receipts.",
+    url: "../citadeldb/index.html",
+    dock: false,
+    size: [1040, 680]
+  },
+  {
+    id: "company-knowledge",
+    name: "Company Knowledge",
+    icon: "CK",
+    kind: "infra",
+    summary: "Company knowledge console for platform memory and tenant-scoped knowledge bases under the shared gate.",
+    url: "../admin/company-knowledge.html",
+    dock: false,
+    size: [1040, 680]
+  },
+  {
+    id: "skyevaultos",
+    name: "SkyeVaultOS",
+    icon: "VO",
+    kind: "infra",
+    summary: "Vault proof lane for scan, offload, inventory, search, restore points, grants, revokes, audit, and proof.",
+    url: "../skye-vault-os/index.html",
+    dock: false,
+    size: [1040, 680]
+  },
+  {
+    id: "skyecommerce",
+    name: "SkyeCommerce",
+    icon: "SC",
+    kind: "commerce",
+    summary: "Owned commerce lane for storefront, catalog, checkout, merchant operations, orders, subscriptions, and payout reporting.",
+    url: "../SkyeCommerce/",
+    dock: false,
+    size: [1120, 740]
   },
   {
     id: "brain",
@@ -96,13 +574,23 @@ const APP_DEFS = [
   },
   {
     id: "pricing",
-    name: "Pricing",
+    name: "Pricing Router",
     icon: "$",
-    kind: "wrapped",
-    summary: "0S plans, offers, and price cards.",
+    kind: "sales",
+    summary: "Current sales router for approved plans, Free99 boundaries, SkyePay handoffs, quote-only lanes, and add-ons.",
+    url: "../sales/pricing-offer-router.html",
+    dock: false,
+    size: [1120, 740]
+  },
+  {
+    id: "commercial-terms",
+    name: "Commercial Terms",
+    icon: "CT",
+    kind: "sales",
+    summary: "Long-form pricing, limits, billing rules, and public commercial terms.",
     url: "../pricing/index.html",
-    dock: true,
-    size: [1000, 680]
+    dock: false,
+    size: [1120, 740]
   },
   {
     id: "music",
@@ -251,36 +739,16 @@ const APP_DEFS = [
     kind: "wrapped",
     summary: "Workforce command lane.",
     url: "../SkyeRouteX/index.html",
-    dock: true,
+    dock: false,
     size: [1040, 680]
   },
   {
     id: "routex-workforce-command",
-    name: "SkyeRouteX v0.4 Platform",
-    icon: "R4",
+    name: "SkyeRouteX Workforce Command",
+    icon: "RX",
     kind: "routex",
-    summary: "Runtime-safe workforce command platform hub.",
+    summary: "Canonical provider, contractor, House Command, proof, payment-state, export, and audit workspace.",
     url: "../SkyeRouteX/workforce-command-v0.4.0/index.html",
-    dock: false,
-    size: [1040, 680]
-  },
-  {
-    id: "routex-api-command",
-    name: "SkyeRouteX API Command UI",
-    icon: "RA",
-    kind: "routex",
-    summary: "Provider jobs, contractor boards, assignments, route stops, proof, payments, exports, and audit panels.",
-    url: "../SkyeRouteX/workforce-command-v0.4.0/public/index.html",
-    dock: false,
-    size: [1040, 680]
-  },
-  {
-    id: "routex-runtime",
-    name: "SkyeRouteX Runtime",
-    icon: "RR",
-    kind: "routex",
-    summary: "Runtime proof lane and preserved runtime contract endpoints.",
-    url: "../SkyeRouteX/runtime.html",
     dock: false,
     size: [1040, 680]
   },
@@ -475,6 +943,16 @@ const APP_DEFS = [
     size: [1040, 680]
   },
   {
+    id: "skyedocx-blog",
+    name: "SkyeDocx Blog",
+    icon: "DB",
+    kind: "marketing",
+    summary: "SuperIDE SkyeBlog editorial package lane promoted into 0S for SkyeDocxMax, SovereignDocs, DeVisional Riftx, SkyPay, and SkyeNet handoffs.",
+    url: "../Marketing-Made-Easy/SkyeDocxBlog/index.html",
+    dock: false,
+    size: [1120, 720]
+  },
+  {
     id: "skyewebcreatormax",
     name: "SkyeWebCreatorMax",
     icon: "WC",
@@ -563,6 +1041,46 @@ const APP_DEFS = [
     url: "../Free99/index.html",
     dock: false,
     size: [1040, 680]
+  },
+  {
+    id: "devisional-riftx",
+    name: "SuperIDE / DeVisional Riftx",
+    icon: "SI",
+    kind: "publishing",
+    summary: "Gate-owned author publishing IDE with SkyPay handoffs, owner-approved dispatch, signed exports, and 0S command bridge signals.",
+    url: "../DeVisional%20Riftx/app/index.html",
+    dock: true,
+    size: [1120, 760]
+  },
+  {
+    id: "0s-command-bridge",
+    name: "0S Command Bridge",
+    icon: "CB",
+    kind: "infra",
+    summary: "Neural communication lane for 0S app events, CRM records, SkyErrors signals, SkyeNet deploys, and Founder Command review.",
+    url: "../founder-command/apps/0s-command-bridge/index.html",
+    dock: true,
+    size: [1120, 760]
+  },
+  {
+    id: "skyerrors",
+    name: "SkyErrors",
+    icon: "SE",
+    kind: "infra",
+    summary: "Gate-owned capture lane backed by Helper K4i, SkyErrors KV, CitadelDB mirroring, and command bridge observability.",
+    url: "../skyerrors/index.html",
+    dock: true,
+    size: [1040, 700]
+  },
+  {
+    id: "skyehawk",
+    name: "Skye Hawk Source Cockpit",
+    icon: "SH",
+    kind: "infra",
+    summary: "Copied Skye Hawk source restructured into a gated 0S cockpit with preserved living-field contract and command bridge readiness signals.",
+    url: "../skyehawk/index.html",
+    dock: true,
+    size: [1040, 700]
   },
   {
     id: "skyeopsconsole",
@@ -878,10 +1396,15 @@ const APP_DEFS = [
 
 const SHELL_COMMANDS = [
   ["help", "Show shell commands."],
+  ["start", "Open the guided customer launch path."],
+  ["offers", "Open the 0S offer and ad engine."],
+  ["ads", "Open the system ad placement map."],
   ["apps", "List launcher apps."],
-  ["open <app>", "Open or focus an app window."],
-  ["wrap <url>", "Open a URL in a desktop window."],
-  ["eject <app>", "Open an app URL in a browser tab."],
+  ["open <app>", "Open a system panel or enter a mounted app route."],
+  ["browser [url]", "Open the 0S browser panel or navigate this tab."],
+  ["route <app|url>", "Enter a mounted route or URL in this tab."],
+  ["wrap <url>", "Alias for top-level 0S route navigation."],
+  ["eject <app>", "Legacy alias for top-level 0S route navigation."],
   ["close <app|all>", "Close one window or every window."],
   ["focus <app>", "Bring a window forward."],
   ["min <app>", "Minimize a window to the dock."],
@@ -892,6 +1415,7 @@ const SHELL_COMMANDS = [
   ["commands [query]", "Search repo command allowlist."],
   ["cmd <id>", "Show exact repo command details."],
   ["copy <id>", "Copy npm run 0s:command -- <id>."],
+  ["install", "Install the 0S Browser when the browser exposes the PWA prompt."],
   ["fullscreen", "Enter browser fullscreen."],
   ["status", "Print OS registry and window status."],
   ["theme", "Cycle accent state."],
@@ -907,9 +1431,13 @@ const state = {
   surfaces: [],
   commands: [],
   registry: null,
+  gate: null,
   terminalLines: [],
   themeIndex: 0,
-  paletteItems: []
+  paletteItems: [],
+  soundtrackIndex: 0,
+  soundtrackPlaying: false,
+  installPrompt: null
 };
 
 const desktop = document.querySelector("#desktop");
@@ -919,6 +1447,8 @@ const template = document.querySelector("#windowTemplate");
 const palette = document.querySelector("#palette");
 const paletteInput = document.querySelector("#paletteInput");
 const paletteResults = document.querySelector("#paletteResults");
+const entryScene = document.querySelector("#zeroOsEntry");
+const entryButton = document.querySelector("#zeroOsEnterButton");
 
 function qs(selector, root = document) {
   return root.querySelector(selector);
@@ -928,12 +1458,91 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function safeId(value) {
-  return String(value || "window").toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "window";
-}
-
 function appById(id) {
   return APP_DEFS.find(app => app.id === id);
+}
+
+function isSystemPanel(app) {
+  return Boolean(app?.view);
+}
+
+function panelFromHash() {
+  const raw = decodeURIComponent(String(location.hash || "").replace(/^#/, "")).trim();
+  const app = appById(raw);
+  return app?.view ? app.id : "";
+}
+
+function updateInstallButton(label = "PWA", disabled = false) {
+  const button = qs("#installOsButton");
+  if (!button) return;
+  const text = button.querySelector("span");
+  if (text) text.textContent = label;
+  button.disabled = disabled;
+  button.title = disabled ? "0S Browser installed" : "Install 0S Browser";
+  button.setAttribute("aria-label", button.title);
+}
+
+window.addEventListener("beforeinstallprompt", event => {
+  event.preventDefault();
+  state.installPrompt = event;
+  updateInstallButton("PWA", false);
+});
+
+window.addEventListener("appinstalled", () => {
+  state.installPrompt = null;
+  updateInstallButton("OK", true);
+  writeTerminal("0S Browser installed.");
+  rerenderTerminalIfOpen();
+});
+
+async function installOsBrowser() {
+  if (state.installPrompt) {
+    const promptEvent = state.installPrompt;
+    state.installPrompt = null;
+    promptEvent.prompt();
+    const choice = await promptEvent.userChoice.catch(() => ({ outcome: "dismissed" }));
+    updateInstallButton(choice?.outcome === "accepted" ? "OK" : "PWA", choice?.outcome === "accepted");
+    writeTerminal(choice?.outcome === "accepted" ? "0S Browser install accepted." : "0S Browser install dismissed.");
+    rerenderTerminalIfOpen();
+    return true;
+  }
+  await requestFullscreen({ silent: true, enterOnly: true });
+  writeTerminal("PWA prompt unavailable in this browser session; fullscreen shell engaged.");
+  rerenderTerminalIfOpen();
+  updateInstallButton("FS", false);
+  return false;
+}
+
+function resolveNavigationTarget(target) {
+  const raw = String(target || "").trim();
+  if (!raw) return "";
+  const app = appById(raw);
+  const candidate = app?.url || raw;
+  const withProtocol = /^[\w.-]+\.[a-z]{2,}(?:[/:?#].*)?$/i.test(candidate)
+    ? `https://${candidate}`
+    : candidate;
+  try {
+    return new URL(withProtocol, location.href).toString();
+  } catch {
+    return "";
+  }
+}
+
+function launchRoute(target, options = {}) {
+  const url = resolveNavigationTarget(target);
+  if (!url) return false;
+  document.body.classList.add("is-route-launching");
+  if (!options.skipFullscreen) requestFullscreen({ silent: true });
+  window.setTimeout(() => {
+    location.assign(url);
+  }, options.instant ? 0 : 140);
+  return true;
+}
+
+function routeApp(id, options = {}) {
+  const app = appById(id);
+  if (!app || !app.url) return false;
+  return launchRoute(app.url, options);
 }
 
 function updateClock() {
@@ -946,11 +1555,16 @@ function updateClock() {
 
 function updateSystemStatus() {
   const running = state.windows.size;
-  qs("#windowStatus").textContent = `windows: ${running}`;
-  qs("#metricApps").textContent = APP_DEFS.length;
-  qs("#metricSurfaces").textContent = state.surfaces.length;
-  qs("#metricCommands").textContent = state.commands.length;
-  qs("#registryStatus").textContent = state.registry ? "registry: online" : "registry: fallback";
+  const windowStatus = qs("#windowStatus");
+  const metricApps = qs("#metricApps");
+  const metricSurfaces = qs("#metricSurfaces");
+  const metricCommands = qs("#metricCommands");
+  const registryStatus = qs("#registryStatus");
+  if (windowStatus) windowStatus.textContent = `windows: ${running}`;
+  if (metricApps) metricApps.textContent = APP_DEFS.length;
+  if (metricSurfaces) metricSurfaces.textContent = state.surfaces.length;
+  if (metricCommands) metricCommands.textContent = state.commands.length;
+  if (registryStatus) registryStatus.textContent = state.registry ? "registry: online" : "registry: fallback";
   renderDock();
 }
 
@@ -1135,44 +1749,316 @@ function makeResizable(el, handle, id) {
 function openApp(id) {
   const app = appById(id);
   if (!app) return false;
+  if (!isSystemPanel(app)) {
+    return routeApp(app.id);
+  }
   createWindow(app);
   return true;
 }
 
 function renderWindowBody(app, body, id) {
   if (app.view === "dashboard") return renderDashboard(body);
+  if (app.view === "customer-path") return renderCustomerPath(body);
+  if (app.view === "offer-engine") return renderOfferEngine(body);
   if (app.view === "terminal") return renderTerminal(body);
+  if (app.view === "browser") return renderBrowser(body);
   if (app.view === "atlas") return renderAtlas(body);
   if (app.view === "commands") return renderCommands(body);
   if (app.kind === "external") return renderExternal(body, app);
-  return renderIframe(body, app, id);
+  return renderRouteHandoff(body, app, id);
 }
 
-function renderDashboard(body) {
-  body.innerHTML = `
-    <section class="panel-view">
-      <div class="panel-header">
-        <span class="system-label">system board</span>
-        <h2>0S command surface</h2>
-        <p>The launcher is wrapping the public 0S pages as movable desktop windows while keeping the repo command allowlist visible from the shell.</p>
-      </div>
-      <div class="dashboard-grid">
-        <article class="status-tile"><span class="system-label">apps mounted</span><strong>${APP_DEFS.length}</strong><p>Dock and atlas launch targets.</p></article>
-        <article class="status-tile"><span class="system-label">live surfaces</span><strong>${state.surfaces.length}</strong><p>Loaded from brain/live-surface-registry.json.</p></article>
-        <article class="status-tile"><span class="system-label">repo commands</span><strong>${state.commands.length}</strong><p>Snapshot from ops/0s-command-registry.json.</p></article>
-        <article class="status-tile"><span class="system-label">open windows</span><strong>${state.windows.size}</strong><p>Window manager active.</p></article>
-      </div>
-      <div class="app-grid">
-        ${APP_DEFS.slice(1, 13).map(app => appCard(app)).join("")}
-      </div>
-    </section>
+function actionButton(action) {
+  if (!action) return "";
+  if (action.launch) {
+    return `<button type="button" data-launch="${escapeAttr(action.launch)}">${escapeHtml(action.label || "Open")}</button>`;
+  }
+  if (action.route) {
+    return routeTargetButton(action.route, action.label || "Open");
+  }
+  if (action.command) {
+    return `<button type="button" data-command="${escapeAttr(action.command)}">${escapeHtml(action.label || "Run")}</button>`;
+  }
+  if (action.url) {
+    return `<button type="button" data-open-route="${escapeAttr(action.url)}">${escapeHtml(action.label || "Open")}</button>`;
+  }
+  return "";
+}
+
+function actionButtons(actions = []) {
+  const buttons = actions.map(actionButton).filter(Boolean).join("");
+  return buttons ? `<div class="row-actions">${buttons}</div>` : "";
+}
+
+function routeTargetButton(target, label = "Open") {
+  const app = appById(target);
+  if (app?.view) return `<button type="button" data-launch="${escapeAttr(app.id)}">${escapeHtml(label || app.name)}</button>`;
+  if (app?.url) return `<button type="button" data-route="${escapeAttr(app.id)}">${escapeHtml(label || app.name)}</button>`;
+  return `<button type="button" data-open-route="${escapeAttr(target)}">${escapeHtml(label)}</button>`;
+}
+
+function productAdCard(ad) {
+  const actions = actionButtons([
+    ad.launch ? { label: "Open", launch: ad.launch } : null,
+    ad.route ? { label: "Open", route: ad.route } : null,
+    ad.url ? { label: "Open", url: ad.url } : null
+  ].filter(Boolean));
+  return `
+    <article class="ad-card">
+      <span class="system-label">${escapeHtml(ad.slot)}</span>
+      <h3>${escapeHtml(ad.title)}</h3>
+      <p>${escapeHtml(ad.text)}</p>
+      ${actions}
+    </article>
   `;
-  body.querySelectorAll("[data-launch]").forEach(button => {
-    button.addEventListener("click", () => openApp(button.dataset.launch));
+}
+
+function customerStepCard(item) {
+  return `
+    <article class="journey-card">
+      <span>${escapeHtml(item.step)}</span>
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(item.text)}</p>
+      ${actionButtons(item.actions)}
+    </article>
+  `;
+}
+
+function freeStackCard(item) {
+  return `
+    <article class="stack-card">
+      <div class="row-head">
+        <span class="registry-pill">included</span>
+        <span class="command-pill">limit-aware</span>
+      </div>
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(item.included)}</p>
+      <small>${escapeHtml(item.limit)}</small>
+      ${actionButtons([{ label: "Open lane", route: item.route, launch: item.launch }])}
+    </article>
+  `;
+}
+
+function tierOptionCard(item) {
+  return `
+    <article class="tier-card">
+      <span class="registry-pill">${escapeHtml(item.price)}</span>
+      <h3>${escapeHtml(item.name)}</h3>
+      <p>${escapeHtml(item.text)}</p>
+      <ul>
+        ${item.includes.map(entry => `<li>${escapeHtml(entry)}</li>`).join("")}
+      </ul>
+    </article>
+  `;
+}
+
+function revenueLaneCard(lane) {
+  const actions = (lane.routes || []).slice(0, 4).map((target, index) => ({
+    label: index === 0 ? "Open lane" : "View",
+    route: target
+  }));
+  return `
+    <article class="lane-card">
+      <div class="row-head">
+        <span class="registry-pill">${escapeHtml(lane.badge)}</span>
+        <span class="command-pill">free -> upgrade</span>
+      </div>
+      <h3>${escapeHtml(lane.title)}</h3>
+      <dl>
+        <div><dt>Included</dt><dd>${escapeHtml(lane.free)}</dd></div>
+        <div><dt>Upgrade</dt><dd>${escapeHtml(lane.upgrade)}</dd></div>
+      </dl>
+      ${actionButtons(actions)}
+    </article>
+  `;
+}
+
+function adPlacementCard(placement) {
+  return `
+    <article class="ad-placement-card">
+      <span class="registry-pill">system ad slot</span>
+      <h3>${escapeHtml(placement.title)}</h3>
+      <p>${escapeHtml(placement.text)}</p>
+      ${actionButtons([placement.action])}
+    </article>
+  `;
+}
+
+function platformGroupCard(group) {
+  const apps = group.apps.map(id => appById(id)).filter(Boolean);
+  return `
+    <article class="platform-group-card">
+      <div class="row-head">
+        <span class="registry-pill">${apps.length} routes</span>
+        <span class="command-pill">sellable surface</span>
+      </div>
+      <h3>${escapeHtml(group.title)}</h3>
+      <p>${escapeHtml(group.text)}</p>
+      <div class="platform-link-grid">
+        ${apps.slice(0, 7).map(app => routeTargetButton(app.id, app.name)).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function metricCard(label, value, text) {
+  return `<article class="status-tile"><span class="system-label">${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></article>`;
+}
+
+function applyPanelReveal(root) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const targets = root.querySelectorAll(".launch-hero > *, .status-tile, .ad-card, .journey-card, .stack-card, .tier-card, .lane-card, .ad-placement-card, .platform-group-card, .browser-copy, .browser-shortcuts");
+  targets.forEach((el, i) => {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(18px)";
+    motionAnimate(el, { opacity: [0, 1], transform: ["translateY(18px)", "translateY(0)"] }, { duration: 0.6, delay: i * 0.08, ease: REVEAL_EASE });
   });
 }
 
+function renderCustomerPath(body) {
+  body.innerHTML = `
+    <section class="panel-view customer-path-view">
+      <div class="panel-header launch-hero">
+        <span class="system-label">customer launch path</span>
+        <h2>Start here, then let the 0S sell the next step.</h2>
+        <p>Use this lane when you walk into a business: show the landing experience, claim the workspace, activate team chat, hand over SkyeMail, open the CRM, and let the upgrade options appear only when they make sense.</p>
+        ${actionButtons([
+          { label: "Free Stack Pitch", route: "free-stack-pitch" },
+          { label: "Print Flyer", route: "free-stack-flyer" },
+          { label: "Open Offer Engine", launch: "offer-engine" },
+          { label: "Open 0S Browser", launch: "browser" },
+          { label: "Start Signup", route: "gate-signup" }
+        ])}
+      </div>
+      <div class="dashboard-grid">
+        ${metricCard("free promise", "6 lanes", "Landing, workspace, chat, mail, CRM, and backup posture.")}
+        ${metricCard("customer path", "1 flow", "Preview, claim, communicate, follow up, and upgrade.")}
+        ${metricCard("ad engine", String(PRODUCT_ADS.length), "The upsell lives beside useful actions instead of interrupting them.")}
+        ${metricCard("0S browser", "PWA", "Installable fullscreen shell for the owned app network.")}
+      </div>
+      <div class="journey-grid">
+        ${CUSTOMER_PATH_STEPS.map(customerStepCard).join("")}
+      </div>
+      <div class="panel-section-head">
+        <span class="system-label">offer rail</span>
+        <h3>What shows next without forcing a hard sell</h3>
+      </div>
+      <div class="ad-rail">
+        ${PRODUCT_ADS.map(productAdCard).join("")}
+      </div>
+      <div class="panel-section-head">
+        <span class="system-label">free stack</span>
+        <h3>What you can promise first</h3>
+      </div>
+      <div class="stack-grid">
+        ${FREE_STACK.map(freeStackCard).join("")}
+      </div>
+      <div class="panel-section-head">
+        <span class="system-label">upgrade shape</span>
+        <h3>Tier options without stale numbers</h3>
+      </div>
+      <div class="tier-grid">
+        ${TIER_OPTIONS.map(tierOptionCard).join("")}
+      </div>
+    </section>
+  `;
+  bindLauncherButtons(body);
+  applyPanelReveal(body);
+}
+
+function renderOfferEngine(body) {
+  body.innerHTML = `
+    <section class="panel-view offer-engine-view">
+      <div class="panel-header launch-hero">
+        <span class="system-label">0S ad and offer engine</span>
+        <h2>Products run through the launcher as useful next moves.</h2>
+        <p>This is the money map: every free lane has the upgrade sitting beside it, but the buyer sees the free value first. Use pricing later; use this now to keep the platform from feeling scattered.</p>
+      </div>
+      <div class="dashboard-grid">
+        ${metricCard("mounted apps", String(APP_DEFS.length), "Routes already inside the 0S browser.")}
+        ${metricCard("free stack", String(FREE_STACK.length), "Promise-first lanes that can open a relationship.")}
+        ${metricCard("offer lanes", String(REVENUE_LANES.length), "Natural upgrades grouped by buyer need.")}
+        ${metricCard("ad slots", String(AD_PLACEMENTS.length), "Where product offers surface across the shell.")}
+      </div>
+      <div class="ad-rail">
+        ${PRODUCT_ADS.map(productAdCard).join("")}
+      </div>
+      <div class="panel-section-head">
+        <span class="system-label">system placements</span>
+        <h3>Where the 0S sells without feeling like a pitch deck</h3>
+      </div>
+      <div class="placement-grid">
+        ${AD_PLACEMENTS.map(adPlacementCard).join("")}
+      </div>
+      <div class="registry-tools">
+        <input type="search" data-offer-search placeholder="Filter offers, platforms, ads, mail, CRM, commerce, music, or ops" autocomplete="off">
+        <button class="inline-action" type="button" data-route="free-stack-pitch">Free Stack Pitch</button>
+        <button class="inline-action" type="button" data-route="free-stack-flyer">Print Flyer</button>
+        <button class="inline-action" type="button" data-launch="customer-path">Start Here</button>
+        <button class="inline-action" type="button" data-launch="browser">0S Browser</button>
+      </div>
+      <div class="lane-grid" data-offer-list>
+        ${REVENUE_LANES.map(revenueLaneCard).join("")}
+      </div>
+      <div class="panel-section-head">
+        <span class="system-label">platform inventory</span>
+        <h3>Other sellable surfaces already inside the machine</h3>
+      </div>
+      <div class="platform-grid">
+        ${PLATFORM_GROUPS.map(platformGroupCard).join("")}
+      </div>
+    </section>
+  `;
+  const search = body.querySelector("[data-offer-search]");
+  const list = body.querySelector("[data-offer-list]");
+  const render = () => {
+    const query = search.value.trim().toLowerCase();
+    const lanes = REVENUE_LANES.filter(lane => matchText(query, lane.title, lane.badge, lane.free, lane.upgrade, lane.routes?.join(" ")));
+    list.innerHTML = lanes.map(revenueLaneCard).join("") || `<div class="empty-state">No offer lane matched.</div>`;
+    bindLauncherButtons(body);
+  };
+  search.addEventListener("input", render);
+  bindLauncherButtons(body);
+  applyPanelReveal(body);
+}
+
+function renderDashboard(body) {
+  const gateEmail = state.gate?.email || state.gate?.username || state.gate?.actor || "Not signed in";
+  const gateStatus = state.gate?.active ? "Active" : "Signup required";
+  body.innerHTML = `
+    <section class="panel-view">
+      <div class="panel-header launch-hero">
+        <span class="system-label">0S lobby</span>
+        <h2>One front door for customers, offers, and owned apps.</h2>
+        <p>Start with the guided customer path, use the 0S Browser to move through owned apps, and keep the offer engine nearby so free value can naturally turn into managed upgrades.</p>
+        ${actionButtons([
+          { label: "Free Stack Pitch", route: "free-stack-pitch" },
+          { label: "Start Customer Path", launch: "customer-path" },
+          { label: "Open Offer Engine", launch: "offer-engine" },
+          { label: "Open 0S Browser", launch: "browser" }
+        ])}
+      </div>
+      <div class="dashboard-grid">
+        ${metricCard("routes mounted", String(APP_DEFS.length), "Dock and atlas launch targets.")}
+        ${metricCard("live surfaces", String(state.surfaces.length), "Loaded from the live surface registry.")}
+        ${metricCard("repo commands", String(state.commands.length), "Safe operator command snapshot.")}
+        ${metricCard("open windows", String(state.windows.size), "Window manager active.")}
+        ${metricCard("gate identity", gateStatus, gateEmail)}
+      </div>
+      <div class="ad-rail">
+        ${PRODUCT_ADS.map(productAdCard).join("")}
+      </div>
+      <div class="app-grid">
+        ${APP_DEFS.filter(app => ["customer-path", "offer-engine", "browser", "free-stack-pitch", "free-stack-flyer", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified", "business-card-factory", "pricing", "marketing", "media", "content-forge", "skyecommerce", "atlas", "terminal"].includes(app.id)).map(app => appCard(app)).join("")}
+      </div>
+    </section>
+  `;
+  bindLauncherButtons(body);
+  applyPanelReveal(body);
+}
+
 function appCard(app) {
+  const isPanel = isSystemPanel(app);
   return `
     <article class="app-row">
       <div class="row-head">
@@ -1182,8 +2068,8 @@ function appCard(app) {
       <h3>${escapeHtml(app.name)}</h3>
       <p>${escapeHtml(app.summary || "")}</p>
       <div class="row-actions">
-        <button type="button" data-launch="${app.id}">Open</button>
-        ${app.url ? `<button type="button" data-eject="${app.id}">Tab</button>` : ""}
+        <button type="button" data-launch="${app.id}">${isPanel ? "Open Panel" : "Enter Route"}</button>
+        ${app.url ? `<button type="button" data-route="${escapeAttr(app.id)}">Full Tab</button>` : ""}
       </div>
     </article>
   `;
@@ -1195,10 +2081,11 @@ function renderAtlas(body) {
       <div class="panel-header">
         <span class="system-label">surface atlas</span>
         <h2>Apps and live routes</h2>
-        <p>Open every mounted 0S app, platform, and subplatform in windows or search the live registry for routed proof surfaces.</p>
+        <p>Every mounted app, platform, and subplatform enters as a full top-level 0S route. System panels stay in launcher windows.</p>
       </div>
       <div class="registry-tools">
         <input type="search" data-atlas-search placeholder="Filter apps and surfaces" autocomplete="off">
+        <button class="inline-action" type="button" data-launch="browser">Browser</button>
         <button class="inline-action" type="button" data-launch="terminal">Terminal</button>
         <button class="inline-action" type="button" data-command="tile">Tile</button>
       </div>
@@ -1233,8 +2120,7 @@ function surfaceCard(surface) {
       <h3>${escapeHtml(surface.name || surface.id)}</h3>
       <p>${escapeHtml(surface.purpose || surface.sales_use || "")}</p>
       <div class="row-actions">
-        <button type="button" data-surface="${escapeAttr(surface.id)}">Open</button>
-        ${surface.url ? `<button type="button" data-surface-tab="${escapeAttr(surface.id)}">Tab</button>` : ""}
+        <button type="button" data-surface="${escapeAttr(surface.id)}">Enter Surface</button>
       </div>
     </article>
   `;
@@ -1285,6 +2171,71 @@ function commandCard(command) {
   `;
 }
 
+function renderBrowser(body) {
+  const routeApps = APP_DEFS.filter(app => app.url);
+  const priorityRoutes = ["customer-path", "offer-engine", "free-stack-pitch", "free-stack-flyer", "pricing", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified", "business-card-factory", "skyecommerce", "marketing", "music", "routex", "founder-command"];
+  body.innerHTML = `
+    <section class="browser-view">
+      <form class="browser-bar" data-browser-form>
+        <label for="browserInput">0S://</label>
+        <input id="browserInput" name="route" autocomplete="off" spellcheck="false" placeholder="Type an app, route, or URL">
+        <button type="submit">Go</button>
+      </form>
+      <div class="browser-home">
+        <div class="browser-copy">
+          <span class="system-label">0S Browser</span>
+          <h2>Your own fullscreen app browser.</h2>
+          <p>This is the practical Chrome-like lane now: a branded shell for owned apps, customer workspaces, offer routes, and public/private surfaces. A native desktop browser can come later; the money move is making this installable and obvious first.</p>
+          ${actionButtons([
+            { label: "Free Stack Pitch", route: "free-stack-pitch" },
+            { label: "Start Here", launch: "customer-path" },
+            { label: "Offer Engine", launch: "offer-engine" },
+            { label: "Surface Atlas", launch: "atlas" },
+            { label: "Install / Fullscreen", command: "install" }
+          ])}
+        </div>
+        <div class="browser-shortcuts">
+          ${priorityRoutes.map(target => routeTargetButton(target, appById(target)?.name || "Open")).join("")}
+        </div>
+      </div>
+      <div class="ad-rail browser-ad-rail">
+        ${PRODUCT_ADS.map(productAdCard).join("")}
+      </div>
+      <div class="platform-grid browser-platform-grid">
+        ${PLATFORM_GROUPS.slice(0, 3).map(platformGroupCard).join("")}
+      </div>
+      <div class="browser-grid">
+        ${routeApps.slice(0, 36).map(routeCard).join("")}
+      </div>
+    </section>
+  `;
+  const form = body.querySelector("[data-browser-form]");
+  const input = body.querySelector("input");
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    if (!launchRoute(input.value)) writeTerminal(`Could not resolve route: ${input.value}`, "error");
+  });
+  bindLauncherButtons(body);
+  applyPanelReveal(body);
+  setTimeout(() => input.focus(), 80);
+}
+
+function routeCard(app) {
+  return `
+    <article class="app-row browser-route">
+      <div class="row-head">
+        <span class="window-icon" aria-hidden="true">${app.icon}</span>
+        <span class="registry-pill">${escapeHtml(app.kind)}</span>
+      </div>
+      <h3>${escapeHtml(app.name)}</h3>
+      <p>${escapeHtml(app.url || "")}</p>
+      <div class="row-actions">
+        <button type="button" data-route="${escapeAttr(app.id)}">Enter Route</button>
+      </div>
+    </article>
+  `;
+}
+
 function renderTerminal(body) {
   if (!state.terminalLines.length) {
     writeTerminal("MetrAIyux 0S shell online.", "muted");
@@ -1330,18 +2281,16 @@ function writeTerminal(text, kind = "") {
   if (state.terminalLines.length > 300) state.terminalLines.splice(0, state.terminalLines.length - 300);
 }
 
-function renderIframe(body, app, id) {
-  const src = app.url;
+function renderRouteHandoff(body, app) {
+  const src = app.url || "";
   body.innerHTML = `
-    <section class="iframe-shell">
-      <div class="iframe-toolbar">
-        <code>${escapeHtml(src)}</code>
-        <div class="row-actions">
-          <button type="button" data-reload="${escapeAttr(id)}">Reload</button>
-          <button type="button" data-open-tab="${escapeAttr(src)}">Tab</button>
-        </div>
+    <section class="route-handoff">
+      <span class="window-icon" aria-hidden="true">${escapeHtml(app.icon || "0S")}</span>
+      <h2>${escapeHtml(app.name)}</h2>
+      <p>${escapeHtml(src)}</p>
+      <div class="row-actions">
+        <button class="inline-action" type="button" data-open-route="${escapeAttr(src)}">Enter Route</button>
       </div>
-      <iframe title="${escapeAttr(app.name)}" src="${escapeAttr(src)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </section>
   `;
   bindLauncherButtons(body);
@@ -1354,7 +2303,7 @@ function renderExternal(body, app) {
       <h2>${escapeHtml(app.name)}</h2>
       <p>${escapeHtml(app.summary || "This surface lives outside the static 0S folder.")}</p>
       <div class="row-actions">
-        <button class="inline-action" type="button" data-open-tab="${escapeAttr(app.url)}">Open Live Surface</button>
+        <button class="inline-action" type="button" data-open-route="${escapeAttr(app.url)}">Enter Route</button>
       </div>
     </section>
   `;
@@ -1366,16 +2315,16 @@ function bindLauncherButtons(root = document) {
     button.addEventListener("click", () => openApp(button.dataset.launch));
   });
   root.querySelectorAll("[data-eject]").forEach(button => {
-    button.addEventListener("click", () => ejectApp(button.dataset.eject));
+    button.addEventListener("click", () => routeApp(button.dataset.eject));
+  });
+  root.querySelectorAll("[data-route]").forEach(button => {
+    button.addEventListener("click", () => launchRoute(button.dataset.route));
   });
   root.querySelectorAll("[data-command]").forEach(button => {
     button.addEventListener("click", () => runShellCommand(button.dataset.command));
   });
   root.querySelectorAll("[data-surface]").forEach(button => {
     button.addEventListener("click", () => openSurface(button.dataset.surface));
-  });
-  root.querySelectorAll("[data-surface-tab]").forEach(button => {
-    button.addEventListener("click", () => openSurface(button.dataset.surfaceTab, { tab: true }));
   });
   root.querySelectorAll("[data-cmd-detail]").forEach(button => {
     button.addEventListener("click", () => {
@@ -1391,8 +2340,8 @@ function bindLauncherButtons(root = document) {
       rerenderTerminalIfOpen();
     });
   });
-  root.querySelectorAll("[data-open-tab]").forEach(button => {
-    button.addEventListener("click", () => window.open(button.dataset.openTab, "_blank", "noopener"));
+  root.querySelectorAll("[data-open-route]").forEach(button => {
+    button.addEventListener("click", () => launchRoute(button.dataset.openRoute));
   });
   root.querySelectorAll("[data-reload]").forEach(button => {
     button.addEventListener("click", () => reloadWindow(button.dataset.reload));
@@ -1407,16 +2356,12 @@ function rerenderTerminalIfOpen() {
 function reloadWindow(id) {
   const record = state.windows.get(id);
   if (!record) return false;
-  const iframe = record.body.querySelector("iframe");
-  if (iframe) iframe.src = iframe.src;
+  renderWindowBody(record.app, record.body, id);
   return true;
 }
 
 function ejectApp(id) {
-  const app = appById(id);
-  if (!app || !app.url) return false;
-  window.open(app.url, "_blank", "noopener");
-  return true;
+  return routeApp(id);
 }
 
 function openSurface(id, options = {}) {
@@ -1424,20 +2369,7 @@ function openSurface(id, options = {}) {
   if (!surface) return false;
   const url = surfaceLocalUrl(surface) || surface.url;
   if (!url) return false;
-  if (options.tab || isExternalUrl(url)) {
-    window.open(url, "_blank", "noopener");
-    return true;
-  }
-  createWindow({
-    id: `surface-${safeId(surface.id)}`,
-    name: surface.name || surface.id,
-    icon: "SF",
-    kind: surface.privacy || "surface",
-    summary: surface.purpose || surface.sales_use || "",
-    url,
-    size: [1020, 680]
-  }, { id: `surface-${safeId(surface.id)}` });
-  return true;
+  return launchRoute(url, options);
 }
 
 function surfaceLocalUrl(surface) {
@@ -1446,10 +2378,6 @@ function surfaceLocalUrl(surface) {
   if (index === -1) return "";
   const relative = localPath.slice(index + SITE_ROOT.length).replace(/^\/+/, "");
   return `../${relative}`;
-}
-
-function isExternalUrl(url) {
-  return /^https?:\/\//i.test(url);
 }
 
 function runShellCommand(input) {
@@ -1463,6 +2391,13 @@ function runShellCommand(input) {
     case "help":
       writeTerminal(SHELL_COMMANDS.map(([name, desc]) => `${name.padEnd(18)} ${desc}`).join("\n"));
       break;
+    case "start":
+      openApp("customer-path");
+      break;
+    case "offers":
+    case "ads":
+      openApp("offer-engine");
+      break;
     case "apps":
       writeTerminal(APP_DEFS.map(app => `${app.id.padEnd(12)} ${app.name} - ${app.summary}`).join("\n"));
       break;
@@ -1470,12 +2405,21 @@ function runShellCommand(input) {
     case "launch":
       if (!openApp(arg)) writeTerminal(`Unknown app: ${arg}`, "error");
       break;
+    case "browser":
+      if (arg) {
+        if (!launchRoute(arg)) writeTerminal(`Could not resolve route: ${arg}`, "error");
+      } else {
+        openApp("browser");
+      }
+      break;
+    case "route":
+    case "go":
+      if (!arg) writeTerminal(`${command} requires an app id, URL, or relative path.`, "error");
+      else if (!launchRoute(arg)) writeTerminal(`Could not resolve route: ${arg}`, "error");
+      break;
     case "wrap":
       if (!arg) writeTerminal("wrap requires a URL or relative path.", "error");
-      else {
-        const wrapId = `wrap-${Date.now()}`;
-        createWindow({ id: wrapId, name: "Wrapped Surface", icon: "WR", kind: "wrapped", url: arg, size: [940, 620] }, { id: wrapId });
-      }
+      else if (!launchRoute(arg)) writeTerminal(`Could not resolve route: ${arg}`, "error");
       break;
     case "eject":
       if (!ejectApp(arg)) writeTerminal(`No tab URL for app: ${arg}`, "error");
@@ -1512,6 +2456,9 @@ function runShellCommand(input) {
       break;
     case "copy":
       copyRunner(arg);
+      break;
+    case "install":
+      installOsBrowser();
       break;
     case "fullscreen":
       requestFullscreen();
@@ -1622,17 +2569,20 @@ function tileWindows() {
   if (records.at(-1)) focusWindow(records.at(-1).id);
 }
 
-async function requestFullscreen() {
+async function requestFullscreen(options = {}) {
+  const silent = Boolean(options.silent);
   try {
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen();
-      writeTerminal("Fullscreen engaged.");
+      if (!silent) writeTerminal("Fullscreen engaged.");
+    } else if (silent || options.enterOnly) {
+      return;
     } else {
       await document.exitFullscreen();
-      writeTerminal("Fullscreen released.");
+      if (!silent) writeTerminal("Fullscreen released.");
     }
   } catch (error) {
-    writeTerminal(`Fullscreen blocked: ${error.message}`, "error");
+    if (!silent) writeTerminal(`Fullscreen blocked: ${error.message}`, "error");
   }
 }
 
@@ -1755,9 +2705,10 @@ async function loadRegistries() {
 
 async function bootMotionRuntime() {
   try {
-    motionAnimate(".boot-panel", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0)"] }, { duration: .55, ease: "cubic-bezier(.16, 1, .3, 1)" });
-    motionAnimate(".dock button", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0)"] }, { delay: .08, duration: .38 });
-    framerAnimate(".os-brand-logo", { opacity: [0, 1], scale: [.96, 1] }, { duration: .5, ease: [.16, 1, .3, 1] });
+    motionAnimate(".boot-panel", { opacity: [0, 1], transform: ["translateY(12px)", "translateY(0)"] }, { duration: 0.6, ease: REVEAL_EASE });
+    motionAnimate(".boot-metrics button", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0)"] }, { delay: 0.08, duration: 0.5, ease: REVEAL_EASE });
+    motionAnimate(".dock button", { opacity: [0, 1], transform: ["translateY(10px)", "translateY(0)"] }, { delay: 0.16, duration: 0.5, ease: REVEAL_EASE });
+    framerAnimate(".os-brand-logo", { opacity: [0, 1], scale: [.96, 1] }, { duration: 0.6, ease: [0.16, 1, 0.3, 1] });
     document.documentElement.dataset.motionRuntime = "motion+framer-motion";
     window.__metraiyuxOsMotionRuntime = { motion: true, framerMotion: true, loaded: true };
     qs("#motionStatus").textContent = "motion: active";
@@ -1851,8 +2802,98 @@ function bootLivingField() {
   requestAnimationFrame(frame);
 }
 
+function currentSoundtrackTrack() {
+  return SOUNDTRACK[state.soundtrackIndex] || SOUNDTRACK[0];
+}
+
+function updateSoundtrackUi(statusText = "") {
+  const track = currentSoundtrackTrack();
+  const dockEl = qs("#soundtrackDock");
+  const title = qs("#soundtrackTitle");
+  const status = qs("#soundtrackStatus");
+  const playButton = qs("#soundtrackPlayButton span");
+  if (dockEl) dockEl.classList.toggle("is-playing", state.soundtrackPlaying);
+  if (title) title.textContent = track?.title || "0S Soundtrack";
+  if (status) status.textContent = statusText || `${track?.artist || "Gray Skyes"} / ${state.soundtrackIndex + 1} of ${SOUNDTRACK.length}`;
+  if (playButton) playButton.textContent = state.soundtrackPlaying ? "||" : ">";
+}
+
+function loadSoundtrackTrack(index = state.soundtrackIndex) {
+  const audio = qs("#soundtrackAudio");
+  if (!audio || !SOUNDTRACK.length) return null;
+  state.soundtrackIndex = (index + SOUNDTRACK.length) % SOUNDTRACK.length;
+  const track = currentSoundtrackTrack();
+  audio.src = track.src;
+  audio.load();
+  updateSoundtrackUi();
+  return track;
+}
+
+async function playSoundtrack(options = {}) {
+  const audio = qs("#soundtrackAudio");
+  if (!audio) return false;
+  if (!audio.getAttribute("src")) loadSoundtrackTrack();
+  audio.volume = 0.28;
+  audio.loop = false;
+  try {
+    await audio.play();
+    state.soundtrackPlaying = true;
+    updateSoundtrackUi("background music live");
+    return true;
+  } catch {
+    state.soundtrackPlaying = false;
+    updateSoundtrackUi(options.silentFailure ? "soundtrack ready" : "tap play");
+    return false;
+  }
+}
+
+function pauseSoundtrack() {
+  const audio = qs("#soundtrackAudio");
+  if (!audio) return;
+  audio.pause();
+  state.soundtrackPlaying = false;
+  updateSoundtrackUi("paused");
+}
+
+function nextSoundtrack(options = {}) {
+  const shouldPlay = state.soundtrackPlaying || options.auto;
+  loadSoundtrackTrack(state.soundtrackIndex + 1);
+  if (shouldPlay) playSoundtrack({ silentFailure: options.auto });
+}
+
+function previousSoundtrack() {
+  const audio = qs("#soundtrackAudio");
+  const restartCurrent = audio && audio.currentTime > 4;
+  loadSoundtrackTrack(state.soundtrackIndex + (restartCurrent ? 0 : -1));
+  if (state.soundtrackPlaying) playSoundtrack();
+}
+
+function mountSoundtrack() {
+  const audio = qs("#soundtrackAudio");
+  if (!audio) return;
+  loadSoundtrackTrack(0);
+  qs("#soundtrackPlayButton")?.addEventListener("click", () => {
+    if (state.soundtrackPlaying) pauseSoundtrack();
+    else playSoundtrack();
+  });
+  qs("#soundtrackNextButton")?.addEventListener("click", () => nextSoundtrack());
+  qs("#soundtrackPrevButton")?.addEventListener("click", previousSoundtrack);
+  audio.addEventListener("ended", () => nextSoundtrack({ auto: true }));
+  audio.addEventListener("play", () => {
+    state.soundtrackPlaying = true;
+    updateSoundtrackUi("background music live");
+  });
+  audio.addEventListener("pause", () => {
+    if (!audio.ended) {
+      state.soundtrackPlaying = false;
+      updateSoundtrackUi("paused");
+    }
+  });
+}
+
 function bindGlobalEvents() {
   qs("#paletteButton").addEventListener("click", openPalette);
+  qs("#installOsButton")?.addEventListener("click", installOsBrowser);
   qs("#fullscreenButton").addEventListener("click", requestFullscreen);
   qs("#tileButton").addEventListener("click", tileWindows);
   qs("#bootPanel").addEventListener("click", event => {
@@ -1880,24 +2921,551 @@ function bindGlobalEvents() {
   window.addEventListener("resize", () => {
     updateSystemStatus();
   }, { passive: true });
+  window.addEventListener("hashchange", () => {
+    const panel = panelFromHash();
+    if (panel) openApp(panel);
+  });
+}
+
+function waitForLauncherEntry() {
+  if (!entryScene || !entryButton) {
+    document.body.classList.remove("launcher-entry-active");
+    document.body.classList.add("os-entered");
+    return Promise.resolve();
+  }
+
+  return new Promise(resolve => {
+    const enter = () => {
+      playSoundtrack({ silentFailure: true });
+      entryScene.classList.add("is-teleporting");
+      document.body.classList.add("os-entering");
+      requestFullscreen({ silent: true, enterOnly: true });
+      window.setTimeout(() => {
+        document.body.classList.remove("launcher-entry-active", "os-entering");
+        document.body.classList.add("os-entered");
+        entryScene.hidden = true;
+        resolve();
+      }, 720);
+    };
+    entryButton.addEventListener("click", enter, { once: true });
+  });
+}
+
+function osReturnPath() {
+  const path = `${location.pathname || "/0s/"}${location.search || ""}${location.hash || ""}`;
+  return path.startsWith("/0s") ? path : "/0s/";
+}
+
+function ownerLoginUrl() {
+  try {
+    const url = new URL("/admin/login.html", location.origin);
+    url.searchParams.set("return", osReturnPath());
+    return url.toString();
+  } catch {
+    return `/admin/login.html?return=${encodeURIComponent("/0s/")}`;
+  }
+}
+
+function gateSignupUrl() {
+  try {
+    const url = new URL("/gate/signup/", location.origin);
+    url.searchParams.set("return", osReturnPath());
+    return url.toString();
+  } catch {
+    return "../gate/signup/?return=/0s/";
+  }
+}
+
+function normalizeOwnerGatePayload(data = {}) {
+  const token = data.gateToken || data.gateBearerToken || data.token || "";
+  const email = data.user?.email || data.email || data.username || data.owner?.email || "";
+  const role = data.user?.role || data.role || (data.owner ? "owner" : "admin");
+  const workspace = data.workspace?.slug || data.workspace?.id || data.workspace || "metraiyux-0s";
+  const scope = data.scope || (Array.isArray(data.scopes) ? data.scopes.join(" ") : "admin.read admin.write 0s.owner");
+  return {
+    ok: true,
+    active: true,
+    authenticated: true,
+    owner: Boolean(data.owner ?? true),
+    source: data.source || data.via || "owner-admin-session",
+    email,
+    username: email,
+    role,
+    scope,
+    scopes: Array.isArray(data.scopes) ? data.scopes : scope.split(/\s+/).filter(Boolean),
+    workspace,
+    token
+  };
+}
+
+async function resolveOwnerAdminGate(bridge) {
+  const response = await fetch("/api/owner/admin-session", {
+    method: "GET",
+    credentials: "include",
+    headers: { "accept": "application/json" }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.authenticated) return null;
+  const normalized = normalizeOwnerGatePayload(data);
+  if (normalized.token && bridge?.persist) {
+    bridge.persist({
+      token: normalized.token,
+      email: normalized.email,
+      role: normalized.role,
+      workspace_id: normalized.workspace,
+      source: "owner-admin-session",
+      platform_id: "metraiyux-0s",
+      usage_lane: "0s-browser"
+    }, { silent: true });
+  }
+  return normalized;
+}
+
+async function resolveLauncherGate() {
+  const bridge = window.MetrAIyuxGateBridge || window.METRAIYUX_GATE_BRIDGE || null;
+  const session = bridge?.current?.();
+  const headers = bridge?.headers?.({ "content-type": "application/json" }) || { "content-type": "application/json" };
+  try {
+    const response = await fetch("/api/skygate/auth-introspect", {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: JSON.stringify(session?.token ? { token: session.token } : {})
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && data.active) {
+      state.gate = data;
+      if (session && bridge?.persist) bridge.persist(session, { silent: true });
+      return true;
+    }
+    const ownerGate = await resolveOwnerAdminGate(bridge);
+    if (ownerGate) {
+      state.gate = ownerGate;
+      return true;
+    }
+    location.replace(ownerLoginUrl());
+    return false;
+  } catch {
+    try {
+      const ownerGate = await resolveOwnerAdminGate(bridge);
+      if (ownerGate) {
+        state.gate = ownerGate;
+        return true;
+      }
+    } catch {}
+    if (session?.token) {
+      state.gate = { active: true, email: session.email || session.actor || "", source: session.source || "local-gate-session" };
+      return true;
+    }
+    location.replace(ownerLoginUrl());
+    return false;
+  }
 }
 
 async function init() {
+  const gateReady = await resolveLauncherGate();
+  if (!gateReady) return;
+  updateInstallButton();
   updateClock();
   setInterval(updateClock, 15000);
   renderDock();
   bindGlobalEvents();
+  mountSoundtrack();
   bootLivingField();
   await loadRegistries();
   await bootMotionRuntime();
-  openApp("command");
-  openApp("terminal");
-  const terminal = state.windows.get("terminal");
-  if (terminal) {
-    terminal.el.style.left = "58px";
-    terminal.el.style.top = "318px";
+  await waitForLauncherEntry();
+  const firstPanel = panelFromHash() || "customer-path";
+  openApp(firstPanel);
+  const compactBoot = window.matchMedia("(max-width: 680px)").matches;
+  const firstWindow = state.windows.get(firstPanel);
+  if (firstWindow && !compactBoot) {
+    firstWindow.el.style.left = "30px";
+    firstWindow.el.style.top = "138px";
+  }
+  if (!compactBoot) {
+    openApp("browser");
+    const browser = state.windows.get("browser");
+    if (browser) {
+      browser.el.style.left = "calc(100% - min(520px, 42vw) - 32px)";
+      browser.el.style.top = "170px";
+      browser.el.style.width = "min(520px, 42vw)";
+    }
   }
   updateSystemStatus();
 }
 
 init();
+
+// BEGIN quantumskyes:adaptive-neon-scrollbar-js
+(function(){
+  if(window.__mcpVisibleNeonScrollbars) return;
+  window.__mcpVisibleNeonScrollbars = true;
+
+  function onReady(fn){
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    }else{
+      fn();
+    }
+  }
+
+  function clamp(value, min, max){
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function verticalSource(){
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function horizontalSource(){
+    const doc = document.scrollingElement || document.documentElement;
+    if(doc.scrollWidth > doc.clientWidth + 4) return { node: doc, mode: 'horizontal' };
+    const selectors = [
+      '.site-header nav',
+      '.table-wrap',
+      '.topnav',
+      '.route-grid',
+      '.command-table',
+      '.saas-table'
+    ];
+    const node = selectors
+      .flatMap((selector) => [...document.querySelectorAll(selector)])
+      .find((element) => element.scrollWidth > element.clientWidth + 4);
+    return node ? { node, mode: 'horizontal' } : { node: doc, mode: 'page' };
+  }
+
+  onReady(() => {
+    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
+    document.querySelectorAll('.mcp-neon-scroll-rail,.mcp-neon-scroll-corner').forEach((node) => node.remove());
+
+    const yRail = document.createElement('div');
+    yRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-y';
+    yRail.setAttribute('aria-hidden', 'true');
+    yRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const xRail = document.createElement('div');
+    xRail.className = 'mcp-neon-scroll-rail mcp-neon-scroll-rail-x';
+    xRail.setAttribute('aria-hidden', 'true');
+    xRail.innerHTML = '<i class="mcp-neon-scroll-thumb"></i>';
+
+    const corner = document.createElement('div');
+    corner.className = 'mcp-neon-scroll-corner';
+    corner.setAttribute('aria-hidden', 'true');
+
+    document.body.append(yRail, xRail, corner);
+
+    const yThumb = yRail.querySelector('.mcp-neon-scroll-thumb');
+    const xThumb = xRail.querySelector('.mcp-neon-scroll-thumb');
+    let activeHorizontal = horizontalSource();
+    let raf = 0;
+    let dragRaf = 0;
+    let pendingDrag = null;
+    let metrics = null;
+
+    function measure(){
+      const ySource = verticalSource();
+      const yTrack = Math.max(1, yRail.clientHeight);
+      const yMax = Math.max(1, ySource.scrollHeight - window.innerHeight);
+      const yRatio = clamp(window.scrollY / yMax, 0, 1);
+      const ySize = clamp((window.innerHeight / Math.max(ySource.scrollHeight, window.innerHeight)) * yTrack, 78, yTrack);
+
+      if(!activeHorizontal?.node || !document.documentElement.contains(activeHorizontal.node)){
+        activeHorizontal = horizontalSource();
+      }
+      const xTrack = Math.max(1, xRail.clientWidth);
+      const xSource = activeHorizontal.node;
+      const xMax = Math.max(0, xSource.scrollWidth - xSource.clientWidth);
+      const pageMode = activeHorizontal.mode === 'page' || xMax <= 1;
+      const xRatio = pageMode ? yRatio : clamp(xSource.scrollLeft / xMax, 0, 1);
+      const xSize = pageMode
+        ? clamp(xTrack * .24, 84, Math.max(84, xTrack * .38))
+        : clamp((xSource.clientWidth / Math.max(xSource.scrollWidth, xSource.clientWidth)) * xTrack, 84, xTrack);
+
+      return { ySource, yTrack, yMax, yRatio, ySize, xSource, xTrack, xMax, xRatio, xSize, pageMode };
+    }
+
+    function paintRails(view){
+      yThumb.style.height = `${Math.floor(view.ySize)}px`;
+      yRail.style.setProperty('--mcp-scroll-y', `${Math.round(view.yRatio * Math.max(0, view.yTrack - view.ySize))}px`);
+      xThumb.style.width = `${Math.floor(view.xSize)}px`;
+      xRail.style.setProperty('--mcp-scroll-x', `${Math.round(view.xRatio * Math.max(0, view.xTrack - view.xSize))}px`);
+      xRail.dataset.scrollMode = view.pageMode ? 'page' : 'horizontal';
+    }
+
+    function scheduleUpdate(){
+      if(raf) return;
+      raf = window.requestAnimationFrame(updateRails);
+    }
+
+    function updateRails(){
+      raf = 0;
+      metrics = measure();
+      paintRails(metrics);
+    }
+
+    function flushDrag(){
+      dragRaf = 0;
+      if(!pendingDrag) return;
+      const { axis, ratio, snapshot } = pendingDrag;
+      pendingDrag = null;
+      const next = snapshot || measure();
+      const bounded = clamp(ratio, 0, 1);
+
+      if(axis === 'y'){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: next.pageMode ? yRatio : next.xRatio
+        });
+      }else if(next.pageMode){
+        next.ySource.scrollTop = bounded * next.yMax;
+        const yRatio = clamp(next.ySource.scrollTop / Math.max(1, next.yMax), 0, 1);
+        paintRails({
+          ...next,
+          yRatio,
+          xRatio: yRatio
+        });
+      }else{
+        next.xSource.scrollLeft = bounded * next.xMax;
+        paintRails({
+          ...next,
+          xRatio: clamp(next.xSource.scrollLeft / Math.max(1, next.xMax), 0, 1)
+        });
+      }
+      scheduleUpdate();
+    }
+
+    function queueDrag(axis, ratio, snapshot){
+      pendingDrag = { axis, ratio, snapshot };
+      if(!dragRaf) dragRaf = window.requestAnimationFrame(flushDrag);
+    }
+
+    function bindRail(rail, thumb, axis, setter){
+      let dragging = false;
+      let pointerOffset = 0;
+      let dragSnapshot = null;
+      let railStart = 0;
+      let track = 1;
+      let size = 1;
+
+      function ratioFromEvent(event, keepOffset){
+        const coordinate = axis === 'y' ? event.clientY : event.clientX;
+        const localOffset = keepOffset ? pointerOffset : size / 2;
+        return clamp((coordinate - railStart - localOffset) / Math.max(1, track - size), 0, 1);
+      }
+
+      rail.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        dragSnapshot = measure();
+        const railRect = rail.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        railStart = axis === 'y' ? railRect.top : railRect.left;
+        track = axis === 'y' ? dragSnapshot.yTrack : dragSnapshot.xTrack;
+        size = axis === 'y' ? dragSnapshot.ySize : dragSnapshot.xSize;
+        document.documentElement.classList.add('mcp-neon-scroll-dragging');
+        rail.classList.add('is-dragging');
+        rail.setPointerCapture?.(event.pointerId);
+        pointerOffset = event.target === thumb || thumb.contains(event.target)
+          ? (axis === 'y' ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
+          : (axis === 'y' ? thumbRect.height / 2 : thumbRect.width / 2);
+        setter(ratioFromEvent(event, event.target === thumb || thumb.contains(event.target)), dragSnapshot);
+      });
+
+      rail.addEventListener('pointermove', (event) => {
+        if(!dragging) return;
+        event.preventDefault();
+        setter(ratioFromEvent(event, true), dragSnapshot);
+      });
+
+      function endDrag(event){
+        if(!dragging) return;
+        dragging = false;
+        dragSnapshot = null;
+        document.documentElement.classList.remove('mcp-neon-scroll-dragging');
+        rail.classList.remove('is-dragging');
+        rail.releasePointerCapture?.(event.pointerId);
+        scheduleUpdate();
+      }
+
+      rail.addEventListener('pointerup', endDrag);
+      rail.addEventListener('pointercancel', endDrag);
+    }
+
+    bindRail(yRail, yThumb, 'y', (ratio, snapshot) => queueDrag('y', ratio, snapshot));
+    bindRail(xRail, xThumb, 'x', (ratio, snapshot) => queueDrag('x', ratio, snapshot));
+
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', () => {
+      activeHorizontal = horizontalSource();
+      scheduleUpdate();
+    }, { passive: true });
+    document.addEventListener('scroll', (event) => {
+      if(event.target && event.target === activeHorizontal.node) scheduleUpdate();
+    }, true);
+    document.addEventListener('pointerover', (event) => {
+      const candidate = event.target && event.target.closest && event.target.closest('.site-header nav,.table-wrap,.topnav,.route-grid');
+      if(candidate && candidate.scrollWidth > candidate.clientWidth + 4){
+        activeHorizontal = { node: candidate, mode: 'horizontal' };
+        scheduleUpdate();
+      }
+    }, { passive: true });
+
+    scheduleUpdate();
+    window.setTimeout(scheduleUpdate, 350);
+    window.setTimeout(scheduleUpdate, 1200);
+  });
+})();
+// END quantumskyes:adaptive-neon-scrollbar-js
+
+// BEGIN quantumskyes:skyesol-living-background-js
+function mountSkyeSolLivingBackground({
+  canvasSelector = '.skyesol-living-field',
+  particleDensity = 16000,
+  maxParticles = 120,
+  minParticles = 58
+} = {}) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.querySelector(canvasSelector);
+  if (!canvas || !canvas.getContext || reduceMotion) return () => {};
+
+  const ctx = canvas.getContext('2d');
+  const palette = [
+    'rgba(201,168,76,',
+    'rgba(138,99,255,',
+    'rgba(39,242,255,'
+  ];
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let raf = 0;
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * ratio);
+    canvas.height = Math.floor(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(maxParticles, Math.max(minParticles, Math.floor(width * height / particleDensity)));
+    particles = Array.from({ length: count }, (_, index) => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 1.8 + .4,
+      a: Math.random() * .34 + .12,
+      s: Math.random() * .34 + .08,
+      phase: Math.random() * Math.PI * 2,
+      color: palette[index % palette.length]
+    }));
+  }
+
+  function drawWave(time, yOffset, colorA, colorB, amp, speed) {
+    const gradient = ctx.createLinearGradient(0, yOffset - amp * 2, width, yOffset + amp * 2);
+    gradient.addColorStop(0, colorA);
+    gradient.addColorStop(.5, colorB);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    for (let x = 0; x <= width; x += 18) {
+      const n = Math.sin((x * .006) + time * speed) * amp;
+      const n2 = Math.cos((x * .011) - time * speed * .7) * amp * .46;
+      ctx.lineTo(x, yOffset + n + n2);
+    }
+    ctx.lineTo(width, height);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  function animate(now) {
+    if (document.body.classList.contains('motion-paused')) {
+      raf = requestAnimationFrame(animate);
+      return;
+    }
+    const t = now * .001;
+    pointer.x += (pointer.tx - pointer.x) * .035;
+    pointer.y += (pointer.ty - pointer.y) * .035;
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'screen';
+    drawWave(t, height * .28 + pointer.y * 12, 'rgba(138,99,255,0)', 'rgba(138,99,255,.10)', 36, .34);
+    drawWave(t, height * .54 - pointer.y * 10, 'rgba(39,242,255,0)', 'rgba(39,242,255,.08)', 42, .24);
+    drawWave(t, height * .82, 'rgba(201,168,76,0)', 'rgba(201,168,76,.07)', 28, .28);
+    particles.forEach((particle) => {
+      const px = particle.x + Math.sin(t * particle.s + particle.phase) * 28 + pointer.x * 10;
+      const py = particle.y + Math.cos(t * particle.s * .8 + particle.phase) * 18 + pointer.y * 8;
+      ctx.beginPath();
+      ctx.arc(px, py, particle.r, 0, Math.PI * 2);
+      ctx.fillStyle = `${particle.color}${particle.a})`;
+      ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    raf = requestAnimationFrame(animate);
+  }
+
+  function onPointerMove(event) {
+    pointer.tx = (event.clientX / Math.max(width, 1) - .5) * 2;
+    pointer.ty = (event.clientY / Math.max(height, 1) - .5) * 2;
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', onPointerMove, { passive: true });
+  raf = requestAnimationFrame(animate);
+
+  return () => {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('mousemove', onPointerMove);
+  };
+}
+
+
+(function(){
+  if(window.__mcpSkyeSolLivingBackgroundMounted) return;
+  window.__mcpSkyeSolLivingBackgroundMounted = true;
+  function boot(){
+    if(typeof mountSkyeSolLivingBackground === 'function') mountSkyeSolLivingBackground();
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', boot, { once: true })
+    : boot();
+})();
+// END quantumskyes:skyesol-living-background-js
+
+// BEGIN quantumskyes:neon-motion-chrome-vanilla-js
+(function(){
+  if(window.__mcpNeonMotionChrome) return;
+  window.__mcpNeonMotionChrome = true;
+  function ready(fn){ document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, { once: true }) : fn(); }
+  ready(function(){
+    if(!document.querySelector('.neon-scroll-progress')){
+      const progress = document.createElement('i');
+      progress.className = 'neon-scroll-progress';
+      progress.setAttribute('aria-hidden', 'true');
+      document.body.append(progress);
+      const update = function(){
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        progress.style.transform = 'scaleX(' + Math.min(1, Math.max(0, window.scrollY / max)) + ')';
+      };
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    }
+    if(!document.querySelector('.neon-cursor-trail') && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      const glow = document.createElement('div');
+      glow.className = 'neon-cursor-trail';
+      glow.setAttribute('aria-hidden', 'true');
+      document.body.append(glow);
+      window.addEventListener('pointermove', function(event){
+        glow.style.transform = 'translate3d(' + (event.clientX - 150) + 'px,' + (event.clientY - 150) + 'px,0)';
+      }, { passive: true });
+    }
+  });
+})();
+// END quantumskyes:neon-motion-chrome-vanilla-js

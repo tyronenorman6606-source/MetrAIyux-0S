@@ -1,0 +1,29 @@
+{
+  "base_id": "dispute-committee/committee-recommendation",
+  "slug": "committee-recommendation",
+  "title": "Committee Recommendation",
+  "category": { "slug": "dispute-committee", "name": "Dispute Committee" },
+  "version": "1.0.0-legal-skyes",
+  "status": "operational_seed_not_attorney_reviewed",
+  "risk_level": "high",
+  "not_legal_advice": true,
+  "use_case": "Non-binding internal recommendation packet for Legal Skyes owner review.",
+  "questionnaire": [
+    { "key": "case_id", "label": "Case ID", "type": "text", "required": true },
+    { "key": "evidence_reviewed", "label": "Evidence Reviewed", "type": "textarea", "required": true },
+    { "key": "missing_evidence", "label": "Missing Evidence", "type": "textarea", "required": false },
+    { "key": "recommended_remedy", "label": "Recommended Remedy", "type": "textarea", "required": true },
+    { "key": "refund_cap_math", "label": "Refund Cap Math", "type": "textarea", "required": false },
+    { "key": "dissent_or_abstention", "label": "Dissent or Abstention", "type": "textarea", "required": false }
+  ],
+  "sections": [
+    { "heading": "Non-Binding Recommendation", "body": "This is an internal business recommendation for case {{case_id}}. It is not a legal opinion, judicial judgment, arbitral award, or neutral external arbitration decision." },
+    { "heading": "Evidence Reviewed", "body": "{{evidence_reviewed}}" },
+    { "heading": "Missing Evidence", "body": "{{missing_evidence}}" },
+    { "heading": "Recommended Remedy", "body": "{{recommended_remedy}}" },
+    { "heading": "Refund Cap Math", "body": "{{refund_cap_math}}" },
+    { "heading": "Dissent or Abstention", "body": "{{dissent_or_abstention}}" }
+  ],
+  "review": { "requires_attorney_review": true, "requires_current_law_review": true, "human_review_required": true },
+  "tags": ["legal-skyes", "dispute-committee", "recommendation", "high"]
+}

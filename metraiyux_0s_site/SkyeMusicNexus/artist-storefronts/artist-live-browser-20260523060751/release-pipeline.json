@@ -1,0 +1,26 @@
+{
+  "schema": "skyemusicnexus.artist-song-to-storefront-flow.v1",
+  "artistId": "artist_live_browser_20260523060751",
+  "artistSlug": "artist-live-browser-20260523060751",
+  "stageName": "Dre Meridian",
+  "collective": {
+    "id": "gray-skyes-collective",
+    "name": "Gray Gang",
+    "slug": "gray-gang",
+    "ownerArtistId": "444666666666",
+    "ownerName": "Gray Skyes"
+  },
+  "steps": [
+    "Read personality-profile.json",
+    "Generate song with approved provider route using the private operator prompt",
+    "Persist generated audio as MusicNexus asset receipt",
+    "Create SkyePay-backed Music Store product at $4.44",
+    "Publish/update artist feed post",
+    "Expose player and buy link on artist app/storefront",
+    "Log audit events and payout attribution to Gray Gang"
+  ],
+  "providerRoute": "/api/skymusicnexus/music-provider-hooks",
+  "storeRoute": "/api/skymusicnexus/music-store",
+  "playerBinding": "app.html uses products/products.json and generated asset streamUrl when present",
+  "artistName": "Dre Meridian"
+}

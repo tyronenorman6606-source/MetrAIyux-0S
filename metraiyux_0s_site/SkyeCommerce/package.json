@@ -1,0 +1,15 @@
+{
+  "name": "skyecommerce-shopify-replacement-foundation",
+  "version": "1.24.0",
+  "type": "module",
+  "description": "Cloudflare-native merchant commerce platform with runtime-wired public checkout, honest connection-health validation, completed OAuth callback wiring, terminal payment closeout, and production-only operational lanes.",
+  "scripts": {
+    "test": "node --experimental-global-webcrypto --test --test-concurrency=1",
+    "smoke": "node --experimental-global-webcrypto scripts/production-readiness-smoke.mjs",
+    "smoke:providers": "node --experimental-global-webcrypto scripts/provider-smoke.mjs",
+    "verify:live": "node --experimental-global-webcrypto scripts/live-provider-verification.mjs",
+    "smoke:platform": "node --experimental-global-webcrypto scripts/full-platform-smoke.mjs",
+    "smoke:warehouse": "node --experimental-global-webcrypto scripts/warehouse-tracking-smoke.mjs",
+    "smoke:closure": "node --experimental-global-webcrypto scripts/full-platform-closure-smoke.mjs"
+  }
+}

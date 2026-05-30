@@ -1,6 +1,6 @@
 {
   "id": "skyemusicnexus-pricing",
-  "updated_at": "2026-05-17",
+  "updated_at": "2026-05-27",
   "gate_session_required": true,
   "free99_scope": {
     "id": "skyemusicnexus-lite-free99",
@@ -9,58 +9,316 @@
     "setup": 0,
     "monthly": 0,
     "checkout": false,
-    "summary": "Free99 Lite is no-charge access for gated 0S users, not anonymous access.",
+    "summary": "Free99 Lite is no-charge access for gated 0S users, not anonymous access. Selected May 2026 core artists can receive the separate founding-core launch grant without checkout.",
     "limits": [
       "1 artist profile",
       "1 draft release preview",
       "1 small gated proof audio upload in the local/runtime lane",
+      "1 starter artist storefront preview",
+      "up to 3 active storefront products",
+      "up to 25 store order intents per month",
+      "no SkyeNet storefront publish capacity until a paid storefront or host plan is active",
       "sample royalty and analytics view",
       "rights vault preview",
       "proof receipt export",
       "no payout actions",
-      "no live publishing or distributor claims"
+      "no live publishing or distributor claims",
+      "not the full founding-core artist build unless invited"
     ]
+  },
+  "storefront_policy": {
+    "id": "skyemusicnexus-storefront-policy-2026-05",
+    "summary": "Storefront access is growth-led but capped. Free99/Lite lets artists learn and test a tiny store; paid storefront plans unlock larger product catalogs, higher monthly order-intent volume, and SkyeNet publish capacity.",
+    "free99_lite": {
+      "included": true,
+      "price_label": "Free99 with shared gate session",
+      "max_active_products": 3,
+      "monthly_order_intents": 25,
+      "monthly_skyenet_publishes": 0,
+      "purpose": "Let as many artists as possible attach a small store and learn the workflow without opening an unlimited spam lane."
+    },
+    "paid_upgrade_path": [
+      {
+        "id": "skyemusicnexus-storefront-starter",
+        "name": "Nexus Storefront Starter",
+        "monthly": 5,
+        "setup": 0,
+        "max_active_products": 10,
+        "monthly_order_intents": 150,
+        "monthly_skyenet_publishes": 2,
+        "summary": "Low-friction paid storefront lane for artists who only need products, SkyePay checkout intent, and limited SkyeNet publishing."
+      },
+      {
+        "id": "skyemusicnexus-studio",
+        "name": "Artist Host",
+        "monthly": 9,
+        "setup": 0,
+        "max_active_products": 25,
+        "monthly_order_intents": 500,
+        "monthly_skyenet_publishes": 6
+      },
+      {
+        "id": "skyemusicnexus-label-command",
+        "name": "Artist Collective",
+        "monthly": 29,
+        "setup": 99,
+        "max_active_products": 150,
+        "monthly_order_intents": 2500,
+        "monthly_skyenet_publishes": 20
+      }
+    ],
+    "anti_spam_boundary": [
+      "all storefronts require the shared 0S/SkyGate/Free99 gate session",
+      "free storefronts are limited by active products, order intents, and no SkyeNet publish capacity",
+      "paid plans are still owner-auditable and can be paused for abuse, rights issues, chargebacks, or fulfillment risk"
+    ]
+  },
+  "founding_core_month": {
+    "id": "skyemusicnexus-founding-core-2026-05",
+    "name": "SkyeMusicNexus Founding Core Artist Month",
+    "available_through": "2026-05-31",
+    "setup": 0,
+    "monthly": 0,
+    "checkout": false,
+    "summary": "For selected core artists in May 2026, Skyes Over London/SOL Enterprises builds the polished artist surface at no charge while the artist helps promote, test, and shape the platform.",
+    "includes": [
+      "custom artist landing/universe build during the May 2026 core-member window",
+      "up to 5 launch songs uploaded, packaged into artist surfaces, hosted, and maintained",
+      "self-serve uploads after launch stay open under gate, fair-use, and provider-cost limits",
+      "live drops can update the artist surface without requiring a full bespoke rebuild each time",
+      "full SupaBoy-style release worlds after the founding window are paid only when requested",
+      "artist-set paid download/private access packages require a preview and gated full asset",
+      "upload-failure route can notify the founder and carry the file for manual recovery when email storage is configured"
+    ]
+  },
+  "artist_landing_launch_window": {
+    "id": "skyemusicnexus-artist-landing-launch-2026-06-26",
+    "available_through": "2026-06-26",
+    "skyemerit_code": "SKYEMUSICNEXUS-LAUNCH-2000",
+    "skyemerit_pack_id": "SKYEMUSICNEXUS-LAUNCH-MERIT-PACK",
+    "skyemerit_value": 2000,
+    "checkout_rule": "Listed premium value stays visible in SkyePay. The $2,000 SkyeMerit applies before checkout so Stripe charges only the launch-window net due.",
+    "delivery_channels": [
+      "relay13",
+      "skymail",
+      "connectlog",
+      "fs27_event_mirror"
+    ]
+  },
+  "artist_management_lane": {
+    "id": "skyemusicnexus-artist-management-2026",
+    "available": true,
+    "agreement_required": true,
+    "exclusive_possible": true,
+    "default_owner_boundary": "Artist keeps masters, compositions, public likeness, and uploaded media unless a separate signed agreement says otherwise.",
+    "not_included_by_default": [
+      "music distribution",
+      "publishing administration",
+      "sync licensing",
+      "royalty collection",
+      "master ownership transfer",
+      "company ownership of artist media"
+    ],
+    "included_when_scoped": [
+      "Account Executive assignment",
+      "biweekly artist/business meeting",
+      "SkyeNet artist site deployment",
+      "longform blog base",
+      "content engine and campaign calendar",
+      "Media Over London creative routing",
+      "SkyePay checkout and proof receipts"
+    ],
+    "marketing_license_boundary": "Uploaded artist media may be used to operate, display, preview, package, and promote the artist's services and platform surfaces, but not to create unrelated company profit outside the agreed service lane."
+  },
+  "artist_referral_program": {
+    "id": "skyemusicnexus-artist-referral-40",
+    "status": "active_policy_pending_owner_payout_approval",
+    "qualified_payout_rate_bps": 4000,
+    "eligible_revenue_basis": "onboarded spend actually received after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval",
+    "no_self_referrals": true,
+    "examples": [
+      { "offer": "Artist Host", "basis": "$9/mo", "referral_payout": "$3.60/mo" },
+      { "offer": "Artist Collective", "basis": "$99 setup + $29/mo", "referral_payout": "$39.60 setup + $11.60/mo" },
+      { "offer": "Managed Music Ops", "basis": "$499 setup + $99/mo", "referral_payout": "$199.60 setup + $39.60/mo" },
+      { "offer": "Single / Drop Landing Page", "basis": "$239 launch due", "referral_payout": "$95.60" },
+      { "offer": "Artist Page + EPK", "basis": "$444 launch due", "referral_payout": "$177.60" },
+      { "offer": "Custom Artist Universe", "basis": "$1,197+ starting floor", "referral_payout": "$478.80+" }
+    ]
+  },
+  "agentic_marketing_push": {
+    "id": "skyenet-365-content-push",
+    "status": "sellable_when_scope_and_publish_authority_are_written",
+    "can_truthfully_sell": true,
+    "base_deliverable": "365-day content calendar with longform blog base, SkyeNet site publishing lane, Nexus feature slots, proof receipts, and approval workflow.",
+    "requires": [
+      "approved source material",
+      "human/content review policy",
+      "publishing credentials or owned SkyeNet surface",
+      "client approvals",
+      "provider budget for automation and media",
+      "separate social account credentials before social publishing claims"
+    ],
+    "claim_boundary": "The platform can sell and operate a proof-backed content production/publishing push; it cannot guarantee reach, virality, press, sales, playlisting, or social-platform acceptance."
+  },
+  "pricing_realms": [
+    {
+      "id": "drops",
+      "name": "Drop Packaging",
+      "route": "/SkyeMusicNexus/public/pricing-drops.html",
+      "boundary": "Existing owned/approved songs only. AI generation is sold under Song Creation.",
+      "summary": "Release capsules, metadata, preview/full package settings, store/product shell, proof receipt, and campaign add-ons."
+    },
+    {
+      "id": "artist-apps",
+      "name": "Artist Apps",
+      "route": "/SkyeMusicNexus/public/pricing-artist-apps.html",
+      "boundary": "Design/build/media scope, not AI song generation.",
+      "summary": "Artist pages, EPKs, visualizer pages, installable PWA drops, and custom artist universes."
+    },
+    {
+      "id": "song-creation",
+      "name": "Song Creation",
+      "route": "/SkyeMusicNexus/public/pricing-song-creation.html",
+      "boundary": "Paid provider-backed song generation with custom prompt, duration, structure, lyric, vocal, and collaborator control.",
+      "summary": "Song Draft starts at $23; larger cinematic suites and label/brain packs require owner-approved provider budget."
+    },
+    {
+      "id": "daw-beta",
+      "name": "DAW Beta",
+      "route": "/SkyeMusicNexus/public/pricing-daw.html",
+      "boundary": "Free through 2026 while beta-labeled.",
+      "summary": "First-party browser DAW for creation, import, arrangement, mixdown, save/export, and release handoff."
+    }
+  ],
+  "song_creation_pricing": [
+    {
+      "id": "skyemusicnexus-song-draft",
+      "name": "Song Draft",
+      "amount": 23,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_song_draft",
+      "duration_seconds_included": 180,
+      "generation_included": true,
+      "summary": "One AI-generated private song draft up to 3 minutes, custom prompt, lyric/vocal direction, provider receipt, private playback, and creation-bin proof."
+    },
+    {
+      "id": "skyemusicnexus-artist-cut",
+      "name": "Artist Cut",
+      "amount": 49,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_artist_cut",
+      "duration_seconds_included": 240,
+      "generation_included": true,
+      "summary": "One artist-ready song run up to 4 minutes with deeper prompt form, up to 2 generation attempts when provider budget allows, private share page, and basic cover direction."
+    },
+    {
+      "id": "skyemusicnexus-song-release-pack",
+      "name": "Release Pack",
+      "amount": 99,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_song_release_pack",
+      "generation_included": true,
+      "summary": "One generated song plus release metadata, cover/canvas request lane, rights checklist, Nexus drop page, product shell, and proof receipt."
+    },
+    {
+      "id": "skyemusicnexus-five-song-local-artist-bundle",
+      "name": "5-Song Local Artist Bundle",
+      "amount": 249,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_five_song_local_artist_bundle",
+      "generation_included": true,
+      "summary": "Five generated song drafts for one artist lane, batch workspace, basic artist profile, creation receipts, and release-package upgrade path."
+    },
+    {
+      "id": "skyemusicnexus-brain-label-pack",
+      "name": "Brain / Label Pack",
+      "amount": 497,
+      "billing": "quote_starting_at",
+      "lookup_key": "skyemusicnexus_brain_label_pack",
+      "generation_included": true,
+      "owner_approval_required": true,
+      "summary": "Multi-artist or brain/label creation run with roster setup, longer-form structures, collaborator planning, release rooms, social/content workflow, and owner-approved provider budget."
+    },
+    {
+      "id": "skyemusicnexus-cinematic-suite",
+      "name": "Cinematic Suite",
+      "amount": 199,
+      "billing": "quote_starting_at",
+      "lookup_key": "skyemusicnexus_cinematic_suite",
+      "generation_included": true,
+      "owner_approval_required": true,
+      "summary": "Everything Movie-style long-form suite with multiple acts, longer runtime, cast/collaborator planning, transitions, release page, Pics2Vid/Still2Vid handoffs, and advanced packaging."
+    }
+  ],
+  "daw_beta_access": {
+    "id": "skyemusicnexus-daw-beta-free-2026",
+    "name": "DAW Beta",
+    "amount": 0,
+    "billing": "free_through_2026",
+    "available_through": "2026-12-31",
+    "summary": "DAW access is free for every user through 2026 while the room remains beta-labeled."
   },
   "paid_tiers": [
     {
-      "id": "skyemusicnexus-studio",
-      "name": "SkyeMusicNexus Studio",
-      "setup": 1500,
-      "monthly": 497,
+      "id": "skyemusicnexus-storefront-starter",
+      "name": "Nexus Storefront Starter",
+      "setup": 0,
+      "monthly": 5,
       "lookup_keys": [
-        "skyemusicnexus_studio_setup",
+        "skyemusicnexus_storefront_starter_monthly"
+      ],
+      "summary": "A low-cost artist store lane with 10 active products, SkyePay checkout intents, SkyeCommerce storefront attachment, and two SkyeNet storefront publishes per month.",
+      "includes": [
+        "1 artist storefront",
+        "up to 10 active products",
+        "up to 150 order intents per month",
+        "SkyePay checkout intent routing",
+        "SkyeCommerce storefront attachment",
+        "2 SkyeNet storefront publishes per month",
+        "13% platform fee policy visible on order intents",
+        "shared 0S gate session required"
+      ]
+    },
+    {
+      "id": "skyemusicnexus-studio",
+      "name": "SkyeMusicNexus Artist Host",
+      "setup": 0,
+      "monthly": 9,
+      "lookup_keys": [
         "skyemusicnexus_studio_monthly"
       ],
-      "summary": "A paid music ops room for active creators and small teams.",
+      "summary": "Low-cost artist hosting and release packaging for solo artists after the founding-core window.",
       "includes": [
-        "up to 5 artists",
-        "25 active releases",
+        "1 primary artist workspace",
+        "self-serve uploads under fair-use and provider-cost limits",
+        "live drop updates to the artist surface",
+        "fan preview plus paid download/private access configuration",
+        "upload-failure founder fallback route",
         "gated upload studio",
         "uploaded audio vault for proof playback",
         "release workflow board",
         "rights vault and takedown hold",
         "royalty ledger tracking",
         "payout review queue",
-        "proof exports",
-        "basic operator dashboard"
+        "proof exports"
       ]
     },
     {
       "id": "skyemusicnexus-label-command",
-      "name": "SkyeMusicNexus Label Command",
-      "setup": 6500,
-      "monthly": 1497,
+      "name": "SkyeMusicNexus Artist Collective",
+      "setup": 99,
+      "monthly": 29,
       "lookup_keys": [
         "skyemusicnexus_label_command_setup",
         "skyemusicnexus_label_command_monthly"
       ],
-      "summary": "A label-grade command lane for multi-artist release operations.",
+      "summary": "A small collective lane for several solo artists, collaborators, or a tiny indie label without enterprise pricing.",
       "includes": [
-        "up to 25 artists",
-        "150 active releases",
+        "up to 5 artists",
+        "60 active releases",
         "gated upload studio",
         "uploaded audio vault for proof playback",
-        "SkyeVault/R2 storage scoping for larger catalogs",
+        "basic SkyeVault/R2 storage scoping when provider cost is present",
         "operator/admin stage",
         "approval workflows",
         "rights audit trail",
@@ -73,13 +331,13 @@
     {
       "id": "skyemusicnexus-managed-music-ops",
       "name": "SkyeMusicNexus Managed Music Ops",
-      "setup": 15000,
-      "monthly": 3997,
+      "setup": 499,
+      "monthly": 99,
       "lookup_keys": [
         "skyemusicnexus_managed_music_ops_setup",
         "skyemusicnexus_managed_music_ops_monthly"
       ],
-      "summary": "A managed music operations room with custom limits and proof-led integrations.",
+      "summary": "A managed artist operations lane for hands-on rollout help, custom release packaging, and proof-led integrations.",
       "includes": [
         "custom artist and release limits",
         "custom upload and storage limits",
@@ -88,48 +346,100 @@
         "team roles",
         "client-facing music ops room",
         "custom proof receipts",
-        "integration scope quoted separately",
+        "custom full release worlds quoted separately",
+        "provider/storage costs passed through or approved separately",
         "owner-approved activation"
       ]
+    }
+  ],
+  "artist_landing_builds": [
+    {
+      "id": "skyemusicnexus-single-drop-landing-page",
+      "name": "Single / Drop Landing Page",
+      "listed_value": 2239,
+      "skyemerit_applied": 2000,
+      "launch_due": 239,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_single_drop_landing_page",
+      "launch_window_ends_on": "2026-06-26",
+      "relay13_inbox_delivery": true,
+      "summary": "One premium artist single or drop landing page generated from artist info, one main picture, release details, links, and proof fields."
+    },
+    {
+      "id": "skyemusicnexus-artist-page-epk",
+      "name": "Artist Page + Gallery / EPK / Booking / Media",
+      "listed_value": 2444,
+      "skyemerit_applied": 2000,
+      "launch_due": 444,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_artist_page_epk",
+      "launch_window_ends_on": "2026-06-26",
+      "relay13_inbox_delivery": true,
+      "summary": "Premium artist page with gallery, EPK, booking/media section, music links, and SkyeMusicNexus dashboard handoff."
+    },
+    {
+      "id": "skyemusicnexus-animated-visualizer-page",
+      "name": "Animated Landing / Visualizer Page",
+      "listed_value": 2796,
+      "skyemerit_applied": 2000,
+      "launch_due": 796,
+      "billing": "one_time",
+      "lookup_key": "skyemusicnexus_animated_visualizer_page",
+      "launch_window_ends_on": "2026-06-26",
+      "relay13_inbox_delivery": true,
+      "summary": "Animated artist landing and visualizer page using the artist image, music/drop metadata, motion, and proof fields."
+    },
+    {
+      "id": "skyemusicnexus-custom-artist-universe",
+      "name": "Custom Artist Universe",
+      "listed_value": 3197,
+      "skyemerit_applied": 2000,
+      "launch_due": 1197,
+      "billing": "one_time_starting_at",
+      "lookup_key": "skyemusicnexus_custom_artist_universe",
+      "launch_window_ends_on": "2026-06-26",
+      "relay13_inbox_delivery": true,
+      "owner_approval_required": true,
+      "summary": "SupaBoy-level custom artist universe quoted manually above the starting floor after asset, motion, music, media, and rollout scope is known."
     }
   ],
   "addons": [
     {
       "id": "skyemusicnexus-single-song-drop",
       "name": "Single Song Drop",
-      "amount": 199,
+      "amount": 15,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_single_song_drop",
-      "summary": "One song release capsule, metadata checklist, gated handoff, and proof receipt."
+      "summary": "One song release capsule, metadata checklist, preview/full-file packaging, gated handoff, and proof receipt."
     },
     {
       "id": "skyemusicnexus-release-drop-plus",
       "name": "Release Drop Plus",
-      "amount": 399,
+      "amount": 29,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_release_drop_plus",
-      "summary": "Single or multi-track release prep with cover/metadata QA, ops queue, and proof export."
+      "summary": "Single or multi-track release prep with cover/metadata QA, preview/full package settings, ops queue, and proof export."
     },
     {
       "id": "skyemusicnexus-ep-drop",
       "name": "EP Drop",
-      "amount": 799,
+      "amount": 49,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_ep_drop",
-      "summary": "Release capsule and proof workflow for up to 6 tracks."
+      "summary": "Release capsule, preview/full package settings, and proof workflow for up to 6 tracks."
     },
     {
       "id": "skyemusicnexus-album-drop",
       "name": "Album Drop",
-      "amount": 1497,
+      "amount": 99,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_album_drop",
-      "summary": "Release capsule and proof workflow for up to 14 tracks."
+      "summary": "Release capsule, preview/full package settings, and proof workflow for up to 14 tracks."
     },
     {
       "id": "skyemusicnexus-catalog-import-pack",
       "name": "Catalog Import Pack",
-      "amount": 299,
+      "amount": 49,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_catalog_import_pack",
       "summary": "Import and structure up to 25 legacy release records."
@@ -137,7 +447,7 @@
     {
       "id": "skyemusicnexus-royalty-ledger-setup",
       "name": "Royalty Ledger Setup",
-      "amount": 249,
+      "amount": 25,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_royalty_ledger_setup",
       "summary": "Configure a proof-safe royalty ledger view and split notes."
@@ -145,7 +455,7 @@
     {
       "id": "skyemusicnexus-payout-review-pack",
       "name": "Payout Review Pack",
-      "amount": 149,
+      "amount": 25,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_payout_review_pack",
       "summary": "Prepare a gated payout review packet without moving real funds."
@@ -153,7 +463,7 @@
     {
       "id": "skyemusicnexus-artist-profile-buildout",
       "name": "Artist Profile Buildout",
-      "amount": 99,
+      "amount": 15,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_artist_profile_buildout",
       "summary": "Build one artist profile with core bio, links, and proof fields."
@@ -161,7 +471,7 @@
     {
       "id": "skyemusicnexus-social-caption-pack",
       "name": "Social Caption Pack",
-      "amount": 99,
+      "amount": 15,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_social_caption_pack",
       "summary": "Caption angles, posting prompts, and lightweight social copy for one release or artist milestone."
@@ -169,7 +479,7 @@
     {
       "id": "skyemusicnexus-cover-canvas-request",
       "name": "Cover / Canvas Request",
-      "amount": 199,
+      "amount": 35,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_cover_canvas_request",
       "summary": "A gated creative request for cover direction, canvas notes, and proof-safe asset handoff."
@@ -177,7 +487,7 @@
     {
       "id": "skyemusicnexus-short-form-clip-brief",
       "name": "Short-Form Clip Brief",
-      "amount": 249,
+      "amount": 35,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_short_form_clip_brief",
       "summary": "Hooks, shot list, caption angle, and creator handoff for a short-form release push."
@@ -185,7 +495,7 @@
     {
       "id": "skyemusicnexus-release-content-kit",
       "name": "Release Content Kit",
-      "amount": 499,
+      "amount": 79,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_release_content_kit",
       "summary": "Captions, short-form hooks, asset requests, and release runway tasks generated from the gated exchange."
@@ -193,7 +503,7 @@
     {
       "id": "skyemusicnexus-community-campaign-sprint",
       "name": "Community Campaign Sprint",
-      "amount": 899,
+      "amount": 149,
       "billing": "one_time",
       "lookup_key": "skyemusicnexus_community_campaign_sprint",
       "summary": "Exchange-led release campaign with community prompts, inbox coordination, content runway, and proof receipt."
@@ -201,7 +511,7 @@
     {
       "id": "skyemusicnexus-extra-artist-seat",
       "name": "Extra Artist Seat",
-      "amount": 29,
+      "amount": 5,
       "billing": "monthly",
       "lookup_key": "skyemusicnexus_extra_artist_seat_monthly",
       "summary": "Add one recurring artist seat to a paid SkyeMusicNexus plan."
@@ -209,7 +519,7 @@
     {
       "id": "skyemusicnexus-extra-release-pack",
       "name": "Extra Release Pack",
-      "amount": 99,
+      "amount": 9,
       "billing": "monthly",
       "lookup_key": "skyemusicnexus_extra_release_pack_monthly",
       "summary": "Add 25 active release slots to a paid SkyeMusicNexus plan."
@@ -217,16 +527,16 @@
     {
       "id": "skyemusicnexus-gated-audio-vault-pack",
       "name": "Gated Audio Vault Pack",
-      "amount": 79,
+      "amount": 9,
       "billing": "monthly",
       "lookup_key": "skyemusicnexus_gated_audio_vault_pack_monthly",
-      "summary": "Add a music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing."
+      "summary": "Add a music-specific SkyeVault/R2 storage lane for larger audio files, fan-paid downloads, proof receipts, and gated handoff. This is storage and proof access, not public streaming licensing."
     },
     {
       "id": "skyemusicnexus-white-label-artist-portal",
       "name": "White-Label Artist Portal",
-      "setup": 997,
-      "amount": 197,
+      "setup": 99,
+      "amount": 19,
       "billing": "monthly_with_setup",
       "lookup_keys": [
         "skyemusicnexus_white_label_artist_portal_setup",
@@ -237,21 +547,92 @@
     {
       "id": "skyemusicnexus-provider-integration-proof-lane",
       "name": "Provider Integration Proof Lane",
-      "amount": 2500,
+      "amount": 250,
       "billing": "quote_starting_at",
       "lookup_key": "skyemusicnexus_provider_integration_proof_lane",
-      "summary": "Owner-approved provider, distributor, payment, or identity proof lane before any live integration claim."
+      "summary": "Owner-approved provider, distributor, payment, storage, or identity proof lane before any live integration claim. This is the lane to charge when an actual provider starts creating cost."
     }
   ],
   "truth_rules": [
     "Free99 applies only to SkyeMusicNexus Lite.",
     "Every tier and add-on still requires a gate session.",
+    "The May 2026 founding-core artist month is invite-only and zero-charge for selected core artists who help promote, test, and give release-flow feedback.",
+    "Founding-core artists get up to 5 launch songs packaged into their artist surfaces; later uploads can be self-serve under gate, fair-use, and provider-cost limits.",
+    "Full custom release universes like the SupaBoy build are not automatic ongoing drops after the founding window; those are requested and quoted separately.",
+    "Artist landing build launch prices end on 2026-06-26: SkyePay shows premium value, applies the $2,000 SkyeMerit before checkout, and charges the net launch due.",
+    "The artist landing SkyeMerit pack is delivered through Relay13, SkyeMail, ConnectLog, and the FS27 event mirror where configured.",
+    "Artist-set paid downloads and private full-song access require a preview surface plus a gated or signed full asset package.",
+    "If an upload fails, the platform must expose a founder fallback route that can notify the configured admin/founder and carry the file when email storage limits allow it.",
     "Audio upload/list/stream actions remain gated even when the plan is Free99.",
     "The local upload lane proves end-to-end upload and playback; the same asset handler can use SkyeVault/R2 when MUSIC_NEXUS_STORAGE_BACKEND=r2 or MUSIC_NEXUS_USE_R2=1 is configured.",
     "Linked preview playback requires ownership and preview-use attestation.",
     "Release publish, stream reporting, and operations queueing require the distribution rights gate.",
     "Takedown requests place playback holds until operator rights review clears them.",
     "Paid checkout does not automatically activate live distributor, DSP, payment, legal, or label authority.",
-    "Provider integrations require separate owner-approved proof before public claims."
-  ]
+    "Provider integrations require separate owner-approved proof before public claims.",
+    "Every artist page should include a Nexus Shop lane for purchases, support/tips, private full access, merch/booking, and fan capture where the artist scope supports it.",
+    "Fan checkout metadata should trail to an artist ID hash, drop ID, SKU ID, fee policy, Stripe/SkyePay IDs, fulfillment route, and payout batch state.",
+    "The default platform fee is 13%; artists can choose buyer-covered or artist-absorbed pricing, but the 13% company fee must be respected.",
+    "Company-held fan payments should settle through payout review with paperwork, rights, disputes, refunds, provider costs, and owner approval before artist payout release.",
+    "Artist vendor/seller paperwork and independent-contractor paperwork are separate lanes; some artists may need both depending on whether they sell through the platform and also perform services for the company.",
+    "Artist management/exclusive lanes do not transfer music ownership, distribution authority, royalty collection, or licensing authority unless a separate signed agreement says so.",
+    "Qualified SkyeMusicNexus artist referrals use a 40% payout policy against onboarded spend after refunds, chargebacks, taxes, processor fees, paperwork holds, and owner approval."
+  ],
+  "fan_commerce_model": {
+    "updated_at": "2026-05-23",
+    "public_page": "https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/nexus-marketing-hub.html",
+    "principle": "Every artist page should be able to sell, collect support, prove fulfillment, and trail revenue back to a hashed artist ID.",
+    "fan_surfaces": [
+      "single, EP, album, bundle, or private full-song package after preview playback",
+      "support/tip payments; do not call them charitable donations unless the legal/tax entity supports that claim",
+      "merch, tickets, meet-and-greet slots, fan passes, and behind-the-drop access",
+      "booking, media, feature, interview, or collaboration request cards",
+      "email/SMS capture routed into the 0S campaign engines"
+    ],
+    "stripe_skyepay_tracking": {
+      "artist_id_strategy": "Store artist IDs internally and send a non-reversible HMAC/hash or opaque artist reference through checkout metadata.",
+      "required_metadata": [
+        "artist_id_hash",
+        "drop_id",
+        "sku_id",
+        "fee_policy",
+        "artist_price_cents",
+        "platform_fee_bps",
+        "stripe_payment_intent",
+        "stripe_checkout_session",
+        "fulfillment_route",
+        "payout_batch_id"
+      ],
+      "settlement_holder": "Company Stripe/SkyePay lane collects fan payments first, then approved artist payouts are reviewed and batched.",
+      "payout_cadence": "biweekly after refunds, disputes, rights holds, paperwork, and provider costs are reviewed"
+    },
+    "platform_fee_policy": {
+      "platform_fee_bps": 1300,
+      "default_mode": "buyer_covers_platform_and_processing",
+      "artist_options": [
+        "buyer_covers_platform_and_processing: fan pays artist price plus 13% platform fee plus estimated processing",
+        "platform_fee_on_top: fan pays artist price plus 13%; processing is deducted from settlement unless separately passed through",
+        "artist_absorbs: fan pays artist price; artist payout is artist price minus 13% platform fee minus Stripe/payment processing"
+      ],
+      "example_199_single": {
+        "artist_price_cents": 199,
+        "platform_fee_cents": 26,
+        "estimated_us_domestic_card_fee_cents_on_buyer_protect": 38,
+        "estimated_customer_price_cents_buyer_protect": 263,
+        "note": "Stripe domestic card pricing is commonly 2.9% + 30c in the US. Low-ticket drops should show the artist that the fixed 30c fee is material before launch."
+      }
+    },
+    "legal_onboarding_lanes": {
+      "vendor_seller": "Use when the artist is selling music, merch, fan support, downloads, booking/media offers, or access products through the Nexus Shop.",
+      "independent_contractor": "Use when Skyes Over London pays the artist for company-requested services such as founding-core promotion, testing, content, appearances, consulting, or deliverables.",
+      "both_possible": "Some artists should complete both. Keep fan revenue/vendor payouts separate from company-paid contractor compensation.",
+      "paperwork_before_real_payout": [
+        "vendor/seller agreement or independent contractor agreement as applicable",
+        "W-9 or business tax profile",
+        "rights attestation for paid releases",
+        "payout profile or Stripe Connect account when automated transfers are used"
+      ]
+    },
+    "business_growth_lane": "Founding Nexus artists can be routed into the greater 0S business setup, docs, campaigns, email, and incorporation-support surfaces with a 67% eligible-feature discount where approved."
+  }
 }

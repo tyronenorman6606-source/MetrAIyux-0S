@@ -1,87 +1,116 @@
 <!doctype html>
-<html lang="en">
+<html data-mcp-neon-scrollbar lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus - Platform Dashboard</title>
-  <meta name="description" content="SkyeMusicNexus platform dashboard for upload, player, releases, rights, exchange, and operations." />
+  <title>SkyeMusicNexus - Artist Workspace</title>
+  <meta name="description" content="SkyeMusicNexus artist workspace for upload, player, releases, rights, exchange, drops, artist apps, store, media, brand, and launch offer handoffs." />
   <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./nexus-player.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
   <script defer src="../../assets/js/skye-id-bridge.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>
+    window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);
+  </script>
+  <script defer src="./nexus-player.js"></script>
   <script defer src="./neo-nexus.js"></script>
 </head>
-<body data-app="skye-music-nexus" data-mode="artist">
+<body data-0s-canonical-platform="true" data-app="skye-music-nexus" data-mode="artist" class="skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+<canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
   <canvas id="pulse-field" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
   <div class="aurora aurora-one" aria-hidden="true"></div>
   <div class="aurora aurora-two" aria-hidden="true"></div>
 
   <header class="nexus-topline">
-    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
     <div class="top-title">
-      <p class="micro">SkyeMusicNexus // Platform Dashboard</p>
-      <h1>Release-ready artist platform with gated upload, playback, rights, and exchange.</h1>
+      <p class="micro">SkyeMusicNexus // Artist Workspace</p>
+      <h1 class="neon-gradient-text">Release-ready artist workspace with protected upload, playback, rights, brand, media, and launch handoffs.</h1>
     </div>
     <div class="session-rack">
-      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-      <button class="ghost" data-action="proof-session">Proof Session</button>
-      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
       <button class="ghost" data-action="logout">Disconnect</button>
     </div>
   </header>
 
   <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
-    <a class="active" href="./index.html">Dashboard</a>
+    <a class="active" href="./index.html">Workspace</a>
+    <a href="./walkthrough.html">Walkthroughs</a>
+    <a href="./signup.html">Artist Signup</a>
+    <a href="./pricing.html">Pricing</a>
     <a href="./create.html">Create</a>
     <a href="./daw.html">DAW</a>
     <a href="./discover.html">Discover</a>
+    <a href="./radio.html">Radio</a>
+    <a href="./stream-analytics.html">Streams</a>
+    <a href="./achievements.html">Awards</a>
     <a href="./feed.html">Feed</a>
+    <a href="./contests.html">Contests</a>
     <a href="./upload.html">Upload Studio</a>
     <a href="./player.html">Music Player</a>
     <a href="./releases.html">Releases</a>
     <a href="./rights.html">Rights</a>
     <a href="./exchange.html">Exchange</a>
     <a href="./drops.html">Drops</a>
-    <a href="./admin.html">Operator</a>
-    <a href="../skepticks-spectic-override.html">Skeptic Audit</a>
+    <a href="./artist-apps.html">Artist Apps</a>
+    <a href="./store.html">Store</a>
+    <a href="./brain.html">Brain</a>
+    <a href="./brain-monitor.html">Brain Monitor</a>
+    <a href="../skepticks-spectic-override.html">Claim Audit</a>
   </nav>
 
   <main class="nexus-shell">
     <section class="panel-xl platform-app-directory">
       <div class="section-head">
         <div>
-          <p class="micro">Start Here // MusicNexus App Directory</p>
-          <h3>The real rooms are listed first now.</h3>
+          <p class="micro">Start Here // MusicNexus Artist Workspace</p>
+          <h3>Choose the next client move.</h3>
         </div>
-        <a class="primary button-link" href="./drops.html">Open Drop Deploy Room</a>
+        <a class="primary button-link" href="./signup.html">Start Artist Signup</a>
       </div>
       <div class="platform-room-grid">
-        <a class="platform-room featured" href="./drops.html"><span>DROP</span><h3>Drops</h3><p>Song pages, album pages, campaign pages, private delivery, batching, approval brain, Netlify deploy intent.</p></a>
+        <a class="platform-room featured" href="./signup.html"><span>START</span><h3>Artist Signup</h3><p>Pull Skye ID, SkyEmail, profile photo, artist details, paperwork, and SkyePay tracking into one launch record.</p></a>
+        <a class="platform-room featured" href="./walkthrough.html"><span>GUIDE</span><h3>Full Walkthroughs</h3><p>Moving screen passes and a written packet for listening, artist launch, DAW, upload, releases, rights, store, analytics, brain, and SupaBoy handoff.</p></a>
+        <a class="platform-room featured" href="./drops.html"><span>DROP</span><h3>Drops</h3><p>Song pages, album pages, campaign pages, private delivery, batching, approvals, and publish packaging.</p></a>
+        <a class="platform-room featured" href="./artist-apps.html"><span>APP</span><h3>Artist Apps</h3><p>Approved artist universes become installable fan apps with share links, video loops, and Nexus return paths.</p></a>
         <a class="platform-room featured" href="./daw.html"><span>DAW</span><h3>DAW</h3><p>Native creation studio for building, recording, arranging, and exporting music work inside the Nexus lane.</p></a>
-        <a class="platform-room featured" href="./feed.html"><span>FEED</span><h3>Social Feed</h3><p>Instagram-style artist feed, release posts, comments, saves, boosts, and token-safe provider publishing.</p></a>
-        <a class="platform-room" href="./upload.html"><span>UP</span><h3>Upload Studio</h3><p>Gated audio intake for MP3, WAV, FLAC, M4A, OGG, WebM, direct-upload readiness, and track-line handoff.</p></a>
-        <a class="platform-room" href="./releases.html"><span>REL</span><h3>Release Forge</h3><p>Artist records, releases, tracks, distribution targets, review state, and operations queue handoff.</p></a>
+        <a class="platform-room featured" href="./feed.html"><span>FEED</span><h3>Social Feed</h3><p>Instagram-style artist feed, release posts, comments, saves, boosts, and connected publishing queues.</p></a>
+        <a class="platform-room featured" href="./contests.html"><span>PR</span><h3>Contests</h3><p>Featured artist contests, winner packages, safe backlinks, blog packets, and SkyeNet PR queue receipts.</p></a>
+        <a class="platform-room featured" href="./store.html"><span>SHOP</span><h3>Artist Store</h3><p>Digital access, merch, tickets, tips, bookings, memberships, order intents, and SkyePay routes.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel"><span>FORMS</span><h3>Workforce Paperwork</h3><p>No artist payout can legally release until onboarding, contractor/vendor, tax/payment, and owner approval forms are complete.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/connectlog-v7.7-relay13-operator-proof/app.html"><span>RELAY</span><h3>ConnectLog + Relay13</h3><p>Artist access to relationship logging, handoff notes, follow-up, and Relay13 inbox movement.</p></a>
+        <a class="platform-room featured" href="./brain.html"><span>BRAIN</span><h3>Artist Brain</h3><p>Artist memory, network stream cycles, site feed motion, SkyeMeter, merits, and giveaways.</p></a>
+        <a class="platform-room featured" href="./brain-monitor.html"><span>OPS</span><h3>Brain Monitor</h3><p>Daemon status, now-listening queue, unified stream impact, allocation gauges, alerts, and neural operations map.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMediaCenter/index.html?source=SkyeMusicNexus"><span>MEDIA</span><h3>SkyeMediaCenter</h3><p>Move cover art, promo clips, visualizers, press photos, and reusable release media into the shared media center.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BrandID-Offline-PWA/index.html?source=SkyeMusicNexus"><span>BRAND</span><h3>BrandID Offline PWA</h3><p>Turn artist voice, release notes, store offers, and audience cues into a portable brand kit that works offline.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/kAIxUBrandKit/index.html?source=SkyeMusicNexus"><span>LOGO</span><h3>kAIxUBrandKit</h3><p>Create logo direction, mark prompts, color notes, and usage rules for covers, avatars, merch, and clips.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BusinessLaunchGo/index.html?source=SkyeMusicNexus"><span>OFFER</span><h3>BusinessLaunchGo</h3><p>Shape the release into a fan-facing launch offer with bundle copy, CTA language, and SkyePay/store context.</p></a>
+        <a class="platform-room" href="./upload.html"><span>UP</span><h3>Upload Studio</h3><p>Gated audio intake for MP3, WAV, FLAC, M4A, OGG, WebM, large-file upload, and track-line handoff.</p></a>
+        <a class="platform-room" href="./releases.html"><span>REL</span><h3>Release Forge</h3><p>Artist records, releases, tracks, distribution targets, review state, and release planning.</p></a>
         <a class="platform-room" href="./rights.html"><span>RTS</span><h3>Rights Vault</h3><p>Ownership, preview-use, distribution authorization, takedown holds, and playback blocking.</p></a>
         <a class="platform-room" href="./exchange.html"><span>EX</span><h3>Artist Exchange</h3><p>Content requests, inbox relay, community calls, achievements, and campaign pack generation.</p></a>
-        <a class="platform-room" href="./admin.html"><span>OPS</span><h3>Operator Stage</h3><p>Review, publish, payout, analytics, workflow movement, social queue, and proof boundaries.</p></a>
-        <a class="platform-room featured" href="./command-dashboard.html"><span>CMD</span><h3>Command Dashboard</h3><p>Live visual analytics, API route health, workflow counts, audit events, storage state, and fallback disclosure.</p></a>
-        <a class="platform-room featured" href="../skepticks-spectic-override.html"><span>AUDIT</span><h3>Skepticks and SPectic Override</h3><p>Investor-grade claim audit tying marketing language to receipts, live routes, storage state, and provider boundaries.</p></a>
+        <a class="platform-room featured" href="#artist-referral-layer"><span>REF</span><h3>Artist Referral Layer</h3><p>40% qualified payout policy, examples from Artist Host through Custom Universe, and clear payout rules.</p></a>
+        <a class="platform-room featured" href="../skepticks-spectic-override.html"><span>TRUST</span><h3>Claim Audit</h3><p>Public receipt matrix showing what is verified, what is stress-backed, and what still has limits.</p></a>
       </div>
     </section>
 
     <section class="hero-stage panel-xl platform-hero">
       <div class="hero-copy">
-        <p class="eyebrow">create / discover / feed / upload / release ops</p>
-        <h2>BandLab plus Spotify plus Instagram, gated by Nexus.</h2>
-        <p class="lede">Artists make the song, stage the assets, post the rollout, browse the release graph, gate the rights, play the preview, and move inside one authenticated music network.</p>
+        <p class="eyebrow">create / media / brand / launch / release workflow</p>
+        <h2>BandLab plus Spotify-style discovery plus Instagram, protected by Nexus.</h2>
+        <p class="lede">Artists make the song, stage the media, package the brand, shape the offer, post the rollout, clear the rights, play the preview, and move inside one authenticated music network.</p>
         <div class="hero-actions">
           <a class="primary button-link" href="./daw.html">Open DAW</a>
           <a class="secondary button-link" href="./discover.html">Discover</a>
           <a class="secondary button-link" href="./feed.html">Open Social Feed</a>
           <a class="primary button-link" href="./upload.html">Upload Audio</a>
           <a class="secondary button-link" href="./drops.html">Build Drops</a>
+          <a class="secondary button-link" href="./artist-apps.html">Artist Apps</a>
+          <a class="secondary button-link" href="./walkthrough.html">Walkthroughs</a>
           <a class="ghost button-link" href="./rights.html">Rights Vault</a>
         </div>
       </div>
@@ -90,7 +119,7 @@
         <div class="vinyl-ring ring-b"></div>
         <div class="vinyl-ring ring-c"></div>
         <div class="needle"></div>
-        <div class="core-label"><span>SKYE</span><strong>NEXUS</strong><small>PLATFORM</small></div>
+        <div class="core-label nexus-logo-label"><img src="../assets/skye-music-nexus-logo.png" alt="SkyeMusicNexus logo" /></div>
       </div>
       <div class="hero-meters">
         <article><span id="meterArtists">0</span><small>artists</small></article>
@@ -100,18 +129,34 @@
       </div>
     </section>
 
+    <section class="panel-xl" id="launch-integrations">
+      <div class="section-head">
+        <div>
+          <p class="micro">Release Launch Integrations</p>
+          <h3>Four handoffs are now first-class artist moves.</h3>
+        </div>
+        <a class="secondary button-link" href="./brain-monitor.html">Open Brain Monitor</a>
+      </div>
+      <div class="platform-room-grid">
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMediaCenter/index.html?source=SkyeMusicNexus"><span>01</span><h3>SkyeMediaCenter</h3><p>Collect and reuse release media: cover art, vertical clips, promo assets, press photos, visualizers, and delivery files.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BrandID-Offline-PWA/index.html?source=SkyeMusicNexus"><span>02</span><h3>BrandID Offline PWA</h3><p>Package artist positioning, tone, audience, content pillars, palette direction, and reusable brand notes.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/kAIxUBrandKit/index.html?source=SkyeMusicNexus"><span>03</span><h3>kAIxUBrandKit</h3><p>Build logo and identity briefs that can be used on artwork, storefronts, social posts, video watermarks, and merch.</p></a>
+        <a class="platform-room featured" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/BusinessLaunchGo/index.html?source=SkyeMusicNexus"><span>04</span><h3>BusinessLaunchGo</h3><p>Translate the release into a clean launch offer, fan bundle, checkout CTA, and next-step sales path.</p></a>
+      </div>
+    </section>
+
     <section class="platform-room-grid">
       <a class="platform-room featured" href="./upload.html">
         <span>01</span><h3>Upload Studio</h3>
-        <p>Upload owned or licensed audio into gated local MusicNexus storage and generate a release track line.</p>
+        <p>Upload owned or licensed audio into protected MusicNexus storage and generate a release track line.</p>
       </a>
       <a class="platform-room featured" href="./player.html">
         <span>02</span><h3>Music Player</h3>
-        <p>Play the release queue. Uploaded audio is fetched through the gate session; uncleared audio stays blocked or generated-preview only.</p>
+        <p>Play the release queue. Uploaded audio is fetched through the client session; uncleared audio stays blocked or preview-only.</p>
       </a>
       <a class="platform-room" href="./releases.html">
         <span>03</span><h3>Release Forge</h3>
-        <p>Create artists, build release capsules, credit proof ledgers, and queue operations after rights clear.</p>
+        <p>Create artists, build release capsules, keep credits visible, and queue release work after rights clear.</p>
       </a>
       <a class="platform-room" href="./rights.html">
         <span>04</span><h3>Rights Vault</h3>
@@ -121,21 +166,25 @@
         <span>05</span><h3>Artist Exchange</h3>
         <p>Request content, send inbox signals, post community calls, unlock achievements, and generate campaign packs.</p>
       </a>
-      <a class="platform-room featured" href="./feed.html">
-        <span>06</span><h3>Open Social Feed</h3>
-        <p>Connect Pixelfed, Mastodon-compatible, and Funkwhale lanes to release posts, federated feeds, and token-safe publishing.</p>
+      <a class="platform-room featured" href="./artist-apps.html">
+        <span>06</span><h3>Artist Apps</h3>
+        <p>Package an approved artist world as an installable PWA drop fans can keep, share, watch, and route back into the Nexus.</p>
       </a>
-      <a class="platform-room" href="./admin.html">
-        <span>07</span><h3>Operator Stage</h3>
-        <p>Review releases, move payouts, inspect analytics, and keep operator proof boundaries honest.</p>
+      <a class="platform-room featured" href="./feed.html">
+        <span>07</span><h3>Open Social Feed</h3>
+        <p>Connect social lanes to release posts, federated feeds, and approved publishing queues.</p>
+      </a>
+      <a class="platform-room featured" href="./store.html">
+        <span>08</span><h3>Artist Store</h3>
+        <p>Build products, record order intents, keep payout math visible, and route checkout through SkyePay.</p>
+      </a>
+      <a class="platform-room featured" href="./brain.html">
+        <span>09</span><h3>Artist Brain</h3>
+        <p>Run artist cycles that post, stream network releases, engage the feed, fill SkyeMeter, and enter giveaways.</p>
       </a>
       <a class="platform-room featured" href="./drops.html">
-        <span>08</span><h3>Drop Deploy Room</h3>
-        <p>Create artist drop pages, batch them into one Netlify deploy, and keep private deliveries behind SkyGate.</p>
-      </a>
-      <a class="platform-room featured" href="./command-dashboard.html">
-        <span>09</span><h3>Command Dashboard</h3>
-        <p>See live metrics, backend route health, audit logs, and stress-backed workflow shape from the music Worker.</p>
+        <span>10</span><h3>Drop Room</h3>
+        <p>Create artist drop pages, batch release packages, and keep private deliveries behind client access.</p>
       </a>
     </section>
 
@@ -151,11 +200,27 @@
       </div>
     </section>
 
+    <section class="panel-xl" id="artist-referral-layer">
+      <div class="section-head">
+        <div>
+          <p class="micro">Artist Referral Layer</p>
+          <h3>Artists can see the money path before they refer.</h3>
+        </div>
+        <a class="secondary button-link" href="https://metraiyux-0s-marketing.pages.dev/skye-music-nexus/nexus-marketing-hub.html#referral-layer" target="_blank" rel="noopener">Public payout examples</a>
+      </div>
+      <div class="platform-room-grid">
+        <article class="platform-room"><span>$3.60/mo</span><h3>Artist Host</h3><p>40% of the lowest paid tier above Free99: $9/mo.</p></article>
+        <article class="platform-room"><span>$39.60 + $11.60/mo</span><h3>Artist Collective</h3><p>40% of $99 setup and $29/mo after qualified onboarded spend clears.</p></article>
+        <article class="platform-room"><span>$199.60 + $39.60/mo</span><h3>Managed Music Ops</h3><p>40% of $499 setup and $99/mo, subject to refunds, disputes, taxes, and payout qualification.</p></article>
+        <article class="platform-room"><span>$95.60-$478.80+</span><h3>Artist Landing Builds</h3><p>40% examples: $239 single page, $444 EPK, $796 visualizer, and $1,197+ custom universe launch floors.</p></article>
+      </div>
+    </section>
+
     <section class="panel-xl">
       <div class="section-head">
         <div>
           <p class="micro">Live Constellation</p>
-          <h3>Recent records across the platform</h3>
+          <h3>Recent artist records across the workspace</h3>
         </div>
         <button class="ghost mini" data-action="refresh-records">Refresh</button>
       </div>
@@ -164,27 +229,17 @@
 
     <section class="panel-xl proof-chain">
       <div>
-        <p class="micro">Truth Boundary</p>
-        <h3>Client-ready preview, not a fake Spotify claim</h3>
-        <p>SkyeMusicNexus now has separate rooms for upload, player, release ops, rights, exchange, and operator proof. Live DSP distribution, royalty settlement, formal legal review, and production DMCA-agent operations remain provider/legal boundaries until connected and proven.</p>
+        <p class="micro">Client Launch Path</p>
+        <h3>Everything an artist needs stays in one music workspace.</h3>
+        <p>SkyeMusicNexus keeps creation, uploads, playback, release packaging, rights, exchange, drops, store, artist apps, and client delivery in one authenticated platform.</p>
       </div>
       <div class="proof-links">
-        <a href="../PROOF_STATUS.md">Proof Status</a>
-        <a href="../src/runtime-contract.json">Runtime Contract</a>
-        <a href="../smoke/smoke-proof.mjs">Smoke Proof</a>
+        <a href="./daw.html">Create Music</a>
+        <a href="./upload.html">Upload Audio</a>
+        <a href="./drops.html">Build Drops</a>
       </div>
     </section>
   </main>
-
-  <dialog id="operatorDialog" class="operator-dialog">
-    <form method="dialog" id="operatorForm">
-      <h3>Local Operator Login</h3>
-      <p>Uses the existing SkyGate local bootstrap variables. No demo secrets are embedded.</p>
-      <label>Email<input name="email" type="email" required /></label>
-      <label>Password<input name="password" type="password" required /></label>
-      <menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu>
-    </form>
-  </dialog>
 
   <div id="toast" role="status" aria-live="polite"></div>
 </body>

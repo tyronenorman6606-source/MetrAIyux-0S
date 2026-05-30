@@ -6,7 +6,7 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const routePages = ["index.html","dashboard.html","workflows.html","records.html","runtime.html","proof.html","settings.html"];
 const required = [
   'PLATFORM_TRUTH.json',
-  'assets/platform-mark.svg',
+  'assets/skye-music-nexus-logo.png',
   'docs/PLATFORM_STATUS.md',
   'src/runtime-contract.json',
 ];

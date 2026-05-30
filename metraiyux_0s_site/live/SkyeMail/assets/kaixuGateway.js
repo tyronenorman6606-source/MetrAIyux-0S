@@ -26,6 +26,17 @@ function kaixuGatewayUrl(path){
   return `${base.startsWith("/") ? base : `/${base}`}/${normalizedPath}`;
 }
 
+function kaixuGatewayHeaders(){
+  const headers = { "Content-Type":"application/json" };
+  try{
+    const token = typeof getToken === "function" ? getToken() : "";
+    if(token) headers.Authorization = `Bearer ${token}`;
+    const mailbox = typeof getActiveMailbox === "function" ? getActiveMailbox() : "";
+    if(mailbox) headers["x-skymail-mailbox-email"] = mailbox;
+  }catch(_err){}
+  return headers;
+}
+
 function remainingBudget(monthObj){
   if(!monthObj) return null;
   const cap = Number(monthObj.cap_cents ?? 0);
@@ -43,9 +54,7 @@ function mapGatewayError(status, data){
 async function kaixuChat({ provider, model, messages, max_tokens=512, temperature=0.4, signal }){
   const res = await fetch(kaixuGatewayUrl("gateway-chat"), {
     method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
+    headers:kaixuGatewayHeaders(),
     signal,
     body: JSON.stringify({ provider, model, messages, max_tokens, temperature })
   });
@@ -110,9 +119,7 @@ function parseSseFrame(frame){
 async function kaixuStreamChat({ provider, model, messages, max_tokens=512, temperature=0.4, signal, onMeta, onDelta, onDone, onError }){
   const res = await fetch(kaixuGatewayUrl("gateway-stream"), {
     method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
+    headers:kaixuGatewayHeaders(),
     signal,
     body: JSON.stringify({ provider, model, messages, max_tokens, temperature })
   });

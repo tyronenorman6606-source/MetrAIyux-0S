@@ -6,6 +6,7 @@ import {
   simulateAiResponseLoad
 } from './relay13-ai-lanes.mjs';
 import { recordTenantLead, resolveCanonicalTenant } from './tenant-backbone.mjs';
+import { executeZeroOsAutomationAction } from './zero-os-automation-spine.mjs';
 
 const FACTORY_BASE = '/api/client-app-factory';
 const FACTORY_PUBLIC_BASE = '/client-app-factory';
@@ -119,6 +120,61 @@ async function factoryAssetExists(env, pathname) {
   return Boolean(response?.ok);
 }
 
+function factoryEnvFlag(env, names = []) {
+  return names.some((name) => {
+    const value = String(env?.[name] ?? '').trim().toLowerCase();
+    return value === '1' || value === 'true' || value === 'yes' || value === 'on';
+  });
+}
+
+function factoryProviderRuntimeForcedSandbox(env) {
+  return factoryEnvFlag(env, ['CLIENT_APP_FACTORY_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX', '0S_PROVIDER_SANDBOX']);
+}
+
+function factoryProviderRuntimePublic(receipt = null) {
+  if (!receipt) return null;
+  const providerResult = receipt.provider_result && typeof receipt.provider_result === 'object' ? receipt.provider_result : null;
+  return {
+    receipt_id: receipt.id || '',
+    status: receipt.status || '',
+    provider_id: receipt.provider_id || '',
+    action: receipt.action || '',
+    executed: Boolean(receipt.executed),
+    provider_call_made: Boolean(receipt.provider_call_made),
+    error: receipt.error || '',
+    provider_result: providerResult
+      ? {
+          id: providerResult.id || '',
+          status: providerResult.status || '',
+          object: providerResult.object || '',
+          url: providerResult.url || '',
+          bytes: providerResult.bytes || 0,
+          conversation_id: providerResult.conversation_id || ''
+        }
+      : null
+  };
+}
+
+async function factoryRunProviderRuntime(env, envelope = {}) {
+  const execution = await executeZeroOsAutomationAction(env, {}, {
+    app_id: 'client-app-factory',
+    owner_approved: true,
+    ...envelope
+  }, {
+    actor: 'client-app-factory',
+    identity: { email: 'client-app-factory@metraiyux.local', role: 'system' }
+  }, { operator_ok: true });
+  const receipt = execution?.response?.receipt || null;
+  return {
+    ok: execution?.response?.ok === true,
+    status: execution?.status || receipt?.http_status || 0,
+    receipt,
+    provider_runtime: factoryProviderRuntimePublic(receipt),
+    provider_result: receipt?.provider_result || null,
+    error: receipt?.error || execution?.response?.error || ''
+  };
+}
+
 async function factoryReadAssetJson(env, pathname, fallback = null) {
   const response = await factoryAssetResponse(env, pathname);
   if (!response?.ok) return fallback;
@@ -198,6 +254,7 @@ function factoryNormalizeRecord(record = {}) {
     proofArtifacts: cleanList(record.proofArtifacts),
     mcpReceipts: cleanList(record.mcpReceipts),
     scannerReports: cleanList(record.scannerReports),
+    providerRuntimeReceipts: Array.isArray(record.providerRuntimeReceipts) ? record.providerRuntimeReceipts.filter(Boolean).slice(0, 50) : [],
     completedStates: factoryUnique(record.completedStates),
     status: factoryText(record.status, 120) || 'intake-created',
     notes: factoryText(record.notes, 4000),
@@ -814,21 +871,97 @@ async function factoryVerify(env, payload = {}) {
   };
 }
 
+function factoryDataUrlParts(value = '') {
+  const match = String(value || '').match(/^data:([^;,]+)?(?:;[^,]*)?;base64,(.+)$/i);
+  return match ? { mimeType: match[1] || '', base64: match[2] || '' } : { mimeType: '', base64: '' };
+}
+
+function factoryBase64ByteLength(value = '') {
+  const clean = String(value || '').replace(/\s+/g, '');
+  if (!clean) return 0;
+  const padding = clean.endsWith('==') ? 2 : clean.endsWith('=') ? 1 : 0;
+  return Math.max(0, Math.floor((clean.length * 3) / 4) - padding);
+}
+
+function factoryContentByteLength(value) {
+  if (value == null) return 0;
+  const text = typeof value === 'string' ? value : JSON.stringify(value);
+  return new TextEncoder().encode(text || '').byteLength;
+}
+
+function factoryAssetContent(payload = {}) {
+  const dataUrl = factoryDataUrlParts(payload.dataUrl || payload.data_url || '');
+  const rawBase64 = payload.content_base64 || payload.contentBase64 || payload.base64 || dataUrl.base64 || '';
+  const contentBase64 = String(rawBase64 || '').replace(/^data:[^,]+,/, '').replace(/\s+/g, '');
+  const hasBase64 = Boolean(contentBase64);
+  const hasContent = !hasBase64 && Object.prototype.hasOwnProperty.call(payload, 'content');
+  return {
+    hasContent: hasBase64 || hasContent,
+    content_base64: hasBase64 ? contentBase64 : '',
+    content: hasBase64 ? undefined : payload.content,
+    mimeType: dataUrl.mimeType || '',
+    bytes: hasBase64 ? factoryBase64ByteLength(contentBase64) : factoryContentByteLength(payload.content)
+  };
+}
+
+function factoryStorageRuntimeLive(env) {
+  if (factoryProviderRuntimeForcedSandbox(env)) return false;
+  return Boolean(env.ZERO_OS_PROVIDER_R2?.put || env.DEPLOYMENT_ASSET_BUCKET?.put || env.DEPLOYMENT_ASSETS_BUCKET?.put || env.R2_BUCKET_BINDING?.put);
+}
+
+function factoryAssetStorageKey(record = {}, asset = {}) {
+  const file = factorySlug(asset.fileName || asset.id || 'asset');
+  return `client-app-factory/${record.clientId || 'client'}/assets/${asset.id || factoryId('asset')}/${file}`;
+}
+
 async function factoryCatalogAsset(env, payload = {}) {
   const { state, record } = await factoryReadRecord(env, payload.clientId || 'skye-app-template');
   const fileName = factoryText(payload.fileName || 'uploaded-asset.bin', 180) || 'uploaded-asset.bin';
-  const mimeType = factoryText(payload.mimeType || 'application/octet-stream', 160);
+  const content = factoryAssetContent(payload);
+  const mimeType = factoryText(payload.mimeType || content.mimeType || 'application/octet-stream', 160);
   const asset = {
     id: factoryId('asset'),
     fileName,
     originalName: fileName,
     mimeType,
-    bytes: Math.max(0, Number(payload.base64 ? String(payload.base64).length * 0.75 : 0)),
+    bytes: content.bytes || Math.max(0, Number(payload.base64 ? String(payload.base64).length * 0.75 : 0)),
     type: /^image\//i.test(mimeType) || /^video\//i.test(mimeType) ? 'media' : 'document',
     publicPath: fileName,
     provenance: factoryText(payload.provenance || 'operator-uploaded', 120),
     uploadedAt: factoryNow()
   };
+  if (content.hasContent) {
+    const storageKey = factoryText(payload.key || payload.path || payload.objectKey || factoryAssetStorageKey(record, asset), 800);
+    const live = factoryStorageRuntimeLive(env);
+    const runtime = await factoryRunProviderRuntime(env, {
+      provider_id: 'cloudflare-r2',
+      action: 'storage.object.put',
+      workspace_id: record.previewConfig?.workspaceId || record.clientId,
+      customer_id: record.clientId,
+      client_id: record.clientId,
+      usage_lane: 'client-app-factory:asset-catalog',
+      live,
+      sandbox: !live,
+      payload: {
+        key: storageKey,
+        content_type: mimeType,
+        ...(content.content_base64 ? { content_base64: content.content_base64 } : { content: content.content }),
+        metadata: {
+          client_id: record.clientId,
+          asset_id: asset.id,
+          file_name: fileName,
+          provenance: asset.provenance
+        }
+      }
+    });
+    asset.storageKey = storageKey;
+    asset.storageStatus = runtime.ok
+      ? (runtime.receipt?.provider_call_made ? 'stored_by_provider_runtime' : 'provider_runtime_receipted')
+      : 'provider_runtime_failed';
+    asset.providerRuntimeReceiptId = runtime.provider_runtime?.receipt_id || '';
+    asset.providerRuntimeStatus = runtime.provider_runtime?.status || '';
+    asset.provider_runtime = runtime.provider_runtime;
+  }
   const next = factoryNormalizeRecord({
     ...record,
     assetVault: [asset, ...(record.assetVault || [])],
@@ -859,23 +992,19 @@ async function factoryGenerateIdentityImage(env, payload = {}) {
   const apiKey = env.OPENAI_API_KEY || env.openaiApiKey || '';
   const allow = String(env.VANTA_ALLOW_LIVE_AI ?? env.allowLiveAi ?? '0') === '1' || Boolean(env.forceLiveAi);
   const disabled = String(env.VANTA_DISABLE_LIVE_AI ?? env.disableLiveAi ?? '0') === '1';
-  if (!apiKey || !allow || disabled) {
-    return {
-      ok: false,
-      message: 'AI identity generation is not configured on this 0S worker.',
-      needs: ['OPENAI_API_KEY', 'VANTA_ALLOW_LIVE_AI=1']
-    };
-  }
   const model = String(env.OPENAI_IMAGE_MODEL || env.openaiImageModel || 'gpt-image-1');
-  const baseUrl = String(env.OPENAI_BASE_URL || env.openaiBaseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '');
   const prompt = factoryIdentityPrompt(payload);
-  const response = await fetch(`${baseUrl}/images/generations`, {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
+  const live = Boolean(apiKey && allow && !disabled && !factoryProviderRuntimeForcedSandbox(env));
+  const runtime = await factoryRunProviderRuntime(env, {
+    provider_id: 'openai',
+    action: 'openai.image.generate',
+    workspace_id: factorySlug(payload.clientId || payload.displayName || 'client'),
+    customer_id: factorySlug(payload.clientId || payload.displayName || 'client'),
+    client_id: factorySlug(payload.clientId || payload.displayName || 'client'),
+    usage_lane: 'client-app-factory:identity-image',
+    live,
+    sandbox: !live,
+    payload: {
       model,
       prompt,
       n: 1,
@@ -883,27 +1012,74 @@ async function factoryGenerateIdentityImage(env, payload = {}) {
       quality: 'low',
       background: 'transparent',
       output_format: 'png'
-    })
+    }
   });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error?.message || `OpenAI image generation failed with ${response.status}`);
-  const base64 = data.data?.[0]?.b64_json || '';
-  if (!base64) throw new Error('AI identity image response missing b64_json.');
+  const providerResult = runtime.provider_result || {};
+  const generated = runtime.ok && Boolean(runtime.receipt?.provider_call_made) && Boolean(providerResult.url || providerResult.b64_json_present || providerResult.id);
   return {
-    ok: true,
+    ok: generated,
+    generated,
+    message: generated
+      ? 'AI identity image generated through the shared 0S provider runtime.'
+      : 'AI identity image request was receipted through the shared 0S provider runtime; no live image bytes were returned.',
     fileName: `${factorySlug(payload.clientId || payload.displayName || 'client')}-ai-identity.png`,
     mimeType: 'image/png',
-    dataUrl: `data:image/png;base64,${base64}`,
+    imageUrl: providerResult.url || '',
+    dataUrl: '',
+    provider_runtime: runtime.provider_runtime,
     receipt: {
-      provider: 'openai-images-api',
+      provider: 'openai-provider-runtime',
       model,
-      sourceUrl: `${baseUrl}/images/generations`,
       summary: `ai-generated:openai:${model}:${factoryNow()}`,
       prompt,
       generatedAt: factoryNow(),
-      usage: data.usage || null
+      provider_runtime_receipt_id: runtime.provider_runtime?.receipt_id || '',
+      provider_runtime_status: runtime.provider_runtime?.status || '',
+      provider_call_made: Boolean(runtime.receipt?.provider_call_made)
     }
   };
+}
+
+async function factoryRelay13RuntimeReceipt(env, record = {}, tenantLeadResult = {}, body = {}) {
+  const lead = tenantLeadResult?.lead || null;
+  if (!lead) return null;
+  const live = factoryEnvFlag(env, ['CLIENT_APP_FACTORY_RELAY13_RUNTIME_LIVE'])
+    && !factoryProviderRuntimeForcedSandbox(env)
+    && Boolean(env.RELAY13_WORKER_ORIGIN || env.RELAY13_ORIGIN);
+  const runtime = await factoryRunProviderRuntime(env, {
+    provider_id: 'relay13',
+    action: 'relay13.thread.attach',
+    workspace_id: lead.workspaceId || record.previewConfig?.workspaceId || record.clientId,
+    customer_id: lead.contact?.email || lead.contact?.phone || lead.clientId || record.clientId,
+    client_id: lead.clientId || record.clientId,
+    usage_lane: 'client-app-factory:relay13-intake-handoff',
+    live,
+    sandbox: !live,
+    payload: {
+      path: '/api/v1/connectlog/scan',
+      body: {
+        workspace: lead.clientId || record.clientId,
+        workspace_id: lead.workspaceId || record.previewConfig?.workspaceId || '',
+        channel: 'client-app-lead',
+        customer_name: lead.contact?.name || lead.contact?.company || body.primaryContact || 'Client app visitor',
+        subject: lead.subject || body.subject || 'Client App Factory intake',
+        message: lead.message || body.message || body.notes || '',
+        source_url: lead.sourceUrl || body.sourceUrl || body.source_url || '',
+        connectlog_bridge: true,
+        connectlog_card_id: lead.clientId || record.clientId,
+        connectlog_card_label: lead.tenant?.displayName || record.displayName || '',
+        metadata: {
+          tenant_event_id: lead.id || '',
+          client_id: lead.clientId || record.clientId || '',
+          valley_business_id: lead.valleyBusinessId || '',
+          relay_inbox_id: lead.relayInboxId || '',
+          direct_tenant_backbone_status: tenantLeadResult?.delivery?.connectLog?.status || lead.delivery?.connectLog?.status || '',
+          provider_runtime_shadow_receipt: String(!live)
+        }
+      }
+    }
+  });
+  return runtime.provider_runtime;
 }
 
 function factoryCollectRecords(state, staticRecords = []) {
@@ -1050,7 +1226,30 @@ async function factoryHandleApi(request, env, url, matchedBase = FACTORY_BASE) {
       ok: false,
       error: error?.message || String(error)
     }));
-    return factoryJson({ ok: true, record: saved.record, tenantLead });
+    let responseRecord = saved.record;
+    const relay13ProviderRuntime = await factoryRelay13RuntimeReceipt(env, saved.record, tenantLead, body).catch((error) => ({
+      receipt_id: '',
+      status: 'provider_runtime_failed',
+      provider_id: 'relay13',
+      action: 'relay13.thread.attach',
+      executed: false,
+      provider_call_made: false,
+      error: error?.message || String(error),
+      provider_result: null
+    }));
+    if (relay13ProviderRuntime) {
+      if (tenantLead?.delivery) tenantLead.delivery.relay13ProviderRuntime = relay13ProviderRuntime;
+      if (tenantLead?.lead?.delivery) tenantLead.lead.delivery.relay13ProviderRuntime = relay13ProviderRuntime;
+      const updated = await factorySaveRecord(env, saved.state, {
+        ...saved.record,
+        providerRuntimeReceipts: factoryUnique([relay13ProviderRuntime, ...(saved.record.providerRuntimeReceipts || [])])
+      }, factoryEvent('provider-runtime-receipted', clientId, `Attached Relay13 provider runtime receipt for ${displayName}`, {
+        providerRuntimeReceiptId: relay13ProviderRuntime.receipt_id || '',
+        providerRuntimeStatus: relay13ProviderRuntime.status || ''
+      }));
+      responseRecord = updated.record;
+    }
+    return factoryJson({ ok: true, record: responseRecord, tenantLead });
   }
 
   if (method === 'POST' && route === '/factory/tenant-lead') {

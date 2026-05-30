@@ -1,6 +1,6 @@
 # MetrAIyux 0S — Asset Valuation Brief
 *For investor conversations, partnership diligence, and acquisition discussions.*
-*Revised May 23, 2026 — updated to reflect SkyeMusicNexus mounted Worker stress, contractor onboarding/payment-readiness hardening, SKRUCIBLE MCP public launch (skrucible.pages.dev, PWA, SkyesOverLondon Deity logo, 8 MCP tools, Google/LLM JSON-LD schema), Relay13 v1.8 guardrails, Interactive System Map, PHX Verified Network, SkySecure FS27 -> SkyeVault secret-pack proof, gate-owned remote QuantumSkyes MCP, 80 verified live surfaces, 18 CF Pages.*
+*Revised May 30, 2026 - updated to reflect the $13.5M-$24M full-repo engineering replacement master valuation, $13.5M-$38M founder/operator general range, $38M-$68M strategic ceiling, 102,469 workspace files, 91,854 tracked files, 11,087,013 tracked text lines, 23,282 local HTML pages crawled, 2,617 SkyeWay route atlas entries, 31,652 SovereignDocs files, remediation reruns, owner-private SkyeVault full-repo custody, additive delta custody, local smart-HTTP Git origin proof, and the current valuation source of truth.*
 
 ---
 
@@ -8,7 +8,11 @@
 
 A plain-language valuation brief for MetrAIyux 0S as of May 2026. Factual breakdown of what the asset is, what it contains, what comparable assets cost in the market, and what it can generate as a deployed SaaS product.
 
-All claims in this document are substantiated. Deployment status has been independently verified via live HTTP responses, CF-Ray header confirmation, the May 17, 2026 SkyeVault Git remote proof receipt, the May 19, 2026 SkySecure FS27 Vault proof receipt, the May 20, 2026 gate-owned remote MCP proof, and the May 23, 2026 SkyeMusicNexus/contractor-onboarding stress receipts.
+All claims in this document are substantiated. Deployment status has been independently verified via live HTTP responses, CF-Ray header confirmation, the May 17, 2026 SkyeVault Git remote proof receipt, the May 19, 2026 SkySecure FS27 Vault proof receipt, the May 20, 2026 gate-owned remote MCP proof, the May 23, 2026 SkyeMusicNexus/contractor-onboarding receipts, the May 25, 2026 full-repo Codex inventory plus remediation pass, and the May 30, 2026 owner-private SkyeVault custody receipts for a 17.3GB encrypted full-repo baseline, additive encrypted delta packs, and a clone-proved local owner Git origin.
+
+The May 25 valuation no longer treats component replacement cost as the primary value method. The master value is now calculated from the full repo codebase, static crawl, live deployment proof, SkyeWay route atlas, standalone platform lanes, pricing registry, smoke/stress/e2e receipts, remediation receipts, and proof artifacts. Zero ARR is a revenue-multiple limitation, not a reduction to live engineering replacement value.
+
+Current valuation source of truth: `metraiyux_0s_site/data/valuation-source-of-truth.json`.
 
 ---
 
@@ -28,7 +32,7 @@ This is not code waiting to be deployed. Every backend layer is running on Cloud
 | Sentinel Operator | `sovereign-13-cabinet-sentinel-operator.graylondonskyes.workers.dev` | ✓ Live — CF-Ray confirmed |
 | kAIxu 6.7 Brain | `kaixu-6-7-brain` | ✓ Live — sovereign inference + FS27 metering proof |
 | SkyeGateFS27 Auth Platform | `skyegatefs27-citadeldb.graylondonskyes.workers.dev` | ✓ Live — separate platform |
-| SkyeVault Git Remote | local proof service + deployable vault lane | ✓ Proof passed — clone, push, fetch, policy, quota, snapshot, restore |
+| SkyeVault Source Custody | owner-private full baseline + additive delta + local Git origin | ✓ Proof passed — 17.3GB encrypted baseline, owner-only receipt, additive delta upload, clone-proved smart-HTTP origin |
 | SkySecure Secret Packs | FS27 -> SkyeVault -> SkySecure | ✓ Proof passed — encrypted pack upload, FS27 metadata registration, scoped grant, event, public proof counts |
 | SkyeMusicNexus | mounted under main 0S Worker | ✓ Stress passed — 216 workflow actions, 72 read-stress requests, 192 audit events, live visual KPIs |
 | Contractor Onboarding / Payment Readiness | Marketing Made Easy + RouteX + owner/admin inbox | ✓ Live browser + API stress passed — encrypted packet storage, Resend owner notification, owner approval state, no accidental external transfer |
@@ -39,7 +43,7 @@ This is not code waiting to be deployed. Every backend layer is running on Cloud
 | Skye Design MCP / QuantumSkyes | `skye-design-mcp.pages.dev/mcp` | ✓ Live — gate-owned Streamable HTTP MCP, email-required 0S gate, owner-admin bearer, combined 0S/FS27 introspection, repo runner proof |
 | SKRUCIBLE MCP | `skrucible.pages.dev` / `skrucible.pages.dev/mcp` | ✓ Live — public Streamable HTTP MCP (no token), PWA installable, SkyesOverLondon Deity logo, JSON-LD schema, 8 forge tools, React Three Fiber + GLSL + Rapier + Tone.js |
 
-**18 CF Pages. 17 CF Workers (core). Additional confirmed live: Relay13 Core, SkyeGateFS13, VantaCore, SkyeDexia adapter/ops. 8 D1 databases. 1 auth platform. Git-level SkyeVault remote proof passed. SkySecure FS27 Vault proof passed. 80 verified live surfaces.**
+**18 CF Pages. 17 CF Workers (core). Additional confirmed live: Relay13 Core, SkyeGateFS13, VantaCore, SkyeDexia adapter/ops. 8 D1 databases. 1 auth platform. SkyeVault owner-private source custody proof passed. SkySecure FS27 Vault proof passed. 80 verified live surfaces.**
 
 ---
 
@@ -71,7 +75,7 @@ MetrAIyux 0S is a live business operating system consisting of:
 
 **SkyeGateFS27 Auth Platform** — Live at its own Cloudflare Worker. Bearer token introspection, role/scope validation, email allowlist, admin session management. Separate deployable platform that MetrAIyux 0S consumes.
 
-**SkyeVault Git Remote** — SkyeVault now has two repo lanes: archive upload for sanitized packages and a Git remote lane for active repositories. The Git lane supports clone, push, fetch, protected branch and tag policy, quota checks, verified snapshots, bundle export, maintenance restore verification, CLI login/clone flows, an SSH wrapper, and per-workspace neural maps. A developer downloading from the Git lane receives a real Git clone with the refs and object graph that were pushed into that workspace.
+**SkyeVault Source Custody** — SkyeVault now has three owner-private repo continuity lanes: a 17.3GB encrypted literal full-repo baseline for all workspace bytes, encrypted additive delta packs for changed/untracked/local-critical files and tombstones, and a smart-HTTP Git origin for clone/fetch/push parity. The Git origin supports clone, push, fetch, protected branch and tag policy, quota checks, snapshots, bundle export, maintenance restore verification, CLI flows, and per-workspace neural maps. The May 30 proof cloned `http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git` into a fresh directory, matched `HEAD` `6336a975e8702e50e06ed26da1cb026ba06290d6`, and passed `git fsck --connectivity-only`.
 
 **SkySecure Secret Packs** — SkySecure lives under FS27 and SkyeVault as the encrypted handoff lane for ignored developer secret files. The app creates encrypted packs locally, SkyeVault holds ciphertext, FS27 records hash-only metadata and scoped grants, and the public proof lane reports current live counts without exposing secret values. The current production proof returns `FS27 -> SkyeVault -> SkySecure` with 3 packs, 3 active grants, and 9 events.
 
@@ -92,13 +96,28 @@ With infrastructure pre-deployed, a new customer can be provisioned into a live 
 
 ---
 
-## What It Would Cost to Build and Deploy This — Section-Level Accumulation
+## May 25 Master Valuation - Full Repo Engineering And Deployed Product Stack
+
+The current master valuation is:
+
+| Band | Value | Meaning |
+|---|---|---|
+| **Full-repo engineering replacement value** | **$13.5M-$24M** | Revised Codex code/architecture range from workspace files, tracked files, tracked text lines, local HTML crawl, Worker/API surface, SkyeWay routes, SovereignDocs corpus, pricing rows, proof receipts, stress results, and remediation reruns. |
+| **Founder/operator general range** | **$13.5M-$38M** | Current master synthesis after reading the independent model passes against the deeper full-repo Codex scan, remediation receipt, and primary source evidence. |
+| **Strategic portfolio ceiling** | **$38M-$68M** | Buyer-specific ceiling if the music, logistics, docs, dispatch, enterprise, GovTech, auth, deploy, payments, vault, email, MCP, route atlas, and client-app lanes are valued as one sovereign operating system. |
+| **Revenue-multiple status** | **Not yet primary** | ARR, retention, churn, CAC, and paid customer concentration are still future revenue proof, not a reduction to code value. |
+
+Use the $13.5M-$38M founder/operator range in investor, partnership, and acquisition conversations unless the buyer is explicitly evaluating the system as a strategic platform acquisition.
+
+---
+
+## Replacement-Cost Floor - Section-Level Accumulation
 
 | Component | Build + Deploy Cost Estimate |
 |---|---|
 | 17 CF Workers — service bindings, D1/KV/Queues/Durable Objects, real integrations | $90,000–$160,000 |
 | CitadelDB v3.0.1 — K8s HA Postgres, PITR, WAL, control plane, gateway API, tenant registry | $90,000–$170,000 |
-| SkyeVault — real Git smart-HTTP protocol in CF Worker (clone, push, fetch, snapshots, maps) | $50,000–$95,000 |
+| SkyeVault — owner-private source custody: encrypted literal full-repo baseline, additive encrypted delta journal, smart-HTTP Git origin, clone proof, snapshots, maps | $70,000–$130,000 |
 | SkySecure Secret Packs — client-side encrypted pack format, FS27 metadata/grants/events, SkyeVault ciphertext custody, CLI/browser proof lane, public proof receipt | $35,000–$75,000 |
 | SkyeGateFS27 — 20,284-line production auth platform: BLAKE3 hash-only scoped API keys, FS27 sessions, full OAuth, Twilio voice/SMS, 2,063-line Stripe billing catalog, allowlist management, audit system, browser fingerprinting, rate limiting | $70,000–$140,000 |
 | ConnectLog v7.7 + Relay13 v1.8 — Durable Objects stateful WebSocket rooms, D1 persistence, v1.8 guardrails system (workspace_guardrails, guardrail_events, ai_usage_ledger tables — per-workspace AI policy, server-side inbound guardrails, AI usage cost ledger), 1,119-line src, Relay13 Chat Hub wired to production, 3 SKM account proof lanes, 18 live checks | $40,000–$70,000 |
@@ -130,11 +149,11 @@ With infrastructure pre-deployed, a new customer can be provisioned into a live 
 | Proof receipt system, D1 audit trail, 465 Markdown runbooks, 1493 JSON manifests | $15,000–$25,000 |
 | **Component total** | **$1,168,000–$2,208,000** |
 | Deployment premium (+4.5% — live infra, CF-Ray headers confirmed, cs_live sessions verified, Relay13 v1.8 guardrails proof, SkySecure FS27 Vault proof, remote MCP gate proof, SkyeMusicNexus mounted Worker stress, contractor onboarding live browser/API stress) | **$1,221,000–$2,307,000** |
-| **Deployed asset band (conservative public band, pre-commercialization discount applied)** | **$2,350,000–$2,950,000** |
+| **Component-cost support (not the May 25 master valuation cap)** | **$2,500,000–$3,200,000** |
 
-This is how the band was derived — not a single guess. Component-by-component accumulation using specialist agency rates for Cloudflare-edge infrastructure. A boutique agency charging these rates would also not guarantee their deployment works — this one does. CF-Ray headers confirmed. `cs_live` Stripe sessions live. SkyeVault Git remote proof passed. SkySecure FS27 Vault proof passed. The QuantumSkyes MCP now also proves gate-owned remote access through 0S/FS27 email capture and token introspection.
+This is how the floor was derived - not a single guess. Component-by-component accumulation using specialist agency rates for Cloudflare-edge infrastructure, then refreshed against the live platform inventory. A boutique agency charging these rates would also not guarantee their deployment works - this one does. CF-Ray headers confirmed. `cs_live` Stripe sessions live. SkyeVault owner source custody proof passed across encrypted full baseline, additive delta journal, and clone-proved local Git origin. SkySecure FS27 Vault proof passed. The QuantumSkyes MCP now also proves gate-owned remote access through 0S/FS27 email capture and token introspection.
 
-**Deployed asset valuation: $2,350,000–$2,950,000.**
+**Replacement-cost floor: $2,500,000-$3,200,000.**
 
 Key corrections from prior $950K–$1.75M band (which itself was a correction from $450K):
 - **SkyeGateFS27** was priced at $30K–$60K — it is 20,284 lines of production netlify function code: BLAKE3 crypto, OAuth, Twilio voice/SMS, 2,063-line Stripe catalog, allowlist management, audit system, browser fingerprinting. A complete auth platform at $70K–$140K.
@@ -179,11 +198,11 @@ At 8x multiple: **$7,185,600**.
 
 One commercial gap remains, plus one approval boundary that is intentionally controlled.
 
-**No paying customers yet.** The platform is live, the infrastructure is deployed, the Workers are responding, the D1 databases are active, the auth is working, the billing flow is wired, kAIxu is metered, SkyeVault has Git-level proof, and SkyeMusicNexus now has mounted Worker stress. The number that doesn't exist yet is a customer on a paid plan.
+**No paying customers yet.** The platform is live, the infrastructure is deployed, the Workers are responding, the D1 databases are active, the auth is working, the billing flow is wired, kAIxu is metered, SkyeVault has owner-private source custody proof, and SkyeMusicNexus now has mounted Worker stress. The number that doesn't exist yet is a customer on a paid plan.
 
 **Real-money payout execution stays approval-gated.** The contractor packet lane can collect encrypted contractor/payment information, notify the owner, expose owner/admin review, and set payout-profile approval state. External payout transfer execution should only turn on after the contractor profile is complete, approved, and connected to the selected payout provider.
 
-That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts this from a $2.0M–$2.5M asset into a $2M–$9M+ company.
+That is the work. Not deployment. Not architecture. Not building anything. The sales motion is what converts the current $13.5M-$38M code-backed/platform valuation into an ARR-multiple company valuation.
 
 ---
 
@@ -205,18 +224,21 @@ That is the work. Not deployment. Not architecture. Not building anything. The s
 | Item | Value |
 |---|---|
 | Prior asset valuation (incorrect — pre-deployment-confirmation) | $85K–$220K |
-| **Deployed asset valuation (section-level accumulation, May 23 2026)** | **$2.35M–$2.95M** |
+| **Full-repo engineering replacement value (May 25 source of truth)** | **$13.5M-$24M** |
+| **Founder/operator general range (May 25 source of truth)** | **$13.5M-$38M** |
+| **Strategic integrated-OS ceiling (May 25 source of truth)** | **$38M-$68M** |
+| Component-cost support only | $2.5M-$3.2M |
 | Current MRR | $0 — live platform, no paying customers yet |
 | Implied valuation at 10 customers / $96K ARR (5x) | ~$480K |
 | Implied valuation at 25 customers / $270K ARR (6x) | ~$1.6M |
 | Implied valuation at 50 customers / $898K ARR (8x) | ~$7.2M |
 | CF Workers/Pages confirmed live | 17 Workers + 17 Pages (core) + additional platform Workers |
 | Auth platform live | Yes (SkyeGateFS27) |
-| SkyeVault Git remote proof | Passed: clone, push, fetch, policy, quota, snapshot, restore, CLI, workspace maps |
+| SkyeVault source custody proof | Passed: 17.3GB encrypted full-repo baseline, additive encrypted delta upload, local smart-HTTP Git origin clone proof, policy, quota, snapshots, CLI, workspace maps |
 | SkySecure FS27 Vault proof | Passed: encrypted pack upload, SkyeVault ciphertext receipt, FS27 metadata registration, scoped grant, event, proof counts |
 | Operating brains | 17 |
 | Time to first customer revenue | Days — infrastructure requires no setup |
 
 ---
 
-*Revised May 23, 2026. Deployment status verified via CF-Ray header confirmation on Worker endpoints, May 17, 2026 SkyeVault Git remote proof, May 19, 2026 SkySecure FS27 Vault proof, May 20, 2026 gate-owned remote QuantumSkyes MCP proof, May 21, 2026 SKRUCIBLE public MCP launch (skrucible.pages.dev), and May 23, 2026 SkyeMusicNexus plus contractor-onboarding stress receipts. Contact: contact@metraiyux.com*
+*Revised May 30, 2026. Current valuation source of truth: `metraiyux_0s_site/data/valuation-source-of-truth.json`. Deployment status and code value are backed by CF-Ray proof, SkyeVault/SkySecure proof, remote QuantumSkyes MCP proof, SkyeMusicNexus and contractor-onboarding proof, May 25 full-repo Codex inventory/remediation receipts, and May 30 owner-private source custody receipts. Contact: contact@metraiyux.com*

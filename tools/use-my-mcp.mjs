@@ -54,6 +54,10 @@ function readFirstExisting(paths) {
   return '';
 }
 
+function firstExistingPath(paths) {
+  return paths.find((filePath) => filePath && fs.existsSync(filePath)) || '';
+}
+
 function shortSource(filePaths, maxBytes = 22000) {
   return filePaths
     .slice(0, 20)
@@ -145,6 +149,7 @@ const relativeTarget = path.relative(repoRoot, targetFolder);
 const isSkyeGateFS27 = relativeTarget === 'SkyeGateFS27';
 const isSkyeSolTarget = relativeTarget === 'skyesol_current_public_site' || /(?:^|\/)SkyeSol(?:\/|$)/.test(relativeTarget);
 const isMetrAIyux0S = relativeTarget === 'metraiyux_0s_site' || /(?:^|\/)metraiyux_0s_site(?:\/|$)/.test(relativeTarget);
+const isDevoodeRatorTarget = relativeTarget === 'marketing/devooderator' || /(?:^|\/)devooderator(?:\/|$)/i.test(relativeTarget);
 const isFree99AppIntakeTarget = relativeTarget === 'metraiyux_0s_site/Free99' || /(?:^|\/)Free99$/.test(relativeTarget);
 const isDesignLab = relativeTarget === 'skye-design-lab' || relativeTarget === 'MCP/skye-design-lab';
 const isMcpServerTarget = relativeTarget === 'MCP';
@@ -162,8 +167,24 @@ const skyepayMotionJs = path.join(targetFolder, 'assets/skyepay-motion.mjs');
 const rootCss = path.join(targetFolder, 'style.css');
 const rootJs = path.join(targetFolder, 'script.js');
 const rootMotionJs = path.join(targetFolder, 'morphing-motion.mjs');
+const skyeMusicNexusCssCandidates = [
+  path.join(targetFolder, 'public/nexus-home.css'),
+  path.join(targetFolder, 'public/neo-nexus.css'),
+  path.join(targetFolder, 'home-surface.css')
+];
+const skyeMailCssCandidates = [path.join(targetFolder, 'assets/mail-ui.css')];
+const relay13CssCandidates = [path.join(targetFolder, 'public/styles.css')];
+const preferredCssCandidates = /(?:^|\/)SkyeMusicNexus$/.test(relativeTarget)
+  ? skyeMusicNexusCssCandidates
+  : /(?:^|\/)SkyeMail$/.test(relativeTarget)
+  ? skyeMailCssCandidates
+  : /(?:^|\/)relay13-core-v1\.7-connectlog-operator-proof$/.test(relativeTarget)
+  ? relay13CssCandidates
+  : [];
 
 function buildSourceSnapshot() {
+  const defaultCssCandidates = [rootCss, path.join(targetFolder, 'src', 'styles.css'), cssFiles[0]].filter(Boolean);
+  const selectedCssPath = firstExistingPath([...preferredCssCandidates, ...defaultCssCandidates]);
   const source = {
     index: isSkyeGateFS27
       ? readFirstExisting([skyepayIndex, path.join(targetFolder, 'index.html'), htmlFiles[0]].filter(Boolean))
@@ -174,7 +195,9 @@ function buildSourceSnapshot() {
       ? readFirstExisting([skyepayCss, cssFiles[0]].filter(Boolean))
       : isSkyeSolTarget
       ? readFirstExisting([canonicalCss, cssFiles[0]].filter(Boolean))
-      : readFirstExisting([rootCss, path.join(targetFolder, 'src', 'styles.css'), cssFiles[0]].filter(Boolean)),
+      : selectedCssPath
+      ? fs.readFileSync(selectedCssPath, 'utf8')
+      : '',
     js: isSkyeGateFS27
       ? [readFirstExisting([skyepayJs, jsFiles[0]].filter(Boolean)), readFirstExisting([skyepayMotionJs])].filter(Boolean).join('\n\n')
       : isSkyeSolTarget
@@ -191,7 +214,7 @@ function buildSourceSnapshot() {
       ? skyepayCss
       : isSkyeSolTarget
       ? canonicalCss
-      : fs.existsSync(rootCss) ? rootCss : path.join(targetFolder, 'src', 'styles.css'),
+      : selectedCssPath,
     js: isSkyeGateFS27
       ? skyepayJs
       : isSkyeSolTarget
@@ -244,24 +267,72 @@ function buildSourceSnapshot() {
 
 let { source, sourcePaths, combinedSource, auditSource, homepageCopy } = buildSourceSnapshot();
 
+const targetProduct = isMcpServerTarget
+  ? 'QuantumSkyes MCP design tooling'
+  : isDesignLab
+  ? 'Skye Design Lab'
+  : isSkyeGateFS27
+  ? 'SkyePay / SkyeGateFS27'
+  : isDevoodeRatorTarget
+  ? 'DevoodeRator'
+  : 'SkyeSol / Skyes Over London LC';
+const targetAudience = isMcpServerTarget
+  ? 'agents and builders using the local MCP'
+  : isDesignLab
+  ? 'builders and agents producing premium design systems'
+  : isSkyeGateFS27
+  ? 'private preview clients and the owner/operator'
+  : isDevoodeRatorTarget
+  ? 'founders, devs, operators, and buyers who want to see how Gray builds the 0S in public'
+  : 'operators and buyers';
+const targetGoal = isMcpServerTarget
+  ? 'Organize flexible components by use case while enforcing quality and runtime stack gates.'
+  : isDesignLab
+  ? 'High-end design generation infrastructure with varied art directions and MCP pattern packs.'
+  : isSkyeGateFS27
+  ? 'Stripe-backed closeout, owner approval, and private preview payment flow.'
+  : isDevoodeRatorTarget
+  ? 'Publish Gray’s daily behind-the-build field notes with receipts, MCP workflow proof, SkyeVault source-custody receipts, business cards, social drops, and SkyeVault Bins context.'
+  : 'Use the local quantumskyes MCP to audit and drive the public surface build.';
+const targetOffer = isSkyeGateFS27
+  ? 'a private Stripe-backed owner approval and payment command lane'
+  : isDevoodeRatorTarget
+  ? 'a founder-operated dev journal where production receipts, MCP workflows, vault pushes, recovery architecture, social cards, and daily build lessons become public proof'
+  : 'a crisp public route into Web Builds, AI Data Apps, Portals Hubs, Intake Routing, Trust Surfaces, SEO Content, Gateway13, SkyeSuite, proof receipts, and private operator handoff';
+const targetComponents = isSkyeGateFS27
+  ? ['SkyePay', 'Stripe Checkout', 'owner approval', 'payment ledger', 'browser proof']
+  : isDevoodeRatorTarget
+  ? ['daily build logs', 'SkyeVault receipts', 'MCP tooling receipts', 'business cards', 'social vault', 'SkyeVault Bins beta']
+  : ['Web Builds', 'AI Data Apps', 'Portals Hubs', 'Intake Routing', 'Trust Surfaces', 'SEO Content', 'Gateway13', 'SkyeSuite', 'proof receipts'];
+
 const publicCopyForAudit = [
   isSkyeGateFS27
     ? 'I built SkyePay inside SkyeGateFS27 as the payment and owner approval lane for private app previews, Stripe Checkout, and workspace unlocks.'
+    : isDevoodeRatorTarget
+    ? 'I built DevoodeRator as my daily behind-the-build journal where I show the pressure, the fixes, the receipts, the smoke checks, and the 0S architecture in my own voice.'
     : 'I built SkyeSol as the public command room for Skyes Over London LC.',
   isSkyeGateFS27
     ? 'I route the client from preview acceptance into a gate ledger, pending owner approval, and repo platform wiring after live proof.'
+    : isDevoodeRatorTarget
+    ? 'I route readers through the DevoodeRator command room: SkyeVault source custody, MCP tooling, proof receipts, gates, blog drops, social cards, business cards, and the beta Bin workflow without turning the work into generic dev content.'
     : 'I route buyers through web builds, AI data apps, client workspace portals, intake gates, trust surfaces, SEO content, proof receipts, and private operator handoff.',
   isSkyeGateFS27
     ? 'I keep card handling inside Stripe while FS27 owns the approval record, customer activation state, and operational handoff.'
+    : isDevoodeRatorTarget
+    ? 'I keep the public page alive with founder perspective while our operating brains, vault daemon, agents, routing, and proof receipts keep the system accountable.'
     : 'I keep the public offer readable while our operating brains, gates, agents, and proof layers stay organized behind it.'
 ].join(' ');
 
 const logoSourceForAudit = [
   isSkyeGateFS27
     ? '<img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27"><span>SkyePay</span>'
+    : isDevoodeRatorTarget
+    ? '<img src="assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem"><span>☣️ DevoodeRator ☣️</span>'
     : '<img src="/SkyeSol/skyesol-main/assets/skyesol-rebuild/skyes-primary-logo.png" alt="SkyeSol">',
   isSkyeGateFS27
     ? '<span class="pay-brand">SkyePay</span>'
+    : isDevoodeRatorTarget
+    ? '<img src="assets/gray-skyes-headshot.png" alt="Gray Skyes">'
     : '<img src="/SkyeSol/skyesol-main/assets/skyesol-rebuild/skyes-over-london-deity-logo.png" alt="Skyes Over London LC">'
 ].join('\n');
 
@@ -271,6 +342,8 @@ const requiredStackForTarget = relativeTarget === 'skyesol_current_public_site' 
   ? ['gsap', 'lenis']
   : isDesignLab
   ? ['framerMotion', 'gsap', 'lenis', 'three', 'r3f', 'drei', 'postprocessing']
+  : isDevoodeRatorTarget
+  ? []
   : [];
 const requestedEffectOverrides = (process.env.MCP_EFFECTS || '')
   .split(',')
@@ -284,6 +357,8 @@ const requestedEffectsForTarget = [...new Set([...(isSkyeGateFS27
   ? []
   : isDesignLab
   ? ['textEffects', 'motionChrome', 'livingBackground', 'gsapScroll', 'threeCanvas', 'surfaceScreenshots']
+  : isDevoodeRatorTarget
+  ? ['textEffects', 'motionChrome', 'livingBackground', 'neonScrollbar']
   : isMetrAIyux0S
   ? ['neonScrollbar', 'textEffects', 'motionChrome', 'livingBackground']
   : targetHasPublicSource
@@ -353,7 +428,7 @@ for (const filePath of [canonicalIndex, canonicalCss, canonicalStackSource, cano
     toolCalls.push(await callTool('repo_read', { path: path.relative(repoRoot, filePath) }));
   }
 }
-toolCalls.push(await callTool('design_find', { query: `${relativeTarget} SkyeSol public site services proof operator MCP`, limit: 8 }));
+toolCalls.push(await callTool('design_find', { query: `${relativeTarget} ${targetProduct} ${targetGoal} MCP proof operator`, limit: 8 }));
 toolCalls.push(await callTool('design_asset_manifest', {}));
 toolCalls.push(await callTool('design_template_manifest', {}));
 if (templateTargetId) {
@@ -391,55 +466,47 @@ if (!isSkyeGateFS27 && targetHasPublicSource) {
   }
 }
 toolCalls.push(await callTool('design_variety_plan', {
-  product: isDesignLab ? 'Skye Design Lab' : isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
+  product: targetProduct,
   surface: relativeTarget,
-  goal: isDesignLab ? 'High-end design generation infrastructure with varied art directions and MCP pattern packs.' : 'Use the local quantumskyes MCP to audit and drive the public surface build.',
-  audience: isDesignLab ? 'builders and agents producing premium design systems' : isSkyeGateFS27 ? 'private preview clients and the owner/operator' : 'operators and buyers',
+  goal: targetGoal,
+  audience: targetAudience,
   previousArchetype: isDesignLab ? 'cinematic-command' : ''
 }));
 toolCalls.push(await callTool('design_recipe_plan', {
-  product: isDesignLab ? 'Skye Design Lab' : isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
+  product: targetProduct,
   surface: relativeTarget,
-  goal: isDesignLab ? 'High-end design generation infrastructure with varied art directions and MCP pattern packs.' : 'Use the local quantumskyes MCP to audit and drive the public surface build.',
-  audience: isDesignLab ? 'builders and agents producing premium design systems' : isSkyeGateFS27 ? 'private preview clients and the owner/operator' : 'operators and buyers',
+  goal: targetGoal,
+  audience: targetAudience,
   effects: requestedEffectsForTarget
 }));
 toolCalls.push(await callTool('design_component_plan', {
-  product: isMcpServerTarget ? 'QuantumSkyes MCP design tooling' : isDesignLab ? 'Skye Design Lab' : isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
+  product: targetProduct,
   surface: relativeTarget,
-  goal: isMcpServerTarget
-    ? 'Organize flexible components by use case while enforcing quality and runtime stack gates.'
-    : isDesignLab
-    ? 'High-end design generation infrastructure with varied art directions and MCP pattern packs.'
-    : 'Use the local quantumskyes MCP to audit and drive the public surface build.',
-  audience: isMcpServerTarget ? 'agents and builders using the local MCP' : isDesignLab ? 'builders and agents producing premium design systems' : isSkyeGateFS27 ? 'private preview clients and the owner/operator' : 'operators and buyers',
+  goal: targetGoal,
+  audience: targetAudience,
   useCases: isMcpServerTarget ? ['content-sections'] : [],
-  componentIds: isSkyeGateFS27 ? ['gsap-scroll-stage', 'text-effects', 'neon-motion-chrome'] : [],
+  componentIds: isSkyeGateFS27 ? ['gsap-scroll-stage', 'text-effects', 'neon-motion-chrome'] : isDevoodeRatorTarget ? ['text-effects', 'neon-motion-chrome'] : [],
   effects: requestedEffectsForTarget,
   requiredStack: requiredStackForTarget,
   stackMode: isSkyeSolTarget ? 'full' : 'selected'
 }));
 toolCalls.push(await callTool('design_compose_brief', {
-  product: isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
+  product: targetProduct,
   surface: relativeTarget,
-  goal: isSkyeGateFS27 ? 'Stripe-backed closeout and owner approval' : 'crisp public front door',
-  audience: isSkyeGateFS27 ? 'private preview clients and the owner/operator' : 'operators and buyers',
+  goal: targetGoal,
+  audience: targetAudience,
   intensity: 'polished'
 }));
 toolCalls.push(await callTool('design_content_generate', {
-  product: isSkyeGateFS27 ? 'SkyePay' : 'SkyeSol',
+  product: isDevoodeRatorTarget ? 'DevoodeRator' : isSkyeGateFS27 ? 'SkyePay' : 'SkyeSol',
   format: 'hero',
-  audience: isSkyeGateFS27 ? 'private preview clients and the owner/operator' : 'operators and buyers',
-  offer: isSkyeGateFS27
-    ? 'a private Stripe-backed owner approval and payment command lane'
-    : 'a crisp public route into Web Builds, AI Data Apps, Portals Hubs, Intake Routing, Trust Surfaces, SEO Content, Gateway13, SkyeSuite, proof receipts, and private operator handoff',
-  components: isSkyeGateFS27
-    ? ['SkyePay', 'Stripe Checkout', 'owner approval', 'payment ledger', 'browser proof']
-    : ['Web Builds', 'AI Data Apps', 'Portals Hubs', 'Intake Routing', 'Trust Surfaces', 'SEO Content', 'Gateway13', 'SkyeSuite', 'proof receipts']
+  audience: targetAudience,
+  offer: targetOffer,
+  components: targetComponents
 }));
 toolCalls.push(await callTool('design_content_audit', { content: publicCopyForAudit, requireFirstPerson: true }));
 toolCalls.push(await callTool('design_logo_audit', {
-  product: isSkyeGateFS27 ? 'SkyePay / SkyeGateFS27' : 'SkyeSol / Skyes Over London LC',
+  product: targetProduct,
   requireExistingAsset: !isSkyeGateFS27 && targetHasPublicSource,
   source: `${logoSourceForAudit}\n${auditSource.slice(0, 90000)}`
 }));
@@ -452,6 +519,9 @@ if (!isMcpServerTarget) {
   }
   toolCalls.push(await callTool('design_performance_audit', { source: auditSource.slice(0, 90000) }));
   toolCalls.push(await callTool('design_stack_audit', { required: requiredStackForTarget, packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: auditSource.slice(0, 90000) }));
+  if (targetHasPublicSource && !isFree99AppIntakeTarget) {
+    toolCalls.push(await callTool('design_luxury_audit', { level: 'full', source: auditSource.slice(0, 90000) }));
+  }
 } else {
   toolCalls.push(await callTool('design_stack_audit', { required: [], packageJson: readFirstExisting([path.join(repoRoot, 'package.json')]), source: auditSource.slice(0, 90000) }));
 }

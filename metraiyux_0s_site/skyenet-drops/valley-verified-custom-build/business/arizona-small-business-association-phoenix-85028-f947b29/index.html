@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Small Business Association | Phoenix Small Business Association</title>
+  <meta name="description" content="Arizona Small Business Association in Phoenix: Valley Verified business profile with researched services, local presence, audience fit, and trust signals.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172018;
+      --muted: #526150;
+      --leaf: #2f7d4d;
+      --coral: #d65b45;
+      --blue: #2374ab;
+      --sun: #efbd4a;
+      --paper: #fffdf8;
+      --line: rgba(23, 32, 24,.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(47, 125, 77,.12), transparent 34%),
+        linear-gradient(315deg, rgba(35, 116, 171,.13), transparent 44%),
+        #f8f5ed;
+    }
+
+    a { color: inherit; }.page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }.navline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+      color: var(--leaf);
+      font-weight: 800;
+    }.navline img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }.navline div {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }.hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px,.62fr);
+      gap: 18px;
+      align-items: stretch;
+    }.hero-copy {
+      min-height: 570px;
+      display: grid;
+      align-content: center;
+      gap: 24px;
+      padding: clamp(28px, 5vw, 60px);
+      border-radius: 8px;
+      background:
+        linear-gradient(140deg, rgba(255, 253, 248,.96), rgba(255, 253, 248,.75)),
+        repeating-linear-gradient(90deg, rgba(47, 125, 77,.11) 0 1px, transparent 1px 58px);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }.tag {
+      width: fit-content;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: var(--sun);
+      color: #1e271f;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(42px, 8vw, 92px);
+      line-height:.94;
+    }.lead {
+      margin: 0;
+      max-width: 720px;
+      color: #3f4f40;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.5;
+    }.contact-stack {
+      display: grid;
+      gap: 14px;
+    }.panel {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 22px;
+    }.panel.feature {
+      display: grid;
+      place-items: center;
+      min-height: 210px;
+      background: var(--leaf);
+    }.panel.feature img {
+      width: 124px;
+      height: 124px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+    }.panel b,.metric b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      text-transform: uppercase;
+    }.panel a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 15px;
+      border-radius: 7px;
+      background: var(--coral);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    address {
+      font-style: normal;
+      color: var(--muted);
+      line-height: 1.5;
+    }.metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }.metric {
+      min-height: 126px;
+      padding: 20px;
+      border-radius: 8px;
+      background: #fff;
+      border-top: 8px solid var(--leaf);
+      box-shadow: 0 14px 34px rgba(29, 63, 40,.08);
+    }.metric:nth-child(2) { border-top-color: var(--coral); }.metric:nth-child(3) { border-top-color: var(--blue); }.metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 900px) {.hero,.metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {.navline { align-items: flex-start; flex-direction: column; }.hero-copy { min-height: 440px; padding: 26px; }
+    }.vv-proof {
+      width: min(1120px, calc(100% - 32px));
+      margin: 30px auto 56px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line, rgba(17, 24, 39,.16));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.88);
+      box-shadow: 0 18px 50px rgba(17, 24, 39,.08);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink, #111827);
+    }.vv-proof-eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted, #5f6574);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+    }.vv-proof h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-transform: none;
+    }.vv-proof p {
+      max-width: 920px;
+      margin: 0;
+      color: var(--muted, #4b5563);
+      font-size: 1rem;
+      line-height: 1.72;
+    }.vv-proof p + p {
+      margin-top: 14px;
+    }.vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }.vv-proof-card {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line, rgba(17, 24, 39,.14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.72);
+    }.vv-proof-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--leaf, var(--green, var(--magenta, #0f766e))));
+      font-size: 12px;
+      letter-spacing:.1em;
+      text-transform: uppercase;
+    }.vv-proof-card span {
+      color: var(--muted, #4b5563);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {.vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="navline">
+      <div>
+        <img src="assets/logo.svg" alt="Arizona Small Business Association profile mark">
+        <span>Valley Verified Network</span>
+      </div>
+      <span>Phoenix, AZ 85028</span>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="tag">Small business association</div>
+        <h1>Arizona Small Business Association</h1>
+        <p class="lead">Arizona Small Business Association is a Phoenix-based statewide resource hub for entrepreneurs and small businesses, combining advocacy, education, networking, events, member visibility, and growth programs.</p>
+      </div>
+
+      <aside class="contact-stack" aria-label="Contact details">
+        <div class="panel feature">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="panel">
+          <b>Phone</b>
+          <a href="tel:+16023064000">(602) 306-4000</a>
+        </div>
+        <div class="panel">
+          <b>Address</b>
+          <address>11811 N. Tatum Blvd., Ste. P195<br>Phoenix, AZ 85028</address>
+        </div>
+      </aside>
+    </section>
+
+    <section class="metrics" aria-label="Business facts">
+      <div class="metric">
+        <b>Category</b>
+        <span>Local Services</span>
+      </div>
+      <div class="metric">
+        <b>License Type</b>
+        <span>Business &amp; Professional Services</span>
+      </div>
+      <div class="metric">
+        <b>Profile Reviewed</b>
+        <span>May 19, 2026</span>
+      </div>
+    </section>
+  
+    <section class="vv-proof" aria-labelledby="vv-proof-heading">
+      <p class="vv-proof-eyebrow">Skyes Over London Review</p>
+      <h2 id="vv-proof-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Arizona Small Business Association belongs in Valley Verified because the official site shows a deep statewide small-business role from its Phoenix address at 11811 N. Tatum Blvd., Suite P-195. Founded in 1973, ASBA describes itself as a nonprofit 501(c)(6), membership-based trade association and nonpartisan advocate for Arizona small businesses.</p>
+      <p>Skyes Over London highlights ASBA for the scale and specificity of its support: 2,500+ members, 30,000+ social reach, members in all 15 Arizona counties, and programs including networking, advocacy, education, events, SCALE, Small Business Incubator, ElevateIT, ForgeAhead, Locate48, ribbon cuttings, community calendar, and digital marketing benefits.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Best for</strong><span>Arizona entrepreneurs, small business owners, community partners, and companies from one employee to 500 employees.</span></div>
+        <div class="vv-proof-card"><strong>Local presence</strong><span>11811 N. Tatum Blvd., Suite P-195, Phoenix, AZ 85028 with listed phone 602-306-4000.</span></div>
+        <div class="vv-proof-card"><strong>Proof signals</strong><span>Official website, official about page, official member benefits page, statewide membership stats, and Chamber evidence.</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -6,6 +6,7 @@ import { verifyJwt } from "./_lib/crypto.js";
 import { verifyAccessToken } from "./_lib/oauth.js";
 import { verifySessionToken } from "./_lib/sessions.js";
 import { audit } from "./_lib/audit.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
 
 let crmSchemaPromise = null;
 
@@ -910,144 +911,98 @@ function makeMessageTemplate(kind, context, body = {}) {
   return `Hi${contact.name ? ` ${contact.name}` : ""}, following up on ${service}. Reply with the best time and address and we will keep this moving.`;
 }
 
-async function sendTwilioSms({ to, body }) {
-  const accountSid = firstEnv("TWILIO_ACCOUNT_SID", "SKYGATEFS13_TWILIO_ACCOUNT_SID");
-  const authToken = firstEnv("TWILIO_AUTH_TOKEN", "SKYGATEFS13_TWILIO_AUTH_TOKEN");
-  const from = firstEnv("TWILIO_PHONE_NUMBER", "SKYGATEFS13_TWILIO_PHONE_NUMBER");
-  if (!accountSid || !authToken || !from) {
-    const err = new Error("Twilio is not configured.");
-    err.status = 501;
-    throw err;
-  }
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/Messages.json`, {
-    method: "POST",
-    headers: {
-      "authorization": `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString("base64")}`,
-      "content-type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams({ To: to, From: from, Body: body })
+async function sendTwilioSms({ to, body, tenantKey = "", leadId = "", contactId = "" }) {
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "twilio",
+    action: "twilio.sms.send",
+    app_id: "vantacore-crm",
+    workspace_id: tenantKey || "vantacore",
+    customer_id: leadId || contactId || tenantKey || "vantacore",
+    client_id: contactId || leadId || "",
+    usage_lane: "vantacore:crm_sms",
+    payload: { to, body },
+    consent: { sms_opt_in: true, operator_initiated: true }
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(data.message || `Twilio returned ${res.status}`);
-    err.status = res.status;
-    err.providerResponse = data;
+  const receipt = runtime.receipt || null;
+  if (!runtime.ok) {
+    const err = new Error(receipt?.error || runtime.response?.error || `Twilio provider runtime returned ${runtime.status}`);
+    err.status = runtime.status || 502;
+    err.providerResponse = publicProviderRuntime(receipt);
     throw err;
   }
-  return { sid: data.sid, status: data.status, to: redact(to), from: redact(from) };
+  return {
+    sid: receipt?.provider_result?.id || null,
+    status: receipt?.provider_result?.status || receipt?.status || null,
+    to: redact(to),
+    from: "0s-provider-runtime",
+    provider_runtime: publicProviderRuntime(receipt)
+  };
 }
 
-async function sendResendEmail({ to, subject, text }) {
-  const apiKey = firstEnv("RESEND_API_KEY");
-  const from = firstEnv("RESEND_FROM_EMAIL", "RESEND_FROM", "MAIL_FROM");
-  if (!apiKey || !from) {
-    const err = new Error("Resend is not configured.");
-    err.status = 501;
-    throw err;
-  }
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "authorization": `Bearer ${apiKey}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({ from, to: [to], subject, text })
+async function sendResendEmail({ to, subject, text, tenantKey = "", leadId = "", contactId = "" }) {
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "resend",
+    action: "resend.email.send",
+    app_id: "vantacore-crm",
+    workspace_id: tenantKey || "vantacore",
+    customer_id: leadId || contactId || tenantKey || "vantacore",
+    client_id: contactId || leadId || "",
+    usage_lane: "vantacore:crm_email",
+    payload: { to: [to], subject, text }
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(data.message || data.error || `Resend returned ${res.status}`);
-    err.status = res.status;
-    err.providerResponse = data;
+  const receipt = runtime.receipt || null;
+  if (!runtime.ok) {
+    const err = new Error(receipt?.error || runtime.response?.error || `Resend provider runtime returned ${runtime.status}`);
+    err.status = runtime.status || 502;
+    err.providerResponse = publicProviderRuntime(receipt);
     throw err;
   }
-  return { id: data.id, to: redact(to), from: redact(from) };
+  return {
+    id: receipt?.provider_result?.id || null,
+    to: redact(to),
+    from: "0s-provider-runtime",
+    provider_runtime: publicProviderRuntime(receipt)
+  };
 }
 
-function base64Url(input) {
-  return Buffer.from(input).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-}
-
-function googlePrivateKey() {
-  return firstEnv("GOOGLE_PRIVATE_KEY").replace(/\\n/g, "\n");
-}
-
-async function googleAccessToken() {
-  const clientEmail = firstEnv("GOOGLE_CLIENT_EMAIL");
-  const privateKey = googlePrivateKey();
-  if (!clientEmail || !privateKey) {
-    const err = new Error("Google Calendar service account is not configured.");
-    err.status = 501;
-    throw err;
-  }
-  const now = Math.floor(Date.now() / 1000);
-  const header = base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const claim = base64Url(JSON.stringify({
-    iss: clientEmail,
-    scope: "https://www.googleapis.com/auth/calendar.events",
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now
-  }));
-  const input = `${header}.${claim}`;
-  const signature = crypto.createSign("RSA-SHA256").update(input).sign(privateKey, "base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion: `${input}.${signature}`
-    })
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.access_token) {
-    const err = new Error(data.error_description || data.error || `Google token returned ${res.status}`);
-    err.status = res.status;
-    err.providerResponse = data;
-    throw err;
-  }
-  return data.access_token;
-}
-
-async function createGoogleCalendarEvent({ booking, contact, body }) {
-  const calendarId = firstEnv("GOOGLE_CALENDAR_ID");
-  if (!calendarId) {
-    const err = new Error("GOOGLE_CALENDAR_ID is not configured.");
-    err.status = 501;
-    throw err;
-  }
-  const accessToken = await googleAccessToken();
+async function createGoogleCalendarEvent({ booking, contact, body, tenantKey = "" }) {
   const start = new Date(body.start_at || booking.start_at);
   const end = new Date(start.getTime() + clampInt(body.duration_minutes, 15, 480, 60) * 60 * 1000);
-  const event = {
-    summary: normalizeText(body.title || `${booking.service} - ${contact.name || "VantaCore customer"}`, 220),
-    description: normalizeText(body.description || booking.notes || "Created by VantaCore through FS27 provider control.", 1200),
-    start: { dateTime: start.toISOString() },
-    end: { dateTime: end.toISOString() },
-    attendees: contact.email ? [{ email: contact.email, displayName: contact.name || undefined }] : undefined,
-    extendedProperties: {
-      private: {
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "google-calendar",
+    action: "google.calendar.event.create",
+    app_id: "vantacore-crm",
+    workspace_id: tenantKey || "vantacore",
+    customer_id: booking.lead_id || booking.contact_id || tenantKey || "vantacore",
+    client_id: booking.contact_id || booking.id || "",
+    usage_lane: "vantacore:calendar_event",
+    payload: {
+      summary: normalizeText(body.title || `${booking.service} - ${contact.name || "VantaCore customer"}`, 220),
+      description: normalizeText(body.description || booking.notes || "Created by VantaCore through FS27 provider control.", 1200),
+      start_at: start.toISOString(),
+      end_at: end.toISOString(),
+      attendee_email: contact.email || "",
+      timezone: body.timezone || process.env.FOUNDER_CALENDAR_TIMEZONE || process.env.TZ || "America/Phoenix",
+      metadata: {
         source_app: "vantacore-service-crm",
         booking_id: booking.id,
         lead_id: booking.lead_id || ""
       }
     }
-  };
-  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
-    method: "POST",
-    headers: {
-      "authorization": `Bearer ${accessToken}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify(event)
   });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err = new Error(data.error?.message || `Google Calendar returned ${res.status}`);
-    err.status = res.status;
-    err.providerResponse = data;
+  const receipt = runtime.receipt || null;
+  if (!runtime.ok) {
+    const err = new Error(receipt?.error || runtime.response?.error || `Google Calendar provider runtime returned ${runtime.status}`);
+    err.status = runtime.status || 502;
+    err.providerResponse = publicProviderRuntime(receipt);
     throw err;
   }
-  return { id: data.id, htmlLink: data.htmlLink || null, status: data.status || "confirmed" };
+  return {
+    id: receipt?.provider_result?.id || null,
+    htmlLink: receipt?.provider_result?.htmlLink || null,
+    status: receipt?.provider_result?.status || "confirmed",
+    provider_runtime: publicProviderRuntime(receipt)
+  };
 }
 
 async function executeProviderAction(req, access, action, body) {
@@ -1088,7 +1043,7 @@ async function executeProviderAction(req, access, action, body) {
       const message = makeMessageTemplate("sms", { lead, contact }, body);
       if (!to) throw Object.assign(new Error("SMS action requires a lead/contact phone or explicit to number."), { status: 400 });
       rollbackAction = "Record cancellation receipt; Twilio SMS cannot be unsent.";
-      response = live ? await sendTwilioSms({ to, body: message }) : { dry_run: true, to: redact(to), body_preview: message.slice(0, 220) };
+      response = live ? await sendTwilioSms({ to, body: message, tenantKey: access.tenantKey, leadId: lead.id, contactId: contact.id }) : { dry_run: true, to: redact(to), body_preview: message.slice(0, 220) };
       externalId = response.sid || null;
       status = live ? "sent" : "dry_run_ready";
       if (live && lead?.id) {
@@ -1103,7 +1058,7 @@ async function executeProviderAction(req, access, action, body) {
       const subject = normalizeText(body.subject || `Follow-up: ${lead?.service || "your service request"}`, 180);
       if (!to) throw Object.assign(new Error("Email action requires a lead/contact email or explicit to email."), { status: 400 });
       rollbackAction = "Record cancellation receipt; delivered email cannot be recalled.";
-      response = live ? await sendResendEmail({ to, subject, text }) : { dry_run: true, to: redact(to), subject, text_preview: text.slice(0, 320) };
+      response = live ? await sendResendEmail({ to, subject, text, tenantKey: access.tenantKey, leadId: lead.id, contactId: contact.id }) : { dry_run: true, to: redact(to), subject, text_preview: text.slice(0, 320) };
       externalId = response.id || null;
       status = live ? "sent" : "dry_run_ready";
       if (live && lead?.id) {
@@ -1117,7 +1072,7 @@ async function executeProviderAction(req, access, action, body) {
       const bookingContact = bookingContext.contact || contact;
       rollbackAction = "Delete or cancel the created Google Calendar event by external_id.";
       response = live
-        ? await createGoogleCalendarEvent({ booking, contact: bookingContact, body })
+        ? await createGoogleCalendarEvent({ booking, contact: bookingContact, body, tenantKey: access.tenantKey })
         : { dry_run: true, service: booking.service, start_at: booking.start_at, contact: bookingContact.name || "customer" };
       externalId = response.id || null;
       status = live ? "created" : "dry_run_ready";

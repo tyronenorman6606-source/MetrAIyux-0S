@@ -1,0 +1,49 @@
+{
+  "receipt_type": "supaboy_artist_landing_nexus_local_proof",
+  "created_at_utc": "2026-05-23T08:17:47.787Z",
+  "folder": ".1/supaboy-artist-landing-nexus",
+  "local_url": "http://127.0.0.1:4197/",
+  "pages": {
+    "value_surface": "http://127.0.0.1:4197/index.html",
+    "artist_id_upload_proof": "http://127.0.0.1:4197/artist-id-upload.html",
+    "supaboy_artist_landing": "http://127.0.0.1:4197/SUPABOY/index.html",
+    "supaboy_music_section": "http://127.0.0.1:4197/SUPABOY/index.html#sound"
+  },
+  "supaboy_package": {
+    "source": ".1/supaboy-merser31/dist",
+    "target": ".1/supaboy-artist-landing-nexus/SUPABOY",
+    "file_count": 26,
+    "note": "Packaged once inside this Nexus folder as the SUPABOY artist landing artifact."
+  },
+  "music_nexus_boundary": {
+    "touched_live_music_nexus_surfaces": false,
+    "claim_posture": "Conservative: no live DSP, royalty, legal, DMCA, or production storage claims are made by this static proof folder."
+  },
+  "browser_test": {
+    "ok": true,
+    "base": "http://127.0.0.1:4197",
+    "actions": [
+      "opened value page",
+      "opened artist ID upload proof",
+      "uploaded WAV into audio input",
+      "uploaded SVG image into media input",
+      "published to artist page preview",
+      "clicked generated track play button",
+      "confirmed audio player blob source and media wall render"
+    ],
+    "state": {
+      "title_present": true,
+      "artist_id_present": true,
+      "media_present": true,
+      "audio_current_src_kind": "blob",
+      "indexeddb_name": "artistLandingNexusProof"
+    },
+    "console_errors": 0,
+    "failures": 0,
+    "report": "test-artifacts/supaboy-artist-landing-nexus/browser-proof-report.json",
+    "screenshots": [
+      "test-artifacts/supaboy-artist-landing-nexus/value-page.png",
+      "test-artifacts/supaboy-artist-landing-nexus/id-upload-proof.png"
+    ]
+  }
+}

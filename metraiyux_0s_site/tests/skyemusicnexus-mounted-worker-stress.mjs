@@ -31,6 +31,19 @@ function memoryKv() {
 function fakeGateWorker() {
   return {
     async fetch(request) {
+      const url = new URL(request.url);
+      if (url.pathname === '/admin/login') {
+        return Response.json({
+          ok: true,
+          token: 'admin:music-owner@example.com',
+          active: true,
+          email: 'music-owner@example.com',
+          username: 'music-owner@example.com',
+          sub: 'music-stress-admin-music-owner',
+          role: 'admin',
+          scope: 'admin.read admin.write music.write',
+        });
+      }
       const body = await request.json().catch(() => ({}));
       const token = String(body.token || '');
       const [role = 'artist', email = `${role}@music-stress.local`] = token.split(':');

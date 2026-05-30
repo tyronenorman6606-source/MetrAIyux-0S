@@ -2,14 +2,14 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const cors = { 'content-type':'application/json', 'access-control-allow-origin':'*', 'access-control-allow-methods':'GET,POST,OPTIONS', 'access-control-allow-headers':'content-type,authorization,x-admin-token' };
+    const cors = { 'content-type':'application/json', 'access-control-allow-origin':'*', 'access-control-allow-methods':'GET,POST,OPTIONS', 'access-control-allow-headers':'content-type,authorization,x-admin-token,x-0s-shared-gate,x-0s-internal-proxy-secret' };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (url.pathname === '/' || url.pathname === '/health' || url.pathname === '/api/crown/status') return Response.json({ ok:true, service:'CROWN Site Operator Brain', brains:16, persistence:{d1:!!env.CROWN_DB, kv:!!env.CROWN_KV, queue:!!env.CROWN_QUEUE}, mode:'worker-ready', time:new Date().toISOString() }, { headers:cors });
     if (url.pathname === '/api/crown/intake' && request.method === 'POST') {
       const body = await request.json().catch(()=>({}));
       const signal = String(body.signal || body.message || body.text || body.title || '');
       const route = classify(signal);
-      const row = { id: crypto.randomUUID(), type:'public_intake', signal, route, created_at:new Date().toISOString(), status:'intake_pending_review', public_intake:true };
+      const row = { id: safeRandomUUID(), type:'public_intake', signal, route, created_at:new Date().toISOString(), status:'intake_pending_review', public_intake:true };
       if (env.CROWN_KV) await env.CROWN_KV.put(`intake:${row.id}`, JSON.stringify(row));
       if (env.CROWN_DB) await env.CROWN_DB.prepare('insert into crown_events (id,type,payload,created_at) values (?1,?2,?3,?4)').bind(row.id,'public_intake',JSON.stringify(row),row.created_at).run();
       if (env.CROWN_QUEUE) await env.CROWN_QUEUE.send(row);
@@ -20,7 +20,7 @@ export default {
       const body = await request.json().catch(()=>({}));
       const signal = String(body.signal || body.message || body.text || '');
       const route = classify(signal);
-      const id = crypto.randomUUID();
+      const id = safeRandomUUID();
       const row = { id, type:'route', signal, route, created_at:new Date().toISOString(), status:'draft_receipt' };
       if (env.CROWN_KV) await env.CROWN_KV.put(`event:${id}`, JSON.stringify(row));
       if (env.CROWN_DB) await env.CROWN_DB.prepare('insert into crown_events (id,type,payload,created_at) values (?1,?2,?3,?4)').bind(id,'route',JSON.stringify(row),row.created_at).run();
@@ -30,7 +30,7 @@ export default {
     if (url.pathname === '/api/crown/task' && request.method === 'POST') {
       if (!authorized(request, env)) return unauthorized(cors);
       const body = await request.json().catch(()=>({}));
-      const id = crypto.randomUUID();
+      const id = safeRandomUUID();
       const task = { id, type:'task', title:body.title||'Untitled task', owner:body.owner||'Site Operator Brain', approval_required: body.approval_required ?? true, status:'pending_human_review', created_at:new Date().toISOString() };
       if (env.CROWN_KV) await env.CROWN_KV.put(`task:${id}`, JSON.stringify(task));
       if (env.CROWN_DB) await env.CROWN_DB.prepare('insert into crown_tasks (id,title,owner,status,payload,created_at) values (?1,?2,?3,?4,?5,?6)').bind(id,task.title,task.owner,task.status,JSON.stringify(task),task.created_at).run();
@@ -50,7 +50,7 @@ export default {
     if (url.pathname === '/api/crown/approval' && request.method === 'POST') {
       if (!authorized(request, env)) return unauthorized(cors);
       const body = await request.json().catch(()=>({}));
-      const id = crypto.randomUUID();
+      const id = safeRandomUUID();
       const approval = { id, item_id:body.item_id||null, decision:body.decision||'pending', approver:body.approver||'human_operator', notes:body.notes||'', created_at:new Date().toISOString() };
       if (env.CROWN_KV) await env.CROWN_KV.put(`approval:${id}`, JSON.stringify(approval));
       if (env.CROWN_DB) await env.CROWN_DB.prepare('insert into crown_approvals (id,item_id,decision,approver,notes,created_at) values (?1,?2,?3,?4,?5,?6)').bind(id,approval.item_id,approval.decision,approval.approver,approval.notes,approval.created_at).run();
@@ -60,6 +60,10 @@ export default {
   }
 }
 function authorized(request, env){
+  const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.CROWN_INTERNAL_PROXY_SECRET || '').trim();
+  const sharedGate = String(request.headers.get('x-0s-shared-gate') || '').trim();
+  const presentedProxySecret = String(request.headers.get('x-0s-internal-proxy-secret') || '').trim();
+  if (proxySecret) return sharedGate === 'operator' && presentedProxySecret === proxySecret;
   const expected = String(env.CROWN_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
   if (!expected) return false;
   const bearer = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i,'').trim();
@@ -81,4 +85,9 @@ function classify(signal){
   const hit = tests.find(([keys])=>keys.some(k=>s.includes(k)));
   const approval_required = /(contract|payment|hire|fire|legal|tax|send|publish|price|refund|public claim)/i.test(signal);
   return { primary: hit?hit[1]:'Central Company Command Brain', secondary: hit?hit[2]:'Site Operator Brain', approval_required };
+}
+
+function safeRandomUUID(){
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `uuid_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
 }

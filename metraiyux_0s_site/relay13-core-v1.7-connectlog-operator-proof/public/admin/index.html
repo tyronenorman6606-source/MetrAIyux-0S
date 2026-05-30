@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Relay13 Console</title>
-  <meta name="description" content="Relay13 operator console for workspaces, API keys, widget publishing, and real messaging threads.">
+  <meta name="description" content="Relay13 operator console for workspaces, shared 0S gate access, widget publishing, and real messaging threads.">
   <link rel="stylesheet" href="../styles.css">
 </head>
 <body class="skyesol-living-page">
@@ -58,7 +58,7 @@
       <div class="workspace-page-grid">
         <section class="panel stack"><strong>Allowed widget domains</strong><div class="row"><input id="domainName" class="input" placeholder="clientdomain.com"><button id="addDomain" class="btn">Allow</button></div><div id="domainList" class="micro">No workspace selected.</div></section>
         <section class="panel stack"><strong>System guardrails</strong><div id="guardrailPanel" class="micro">No workspace selected.</div><button id="enforceGuardrails" class="btn ghost">Enforce app-knowledge mode</button></section>
-        <section class="panel stack"><strong>API keys</strong><input id="keyName" class="input" placeholder="Key name"><button id="createKey" class="btn">Create scoped key</button><div id="newKey" class="install"></div></section>
+        <section class="panel stack"><strong>Shared gate</strong><input id="keyName" class="input" placeholder="0S/SkyGate session owned by Free99" disabled><button id="createKey" class="btn" disabled>Gate-owned</button><div id="newKey" class="install">Browser key minting is disabled on the 0S mount. Server-side helpers can mint short-lived Relay13 keys only when needed and revoke them immediately.</div></section>
       </div>
     </section>
 

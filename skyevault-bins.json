@@ -1,0 +1,73 @@
+{
+  "schema": "skyevault.bins.v1",
+  "status": "beta",
+  "updatedAt": "2026-05-26T02:20:00Z",
+  "description": "Scoped SkyeVault custody folders for source, agents, blog surfaces, and client build lanes that should be protected before or alongside Git.",
+  "export": {
+    "enabled": true,
+    "mode": "companion",
+    "dedupe": true,
+    "defaultBinIds": [
+      "skyeagents-bin",
+      "devooderator-blog",
+      "founder-song-vault"
+    ],
+    "purpose": "Autosync runs the normal repo/source-custody lane, then writes companion bin exports for agent/site lanes with file-level dedupe between bins."
+  },
+  "securityRules": [
+    "Bins are encrypted before vault storage.",
+    "Agents may read bin manifests and receipts, but must not print secrets, passphrases, bearer tokens, admin codes, raw env values, or private unlock material.",
+    "Public pages may reference receipt IDs and gated proof routes, not private handoff files.",
+    "Import/export/deploy-from-vault remains beta until stress proof and owner approval are recorded."
+  ],
+  "bins": [
+    {
+      "id": "devooderator-blog",
+      "label": "☣️ DevodeRator Blog Bin",
+      "exportLane": "site",
+      "exportPriority": 20,
+      "paths": [
+        "marketing/devooderator"
+      ],
+      "purpose": "Founder daily blog, copied social assets, business-card mirrors, DevodeRator agent instructions, and proof-linked writing surfaces."
+    },
+    {
+      "id": "skyeagents-bin",
+      "label": "SkyeAgents Bin",
+      "exportLane": "agents",
+      "exportPriority": 10,
+      "paths": [
+        ".agents/devooderator-field-scribe",
+        "marketing/devooderator/AGENTS.md",
+        "marketing/devooderator/AI_READ_ONLY_SITE_GOAL.md",
+        "marketing/devooderator/agents",
+        ".agents",
+        ".codex"
+      ],
+      "allowMissing": true,
+      "purpose": "Agent cards, site rules, operator prompts, and AI-readable workflow instructions that should be preserved without leaking credentials."
+    },
+    {
+      "id": "client-portal-builds",
+      "label": "Client Portal Builds Bin",
+      "paths": [
+        ".1",
+        "test-artifacts/supaboy-artist-landing-nexus-skynet"
+      ],
+      "allowMissing": true,
+      "purpose": "Client portal/build imports, SupaBoy-style build lanes, and generated proof receipts that may be too large or too temporary for Git-first handling."
+    },
+    {
+      "id": "founder-song-vault",
+      "label": "Founder Song Vault Bin",
+      "exportLane": "media",
+      "exportPriority": 30,
+      "paths": [
+        "metraiyux_0s_site/founder-command/song-vault",
+        "tools/founder-command/build-founder-song-vault.mjs"
+      ],
+      "allowMissing": true,
+      "purpose": "Browser-downloadable Founder Command song copies, original master references, generated-song manifest, and the repeatable builder that rebuilds the vault."
+    }
+  ]
+}

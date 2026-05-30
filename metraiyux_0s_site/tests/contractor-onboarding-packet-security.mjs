@@ -1,5 +1,14 @@
 import assert from 'node:assert/strict';
-import worker from '../cloudflare/worker.js';
+import { webcrypto } from 'node:crypto';
+
+if (!globalThis.crypto?.subtle || !globalThis.crypto?.getRandomValues) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true
+  });
+}
+
+const { default: worker } = await import('../cloudflare/worker.js');
 
 function memoryKv() {
   const store = new Map();
@@ -48,6 +57,9 @@ function formPacket(suffix) {
     preferred_name: 'Packet',
     email: `packet-${suffix}@example.com`,
     phone: '+15551234567',
+    role_lane: 'Artist / Music Nexus Contractor',
+    commission_plan: 'Artist/vendor payout hold — custom rights and payout addendum required',
+    approved_by: 'Founder Command owner review required',
     typed_signature: `Packet Contractor ${suffix}`,
     signature_date: '2026-05-23',
     accept_ic_agreement: 'on',
@@ -61,7 +73,21 @@ function formPacket(suffix) {
     bank_account: '999888777666',
     address_line_1: '100 Private Packet Lane',
     city_state_zip: 'Phoenix, AZ 85001',
-    tax_note: 'Sole proprietor test packet'
+    tax_note: 'Sole proprietor test packet',
+    source_app: 'SkyeMusicNexus',
+    artist_slug: 'supaboy',
+    artist_id: '444666666667',
+    stage_name: 'SupaBoy',
+    company_onboarding_lane: 'Skyes Over London LC artist/vendor contractor onboarding',
+    music_nexus_release_lane: 'slb-superboy',
+    founder_command_copy: 'true',
+    founder_command_route: '/api/founder-command/contractor-packets',
+    contractor_packet_inbox_route: '/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html',
+    ae_command_route: '/ae-command/?artist=supaboy&artistId=444666666667&stageName=SupaBoy&lane=artist',
+    workforce_command_route: '/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel',
+    skye_pay_tracking_ref: 'skyepay_artist_444666666667',
+    rights_review_required: 'true',
+    payout_hold_reason: 'Artist payout and checkout stay blocked until paperwork, rights/audio ownership review, payout destination verification, and owner approval clear.'
   };
   for (const [key, value] of Object.entries(fields)) form.append(key, value);
   form.append('w9_file', new Blob(['fake pdf W9 with sensitive tin 123-45-6789'], { type: 'application/pdf' }), 'w9.pdf');
@@ -121,7 +147,13 @@ try {
   assert.equal(created.payload.storage.netlify, false);
   assert.equal(created.payload.paymentProfile.status, 'encrypted_pending_owner_verification');
   assert.equal(created.payload.payoutLedger.externalTransferCreated, false);
+  assert.equal(created.payload.packet.artistSlug, 'supaboy');
+  assert.equal(created.payload.packet.artistId, '444666666667');
+  assert.equal(created.payload.packet.founderCommandCopy, true);
+  assert.equal(created.payload.founderCommand.status, 'visible_through_founder_command_contractor_packets_alias');
   assert.equal(created.payload.adminNotification.ok, true);
+  assert.equal(created.payload.adminNotification.provider_runtime?.provider_id, 'resend');
+  assert.equal(created.payload.adminNotification.provider_runtime?.action, 'resend.email.send');
   assert.equal(resendCalls.length, 1);
 
   const emailBody = JSON.stringify(resendCalls[0].body);
@@ -141,6 +173,17 @@ try {
 
   const inbox = await call(env, 'GET', '/api/marketing-made-easy/ae-vendor-onboarding/packets', { token: adminToken });
   assert.equal(inbox.payload.packets.length, 1);
+  assert.equal(inbox.payload.packets[0].companyOnboardingLane, 'Skyes Over London LC artist/vendor contractor onboarding');
+
+  const founderContractorListBlocked = await call(env, 'GET', '/api/founder-command/contractor-packets?artist=supaboy', {
+    token: contractorToken,
+    expectOk: false
+  });
+  assert.equal(founderContractorListBlocked.status, 403);
+
+  const founderInbox = await call(env, 'GET', '/api/founder-command/contractor-packets?artist=supaboy', { token: adminToken });
+  assert.equal(founderInbox.payload.packets.length, 1);
+  assert.equal(founderInbox.payload.packets[0].artistSlug, 'supaboy');
 
   const packetId = created.payload.receiptId;
   const contractorApprove = await call(env, 'POST', `/api/marketing-made-easy/ae-vendor-onboarding/packets/${packetId}/approve`, {
@@ -150,7 +193,11 @@ try {
   });
   assert.equal(contractorApprove.status, 403);
 
-  const approved = await call(env, 'POST', `/api/marketing-made-easy/ae-vendor-onboarding/packets/${packetId}/approve`, {
+  const founderDetail = await call(env, 'GET', `/api/founder-command/contractor-packets/${packetId}`, { token: adminToken });
+  assert.equal(founderDetail.payload.packet.onboardingContext.artistId, '444666666667');
+  assert.equal(founderDetail.payload.packet.companyOnboarding.founderCommandRoute, '/api/founder-command/contractor-packets');
+
+  const approved = await call(env, 'POST', `/api/founder-command/contractor-packets/${packetId}/approve`, {
     token: adminToken,
     body: JSON.stringify({ note: 'Owner approved test packet.', payoutDestinationVerified: true })
   });
@@ -160,6 +207,7 @@ try {
 
   const detail = await call(env, 'GET', `/api/marketing-made-easy/ae-vendor-onboarding/packets/${packetId}`, { token: adminToken });
   assert.equal(detail.payload.packet.adminNotification.ok, true);
+  assert.equal(detail.payload.packet.adminNotification.provider_runtime?.provider_id, 'resend');
   assert.equal(detail.payload.packet.storage.files[0].encryptedStorageKey.includes('ae-vendor-file'), true);
   assert.equal(detail.payload.packet.storage.files[0].sha256.length, 64);
 
@@ -169,7 +217,9 @@ try {
     packetId,
     resendCalls: resendCalls.length,
     contractorInboxBlockedStatus: contractorList.status,
+    founderContractorInboxBlockedStatus: founderContractorListBlocked.status,
     ownerInboxPackets: inbox.payload.packets.length,
+    founderInboxPackets: founderInbox.payload.packets.length,
     externalTransferCreated: approved.payload.payoutLedger.externalTransferCreated,
     leakScan: 'no raw routing/account/tin values found in email or KV JSON'
   }, null, 2));

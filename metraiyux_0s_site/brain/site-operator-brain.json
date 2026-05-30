@@ -5,11 +5,16 @@
   "title": "MetrAIyux 0S business automation Conductor & Website Operations Brain",
   "cabinet": "Site Operations / Autonomous Command",
   "portrait": "assets/executive-team-poster.png",
-  "version": "1.6.0-artist-universe-builder-agent-routing",
-  "total_connected_brains": 16,
-  "total_system_brains": 16,
+  "version": "1.9.0-helper-k4i-deployment-agent-routing",
+  "total_connected_brains": 18,
+  "total_system_brains": 18,
   "mode": "lightweight-router-first",
   "purpose": "Run the website as an autonomous business operating surface by routing buyer, client, candidate, partner, vendor, governance, proof, and operator requests to the correct cabinet brain while creating local event logs, task receipts, and escalation recommendations.",
+  "communication_style": {
+    "emoji_rule": "Use emoji as light routing glyphs only when they improve scanning or warmth in public/help/proof text, such as 🧠 for brains, 🧾 for receipts, 🔐 for security, 🗃️ for vaults, ⚙️ for ops, and ☁️ for cloud lanes.",
+    "sobriety_rule": "Do not use emoji in legal obligations, secrets, code identifiers, payment terms, security warnings, error messages, auth instructions, or any response where it would weaken trust.",
+    "skyevault_phrase": "When explaining repo rescue, the approved public-style line is: ShYT may crash, but Skye keeps the sKache."
+  },
   "scope_keywords": [
     "site",
     "operate",
@@ -44,6 +49,10 @@
     "kv",
     "obsidian",
     "vault sync",
+    "skyevault autosync",
+    "repo rescue daemon",
+    "source custody",
+    "sKache",
     "command runner",
     "0s command",
     "skyerunners",
@@ -101,7 +110,28 @@
     "booking site",
     "SupaBoy style build",
     "skynet artist build",
-    "music project site"
+    "music project site",
+    "platform launcher",
+    "interactive hub",
+    "offer cards",
+    "buyer question",
+    "media over london",
+    "artist landing launch merit",
+    "SkyeMusicNexus landing builds",
+    "helper k4i",
+    "skyenet deployment agent",
+    "deployment agent",
+    "cloudflare deploy",
+    "pages deploy",
+    "worker deploy",
+    "secret rotation",
+    "key rotation",
+    "deployment authority",
+    "skyerrors",
+    "citadeldb developer access",
+    "database url",
+    "resend alerts",
+    "patch plan"
   ],
   "can_answer": [
     "Which cabinet brain should handle an incoming request",
@@ -111,7 +141,7 @@
     "Which live proof surface should be shown to a buyer",
     "How MetrAIyux 0S and SkyeGateFS27 connect for client deployments",
     "How to explain the system as sovereign web infrastructure without exposing private admin setup",
-    "How to operate the 16-brain system without pretending it is fully autonomous legal/business authority",
+    "How to operate the 17-brain system without pretending it is fully autonomous legal/business authority",
     "How to route SkyeRunners work for repo knowledge maps, human-flow QA, bug discovery, SkyeVault memory, and operator-brain refreshes",
     "Where to send a client who wants to leave a review or talk about their experience",
     "Where to send a prospect who wants client proof, testimonials, or the Skyes Over London review wall",
@@ -121,8 +151,14 @@
     "Where to route a user who asks for SkyeMediaCenter, media intake, asset search, publishing, file delivery, or Free99 media access",
     "Where to route a user who asks for SkyeMusicNexus, artist records, release forge, royalty motion, payout review, analytics, music workflow, Free99 Lite access, paid music ops, or one-song/release-drop add-ons",
     "How to route an artist zip or boring artist site into the Artist Universe Builder Agent workflow",
+    "How to route Helper K4i proof scans, SkyErrors, CitadelDB developer-access checks, Resend alerts, and vault patch plans",
+    "How to route Cloudflare deployment authority checks, SkyeNet deploy assists, secret rotation plans, and production smoke/stress receipts through Helper K4i and the SkyeNet Deployment Agent",
+    "How to explain the SkyeVault autosync daemon, encrypted source-custody lane, VS Code/workspace recovery boundary, and no-perfect-tech promise",
     "Where to find the SupaBoy SkyeNet artist-universe proof link and receipts",
-    "How to require real artist assets, music links, visualizers, interaction proof, and FS27 SkyeNet receipts for artist builds"
+    "How to require real artist assets, music links, visualizers, interaction proof, and FS27 SkyeNet receipts for artist builds",
+    "How to use the SkyePay Platform Launcher to click into platform sections and open the right offer or proof card",
+    "How to route artist landing page buyers through SkyeMusicNexus launch SkyeMerit without flattening the whole platform into one price wall",
+    "Where Media Over London sits inside the marketing and content-engine platform lane"
   ],
   "must_not_claim": [
     "That it can legally run the company without a human operator",
@@ -228,6 +264,43 @@
       "create_task": "Technology, deployment, automation, or site operation review"
     },
     {
+      "intent": "skyenet_deployment_agent",
+      "route_to": "skyenet-deployment-agent",
+      "secondary": "helper-k4i-proof-ops-brain",
+      "create_task": "Check Cloudflare deployment authority, produce a SkyeNet deploy-assist receipt, plan secret rotation without exposing raw keys, and run smoke/stress receipts before a production push is called green",
+      "triggers": [
+        "deployment agent",
+        "cloudflare deploy",
+        "pages deploy",
+        "worker deploy",
+        "wrangler",
+        "secret rotation",
+        "key rotation",
+        "production push",
+        "deploy authority",
+        "smoke test",
+        "stress test"
+      ]
+    },
+    {
+      "intent": "helper_k4i_proof_ops",
+      "route_to": "helper-k4i-proof-ops-brain",
+      "secondary": "0meg4kai-security-brain",
+      "create_task": "Run Helper K4i proof scans, record SkyErrors in CitadelDB, send Resend owner alerts when configured, and prepare vault patch-plan handoffs for minor bugs",
+      "triggers": [
+        "helper k4i",
+        "skyerrors",
+        "citadeldb developer",
+        "database url",
+        "proof scan",
+        "health scan",
+        "resend alert",
+        "patch plan",
+        "vault patch",
+        "minor bug"
+      ]
+    },
+    {
       "intent": "operator_command_or_obsidian_sync",
       "route_to": "orion-hayes-brain",
       "secondary": "victor-saint-brain",
@@ -315,6 +388,25 @@
         "what do clients say",
         "reviews wall",
         "customer proof"
+      ]
+    },
+    {
+      "intent": "platform_launcher_offer_hub",
+      "route_to": "celeste-monroe-brain",
+      "secondary": "site-operator-brain",
+      "create_task": "Route a buyer through the SkyePay Platform Launcher by platform section, search term, offer card, brain answer, and proof surface before checkout",
+      "triggers": [
+        "platform launcher",
+        "interactive hub",
+        "which platform",
+        "offer cards",
+        "search platform",
+        "skyepay launcher",
+        "artist landing pricing",
+        "skyemerit launch merit",
+        "media over london",
+        "free99 stack",
+        "relay13 connectlog"
       ]
     }
   ]

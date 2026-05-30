@@ -74,6 +74,62 @@ async function resolveActorContext(actor) {
   };
 }
 
+function normalizeBool(value) {
+  if (value === true || value === false) return value;
+  const text = normalizeText(value, 20).toLowerCase();
+  if (["1", "true", "yes", "y"].includes(text)) return true;
+  if (["0", "false", "no", "n"].includes(text)) return false;
+  return false;
+}
+
+function normalizeInt(value, fallback = 0) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.max(0, Math.trunc(number));
+}
+
+function isProviderUsageEvent(type, meta) {
+  const t = normalizeText(type, 160).toLowerCase();
+  return t === "0s.provider_execution"
+    || normalizeText(meta?.provider_id, 120)
+    || normalizeText(meta?.receipt_id, 160);
+}
+
+async function recordProviderUsageEvent({ source_app, actorContext, org_id, ws_id, type, lane, billable, meta, event_ts }) {
+  if (!isProviderUsageEvent(type, meta)) return false;
+  await q(
+    `insert into provider_usage_events(
+       source_app, actor_email, gate_user_id, gate_customer_id, org_id,
+       workspace_id, customer_ref, client_ref, provider_id, action, usage_lane,
+       quantity, estimated_cost_cents, billable, chargeback_ready,
+       provider_call_made, receipt_id, event_ts, meta
+     )
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18::timestamptz,$19::jsonb)`,
+    [
+      source_app,
+      actorContext.actor_email,
+      actorContext.user_id,
+      actorContext.customer_id,
+      org_id,
+      normalizeText(meta?.workspace_id || ws_id || "", 160) || null,
+      normalizeText(meta?.customer_id || meta?.customer_ref || "", 160) || null,
+      normalizeText(meta?.client_id || meta?.client_ref || "", 160) || null,
+      normalizeText(meta?.provider_id || "unknown-provider", 120),
+      normalizeText(meta?.action || type || "provider.action", 160),
+      normalizeText(meta?.usage_lane || lane || "provider", 120),
+      normalizeInt(meta?.quantity, 1) || 1,
+      normalizeInt(meta?.estimated_cost_cents, 0),
+      meta?.billable === false ? false : (normalizeBool(meta?.billable) || billable === true),
+      normalizeBool(meta?.chargeback_ready),
+      normalizeBool(meta?.provider_call_made),
+      normalizeText(meta?.receipt_id || "", 180) || null,
+      event_ts,
+      JSON.stringify(meta || {})
+    ]
+  );
+  return true;
+}
+
 export default wrap(async (req, _cors, context) => {
   const cors = buildCors(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
@@ -102,6 +158,7 @@ export default wrap(async (req, _cors, context) => {
   const privileged = inferPrivileged(lane, type);
 
   const request_id = getRequestId(req);
+  let provider_usage_recorded = false;
   const recordEvent = async () => {
     const actorContext = await resolveActorContext(actor);
 
@@ -148,6 +205,18 @@ export default wrap(async (req, _cors, context) => {
         meta
       }
     );
+
+    provider_usage_recorded = await recordProviderUsageEvent({
+      source_app,
+      actorContext,
+      org_id,
+      ws_id,
+      type,
+      lane,
+      billable,
+      meta,
+      event_ts
+    });
   };
 
   const forceSync = req.headers.get("x-skygate-mirror-sync") === "1";
@@ -160,5 +229,5 @@ export default wrap(async (req, _cors, context) => {
 
   await recordEvent();
 
-  return json(200, { ok: true, request_id, accepted: true, persisted: true }, cors);
+  return json(200, { ok: true, request_id, accepted: true, persisted: true, provider_usage_recorded }, cors);
 });

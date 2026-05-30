@@ -1,5 +1,5 @@
 /* AE FLOW by Skyes Over London — Service Worker (offline-first) */
-const CACHE_NAME = "ae-flow-cache-v13";
+const CACHE_NAME = "ae-flow-cache-v14-single-platform";
 const PRECACHE_URLS = [
   "./",
   "./index.html",

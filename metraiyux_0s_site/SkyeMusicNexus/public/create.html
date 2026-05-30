@@ -10,7 +10,7 @@
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
   <script defer src="../../assets/js/skye-id-bridge.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="./neo-nexus.js"></script>
   <script defer src="./open-source-studio.js"></script>
 </head>
@@ -22,21 +22,20 @@
 
   <main class="nexus-shell open-source-studio-shell">
     <header class="nexus-topline">
-      <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus dashboard"><img src="../assets/platform-mark.svg" alt="" /></a>
+      <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus workspace"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
       <div>
         <p class="micro">SkyeMusicNexus // Native Creation Studio</p>
         <h1>Build the song before it becomes a release.</h1>
       </div>
-      <div class="session-rack" aria-label="Gate status">
-        <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-        <button id="proofSessionButton" class="ghost" type="button" data-action="proof-session">Proof Session</button>
-        <button id="operatorLoginButton" class="ghost" type="button" data-action="operator-login">Operator Login</button>
+      <div class="session-rack" aria-label="Access status">
+        <span id="sessionChip" class="chip chip-hot">Client access required</span>
+        <button id="proofSessionButton" class="ghost" type="button" data-action="proof-session">Use Session</button>
         <button id="disconnectButton" class="ghost" type="button" data-action="logout">Disconnect</button>
       </div>
     </header>
 
     <nav class="nexus-nav" aria-label="SkyeMusicNexus rooms">
-      <a href="./index.html">Dashboard</a>
+      <a href="./index.html">Workspace</a>
       <a class="active" href="./create.html" aria-current="page">Create</a>
       <a href="./daw.html">DAW</a>
       <a href="./discover.html">Discover</a>
@@ -47,7 +46,7 @@
       <a href="./rights.html">Rights</a>
       <a href="./exchange.html">Exchange</a>
       <a href="./drops.html">Drops</a>
-      <a href="./admin.html">Operator</a>
+
     </nav>
 
     <nav class="surface-switcher" aria-label="Creation surfaces">
@@ -75,27 +74,31 @@
 
     <section class="creation-surface-grid">
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">01 native daw</p><h3>Make the song.</h3><p>Nexus DAW gets its own fullscreen room with transport, tracks, pads, keys, mixer, and project handoff.</p></div>
+        <div><p class="eyebrow">01 drop packaging</p><h3>Package the next release.</h3><p>Use the Nexus drop room for release packaging, product routing, rights checks, and proof-backed launch handoff.</p></div>
+        <a class="ghost-link" href="./drops.html">Open Drops</a>
+      </article>
+      <article class="panel glass-panel surface-card">
+        <div><p class="eyebrow">02 native daw</p><h3>Make the song.</h3><p>Nexus DAW gets its own fullscreen room with transport, tracks, pads, keys, mixer, and project handoff.</p></div>
         <a class="ghost-link" href="./daw.html">Open DAW Room</a>
       </article>
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">02 stem vault</p><h3>Organize the session.</h3><p>Stems, bounces, masters, notes, and sample packs sit in their own surface.</p></div>
+        <div><p class="eyebrow">03 stem vault</p><h3>Organize the session.</h3><p>Stems, bounces, masters, notes, and sample packs sit in their own surface.</p></div>
         <a class="ghost-link" href="./stems.html">Open Stems</a>
       </article>
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">03 export forge</p><h3>Move toward release.</h3><p>Preview, WAV, stem archive, and Release Forge manifest queue stay separate from the DAW.</p></div>
+        <div><p class="eyebrow">04 export forge</p><h3>Move toward release.</h3><p>Preview, WAV, stem archive, and Release Forge manifest queue stay separate from the DAW.</p></div>
         <a class="ghost-link" href="./exports.html">Open Exports</a>
       </article>
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">04 discovery</p><h3>Listen like a platform.</h3><p>Playlist lanes, artist drops, release queue, and player routing give the Spotify side room.</p></div>
+        <div><p class="eyebrow">05 discovery</p><h3>Listen like a platform.</h3><p>Playlist lanes, artist drops, release queue, and player routing give the Spotify side room.</p></div>
         <a class="ghost-link" href="./discover.html">Open Discover</a>
       </article>
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">05 social feed</p><h3>Move like Instagram.</h3><p>Stories, posts, campaign calls, community signals, and release moments sit in the feed.</p></div>
+        <div><p class="eyebrow">06 social feed</p><h3>Move like Instagram.</h3><p>Stories, posts, campaign calls, community signals, and release moments sit in the feed.</p></div>
         <a class="ghost-link" href="./feed.html">Open Feed</a>
       </article>
       <article class="panel glass-panel surface-card">
-        <div><p class="eyebrow">06 release ops</p><h3>Package the business.</h3><p>When the art is ready, Releases, Rights, Exchange, and Operator stay behind the same gate.</p></div>
+        <div><p class="eyebrow">07 release workflow</p><h3>Package the business.</h3><p>When the art is ready, Releases, Rights, Exchange, and Drops stay behind the same client access lane.</p></div>
         <a class="ghost-link" href="./releases.html">Open Release Forge</a>
       </article>
     </section>
@@ -107,7 +110,7 @@
             <p class="eyebrow">session ledger</p>
             <h3>Save the creative packet once, use it across the surfaces.</h3>
           </div>
-          <span class="status-pill">gated write</span>
+          <span class="status-pill">protected write</span>
         </div>
         <div class="form-grid">
           <label class="field-stack"><span>Artist ID</span><input id="artistIdInput" placeholder="artist_001" /></label>
@@ -136,16 +139,6 @@
       </div>
       <pre id="releaseForgeLine" class="code-output">No handoff line generated yet.</pre>
     </section>
-
-    <dialog id="operatorDialog" class="operator-dialog">
-      <form method="dialog" id="operatorForm">
-        <h3>Local Operator Login</h3>
-        <p>Uses the same SkyGate local proof posture as the other Nexus rooms. No demo secrets are embedded.</p>
-        <label>Email<input name="email" type="email" required /></label>
-        <label>Password<input name="password" type="password" required /></label>
-        <menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu>
-      </form>
-    </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
   </main>
 </body>

@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bob's Smoke Shop - Free Workspace Pilot Review</title>
+  <meta name="description" content="Bob's Smoke Shop can review the live app and free MetrAIyux 0S workspace pilot built by Gray Skyes.">
+  <link rel="canonical" href="https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot">
+  <meta property="og:title" content="Bob's Smoke Shop - Free Workspace Pilot">
+  <meta property="og:description" content="Review Bob's live app, active ConnectLog/Relay13 workspace lane, reserved SkyEmail handoff, CRM notes, and proof receipts.">
+  <meta property="og:url" content="https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot">
+  <link rel="icon" href="/assets/favicon-32.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+    :root {
+      --bg: #070607;
+      --panel: rgba(18, 16, 15, 0.88);
+      --ink: #fff8ed;
+      --muted: #cab9a1;
+      --amber: #ff8c00;
+      --gold: #ffd166;
+      --blue: #65d8ff;
+      --line: rgba(255, 140, 0, 0.26);
+      --soft-line: rgba(255, 255, 255, 0.14);
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      letter-spacing: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,0.024) 1px, transparent 1px),
+        radial-gradient(circle at 16% 10%, rgba(255,140,0,0.24), transparent 30%),
+        radial-gradient(circle at 86% 20%, rgba(101,216,255,0.16), transparent 28%),
+        linear-gradient(180deg, #070607 0%, #14100c 48%, #050505 100%);
+      background-size: 70px 70px, 70px 70px, auto, auto, auto;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .wrap { width: min(1120px, calc(100vw - 36px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(7,6,7,0.84);
+      backdrop-filter: blur(16px);
+    }
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: Oswald, system-ui, sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .brand img { width: 58px; height: 58px; object-fit: contain; }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .nav-links a,
+    .btn {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .btn.primary {
+      color: #140b02;
+      border-color: rgba(255,209,102,0.62);
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+      box-shadow: 0 18px 46px rgba(255,140,0,0.24);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.7fr);
+      gap: 30px;
+      align-items: center;
+      padding: clamp(48px, 7vw, 88px) 0 40px;
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--amber);
+      font: 700 13px Oswald, system-ui, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 {
+      font-family: Oswald, system-ui, sans-serif;
+      letter-spacing: 0;
+      line-height: 1;
+      margin: 0;
+    }
+    h1 {
+      max-width: 790px;
+      font-size: clamp(44px, 8vw, 92px);
+      text-transform: uppercase;
+    }
+    h1 span { color: var(--amber); }
+    .lead {
+      max-width: 760px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.55;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    .hero-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.5);
+    }
+    .hero-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+    .hero-card .caption { padding: 16px; color: var(--muted); line-height: 1.45; }
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 8px 0 42px;
+    }
+    .strip div,
+    .card,
+    .qr-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.055);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.34);
+    }
+    .strip div { padding: 14px; }
+    .strip strong { display: block; color: var(--gold); font-family: Oswald, system-ui, sans-serif; text-transform: uppercase; }
+    .strip span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .section { padding: 54px 0; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(280px, 0.55fr);
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+    .section-head p { margin: 0; color: var(--muted); line-height: 1.6; }
+    h2 { font-size: clamp(32px, 5vw, 56px); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card { padding: 20px; min-height: 180px; }
+    .card .tag {
+      display: inline-flex;
+      border: 1px solid rgba(255,140,0,0.35);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .card h3 { margin: 18px 0 8px; font-size: 24px; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .qr-card {
+      display: grid;
+      grid-template-columns: 152px 1fr;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      background: rgba(255,255,255,0.076);
+    }
+    .qr-box {
+      width: 152px;
+      height: 152px;
+      display: grid;
+      place-items: center;
+      border: 8px solid #fff;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .qr-box svg { width: 100%; height: 100%; display: block; }
+    .qr-card h3 { margin: 0 0 8px; font-size: 26px; }
+    .qr-card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .url {
+      margin-top: 10px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .final {
+      margin: 38px 0 70px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255,140,0,0.18), rgba(101,216,255,0.08)), rgba(255,255,255,0.054);
+    }
+    .final h2 { font-size: clamp(30px, 5vw, 50px); }
+    .notice {
+      margin-top: 18px;
+      color: rgba(255,248,237,0.62);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .handle-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.32);
+    }
+    .handle-panel .lead-small {
+      max-width: 760px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.58;
+    }
+    .mailbox {
+      color: var(--blue);
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+    .skyemail-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .skyemail-form label {
+      display: grid;
+      gap: 7px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .skyemail-form .full { grid-column: 1 / -1; }
+    .skyemail-form input,
+    .skyemail-form textarea {
+      width: 100%;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius);
+      padding: 12px;
+      color: var(--ink);
+      background: rgba(0,0,0,0.3);
+      font: 600 15px Inter, system-ui, sans-serif;
+    }
+    .skyemail-form textarea { min-height: 96px; resize: vertical; }
+    .skyemail-form button { justify-self: start; }
+    .skyemail-status {
+      align-self: center;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    @media (max-width: 880px) {
+      .hero,
+      .section-head,
+      .grid,
+      .qr-grid,
+      .strip,
+      .skyemail-form { grid-template-columns: 1fr; }
+      .qr-card { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav wrap" aria-label="Bob's Smoke Shop pilot navigation">
+      <a class="brand" href="bobs-smoke-shop-free-pilot.html">
+        <img src="assets/media-over-london/bobs-smoke-shop-3d-logo.png" alt="Bob's Smoke Shop logo">
+        Bob's Smoke Shop Pilot
+      </a>
+      <div class="nav-links">
+        <a href="#included">Included</a>
+        <a href="#qr">QR Links</a>
+        <a href="bobs-smoke-shop-free-pilot-flyer.html" target="_blank" rel="noopener">Flyer</a>
+        <a href="mailto:MediaOverLondon@solenterprises.org?subject=Bob's%20Smoke%20Shop%20pilot%20review">Request Access</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Bob's Smoke Shop review lane</p>
+        <h1>Your live app and free workspace pilot are <span>ready to review.</span></h1>
+        <p class="lead">Gray Skyes built Bob's Smoke Shop a live customer-facing app plus an active ConnectLog/Relay13 workspace preview for intake, chat, CRM-ready notes, and proof receipts. SkyEmail is reserved for Bob and activates after the shared-gate handoff.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="mailto:MediaOverLondon@solenterprises.org?subject=Bob's%20Smoke%20Shop%20pilot%20review&body=I%20would%20like%20to%20review%20the%20Bob's%20Smoke%20Shop%20workspace%20pilot.">Request Review Access</a>
+          <a class="btn" href="https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/" target="_blank" rel="noopener">Open Sovereign App</a>
+          <a class="btn" href="bobs-smoke-shop-free-pilot-flyer.html" target="_blank" rel="noopener">Open Flyer</a>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <img src="assets/media-over-london/bobs-storefront-hero-banner.png" alt="Bob's Smoke Shop storefront banner">
+        <div class="caption">Bob's Smoke Shop, 5115 N Dysart Rd, Unit 214, Litchfield Park, AZ 85340. 21+ only. Product availability, pricing, and brands may vary.</div>
+      </aside>
+    </section>
+
+    <section class="strip" aria-label="Pilot summary">
+      <div><strong>Live app</strong><span>Customer-facing Bob's Smoke Shop web app is online.</span></div>
+      <div><strong>Free review</strong><span>No credit card needed to inspect the pilot.</span></div>
+      <div><strong>Workspace</strong><span>ConnectLog/Relay13 intake and assisted chat lane.</span></div>
+      <div><strong>Decision</strong><span>Keep it, edit it, expand it, or remove it.</span></div>
+    </section>
+
+    <section class="section" id="included">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">What Bob gets to review</p>
+          <h2>One app for customers. One workspace for operations.</h2>
+        </div>
+        <p>The public app helps shoppers inspect the store, categories, contact details, and location. The workspace pilot gives Bob a private lane for requests, follow-up, content updates, and proof receipts.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Customer App</span><h3>Live storefront app</h3><p>Mobile-ready Bob's Smoke Shop app with age gate, store details, categories, gallery, contact, and local pages.</p></article>
+        <article class="card"><span class="tag">Workspace</span><h3>ConnectLog memory</h3><p>Bob has a configured workspace lane for customer requests, owner notes, follow-ups, update ideas, and review status.</p></article>
+        <article class="card"><span class="tag">Relay13</span><h3>Assisted live intake</h3><p>Relay13/ConnectLog production proof confirms Bob's workspace can create conversations, persist messages, and open realtime rooms.</p></article>
+        <article class="card"><span class="tag">SkyEmail</span><h3>Reserved inbox lane</h3><p>Bob's starter SkyEmail address is reserved as <span class="mailbox">bobs-smokeshop@skyemail.solenterprises.org</span>. Bob can change the handle before activation if he wants a cleaner mailbox.</p></article>
+        <article class="card"><span class="tag">CRM</span><h3>CRM-ready notes</h3><p>Owner notes, follow-ups, content requests, and approvals are included in the workspace handoff without a separate app password.</p></article>
+        <article class="card"><span class="tag">Receipts</span><h3>Proof exports first</h3><p>The free review includes 5 proof exports; recurring biweekly mirror or backup receipts begin after Bob approves the workspace.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Setup status</p>
+          <h2>What is live today, and what activates after Bob says yes.</h2>
+        </div>
+        <p>This keeps the offer honest: Bob can inspect the app and workspace now, while mailbox, managed CRM, and recurring backup operations stay tied to owner acceptance.</p>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">Live now</span><h3>App + QR</h3><p>The customer app is hosted on MetrAIyux 0S SkyeNet and the flyer includes the app QR.</p></article>
+        <article class="card"><span class="tag">Live now</span><h3>Workspace chat</h3><p>Bob's Relay13 workspace slug is configured as bobs-smoke-shop with ConnectLog message persistence.</p></article>
+        <article class="card"><span class="tag">After acceptance</span><h3>Mailbox + backups</h3><p>SkyEmail, managed CRM handling, and recurring backup cadence are included activation steps after Bob confirms access.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="skyemail">
+      <div class="handle-panel">
+        <p class="eyebrow">SkyEmail handle</p>
+        <h2>Bob can keep it or change it before activation.</h2>
+        <p class="lead-small">Starter reservation: <span class="mailbox">bobs-smokeshop@skyemail.solenterprises.org</span>. If Bob wants a different handle, send it here. The request is saved with the workspace handoff and Gray gets notified by system email.</p>
+        <form class="skyemail-form" data-skyemail-handle-form>
+          <input type="hidden" name="business_id" value="bobs-smoke-shop-litchfield-park">
+          <input type="hidden" name="business_name" value="Bob's Smoke Shop">
+          <input type="hidden" name="current_mailbox" value="bobs-smokeshop@skyemail.solenterprises.org">
+          <label>Preferred SkyEmail handle
+            <input name="preferred_handle" value="bobs-smokeshop" autocomplete="off" required>
+          </label>
+          <label>Your email
+            <input name="owner_email" type="email" placeholder="owner@email.com" autocomplete="email">
+          </label>
+          <label>Your phone
+            <input name="owner_phone" type="tel" placeholder="Best phone" autocomplete="tel">
+          </label>
+          <label class="full">Notes
+            <textarea name="notes" placeholder="Tell Gray what handle you want before activation."></textarea>
+          </label>
+          <button class="btn primary" type="submit">Send Handle Request</button>
+          <p class="skyemail-status" data-skyemail-handle-status>Requests go directly into the owner notification lane.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" id="qr">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Two QR links</p>
+          <h2>Scan one for the review lane. Scan one for the live app.</h2>
+        </div>
+        <p>The flyer uses these same two destinations, so Bob can inspect the business app and the pilot offer from one sheet.</p>
+      </div>
+      <div class="qr-grid">
+        <article class="qr-card">
+          <div class="qr-box" data-qr="https://metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot"></div>
+          <div>
+            <h3>Review workspace pilot</h3>
+            <p>Bob-specific pilot page with the free workspace offer, included lanes, limits, and review access path.</p>
+            <div class="url">metraiyux-0s-marketing.pages.dev/bobs-smoke-shop-free-pilot</div>
+          </div>
+        </article>
+        <article class="qr-card">
+          <div class="qr-box" data-qr="https://skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/"></div>
+          <div>
+            <h3>Open Bob's live app</h3>
+            <p>Customer-facing Bob's Smoke Shop app hosted on standalone SkyeNet, with 0S/Gate connected behind it.</p>
+            <div class="url">skyenet.graylondonskyes.workers.dev/bobs-smoke-shop/</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="final">
+      <p class="eyebrow">Next step</p>
+      <h2>Review first, decide after.</h2>
+      <p class="lead">If the app and workspace help Bob's Smoke Shop, we can keep the pilot and expand it. If something is off, we edit it. If Bob does not want it, we remove it.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="mailto:MediaOverLondon@solenterprises.org?subject=Bob's%20Smoke%20Shop%20pilot%20review">Request Access</a>
+        <a class="btn" href="tel:18004844783">Call Skyes Over London</a>
+      </div>
+      <p class="notice">21+ only. The Bob's Smoke Shop customer app and pilot materials do not guarantee exact stock, pricing, availability, or brand selection. Regulated product claims and content updates require business owner review. SkyEmail, managed CRM operations, and recurring backup cadence activate after Bob confirms the shared-gate handoff.</p>
+    </section>
+  </main>
+
+  <script src="assets/vendor/qrcode-generator.js"></script>
+  <script>
+    (function () {
+      if (typeof qrcode !== 'function') return;
+      document.querySelectorAll('[data-qr]').forEach(function (node, index) {
+        var qr = qrcode(0, 'M');
+        qr.addData(node.getAttribute('data-qr'));
+        qr.make();
+        node.innerHTML = qr.createSvgTag({
+          scalable: true,
+          margin: 2,
+          title: { text: index === 0 ? 'Bob workspace pilot QR code' : 'Bob live app QR code' },
+          alt: { text: index === 0 ? 'QR code for Bob workspace pilot review page' : 'QR code for Bob live app' }
+        });
+      });
+    })();
+    (function () {
+      var form = document.querySelector('[data-skyemail-handle-form]');
+      if (!form) return;
+      var status = document.querySelector('[data-skyemail-handle-status]');
+      var endpoint = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/valley-verified/skyemail-handle-request';
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var data = new FormData(form);
+        var preferred = String(data.get('preferred_handle') || '').trim();
+        if (!preferred) {
+          status.textContent = 'Add the SkyEmail handle Bob wants before sending.';
+          return;
+        }
+        status.textContent = 'Sending handle request...';
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            business_id: data.get('business_id'),
+            business_name: data.get('business_name'),
+            current_mailbox: data.get('current_mailbox'),
+            preferred_handle: preferred,
+            owner_email: data.get('owner_email'),
+            owner_phone: data.get('owner_phone'),
+            notes: data.get('notes'),
+            source_url: window.location.href
+          })
+        })
+          .then(function (response) {
+            return response.json().then(function (body) {
+              if (!response.ok || !body.ok) throw new Error(body.error || 'Request failed');
+              return body;
+            });
+          })
+          .then(function (body) {
+            var mailbox = body.request && body.request.preferred_mailbox ? body.request.preferred_mailbox : preferred;
+            status.textContent = 'Saved. Gray has the request for ' + mailbox + '.';
+            form.reset();
+          })
+          .catch(function () {
+            status.textContent = 'The request did not send. Email MediaOverLondon@solenterprises.org or call 1-(800)-484-4783 and Gray can update the handle manually.';
+          });
+      });
+    })();
+  </script>
+</body>
+</html>

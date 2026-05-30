@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const repoRoot = '/workspaces/MetrAIyux-0S';
+const repoRoot = process.cwd();
 const nexusRoot = path.join(repoRoot, 'metraiyux_0s_site', 'SkyeMusicNexus');
 const dataPath = path.join(nexusRoot, 'data', 'skeptics-override-claims.json');
 const pagePath = path.join(nexusRoot, 'skepticks-spectic-override.html');

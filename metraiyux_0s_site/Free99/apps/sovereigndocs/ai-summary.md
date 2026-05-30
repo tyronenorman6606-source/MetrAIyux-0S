@@ -8,7 +8,7 @@ Current v6 build uses the v2.1 confidence-review library as source of truth:
 - 15 categories
 - 51 jurisdictions
 - 37 official-source prep workflows
-- 6,069 high-risk records queued/gated
+- elevated-review records guarded before completed export
 
 Runtime files:
 

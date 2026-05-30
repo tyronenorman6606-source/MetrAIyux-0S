@@ -24,8 +24,8 @@ try{
   const health = await fetch(`${baseUrl}/api/health`).then(r=>r.json());
   assert(health.ok && health.version === '0.4.0', 'health_reports_v0_4_0', health);
   const html = await fetchText('/');
-  const css = await fetchText('/styles.css');
-  const js = await fetchText('/app.js');
+  const css = await fetchText('/public/styles.css');
+  const js = await fetchText('/public/app.js');
   assert(!html.includes('id="login-form"') && !html.includes('id="signup-form"'), 'html_uses_gate_owned_auth_not_local_login');
   const requiredHtml = ['btn-gate-check','session-label','market-form','job-form','feed-form','provider-jobs','applicant-pool','contractor-feed','assignments','routes','roster','ratings','operator-assign-form','rating-form','house-jobs','payments','audits','workflow-board','workflow-timeline'];
   for (const id of requiredHtml) assert(html.includes(`id="${id}"`), `html_has_${id}`);

@@ -4761,8 +4761,286 @@
         };
 
         window.App = App;
-        // Initialize!
-        (window.__SKYE_DOCX_BOOT__ ? window.__SKYE_DOCX_BOOT__(App) : App.boot());
+
+        async function hydrateSovereignDocsBridge(app) {
+            const params = new URLSearchParams(window.location.search);
+            const source = String(params.get('source') || '').toLowerCase();
+            const handoffId = params.get('sd_handoff') || params.get('handoffId') || '';
+            const localHandoffId = params.get('sd_local_handoff') || '';
+            if (source !== 'sovereigndocs' && !handoffId && !localHandoffId) return;
+
+            const bridgeState = {
+                source: 'sovereigndocs',
+                handoffId,
+                localHandoffId,
+                hydratedAt: new Date().toISOString()
+            };
+
+            function readJsonStorage(key) {
+                for (const store of [sessionStorage, localStorage]) {
+                    try {
+                        const raw = store.getItem(key);
+                        if (raw) return JSON.parse(raw);
+                    } catch {}
+                }
+                return null;
+            }
+
+            function escapeHtml(value) {
+                return String(value || '').replace(/[&<>"']/g, (char) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+            }
+
+            function markdownToEditorHtml(markdown) {
+                const lines = String(markdown || '').split(/\r?\n/);
+                const html = [];
+                let listOpen = false;
+                const closeList = () => {
+                    if (listOpen) html.push('</ul>');
+                    listOpen = false;
+                };
+                lines.forEach((line) => {
+                    const text = line.trim();
+                    if (!text) {
+                        closeList();
+                        html.push('<p><br></p>');
+                        return;
+                    }
+                    const heading = text.match(/^(#{1,3})\s+(.+)$/);
+                    if (heading) {
+                        closeList();
+                        html.push(`<h${heading[1].length}>${escapeHtml(heading[2])}</h${heading[1].length}>`);
+                        return;
+                    }
+                    const bullet = text.match(/^[-*]\s+(.+)$/);
+                    if (bullet) {
+                        if (!listOpen) {
+                            html.push('<ul>');
+                            listOpen = true;
+                        }
+                        html.push(`<li>${escapeHtml(bullet[1])}</li>`);
+                        return;
+                    }
+                    closeList();
+                    html.push(`<p>${escapeHtml(text)}</p>`);
+                });
+                closeList();
+                return html.join('\n') || '<p><br></p>';
+            }
+
+            async function fetchApiHandoff(id) {
+                if (!id) return null;
+                const response = await fetch(`/api/sovereigndocs/editor/skye-docx-max/session/${encodeURIComponent(id)}`, {
+                    credentials: 'include',
+                    headers: { accept: 'application/json' }
+                });
+                if (!response.ok) throw new Error(`SovereignDocs handoff returned ${response.status}`);
+                const data = await response.json();
+                try {
+                    await fetch(`/api/sovereigndocs/editor/skye-docx-max/session/${encodeURIComponent(id)}/opened`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'content-type': 'application/json', accept: 'application/json' },
+                        body: JSON.stringify({ openedAt: new Date().toISOString(), editor: 'canonical-skydocxmax' })
+                    });
+                } catch {}
+                return data.handoff || null;
+            }
+
+            let handoff = localHandoffId ? readJsonStorage(`sovereigndocs.localSkyeHandoff.${localHandoffId}`) : null;
+            if (!handoff && handoffId) handoff = await fetchApiHandoff(handoffId);
+            if (!handoff) {
+                app.showToast?.('SovereignDocs handoff was not found.');
+                return;
+            }
+
+            const title = handoff.title || handoff.metadata?.title || 'SovereignDocs Document';
+            const content = handoff.html || markdownToEditorHtml(handoff.markdown || handoff.text || '');
+            await app.importHtmlOrTextDocument({ title, content, type: 'html' });
+            bridgeState.handoffId = handoff.id || handoffId || '';
+            bridgeState.title = title;
+            bridgeState.activeDocId = app.activeDocId || null;
+            try {
+                localStorage.setItem('sovereigndocs.skyeDocxMax.activeHandoff', JSON.stringify(bridgeState));
+            } catch {}
+
+            const header = document.querySelector('.header-actions');
+            if (header && !document.getElementById('sovereigndocs-return-button')) {
+                const button = document.createElement('button');
+                button.id = 'sovereigndocs-return-button';
+                button.className = 'tool-btn';
+                button.type = 'button';
+                button.textContent = 'Return SovereignDocs';
+                button.addEventListener('click', async () => {
+                    const activeDoc = app.getActiveDocRecord?.() || {};
+                    const html = app.quill?.root?.innerHTML || activeDoc.content || '';
+                    const text = app.quill?.getText?.() || '';
+                    const payload = {
+                        handoffId: bridgeState.handoffId || handoff.id || handoffId || localHandoffId,
+                        title: activeDoc.title || title,
+                        html,
+                        text,
+                        activeDocId: app.activeDocId || activeDoc.id || null,
+                        metadata: { source: 'canonical-skydocxmax', localHandoffId: localHandoffId || null }
+                    };
+                    try {
+                        const response = await fetch('/api/sovereigndocs/editor/skye-docx-max/return', {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'content-type': 'application/json', accept: 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const body = await response.json().catch(() => ({}));
+                        if (!response.ok) throw new Error(body.error || `Return failed with ${response.status}`);
+                        localStorage.setItem('sovereigndocs.skyeDocxMax.lastReturn', JSON.stringify({ ...body, returnedAt: new Date().toISOString() }));
+                        app.showToast?.('Returned to SovereignDocs.');
+                    } catch (error) {
+                        const key = `sovereigndocs.skyeDocxMax.return.${Date.now()}`;
+                        try {
+                            localStorage.setItem(key, JSON.stringify({ payload, error:String(error?.message || error), storedAt:new Date().toISOString() }));
+                        } catch {}
+                        app.showToast?.('Stored local return for SovereignDocs.');
+                    }
+                });
+                header.prepend(button);
+            }
+
+            if (window.SkyeStandaloneSession?.recordSuiteIntent) {
+                window.SkyeStandaloneSession.recordSuiteIntent({
+                    sourceApp: 'SovereignDocs',
+                    targetApp: 'SkyeDocxMax',
+                    intent: { name: 'document-handoff', status: 'completed', handoffId: bridgeState.handoffId || localHandoffId || null, activeDocId: app.activeDocId || null }
+                });
+            }
+        }
+
+        async function hydrateSkyeMailBridge(app) {
+            const params = new URLSearchParams(window.location.search);
+            const source = String(params.get('source') || '').toLowerCase();
+            const hashParams = new URLSearchParams(String(window.location.hash || '').replace(/^#/, ''));
+            const encoded = hashParams.get('skymail') || '';
+            if (source !== 'skymail' && !encoded && !params.get('skymail_handoff')) return;
+
+            function escapeHtml(value) {
+                return String(value || '').replace(/[&<>"']/g, (char) => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+            }
+
+            function textToHtml(text) {
+                const lines = String(text || '').split(/\r?\n/);
+                return lines.map((line) => line.trim()
+                    ? `<p>${escapeHtml(line)}</p>`
+                    : '<p><br></p>').join('\n') || '<p><br></p>';
+            }
+
+            function decodeBridgePayload(value) {
+                if (!value) return {};
+                try {
+                    const padded = value.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((value.length + 3) % 4);
+                    const binary = atob(padded);
+                    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+                    return JSON.parse(new TextDecoder().decode(bytes));
+                } catch (error) {
+                    console.warn('[SkyeMail bridge] payload decode failed', error);
+                    return {};
+                }
+            }
+
+            const payload = {
+                source: 'skymail',
+                ...decodeBridgePayload(encoded),
+            };
+            payload.mailbox = payload.mailbox || params.get('mailbox') || '';
+            payload.subject = payload.subject || params.get('subject') || 'SkyeMail Draft';
+            payload.messageId = payload.messageId || params.get('message_id') || '';
+            payload.threadId = payload.threadId || params.get('thread_id') || '';
+            payload.from = payload.from || params.get('from') || '';
+            payload.to = payload.to || params.get('to') || '';
+            payload.returnUrl = payload.returnUrl || params.get('return') || 'https://skyemail-platform.graylondonskyes.workers.dev/compose.html';
+
+            const importKey = `skyedocxmax.skymail.imported.${payload.createdAt || payload.messageId || payload.threadId || payload.subject}`;
+            try {
+                if (sessionStorage.getItem(importKey)) return;
+                sessionStorage.setItem(importKey, new Date().toISOString());
+            } catch {}
+
+            const title = String(payload.subject || 'SkyeMail Draft').replace(/^re:\s*/i, '').trim() || 'SkyeMail Draft';
+            const heading = `<h1>${escapeHtml(title)}</h1>`;
+            const meta = [
+                payload.mailbox ? `<p><strong>Mailbox:</strong> ${escapeHtml(payload.mailbox)}</p>` : '',
+                payload.from ? `<p><strong>From:</strong> ${escapeHtml(payload.from)}</p>` : '',
+                payload.to ? `<p><strong>To:</strong> ${escapeHtml(payload.to)}</p>` : '',
+                payload.messageId ? `<p><strong>Message ID:</strong> ${escapeHtml(payload.messageId)}</p>` : '',
+                payload.threadId ? `<p><strong>Thread ID:</strong> ${escapeHtml(payload.threadId)}</p>` : '',
+            ].filter(Boolean).join('\n');
+            const body = payload.html ? String(payload.html) : textToHtml(payload.text || payload.snippet || '');
+            await app.importHtmlOrTextDocument({
+                title: `SkyeMail - ${title}`.slice(0, 120),
+                content: `${heading}${meta}<hr>${body}`,
+                type: 'html'
+            });
+
+            const bridgeState = {
+                source: 'skymail',
+                mailbox: payload.mailbox || '',
+                messageId: payload.messageId || '',
+                threadId: payload.threadId || '',
+                title,
+                activeDocId: app.activeDocId || null,
+                hydratedAt: new Date().toISOString(),
+                returnUrl: payload.returnUrl || ''
+            };
+            try {
+                localStorage.setItem('skyedocxmax.skymail.activeHandoff', JSON.stringify(bridgeState));
+            } catch {}
+
+            const header = document.querySelector('.header-actions');
+            if (header && !document.getElementById('skymail-return-button')) {
+                const button = document.createElement('button');
+                button.id = 'skymail-return-button';
+                button.className = 'tool-btn';
+                button.type = 'button';
+                button.textContent = 'Return SkyeMail';
+                button.addEventListener('click', () => {
+                    const activeDoc = app.getActiveDocRecord?.() || {};
+                    const subject = activeDoc.title || title;
+                    const returnUrl = new URL(payload.returnUrl || 'https://skyemail-platform.graylondonskyes.workers.dev/compose.html', window.location.href);
+                    if (returnUrl.pathname.endsWith('/compose.html') || returnUrl.pathname.endsWith('/compose/')) {
+                        const text = app.quill?.getText?.() || '';
+                        returnUrl.searchParams.set('subject', subject.replace(/^SkyeMail\s+-\s+/i, ''));
+                        returnUrl.searchParams.set('body', text.slice(0, 6000));
+                    }
+                    window.open(returnUrl.toString(), '_blank');
+                });
+                header.prepend(button);
+            }
+
+            if (window.SkyeStandaloneSession?.recordSuiteIntent) {
+                window.SkyeStandaloneSession.recordSuiteIntent({
+                    sourceApp: 'SkyeMail',
+                    targetApp: 'SkyeDocxMax',
+                    intent: { name: 'mail-document-handoff', status: 'completed', messageId: bridgeState.messageId, activeDocId: bridgeState.activeDocId }
+                });
+            }
+        }
+
+        const bootResult = (window.__SKYE_DOCX_BOOT__ ? window.__SKYE_DOCX_BOOT__(App) : App.boot());
+        Promise.resolve(bootResult).then(async () => {
+            await hydrateSovereignDocsBridge(App);
+            await hydrateSkyeMailBridge(App);
+        }).catch((error) => {
+            console.warn('[Editor bridge]', error);
+        });
     </script>
     <script>
         (() => {
@@ -5039,7 +5317,7 @@
 
             function buildSkyeBlogLaunchUrl() {
                 const params = new URLSearchParams({ ws_id: wsId, bridge_import: '1', source: appId });
-                return `/SkyeBlog/index.html?${params.toString()}`;
+                return `/Marketing-Made-Easy/SkyeDocxBlog/index.html?${params.toString()}`;
             }
 
             function queueSkyeBlogDraft(payload) {
@@ -5351,5 +5629,6 @@
             }
         })();
         </script>
+        <script src="/assets/js/skymail-pocket-tab.js" defer data-skymail-pocket-tab="1"></script>
 </body>
 </html>

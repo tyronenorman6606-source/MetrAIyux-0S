@@ -1,19 +1,14 @@
 # SkyeRoutex Workforce Command Platform Status
 
-Generated: 2026-05-09
+Updated: 2026-05-24
 
-This folder is promoted as the local platform truth for SkyeRoutex Workforce Command. The app payload, routed surfaces, proof metadata, runtime contract, local visual asset, and smoke check live inside this folder so the platform can be carried forward without reading from the original import location.
+This folder is the canonical SkyeRouteX Workforce Command app surface. The provider, contractor, House Command, proof, payment-state, audit, compliance, and export console now lives directly at `index.html`; the old docked shell pages, nested `app.html`, and nested `public/index.html` entry were removed. Supporting CSS, module JS, and gate-readiness files remain in `public/`.
 
 ## Included Surfaces
 
-- Command: `index.html`
-- Dashboard: `dashboard.html`
-- Workflows: `workflows.html`
-- Records: `records.html`
-- Proof: `proof.html`
-- Runtime: `runtime.html`
-- Settings: `settings.html`
-- Imported App: `app.html`
+- Canonical app: `index.html`
+- Support assets: `public/styles.css`, `public/app.js`, `public/gate-readiness.html`
+- Real logo: `assets/platform-mark.svg`
 
 ## Runtime Proof
 

@@ -1,58 +1,58 @@
 {
   "ok": true,
-  "provider": "zoho",
-  "proof_mode": "zoho-provider-send-and-inbox-read",
-  "run_id": "codex-20260524-zoho-live-final",
+  "mail_lane": "citadel-skynet",
+  "proof_mode": "citadel-skynet-send-and-inbox-read",
+  "run_id": "codex-20260524-citadel-live-final",
   "started_at": "2026-05-24T11:41:27.721Z",
   "completed_at": "2026-05-24T11:41:52.836Z",
   "public_demo_url": "https://skyemail-platform.graylondonskyes.workers.dev/live-proof",
   "domain": "solenterprises.org",
   "actors": [
     {
-      "label": "Active Zoho mailbox",
+      "label": "Active Citadel mailbox",
       "mailbox": "grayskyes@solenterprises.org",
-      "provider_account_id": "4038952000000008002"
+      "citadel_lane_id": "4038952000000008002"
     },
     {
-      "label": "SkyeMail inbox reader",
+      "label": "SkyeMail sovereign inbox reader",
       "mailbox": "grayskyes@solenterprises.org",
-      "provider_account_id": "4038952000000008002"
+      "citadel_lane_id": "4038952000000008002"
     }
   ],
   "runs": [
     {
-      "label": "Provider send to inbox",
+      "label": "Citadel send to sovereign inbox",
       "from": "grayskyes@solenterprises.org",
       "to": "grayskyes@solenterprises.org",
-      "subject": "SkyeMail Zoho live inbox proof A codex-20260524-zoho-live-final",
-      "provider": "zoho",
-      "zoho_id": "1779622894703155000",
-      "provider_message_id": "1779622895507141200",
+      "subject": "SkyeMail Citadel live inbox proof A codex-20260524-citadel-live-final",
+      "mail_lane": "citadel-skynet",
+      "citadel_send_id": "1779622894703155000",
+      "citadel_message_id": "1779622895507141200",
       "imported_to_inbox": true,
       "imported_message_id": "1779622895507141200",
-      "provider_inbox_visible": true,
-      "provider_sent_visible": true,
+      "sovereign_inbox_visible": true,
+      "sovereign_sent_visible": true,
       "event_count": 2
     },
     {
-      "label": "Provider reply loop to inbox",
+      "label": "Citadel reply loop to sovereign inbox",
       "from": "grayskyes@solenterprises.org",
       "to": "grayskyes@solenterprises.org",
-      "subject": "SkyeMail Zoho live inbox proof B codex-20260524-zoho-live-final",
-      "provider": "zoho",
-      "zoho_id": "1779622906861155100",
-      "provider_message_id": "1779622907476141200",
+      "subject": "SkyeMail Citadel live inbox proof B codex-20260524-citadel-live-final",
+      "mail_lane": "citadel-skynet",
+      "citadel_send_id": "1779622906861155100",
+      "citadel_message_id": "1779622907476141200",
       "imported_to_inbox": true,
       "imported_message_id": "1779622907476141200",
-      "provider_inbox_visible": true,
-      "provider_sent_visible": true,
+      "sovereign_inbox_visible": true,
+      "sovereign_sent_visible": true,
       "event_count": 2
     }
   ],
   "security": {
-    "vault_keys_active": true,
+    "citadel_keys_active": true,
     "private_keys_exposed": false,
-    "inbox_storage": "Zoho provider-backed mailbox read through SkyeMail; no raw OAuth token is published",
-    "provider_events": "Zoho Mail API send and inbox-read proof"
+    "inbox_storage": "Citadel/SkyeNet sovereign mailbox read through SkyeMail; no raw OAuth token is published",
+    "mail_events": "Citadel/SkyeNet send and inbox-read proof"
   }
 }

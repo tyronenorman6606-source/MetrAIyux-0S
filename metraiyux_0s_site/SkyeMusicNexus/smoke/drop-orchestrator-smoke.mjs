@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 
 const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'skye-music-drops-smoke-'));
@@ -12,7 +13,6 @@ process.env.MUSIC_NEXUS_DROPS_NETLIFY_SITE_ID = 'smoke-site-id';
 delete process.env.MUSIC_NEXUS_DROPS_ENABLE_LIVE_DEPLOY;
 
 const require = createRequire(import.meta.url);
-const { localIdentity } = require('../netlify/functions/_lib/skygate-auth.js');
 const dropsFunction = require('../netlify/functions/music-drops.js');
 
 const failures = [];
@@ -23,6 +23,23 @@ function assert(condition, message) {
 
 function parse(response) {
   return JSON.parse(response.body || '{}');
+}
+
+function base64urlJson(value) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function signJwt(privateKey, payload) {
+  const header = base64urlJson({ alg: 'RS256', typ: 'JWT', kid: 'fs27-drop-smoke-key' });
+  const body = base64urlJson({
+    iss: 'local://skygatefs13/drop-smoke',
+    aud: 'skygatefs13',
+    exp: Math.floor(Date.now() / 1000) + 3600,
+    iat: Math.floor(Date.now() / 1000),
+    ...payload,
+  });
+  const signature = crypto.sign('RSA-SHA256', Buffer.from(`${header}.${body}`), privateKey).toString('base64url');
+  return `${header}.${body}.${signature}`;
 }
 
 async function call(method, body = {}, query = {}) {
@@ -36,14 +53,15 @@ async function call(method, body = {}, query = {}) {
   return dropsFunction.handler(event);
 }
 
-const created = localIdentity.createFirstAdmin({
+const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
+process.env.SKYGATE_PUBLIC_KEY_PEM = publicKey.export({ type: 'spki', format: 'pem' });
+process.env.SKYGATE_EXPECTED_AUDIENCE = 'skygatefs13';
+process.env.SKYGATE_ISSUER = 'local://skygatefs13/drop-smoke';
+const token = signJwt(privateKey, {
+  sub: 'fs27-drop-smoke-operator',
   email: 'drop-smoke@example.com',
-  password: 'drop-smoke-password-2026',
-  name: 'Drop Smoke',
+  role: 'admin',
 });
-const user = created.user || localIdentity.findUserByEmail('drop-smoke@example.com');
-const session = localIdentity.issueSession(user, { subject: 'drop-smoke' });
-const token = session.token;
 
 const envStatus = parse(await call('GET', {}, { action: 'env-status' }));
 const envText = JSON.stringify(envStatus);

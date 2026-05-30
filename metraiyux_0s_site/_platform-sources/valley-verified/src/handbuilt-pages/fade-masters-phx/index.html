@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fade Masters PHX | Valley Verified</title>
+  <meta name="description" content="Valley Verified static landing page for Fade Masters PHX, a Phoenix mobile barber listing with owner-researched contact facts and SkyEmail acceptance.">
+  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/fade-masters-phx/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14171f;
+      --muted: #5e6675;
+      --paper: #fbf7ef;
+      --panel: #ffffff;
+      --line: #222833;
+      --gold: #f3b83f;
+      --teal: #187a78;
+      --coral: #d95f4f;
+      --blue: #355c8c;
+      --wash: #e9f3f1;
+      --shadow: 0 20px 46px rgba(20, 23, 31, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(243, 184, 63, 0.28), transparent 32%),
+        linear-gradient(180deg, #fffaf0 0%, #eef7f5 48%, #f7f8fb 100%);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      border: 2px solid var(--line);
+      background: #fff;
+    }
+
+    .brand small,
+    .navline {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .mast {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .hero,
+    .panel,
+    .stripe,
+    .skymail {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 34px;
+      min-height: 560px;
+      display: grid;
+      align-content: space-between;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 88% 12%, rgba(24, 122, 120, 0.28), transparent 28%),
+        linear-gradient(145deg, #ffffff 0%, #fff3d4 52%, #dff2ef 100%);
+    }
+
+    .kicker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .kicker span,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .kicker span:first-child {
+      background: var(--gold);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin-bottom: 20px;
+      font-size: clamp(3.1rem, 9vw, 6.6rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 680px;
+      color: #283342;
+      font-size: 1.14rem;
+      line-height: 1.65;
+    }
+
+    .service-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .service-board div {
+      min-height: 102px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .service-board strong {
+      font-size: 1.05rem;
+    }
+
+    .service-board span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .panel {
+      padding: 26px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .score div {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--wash);
+      padding: 16px;
+      min-height: 116px;
+    }
+
+    .score strong {
+      display: block;
+      font-size: 2.2rem;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .score span,
+    dt {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .facts {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+
+    .facts div {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid #dce2ea;
+    }
+
+    .facts dd {
+      margin: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .button.primary {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .button.gold {
+      background: var(--gold);
+    }
+
+    .stripe {
+      margin-top: 22px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      background: #fff;
+    }
+
+    .stripe div {
+      border-left: 5px solid var(--coral);
+      padding: 10px 12px;
+      background: #fff8ef;
+      border-radius: 6px;
+    }
+
+    .stripe strong,
+    .stripe span {
+      display: block;
+    }
+
+    .stripe span {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .skymail {
+      margin-top: 22px;
+      padding: 28px;
+      background:
+        linear-gradient(135deg, rgba(53, 92, 140, 0.12), transparent 38%),
+        #ffffff;
+    }
+
+    .skymail-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid #dce2ea;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .steps b {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .notice {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff4d7;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .mast,
+      .grid,
+      .skymail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .stripe,
+      .service-board {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        width: min(100% - 20px, 1160px);
+      }
+
+      .topbar,
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .hero,
+      .panel,
+      .skymail {
+        padding: 20px;
+      }
+
+      .score,
+      .stripe,
+      .service-board {
+        grid-template-columns: 1fr;
+      }
+
+      .facts div {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+    }
+  </style>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "@id": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/fade-masters-phx/#business",
+      "name": "Fade Masters PHX",
+      "description": "Precision fades, sharp lineups, and clean beard work. Mobile service across Phoenix Metro.",
+      "url": "https://fademastersphx.com",
+      "telephone": "(602) 555-0123",
+      "email": "book@fademastersphx.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Mobile (Phoenix Metro)",
+        "addressLocality": "Phoenix",
+        "addressRegion": "AZ",
+        "postalCode": "85003",
+        "addressCountry": "US"
+      },
+      "areaServed": "Phoenix Metro",
+      "priceRange": "Starting at $35",
+      "sameAs": [
+        "https://instagram.com/fademastersphx"
+      ]
+    }
+  </script>
+</head>
+<body data-static-hand-page="true">
+  <main class="page">
+    <header class="topbar" aria-label="Valley Verified business header">
+      <a class="brand" href="/valley-verified/">
+        <img src="/assets/valley-verified-logo.png" alt="">
+        <span>
+          <strong>Valley Verified</strong><br>
+          <small>Owner-researched local record</small>
+        </span>
+      </a>
+      <div class="navline">Phoenix / Haircuts / Mobile barber</div>
+    </header>
+
+    <section class="mast" aria-labelledby="fade-title">
+      <div class="hero">
+        <div>
+          <ul class="kicker" aria-label="Listing status">
+            <li><span>Owner-researched verified status</span></li>
+            <li><span>Business verified</span></li>
+            <li><span>Mobile service</span></li>
+            <li><span>No hidden fees badge</span></li>
+          </ul>
+          <h1 id="fade-title">Fade Masters PHX</h1>
+          <p class="lead">Precision fades, sharp lineups, clean beard work, and kids cuts by appointment across Phoenix Metro. Valley Verified keeps the public record centered on contact, pricing clarity, and the real booking path.</p>
+        </div>
+        <div class="service-board" aria-label="Service highlights">
+          <div><strong>Lining Restoration</strong><span>Tag</span></div>
+          <div><strong>Beard Sculpt</strong><span>Tag</span></div>
+          <div><strong>Kids Cuts</strong><span>Tag</span></div>
+          <div><strong>20 miles</strong><span>Service area</span></div>
+        </div>
+      </div>
+
+      <aside class="panel" aria-labelledby="fade-contact">
+        <div>
+          <p class="pill">Phoenix Metro</p>
+          <h2 id="fade-contact">Contact and source facts</h2>
+        </div>
+        <div class="score">
+          <div><strong>90</strong><span>Verification score</span></div>
+          <div><strong>$35</strong><span>Starting price</span></div>
+        </div>
+        <dl class="facts">
+          <div><dt>Business</dt><dd>Fade Masters PHX</dd></div>
+          <div><dt>Category</dt><dd>Haircuts / Barber</dd></div>
+          <div><dt>Address</dt><dd>Mobile (Phoenix Metro), Phoenix, AZ 85003</dd></div>
+          <div><dt>Phone</dt><dd><a href="tel:+16025550123">(602) 555-0123</a></dd></div>
+          <div><dt>Email</dt><dd><a href="mailto:book@fademastersphx.com">book@fademastersphx.com</a></dd></div>
+          <div><dt>Website</dt><dd><a href="https://fademastersphx.com" rel="noopener">fademastersphx.com</a></dd></div>
+          <div><dt>Booking</dt><dd><a href="https://book.fademastersphx.com" rel="noopener">book.fademastersphx.com</a></dd></div>
+          <div><dt>Source</dt><dd>dist/data/businesses.json, seed/businesses/core.json, hash 447f209b70a2</dd></div>
+          <div><dt>Checked</dt><dd>Last verified 2026-02-04; claim status unclaimed</dd></div>
+        </dl>
+        <div class="actions">
+          <a class="button primary" href="https://book.fademastersphx.com" rel="noopener">Book appointment</a>
+          <a class="button" href="https://fademastersphx.com" rel="noopener">Open website</a>
+          <a class="button" href="https://instagram.com/fademastersphx" rel="noopener">Instagram</a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="stripe" aria-label="Public record summary">
+      <div><strong>Owner-researched</strong><span>Listing reviewed for public contact usefulness.</span></div>
+      <div><strong>English and Spanish</strong><span>Languages listed in the source record.</span></div>
+      <div><strong>Price clarity</strong><span>Final price confirmed before service. No surprise add-ons.</span></div>
+      <div><strong>By appointment</strong><span>All listed days route through appointment scheduling.</span></div>
+    </section>
+
+    <section class="grid" aria-label="Business details">
+      <article class="panel">
+        <h2>What customers can use</h2>
+        <p class="lead">The listing gives Phoenix customers one clean path to the barber: call, email, book, open the website, or confirm the mobile service area before requesting a cut.</p>
+        <dl class="facts">
+          <div><dt>Fees</dt><dd>Quote or package is confirmed before service.</dd></div>
+          <div><dt>Notice</dt><dd>24 hours notice preferred for cancellation.</dd></div>
+          <div><dt>Badges</dt><dd>Business verified, mobile, insured, no hidden fees.</dd></div>
+        </dl>
+      </article>
+      <article class="panel">
+        <h2>Valley Verified record</h2>
+        <p class="lead">This page preserves the source facts without adding a separate owner password. Owner/admin access stays on the shared 0S gate lane, and the public page stays focused on customers.</p>
+        <dl class="facts">
+          <div><dt>Primary key</dt><dd>domain:fademastersphx.com</dd></div>
+          <div><dt>Strong signals</dt><dd>Domain, phone, email, Instagram.</dd></div>
+          <div><dt>Moderation</dt><dd>No moderation flags listed.</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="skymail" aria-labelledby="fade-skymail">
+      <div class="skymail-grid">
+        <div>
+          <p class="pill">SkyEmail acceptance</p>
+          <h2 id="fade-skymail">Accept the free SkyEmail account for Fade Masters PHX.</h2>
+          <p class="lead">Use the shared 0S/SkyGate sign-in path, then notify the owner to provision the workspace. Team activation starts within 24 hours after provisioning.</p>
+          <div class="actions">
+            <a class="button primary" href="/admin/login.html?return=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html%3Fworkspace=valley-verified%26business=fade-masters-phx">Accept free SkyEmail account</a>
+            <a class="button gold" href="mailto:owner@metraiyux.com?subject=Provision%20SkyEmail%20for%20Fade%20Masters%20PHX&amp;body=Please%20provision%20the%20Valley%20Verified%20SkyEmail%20workspace%20for%20Fade%20Masters%20PHX.">Notify owner to provision workspace</a>
+          </div>
+        </div>
+        <div>
+          <ol class="steps">
+            <li><b>1</b><span>Sign in through shared 0S/SkyGate; do not create an app-specific owner password.</span></li>
+            <li><b>2</b><span>Owner provisions the SkyEmail workspace and returns the shared account route.</span></li>
+            <li><b>3</b><span>Team activation is expected within 24 hours after provisioning.</span></li>
+            <li><b>4</b><span>K4i escalation starts after 24 hours if activation has not landed.</span></li>
+          </ol>
+          <p class="notice">Seats: 9 left. Warn at 2 seats remaining. Buy seats in groups of 5 so the workspace never stalls during onboarding.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

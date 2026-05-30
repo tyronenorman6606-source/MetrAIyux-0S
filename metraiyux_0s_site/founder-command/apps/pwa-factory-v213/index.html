@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#07090d" />
+  <title>PWA Drop Factory | Founder Command</title>
+  <meta name="description" content="Founder-only 0S app for turning audio uploads, Nexus singles, albums, and collective drops into installable Skye Radio PWAs." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-32.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="preload" as="image" href="assets/skyes-over-london-deity-logo.png" />
+  <link rel="stylesheet" href="assets/pwa-factory.css" />
+  <script defer src="assets/pwa-factory.js"></script>
+</head>
+<body>
+  <canvas class="motion-field" id="motionField" aria-hidden="true"></canvas>
+  <div class="texture" aria-hidden="true"></div>
+
+  <div class="factory-shell">
+    <header class="factory-header">
+      <a class="brand-lockup" href="/founder-command/" aria-label="Founder Command home">
+        <img src="assets/skyes-over-london-deity-logo.png" alt="Skyes Over London" />
+        <span>
+          <strong>PWA Drop Factory</strong>
+          <small>Founder Command / 0S Gate Owned</small>
+        </span>
+      </a>
+      <nav class="header-actions" aria-label="Factory actions">
+        <a class="button secondary" href="/founder-command/">Founder Command</a>
+        <a class="button secondary" href="/SkyeMusicNexus/artist-storefronts/gray-skyes-collective/">Gray Gang</a>
+        <button class="button secondary" id="refreshFactoryBtn" type="button">Refresh</button>
+        <button class="button" id="mintBundleBtn" type="button">Mint Bundle</button>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <section class="intro-band" aria-labelledby="factoryTitle">
+        <div>
+          <p class="eyebrow">No donor dependency / no browser provider keys</p>
+          <h1 id="factoryTitle">Package music drops into real installable player apps.</h1>
+          <p class="lede">Build from a local MP3/audio upload, a Nexus single, a full artist album, or a Gray Gang collective set. AI manifest polish is routed through the shared 0S gate session.</p>
+        </div>
+        <div class="truth-panel" aria-label="0S integration proof">
+          <span id="gateStatusChip" class="status-chip pending">Checking gate lane</span>
+          <span>AI route: <strong>/api/founder-command/pwa-factory/analyze</strong></span>
+          <span>Store route: <strong>/api/skymusicnexus/music-store</strong></span>
+          <span>Audio route: <strong>/api/skymusicnexus/music-assets</strong></span>
+        </div>
+      </section>
+
+      <section class="factory-grid">
+        <aside class="panel controls-panel" aria-label="Drop controls">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Source</p>
+              <h2>Build Input</h2>
+            </div>
+            <span id="registryCount" class="mini-chip">0 artists</span>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="Drop source">
+            <button class="active" data-source-mode="nexus" type="button">Nexus</button>
+            <button data-source-mode="audio" type="button">Audio Upload</button>
+            <button data-source-mode="html" type="button">HTML Import</button>
+          </div>
+
+          <div class="source-pane active" id="sourceNexus">
+            <label>
+              Artist
+              <select id="artistSelect"></select>
+            </label>
+            <div class="button-row">
+              <button class="button" data-build-mode="single" type="button">Single PWA</button>
+              <button class="button secondary" data-build-mode="album" type="button">Album PWA</button>
+              <button class="button secondary" data-build-mode="collective" type="button">Gray Gang PWA</button>
+            </div>
+            <p class="fine-print">Nexus builds fetch store products and gated MusicNexus asset streams. When possible, Mint Bundle copies same-origin audio into the PWA zip.</p>
+          </div>
+
+          <div class="source-pane" id="sourceAudio">
+            <label>
+              Audio File
+              <input id="audioInput" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.webm" />
+            </label>
+            <label>
+              Drop Title
+              <input id="audioTitleInput" type="text" placeholder="Song or drop title" />
+            </label>
+            <label>
+              Artist / Brand
+              <input id="audioArtistInput" type="text" placeholder="Artist name" value="Skye Artist" />
+            </label>
+            <label>
+              Store / Buy Link
+              <input id="audioBuyUrlInput" type="url" placeholder="/SkyeMusicNexus/artist-storefronts/..." />
+            </label>
+            <button class="button" id="buildAudioDropBtn" type="button">Build Audio Drop</button>
+            <p class="fine-print">This path packages the uploaded audio file inside the zip with a working player and offline cache.</p>
+          </div>
+
+          <div class="source-pane" id="sourceHtml">
+            <label>
+              HTML or Project Files
+              <input id="htmlInput" type="file" multiple accept=".html,.css,.js,.json,.png,.jpg,.jpeg,.webp,.svg,.mp3,.wav,.m4a,.ogg,.txt" />
+            </label>
+            <textarea id="htmlEditor" spellcheck="false"></textarea>
+            <button class="button secondary" id="loadHtmlBtn" type="button">Use HTML</button>
+          </div>
+
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Manifest</p>
+              <h2>Install Settings</h2>
+            </div>
+            <button class="button small" id="gateAiBtn" type="button">Gate AI Sync</button>
+          </div>
+          <div class="settings-grid">
+            <label>Name<input id="manifestName" type="text" /></label>
+            <label>Short Name<input id="manifestShort" type="text" maxlength="18" /></label>
+            <label class="wide">Description<textarea id="manifestDescription" rows="3"></textarea></label>
+            <label>Theme<input id="themeColor" type="color" value="#d4af37" /></label>
+            <label>Icon<input id="iconInput" type="file" accept="image/*" /></label>
+          </div>
+        </aside>
+
+        <section class="panel preview-panel" aria-label="Drop preview">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2 id="dropTitle">Skye Artist Drop</h2>
+            </div>
+            <span id="trackCount" class="mini-chip">0 tracks</span>
+          </div>
+          <div class="device-preview">
+            <iframe id="previewFrame" title="PWA drop preview" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+          </div>
+        </section>
+
+        <section class="panel detail-panel" aria-label="Drop details">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Skye Radio</p>
+              <h2>Tracks</h2>
+            </div>
+            <button class="button small secondary" id="copyManifestBtn" type="button">Copy JSON</button>
+          </div>
+          <div id="trackList" class="track-list"></div>
+
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">Output</p>
+              <h2>Mint Receipt</h2>
+            </div>
+          </div>
+          <pre id="receiptBox" class="receipt-box">Factory idle.</pre>
+        </section>
+      </section>
+    </main>
+  </div>
+<script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="pwa-factory" data-command-bridge-surface="pwa-drop-factory"></script>
+<script src="/assets/js/skymail-pocket-tab.js" defer data-skymail-pocket-tab="1"></script>
+</body>
+</html>

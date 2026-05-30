@@ -6,23 +6,23 @@ What lives here:
 - `suite/`: the self-contained multi-surface SkyeMail platform shell
 - `dist/SkyeMail/`: generated route-safe sync output for hosts that expect a flat `/SkyeMail/...` tree
 - `netlify/functions/`: the deeper standalone mail service implementation, including auth, mailbox state, drafts, contacts, Gmail OAuth, Gmail sync, inbound handlers, outbound send, and watch/webhook lanes
-- `cloudflare/` and `wrangler.toml`: the Cloudflare Worker port for FS27 auth, Neon primary database access, hosted mailbox provisioning, send, inbound Resend receive webhooks, and Citadel backup events
+- `cloudflare/` and `wrangler.toml`: the sovereign Worker runtime for FS27 auth, Citadel/SkyeNet primary storage, mailbox provisioning, send, inbound receive webhooks, and Citadel backup events
 - `sql/schema.sql`: the standalone database contract for the service implementation
 - `.env.template`: the provider/runtime contract, intended to be the only missing layer before live deployment
 
 Operational reality:
 - The root pages (`dashboard.html`, `compose.html`, `settings.html`, `contacts.html`, and related pages) are the real standalone mail surfaces.
 - The suite now wraps those real surfaces instead of depending on external shared auth or dead `/api/skymail-*` routes.
-- The Cloudflare Worker deploy now has a Zoho provider-backed lane for live hosted-mail send/read proof. Gmail OAuth, Resend inbound, Stalwart, and external provisioner lanes remain in source for compatibility and later scale-up.
+- The deployed sovereign runtime now has a Citadel/SkyeNet lane for live mailbox send/read proof. Gmail OAuth, inbound webhook, Stalwart, and external provisioner lanes remain in source for compatibility and later scale-up.
 - `_redirects` maps `/SkyeMail/...` requests into `suite/` so subpath deployment works without touching other platforms.
 - `npm run build:suite` copies `suite/` into `dist/SkyeMail/` for flat route-safe syncs into another host tree.
 - The service implementation is the fuller standalone mail backend.
 - SkyeGateFS27 can now be used as the primary auth gate through `auth-fs27-session`; SkyeMail mints an app session only after FS27 introspection succeeds.
 - The missing hosted mailbox provisioning endpoints now exist: `mailbox-domains`, `mail-status`, and `mailbox-provision`.
-- The current live hosted-mail proof runs through Zoho for `solenterprises.org`: token refresh, provider account discovery, send, and inbox readback are green. DNS/MX/SPF/DKIM/DMARC still must remain correct per domain before selling broad customer-domain mail.
+- The current live mailbox proof runs through the Citadel/SkyeNet lane for `solenterprises.org`: sovereign route discovery, send, and inbox readback are green. DNS/MX/SPF/DKIM/DMARC still must remain correct per domain before selling broad customer-domain mail.
 
-Provider note:
-- The service layer in this folder is provider-backed. Zoho is the active deployed provider lane. Gmail remains available as a compatibility lane, and Stalwart/external provisioner support remains for later direct-control mailbox-server paths.
+Sovereign mail note:
+- The service layer in this folder is treated as Citadel/SkyeNet-backed. Gmail remains available as a compatibility lane, and Stalwart/external provisioner support remains for later direct-control mailbox-server paths.
 - FS27 event mirroring sends auth and mailbox provisioning events into the parent gate through `/platform/events` when `SKYGATEFS27_ORIGIN` and `SKYGATE_EVENT_MIRROR_SECRET` are configured.
 
 Suite/runtime note:

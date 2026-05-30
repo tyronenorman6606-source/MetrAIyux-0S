@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>General Dentistry 4 Kids | Phoenix Pediatric Dentistry</title>
+  <meta name="description" content="General Dentistry 4 Kids is a Valley Verified pediatric dentistry profile at 3202 E. Greenway Rd. Ste #1287, Phoenix, AZ 85032, highlighting Pediatric.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c2230;
+      --blue: #2478a8;
+      --green: #4b9c6f;
+      --coral: #f06f56;
+      --yellow: #ffd66b;
+      --lavender: #d8d6ff;
+      --paper: #fffefa;
+      --soft: #eef8f4;
+      --line: #dce5df;
+      --muted: #657080;
+      --shadow: 0 22px 80px rgba(28, 34, 48, .16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(255, 214, 107, .38) 0 12%, transparent 13%),
+        radial-gradient(circle at 88% 8%, rgba(216, 214, 255, .48) 0 10%, transparent 11%),
+        linear-gradient(180deg, #eaf7fb 0%, var(--paper) 44%, #f5fbf0 100%);
+      color: var(--ink);
+      font-family: ui-rounded, "SF Pro Rounded", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    img,
+    video {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 20px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand img {
+      width: 144px;
+      max-height: 72px;
+      object-fit: contain;
+    }
+
+    .brand span {
+      color: var(--blue);
+      font-size: .8rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .call {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--yellow);
+      font-weight: 950;
+      text-decoration: none;
+      box-shadow: 0 8px 0 rgba(28, 34, 48, .15);
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(440px, 1.1fr);
+      gap: 34px;
+      align-items: center;
+      padding: 36px 0 58px;
+    }
+
+    .intro {
+      padding: clamp(28px, 5vw, 50px);
+      border: 2px solid rgba(28, 34, 48, .12);
+      border-radius: 8px;
+      background: rgba(255, 254, 250, .9);
+      box-shadow: var(--shadow);
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--coral);
+      font-size: .78rem;
+      font-weight: 950;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .label::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 24px 0 0 var(--yellow), 48px 0 0 var(--lavender);
+    }
+
+    h1 {
+      max-width: 650px;
+      margin: 0;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 24px 0 0;
+      color: #394454;
+      font-size: clamp(1.05rem, 2vw, 1.28rem);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 950;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 14px 28px rgba(36, 120, 168, .26);
+    }
+
+    .button.secondary {
+      border: 2px solid rgba(28, 34, 48, .18);
+      background: white;
+      color: var(--ink);
+    }
+
+    .mini-facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .mini-fact {
+      min-height: 108px;
+      padding: 16px;
+      border: 2px solid rgba(28, 34, 48, .1);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .mini-fact:nth-child(2) {
+      background: #fff5e6;
+    }
+
+    .mini-fact span {
+      display: block;
+      color: var(--muted);
+      font-size: .74rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .mini-fact strong {
+      display: block;
+      margin-top: 8px;
+      line-height: 1.22;
+    }
+
+    .family-wall {
+      display: grid;
+      grid-template-columns: 1fr .74fr;
+      grid-template-rows: 1fr .78fr;
+      gap: 14px;
+      min-height: 650px;
+    }
+
+    .tile {
+      overflow: hidden;
+      border: 2px solid white;
+      border-radius: 8px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .tile.main {
+      grid-row: 1 / -1;
+    }
+
+    .tile.club {
+      background: var(--lavender);
+    }
+
+    .tile.office {
+      background: var(--soft);
+    }
+
+    .tile img,
+    .tile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .tile.club img,
+    .tile.office img {
+      object-fit: cover;
+    }
+
+    .profile {
+      padding: 42px 0 68px;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 26px;
+      align-items: stretch;
+      padding: clamp(24px, 4vw, 38px);
+      border: 2px solid rgba(28, 34, 48, .12);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 18px 64px rgba(28, 34, 48, .1);
+    }
+
+    .profile-card h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3.4vw, 3rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .profile-card p {
+      margin: 16px 0 0;
+      color: var(--muted);
+    }
+
+    .profile-list {
+      display: grid;
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border: 2px solid rgba(28, 34, 48, .08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .profile-list li {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 14px;
+      padding: 16px;
+      background: #fbfefd;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .profile-list li:nth-child(even) {
+      background: #fff9ed;
+    }
+
+    .profile-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .profile-list span {
+      color: var(--blue);
+      font-size: .76rem;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .profile-list strong {
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 30px;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .footer a {
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        width: min(100% - 28px, 760px);
+      }
+
+      .hero,
+      .profile-card {
+        grid-template-columns: 1fr;
+      }
+
+      .family-wall {
+        min-height: auto;
+      }
+
+      .tile.main {
+        aspect-ratio: 1 / 1;
+      }
+
+      .tile.club,
+      .tile.office {
+        aspect-ratio: 1 / 1;
+      }
+    }
+
+    @media (max-width: 590px) {
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .call,
+      .button {
+        width: 100%;
+      }
+
+      .actions,
+      .mini-facts,
+      .family-wall {
+        grid-template-columns: 1fr;
+      }
+
+      .tile.main {
+        grid-row: auto;
+      }
+
+      .profile-list li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .footer {
+        flex-direction: column;
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="shell top" aria-label="General Dentistry 4 Kids contact">
+      <div class="brand">
+        <img src="assets/real/logo.webp" alt="General Dentistry 4 Kids logo">
+        <span>Phoenix pediatric dentistry</span>
+      </div>
+      <a class="call" href="tel:+16029966065">(602) 996-6065</a>
+    </header>
+
+    <section class="shell hero">
+      <div class="intro">
+        <p class="label">Greenway Road pediatric dentistry</p>
+        <h1>General Dentistry 4 Kids</h1>
+        <p class="lead">General Dentistry 4 Kids gives patients, families seeking care, and local Phoenix-area residents a practical Phoenix connection for Pediatric Dentistry, Health Care / Pediatric Dentistry, Health Care, and Healthcare / local provider. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+        <div class="actions" aria-label="Primary actions">
+          <a class="button primary" href="tel:+16029966065">Call the office</a>
+          <a class="button secondary" href="#directory-profile">View local details</a>
+        </div>
+        <div class="mini-facts">
+          <div class="mini-fact">
+            <span>Niche</span>
+            <strong>Pediatric Dentistry</strong>
+          </div>
+          <div class="mini-fact">
+            <span>Checked</span>
+            <strong>public business profile checked May 19, 2026</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="family-wall" aria-label="General Dentistry 4 Kids imagery">
+        <figure class="tile main">
+          <video autoplay muted loop playsinline poster="assets/real/hero.jpg">
+            <source src="assets/real/hero-video.mp4" type="video/mp4">
+            <img src="assets/real/hero.jpg" alt="General Dentistry 4 Kids hero image">
+          </video>
+        </figure>
+        <figure class="tile office">
+          <img src="assets/real/office.webp" alt="General Dentistry 4 Kids office image">
+        </figure>
+        <figure class="tile club">
+          <img src="assets/real/club.webp" alt="General Dentistry 4 Kids club image">
+        </figure>
+      </div>
+    </section>
+
+    <section class="shell profile" id="directory-profile">
+      <div class="profile-card">
+        <div>
+          <h2>Phoenix 85032 contact details</h2>
+          <p>Families can use the listed Phoenix phone and Greenway Road address to reach this pediatric dentistry office for current appointments, scope, and pricing.</p>
+        </div>
+        <ul class="profile-list">
+          <li>
+            <span>Address</span>
+            <strong>3202 E. Greenway Rd. Ste #1287, Phoenix, AZ 85032</strong>
+          </li>
+          <li>
+            <span>Phone</span>
+            <strong><a href="tel:+16029966065">(602) 996-6065</a></strong>
+          </li>
+          <li>
+            <span>Language</span>
+            <strong>English</strong>
+          </li>
+          <li>
+            <span>Category</span>
+            <strong>Health Care / Pediatric Dentistry</strong>
+          </li>
+          <li>
+            <span>Evidence</span>
+            <strong><a href="https://business.phoenixchamber.com/list/ql/health-care-11">Public Phoenix Chamber health care directory</a></strong>
+          </li>
+        </ul>
+      </div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-general-dentistry-4-kids-phoenix-85032-237e895">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-general-dentistry-4-kids-phoenix-85032-237e895">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>General Dentistry 4 Kids earns this Valley Verified placement because public business evidence connects a real pediatric dentistry operation to 3202 E. Greenway Rd. Ste #1287, Phoenix, AZ 85032 and (602) 996-6065. Greater Phoenix Chamber directory evidence supports this local profile. For patients, families seeking care, and local Phoenix-area residents, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Pediatric Dentistry, Health Care / Pediatric Dentistry, Health Care, and Healthcare / local provider</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>patients, families seeking care, and local Phoenix-area residents</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>3202 E. Greenway Rd. Ste #1287, Phoenix, AZ 85032; (602) 996-6065</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+
+    <footer class="shell footer"><div class="vv-footer-inner">General Dentistry 4 Kids in Phoenix - Valley Verified local business profile.</div></footer>
+  </main>
+</body>
+</html>

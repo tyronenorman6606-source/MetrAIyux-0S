@@ -2444,6 +2444,13 @@ body::after {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.shyt-banner {
+  border-color: rgba(255, 214, 118, 0.34);
+  background:
+    linear-gradient(135deg, rgba(255, 214, 118, 0.13), rgba(100, 217, 255, 0.06)),
+    var(--panel);
+}
+
 .agent-prompt {
   margin: 22px 0 0;
   max-width: 100%;
@@ -2455,6 +2462,14 @@ body::after {
   color: #dffaff;
   line-height: 1.55;
   white-space: pre-wrap;
+}
+
+.copy-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
 }
 
 .agent-prompt code,

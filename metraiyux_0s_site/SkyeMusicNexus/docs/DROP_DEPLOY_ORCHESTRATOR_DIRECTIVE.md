@@ -28,7 +28,7 @@ The existing app is ready for this as an upgrade layer, not a rebuild.
 - `public/rights.html` and release rights logic already enforce ownership, preview authorization, distribution authorization, takedown holds, and playback blocks.
 - `netlify/functions/music-social.js` already provides Pixelfed, Mastodon-compatible, Funkwhale, ActivityPub-style queues, provider-token-safe social posts, and feed sync contracts.
 - `netlify/functions/music-exchange.js` already provides content requests, inbox threads, community posts, campaign packs, and achievement progression.
-- `data/skyemusicnexus-pricing.json` already contains Free99 Lite, Studio, Label Command, Managed Music Ops, Single Song Drop, Release Drop Plus, EP Drop, Album Drop, campaign add-ons, and a gated audio vault pack.
+- `data/skyemusicnexus-pricing.json` already contains Free99 Lite, the May 2026 founding-core grant, Artist Host, Artist Collective, Managed Music Ops, Single Song Drop, Release Drop Plus, EP Drop, Album Drop, campaign add-ons, fan preview/private package policy, and a gated audio vault pack.
 - `PLATFORM_TRUTH.json` correctly says paid checkout does not create live distributor, DSP, legal, label, payment, or production provider claims.
 
 Missing layer:
@@ -526,7 +526,7 @@ Pro Artist
   private delivery allowed
   priority deploy windows
 
-Label Command
+Artist Collective
   multi-artist batching
   album and roster hubs
   custom monthly drop limit
@@ -1047,7 +1047,7 @@ The admin room should show:
 - Add qualified stream rules.
 - Add download accounting.
 - Add Netlify credit estimator.
-- Add admin traffic dashboard.
+- Add admin traffic service-health view.
 
 ## Proof Requirements
 

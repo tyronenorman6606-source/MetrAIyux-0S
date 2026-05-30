@@ -1,0 +1,27 @@
+[Unit]
+Description=SkyeVault repo parity autosync
+Documentation=/opt/metraiyux-0s/docs/SKYEVAULT_AUTOSYNC_PARITY.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=skyevault
+Group=skyevault
+WorkingDirectory=/opt/metraiyux-0s
+Environment=SKYEVAULT_AUTOSYNC_MODE=git+full
+Environment=SKYEVAULT_AUTOSYNC_FULL_ARCHIVE_FORMAT=tar.zst
+Environment=SKYEVAULT_AUTOSYNC_FULL_MAX_GB=50
+Environment=SKYEVAULT_AUTOSYNC_FULL_DIRECT_R2=1
+Environment=SKYEVAULT_AUTOSYNC_FULL_ZIP_LEVEL=0
+Environment=SKYEVAULT_AUTOSYNC_FULL_ZIP_UPLOAD_CONCURRENCY=8
+Environment=SKYEVAULT_FULL_REPO_SOURCE_CUSTODY=1
+EnvironmentFile=-/etc/skyevault/autosync.env
+ExecStart=/usr/bin/npm run vault:autosync:once
+Nice=5
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/metraiyux-0s/.skyevault-out /tmp

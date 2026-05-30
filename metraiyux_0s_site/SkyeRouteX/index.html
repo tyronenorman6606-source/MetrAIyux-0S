@@ -1,557 +1,360 @@
 <!doctype html>
 <html data-mcp-neon-scrollbar lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SkyeRouteX Workforce Command full routed platform shell for VantaCore and QuantumSkyes.">
-  <title>SkyeRouteX Workforce Command</title>
-  <link rel="canonical" href="./workforce-command-v0.4.0/public/index.html">
-  <meta http-equiv="refresh" content="0; url=./workforce-command-v0.4.0/public/index.html">
-  <script>
-    (() => {
-      const target = new URL("./workforce-command-v0.4.0/public/index.html", location.href);
-      target.search = location.search;
-      target.hash = location.hash;
-      location.replace(target.href);
-    })();
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="SkyeRouteX Logistics company lane for dispatch, route-heavy work, contractor assignment, proof, and 0S-owned workforce operations." />
+  <title>SkyeRouteX Logistics | Dispatch, Route Work, Proof, and Workforce Command</title>
+  <link rel="icon" href="./workforce-command-v0.4.0/assets/platform-mark.svg" type="image/svg+xml" />
+  <script src="/Free99/free99-gate.js" data-platform-id="skyeroutex" data-platform-name="SkyeRouteX Logistics" data-billing-mode="gate_owned" data-price-label="0S shared FS27/SkyGate owner session required" data-app-root="/SkyeRouteX/"></script>
   <style>
-    :root{color-scheme:dark;--bg:#05070d;--panel:rgba(16,21,32,.88);--panel2:rgba(24,32,47,.76);--line:rgba(255,255,255,.13);--text:#f5f8ff;--muted:rgba(245,248,255,.66);--a:#f4c969;--b:#5ad7ff;}
-    *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 12% 10%,color-mix(in srgb,var(--a) 18%,transparent),transparent 28%),linear-gradient(135deg,#05070d,#10141f 56%,#070910);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    a{color:inherit;text-decoration:none} button,input,textarea{font:inherit;color:inherit} button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.06);padding:10px 12px;font-weight:800;cursor:pointer} button:hover,a:hover{border-color:color-mix(in srgb,var(--a) 55%,white 0%)}
-    .app{min-height:100vh;display:grid;grid-template-columns:300px minmax(0,1fr)} .side{border-right:1px solid var(--line);background:rgba(5,7,13,.82);padding:18px;display:grid;grid-template-rows:auto auto 1fr auto;gap:16px;position:sticky;top:0;height:100vh}
-    .brand{display:flex;gap:12px;align-items:center}.mark{width:44px;height:44px;display:grid;place-items:center;border-radius:8px;border:1px solid color-mix(in srgb,var(--a) 42%,transparent);background:linear-gradient(135deg,color-mix(in srgb,var(--a) 20%,transparent),color-mix(in srgb,var(--b) 14%,transparent));font-weight:1000}.brand h1{font-size:17px;line-height:1.05;margin:0}.brand p{font-size:12px;color:var(--muted);margin:4px 0 0}
-    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.045);padding:10px}.metric strong{display:block;font-size:24px}.metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-    nav{display:grid;gap:7px;overflow:auto}.side nav a{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;border:1px solid transparent;border-radius:8px;padding:10px;color:rgba(245,248,255,.78)}.side nav a span{display:grid;place-items:center;width:34px;height:28px;border-radius:6px;background:rgba(255,255,255,.06);font-size:11px;color:var(--muted)}.side nav a.active{background:color-mix(in srgb,var(--a) 12%,transparent);border-color:color-mix(in srgb,var(--a) 34%,transparent);color:#fff}
-    .sidefoot{display:grid;gap:8px}.primary{border:0;background:linear-gradient(135deg,var(--a),var(--b));color:#041017}.main{min-width:0}.top{min-height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;background:rgba(5,7,13,.58);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}.top h2{margin:0;font-size:clamp(24px,3vw,40px);letter-spacing:0}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}.content{padding:24px}.view{display:none}.view.active{display:block}
-    .hero{border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,color-mix(in srgb,var(--a) 12%,transparent),rgba(255,255,255,.035));padding:20px;margin-bottom:16px}.hero h2{font-size:clamp(42px,7vw,88px);line-height:.9;letter-spacing:0;margin:0}.hero p{color:var(--muted);max-width:820px;line-height:1.6}.kicker{color:var(--a);text-transform:uppercase;letter-spacing:.14em;font-size:11px;font-weight:1000;margin:0 0 8px}
-    .section-head{margin-bottom:14px}.section-head h2{font-size:clamp(32px,5vw,64px);line-height:.95;letter-spacing:0;margin:0}.section-head p{color:var(--muted);line-height:1.55;max-width:780px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card,.panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:16px;box-shadow:0 22px 70px rgba(0,0,0,.3)}.card h3,.panel h3{margin:8px 0}.card p,.muted{color:var(--muted);line-height:1.55}.badge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted);font-size:11px}.small{margin-top:12px;padding:8px 10px;font-size:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.rows{display:grid;gap:8px}.row,.rowlink{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);padding:10px}.rowlink{grid-template-columns:1fr auto}.dot{width:10px;height:10px;border-radius:50%;background:var(--b);box-shadow:0 0 16px var(--b)}.console{min-height:240px;white-space:pre-wrap;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#02040a;color:#b8f4ff;padding:14px;overflow:auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-    @media(max-width:980px){.app{grid-template-columns:1fr}.side{position:static;height:auto}.grid,.split{grid-template-columns:1fr}.top{position:static;align-items:flex-start;flex-direction:column}}
+    :root{
+      color-scheme:dark;
+      --bg:#07100d;
+      --panel:#10211b;
+      --panel2:#142b25;
+      --line:rgba(231,245,238,.18);
+      --text:#f5fbf7;
+      --muted:rgba(245,251,247,.72);
+      --green:#58d88a;
+      --cyan:#46d9dc;
+      --gold:#f1c65b;
+      --red:#ff7a70;
+      --shadow:0 28px 90px rgba(0,0,0,.36);
+      --radius:8px;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      background:
+        linear-gradient(120deg,rgba(7,16,13,.94),rgba(12,28,34,.9)),
+        radial-gradient(circle at 16% 0%,rgba(70,217,220,.18),transparent 28%),
+        radial-gradient(circle at 88% 8%,rgba(241,198,91,.14),transparent 32%),
+        #07100d;
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .shell{width:min(1180px,calc(100vw - 32px));margin:0 auto}
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(16px);
+      background:rgba(7,16,13,.78);
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:230px}
+    .brand img{width:50px;height:50px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(70,217,220,.22))}
+    .brand strong{display:block;font-size:16px;letter-spacing:0}
+    .brand span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+    .nav-links{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+    .nav-links a,.button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:10px 13px;
+      border-radius:8px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-size:13px;
+      font-weight:800;
+    }
+    .button.primary{border-color:rgba(88,216,138,.45);background:linear-gradient(135deg,var(--green),var(--cyan));color:#06120f}
+    .button.gold{border-color:rgba(241,198,91,.42);background:rgba(241,198,91,.14)}
+    .hero{
+      min-height:calc(100vh - 76px);
+      display:grid;
+      grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);
+      gap:28px;
+      align-items:center;
+      padding:56px 0 34px;
+    }
+    .eyebrow{
+      margin:0 0 12px;
+      color:var(--gold);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    h1,h2,h3,p{letter-spacing:0}
+    h1{margin:0;font-size:clamp(42px,7vw,82px);line-height:.92}
+    h2{margin:0;font-size:clamp(26px,4vw,44px);line-height:1.02}
+    h3{margin:0;font-size:18px}
+    p{color:var(--muted);line-height:1.65}
+    .hero-copy p{max-width:690px;font-size:16px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .hero-visual{
+      position:relative;
+      min-height:500px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:
+        linear-gradient(160deg,rgba(20,43,37,.94),rgba(8,24,31,.9)),
+        radial-gradient(circle at 20% 20%,rgba(88,216,138,.22),transparent 38%);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .hero-visual::before{
+      content:"";
+      position:absolute;
+      inset:24px;
+      background:
+        linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+      background-size:38px 38px;
+      opacity:.34;
+      mask-image:linear-gradient(145deg,#000,transparent 88%);
+    }
+    .route-map{position:absolute;inset:0}
+    .route-line{
+      position:absolute;
+      left:18%;
+      right:13%;
+      top:48%;
+      height:4px;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--green),var(--cyan),var(--gold));
+      box-shadow:0 0 28px rgba(70,217,220,.26);
+      transform:rotate(-14deg);
+    }
+    .node{
+      position:absolute;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:var(--cyan);
+      box-shadow:0 0 0 8px rgba(70,217,220,.14),0 0 26px rgba(70,217,220,.54);
+    }
+    .node.a{left:18%;top:58%;background:var(--green)}
+    .node.b{left:42%;top:45%}
+    .node.c{left:64%;top:35%;background:var(--gold)}
+    .node.d{right:14%;top:28%;background:#fff}
+    .command-card{
+      position:absolute;
+      left:24px;
+      right:24px;
+      bottom:24px;
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:8px;
+      background:rgba(7,16,13,.82);
+      padding:18px;
+      backdrop-filter:blur(12px);
+    }
+    .visual-logo{
+      position:absolute;
+      width:128px;
+      height:128px;
+      right:30px;
+      top:30px;
+      object-fit:contain;
+      filter:drop-shadow(0 0 30px rgba(88,216,138,.22));
+    }
+    .metric-grid,.app-grid,.proof-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:22px;
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.06);
+      padding:16px;
+      min-width:0;
+    }
+    .card strong{display:block;color:var(--text);font-size:18px;margin-bottom:6px}
+    .card span,.card small{display:block;color:var(--muted);font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+    section.band{padding:48px 0;border-top:1px solid rgba(255,255,255,.08)}
+    .split{display:grid;grid-template-columns:minmax(0,.92fr) minmax(320px,1.08fr);gap:20px;align-items:start}
+    .app-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .app-link{display:grid;gap:8px;min-height:148px}
+    .app-link b{font-size:17px}
+    .app-link em{font-style:normal;color:var(--gold);font-size:12px;text-transform:uppercase;font-weight:900;letter-spacing:.12em}
+    .notice{border-color:rgba(241,198,91,.32);background:rgba(241,198,91,.1)}
+    .notice strong{color:var(--gold)}
+    .link-list{display:grid;gap:10px}
+    .link-list a{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:12px}
+    .link-list span{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+    .status-pill{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(88,216,138,.3);background:rgba(88,216,138,.1);color:#dfffea;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:800}
+    .footer{border-top:1px solid var(--line);padding:28px 0 42px;color:var(--muted);font-size:13px}
+    @media(max-width:960px){
+      .hero,.split{grid-template-columns:1fr}
+      .hero{min-height:auto;padding-top:38px}
+      .hero-visual{min-height:380px}
+      .metric-grid,.app-grid,.proof-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:640px){
+      .nav-inner{align-items:flex-start;flex-direction:column;padding:12px 0}
+      .nav-links{justify-content:flex-start}
+      .metric-grid,.app-grid,.proof-grid{grid-template-columns:1fr}
+      h1{font-size:42px}
+    }
   </style>
-<link rel="stylesheet" href="/assets/css/0s-runtime-truth.css" data-runtime-truth-style><script defer src="/assets/js/0s-runtime-truth.js" data-surface-id="skyeroutex" data-repair-href="/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md#phase-4-ui-truth-layer"></script></head>
-<body class="skyesol-living-page">
+</head>
+<body data-platform-id="skyeroutex" class="skyesol-living-page">
 <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
 <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
-  <div class="app">
-    <aside class="side">
-      <div class="brand"><div class="mark">SK</div><div><h1 class="neon-gradient-text">SkyeRouteX Workforce Command</h1><p>Full platform shell · v0.5.0</p></div></div>
-      <div class="metrics"><div class="metric"><strong>8</strong><span>Pages</span></div><div class="metric"><strong id="queueCount">0</strong><span>Queue</span></div><div class="metric"><strong id="sessionCount">0</strong><span>Sessions</span></div><div class="metric"><strong>9</strong><span>Endpoints</span></div></div>
-      <nav><a href="./dashboard.html" data-view="dashboard"><span>ops</span><strong>Dashboard</strong></a>
-<a href="./routes.html" data-view="routes"><span>planner</span><strong>Routes</strong></a>
-<a href="./stops.html" data-view="stops"><span>pod</span><strong>Stops</strong></a>
-<a href="./workforce.html" data-view="workforce"><span>field</span><strong>Workforce</strong></a>
-<a href="./proof.html" data-view="proof"><span>ledger</span><strong>Proof Vault</strong></a>
-<a href="./analytics.html" data-view="analytics"><span>signals</span><strong>Analytics</strong></a>
-<a href="./runtime.html" data-view="runtime"><span>api</span><strong>Runtime</strong></a>
-<a href="./settings.html" data-view="settings"><span>local</span><strong>Settings</strong></a></nav>
-      <div class="sidefoot"><button class="primary" id="quickRuntime">Ping Runtime</button><button id="quickQueue">Queue Proof</button></div>
-    </aside>
-    <main class="main">
-      <header class="top"><div><h2 id="viewTitle">Dashboard</h2><p id="viewSubtitle">Routed production platform for SkyeRouteX Workforce Command.</p></div><div class="actions"><a class="button" href="./health">Health</a><a class="button" href="./v1/runtime-summary">Summary</a></div></header>
-      <div class="content">
-        <section class="view active" id="view-home">
-          <div class="hero"><p class="kicker">VantaCore production platform</p><h2>SkyeRouteX Workforce Command</h2><p>This entry is a routed platform shell, not a single landing page. Every lane has a direct URL, stateful controls, runtime proof endpoints, and legacy links where older full consoles are preserved.</p></div>
-        </section>
-
-        <section class="view" id="view-dashboard">
-          <div class="section-head">
-            <p class="kicker">ops lane</p>
-            <h2>Dashboard</h2>
-            <p>Dispatch command, today route state, proofs, blockers, and sync health.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Dashboard 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="dashboard-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="dashboard-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="dashboard-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="dashboard-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="dashboard-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Dashboard 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="dashboard-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Live Platform Proof</h3>
-              <div class="rows" id="proofRows"></div>
-            </div>
-            <div class="panel">
-              <h3>Local Operator Queue</h3>
-              <div class="rows" id="queueRows"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-routes">
-          <div class="section-head">
-            <p class="kicker">planner lane</p>
-            <h2>Routes</h2>
-            <p>Route creation, driver, vehicle, territory, stop order, and day ledger.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Routes 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="routes-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Routes 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="routes-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Routes 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="routes-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Routes 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="routes-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Routes 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="routes-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Routes 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="routes-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-stops">
-          <div class="section-head">
-            <p class="kicker">pod lane</p>
-            <h2>Stops</h2>
-            <p>Proof-of-delivery stops, signatures, photos, document vault, and notes.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Stops 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="stops-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Stops 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="stops-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Stops 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="stops-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Stops 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="stops-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Stops 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="stops-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Stops 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="stops-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-workforce">
-          <div class="section-head">
-            <p class="kicker">field lane</p>
-            <h2>Workforce</h2>
-            <p>Drivers, crews, assignments, route load, readiness, and safety checks.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Workforce 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="workforce-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Workforce 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="workforce-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Workforce 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="workforce-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Workforce 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="workforce-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Workforce 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="workforce-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Workforce 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="workforce-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-proof">
-          <div class="section-head">
-            <p class="kicker">ledger lane</p>
-            <h2>Proof Vault</h2>
-            <p>Receipts, route records, proof packets, and exportable audit data.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Proof Vault 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="proof-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Proof Vault 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="proof-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Proof Vault 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="proof-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Proof Vault 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="proof-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Proof Vault 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="proof-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Proof Vault 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="proof-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-analytics">
-          <div class="section-head">
-            <p class="kicker">signals lane</p>
-            <h2>Analytics</h2>
-            <p>Territory scores, route efficiency, revenue, mileage, and risk signals.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Analytics 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="analytics-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Analytics 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="analytics-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Analytics 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="analytics-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Analytics 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="analytics-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Analytics 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="analytics-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Analytics 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="analytics-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          
-        </section>
-
-        <section class="view" id="view-runtime">
-          <div class="section-head">
-            <p class="kicker">api lane</p>
-            <h2>Runtime</h2>
-            <p>Static PHC v83 runtime contract and full-console bridge.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Runtime 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="runtime-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="runtime-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="runtime-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="runtime-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="runtime-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Runtime 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="runtime-5">Queue Check</button>
-            </article>
-          </div>
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Runtime Contract</h3>
-              <p class="muted">These buttons hit same-origin production URLs, so the platform has a testable contract even before a provider-backed worker is attached.</p>
-              <div class="actions">
-                <button id="pingRuntime">Ping Health</button>
-                <button id="loadSummary">Load Summary</button>
-                <button id="saveSession">Record Session</button>
-              </div>
-            </div>
-            <pre class="console" id="runtimeConsole">Runtime console ready.</pre>
-          </div>
-          
-          
-        </section>
-
-        <section class="view" id="view-settings">
-          <div class="section-head">
-            <p class="kicker">local lane</p>
-            <h2>Settings</h2>
-            <p>PIN mode, local storage, backups, and full vault console access.</p>
-          </div>
-          <div class="grid">
-            
-            <article class="card">
-              <span class="badge">Settings 1</span>
-              <h3>Dispatch Board</h3>
-              <p>Route readiness, assigned driver, territory, stop count, and current blockers.</p>
-              <button class="small" data-action="settings-0">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 2</span>
-              <h3>Proof-of-Delivery</h3>
-              <p>Signatures, photos, receipts, notes, and downloadable proof packets.</p>
-              <button class="small" data-action="settings-1">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 3</span>
-              <h3>Workforce Lane</h3>
-              <p>Driver roster, active crews, vehicle profiles, and assignment readiness.</p>
-              <button class="small" data-action="settings-2">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 4</span>
-              <h3>Analytics</h3>
-              <p>Route score, revenue signal, mileage, follow-up pressure, and territory load.</p>
-              <button class="small" data-action="settings-3">Queue Check</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 5</span>
-              <h3>Audit Ready Console</h3>
-              <p>Preserved deep console and PHC app fabric files remain linked behind the shell.</p>
-              <button class="small" data-action="settings-4">Save Proof</button>
-            </article>
-            <article class="card">
-              <span class="badge">Settings 6</span>
-              <h3>Static Runtime</h3>
-              <p>Health, summary, queue, boards, sessions, and handoff endpoints are addressable.</p>
-              <button class="small" data-action="settings-5">Queue Check</button>
-            </article>
-          </div>
-          
-          
-          <div class="split">
-            <div class="panel">
-              <h3>Legacy and Deep Tools</h3>
-              <div class="rows"><a class="rowlink" href="apps/audit-ready-console/index.html"><strong>Audit Ready Console</strong><span>Open</span></a></div>
-            </div>
-            <div class="panel">
-              <h3>Local State</h3>
-              <p class="muted">Queue and sessions are stored in this browser for static production mode.</p>
-              <div class="actions"><button id="exportState">Export State</button><button id="clearState">Clear State</button></div>
-            </div>
-          </div>
-          
-        </section>
+  <nav class="nav" aria-label="SkyeRouteX Logistics navigation">
+    <div class="shell nav-inner">
+      <a class="brand" href="/SkyeRouteX/" aria-label="SkyeRouteX Logistics home">
+        <img src="./workforce-command-v0.4.0/assets/platform-mark.svg" alt="SkyeRouteX Logistics mark" />
+        <span><strong>SkyeRouteX Logistics</strong><span>Dispatch, route work, proof, and workforce command</span></span>
+      </a>
+      <div class="nav-links">
+        <a href="/skyenet/skyeroutex-logistics/">Public Site</a>
+        <a href="#apps">Apps</a>
+        <a href="#route-stack">Route Stack</a>
+        <a href="#owner-inventory">Inventory</a>
+        <a href="#proof">Proof</a>
+        <a href="/founder-command/?view=clients">Founder Command</a>
+        <a class="button primary" href="./workforce-command-v0.4.0/index.html">Open Command</a>
       </div>
-    </main>
-  </div>
-  <script>
-    const platform = {"slug":"skyeroutex","title":"SkyeRouteX Workforce Command","pages":[["dashboard","Dashboard","ops","Dispatch command, today route state, proofs, blockers, and sync health."],["routes","Routes","planner","Route creation, driver, vehicle, territory, stop order, and day ledger."],["stops","Stops","pod","Proof-of-delivery stops, signatures, photos, document vault, and notes."],["workforce","Workforce","field","Drivers, crews, assignments, route load, readiness, and safety checks."],["proof","Proof Vault","ledger","Receipts, route records, proof packets, and exportable audit data."],["analytics","Analytics","signals","Territory scores, route efficiency, revenue, mileage, and risk signals."],["runtime","Runtime","api","Static PHC v83 runtime contract and full-console bridge."],["settings","Settings","local","PIN mode, local storage, backups, and full vault console access."]],"endpoints":["health","status","v1/runtime-summary","v1/sessions","queue","handoff-packs","review-board","execution-board","dispatch-board"]};
-    const stateKey = 'vanta.platform.' + platform.slug + '.v1';
-    const state = JSON.parse(localStorage.getItem(stateKey) || '{"queue":[],"sessions":[]}');
-    const $ = s => document.querySelector(s);
-    const $$ = s => [...document.querySelectorAll(s)];
-    const save = () => localStorage.setItem(stateKey, JSON.stringify(state));
-    const log = msg => { const el = $('#runtimeConsole'); if (el) el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n' + el.textContent; };
-    const pageIds = new Set(platform.pages.map(p => p[0]));
-    function pageFromPath(){ const last = location.pathname.split('/').pop().replace(/\.html$/,'') || 'dashboard'; return pageIds.has(last) ? last : 'dashboard'; }
-    function row(title, sub, tag){ return '<div class="row"><span class="dot"></span><strong>' + title + '<br><small class="muted">' + sub + '</small></strong><span class="badge">' + tag + '</span></div>'; }
-    function render(){
-      $('#queueCount').textContent = state.queue.length;
-      $('#sessionCount').textContent = state.sessions.length;
-      const proof = $('#proofRows'); if (proof) proof.innerHTML = platform.endpoints.slice(0,6).map(e => row(e, 'Same-origin production contract route.', '200')).join('');
-      const queue = $('#queueRows'); if (queue) queue.innerHTML = state.queue.length ? state.queue.map(q => row(q.title, q.note, q.at)).join('') : '<p class="muted">No queued proof items yet.</p>';
-    }
-    function switchView(id){
-      if (!pageIds.has(id)) id = 'dashboard';
-      $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + id));
-      $$('nav a').forEach(a => a.classList.toggle('active', a.dataset.view === id));
-      const def = platform.pages.find(p => p[0] === id);
-      $('#viewTitle').textContent = def ? def[1] : 'Dashboard';
-      $('#viewSubtitle').textContent = def ? def[3] : '';
-      render();
-    }
-    async function pingRuntime(){
-      switchView('runtime');
-      history.replaceState({}, '', './runtime.html');
-      log('GET ./health');
-      try { const res = await fetch('./health'); const data = await res.json(); log('Health OK: ' + JSON.stringify(data).slice(0,260)); }
-      catch(err){ log('Health failed: ' + err.message); }
-    }
-    async function loadSummary(){
-      log('GET ./v1/runtime-summary');
-      try { const res = await fetch('./v1/runtime-summary'); const data = await res.json(); log('Summary OK: ' + JSON.stringify(data, null, 2)); }
-      catch(err){ log('Summary failed: ' + err.message); }
-    }
-    function queueProof(){
-      state.queue.unshift({ title: 'Operator proof check', note: 'Queued from ' + platform.title, at: new Date().toLocaleString() });
-      save(); render();
-    }
-    function recordSession(){
-      state.sessions.unshift({ title: 'Local production session', note: platform.title + ' session recorded in browser.', at: new Date().toLocaleString() });
-      save(); render(); log('Local session recorded.');
-    }
-    document.addEventListener('click', e => {
-      const nav = e.target.closest('nav a[data-view]');
-      if (nav) { e.preventDefault(); history.pushState({}, '', nav.href); switchView(nav.dataset.view); }
-      const action = e.target.closest('[data-action]');
-      if (action) queueProof();
-    });
-    window.addEventListener('popstate', () => switchView(pageFromPath()));
-    $('#quickRuntime').addEventListener('click', pingRuntime);
-    $('#quickQueue').addEventListener('click', queueProof);
-    $('#pingRuntime')?.addEventListener('click', pingRuntime);
-    $('#loadSummary')?.addEventListener('click', loadSummary);
-    $('#saveSession')?.addEventListener('click', recordSession);
-    $('#exportState')?.addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = platform.slug + '-state.json'; a.click(); URL.revokeObjectURL(a.href);
-    });
-    $('#clearState')?.addEventListener('click', () => { localStorage.removeItem(stateKey); location.reload(); });
-    render(); switchView(pageFromPath());
-  </script>
+    </div>
+  </nav>
+
+  <main>
+    <section class="shell hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Private operator lane backed by the 0S</p>
+        <h1 class="neon-gradient-text">SkyeRouteX Logistics</h1>
+        <p>This gated page is the owner/operator doorway for SkyeRouteX apps, dispatch records, route-heavy work, contractor assignment, provider jobs, proof, payment state, and owner-controlled operations. The public company website now lives as a SkyeNet deployment, while this cockpit stays under the shared FS27/SkyGate/Free99 gate.</p>
+        <div class="actions">
+          <a class="button gold" href="/skyenet/skyeroutex-logistics/">Open Public Company Site</a>
+          <a class="button primary" href="./workforce-command-v0.4.0/index.html">Open Workforce Command</a>
+          <a class="button" href="./workforce-command-v0.4.0/index.html#provider-panel">Provider Jobs</a>
+          <a class="button" href="./workforce-command-v0.4.0/index.html#contractor-panel">Contractor Dispatch</a>
+          <a class="button" href="/live/SkyeMail/session-handoff.html?next=compose.html&from=skyeroutex-logistics">Email From SkyeMail</a>
+        </div>
+        <div class="metric-grid" aria-label="Company contact and ownership">
+          <article class="card"><strong>Owner email</strong><span>grayskyes@solenterprises.org</span></article>
+          <article class="card"><strong>Mailbox</strong><span>skyeroutex-logistics@solenterprises.org</span></article>
+          <article class="card"><strong>Company line</strong><span>1-(800)-484-4783</span></article>
+          <article class="card"><strong>Auth lane</strong><span>Shared FS27/SkyGate/Free99 only</span></article>
+        </div>
+      </div>
+      <aside class="hero-visual" aria-label="SkyeRouteX dispatch visual">
+        <img class="visual-logo" src="./workforce-command-v0.4.0/assets/platform-mark.svg" alt="" />
+        <div class="route-map" aria-hidden="true">
+          <div class="route-line"></div>
+          <span class="node a"></span>
+          <span class="node b"></span>
+          <span class="node c"></span>
+          <span class="node d"></span>
+        </div>
+        <div class="command-card">
+          <span class="status-pill">0S gate protected</span>
+          <h2 style="margin:14px 0 8px;font-size:28px">Dispatch command is live.</h2>
+          <p style="margin:0">The mounted app covers AE lane, provider job boards, contractor assignments, route jobs, proof, storage export, integrations, compliance, and House Command.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="band" id="apps">
+      <div class="shell">
+        <p class="eyebrow">Operational apps under SkyeRouteX Logistics</p>
+        <h2>Use the public SkyeNet site for the company. Use this gated lane as the cockpit.</h2>
+        <div class="app-grid">
+          <a class="card app-link" href="./workforce-command-v0.4.0/index.html"><em>Core</em><b>Workforce Command</b><span>One mounted console for jobs, assignments, proof, payment state, audit, workflow, storage, and exports.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/index.html#provider-panel"><em>Provider</em><b>Provider Job Board</b><span>Post route-heavy work, see applicant pools, select AEs, and move jobs into assignment flow.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/index.html#contractor-panel"><em>Contractor</em><b>Contractor Dispatch</b><span>Browse jobs, apply, accept assignments, complete work, and push proof back to the lane.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/index.html#house-panel"><em>Owner</em><b>House Command</b><span>Owner command for markets, jobs, payments, recommendations, audit, and operations review.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/public/gate-readiness.html"><em>Auth</em><b>Gate Readiness</b><span>Shared gate health and RouteX auth proof. No app-local owner/admin passwords belong here.</span></a>
+          <a class="card app-link" href="/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/contractor-packet-inbox.html"><em>Paperwork</em><b>Packet Inbox</b><span>Owner paperwork lane for contractor/vendor packets before payout or external work clearance.</span></a>
+          <a class="card app-link" href="/valley-verified/map/"><em>Map</em><b>Valley Map Surface</b><span>Repo map lane connected to Valley Verified geographic surfaces and business-service clusters.</span></a>
+          <a class="card app-link" href="/api/0s/route-manifest"><em>0S</em><b>Route Manifest</b><span>Live mounted route/source map for the 0S surfaces and APIs that surround the logistics lane.</span></a>
+          <a class="card app-link" href="https://skyes-over-london-legal.pages.dev/legal/delivery-logistics/" target="_blank" rel="noopener"><em>Legal</em><b>Delivery Logistics Terms</b><span>Public legal lane for delivery, logistics, contractor, and customer communication boundaries.</span></a>
+          <a class="card app-link" href="./dashboard.html"><em>V83</em><b>Dispatch Dashboard</b><span>Dispatch board, proof-of-delivery, workforce lane, analytics, audit console, and runtime cards.</span></a>
+          <a class="card app-link" href="./routes.html"><em>V83</em><b>Routes</b><span>Route creation, driver, vehicle, territory, stop order, and day ledger.</span></a>
+          <a class="card app-link" href="./stops.html"><em>V83</em><b>Stops</b><span>Stop proof, exceptions, POD notes, and route sequence review.</span></a>
+          <a class="card app-link" href="./workforce.html"><em>V83</em><b>Workforce</b><span>Field crew, driver, contractor, vehicle, and readiness surfaces.</span></a>
+          <a class="card app-link" href="./proof.html"><em>V83</em><b>Proof Vault</b><span>Proof vault and audit handoff surface for route-heavy operations.</span></a>
+          <a class="card app-link" href="./analytics.html"><em>V83</em><b>Analytics</b><span>Route score, revenue signal, mileage, follow-up pressure, and territory load.</span></a>
+          <a class="card app-link" href="./runtime.html"><em>V83</em><b>Runtime</b><span>Health, summary, queue, boards, sessions, and handoff endpoint surface.</span></a>
+          <a class="card app-link" href="./settings.html"><em>V83</em><b>Settings</b><span>Local runtime, provider posture, and configuration boundary surface.</span></a>
+          <a class="card app-link" href="./apps/audit-ready-console/index.html"><em>Audit</em><b>Audit-ready Console</b><span>Preserved deep console and PHC app-fabric proof lane.</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="route-stack">
+      <div class="shell split">
+        <div>
+          <p class="eyebrow">Dispatch and navigation stack</p>
+          <h2>Built-in route operations now, live provider navigation when credentials are configured.</h2>
+          <p>SkyeRouteX already has route jobs, assignments, stop/proof flows, provider adapters, API mounts, and a Mapbox-ready route intelligence driver. The honest boundary is simple: local route intelligence is available inside the app, while external live GPS, ETA, and map optimization depend on configured provider credentials.</p>
+          <div class="proof-grid">
+            <article class="card"><strong>/api/routex</strong><span>Main RouteX API namespace</span></article>
+            <article class="card"><strong>/api/skyeroutex</strong><span>Compatibility API alias</span></article>
+            <article class="card"><strong>Mapbox-ready</strong><span>ROUTE_INTELLIGENCE_PROVIDER=mapbox plus MAPBOX_ACCESS_TOKEN</span></article>
+            <article class="card"><strong>Twilio-ready</strong><span>SMS/voice provider lane once call handling credentials are verified</span></article>
+          </div>
+        </div>
+        <aside class="card notice">
+          <strong>Current boundary</strong>
+          <p>Do not claim real live GPS navigation, external ETA routing, or full AI phone handling until the provider credentials and proof receipts are present. The 1-(800)-484-4783 company line is documented as the company line and the integration target.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="band" id="owner-inventory">
+      <div class="shell">
+        <p class="eyebrow">Concrete owner inventory</p>
+        <h2>Every dispatch, route, map, nav, and proof surface now has a direct owner link.</h2>
+        <div class="app-grid">
+          <a class="card app-link" href="./dashboard.html"><em>Dispatch</em><b>Dashboard</b><span>Dispatch board and day-state command surface.</span></a>
+          <a class="card app-link" href="./routes.html"><em>Routes</em><b>Route Planner</b><span>Route creation, driver, vehicle, territory, stop order, and day ledger.</span></a>
+          <a class="card app-link" href="./stops.html"><em>Stops</em><b>Stop Proof</b><span>Stop-level POD, exception, and sequence review lane.</span></a>
+          <a class="card app-link" href="./workforce.html"><em>Field</em><b>Workforce</b><span>Driver, contractor, field crew, vehicle, and readiness surface.</span></a>
+          <a class="card app-link" href="./runtime.html"><em>Runtime</em><b>Runtime Endpoints</b><span>Health, queue, boards, sessions, and handoff endpoint map.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/docs/API_REFERENCE.md"><em>API</em><b>API Reference</b><span>v0.4.0 dispatch and workforce command API inventory.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/proof/provider-env-audit-2026-05-21.md"><em>Provider</em><b>Provider Env Audit</b><span>Map, navigation, SMS, storage, and provider-credential boundary receipt.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/PLATFORM_TRUTH.json"><em>Truth</em><b>Platform Truth</b><span>Machine-readable platform capability and boundary record.</span></a>
+          <a class="card app-link" href="./workforce-command-v0.4.0/proof/skyeroutex-mounted-worker-stress-latest.json"><em>Stress</em><b>Mounted Worker Stress</b><span>Latest same-domain mounted worker stress receipt.</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="proof">
+      <div class="shell split">
+        <div>
+          <p class="eyebrow">Proof and receipts</p>
+          <h2>The logistics lane is documented in Founder Command and SkyeMail.</h2>
+          <p>Founder Command now carries the public SkyeNet company site, private SkyeRouteX app lane, tour-token endpoint, owner email, mailbox, company line, app routes, auth boundary, provider boundary, and proof locations so the empire map stays readable from one place.</p>
+        </div>
+        <div class="link-list">
+          <a href="/founder-command/client-credentials/skyeroutex-logistics.json"><strong>Founder credential JSON</strong><span>/founder-command/client-credentials/skyeroutex-logistics.json</span></a>
+          <a href="/docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md"><strong>Operating map</strong><span>/docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md</span></a>
+          <a href="/skyenet/skyeroutex-logistics/"><strong>Public company site</strong><span>/skyenet/skyeroutex-logistics/</span></a>
+          <a href="/api/skyeroutex/tour-token"><strong>Tour token endpoint</strong><span>POST /api/skyeroutex/tour-token</span></a>
+          <a href="/founder-command/?view=clients"><strong>Founder Client Vault</strong><span>Open the company lane inside Founder Command</span></a>
+          <a href="/proof/skyeroutex-expansion-receipt.html"><strong>Expansion receipt</strong><span>SkyeRouteX expansion proof surface</span></a>
+          <a href="/SkyeRouteX/workforce-command-v0.4.0/proof/routex-ae-workforce-lane-latest.json"><strong>AE workforce lane receipt</strong><span>Latest RouteX AE/workforce lane receipt</span></a>
+          <a href="/SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-live-production-stress-latest.json"><strong>Live production stress receipt</strong><span>Latest live production stress JSON</span></a>
+          <a href="/live/skyeroutex-workforce-command.html"><strong>Live expansion hub</strong><span>Legacy expansion index and app links</span></a>
+          <a href="/live/SkyeMail/session-handoff.html?next=dashboard.html&from=skyeroutex-logistics"><strong>SkyeMail inbox</strong><span>Open the active shared-gate mail surface</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">
+      SkyeRouteX Logistics operates inside the Skyes Over London LC / SOLEnterprises / MetrAIyux 0S ecosystem. Owner email: grayskyes@solenterprises.org. Company line: 1-(800)-484-4783. Mailbox: skyeroutex-logistics@solenterprises.org.
+    </div>
+  </footer>
 </body>
 </html>

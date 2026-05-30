@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dave &amp; Buster's Westgate | Valley Verified</title>
+  <meta name="description" content="Dave &amp; Buster's at Westgate is a Glendale arcade sports bar and event venue listed in Valley Verified.">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #fff8ea;
+      --night: #11111d;
+      --panel: #1a1d32;
+      --red: #e73b4d;
+      --cyan: #2ed4d7;
+      --yellow: #ffd95a;
+      --line: rgba(255,248,234,.16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      letter-spacing: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(46,212,215,.10) 1px, transparent 1px),
+        linear-gradient(rgba(255,217,90,.08) 1px, transparent 1px),
+        var(--night);
+      background-size: 42px 42px;
+    }
+    a { color: inherit; }
+    main { width: min(1140px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+    .arcade {
+      display: grid;
+      grid-template-columns: .82fr 1.18fr;
+      gap: 22px;
+      min-height: 620px;
+      align-items: stretch;
+    }
+    .score {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 0 0 8px rgba(231,59,77,.16);
+    }
+    .score img {
+      width: 132px;
+      height: 132px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .scoreboard {
+      align-self: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .tile {
+      min-height: 96px;
+      padding: 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--line);
+    }
+    .tile strong { display: block; color: var(--yellow); margin-bottom: 8px; }
+    .tile span { font-weight: 900; color: #ffffff; line-height: 1.25; }
+    .contact {
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      color: #c9c9d5;
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .phone {
+      display: inline-block;
+      color: var(--cyan);
+      font-size: 1.55rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+    address { font-style: normal; line-height: 1.55; color: #f1ebdd; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 44px;
+      background:
+        linear-gradient(135deg, rgba(231,59,77,.42), transparent 38%),
+        linear-gradient(45deg, rgba(255,217,90,.12) 0 18%, transparent 18% 100%),
+        #0b0d18;
+      border: 1px solid var(--line);
+    }
+    .kicker { color: var(--cyan); font-weight: 900; }
+    h1 {
+      max-width: 720px;
+      margin: 152px 0 18px;
+      font-size: 5.2rem;
+      line-height: .92;
+    }
+    .lede {
+      max-width: 650px;
+      margin: 0;
+      color: #eee7db;
+      font-size: 1.16rem;
+      line-height: 1.65;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .button {
+      display: inline-block;
+      min-height: 46px;
+      padding: 13px 16px;
+      color: #0b0d18;
+      background: var(--yellow);
+      text-decoration: none;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,.24);
+    }
+    .button.alt { color: #fff; background: transparent; border-color: var(--cyan); }
+    .source {
+      margin-top: 20px;
+      padding: 22px;
+      background: rgba(46,212,215,.10);
+      border: 1px solid rgba(46,212,215,.28);
+    }
+    .source p { margin: 0; line-height: 1.6; color: #d8d7dd; }
+    .source a { color: #fff; font-weight: 900; }
+    @media (max-width: 880px) {
+      .arcade { grid-template-columns: 1fr; }
+      h1 { margin-top: 82px; font-size: 3.35rem; }
+    }
+    @media (max-width: 540px) {
+      main { width: min(100% - 22px, 1140px); }
+      .hero, .score, .source { padding: 20px; }
+      h1 { font-size: 2.62rem; }
+      .scoreboard { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="arcade">
+      <aside class="score">
+        <div><span class="label">Valley Verified</span><img src="assets/logo.svg" alt="Dave and Buster's mark"></div>
+        <div class="scoreboard" aria-label="Business facts">
+          <div class="tile"><strong>Category</strong><span>Food And Events</span></div>
+          <div class="tile"><strong>Niche</strong><span>Arcade Sports Bar / Event Venue</span></div>
+          <div class="tile"><strong>City</strong><span>Glendale, AZ</span></div>
+          <div class="tile"><strong>Hours</strong><span>See website</span></div>
+        </div>
+        <div class="contact">
+          <span class="label">Phone</span>
+          <a class="phone" href="tel:+16237597800">(623) 759-7800</a>
+          <div><span class="label">Address</span><address>9460 W Hanna Ln<br>Glendale, AZ 85305</address></div>
+        </div>
+      </aside>
+      <div>
+        <section class="hero">
+          <span class="kicker">Restaurant / Entertainment</span>
+          <h1>Dave &amp; Buster's Westgate</h1>
+          <p class="lede">A Glendale entertainment venue for arcade sports bar experiences, events, group registration, birthday party arrivals, trivia check-in, and promo-night tracking.</p>
+          <div class="actions">
+            <a class="button" href="https://www.daveandbusters.com">Open website</a>
+            <a class="button alt" href="tel:+16237597800">Call venue</a>
+          </div>
+        </section>
+        <section class="source">
+          <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+          <p>Dave &amp; Buster's Westgate belongs in Valley Verified because the research ties a Glendale entertainment venue to the official website, phone, Westgate-area address, restaurant/entertainment category, and specific guest flows such as trivia team check-in, birthday party arrival, group events, and arcade sports bar visits.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

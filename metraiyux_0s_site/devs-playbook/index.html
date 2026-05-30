@@ -76,8 +76,8 @@
           <div class="stat"><strong id="gate-user">email-skdevpbk</strong><span>Tracked gate user</span></div>
         </div>
         <div class="actions">
-          <a class="button" href="/devs-playbook/login.html?key=skdevpbk">Switch Email</a>
-          <button id="logout" type="button">Log Out</button>
+          <a class="button" href="/devs-playbook/login.html?key=skdevpbk">Record Email</a>
+          <button id="logout" type="button">Switch Gate Account</button>
         </div>
       </aside>
     </div>
@@ -88,10 +88,9 @@
       <table>
         <thead><tr><th>Lane</th><th>Names to know</th><th>Where value lives</th><th>Rotation path</th></tr></thead>
         <tbody>
-          <tr><td>0S owner gate</td><td><code>FREE99_ADMIN_CODE</code>, <code>OWNER_ADMIN_CODE</code>, <code>ADMIN_TOKEN</code></td><td>Cloudflare Worker secrets and local private env references</td><td><code>npx wrangler secret put FREE99_ADMIN_CODE --name metraiyux-0s-full-system</code></td></tr>
-          <tr><td>Owner sessions</td><td><code>OWNER_ADMIN_SESSION_SECRET</code></td><td>Worker secret</td><td>Rotate with Wrangler, then re-login at <code>/admin/login.html</code></td></tr>
-          <tr><td>Free99 Sign In Pro demo</td><td><code>FREE99_DEMO_SESSION_SECRET</code>, <code>FREE99_DEMO_OWNER_EMAIL</code>, <code>FREE99_DEMO_CODE</code></td><td>Worker secrets plus hashed active code in KV</td><td>Owner page <code>/admin/free99-demo-code.html</code></td></tr>
-          <tr><td>Marketing keys</td><td><code>MARKETING_KEY_SESSION_SECRET</code>, <code>skdevpbk</code></td><td>Worker secret for sessions, <code>SITE_EVENTS_KV</code> for signups</td><td>Set session secret with Wrangler; campaign tags are URL/form values</td></tr>
+          <tr><td>0S owner gate</td><td><code>FREE99_ADMIN_CODE</code>, <code>OWNER_ADMIN_CODE</code>, <code>ADMIN_TOKEN</code></td><td>Exchange-only Worker secrets that must resolve to FS27/SkyGate</td><td><code>/admin/login.html</code> exchanges into the canonical Gate bearer</td></tr>
+          <tr><td>Free99 Sign In Pro demo</td><td><code>FREE99_DEMO_OWNER_EMAIL</code>, <code>FREE99_DEMO_CODE</code></td><td>Hashed active code and demo signups in KV</td><td>Owner page <code>/admin/free99-demo-code.html</code>; successful demo validation hands off to <code>/gate/signup/</code></td></tr>
+          <tr><td>Marketing keys</td><td><code>skdevpbk</code></td><td><code>SITE_EVENTS_KV</code> signup ledger only</td><td>Campaign tags are URL/form values; access still requires the shared 0S Gate</td></tr>
           <tr><td>Resend</td><td><code>RESEND_API_KEY</code>, <code>RESEND_FROM_EMAIL</code>, <code>RESEND_TO_EMAIL</code></td><td>Worker secrets or provider dashboard</td><td>Resend dashboard plus Wrangler secret update</td></tr>
           <tr><td>Cloudflare deploy</td><td><code>CLOUDFLARE_API_TOKEN</code>, <code>CLOUDFLARE_ACCOUNT_ID</code></td><td>Local private env or CI secret manager</td><td>Cloudflare dashboard token rotation, then local env refresh</td></tr>
           <tr><td>Stripe / SkyePay</td><td><code>STRIPE_SECRET_KEY</code>, <code>STRIPE_WEBHOOK_SECRET</code></td><td>FS27 / SkyePay Worker secrets</td><td>Stripe dashboard and Wrangler secret update</td></tr>
@@ -105,9 +104,9 @@
       <p class="eyebrow">Gate lanes</p>
       <h2>Which login opens what.</h2>
       <div class="grid">
-        <div class="stat"><strong>Owner</strong><span><code>/admin/login.html</code> creates the real 0S owner session.</span></div>
-        <div class="stat"><strong>Free99 demo</strong><span><code>/Free99/demo?return=/northstar/index.html</code> opens Sign In Pro only as demo.</span></div>
-        <div class="stat"><strong>Marketing key</strong><span><code>/devs-playbook/login.html?key=skdevpbk</code> records email interest only.</span></div>
+        <div class="stat"><strong>Owner</strong><span><code>/admin/login.html</code> exchanges into the real FS27/SkyGate owner session.</span></div>
+        <div class="stat"><strong>Free99 demo</strong><span><code>/Free99/demo?return=/northstar/index.html</code> validates the code, records the signup, and hands off to <code>/gate/signup/</code>.</span></div>
+        <div class="stat"><strong>Marketing key</strong><span><code>/devs-playbook/login.html?key=skdevpbk</code> records email interest, then hands off to the shared Gate.</span></div>
       </div>
       <pre><code>Owner login:
 https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html
@@ -170,10 +169,9 @@ node metraiyux_0s_site/tests/marketing-keys-dev-playbook-flow.mjs</code></pre>
         </div>
         <div>
           <h3>Deploy</h3>
-          <pre><code>cd metraiyux_0s_site
+<pre><code>cd metraiyux_0s_site
 npx wrangler deploy
-npx wrangler secret list --name metraiyux-0s-full-system
-npx wrangler secret put MARKETING_KEY_SESSION_SECRET --name metraiyux-0s-full-system</code></pre>
+npx wrangler secret list --name metraiyux-0s-full-system</code></pre>
         </div>
       </div>
     </section>
@@ -224,8 +222,7 @@ node metraiyux_0s_site/tests/marketing-keys-dev-playbook-flow.mjs</code></pre>
     }
 
     document.getElementById('logout').addEventListener('click', async () => {
-      await fetch('/api/marketing-keys/logout', {method:'POST', credentials:'include'}).catch(() => null);
-      location.assign('/devs-playbook/login.html?key=skdevpbk');
+      location.assign('/gate/signup/?return=' + encodeURIComponent('/devs-playbook/'));
     });
 
     loadGate();

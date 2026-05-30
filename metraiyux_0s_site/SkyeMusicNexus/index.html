@@ -3,152 +3,282 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus - Music Operating Surface</title>
-  <meta name="description" content="SkyeMusicNexus is a serious music operating surface with native DAW creation, drops, social feed, upload studio, playback, rights, exchange, and operator rooms." />
+  <title>SkyeMusicNexus</title>
+  <meta name="description" content="SkyeMusicNexus artist discovery, radio, live streams, artist stats, store, social feed, upload studio, and DAW workspace." />
   <link rel="stylesheet" href="./public/neo-nexus.css" />
-  <link rel="stylesheet" href="./home-surface.css" />
+  <link rel="stylesheet" href="./public/nexus-player.css" />
+  <link rel="stylesheet" href="./public/nexus-home.css" />
   <script defer src="./gate-session.js"></script>
   <script defer src="./public/skygate-auth.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
-  <script defer src="./public/neo-nexus.js"></script>
-<link rel="stylesheet" href="/assets/css/0s-runtime-truth.css" data-runtime-truth-style><script defer src="/assets/js/0s-runtime-truth.js" data-surface-id="skymusicnexus" data-repair-href="/audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md#phase-4-ui-truth-layer"></script></head>
-<body data-app="skye-music-nexus" data-mode="home" data-platform-hardening="p2-routed" data-platform-id="skye-music-nexus" data-page="index.html" class="skyesol-living-page">
+<link rel="stylesheet" href="artist-storefronts/NexusArtistPrimePackage/assets/mcp-implementation/mcp-effects.css" data-mcp-generated-css>
+</head>
+<body data-app="skye-music-nexus" data-page="nexus-home" data-platform-hardening="p2-routed" data-platform-id="skye-music-nexus" class="nexus-home skyesol-living-page">
   <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
-  <canvas id="pulse-field" class="living-background skyesol-living-field" aria-hidden="true"></canvas>
-  <div class="grain" aria-hidden="true"></div>
-
-  <header class="nexus-topline home-topline">
-    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="./assets/platform-mark.svg" alt="" /></a>
-    <div class="top-title">
-      <p class="micro">SkyeMusicNexus // Command Field</p>
-      <strong>Studio, drops, feed, rights, playback, delivery, and operator command.</strong>
-    </div>
-    <div class="session-rack">
-      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-      <a class="ghost" href="./public/daw.html">Open DAW</a>
-      <a class="primary" href="./public/drops.html">Drop Room</a>
-    </div>
-  </header>
-
-  <nav class="nexus-nav home-nav" aria-label="SkyeMusicNexus rooms">
-    <a class="active" href="./index.html">Home</a>
-    <a href="./public/index.html">Dashboard</a>
-    <a href="./public/create.html">Create</a>
-    <a href="./public/daw.html">DAW</a>
-    <a href="./public/drops.html">Drops</a>
-    <a href="./public/discover.html">Discover</a>
-    <a href="./public/feed.html">Feed</a>
-    <a href="./public/upload.html">Upload Studio</a>
-    <a href="./public/player.html">Music Player</a>
-    <a href="./public/releases.html">Releases</a>
-    <a href="./public/rights.html">Rights</a>
-    <a href="./public/exchange.html">Exchange</a>
-    <a href="./public/admin.html">Operator</a>
-    <a href="./proof.html">Readiness</a>
-    <a href="./skepticks-spectic-override.html">Skeptic Audit</a>
-  </nav>
-
-  <main class="nexus-shell home-shell">
-    <section class="home-command-hero panel-xl">
-      <div class="home-hero-copy">
-        <p class="eyebrow">Command Field / BandLab-grade creation / deployable drops / private delivery</p>
-        <h1 class="neon-gradient-text">SkyeMusicNexus</h1>
-        <p class="lede">Make the record, package the drop, push the page, and keep private delivery behind SkyGate from one serious music operating surface.</p>
-        <div class="hero-actions">
-          <a class="primary" href="./public/daw.html">Start a Session</a>
-          <a class="secondary" href="./public/drops.html">Build a Drop</a>
-          <a class="ghost" href="./public/upload.html">Import Audio</a>
-        </div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="skyesol-scanline" aria-hidden="true"></div>
+  <div class="nexus-home-bg" aria-hidden="true"></div>
+  <div class="nexus-home-frame">
+    <aside class="nexus-sidebar" aria-label="SkyeMusicNexus navigation">
+      <a class="nexus-brand" href="./index.html" aria-label="SkyeMusicNexus home">
+        <img src="./assets/skye-music-nexus-logo.png" alt="SkyeMusicNexus" />
+        <span>
+          <strong>SkyeMusicNexus</strong>
+          <small>Music first</small>
+        </span>
+      </a>
+      <nav class="nexus-sidebar__nav" aria-label="Browse">
+        <span class="nexus-sidebar__label">Browse</span>
+        <a href="./index.html" aria-current="page">Home</a>
+        <a href="./public/walkthrough.html">Walkthroughs</a>
+        <a href="./public/discover.html">Discover</a>
+        <a href="./public/radio.html">Radio</a>
+        <a href="./artist-storefronts/">Artists</a>
+        <a href="./public/feed.html">Social</a>
+        <a href="./public/contests.html">Contests</a>
+        <a href="./public/store.html">Store</a>
+        <a href="./public/achievements.html">Awards</a>
+      </nav>
+      <div class="nexus-sidebar__library" aria-label="Library">
+        <span class="nexus-sidebar__label">Your Library</span>
+        <button class="nexus-sidebar__button" type="button" data-action="play-liked">Liked Songs</button>
+        <a href="./public/library.html">Playlists</a>
+        <a href="./public/discover.html">Charts</a>
       </div>
+      <div class="nexus-sidebar__tools" aria-label="Create">
+        <span class="nexus-sidebar__label">Create</span>
+        <a href="./public/create.html">Create</a>
+        <a href="./public/daw.html">DAW</a>
+        <a href="./public/pricing.html">Pricing</a>
+        <a href="./public/upload.html">Upload</a>
+        <a href="./public/drops.html">Drops</a>
+        <a href="./public/contests.html">Contests</a>
+        <a href="./public/artist-dashboard.html">Artist Stats</a>
+        <a href="./public/stream-analytics.html">Streams</a>
+        <a href="./platform.html">Workspace</a>
+      </div>
+    </aside>
 
-      <div class="home-live-surface" aria-label="SkyeMusicNexus product surface preview">
-        <div class="surface-bar">
-          <span>Artist session</span>
-          <strong>release packet active</strong>
-          <i></i>
+    <main class="nexus-main" id="home">
+      <header class="nexus-command-bar">
+        <label class="nexus-search">
+          <span>Search</span>
+          <input id="nexusSearch" type="search" placeholder="What do you want to hear?" autocomplete="off" />
+        </label>
+        <div class="nexus-command-actions">
+          <button class="nexus-button nexus-button--primary" type="button" data-action="start-radio">Start Radio</button>
+          <a class="nexus-button" href="./public/walkthrough.html">Walkthroughs</a>
+          <a class="nexus-button" href="./public/library.html">Library</a>
+          <a class="nexus-button" href="./public/upload.html">Upload</a>
         </div>
-        <div class="surface-sequencer">
-          <div class="sequencer-row"><span>DRUMS</span><b style="--w:78%"></b></div>
-          <div class="sequencer-row"><span>808</span><b style="--w:62%"></b></div>
-          <div class="sequencer-row"><span>KEYS</span><b style="--w:86%"></b></div>
-          <div class="sequencer-row"><span>VOCAL</span><b style="--w:54%"></b></div>
-        </div>
-        <div class="surface-pipeline">
-          <article><span>01</span><strong>Import</strong><small>audio and stems</small></article>
-          <article><span>02</span><strong>Create</strong><small>DAW session</small></article>
-          <article><span>03</span><strong>Clear</strong><small>rights gate</small></article>
-          <article><span>04</span><strong>Drop</strong><small>page bundle</small></article>
-          <article><span>05</span><strong>Deliver</strong><small>private access</small></article>
-        </div>
-        <div class="surface-footer">
-          <span>Drop engine ready</span>
-          <a href="./public/drops.html">Open deploy room</a>
-        </div>
-      </div>
-    </section>
+      </header>
 
-    <section class="home-room-ribbon panel-xl" aria-label="MusicNexus app map">
-      <div class="section-head">
-        <div>
-          <p class="micro">rooms on the platform</p>
-          <h2>The whole music system is visible now.</h2>
-        </div>
-        <a class="ghost mini" href="./public/index.html">Open dashboard</a>
-      </div>
-      <div class="room-ribbon">
-        <a href="./public/daw.html"><span>DAW</span><strong>Arrangement, keys, pads, mixdown</strong></a>
-        <a href="./public/drops.html"><span>Drops</span><strong>Singles, albums, campaigns, delivery</strong></a>
-        <a href="./public/discover.html"><span>Discover</span><strong>Playlist rails, previews, listener lanes</strong></a>
-        <a href="./public/feed.html"><span>Feed</span><strong>Stories, posts, release moments</strong></a>
-        <a href="./public/upload.html"><span>Upload Studio</span><strong>Audio import and stream handoff</strong></a>
-        <a href="./public/player.html"><span>Music Player</span><strong>Rights-aware playback</strong></a>
-        <a href="./public/releases.html"><span>Releases</span><strong>Artist and catalog ops</strong></a>
-        <a href="./public/rights.html"><span>Rights</span><strong>Clearance, holds, takedown path</strong></a>
-        <a href="./public/exchange.html"><span>Exchange</span><strong>Requests, collabs, campaign packs</strong></a>
-        <a href="./public/admin.html"><span>Operator</span><strong>Approval, analytics, payout command</strong></a>
-        <a href="./public/command-dashboard.html"><span>Command</span><strong>Live analytics, route health, audit events</strong></a>
-        <a href="./skepticks-spectic-override.html"><span>Audit</span><strong>Claim receipts, limits, investor answers</strong></a>
-      </div>
-    </section>
+      <nav class="nexus-shelf-tabs" aria-label="Home sections">
+        <a href="#made-for-you">Made For You</a>
+        <a href="#trending">Trending</a>
+        <a href="#new-drops">New Drops</a>
+        <a href="#stations">Stations</a>
+        <a href="#artists">Artists</a>
+        <a href="./public/walkthrough.html">Walkthroughs</a>
+      </nav>
 
-    <section class="home-drop-focus panel-xl">
-      <div>
-        <p class="eyebrow">drop web engine</p>
-        <h2>Singles, albums, campaigns, and client delivery belong in the same deploy lane.</h2>
-        <p class="lede">Artists can draft single-song pages, release pages, campaign pages, private stem delivery, and grouped hubs. The system keeps the drop tied to the correct artist, rights state, tier policy, approval receipt, and publish intent.</p>
-        <div class="hero-actions">
-          <a class="primary" href="./public/drops.html">Run Drops</a>
-          <a class="ghost" href="./public/feed.html">Promote in Feed</a>
-        </div>
-      </div>
-      <div class="drop-proof-stack">
-        <article><span>single page</span><strong>One track, cover, player, download</strong></article>
-        <article><span>release page</span><strong>EP or album under one artist hub</strong></article>
-        <article><span>campaign page</span><strong>Story, presave, download, social links</strong></article>
-        <article><span>private delivery</span><strong>Client stream and stem download behind SkyGate</strong></article>
-      </div>
-    </section>
+      <section class="nexus-stage" aria-label="Now playing and live catalog">
+        <article class="nexus-now">
+          <div class="nexus-now__art-wrap">
+            <img id="nowArt" src="./assets/skye-music-nexus-logo.png" alt="" />
+            <canvas id="nexusPulse" width="720" height="480" aria-label="Nexus live stream map"></canvas>
+          </div>
+          <div class="nexus-now__copy">
+            <span class="nexus-kicker" id="nowStatus">Featured Track</span>
+            <h1 id="nowTitle" class="neon-gradient-text">Loading Music Nexus</h1>
+            <p id="nowArtist">Radio, discovery, playlists, artist pages, store, upload room, and DAW are in one listening flow.</p>
+            <div class="nexus-now__meta" aria-label="Current track details">
+              <span id="nowGenre">Genre</span>
+              <span id="nowStreams">0 streams</span>
+              <span id="nowQueue">Queue ready</span>
+            </div>
+            <div class="nexus-current-card" aria-label="Current player">
+              <span>Current player</span>
+              <strong id="currentTrackTitle">Pick a track to start listening</strong>
+              <small id="currentTrackArtist">The mini player stays ready across the app.</small>
+            </div>
+            <div class="nexus-now__actions">
+              <button class="nexus-button nexus-button--primary" type="button" id="playFeatured">Play Featured</button>
+              <button class="nexus-button" type="button" data-action="start-radio">Radio Mix</button>
+              <a class="nexus-button" id="featuredArtist" href="./artist-storefronts/">Artist</a>
+              <a class="nexus-button" id="featuredDrop" href="./public/discover.html">Drop</a>
+            </div>
+          </div>
+        </article>
 
-    <section class="home-lane-grid">
-      <article class="panel-xl">
-        <p class="micro">creation lane</p>
-        <h3>Native DAW first, release packet second.</h3>
-        <p>Keyboard notes, drum pads, imported audio, project state, and export handoff sit inside the platform instead of feeling bolted on.</p>
-        <a class="ghost mini" href="./public/daw.html">Open DAW</a>
-      </article>
-      <article class="panel-xl">
-        <p class="micro">social lane</p>
-        <h3>The feed is a release surface, not filler.</h3>
-        <p>Story rail, posts, comments, release moments, and connector boundaries stay attached to the artist system.</p>
-        <a class="ghost mini" href="./public/feed.html">Open Feed</a>
-      </article>
-      <article class="panel-xl">
-        <p class="micro">operator lane</p>
-        <h3>Approvals and rights stay in command.</h3>
-        <p>Rights checks, payouts, analytics, batches, publish intent, and operator review stay visible before anything goes live.</p>
-        <a class="ghost mini" href="./public/admin.html">Open Operator</a>
-      </article>
-    </section>
-  </main>
+        <aside class="nexus-live-strip" aria-label="Live totals">
+          <article><strong id="totalStreams">0</strong><span>Nexus streams</span></article>
+          <article><strong id="totalArtists">0</strong><span>artists</span></article>
+          <article><strong id="totalTracks">0</strong><span>songs</span></article>
+          <article><strong id="totalSeconds">0</strong><span>listen seconds</span></article>
+        </aside>
+      </section>
+
+      <section class="nexus-quick-grid" aria-label="Library shortcuts">
+        <article class="nexus-shortcut nexus-shortcut--library">
+          <span class="nexus-kicker">Library</span>
+          <strong id="likedCount">0 liked songs</strong>
+          <p id="libraryStatus">Save tracks from the player and they appear here.</p>
+          <div class="nexus-panel-actions">
+            <button class="nexus-button" type="button" data-action="play-liked">Play Liked</button>
+            <a class="nexus-button" href="./public/library.html">Open Library</a>
+          </div>
+        </article>
+        <article class="nexus-shortcut">
+          <span class="nexus-kicker">Radio</span>
+          <strong id="quickStartTitle">All Nexus Radio</strong>
+          <p>Shuffle the live catalog with the shared player and queue.</p>
+          <button class="nexus-button nexus-button--primary" type="button" data-action="start-radio">Start Listening</button>
+        </article>
+        <article class="nexus-shortcut">
+          <span class="nexus-kicker">Studio</span>
+          <strong>Make the next drop</strong>
+          <p>Record, upload, package, and publish from the creator rooms.</p>
+          <div class="nexus-panel-actions">
+            <a class="nexus-button nexus-button--primary" href="./public/daw.html">DAW</a>
+            <a class="nexus-button" href="./public/drops.html">Drops</a>
+          </div>
+        </article>
+        <article class="nexus-shortcut">
+          <span class="nexus-kicker">Walkthroughs</span>
+          <strong>See the whole platform move</strong>
+          <p>Guided screen passes for artists, releases, store setup, proof, and SupaBoy onboarding.</p>
+          <a class="nexus-button nexus-button--primary" href="./public/walkthrough.html">Open Walkthroughs</a>
+        </article>
+      </section>
+
+      <section class="nexus-section" id="made-for-you">
+        <div class="nexus-section__head">
+          <div>
+            <span class="nexus-kicker">Playlists</span>
+            <h2>Made for the Nexus</h2>
+          </div>
+          <a href="./public/library.html">Open playlists</a>
+        </div>
+        <div class="nexus-playlist-grid" id="playlistGrid"></div>
+      </section>
+
+      <section class="nexus-section" id="trending">
+        <div class="nexus-section__head">
+          <div>
+            <span class="nexus-kicker">Music</span>
+            <h2>Trending now</h2>
+          </div>
+          <a href="./public/discover.html">Open charts</a>
+        </div>
+        <div class="nexus-track-rail" id="trendingRail"></div>
+      </section>
+
+      <section class="nexus-section" id="new-drops">
+        <div class="nexus-section__head">
+          <div>
+            <span class="nexus-kicker">Fresh</span>
+            <h2>New drops</h2>
+          </div>
+          <a href="./public/discover.html">See all</a>
+        </div>
+        <div class="nexus-track-rail" id="newDropsRail"></div>
+      </section>
+
+      <section class="nexus-section" id="stations">
+        <div class="nexus-section__head">
+          <div>
+            <span class="nexus-kicker">Stations</span>
+            <h2>Genre lanes</h2>
+          </div>
+          <a href="./public/radio.html">Open radio</a>
+        </div>
+        <div class="nexus-genre-grid" id="genreShelfGrid"></div>
+      </section>
+
+      <section class="nexus-home-grid" id="artists">
+        <article class="nexus-panel nexus-panel--large">
+          <div class="nexus-section__head">
+            <div>
+              <span class="nexus-kicker">Artists</span>
+              <h2>Discovery</h2>
+            </div>
+            <a href="./artist-storefronts/">All artists</a>
+          </div>
+          <div class="nexus-artist-grid" id="artistGrid"></div>
+        </article>
+
+        <article class="nexus-panel">
+          <span class="nexus-kicker">Social</span>
+          <h2>Release feed</h2>
+          <div class="nexus-feed-preview" id="feedPreview"></div>
+          <div class="nexus-panel-actions">
+            <a class="nexus-button" href="./public/feed.html">Open Social</a>
+            <a class="nexus-button" href="./public/discover.html">Discover</a>
+          </div>
+        </article>
+
+        <article class="nexus-panel">
+          <span class="nexus-kicker">Studio</span>
+          <h2>Create and package</h2>
+          <div class="nexus-workflow-list">
+            <a href="./public/daw.html"><strong>DAW</strong><span>Record, arrange, review</span></a>
+            <a href="./public/upload.html"><strong>Upload</strong><span>Attach audio and cover</span></a>
+            <a href="./public/drops.html"><strong>Drops</strong><span>Build public release pages</span></a>
+            <a href="./public/store.html"><strong>Store</strong><span>Product room and SkyePay</span></a>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <aside class="nexus-right-rail" aria-label="Artist live stats">
+      <section class="nexus-queue-card">
+        <div class="nexus-rail-head">
+          <div>
+            <span class="nexus-kicker">Up Next</span>
+            <h2>Queue</h2>
+          </div>
+          <button class="nexus-link-button" type="button" data-action="start-radio">Radio</button>
+        </div>
+        <div class="nexus-queue-preview" id="queuePreview"></div>
+      </section>
+
+      <section class="nexus-artist-card">
+        <div class="nexus-rail-head">
+          <div>
+            <span class="nexus-kicker">Live Artist Stats</span>
+            <h2 id="selectedArtistName">Artist</h2>
+          </div>
+          <a href="./public/artist-dashboard.html">Full</a>
+        </div>
+        <select id="artistSelect" class="nexus-select" aria-label="Choose artist"></select>
+        <img id="selectedArtistImage" src="./assets/skye-music-nexus-logo.png" alt="" />
+        <div class="nexus-stat-list">
+          <article><strong id="artistStreams">0</strong><span>Nexus streams</span></article>
+          <article><strong id="artistTracks">0</strong><span>songs</span></article>
+          <article><strong id="artistSeconds">0</strong><span>listen seconds</span></article>
+        </div>
+        <div class="nexus-panel-actions">
+          <button class="nexus-button nexus-button--primary" type="button" data-action="play-selected-artist">Play</button>
+          <a class="nexus-button" id="selectedArtistStore" href="./artist-storefronts/">Store</a>
+          <a class="nexus-button" id="selectedArtistStats" href="./public/artist-dashboard.html">Stats</a>
+        </div>
+      </section>
+
+      <section class="nexus-owner-card">
+        <div class="nexus-rail-head">
+          <div>
+            <span class="nexus-kicker">Gray Gang Owner View</span>
+            <h2>Collective pulse</h2>
+          </div>
+          <a href="./public/artist-dashboard.html?collective=gray-gang">Open</a>
+        </div>
+        <div class="nexus-owner-list" id="ownerPulse"></div>
+      </section>
+    </aside>
+  </div>
+
+  <script src="./public/nexus-player.js" defer></script>
+  <script src="./public/nexus-home.js" defer></script>
 </body>
 </html>

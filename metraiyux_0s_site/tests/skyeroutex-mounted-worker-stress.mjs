@@ -209,7 +209,7 @@ async function runScenario({ complianceMode, iterations, providerCalls }) {
     actions,
     body: { email: 'local-auth@stress.local', password: 'Password1234', role: 'provider' }
   });
-  assert(disabled.status === 503 && disabled.payload.sharedAuth === true, 'shared gate mode must disable app-local signup');
+  assert(disabled.status === 410 && disabled.payload.sharedAuth === true, 'shared gate mode must remove app-local signup');
 
   const market = (await call(env, 'POST', '/api/routex/markets', {
     token: admin,

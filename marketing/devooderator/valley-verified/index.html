@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valley Verified Priority Access | DevodeRator</title>
+  <meta name="description" content="Public Valley Verified priority access handoff for business-card QR scans.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body class="forge-app money-universe">
+  <header class="topbar">
+    <nav class="nav">
+      <a class="brand" href="../index.html">
+        <img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo">
+        DevodeRator
+      </a>
+      <div class="nav-links">
+        <a href="../cards.html">Cards</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../money-paths/">Money Paths</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">Valley Verified · QR access lane</p>
+    <h1>Priority access for the business in front of you.</h1>
+    <p class="lede">This public page is the scan-safe destination for Valley Verified business cards. It can carry the selected company, priority code, and owner handoff without exposing gated 0S operator screens.</p>
+
+    <section class="money-notice" id="priorityCard">
+      <strong id="selectedName">Loading Valley Verified match...</strong>
+      <p id="selectedMeta">Pulling public directory context from the local DevodeRator business list.</p>
+      <div class="cta-row">
+        <a class="btn primary" id="contactGray" href="mailto:grayskyes@solenterprises.org?subject=Valley%20Verified%20Priority%20Access">Email Gray</a>
+        <a class="btn" href="tel:+18004844788">Call 1-(800)-484-4788</a>
+        <a class="btn" id="businessWebsite" href="../cards.html">Open business link</a>
+      </div>
+    </section>
+
+    <section class="post-body">
+      <h2>What this scan does</h2>
+      <p>It gives the business owner a public path back to Gray London Skyes, the printed-card source, and any public website or booking link found in the Valley Verified directory.</p>
+      <div class="money-grid-xl" id="detailsGrid">
+        <article>
+          <span>01</span>
+          <h3>Owner handoff</h3>
+          <p>Use the email or phone action above to request the selected business page, contact packet, or next setup call.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Public proof boundary</h3>
+          <p>Business-card scans stay on public pages. Private dashboards, credentials, and owner-only routes are never embedded in the QR.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Card source</h3>
+          <p><a href="../mirrors/business-cards.html">Open the print-ready card studio</a> or <a href="../cards.html">return to the QR card vault</a>.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Valley Verified public QR lane · Generated for DevodeRator card scans · 2026-05-27</footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const selectedName = document.getElementById('selectedName');
+    const selectedMeta = document.getElementById('selectedMeta');
+    const contactGray = document.getElementById('contactGray');
+    const businessWebsite = document.getElementById('businessWebsite');
+
+    function normalize(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function pickBusiness(businesses) {
+      const clientId = normalize(params.get('clientId'));
+      const businessName = normalize(params.get('business') || params.get('q'));
+      if (clientId) {
+        const byId = businesses.find((item) => normalize(item.id) === clientId);
+        if (byId) return byId;
+      }
+      if (businessName) {
+        return businesses.find((item) => normalize(item.name) === businessName)
+          || businesses.find((item) => normalize(item.name).includes(businessName));
+      }
+      return businesses.find((item) => item.id === 'bobs-smoke-shop-litchfield-park')
+        || businesses.find((item) => item.featured)
+        || businesses[0];
+    }
+
+    function businessHref(business) {
+      return business.booking_url || business.website || '../cards.html';
+    }
+
+    async function boot() {
+      let businesses = [];
+      try {
+        const response = await fetch('../assets/valley-verified/businesses-lite.json', { cache: 'no-store' });
+        const payload = await response.json();
+        businesses = Array.isArray(payload) ? payload : payload.businesses || [];
+      } catch (error) {
+        console.warn('Valley Verified directory unavailable', error);
+      }
+
+      const business = pickBusiness(businesses) || {};
+      const priorityCode = params.get('priorityCode') || 'VV-DIRECT';
+      const expires = params.get('expires') || 'manual review';
+      const businessLabel = params.get('business') || business.name || 'Valley Verified business';
+      const city = params.get('city') || business.city || 'Phoenix Metro';
+      const category = params.get('category') || business.category || business.niche || 'Local business';
+      const subject = encodeURIComponent(`Valley Verified ${priorityCode}: ${businessLabel}`);
+      const body = encodeURIComponent(`Business: ${businessLabel}\nCity: ${city}\nCategory: ${category}\nPriority code: ${priorityCode}\nExpires: ${expires}\n\nI scanned the card and want the next handoff.`);
+
+      selectedName.textContent = businessLabel;
+      selectedMeta.textContent = `${city} / ${category} / Priority code ${priorityCode} / Window: ${expires}`;
+      contactGray.href = `mailto:grayskyes@solenterprises.org?subject=${subject}&body=${body}`;
+
+      const href = businessHref(business);
+      businessWebsite.href = href.startsWith('/') ? `https://devooderator.pages.dev${href}` : href;
+      businessWebsite.textContent = business.booking_url ? 'Open booking link' : business.website ? 'Open website' : 'Open public card vault';
+    }
+
+    boot();
+  </script>
+</body>
+</html>

@@ -291,6 +291,15 @@ test('SN-03 SkyeNet proxy initializes, uploads, completes, and registers a route
   assert.equal(routes.response.status, 200);
   assert.equal(routes.data.skynet.count, 1);
   assert.equal(routes.data.skynet.routes[0].route.active_deployment_id, deploymentId);
+
+  const source = await siteWorker.fetch(req(`/api/skyenet/source-download?project_id=${projectId}&deployment_id=${deploymentId}`, { token }), e, ctx());
+  assert.equal(source.status, 200);
+  assert.equal(source.headers.get('content-type'), 'application/x-tar');
+  assert.equal(source.headers.get('x-0s-skynet-source-download-proxy'), 'passthrough');
+  const tarText = Buffer.from(await source.arrayBuffer()).toString('utf8');
+  assert.match(tarText, /\.skyenet\/source-manifest\.json/);
+  assert.match(tarText, /index\.html/);
+  assert.match(tarText, /SkyeNet demo/);
 });
 
 test('SN-04 SkyeNet published path serves uploaded asset without 0S gate redirect', async () => {
@@ -424,4 +433,59 @@ test('SN-06 SkyeNet registered routes with missing root assets return a diagnost
   assert.match(text, /route found, asset missing/i);
   assert.match(text, /index\.html/i);
   assert.doesNotMatch(text, /^SkyeNet route not found$/i);
+});
+
+test('SN-07 Founder Command can be mounted as a private SkyeNet surface with shared gate headers', async () => {
+  const e = envWithActualFs27();
+  const token = 'gate-token';
+  const projectId = 'founder-command';
+  const deploymentId = 'dep_founder_command';
+
+  assert.equal((await call(e, '/api/skyenet/deploy/init', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, title: 'Founder Command' }
+  })).response.status, 200);
+
+  const uploadParams = new URLSearchParams({ projectId, deploymentId, path: 'index.html' });
+  assert.equal((await call(e, `/api/skyenet/deploy/upload?${uploadParams.toString()}`, {
+    method: 'PUT',
+    token,
+    headers: { 'content-type': 'text/html; charset=utf-8' },
+    body: '<h1>Founder Command on SkyeNet</h1>'
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/complete', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, files: ['index.html'] }
+  })).response.status, 200);
+
+  const route = await call(e, '/api/skyenet/deploy/route', {
+    method: 'POST',
+    token,
+    body: {
+      hostname: 'metraiyux.example',
+      mount_path: '/skyenet/founder-command',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      public_access: false,
+      default_auth: 'gate'
+    }
+  });
+  assert.equal(route.response.status, 200);
+
+  const denied = await siteWorker.fetch(req('/skyenet/founder-command/'), e, ctx());
+  assert.equal(denied.status, 401);
+
+  const live = await siteWorker.fetch(req('/skyenet/founder-command/', { token }), e, ctx());
+  const text = await live.text();
+  assert.equal(live.status, 200);
+  assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
+  assert.equal(live.headers.get('x-skynet-route'), 'r2-deployment');
+  assert.match(text, /Founder Command on SkyeNet/);
+
+  const redirect = await siteWorker.fetch(req('/founder-command/?view=repo-vault', { token }), e, ctx());
+  assert.equal(redirect.status, 302);
+  assert.match(redirect.headers.get('location') || '', /\/skyenet\/founder-command\/\?view=repo-vault$/);
 });

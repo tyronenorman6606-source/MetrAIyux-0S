@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CMIT Solutions of the Northeast Valley | Scottsdale Managed IT Services</title>
+  <meta name="description" content="CMIT Solutions of the Northeast Valley in Scottsdale: Valley Verified business profile with researched services, local presence, audience fit, and trust signals.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111c24;
+      --muted: #66717a;
+      --blue: #145c8a;
+      --green: #2f8a68;
+      --plum: #6b5b95;
+      --paper: #f5f8fa;
+      --panel: #ffffff;
+      --line: rgba(17, 28, 36,.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(20, 92, 138,.13), transparent 38%),
+        linear-gradient(315deg, rgba(47, 138, 104,.14), transparent 42%),
+        var(--paper);
+    }
+
+    a { color: inherit; }.wrap {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }.topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 24px 0;
+      color: var(--muted);
+      font-size:.92rem;
+    }.brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-weight: 800;
+      color: var(--blue);
+    }.brand img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }.hero {
+      min-height: 72vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px,.9fr);
+      gap: 32px;
+      align-items: center;
+      padding: 32px 0 60px;
+    }.eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-weight: 800;
+      font-size:.86rem;
+      letter-spacing: 0;
+    }.eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 3px;
+      border-radius: 6px;
+      background: var(--green);
+    }
+
+    h1 {
+      margin: 18px 0 0;
+      max-width: 760px;
+      font-size: 4.3rem;
+      line-height:.98;
+      letter-spacing: 0;
+    }.lead {
+      max-width: 680px;
+      margin: 22px 0 0;
+      color: #334552;
+      font-size: 1.24rem;
+      line-height: 1.55;
+    }.actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }.button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      background: white;
+      color: var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+    }.button.primary {
+      background: var(--blue);
+      color: white;
+    }.console {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f1d2a;
+      color: white;
+      overflow: hidden;
+      box-shadow: 0 18px 54px rgba(17, 28, 36,.22);
+    }.console-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px;
+      background: #13283a;
+      border-bottom: 1px solid rgba(255, 255, 255,.12);
+    }.console-head img {
+      width: 66px;
+      height: 66px;
+      border-radius: 8px;
+      background: white;
+      padding: 7px;
+    }.nodes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 28px;
+    }.node {
+      min-height: 96px;
+      border: 1px solid rgba(255, 255, 255,.16);
+      border-radius: 8px;
+      padding: 16px;
+      background: rgba(255, 255, 255,.06);
+    }.node strong {
+      display: block;
+      color: #d6f2e7;
+      letter-spacing: 0;
+    }.node span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255, 255, 255,.72);
+      line-height: 1.4;
+      font-size:.92rem;
+    }.console-foot {
+      padding: 22px 28px 28px;
+      color: rgba(255, 255, 255,.78);
+      line-height: 1.5;
+    }.facts {
+      display: grid;
+      grid-template-columns: 1.2fr.8fr;
+      gap: 16px;
+      padding-bottom: 58px;
+    }.panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.82);
+      padding: 22px;
+    }.label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size:.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }.panel p {
+      margin: 0;
+      color: #3e4f5a;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {.topbar,.hero,.facts {
+        grid-template-columns: 1fr;
+      }.hero { min-height: auto; }
+      h1 { font-size: 3rem; }
+    }
+
+    @media (max-width: 560px) {.topbar { flex-direction: column; align-items: flex-start; }
+      h1 { font-size: 2.35rem; }.lead { font-size: 1.05rem; }.nodes { grid-template-columns: 1fr; padding: 20px; }
+    }.vv-proof {
+      width: min(1120px, calc(100% - 32px));
+      margin: 30px auto 56px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line, rgba(17, 24, 39,.16));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.88);
+      box-shadow: 0 18px 50px rgba(17, 24, 39,.08);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink, #111827);
+    }.vv-proof-eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted, #5f6574);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+    }.vv-proof h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-transform: none;
+    }.vv-proof p {
+      max-width: 920px;
+      margin: 0;
+      color: var(--muted, #4b5563);
+      font-size: 1rem;
+      line-height: 1.72;
+    }.vv-proof p + p {
+      margin-top: 14px;
+    }.vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }.vv-proof-card {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line, rgba(17, 24, 39,.14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.72);
+    }.vv-proof-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--leaf, var(--green, var(--magenta, #0f766e))));
+      font-size: 12px;
+      letter-spacing:.1em;
+      text-transform: uppercase;
+    }.vv-proof-card span {
+      color: var(--muted, #4b5563);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {.vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main>
+    <div class="wrap">
+      <header class="topbar">
+        <div class="brand">
+          <img src="assets/logo.svg" alt="CMIT Solutions of the Northeast Valley mark">
+          <span>CMIT Solutions of the Northeast Valley</span>
+        </div>
+        <span>Accepted Valley Verified Network listing</span>
+      </header>
+
+      <section class="hero" aria-labelledby="business-name">
+        <div>
+          <div class="eyebrow">Computers/Telecom / Managed IT Services</div>
+          <h1 id="business-name">Managed IT services record in Scottsdale.</h1>
+          <p class="lead">CMIT Solutions of the Northeast Valley is a Scottsdale managed IT services profile for Valley businesses seeking technology support and a local MSP contact.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14804193931">Call (480) 419-3931</a>
+            <a class="button" href="https://business.phoenixchamber.com/list/ql/computers-telecommunications-6">Business source</a>
+          </div>
+        </div>
+
+        <aside class="console" aria-label="Managed IT listing panel">
+          <div class="console-head">
+            <img src="assets/logo.svg" alt="">
+            <strong>Directory snapshot</strong>
+          </div>
+          <div class="nodes">
+            <div class="node">
+              <strong>Category</strong>
+              <span>Local Services</span>
+            </div>
+            <div class="node">
+              <strong>Niche</strong>
+              <span>Managed IT Services</span>
+            </div>
+            <div class="node">
+              <strong>Language</strong>
+              <span>English</span>
+            </div>
+          </div>
+          <div class="console-foot">Website and booking URL are covered through official organization channels.</div>
+        </aside>
+      </section>
+
+      <section class="facts" aria-label="Business facts">
+        <article class="panel">
+          <span class="label">Address</span>
+          <p>14700 N. Airport Drive Suite 216, Scottsdale, AZ 85260</p>
+        </article>
+        <article class="panel">
+          <span class="label">Profile Reviewed</span>
+          <p>May 19, 2026</p>
+        </article>
+      </section>
+    </div>
+  
+    <section class="vv-proof" aria-labelledby="vv-proof-heading">
+      <p class="vv-proof-eyebrow">Skyes Over London Review</p>
+      <h2 id="vv-proof-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>CMIT Solutions of the Northeast Valley earns a Valley Verified profile because the record identifies managed IT services, a Scottsdale office at 14700 N. Airport Drive Suite 216, and listed phone (480) 419-3931.</p>
+      <p>Skyes Over London includes CMIT for local companies that need computers, telecom, and managed technology support with a specific office and phone route. The Greater Phoenix Chamber computers and telecommunications category supports the placement.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Best for</strong><span>Local businesses, operators, and professional teams seeking managed IT support in Scottsdale and the Northeast Valley.</span></div>
+        <div class="vv-proof-card"><strong>Local presence</strong><span>14700 N. Airport Drive Suite 216, Scottsdale, AZ 85260 with listed phone (480) 419-3931.</span></div>
+        <div class="vv-proof-card"><strong>Proof signals</strong><span>Valley Verified business record and Greater Phoenix Chamber computers and telecommunications category evidence.</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

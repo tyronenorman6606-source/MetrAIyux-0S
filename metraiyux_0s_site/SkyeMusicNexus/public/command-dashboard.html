@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus - Command Dashboard</title>
-  <meta name="description" content="Live SkyeMusicNexus analytics, API route health, audit events, workflow state, and dashboard visuals." />
+  <title>SkyeMusicNexus - Service Health</title>
+  <meta name="description" content="Owner-facing SkyeMusicNexus analytics, service health, activity records, workflow state, and visual health data." />
   <link rel="stylesheet" href="./neo-nexus.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="../../assets/js/visual-data-kit.js"></script>
   <script defer src="./neo-nexus.js"></script>
 </head>
@@ -17,21 +17,20 @@
   <div class="grain" aria-hidden="true"></div>
 
   <header class="nexus-topline">
-    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus dashboard"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus workspace"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
     <div class="top-title">
-      <p class="micro">SkyeMusicNexus // Command Dashboard</p>
-      <h1>Live analytics, route health, workflow state, and audit events from the music API.</h1>
+      <p class="micro">SkyeMusicNexus // Service Health</p>
+      <h1>Live analytics, service health, workflow state, and activity records from the music platform.</h1>
     </div>
     <div class="session-rack">
-      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-      <button class="ghost" data-action="proof-session">Proof Session</button>
-      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
       <button class="ghost" data-action="logout">Disconnect</button>
     </div>
   </header>
 
   <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
-    <a href="./index.html">Dashboard</a>
+    <a href="./index.html">Workspace</a>
     <a href="./create.html">Create</a>
     <a href="./daw.html">DAW</a>
     <a href="./discover.html">Discover</a>
@@ -42,9 +41,9 @@
     <a href="./rights.html">Rights</a>
     <a href="./exchange.html">Exchange</a>
     <a href="./drops.html">Drops</a>
-    <a href="./admin.html">Operator</a>
-    <a class="active" href="./command-dashboard.html">Command Dashboard</a>
-    <a href="../skepticks-spectic-override.html">Skeptic Audit</a>
+
+    <a class="active" href="./command-dashboard.html">Service Health</a>
+
   </nav>
 
   <main class="nexus-shell command-dashboard-shell">
@@ -61,7 +60,7 @@
 
       <div class="visual-panel-grid">
         <article class="visual-panel">
-          <h2>Workflow Readiness</h2>
+        <h2>Workflow Readiness</h2>
           <div data-visual-progress></div>
         </article>
         <article class="visual-panel">
@@ -79,8 +78,8 @@
       </div>
 
       <section class="visual-panel">
-        <h2>Front/Back Route Health</h2>
-        <p class="compact">Every row is a browser-facing room/API lane. Live mode shows retained audit-event counts from successful backend mutations.</p>
+        <h2>Service Health</h2>
+        <p class="compact">Every row is a browser-facing room/service lane. Live mode shows retained activity counts from successful platform actions.</p>
         <div class="visual-route-grid" data-visual-routes></div>
       </section>
 
@@ -90,7 +89,7 @@
       </section>
 
       <section class="visual-panel">
-        <h2>Latest Audit Events</h2>
+        <h2>Latest Activity Records</h2>
         <div class="visual-audit-list" data-visual-audit></div>
       </section>
 
@@ -100,13 +99,11 @@
       </section>
 
       <section class="visual-panel">
-        <h2>0S Stack State</h2>
+        <h2>0S Service State</h2>
         <div class="visual-stack-grid" data-visual-stack></div>
       </section>
     </section>
   </main>
-
-  <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

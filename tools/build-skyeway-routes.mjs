@@ -10,6 +10,8 @@ const skippedRoutePatterns = [
   /^api(?:\/|$)/,
   /(?:^|\/)(?:src|server|scripts|smoke|tests?|proof)(?:\/|$)/,
   /(?:^|\/)(?:netlify|migrations|runtime\/data|runtime\/db|runtime\/state)(?:\/|$)/,
+  /^DeVisional(?:%20| )Riftx(?:\/|$)/i,
+  /^skyenet\/devisional-riftx(?:\/|$)/i,
   /^Free99\/apps\/sovereigndocs\/(?:template-library|templates|build)(?:\/|$)/
 ];
 
@@ -79,6 +81,30 @@ const externalRoutes = [
     'MCP and Developer Tools',
     'remote-mcp',
     'fs27-gated-remote-mcp'
+  ]
+];
+
+const manualRoutes = [
+  [
+    'DeVisional%20Riftx/app/index.html',
+    'SuperIDE / DeVisional Riftx',
+    'Platform Apps',
+    'DeVisional Riftx',
+    'fs27-owner-gated-superide'
+  ],
+  [
+    'founder-command/apps/0s-command-bridge/index.html',
+    '0S Command Bridge',
+    'Brains, Proof, and Infra',
+    'founder-command',
+    'fs27-owner-gated-command-bridge'
+  ],
+  [
+    'skyehawk/index.html',
+    'Skye Hawk Source Cockpit',
+    'Brains, Proof, and Infra',
+    'skyehawk',
+    'fs27-owner-gated-skyehawk'
   ]
 ];
 
@@ -236,7 +262,7 @@ const routes = walk(root)
     const file = path.join(root, routePath);
     return [routePath, titleFor(file, routePath), categoryFor(routePath), folderFor(routePath), gatePolicyFor(routePath)];
   })
-  .concat(externalRoutes);
+  .concat(manualRoutes, externalRoutes);
 
 const categories = routes.reduce((counts, route) => {
   counts[route[2]] = (counts[route[2]] || 0) + 1;

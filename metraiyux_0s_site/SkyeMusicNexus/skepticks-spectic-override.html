@@ -3,32 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SkyeMusicNexus - Skepticks and SPectic Override</title>
-  <meta name="description" content="Investor-grade SkyeMusicNexus claim audit with receipts, live API checks, boundaries, and board-room language.">
+  <title>SkyeMusicNexus - Public Claim Audit</title>
+  <meta name="description" content="Public SkyeMusicNexus claim audit with receipts, live platform checks, honest limits, and board-room language.">
   <link rel="stylesheet" href="./platform.css">
   <script defer src="./gate-session.js"></script>
   <script defer src="./platform.js"></script>
   <script defer src="./skepticks-spectic-override.js"></script>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
 </head>
 <body data-platform-hardening="p2-routed" data-platform-id="skye-music-nexus" data-page="skepticks-spectic-override.html">
   <aside class="rail">
-    <a class="brand" href="./index.html"><img src="./assets/platform-mark.svg" alt=""><span>SkyeMusicNexus</span></a>
-    <nav><a class="" href="./index.html"><span>01</span><strong>Command Field</strong></a><a class="" href="./dashboard.html"><span>02</span><strong>Signal Atlas</strong></a><a class="" href="./workflows.html"><span>03</span><strong>Operations Sequencer</strong></a><a class="" href="./records.html"><span>04</span><strong>Capsule Records</strong></a><a class="" href="./runtime.html"><span>05</span><strong>Runtime Spine</strong></a><a class="" href="./proof.html"><span>06</span><strong>Proof Chamber</strong></a><a class="active" href="./skepticks-spectic-override.html"><span>07</span><strong>Skeptic Override</strong></a><a class="" href="./settings.html"><span>08</span><strong>Control Boundary</strong></a></nav>
+    <a class="brand" href="./index.html"><img src="./assets/skye-music-nexus-logo.png" alt=""><span>SkyeMusicNexus</span></a>
+    <nav>
+      <a href="./index.html"><span>01</span><strong>Home</strong></a>
+      <a href="./public/index.html"><span>02</span><strong>Workspace</strong></a>
+      <a href="./public/daw.html"><span>03</span><strong>DAW</strong></a>
+      <a href="./public/drops.html"><span>04</span><strong>Drops</strong></a>
+      <a href="./public/feed.html"><span>05</span><strong>Feed</strong></a>
+      <a href="./public/releases.html"><span>06</span><strong>Releases</strong></a>
+      <a class="active" href="./skepticks-spectic-override.html"><span>07</span><strong>Claim Audit</strong></a>
+    </nav>
   </aside>
   <main class="surface skeptic-surface">
     <header class="topbar">
       <div>
-        <p class="kicker">hostile diligence / board-room receipts / no overclaiming</p>
+        <p class="kicker">public diligence / board-room receipts / no overclaiming</p>
         <h1>Skepticks and SPectic Override</h1>
-        <p>This surface turns the MusicNexus marketing story into an investor-grade claim audit. Every major claim is either verified, stress-backed, or marked as a boundary that cannot be sold as finished yet.</p>
+        <p>This public surface turns the MusicNexus story into an investor-grade claim audit. Every major claim is either verified, stress-backed, or marked with an honest limit that cannot be sold as finished yet.</p>
       </div>
-      <div class="quicklinks"><a href="./proof.html">Readiness</a><a href="./public/command-dashboard.html">Command Dashboard</a><a href="/api/skymusicnexus/observability">Live Observability</a></div>
+      <div class="quicklinks"><a href="./public/index.html">Workspace</a><a href="#claim-audit">Claim Matrix</a><a href="#receipts">Receipts</a></div>
     </header>
 
     <section class="hero skeptic-hero">
       <div>
         <p class="kicker">Investor Stance</p>
-        <h2>Assume it is nonsense until the receipt proves the route, record, and boundary.</h2>
+        <h2>Assume it is nonsense until the receipt proves the workflow, record, and limit.</h2>
         <p data-verdict-copy>Loading the claim ledger...</p>
       </div>
       <div class="metrics skeptic-scoreboard">
@@ -41,12 +50,12 @@
     <section class="panel live-investor-panel">
       <div class="section-line">
         <div>
-          <p class="kicker">Live API Cross-Check</p>
-          <h3>Front end is asking production what it really has.</h3>
+          <p class="kicker">Live Platform Check</p>
+          <h3>The audit asks the live platform what it really has.</h3>
         </div>
         <button type="button" data-action="refresh-live-claims">Refresh Live Check</button>
       </div>
-      <p class="live-status" data-live-status>Waiting for live 0S/SkyGate session...</p>
+      <p class="live-status" data-live-status>Waiting for a client session...</p>
       <div class="live-check-grid" data-live-checks></div>
     </section>
 
@@ -63,7 +72,7 @@
       </article>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="claim-audit">
       <div class="section-line">
         <div>
           <p class="kicker">Claim Audit Matrix</p>
@@ -79,11 +88,12 @@
       <div class="claim-grid" data-claim-grid></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="receipts">
       <p class="kicker">Receipts</p>
       <h3>Files this page is allowed to cite.</h3>
       <div class="receipt-grid" data-receipt-grid></div>
     </section>
   </main>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
 </body>
 </html>

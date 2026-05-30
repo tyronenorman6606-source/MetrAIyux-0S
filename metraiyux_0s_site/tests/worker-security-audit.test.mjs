@@ -121,6 +121,29 @@ test('SEC-02 preserves explicit public proof/static allowlist paths', async () =
   }
 });
 
+test('SEC-03 preserves SkyeMail mounted handoff without exposing implementation source', async () => {
+  const handoff = await siteWorker.fetch(req('/live/SkyeMail/session-handoff.html?next=dashboard.html&from=test'), siteEnv(), ctx());
+  assert.equal(handoff.status, 200);
+  assert.equal(handoff.headers.get('x-0s-skyemail-handoff'), 'free99-session');
+  assert.match(await handoff.text(), /data-skyemail-session-handoff="true"/);
+
+  const mountedInbox = await siteWorker.fetch(
+    req('/live/SkyeMail/dashboard.html', { headers: { 'x-admin-token': 'test-admin' } }),
+    siteEnv({ ADMIN_TOKEN: 'test-admin' }),
+    ctx()
+  );
+  assert.equal(mountedInbox.status, 302);
+  assert.match(mountedInbox.headers.get('location') || '', /^https:\/\/skyemail-platform\.graylondonskyes\.workers\.dev\/dashboard\.html/i);
+
+  const blockedSource = await siteWorker.fetch(
+    req('/live/SkyeMail/netlify/functions/mailbox-provider.js', { headers: { 'x-admin-token': 'test-admin' } }),
+    siteEnv({ ADMIN_TOKEN: 'test-admin' }),
+    ctx()
+  );
+  assert.equal(blockedSource.status, 404);
+  assert.match(await blockedSource.text(), /Private implementation source is not public/i);
+});
+
 test('SEC-04 requires operator auth for site-operator mutation routes', async () => {
   const mutationPaths = [
     '/api/site-operator/route',

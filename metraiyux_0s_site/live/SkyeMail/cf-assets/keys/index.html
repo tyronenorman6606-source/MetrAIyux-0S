@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Vault Keys — SkyeMail Vault</title>
+<title>Sovereign Keys — SkyeMail Citadel</title>
 <style>
 :root{
   --bg0:#fffaf0;
@@ -305,12 +305,13 @@ small{ color: var(--muted); }
 .msg .role{ font-size:11px; color: var(--muted); }
 .msg .content{ white-space:pre-wrap; font-size:13px; line-height:1.55; margin-top:4px; }
   </style>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
 </head><body>
 <div class="wrap">
   <div class="topbar"><div class="nav">
     <div class="brand">
       <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
-      <div class="name"><b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Vault</b><span>Keys • Export/Import • Rotation</span></div>
+      <div class="name"><b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Citadel</b><span>Keys • Export/Import • Rotation</span></div>
     </div>
     <div class="navlinks">
       <a class="pill" href="index.html">Home</a>
@@ -322,8 +323,8 @@ small{ color: var(--muted); }
   </div></div>
 
   <div class="container"><div class="card">
-    <h1 class="h1" style="font-size:30px;">Vault Keys</h1>
-    <p class="sub">Export a Vault Pack for backup/migration, restore keys from a Vault Pack, and rotate keys. Old messages remain decryptable via key versions.</p>
+    <h1 class="h1" style="font-size:30px;">Sovereign Keys</h1>
+    <p class="sub">Export a Citadel Key Pack for backup/migration, restore keys from a Citadel Key Pack, and rotate keys. Old messages remain decryptable via key versions.</p>
 
     <div class="badge" id="who">Loading…</div>
     <div class="hr"></div>
@@ -331,18 +332,18 @@ small{ color: var(--muted); }
     <div class="split">
       <div>
         <div class="pane">
-          <h3>Export Vault Pack</h3>
+          <h3>Export Citadel Key Pack</h3>
           <div class="notice">Downloads an encrypted key pack (wrapped private keys). Keep it safe.</div>
           <div class="btnrow" style="margin-top:10px;">
-            <button class="btn gold" id="btnExport">Download Vault Pack</button>
+            <button class="btn gold" id="btnExport">Download Citadel Key Pack</button>
           </div>
         </div>
 
         <div class="pane" style="margin-top:12px;">
-          <h3>Restore Keys from Vault Pack</h3>
-          <div class="notice">Paste a previously exported Vault Pack. This replaces keys on the server for your account (auth required).</div>
-          <label>Vault Pack JSON</label>
-          <textarea id="packJson" placeholder='{"schema":"SMV_VAULT_PACK_V1", ...}'></textarea>
+          <h3>Restore Keys from Citadel Key Pack</h3>
+          <div class="notice">Paste a previously exported Citadel Key Pack. This replaces keys on the server for your account (auth required).</div>
+          <label>Citadel Key Pack JSON</label>
+          <textarea id="packJson" placeholder='{"schema":"SMV_CITADEL_KEY_PACK_V1", ...}'></textarea>
           <div class="btnrow" style="margin-top:10px;">
             <button class="btn" id="btnRestore">Restore Keys</button>
           </div>
@@ -353,8 +354,8 @@ small{ color: var(--muted); }
         <div class="pane">
           <h3>Key Rotation</h3>
           <div class="notice">Generates a new key pair locally and makes it active. Old key versions remain on your account for decrypting older messages.</div>
-          <label>Vault Passphrase (wrap the new private key)</label>
-          <input id="vaultPass" type="password" placeholder="Enter your vault passphrase" autocomplete="current-password" />
+          <label>Citadel passphrase (wrap the new private key)</label>
+          <input id="vaultPass" type="password" placeholder="Enter your Citadel passphrase" autocomplete="current-password" />
           <div class="btnrow" style="margin-top:10px;">
             <button class="btn gold" id="btnRotate">Rotate Keys</button>
           </div>
@@ -419,9 +420,9 @@ small{ color: var(--muted); }
     try{
       setStatus(status, "Exporting…", "");
       const pack = await apiFetch("/vault-export");
-      const name = `vault-pack-${pack.user.handle}-${new Date().toISOString().slice(0,10)}.json`;
+      const name = `citadel-key-pack-${pack.user.handle}-${new Date().toISOString().slice(0,10)}.json`;
       download(name, JSON.stringify(pack, null, 2));
-      setStatus(status, "Vault Pack downloaded.", "ok");
+      setStatus(status, "Citadel Key Pack downloaded.", "ok");
     }catch(err){
       setStatus(status, err.message || "Export failed.", "danger");
     }
@@ -444,7 +445,7 @@ small{ color: var(--muted); }
   qs("#btnRotate").addEventListener("click", async () => {
     try{
       const pass = qs("#vaultPass").value || "";
-      if(pass.length < 10) { setStatus(kstatus, "Vault Passphrase required (10+ chars).", "danger"); return; }
+      if(pass.length < 10) { setStatus(kstatus, "Citadel passphrase required (10+ chars).", "danger"); return; }
       setStatus(kstatus, "Generating new keypair…", "");
       const kp = await CryptoVault.generateRecipientRsaKeypair();
       const wrap = await CryptoVault.wrapPrivateKeyWithPassphrase(kp.privateKeyPem, pass);

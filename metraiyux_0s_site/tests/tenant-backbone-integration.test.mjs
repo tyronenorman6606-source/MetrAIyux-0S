@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
 import siteWorker from '../cloudflare/worker.js';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 class MemoryKV {
   constructor() { this.map = new Map(); }
@@ -10,8 +13,15 @@ class MemoryKV {
     if (value == null) return null;
     return options?.type === 'json' ? JSON.parse(value) : value;
   }
-  async list({ limit = 1000 } = {}) {
-    return { keys: [...this.map.keys()].slice(0, limit).map((name) => ({ name })) };
+  async list({ prefix = '', limit = 1000 } = {}) {
+    return { keys: [...this.map.keys()].filter((name) => name.startsWith(prefix)).slice(0, limit).map((name) => ({ name })) };
+  }
+}
+
+class MemoryR2 {
+  constructor() { this.objects = new Map(); }
+  async put(key, value, options = {}) {
+    this.objects.set(key, { value, options });
   }
 }
 
@@ -66,6 +76,7 @@ function relayWorker(calls) {
 
 function env(overrides = {}) {
   const kv = new MemoryKV();
+  const r2 = new MemoryR2();
   const calls = [];
   return {
     ASSETS: {
@@ -77,6 +88,8 @@ function env(overrides = {}) {
     CONTENT_ENGINE_KV: kv,
     CLIENT_APP_FACTORY_KV: kv,
     SKYE_MEDIA_CENTER_KV: kv,
+    ZERO_OS_PROVIDER_R2: r2,
+    r2Objects: r2.objects,
     SKYGATEFS27_WORKER: gateWorker(),
     RELAY13_WORKER: relayWorker(calls),
     relayCalls: calls,
@@ -93,7 +106,7 @@ async function call(e, path, options = {}) {
 
 test('TENANT-01 exposes a Gate-owned canonical tenant map', async () => {
   const e = env();
-  const result = await call(e, '/api/0s/tenant-map');
+  const result = await call(e, '/api/0s/tenant-map', { token: 'gate-token' });
   assert.equal(result.response.status, 200);
   assert.equal(result.body.gateAuthority, 'metraiyux-0s-gate');
   assert.match(result.body.northStarSignInProRule, /mounted app/i);
@@ -107,6 +120,7 @@ test('TENANT-02 Client App Factory intake lands in tenant backbone and Relay13 i
   const e = env();
   const intake = await call(e, '/api/client-app-factory/factory/intake', {
     method: 'POST',
+    token: 'gate-token',
     body: {
       clientId: 'fade-masters-phx',
       displayName: 'Fade Masters PHX',
@@ -126,6 +140,43 @@ test('TENANT-02 Client App Factory intake lands in tenant backbone and Relay13 i
   assert.equal(e.relayCalls.length, 1);
   assert.equal(e.relayCalls[0].path, '/api/v1/connectlog/scan');
   assert.equal(e.relayCalls[0].payload.workspace_id, 'fade-masters-phx-preview-001');
+  assert.equal(intake.body.tenantLead.delivery.relay13ProviderRuntime.action, 'relay13.thread.attach');
+  assert.equal(intake.body.tenantLead.delivery.relay13ProviderRuntime.status, 'executed_sandbox');
+  assert.equal(intake.body.record.providerRuntimeReceipts.some((item) => item.action === 'relay13.thread.attach'), true);
+
+  const factoryAsset = await call(e, '/api/client-app-factory/factory/assets', {
+    method: 'POST',
+    token: 'gate-token',
+    body: {
+      clientId: 'fade-masters-phx',
+      fileName: 'proof-asset.txt',
+      mimeType: 'text/plain',
+      content_base64: Buffer.from('client app factory provider runtime asset', 'utf8').toString('base64'),
+      provenance: 'provider-runtime-test'
+    }
+  });
+  assert.equal(factoryAsset.response.status, 200);
+  const storedAsset = factoryAsset.body.record.assetVault[0];
+  assert.equal(storedAsset.provider_runtime.action, 'storage.object.put');
+  assert.equal(storedAsset.provider_runtime.status, 'executed');
+  assert.equal(storedAsset.provider_runtime.provider_call_made, true);
+  assert.equal(storedAsset.storageStatus, 'stored_by_provider_runtime');
+  assert.equal(e.r2Objects.size, 1);
+
+  const identity = await call(e, '/api/client-app-factory/factory/identity-image', {
+    method: 'POST',
+    token: 'gate-token',
+    body: {
+      clientId: 'fade-masters-phx',
+      displayName: 'Fade Masters PHX',
+      industry: 'Barber shop',
+      services: ['Skin Fade']
+    }
+  });
+  assert.equal(identity.response.status, 200);
+  assert.equal(identity.body.provider_runtime.action, 'openai.image.generate');
+  assert.equal(identity.body.provider_runtime.status, 'executed_sandbox');
+  assert.equal(identity.body.provider_runtime.provider_call_made, false);
 
   const inbox = await call(e, '/api/0s/tenant-inbox?clientId=fade-masters-phx', { token: 'gate-token' });
   assert.equal(inbox.response.status, 200);
@@ -223,6 +274,9 @@ test('TENANT-03 SkyeDocxMax, media reuse, and Content Engine packages persist th
   });
   assert.equal(dispatch.response.status, 200);
   assert.equal(dispatch.body.provider_call_made, false);
+  assert.ok(Array.isArray(dispatch.body.provider_runtime_receipts));
+  assert.ok(dispatch.body.provider_runtime_receipts.length >= 1);
+  assert.ok(dispatch.body.dispatches.every((item) => item.event.provider_runtime_receipt_id));
   assert.equal(dispatch.body.ai_response_policy.bucket, 'backup');
   assert.equal(dispatch.body.ai_response_policy.backupRemaining, 30);
 });

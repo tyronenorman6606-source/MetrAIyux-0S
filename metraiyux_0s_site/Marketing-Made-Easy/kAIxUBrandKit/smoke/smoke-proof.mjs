@@ -10,7 +10,6 @@ const root = path.resolve(__dirname, "..");
 
 for (const rel of [
   "index.html",
-  "app.html",
   "runtime/local-runtime.mjs",
   "netlify/functions/kaixu-generate.js",
   "netlify/functions/client-error-report.js",
@@ -22,14 +21,9 @@ for (const rel of [
 }
 
 const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const html = fs.readFileSync(path.join(root, "app.html"), "utf8");
-for (const needle of [
-  "kAIxU BrandKit now has routed surfaces",
-  'href="./app.html"',
-]) {
-  if (!indexHtml.includes(needle)) {
-    throw new Error(`BrandKit route shell is missing expected surface marker: ${needle}`);
-  }
+const html = indexHtml;
+if (fs.existsSync(path.join(root, "app.html"))) {
+  throw new Error("app.html should not exist; kAIxU BrandKit must use one canonical root app");
 }
 
 for (const needle of [
@@ -49,6 +43,8 @@ for (const needle of [
   "/api/runtime/execution-board",
   "/api/runtime/dispatch-board",
   "/api/runtime/workflow-timeline",
+  "SkyeMediaCenter Bridge",
+  "SkyeMediaCenter",
   "SkyeLeadVault",
   "SkyeWebCreatorMax",
   "AE-FlowPro"
@@ -117,6 +113,11 @@ try {
             reason: "Need storefront and landing page follow-through."
           },
           {
+            platform: "SkyeMediaCenter",
+            lane: "media-assets",
+            reason: "Brand files need shared media intake."
+          },
+          {
             platform: "AE-FlowPro",
             lane: "sales-activation",
             reason: "Need activation readiness and downstream follow-up."
@@ -131,6 +132,9 @@ try {
   }
   if (!created.item.actionItems?.length) {
     throw new Error("BrandKit runtime did not derive action items.");
+  }
+  if (created.item.handoffSummary?.mediaLane !== "SkyeMediaCenter") {
+    throw new Error("BrandKit runtime did not map SkyeMediaCenter into the handoff summary.");
   }
 
   const storedRaw = JSON.parse(fs.readFileSync(context.storePath, "utf8"));

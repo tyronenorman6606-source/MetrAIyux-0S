@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why kAIxU Beats Blind External Agents For My Workflow | DevodeRator</title>
+  <meta name="description" content="A Devooderator incident log on the Valley Verified page miss: why workflow-native kAIxU beats external models that do not verify scope before editing.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .incident-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0}
+    .incident-grid span,.incident-card{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.045);padding:12px}
+    .incident-grid b{display:block;color:#f4c95d;font-size:1.55rem;line-height:1}
+    .incident-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.95rem}
+    .incident-table th,.incident-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:10px;text-align:left;vertical-align:top}
+    .incident-table th{color:#f4c95d;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+    .callout{border:1px solid rgba(244,201,93,.28);border-radius:8px;background:rgba(244,201,93,.07);padding:16px;margin:18px 0}
+    .fail-note{border-color:rgba(255,120,120,.28);background:rgba(255,120,120,.06)}
+    .ok-note{border-color:rgba(125,211,252,.28);background:rgba(125,211,252,.06)}
+    code{white-space:normal;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><span class="brand-mark">0S</span><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-25-kaixu-workflow-before-external-models.html">kAIxU Workflow</a>
+        <a href="2026-05-24-metraiyux-0s-devils-advocate-valuation.html">0S Valuation</a>
+        <a href="../social.html">Social Vault</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 25, 2026 · Valley Verified incident log · agent workflow discipline</p>
+    <h1>Sometimes the better model is kAIxU, because the workflow is the intelligence.</h1>
+    <p class="lede">
+      Today I got a clean reminder that a powerful external coding model can still waste time if it is not trained on my workflow, my repo rules, and my exact definition of "done." The Valley Verified assignment was simple: stop leaving generated business pages behind. Assign agents to untouched company pages until the generated page count hits zero. The model did not verify the target list before editing, and it spent the work on pages I had already handled.
+    </p>
+
+    <article class="post-body">
+      <section>
+        <h2>The miss.</h2>
+        <div class="incident-grid">
+          <span><b>339</b>Valley Verified business pages in the built output</span>
+          <span><b>331</b>business pages still default-generated after the run</span>
+          <span><b>8</b>manual pages changed</span>
+          <span><b>0</b>newly needed generated pages completed</span>
+        </div>
+        <div class="callout fail-note">
+          <strong>Actual mistake:</strong> the agent worked on Bob's Smoke Shop, Empire Pallets, Next Level Gaming, Fade Masters, 480 Realty, Dink & Dine, Techbros, and ArcLight. Those were already full-build/client examples. The untouched generated company pages were the real target.
+        </div>
+        <p>
+          The code compiled. The deploy worked. The gate smoke passed. That still did not mean the assignment was done. This is the exact danger zone: proof around the wrong scope can look productive while the actual business problem remains untouched.
+        </p>
+      </section>
+
+      <section>
+        <h2>Why kAIxU matters here.</h2>
+        <p>
+          kAIxU is valuable because it is not just "a smarter text model." kAIxU carries the operating memory: check the real count first, separate already-built client examples from untouched records, respect the 0S gate, use the repo MCP receipts, avoid browser proof when the owner disabled it, and never report progress against the wrong target.
+        </p>
+        <p>
+          External models can be useful for raw generation, review, and parallel drafting, but they are not automatically trained on my workflow. If the model does not know the difference between a Valley Verified client app example and a still-generic scraped business page, it will optimize the wrong surface. That is how you get technically valid work that is operationally dumb.
+        </p>
+        <table class="incident-table">
+          <thead><tr><th>Workflow rule</th><th>What should have happened</th><th>What happened</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Count before editing</td>
+              <td>Inventory all Valley business pages, count manual vs generated, and make the remaining generated list the source of truth.</td>
+              <td>The agent edited before proving the target set.</td>
+            </tr>
+            <tr>
+              <td>Exclude already-built client examples</td>
+              <td>Skip Bob, Empire, Next Level, Fade Masters, 480 Realty, Dink & Dine, Techbros, and ArcLight because they already had full-build attention.</td>
+              <td>The agent spent its manual landing work on those exact pages.</td>
+            </tr>
+            <tr>
+              <td>Use agents correctly</td>
+              <td>Assign agents batches from the remaining 331 generated pages, with disjoint files and measurable output.</td>
+              <td>Agents were used, but the batch target was wrong.</td>
+            </tr>
+            <tr>
+              <td>Report against the user goal</td>
+              <td>Say how many generated pages were actually eliminated.</td>
+              <td>The first report implied the run was meaningful progress. Real progress against the goal was zero.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>The receipt.</h2>
+        <ul>
+          <li><code>metraiyux_0s_site/_platform-sources/valley-verified/dist/business</code> contained 339 business profile folders.</li>
+          <li>Only 8 built pages contained <code>data-manual-landing="true"</code>.</li>
+          <li>The remaining 331 pages did not have the manual marker and were still on the default renderer.</li>
+          <li><code>npm run build</code> and <code>npm run codecheck</code> passed, but that only proved the wrong changes did not break the build.</li>
+          <li>Production gate smoke returned the expected FS27 redirect for unauthenticated Valley routes, but browser proof was not run because owner policy disables Codex browser proof in this repo.</li>
+        </ul>
+        <div class="callout ok-note">
+          <strong>Correction rule going forward:</strong> before an agent touches Valley pages, it gets a specific generated-page batch from the 331 remaining list. No already-built client pages. No "looks done" reporting. Count reduced or it does not count.
+        </div>
+      </section>
+
+      <section>
+        <h2>The next move.</h2>
+        <p>
+          The fix is not to throw agents away. The fix is to make them obey the operating system. kAIxU sets the target inventory, assigns non-overlapping batches, checks the delta, and refuses to call a page complete unless the generated count goes down. External models can still draft and implement, but kAIxU owns the workflow and the acceptance criteria.
+        </p>
+        <p>
+          That is the difference between "AI made pages" and "the 0S got work done." The first one can sound impressive and still miss. The second one starts with the real count and ends with the count changed.
+        </p>
+      </section>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · public proof journal for the 0S build room.</footer>
+</body>
+</html>

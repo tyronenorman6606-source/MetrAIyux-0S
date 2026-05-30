@@ -4,7 +4,7 @@ import {
   buildSkyeMeritCheckout as buildGateCheckout,
   calculateSkyeMerit as calculateGateMerit,
   selectSkyeMerit as selectGateMerit
-} from "../SkyeGateFS27/netlify/functions/_lib/skyeMerit.js";
+} from "../metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyeMerit.js";
 import {
   buildSkyeMeritCheckout as buildWorkerCheckout,
   calculateSkyeMerit as calculateWorkerMerit,
@@ -65,21 +65,41 @@ assert.equal(gateCheckout.line_items[0].amount_cents, 1146000);
 assert.equal(gateCheckout.adjusted_due_cents, 1146000);
 assert.equal(workerCheckout.adjusted_due_cents, gateCheckout.adjusted_due_cents);
 
+const unlimitedOffer = {
+  id: "saas-unlimited-command-setup",
+  title: "Unlimited Command Setup",
+  currency: "usd",
+  mode: "payment",
+  line_items: [{ id: "setup", name: "Unlimited Command Setup", amount_cents: 1500000, type: "one_time", lookup_key: "unlimited_command_setup" }]
+};
+const grayGateCheckout = buildGateCheckout({ offer: unlimitedOffer, code: "GRAYSCAPE467", packId: "GRAYSCAPE467-OWNER-QA-PACK", firstTimeEligible: true });
+const grayWorkerCheckout = buildWorkerCheckout({ offer: unlimitedOffer, code: "GRAYSCAPE467", packId: "GRAYSCAPE467-OWNER-QA-PACK", firstTimeEligible: true });
+assert.equal(grayGateCheckout.allow_free_checkout, true);
+assert.equal(grayGateCheckout.applied, true);
+assert.equal(grayGateCheckout.adjusted_due_cents, 0);
+assert.equal(grayGateCheckout.applied_discount_cents, 1500000);
+assert.equal(grayWorkerCheckout.adjusted_due_cents, 0);
+assert.equal(grayWorkerCheckout.applied_discount_cents, grayGateCheckout.applied_discount_cents);
+
 const dataRules = JSON.parse(read("metraiyux_0s_site/data/skyemerit-rules.json"));
 assert.equal(dataRules.example.discount_cents, 154000);
 assert.equal(dataRules.first_time_pack.kaixu_credit_cents, 600);
+assert.equal(dataRules.owner_qa_pack.coupon_codes[0], "GRAYSCAPE467");
 
-assertIncludes("SkyeGateFS27/netlify/functions/skyepay-checkout.js", [
+assertIncludes("metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/skyepay-checkout.js", [
   "buildSkyeMeritCheckout",
   "allow_promotion_codes: skyeMeritCheckout?.applied ? false : true",
+  "SKYEPAY_ZERO_BALANCE_CHECKOUT_CREATED",
   "skyemerit"
 ]);
-assertIncludes("SkyeGateFS27/netlify/functions/skyepay-offers.js", ["publicSkyeMeritCatalog"]);
+assertIncludes("metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/skyepay-offers.js", ["publicSkyeMeritCatalog"]);
 assertIncludes("metraiyux_0s_site/cloudflare-saas-provisioning-worker/src/index.js", [
   "/api/saas/skyemerit/catalog",
   "/api/saas/skyemerit/preview",
   "/api/saas/skyemerit/issue",
-  "deliverSkyeMeritPack"
+  "deliverSkyeMeritPack",
+  "billing_zero_balance_confirmed",
+  "unlimited-command"
 ]);
 assertIncludes("metraiyux_0s_site/saas/skyemerit.html", [
   "SkyeMerit Wallet",
@@ -130,6 +150,11 @@ console.log(JSON.stringify({
     large: firstLarge
   },
   adjusted_checkout_cents: gateCheckout.adjusted_due_cents,
+  grayscape467: {
+    adjusted_checkout_cents: grayGateCheckout.adjusted_due_cents,
+    discount_cents: grayGateCheckout.applied_discount_cents,
+    allow_free_checkout: grayGateCheckout.allow_free_checkout
+  },
   surfaces: [
     "metraiyux_0s_site/saas/skyemerit.html",
     "metraiyux_0s_site/operator/skyemerit-admin.html",

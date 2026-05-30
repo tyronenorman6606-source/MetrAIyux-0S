@@ -1,9 +1,9 @@
 window.METRAIYUX_OBSIDIAN_GRAPH = {
-  "generated_at": "2026-05-23T08:31:38.388Z",
+  "generated_at": "2026-05-28T22:50:42.277Z",
   "vault": "obsidian-vault",
-  "node_count": 148,
-  "link_count": 213,
-  "notes": 18,
+  "node_count": 165,
+  "link_count": 235,
+  "notes": 19,
   "nodes": [
     {
       "id": "note:00-command-center/0S Command Runner.md",
@@ -18,6 +18,22 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
         "commands",
         "operator",
         "obsidian"
+      ]
+    },
+    {
+      "id": "note:00-command-center/0S Core Surface Test Map.md",
+      "label": "0S Core Surface Test Map",
+      "type": "note",
+      "group": "command",
+      "brain": true,
+      "path": "obsidian-vault/00-command-center/0S Core Surface Test Map.md",
+      "size": 16,
+      "tags": [
+        "metraiyux",
+        "0s",
+        "proof",
+        "neural-map",
+        "gate"
       ]
     },
     {
@@ -339,6 +355,181 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
+      "id": "tag:0s",
+      "label": "#0s",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "0s"
+      ]
+    },
+    {
+      "id": "tag:proof",
+      "label": "#proof",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "proof"
+      ]
+    },
+    {
+      "id": "tag:neural-map",
+      "label": "#neural-map",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "neural-map"
+      ]
+    },
+    {
+      "id": "tag:gate",
+      "label": "#gate",
+      "type": "tag",
+      "group": "tag",
+      "size": 13,
+      "tags": [
+        "gate"
+      ]
+    },
+    {
+      "id": "source:metraiyux-0s-site-docs-0s-core-surface-test-map-2026-05-28-md",
+      "label": "docs/0S_CORE_SURFACE_TEST_MAP_2026-05-28.md",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/docs/0S_CORE_SURFACE_TEST_MAP_2026-05-28.md",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:test-artifacts-0s-core-surface-map-0s-core-surface-map-latest-json",
+      "label": "0s-core-surface-map/0s-core-surface-map-latest.json",
+      "type": "source",
+      "group": "source",
+      "path": "test-artifacts/0s-core-surface-map/0s-core-surface-map-latest.json",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-cloudflare-worker-js",
+      "label": "cloudflare/worker.js",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/cloudflare/worker.js",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:tools-skyerunners-mjs",
+      "label": "tools/skyerunners.mjs",
+      "type": "source",
+      "group": "source",
+      "path": "tools/skyerunners.mjs",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-skyemusicnexus",
+      "label": "metraiyux_0s_site/SkyeMusicNexus",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/SkyeMusicNexus",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-live-skyemail",
+      "label": "live/SkyeMail",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/live/SkyeMail",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-relay13-core-v1-7-connectlog-operator-proof",
+      "label": "metraiyux_0s_site/relay13-core-v1.7-connectlog-operator-proof",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/relay13-core-v1.7-connectlog-operator-proof",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-connectlog-v7-7-relay13-operator-proof",
+      "label": "metraiyux_0s_site/connectlog-v7.7-relay13-operator-proof",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/connectlog-v7.7-relay13-operator-proof",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-signinpro",
+      "label": "metraiyux_0s_site/signinpro",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/signinpro",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-signin-pro",
+      "label": "metraiyux_0s_site/signin-pro",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/signin-pro",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-northstar",
+      "label": "metraiyux_0s_site/northstar",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/northstar",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-ascension",
+      "label": "metraiyux_0s_site/ascension",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/ascension",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-branch-expansion",
+      "label": "metraiyux_0s_site/branch-expansion",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/branch-expansion",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-government",
+      "label": "metraiyux_0s_site/government",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/government",
+      "size": 10,
+      "tags": []
+    },
+    {
+      "id": "source:metraiyux-0s-site-saas",
+      "label": "metraiyux_0s_site/saas",
+      "type": "source",
+      "group": "source",
+      "path": "metraiyux_0s_site/saas",
+      "size": 10,
+      "tags": []
+    },
+    {
       "id": "tag:handoff",
       "label": "#handoff",
       "type": "tag",
@@ -494,15 +685,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "type": "source",
       "group": "source",
       "path": "metraiyux_0s_site/brain/skyerunners.json",
-      "size": 10,
-      "tags": []
-    },
-    {
-      "id": "source:tools-skyerunners-mjs",
-      "label": "tools/skyerunners.mjs",
-      "type": "source",
-      "group": "source",
-      "path": "tools/skyerunners.mjs",
       "size": 10,
       "tags": []
     },
@@ -770,16 +952,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "path": "docs/functions-endpoints-map.json",
       "size": 10,
       "tags": []
-    },
-    {
-      "id": "tag:neural-map",
-      "label": "#neural-map",
-      "type": "tag",
-      "group": "tag",
-      "size": 13,
-      "tags": [
-        "neural-map"
-      ]
     },
     {
       "id": "source:obsidian-vault-neural-map-index-html",
@@ -1264,16 +1436,6 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
       "tags": []
     },
     {
-      "id": "tag:proof",
-      "label": "#proof",
-      "type": "tag",
-      "group": "tag",
-      "size": 13,
-      "tags": [
-        "proof"
-      ]
-    },
-    {
       "id": "tag:receipts",
       "label": "#receipts",
       "type": "tag",
@@ -1519,6 +1681,138 @@ window.METRAIYUX_OBSIDIAN_GRAPH = {
     {
       "source": "note:00-command-center/0S Command Runner.md",
       "target": "source:ops-0s-command-registry-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "hub:metraiyux",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "vault",
+      "strength": 1.8
+    },
+    {
+      "source": "folder:command",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "folder",
+      "strength": 1.2
+    },
+    {
+      "source": "tag:metraiyux",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:0s",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:proof",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:neural-map",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "tag:gate",
+      "target": "note:00-command-center/0S Core Surface Test Map.md",
+      "type": "tag",
+      "strength": 1.5
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-docs-0s-core-surface-test-map-2026-05-28-md",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:test-artifacts-0s-core-surface-map-0s-core-surface-map-latest-json",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-cloudflare-worker-js",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:tools-skyerunners-mjs",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-skyemusicnexus",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-live-skyemail",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-relay13-core-v1-7-connectlog-operator-proof",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-connectlog-v7-7-relay13-operator-proof",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-signinpro",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-signin-pro",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-northstar",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-ascension",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-branch-expansion",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-government",
+      "type": "source",
+      "strength": 0.8
+    },
+    {
+      "source": "note:00-command-center/0S Core Surface Test Map.md",
+      "target": "source:metraiyux-0s-site-saas",
       "type": "source",
       "strength": 0.8
     },

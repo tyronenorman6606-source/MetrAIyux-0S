@@ -170,7 +170,12 @@ export function createActionRegistry({providerRegistry, receipts=null}={}){
     let result;
     if (providerId === 'stripe' || /checkout\.create|create_checkout|checkout/.test(action)) result = await adapter.checkoutCreate({amountCents:input.amountCents || 1000, productName:input.productName || input.title || `Provider action ${action}`, workflowId:ctx.workflow?.id});
     else if (providerId === 'resend' || /email\.send|send_email|mail/.test(action)) result = await adapter.emailSend({to:input.to || input.email || process.env.OPERATOR_EMAIL || 'ops@local.test', subject:input.subject || `Provider action ${action}`, text:input.text || input.body || `Action ${action} completed.`});
-    else if (providerId === 'twilio' || /sms\.send|message|sms/.test(action)) result = await adapter.smsSend({to:input.phone || input.to, body:input.body || input.text || `Action ${action} completed.`});
+    else if (providerId === 'twilio') {
+      if (/sms\.send|message|sms/.test(action)) result = await adapter.smsSend({to:input.phone || input.to, body:input.body || input.text || `Action ${action} completed.`});
+      else if (/voice\.call|voice|call/.test(action)) result = {ok:false, provider:'twilio', action, reason:'voice_call_not_implemented'};
+      else result = {ok:false, provider:'twilio', action, reason:'unsupported_twilio_action'};
+    }
+    else if (/sms\.send|message|sms/.test(action)) result = await adapter.smsSend({to:input.phone || input.to, body:input.body || input.text || `Action ${action} completed.`});
     else if (providerId === 'openai_gateway' || /ai\.chat|summary|score|classify|chat/.test(action)) result = await adapter.chat({prompt:input.prompt || input.text || `Run ${action} with ${JSON.stringify(input).slice(0,1000)}`, maxTokens:input.maxTokens || 600});
     else if (providerId === 'neon' || /db\.query|sql|query|crm/.test(action)) result = await adapter.query({sql:input.sql || `select '${sha256(JSON.stringify(input)).slice(0,12)}' as provider_action`, params:input.params || []});
     else if (providerId === 'google_ops' && /calendar|book/.test(action)) result = await adapter.calendarBook({summary:input.summary || `Provider action ${action}`, attendees:input.attendees || []});

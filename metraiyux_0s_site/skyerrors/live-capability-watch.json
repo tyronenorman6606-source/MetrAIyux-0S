@@ -1,0 +1,548 @@
+{
+  "ok": true,
+  "schema": "metraiyux.0s.live-capability-watch.receipt.v1",
+  "generated_at": "2026-05-30T19:11:16.667Z",
+  "profile": "core",
+  "base_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  "no_browser_proof_run": true,
+  "owner_manual_live_check": true,
+  "summary": {
+    "total": 2,
+    "pass": 2,
+    "warn": 0,
+    "fail": 0,
+    "skipped": 0,
+    "blocked": 0,
+    "live_http_or_api": 0,
+    "local_behavior": 1,
+    "real_action_observed": 2,
+    "failed_ids": [],
+    "warning_ids": []
+  },
+  "health_watch": {
+    "schema": "metraiyux.0s.health-watch-rollup.v1",
+    "generated_at": "2026-05-30T19:11:16.726Z",
+    "source": "tools/0s-live-capability-watch.mjs",
+    "recent_receipts": [
+      {
+        "id": "operating-proof-matrix",
+        "label": "0S operating proof matrix",
+        "path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.operating-proof-matrix.receipt.v1",
+        "generated_at": "2026-05-30T19:06:39.277Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "mounted route gate checks and behavior matrix",
+        "summary": {
+          "summary": {},
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 22,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "truth-ledger",
+        "label": "0S truth ledger",
+        "path": "test-artifacts/0s-truth-ledger/0s-truth-ledger-latest.json",
+        "exists": true,
+        "ok": false,
+        "status": "attention",
+        "schema": "metraiyux.0s.truth-ledger.v1",
+        "generated_at": "2026-05-30T19:06:55.274Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "computed workflow truth and external boundary inventory",
+        "summary": {
+          "summary": {
+            "total": 22,
+            "built": 20,
+            "partial": 1,
+            "failing_proof": 1,
+            "unproven": 0,
+            "not_built_or_untracked": 0,
+            "not_tracked": 0,
+            "provider_or_real_world_gated": 11,
+            "external_boundaries": 11,
+            "p0_not_built": [
+              "per-app-operating-proof-matrix"
+            ],
+            "p1_not_built": [
+              "command-bridge-all-lanes"
+            ]
+          },
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "operating-depth-closeout",
+        "label": "0S operating depth closeout",
+        "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.operating-depth-closeout-live-http.v2",
+        "generated_at": "2026-05-29T16:15:56.235Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "cross-lane closeout and Command Bridge readback",
+        "summary": {
+          "summary": {
+            "workflows_with_create": 13,
+            "workflows_with_read": 13,
+            "workflows_with_update_or_closeout": 13,
+            "workflows_with_receipt_readback": 13,
+            "workflows_with_stress": 13,
+            "workflows_with_founder_command_visible": 13,
+            "workflows_missing_update_or_closeout": [],
+            "external_boundary_count": 14,
+            "closeout_operation_failures": []
+          },
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "provider-runtime-smoke",
+        "label": "0S provider runtime smoke",
+        "path": "test-artifacts/0s-provider-runtime/0s-provider-runtime-smoke-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.provider-runtime-smoke.v1",
+        "generated_at": "2026-05-30T19:11:16.069Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "shared provider runtime sandbox receipt behavior",
+        "summary": {
+          "summary": {
+            "total": 73,
+            "passed": 73,
+            "failed": 0,
+            "provider_runtime_scope": "whole-0s",
+            "founder_command_role": "owner cockpit only"
+          },
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 73,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "provider-runtime-stress",
+        "label": "0S provider runtime stress",
+        "path": "test-artifacts/0s-provider-runtime/0s-provider-runtime-stress-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.provider-runtime-stress.v1",
+        "generated_at": "2026-05-30T19:10:36.583Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "provider runtime stress and retry-safe behavior",
+        "summary": {
+          "summary": {},
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "content-engine-provider-dispatch",
+        "label": "Content Engine provider dispatch",
+        "path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.content-engine-provider-dispatch-live-http.v1",
+        "generated_at": "2026-05-29T15:19:24.093Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "approval-gated dispatch with provider boundary receipts",
+        "summary": {
+          "summary": {},
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 9,
+          "stress_ok": true,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "valuation-deck-alignment",
+        "label": "Valuation deck alignment",
+        "path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+        "exists": true,
+        "ok": true,
+        "status": "ok",
+        "schema": "metraiyux.0s.valuation-deck-alignment.v1",
+        "generated_at": "2026-05-29T16:29:27.464Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "public claims aligned to truth ledger and operating matrix",
+        "summary": {
+          "summary": {},
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [],
+          "failures": [],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      },
+      {
+        "id": "production-closure",
+        "label": "0S production closure",
+        "path": "test-artifacts/0s-production-closure/0s-production-closure-latest.json",
+        "exists": true,
+        "ok": false,
+        "status": "attention",
+        "schema": "metraiyux.0s.production-closure-live-http.v1",
+        "generated_at": "2026-05-30T19:05:11.952Z",
+        "no_browser_proof_run": true,
+        "owner_manual_live_check": true,
+        "proves": "live gate, truth ledger, SkyErrors watch, and deploy readiness",
+        "summary": {
+          "summary": {},
+          "route_failures": 0,
+          "gate_failures": 0,
+          "authenticated_failures": 0,
+          "behavior_green": 0,
+          "behavior_yellow": 0,
+          "behavior_red": 0,
+          "p0_not_green": [],
+          "warnings": [
+            "Live truth ledger generated_at differs from the latest local truth ledger; summary parity is the production readiness signal.",
+            "Live SkyErrors capability watch does not include the health_watch receipt/boundary rollup; regenerate the watch and redeploy proof assets."
+          ],
+          "failures": [
+            "Latest Worker deploy receipt is missing or not ok."
+          ],
+          "checks": 0,
+          "stress_ok": null,
+          "stress_requests": 0,
+          "live_provider_send_attempted": false,
+          "provider_call_made": false
+        }
+      }
+    ],
+    "external_boundaries": [
+      {
+        "id": "llc-to-0s-business-workflow",
+        "priority": "P0",
+        "surface": "SovereignDocs LLC formation prep into full 0S business workspace",
+        "receipt_path": "test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Actual state filing, attorney review, EIN/tax setup, contractor completion/payout, and SkyeNet production publish remain external/provider-bound until real receipts are attached."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "admin-brain-automation",
+        "priority": "P0",
+        "surface": "Admin Brain / Approval Inbox / automation queue",
+        "receipt_path": "test-artifacts/admin-brain-native/admin-brain-native-live-http-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Twilio live SMS remains consent-gated; the current proof verifies refusal without explicit SMS opt-in and does not send an SMS."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "skyeroutex-workforce-depth",
+        "priority": "P1",
+        "surface": "SkyRouteX workforce operations",
+        "receipt_path": "test-artifacts/0s-workflow-rollups/skyeroutex-workforce-depth-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "External notification, background-check, and payout provider execution remains owner-approved/credential-gated; the internal no-payout workforce lifecycle and legal-review job closeout are proven."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "skymail-company-crm-lane",
+        "priority": "P1",
+        "surface": "SkyeMail company mail lane",
+        "receipt_path": "test-artifacts/0s-workflow-rollups/skymail-company-crm-lane-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Live external mailbox/provider sends, cooldowns, and delivery failures remain provider-credential-gated; the owner-gated handoff ledger and CRM closeout are proven without sending external email."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "skyenet-full-runtime",
+        "priority": "P1",
+        "surface": "SkyeNet deploy and app runtime lane",
+        "receipt_path": "test-artifacts/0s-workflow-rollups/skyenet-full-runtime-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Unrestricted arbitrary uploaded function execution remains capped/owner-approved; SkyeNet’s proven lane is static deploy, source custody, env registry, source transfer, observability/cost/status readback, and approved managed runtime controls."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "sovereigndocs-client-packet",
+        "priority": "P1",
+        "surface": "SovereignDocs client/case/document workflow",
+        "receipt_path": "test-artifacts/0s-workflow-rollups/sovereigndocs-client-packet-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Government filing and legal advice remain external/owner-approved boundaries; the 0S creates, reviews, queues, and tracks the client packet and legal review job without claiming official filing."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "skyepay-commerce-financial-ops",
+        "priority": "P1",
+        "surface": "SkyeCommerce / SkyePay order, receivable, refund, payout review",
+        "receipt_path": "test-artifacts/skyemusicnexus-skyepay-loop-live-direct/latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "External payout and refund rails remain provider/credential/owner-approved boundaries; current proof closes internal order, receivable, split, settlement, and no-external-payout disbursement review."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "relay13-communications-center",
+        "priority": "P1",
+        "surface": "Relay13 / ConnectLog communications",
+        "receipt_path": "test-artifacts/connectlog-relay13-production-proof.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "External Relay13 provider/admin bridge execution remains credential-gated where PLATFORM_ADMIN_TOKEN is absent; the shared-gate Founder Command conversation and CRM closeout are proven."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "content-engine-provider-dispatch",
+        "priority": "P1",
+        "surface": "Content Engine / social/provider dispatch",
+        "receipt_path": "test-artifacts/content-engine-provider-dispatch/content-engine-provider-dispatch-live-http-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "External social/email/site provider publishing intentionally remains provider_call_made:false until owner-approved connector credentials and rollback receipts are attached."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "external-provider-hardening",
+        "priority": "P2",
+        "surface": "Provider credentials, throttles, delivery, payout, calendar, social, background services",
+        "receipt_path": "test-artifacts/0s-workflow-rollups/external-provider-hardening-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Customer-impacting live sends, calls, payouts, refunds, social publishing, calendar actions, and background checks remain owner-approved/provider-credential-gated; provider runtime smoke/stress and admin/content receipts prove safe sandbox, retry, dead-letter, and boundary behavior."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      },
+      {
+        "id": "valuation-deck-alignment",
+        "priority": "P2",
+        "surface": "Valuation, deck, proof map, and diligence truth",
+        "receipt_path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
+        "receipt_ok": true,
+        "computed_truth": "built",
+        "boundaries": [
+          "Valuation remains directional internal diligence, not a formal appraisal or ARR valuation; customer revenue, retention, churn, CAC, and paid-contract evidence remain commercial diligence boundaries."
+        ],
+        "next_step": "Keep proof fresh and re-run when the lane changes."
+      }
+    ],
+    "summary": {
+      "total_receipts": 8,
+      "ok_receipts": 6,
+      "failed_receipts": 2,
+      "missing_receipts": 0,
+      "external_boundary_workflows": 11,
+      "route_failures": 0,
+      "behavior_red": 0,
+      "production_closure_ok": false,
+      "provider_runtime_smoke_ok": true,
+      "live_provider_send_attempted": false,
+      "no_browser_proof_run": true,
+      "owner_manual_live_check": true
+    },
+    "failed_receipts": [
+      {
+        "id": "truth-ledger",
+        "path": "test-artifacts/0s-truth-ledger/0s-truth-ledger-latest.json",
+        "generated_at": "2026-05-30T19:06:55.274Z",
+        "failures": [],
+        "warnings": []
+      },
+      {
+        "id": "production-closure",
+        "path": "test-artifacts/0s-production-closure/0s-production-closure-latest.json",
+        "generated_at": "2026-05-30T19:05:11.952Z",
+        "failures": [
+          "Latest Worker deploy receipt is missing or not ok."
+        ],
+        "warnings": [
+          "Live truth ledger generated_at differs from the latest local truth ledger; summary parity is the production readiness signal.",
+          "Live SkyErrors capability watch does not include the health_watch receipt/boundary rollup; regenerate the watch and redeploy proof assets."
+        ]
+      }
+    ],
+    "missing_receipts": [],
+    "consumption": {
+      "skyerrors_health_api": "/api/skyerrors/health",
+      "skyerrors_watch_api": "/api/skyerrors/watch",
+      "production_closure_check": "tools/0s-production-closure-live-http.mjs",
+      "public_surface": "metraiyux_0s_site/skyerrors/live-capability-watch.json"
+    },
+    "boundary_rule": "External provider, customer-impacting, destructive, browser, billing, deployment, legal/government, payout/refund, and credential actions remain boundaries unless an owner-approved non-browser receipt explicitly proves execution."
+  },
+  "policy": {
+    "shared_gate_only": true,
+    "no_new_auth_lane": true,
+    "browser_proof_disabled": true,
+    "provider_spend_and_destructive_actions_gated": true,
+    "evidence_rule": "A check is marked live_action_observed only when an existing non-browser command actually executed and returned output; browser-disabled and provider-gated lanes are reported as boundaries, not proof."
+  },
+  "skyerrors_push": {
+    "attempted": false,
+    "ok": false,
+    "skipped": true,
+    "reason": "push_not_requested"
+  },
+  "catalog": {
+    "script_count": 245,
+    "relevant_count": 138,
+    "missing_references": [],
+    "browser_disabled_count": 33,
+    "live_http_or_api_count": 20,
+    "mutation_or_provider_gated_count": 3
+  },
+  "checks": [
+    {
+      "id": "skyerrors-helper-k4i",
+      "system": "skyerrors",
+      "label": "SkyErrors + Helper K4i",
+      "script": "0s:helper-k4i:proof",
+      "status": "pass",
+      "ok": true,
+      "evidence_level": "local_worker_api",
+      "classification": "local_behavior",
+      "live_action_observed": true,
+      "real_time_observed": true,
+      "duration_ms": 1797.49,
+      "started_at": "2026-05-30T19:11:12.710Z",
+      "finished_at": "2026-05-30T19:11:14.508Z",
+      "claim": "SkyErrors captures gated events and Helper K4i records health scans into KV/CitadelDB-compatible stores.",
+      "observation": "Runs Worker route tests that login through the shared gate, post SkyErrors events, scan Helper K4i health, and read receipts back.",
+      "boundary": "Uses in-memory test bindings, not production Cloudflare storage unless live API proof is selected.",
+      "receipt_hints": [],
+      "warning": null,
+      "failure_reason": ""
+    },
+    {
+      "id": "provider-runtime-closure",
+      "system": "provider-runtime",
+      "label": "0S Provider Runtime Closure",
+      "script": "0s:provider-runtime:smoke",
+      "status": "pass",
+      "ok": true,
+      "evidence_level": "provider_runtime_sandbox",
+      "classification": "smoke",
+      "live_action_observed": true,
+      "real_time_observed": true,
+      "duration_ms": 2157.77,
+      "started_at": "2026-05-30T19:11:14.509Z",
+      "finished_at": "2026-05-30T19:11:16.667Z",
+      "claim": "The whole-0S provider runtime can execute its shared provider action catalog through sandbox receipts without app-local provider auth lanes.",
+      "observation": "Runs the provider-runtime smoke suite across Twilio, Resend, Stripe, PayPal, UPS, catalog, DNS, AI, calendar, SkyeNet, Relay13, SkyeMail, storage, and commerce-http actions.",
+      "boundary": "Provider spend remains owner-approved; smoke uses sandbox/live-gated provider receipts and does not force real sends, calls, payouts, or external publishing.",
+      "receipt_hints": [],
+      "warning": null,
+      "failure_reason": ""
+    }
+  ]
+}

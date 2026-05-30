@@ -18,66 +18,34 @@
 
   window.createSkyGateAuth = function createSkyGateAuth(config) {
     const options = config || {};
-    const storageKey = clean(options.storageKey || 'skygate_token');
+    const storageKey = clean(options.storageKey || 'MetrAIyuxGateBridge');
     const sessionPath = clean(options.sessionPath || defaultSessionPath());
-
-    function readStorage(storage) {
-      try {
-        return normalizeToken(storage.getItem(storageKey));
-      } catch {
-        return '';
-      }
-    }
-
-    function writeStorage(storage, token) {
-      try {
-        if (token) storage.setItem(storageKey, token);
-        else storage.removeItem(storageKey);
-      } catch {}
-    }
+    let memoryToken = '';
 
     function getToken() {
-      const sessionToken = readStorage(window.sessionStorage);
-      if (sessionToken) return sessionToken;
+      if (memoryToken) return memoryToken;
       const musicGateSession = window.SkyeMusicGate && typeof window.SkyeMusicGate.session === 'function'
         ? window.SkyeMusicGate.session()
         : null;
       const musicGateToken = normalizeToken(musicGateSession && musicGateSession.token);
-      if (musicGateToken) {
-        writeStorage(window.sessionStorage, musicGateToken);
-        return musicGateToken;
-      }
-      const legacyToken = readStorage(window.localStorage);
-      if (legacyToken) {
-        writeStorage(window.sessionStorage, legacyToken);
-        writeStorage(window.localStorage, '');
-      }
-      return legacyToken;
+      if (musicGateToken) return musicGateToken;
+      const gateBridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+      const bridgeSession = gateBridge && typeof gateBridge.current === 'function' ? gateBridge.current() : null;
+      return normalizeToken(bridgeSession && bridgeSession.token);
     }
 
     function setToken(value) {
       const token = normalizeToken(value);
-      writeStorage(window.sessionStorage, token);
-      writeStorage(window.localStorage, '');
+      memoryToken = token;
+      if (token && window.SkyeMusicGate && typeof window.SkyeMusicGate.persist === 'function') {
+        window.SkyeMusicGate.persist({ token, source: '0s-gate-session', client: 'MetrAIyux 0S' });
+      }
       return token;
     }
 
     function clearToken() {
-      return setToken('');
-    }
-
-    async function bootstrapLocalProof(payload) {
-      const response = await window.fetch(sessionPath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload || {}),
-      });
-      const data = await response.json().catch(function parseFailure() { return {}; });
-      if (!response.ok || !data.token) {
-        throw new Error(data.error || 'Local proof session bootstrap failed.');
-      }
-      setToken(data.token);
-      return data;
+      memoryToken = '';
+      return '';
     }
 
     async function getSessionInfo() {
@@ -89,27 +57,6 @@
         headers,
       });
       return response.json().catch(function parseFailure() { return {}; });
-    }
-
-    async function loginLocalOperator(credentials) {
-      const payload = credentials || {};
-      const response = await window.fetch(sessionPath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grantType: 'password',
-          email: clean(payload.email || payload.username),
-          password: clean(payload.password),
-          subject: clean(payload.subject),
-          role: clean(payload.role),
-        }),
-      });
-      const data = await response.json().catch(function parseFailure() { return {}; });
-      if (!response.ok || !data.token) {
-        throw new Error(data.error || 'Local operator login failed.');
-      }
-      setToken(data.token);
-      return data;
     }
 
     async function authFetch(url, init, authOptions) {
@@ -152,8 +99,6 @@
       clearToken,
       hasToken: function hasToken() { return Boolean(getToken()); },
       getSessionInfo,
-      bootstrapLocalProof,
-      loginLocalOperator,
       logoutSession,
       fetch: authFetch,
     };

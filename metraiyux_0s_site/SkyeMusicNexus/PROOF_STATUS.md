@@ -8,13 +8,13 @@
 
 The deployed app in `public/` is split into a roomed music platform:
 
-- `public/index.html` — Platform Dashboard with room map, rates posture, Live Constellation, and Proof Chain.
+- `public/index.html` — Artist Workspace with room map, rates posture, Live Constellation, and Proof Chain.
 - `public/create.html` — Create Hub with BandLab plus Spotify plus Instagram launch cards and room navigation.
 - `public/daw.html` — first-party fullscreen SkyeMusicNexus DAW.
 - `public/nexus-daw.js` / `public/nexus-daw.css` — native DAW transport, timeline, tracks, mixer, pads, keys, physical keyboard, region editing, loop/metronome, sound packs, mic/Web MIDI hooks, browser WAV mixdown, save, and export UI.
 - `public/stems.html` — Stem Vault with local stem staging, sample pack rail, notes, and gated project save handoff.
 - `public/exports.html` — Export Forge with project packet editor, JSON export, gated export manifest queue, and Release Forge handoff line.
-- `public/discover.html` — Discover surface with playlist rail, track queue, featured drops, and artist discovery cards.
+- `public/discover.html` — Playlists + Charts surface with overall Nexus queue, trending, new drops, genre charts, artist movement, playable storefront tracks, and browser-local user playlists.
 - `public/feed.html` — Social Feed with story rail, post composer, community wall, and release/social cards.
 - `public/upload.html`, `public/player.html`, `public/releases.html`, `public/rights.html`, `public/exchange.html`, `public/admin.html` — existing gated music platform rooms.
 
@@ -41,7 +41,7 @@ npm run smoke
 
 ## What The Proof Verifies
 
-- the platform dashboard exposes the split platform room map
+- the artist workspace exposes the split platform room map
 - the Create Hub routes to DAW, stems, export, discover, feed, upload, release, rights, and exchange rooms
 - the DAW is native Nexus code and contains no iframe
 - the DAW exposes transport, BPM/key controls, arrangement, tracks, mixer, pads, keys, physical keyboard notes, audio import/decode/preview, region edit tools, undo/redo, loop/metronome, sound-pack insertion, browser WAV mixdown, project save, and export manifest controls

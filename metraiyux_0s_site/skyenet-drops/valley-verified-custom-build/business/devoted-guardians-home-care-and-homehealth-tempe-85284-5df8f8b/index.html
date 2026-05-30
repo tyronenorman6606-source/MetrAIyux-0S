@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devoted Guardians Home Care &amp; Homehealth | Tempe Home Care / Home Health</title>
+  <meta name="description" content="Devoted Guardians Home Care &amp; Homehealth is a Valley Verified home care / home health profile at 1705 W. Ruby Drive #107, Tempe, AZ 85284, highlighting.">
+  <style>
+    :root {
+      --ink: #2b2925;
+      --home: #f6eadf;
+      --blue: #466f7c;
+      --rose: #b9636f;
+      --leaf: #71895d;
+      --card: #fffdf8;
+      --line: rgba(43,41,37,.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(113,137,93,.16), transparent 36%),
+        var(--home);
+    }
+    a { color: inherit; }
+    .page {
+      width: min(1160px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: clamp(28px, 6vw, 70px) 0;
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
+      gap: 22px;
+      align-items: stretch;
+    }
+    .headline {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: clamp(28px, 6vw, 70px);
+      position: relative;
+      overflow: hidden;
+    }
+    .headline:after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -70px;
+      width: 220px;
+      height: 220px;
+      border: 28px solid rgba(185,99,111,.16);
+      border-radius: 50%;
+    }
+    .eyebrow {
+      margin: 0 0 20px;
+      color: var(--rose);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 7vw, 88px);
+      line-height: .96;
+      letter-spacing: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .lead {
+      max-width: 690px;
+      margin: 26px 0 0;
+      color: #5d5851;
+      font-size: 21px;
+      line-height: 1.52;
+      position: relative;
+      z-index: 1;
+    }
+    .contact {
+      background: var(--blue);
+      color: #fffaf2;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 420px;
+    }
+    .contact h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .contact p {
+      margin: 16px 0 0;
+      line-height: 1.5;
+    }
+    .contact a.button {
+      display: inline-block;
+      margin-top: 24px;
+      background: #fffaf2;
+      color: var(--blue);
+      padding: 13px 16px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .care-grid {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: rgba(255,253,248,.82);
+      padding: 22px;
+      min-height: 150px;
+    }
+    .panel b {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--leaf);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 12px;
+    }
+    .panel p {
+      margin: 0;
+      line-height: 1.55;
+    }
+    @media (max-width: 840px) {
+      .hero, .care-grid { grid-template-columns: 1fr; }
+      .contact { min-height: auto; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="hero" aria-labelledby="business-name">
+      <div class="headline">
+        <p class="eyebrow">Valley Verified profile</p>
+        <h1 id="business-name">Devoted Guardians Home Care &amp; Homehealth</h1>
+        <p class="lead">Devoted Guardians Home Care &amp; Homehealth gives patients, families seeking care, and local Phoenix-area residents a practical Tempe connection for Home Care / Home Health, Health Care / Home Care / Home Health, Health Care, and Home care provider / public phone listed. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+      </div>
+      <aside class="contact">
+        <div>
+          <h2>Contact</h2>
+          <p><a href="tel:+14809993012">(480) 999-3012</a></p>
+          <p>1705 W. Ruby Drive #107<br>Tempe, AZ 85284</p>
+        </div>
+        <a class="button" href="tel:+14809993012">Call Devoted Guardians</a>
+      </aside>
+    </section>
+    <section class="care-grid" aria-label="Local details">
+      <article class="panel">
+        <b>Category</b>
+        <p>Health And Care / Home Care / Home Health.</p>
+      </article>
+      <article class="panel">
+        <b>Language</b>
+        <p>English.</p>
+      </article>
+      <article class="panel">
+        <b>Pricing</b>
+        <p>Contact directly for availability, scope, and pricing.</p>
+      </article>
+      <article class="panel">
+        <b>Profile date</b>
+        <p>Directory profile last reviewed May 19, 2026 from a public Phoenix Chamber health care listing.</p>
+      </article>
+      <article class="panel">
+        <b>Listing type</b>
+        <p>Home care provider / public phone listed.</p>
+      </article>
+      <article class="panel">
+        <b>City</b>
+        <p>Tempe, AZ 85284.</p>
+      </article>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-devoted-guardians-home-care-and-homehealth-tempe-85284-5df8f8b">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-devoted-guardians-home-care-and-homehealth-tempe-85284-5df8f8b">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Devoted Guardians Home Care &amp; Homehealth earns this Valley Verified placement because public business evidence connects a real home care / home health operation to 1705 W. Ruby Drive #107, Tempe, AZ 85284 and (480) 999-3012. Greater Phoenix Chamber directory evidence supports this local profile. For patients, families seeking care, and local Phoenix-area residents, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Home Care / Home Health, Health Care / Home Care / Home Health, Health Care, and Home care provider / public phone listed</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>patients, families seeking care, and local Phoenix-area residents</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>1705 W. Ruby Drive #107, Tempe, AZ 85284; (480) 999-3012</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

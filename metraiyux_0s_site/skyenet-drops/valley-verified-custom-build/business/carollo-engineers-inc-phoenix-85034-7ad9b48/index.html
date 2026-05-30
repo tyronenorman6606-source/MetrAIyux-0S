@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carollo Engineers, Inc. | Valley Verified Phoenix, AZ 85034</title>
+  <meta name="description" content="Carollo Engineers, Inc.: Environmental engineering in Phoenix, AZ 85034. Local details, audience fit, trust signals, and Valley Verified reasoning.">
+  <style>
+    :root {
+      --deep: #06354a;
+      --water: #0d8ea6;
+      --sky: #cceef2;
+      --paper: #f6fbf8;
+      --moss: #7d8d4f;
+      --ink: #12313b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--paper);
+    }
+
+    .waterline {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 78% 16%, rgba(13, 142, 166, 0.2), transparent 22%),
+        linear-gradient(118deg, rgba(6, 53, 74, 0.95) 0 42%, transparent 42%),
+        linear-gradient(0deg, rgba(13, 142, 166, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6, 53, 74, 0.08) 1px, transparent 1px),
+        var(--paper);
+      background-size: auto, auto, 34px 34px, 34px 34px, auto;
+    }
+
+    header {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 22px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      color: white;
+    }
+
+    .badge {
+      padding: 9px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .hero {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 52px 0 56px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(300px, 1.05fr);
+      gap: 44px;
+      align-items: center;
+    }
+
+    h1 {
+      margin: 0;
+      color: white;
+      font-size: clamp(2.8rem, 7vw, 6.4rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 560px;
+      margin: 26px 0 0;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 1.1rem;
+      line-height: 1.65;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 0 17px;
+      border-radius: 6px;
+      background: var(--sky);
+      color: var(--deep);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.dark {
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .diagram {
+      position: relative;
+      min-height: 430px;
+      padding: 28px;
+      border: 1px solid rgba(6, 53, 74, 0.16);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(204, 238, 242, 0.92)),
+        repeating-linear-gradient(90deg, transparent 0 32px, rgba(13, 142, 166, 0.2) 32px 34px);
+      box-shadow: 0 22px 60px rgba(6, 53, 74, 0.2);
+    }
+
+    .node {
+      position: absolute;
+      width: 132px;
+      min-height: 96px;
+      padding: 14px;
+      border: 2px solid var(--water);
+      border-radius: 8px;
+      background: white;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .node small {
+      display: block;
+      margin-top: 8px;
+      color: var(--moss);
+      font-weight: 800;
+    }
+
+    .node.one {
+      top: 38px;
+      left: 32px;
+    }
+
+    .node.two {
+      top: 150px;
+      right: 46px;
+    }
+
+    .node.three {
+      bottom: 44px;
+      left: 46%;
+      transform: translateX(-50%);
+    }
+
+    .pipe {
+      position: absolute;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--water);
+      transform-origin: left center;
+    }
+
+    .pipe.a {
+      top: 132px;
+      left: 136px;
+      width: 280px;
+      transform: rotate(18deg);
+    }
+
+    .pipe.b {
+      top: 250px;
+      left: 210px;
+      width: 240px;
+      transform: rotate(-28deg);
+    }
+
+    .pipe.c {
+      top: 298px;
+      right: 110px;
+      width: 230px;
+      transform: rotate(26deg);
+    }
+
+    .facts {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 0 0 56px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .fact {
+      padding: 20px;
+      border-top: 5px solid var(--water);
+      background: white;
+      box-shadow: 0 10px 26px rgba(6, 53, 74, 0.08);
+    }
+
+    .fact b {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--deep);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+    }
+
+    .fact p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    footer {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 0 0 34px;
+      color: rgba(18, 49, 59, 0.72);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 860px) {
+      .waterline {
+        background:
+          linear-gradient(180deg, rgba(6, 53, 74, 0.95) 0 58%, transparent 58%),
+          var(--paper);
+      }
+
+      header,
+      .hero {
+        color: white;
+      }
+
+      .hero,
+      .facts {
+        grid-template-columns: 1fr;
+      }
+
+      .diagram {
+        min-height: 360px;
+      }
+
+      .pipe {
+        opacity: 0.45;
+      }
+    }
+    .vv-page { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; color: var(--ink, #17201c); }
+    .vv-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0 22px; color: var(--muted, #5f6863); font-size: 14px; }
+    .vv-brand { display: flex; align-items: center; gap: 12px; min-width: 0; font-weight: 900; color: var(--accent, var(--green, #245f49)); }
+    .vv-brand img { width: 48px; height: 48px; padding: 7px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: var(--panel, var(--paper, #fff)); object-fit: contain; }
+    .vv-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 390px); gap: 32px; align-items: center; min-height: 58vh; padding: 36px 0 46px; }
+    .vv-eyebrow { display: inline-flex; width: fit-content; margin: 0 0 18px; padding: 8px 11px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-left: 5px solid var(--accent, var(--green, #245f49)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .vv-page h1 { margin: 0; max-width: 850px; font-size: clamp(42px, 7vw, 84px); line-height: .94; letter-spacing: 0; }
+    .vv-lead { max-width: 730px; margin: 24px 0 0; color: var(--muted, #47524c); font-size: clamp(18px, 2.1vw, 23px); line-height: 1.48; }
+    .vv-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .vv-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 12px 17px; border: 1px solid var(--accent, var(--green, #245f49)); border-radius: 8px; text-decoration: none; font-weight: 900; }
+    .vv-button.primary { background: var(--accent, var(--green, #245f49)); color: #fff; }
+    .vv-button.secondary { background: rgba(255,255,255,.78); color: var(--accent, var(--green, #245f49)); }
+    .vv-card, .vv-panel { border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.86); box-shadow: 0 18px 54px rgba(0,0,0,.10); }
+    .vv-card { padding: 24px; }
+    .vv-card h2, .vv-panel h2 { margin: 0 0 14px; color: var(--accent, var(--green, #245f49)); font-size: clamp(20px, 2.4vw, 28px); line-height: 1.1; letter-spacing: 0; text-transform: none; }
+    .vv-card dl { display: grid; gap: 14px; margin: 0; }
+    .vv-card dt { color: var(--muted, #5f6863); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+    .vv-card dd { margin: 4px 0 0; line-height: 1.45; }
+    .vv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 0 38px; }
+    .vv-panel { padding: 22px; }
+    .vv-panel p { margin: 10px 0 0; color: var(--muted, #47524c); line-height: 1.58; }
+    .vv-wide { grid-column: span 2; }
+    .vv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .vv-chip { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 800; }
+    .vv-footer { padding: 18px 0 0; border-top: 1px solid var(--line, rgba(0,0,0,.14)); color: var(--muted, #5f6863); font-size: 14px; }
+    @media (max-width: 840px) { .vv-top, .vv-hero, .vv-grid { display: block; } .vv-top span:last-child { display: block; margin-top: 8px; } .vv-card { margin-top: 24px; } .vv-panel { margin-bottom: 14px; } .vv-wide { grid-column: auto; } .vv-page h1 { font-size: 42px; } }
+  </style>
+</head>
+<body>
+  <main class="vv-page">
+    <header class="vv-top" aria-label="Valley Verified business heading">
+      <div class="vv-brand"><img src="assets/logo.svg" alt=""><span>Valley Verified</span></div>
+      <span>Phoenix, AZ 85034</span>
+    </header>
+
+    <section class="vv-hero" aria-labelledby="business-title">
+      <div>
+        <p class="vv-eyebrow">Environmental engineering</p>
+        <h1 id="business-title">Carollo Engineers, Inc.</h1>
+        <p class="vv-lead">Carollo Engineers, Inc. is a Phoenix environmental engineering profile for water, infrastructure, and public-sector project teams.</p>
+        <div class="vv-actions">
+          <a class="vv-button primary" href="tel:+16022639500">Call (602) 263-9500</a>
+          <a class="vv-button secondary" href="https://www.carollo.com/">Visit official website</a>
+        </div>
+      </div>
+
+      <aside class="vv-card" aria-label="Local business details">
+        <h2>Local Details</h2>
+        <dl>
+          <div><dt>Focus</dt><dd>Environmental engineering</dd></div>
+          <div><dt>Address / Area</dt><dd>4600 E. Washington St., Ste. 500, Phoenix, AZ 85034-1915</dd></div>
+          <div><dt>Phone</dt><dd><a href="tel:+16022639500">(602) 263-9500</a></dd></div>
+          <div><dt>Website</dt><dd><a href="https://www.carollo.com/">www.carollo.com</a></dd></div>
+          <div><dt>Audience</dt><dd>Relevant for municipalities, utilities, developers, environmental teams, and business clients planning complex infrastructure work in the Valley.</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="vv-grid" aria-label="Valley Verified profile sections">
+      <article class="vv-panel">
+        <h2>What They Do</h2>
+        <p>The business is listed at 4600 E. Washington St., Suite 500, with a public phone number and environmental engineering category.</p>
+        <div class="vv-tags">
+          <span class="vv-chip">Environmental engineering</span>
+          <span class="vv-chip">Water infrastructure</span>
+          <span class="vv-chip">Phoenix office</span>
+          <span class="vv-chip">Professional services</span>
+        </div>
+      </article>
+      <article class="vv-panel">
+        <h2>Trust Signals</h2>
+        <p>Carollo's official website anchors the engineering brand, and Greater Phoenix Chamber business services evidence supports the Phoenix office address, phone, and environmental engineering category.</p>
+      </article>
+      <article class="vv-panel vv-wide">
+        <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Skyes Over London says Carollo Engineers is Valley Verified because environmental engineering is mission-critical in Arizona, especially around water and infrastructure. The Phoenix office, official brand presence, and chamber evidence make this a strong professional-services listing for high-stakes local projects.</p>
+      </article>
+    </section>
+
+    <footer class="vv-footer">Carollo Engineers, Inc. | Environmental engineering | Phoenix, AZ 85034 | Valley Verified public business profile.</footer>
+  </main>
+</body>
+</html>

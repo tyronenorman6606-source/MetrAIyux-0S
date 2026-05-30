@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Athletic Republic North Phoenix | Phoenix Performance Training</title>
+  <meta name="description" content="Athletic Republic North Phoenix in Phoenix: Valley Verified business profile with researched services, local presence, audience fit, and trust signals.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #111827;
+      --muted: #4c5967;
+      --navy: #13233f;
+      --red: #d73a31;
+      --lime: #99c24d;
+      --cyan: #1ba6b8;
+      --paper: #ffffff;
+      --line: rgba(17, 24, 39,.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(120deg, rgba(215, 58, 49,.13), transparent 35%),
+        linear-gradient(300deg, rgba(27, 166, 184,.13), transparent 45%),
+        #f5f7fa;
+    }
+
+    a { color: inherit; }.page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }.top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 18px;
+      font-weight: 800;
+      color: var(--navy);
+    }.top div {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }.top img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }.hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(300px,.52fr);
+      gap: 18px;
+      align-items: stretch;
+    }.track {
+      min-height: 580px;
+      display: grid;
+      align-content: end;
+      gap: 26px;
+      padding: clamp(28px, 5vw, 58px);
+      color: #fff;
+      border-radius: 8px;
+      background:
+        linear-gradient(130deg, rgba(19, 35, 63,.96), rgba(17, 24, 39,.88)),
+        repeating-linear-gradient(100deg, rgba(255, 255, 255,.16) 0 2px, transparent 2px 46px);
+      overflow: hidden;
+      position: relative;
+    }.track::before {
+      content: "";
+      position: absolute;
+      left: -80px;
+      bottom: 80px;
+      width: 370px;
+      height: 120px;
+      border: 18px solid rgba(215, 58, 49,.46);
+      border-radius: 70px;
+      transform: rotate(-14deg);
+    }.kicker {
+      width: fit-content;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: var(--lime);
+      color: #111827;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 860px;
+      font-size: clamp(42px, 8vw, 92px);
+      line-height:.93;
+      position: relative;
+      z-index: 1;
+    }.lead {
+      margin: 0;
+      max-width: 700px;
+      color: #e3edf5;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.48;
+      position: relative;
+      z-index: 1;
+    }.side {
+      display: grid;
+      gap: 14px;
+    }.plate {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }.plate.logo {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      background: var(--red);
+    }.plate.logo img {
+      width: 128px;
+      height: 128px;
+      object-fit: contain;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+    }.plate b,.stat b {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--red);
+      font-size: 12px;
+      text-transform: uppercase;
+    }.plate a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 46px;
+      padding: 12px 15px;
+      border-radius: 7px;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    address {
+      color: var(--muted);
+      font-style: normal;
+      line-height: 1.5;
+    }.stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }.stat {
+      min-height: 126px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255,.9);
+    }.stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    @media (max-width: 900px) {.hero,.stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {.top { align-items: flex-start; flex-direction: column; }.track { min-height: 460px; padding: 26px; }
+    }.vv-proof {
+      width: min(1120px, calc(100% - 32px));
+      margin: 30px auto 56px;
+      padding: clamp(24px, 4vw, 40px);
+      border: 1px solid var(--line, rgba(17, 24, 39,.16));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.88);
+      box-shadow: 0 18px 50px rgba(17, 24, 39,.08);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink, #111827);
+    }.vv-proof-eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted, #5f6574);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.12em;
+      text-transform: uppercase;
+    }.vv-proof h2 {
+      margin: 0 0 18px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-transform: none;
+    }.vv-proof p {
+      max-width: 920px;
+      margin: 0;
+      color: var(--muted, #4b5563);
+      font-size: 1rem;
+      line-height: 1.72;
+    }.vv-proof p + p {
+      margin-top: 14px;
+    }.vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }.vv-proof-card {
+      min-height: 138px;
+      padding: 18px;
+      border: 1px solid var(--line, rgba(17, 24, 39,.14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255,.72);
+    }.vv-proof-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent, var(--leaf, var(--green, var(--magenta, #0f766e))));
+      font-size: 12px;
+      letter-spacing:.1em;
+      text-transform: uppercase;
+    }.vv-proof-card span {
+      color: var(--muted, #4b5563);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {.vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <div>
+        <img src="assets/logo.svg" alt="Athletic Republic North Phoenix profile mark">
+        <span>Valley Verified Network</span>
+      </div>
+      <span>Phoenix, AZ 85050</span>
+    </header>
+
+    <section class="hero">
+      <div class="track">
+        <div class="kicker">Fitness / Performance Training</div>
+        <h1>Athletic Republic North Phoenix</h1>
+        <p class="lead">Athletic Republic North Phoenix is a Phoenix performance-training profile for athletes, wellness clients, and appointment-based fitness customers in the Desert Ridge area.</p>
+      </div>
+
+      <aside class="side" aria-label="Contact details">
+        <div class="plate logo">
+          <img src="assets/logo.svg" alt="">
+        </div>
+        <div class="plate">
+          <b>Phone</b>
+          <a href="tel:+16147350227">(614) 735-0227</a>
+        </div>
+        <div class="plate">
+          <b>Address</b>
+          <address>20830 N. 25th Place Suite 108<br>Phoenix, AZ 85050</address>
+        </div>
+      </aside>
+    </section>
+
+    <section class="stats" aria-label="Business facts">
+      <div class="stat">
+        <b>Category</b>
+        <span>Beauty And Wellness</span>
+      </div>
+      <div class="stat">
+        <b>License Type</b>
+        <span>Personal Services</span>
+      </div>
+      <div class="stat">
+        <b>Profile Reviewed</b>
+        <span>May 19, 2026</span>
+      </div>
+    </section>
+  
+    <section class="vv-proof" aria-labelledby="vv-proof-heading">
+      <p class="vv-proof-eyebrow">Skyes Over London Review</p>
+      <h2 id="vv-proof-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Athletic Republic North Phoenix is Valley Verified because the business record gives local clients practical details: fitness and performance training, 20830 N. 25th Place Suite 108 in Phoenix, AZ 85050, and the listed phone number (614) 735-0227.</p>
+      <p>Skyes Over London includes the page for residents and training clients who need a real local address, service category, and phone route before making a decision. The Greater Phoenix Chamber personal services category supports the profile, and the copy stays focused on verified fitness and performance-training facts.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Best for</strong><span>Athletes, wellness customers, and local residents seeking performance-training support in North Phoenix.</span></div>
+        <div class="vv-proof-card"><strong>Local presence</strong><span>20830 N. 25th Place Suite 108, Phoenix, AZ 85050 with listed phone (614) 735-0227.</span></div>
+        <div class="vv-proof-card"><strong>Proof signals</strong><span>Valley Verified business record and Greater Phoenix Chamber personal services category evidence.</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

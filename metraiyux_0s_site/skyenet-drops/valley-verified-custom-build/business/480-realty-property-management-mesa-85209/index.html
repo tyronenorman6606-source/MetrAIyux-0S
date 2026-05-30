@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>480 Realty &amp; Property Management | Mesa Residential Property Management</title>
+  <meta name="description" content="480 Realty &amp; Property Management in Mesa manages rentals with leasing, screening, rent collection, maintenance coordination, inspections, owner portals, and published fees.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #11201b;
+      --muted: #51645d;
+      --evergreen: #0f6048;
+      --river: #1d7a85;
+      --clay: #b9633c;
+      --sand: #f7f1e7;
+      --paper: #fffdf8;
+      --line: rgba(17, 32, 27, .14);
+      --shadow: 0 22px 70px rgba(10, 49, 43, .18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(15, 96, 72, .11), transparent 34%),
+        linear-gradient(315deg, rgba(185, 99, 60, .14), transparent 42%),
+        var(--sand);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .wrap {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      color: var(--evergreen);
+      font-weight: 800;
+    }
+
+    .mark img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .topbar span:last-child {
+      text-align: right;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, 1.02fr) minmax(320px, .98fr);
+      gap: 34px;
+      align-items: center;
+      min-height: 76vh;
+      padding: 44px 0 62px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      margin: 0 0 18px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .74);
+      color: var(--evergreen);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 830px;
+      font-size: clamp(42px, 7vw, 86px);
+      line-height: .94;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 24px 0 0;
+      color: #364d45;
+      font-size: clamp(18px, 2.2vw, 23px);
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 30px 0 0;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 13px 18px;
+      border-radius: 7px;
+      border: 1px solid var(--evergreen);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .button.primary {
+      background: var(--evergreen);
+      color: white;
+      box-shadow: 0 12px 26px rgba(15, 96, 72, .22);
+    }
+
+    .button.secondary {
+      background: rgba(255, 253, 248, .78);
+      color: var(--evergreen);
+    }
+
+    .media-panel {
+      position: relative;
+      padding: 14px;
+      border: 1px solid rgba(15, 96, 72, .22);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, .7);
+      box-shadow: var(--shadow);
+    }
+
+    .media-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto 42px -24px 42px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(15, 96, 72, .16);
+      filter: blur(20px);
+      z-index: -1;
+    }
+
+    .video-shell {
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0b1814;
+      aspect-ratio: 16 / 9;
+    }
+
+    .video-shell video,
+    .video-shell img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .panel-note {
+      display: grid;
+      grid-profile-columns: 88px 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .panel-note img {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: white;
+      padding: 8px;
+    }
+
+    .panel-note strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--evergreen);
+    }
+
+    .panel-note p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .facts {
+      display: grid;
+      grid-profile-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .fact {
+      min-height: 150px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, .78);
+    }
+
+    .fact small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--clay);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .fact p,
+    .fact address {
+      margin: 0;
+      color: #263b34;
+      font-size: 18px;
+      line-height: 1.38;
+      font-style: normal;
+    }
+
+    .service-band {
+      padding: 54px 0 70px;
+      background: rgba(255, 253, 248, .62);
+      border-top: 1px solid var(--line);
+    }
+
+    .service-head {
+      display: grid;
+      grid-profile-columns: .85fr 1.15fr;
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .service-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .services {
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .service {
+      min-height: 160px;
+      padding: 20px;
+      border: 1px solid rgba(15, 96, 72, .18);
+      border-radius: 8px;
+      background: #fffdf8;
+    }
+
+    .service b {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: var(--evergreen);
+    }
+
+    .service span {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    footer {
+      padding: 28px 0 34px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .service-head,
+      .facts {
+        grid-profile-columns: 1fr;
+      }
+
+      .services {
+        grid-profile-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .wrap {
+        width: min(100% - 22px, 1160px);
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar span:last-child {
+        text-align: left;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 28px;
+      }
+
+      .actions,
+      .button {
+        width: 100%;
+      }
+
+      .services {
+        grid-profile-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="wrap">
+      <header class="topbar" aria-label="Business summary">
+        <div class="mark">
+          <img src="assets/logo.svg" alt="">
+          <span>480 Realty &amp; Property Management</span>
+        </div>
+        <span>Mesa, AZ 85209 | Residential Property Management</span>
+      </header>
+
+      <section class="hero" aria-labelledby="headline">
+        <div>
+          <p class="eyebrow">Mesa rental owners, reporting, leasing, maintenance</p>
+          <h1 id="headline">480 Realty &amp; Property Management keeps rental operations moving.</h1>
+          <p class="lead">Mesa rental owners get a licensed local management team for leasing, screening, rent collection, inspections, maintenance coordination, owner reporting, and tenant portal handoff.</p>
+          <div class="actions">
+            <a class="button primary" href="https://480-realty-property-management.pages.dev/">Open live 480 Realty app</a>
+            <a class="button secondary" href="https://realty480pm.appfolio.com/">Go to AppFolio portal</a>
+            <a class="button secondary" href="tel:+14802821234">Call (480) 282-1234</a>
+          </div>
+        </div>
+
+        <aside class="media-panel" aria-label="480 Realty live build preview">
+          <div class="video-shell">
+            <video controls preload="metadata" poster="assets/real/480-live-build-poster.png">
+              <profile src="assets/real/480-live-build.mp4" type="video/mp4">
+              <img src="assets/real/480-live-build-poster.png" alt="480 Realty live operations app preview">
+            </video>
+          </div>
+          <div class="panel-note">
+            <img src="assets/real/480-live-build-qr.png" alt="QR code for 480 Realty app">
+            <p><strong>Direct app handoff</strong>Scan or open the live app for the same management workflow linked from this 480 Realty page.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="facts" aria-label="480 Realty contact facts">
+        <div class="fact">
+          <small>Office</small>
+          <address>7205 E Southern Ave #102<br>Mesa, AZ 85209</address>
+        </div>
+        <div class="fact">
+          <small>Contact</small>
+          <p><a href="tel:+14802821234">(480) 282-1234</a><br><a href="mailto:mario@480realtypm.com">mario@480realtypm.com</a></p>
+        </div>
+        <div class="fact">
+          <small>Pricing note</small>
+          <p>Management pricing depends on portfolio size, property type, leasing scope, and service needs.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="service-band">
+      <div class="wrap">
+        <div class="service-head">
+          <h2>Built around the rental lifecycle.</h2>
+          <p>480 Realty's current Valley Verified facts point to practical owner support: pre-list analysis, leasing, maintenance, tenant portal routing, compliance touchpoints, and turn coordination.</p>
+        </div>
+        <div class="services" aria-label="480 Realty service areas">
+          <div class="service"><b>Rental Analysis</b><span>Owner intake and pricing context before a property moves into active management.</span></div>
+          <div class="service"><b>Leasing Support</b><span>Marketing and application flow for residential rental placements.</span></div>
+          <div class="service"><b>Maintenance Coordination</b><span>Repair routing, inspection context, turns, and owner visibility.</span></div>
+          <div class="service"><b>Owner Reporting</b><span>Portal-linked reporting and handoff for ongoing property decisions.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">Last verified: May 19, 2026. Featured by Skyes Over London for a clear, source-backed Valley Verified business profile.</div>
+    </footer>
+      <section class="sky-vv" aria-labelledby="vv-480-realty-property-management-mesa-85209" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-480-realty-property-management-mesa-85209" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London marks 480 Realty &amp; Property Management as Valley Verified because the Mesa office pairs day-to-day rental operations with real owner visibility. The public profile confirms residential property management, rental marketing, tenant screening, online rent collection, inspections, maintenance coordination, lease enforcement, and free rental analysis from 7205 E Southern Ave #102 in Mesa.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Trust signals are unusually concrete for a property manager: the Arizona Department of Real Estate lists active entity license LC709554000, the official site publishes management and leasing fees, and the owner and tenant portal workflow is spelled out for Mesa, Gilbert, Chandler, Queen Creek, Scottsdale, Phoenix, Apache Junction, San Tan Valley, and Prescott owners.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">That combination of licensing, transparent pricing, and East Valley rental workflow is why the business belongs in Valley Verified: it gives Arizona landlords a public, profile-supported path from rental analysis to ongoing management.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Residential management, leasing, screening, rent collection, inspections, maintenance, owner and tenant portals.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Mesa and East Valley rental owners, Arizona landlords, real estate investors, and tenants using available rentals.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">AZRE license LC709554000, Mesa office and phone, published pricing, official owner portal and review evidence.</span></div>
+        </div>
+      </section>
+  </main>
+</body>
+</html>

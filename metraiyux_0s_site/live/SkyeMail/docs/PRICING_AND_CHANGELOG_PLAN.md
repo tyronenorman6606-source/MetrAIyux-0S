@@ -9,33 +9,33 @@ SkyeMail should not gain serious platform features without a public record of wh
 The public contract is:
 
 1. Changelog records shipped platform capabilities.
-2. Pricing explains launch access and future paid tiers.
-3. Billing hooks are planned before paid checkout is enabled.
+2. Pricing explains launch access, paid AI Brain tiers, and what remains free.
+3. Billing hooks are implemented before a feature is described as paid-live.
 4. Proof artifacts stay local/private unless intentionally published.
 
 ## Current Access Policy
 
-Launch status: free.
+Launch mailbox status: free.
 
 SkyeMail can be used for FS27 gate-card onboarding and proof-lane mailbox work without charging the user during the launch/proof period.
 
-Billing status: charge-ready structure only. No public paid checkout is active yet.
+Billing status: mailbox access is still launch-free. The SkyeMail Brain now has FS27/SkyPay checkout create + claim routes for paid kAIxu response plans.
 
 ## Public Pages
 
 - `/changelog`: product change history, proof status, and known production truth.
-- `/pricing`: launch-free pricing, future tier structure, and billing-readiness checklist.
+- `/pricing`: launch-free mailbox access, paid Brain AI tiers, and billing-readiness checklist.
 - `/live-proof`: proof page for visible operating evidence.
 - `/`: primary entry surface with links to changelog and pricing.
 
-## Future Billing Hooks
+## Active Billing Hooks
 
-When charging starts, wire paid plan state through SkyGate FS27 first:
+Paid Brain AI plan state runs through SkyGate FS27 first:
 
 1. FS27 owns customer identity, customer ID, gate card, and billing state.
 2. SkyeMail reads plan state from FS27/session claims or a signed billing status endpoint.
 3. SkyeMail stores plan snapshot on workspace records for audit history.
-4. Mailbox limits, alias limits, provider features, AI usage, and admin features key off the FS27 plan state.
+4. Mailbox AI usage, send-and-monitor behavior, and managed inbox features key off the FS27/SkyPay entitlement state.
 5. Failed billing never deletes mail. It should pause upgrades, sending, aliases, or AI usage according to policy.
 
 ## Planned Tiers
@@ -68,6 +68,14 @@ Operator:
 - Admin controls.
 - Priority provisioning.
 - Advanced proof, monitoring, and recovery lanes.
+
+AI Brain Starter / Plus / Managed:
+
+- SkyPay checkout create and claim routes.
+- kAIxu metered model calls.
+- Usage events stored in `skymail.ai_usage_events`.
+- Active entitlements stored in `skymail.ai_entitlements`.
+- Reply monitors stored in `skymail.brain_monitors`.
 
 ## Changelog Rules
 

@@ -155,6 +155,9 @@ if (!app.includes('connectlog-menu-collapsed')) throw new Error('Collapsible men
 if (!appHtml.includes('Relay13 bridge')) throw new Error('Relay13 bridge panel is missing.');
 if (!app.includes('META_RELAY_CONFIG')) throw new Error('Relay13 config persistence is missing.');
 if (!app.includes('Relay13 health check failed from this browser. Delivery queue remains protected.')) throw new Error('Relay13 delivery-integrity path is missing.');
+if (!app.includes('recordBusinessCardScan')) throw new Error('Business-card scan Relay13 intake is missing.');
+if (!app.includes('/api/v1/connectlog/scan')) throw new Error('Business-card scans do not post to the ConnectLog scan endpoint.');
+if (!app.includes('sol-scanned-card')) throw new Error('Scanned business-card preview is missing.');
 if (!landingHtml.includes('assets/connectlog-logo-512.png')) throw new Error('Hero logo asset is not wired into landing page.');
 if (!landingHtml.includes('assets/connectlog-og.png')) throw new Error('Open Graph logo image is not wired into landing page.');
 if (!manifest.icons?.some((icon) => icon.src === 'assets/connectlog-logo-512.png')) throw new Error('Manifest is not using the approved logo assets.');

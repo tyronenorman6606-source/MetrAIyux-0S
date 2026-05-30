@@ -35,7 +35,7 @@ const uploadDeveloperName = argValue('--developer-name');
 const uploadDestinationId = argValue('--destination-id');
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 
-const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', '.tmp', '.1', 'download-handoffs', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
 const SKIP_EXTS = new Set(['.zip', '.tar', '.gz', '.tgz', '.7z', '.rar', '.dump', '.backup', '.bak', '.sqlite', '.sqlite3', '.db', '.pem', '.key', '.p12', '.pfx']);
 const SECRET_PATTERNS = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |)?PRIVATE KEY-----/],
@@ -139,6 +139,9 @@ function copyToStage(stage, excludes) {
     '--exclude=.wrangler/',
     '--exclude=.wrangler-dry-run/',
     '--exclude=.claude/',
+    '--exclude=.tmp/',
+    '--exclude=.1/',
+    '--exclude=download-handoffs/',
     '--exclude=test-artifacts/',
     '--exclude=test-results/',
     '--exclude=backups/',
@@ -226,6 +229,61 @@ function quotaFromEnv(env) {
   };
 }
 
+function firstCsv(value = '') {
+  return String(value || '').split(',').map((item) => item.trim()).filter(Boolean)[0] || '';
+}
+
+function firstValidEmail(...values) {
+  for (const value of values) {
+    for (const candidate of String(value || '').split(',')) {
+      const email = candidate.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return email;
+    }
+  }
+  return '';
+}
+
+function ownerCustodyFields(env) {
+  const ownerEmail = firstValidEmail(
+    uploadClientEmail,
+    env.SKYEVAULT_OWNER_EMAIL,
+    env.OWNER_EMAIL,
+    env.ADMIN_EMAILS,
+    env.METRAIYUX_0S_SKYGATE_ADMIN_EMAILS,
+    env.LEGAL_REVIEW_ADMIN_EMAIL,
+    env.RESEND_FROM_EMAIL,
+    env.ZOHO_DEFAULT_FROM,
+    env.SKYEVAULT_CLIENT_EMAIL
+  ) || 'owner@metraiyux.local';
+  const ownerName = String(
+    uploadClientName
+    || env.SKYEVAULT_OWNER_NAME
+    || env.OWNER_NAME
+    || env.GIT_AUTHOR_NAME
+    || '0S Founder Account'
+  ).trim();
+  const ownerWorkspaceId = String(env.SKYEVAULT_OWNER_WORKSPACE_ID || 'metraiyux-0s-owner').trim();
+  const ownerSubject = String(env.SKYEVAULT_OWNER_SUBJECT || 'metraiyux-owner-admin').trim();
+  const ownerAccountId = String(env.SKYEVAULT_OWNER_ACCOUNT_ID || 'founder-metraiyux-0s-owner').trim();
+  return {
+    ownerEmail,
+    ownerName,
+    ownerWorkspaceId,
+    ownerWorkspaceSlug: String(env.SKYEVAULT_OWNER_WORKSPACE_SLUG || 'metraiyux-0s').trim(),
+    ownerSubject,
+    ownerAccountId,
+    ownerRole: 'owner',
+    workspaceId: String(uploadWorkspaceId || env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || ownerWorkspaceId).trim(),
+    developerId: String(uploadDeveloperId || env.SKYEVAULT_DEVELOPER_ID || ownerSubject).trim(),
+    developerName: String(uploadDeveloperName || env.SKYEVAULT_DEVELOPER_NAME || ownerName).trim(),
+    custodyScope: 'owner-private',
+    vaultVisibility: 'owner-only',
+    accessPolicy: 'shared-gate-owner-admin-only',
+    clientVaultVisible: false,
+    clientVaultDownloadAllowed: false
+  };
+}
+
 function enforceUploadQuota(quotas, archiveSize, summary) {
   if (quotas.fileLimit && summary.fileCount && summary.fileCount > quotas.fileLimit) {
     throw new Error(`Vault upload file count ${summary.fileCount} exceeds workspace file limit ${quotas.fileLimit}.`);
@@ -268,6 +326,57 @@ async function fetchTextWithRetry(url, options, retryOptions) {
   throw new Error(`${label} failed after ${retries} retries.`);
 }
 
+function ownerCredentialCandidates(env) {
+  return [
+    'ZERO_OS_GATE_SESSION',
+    'MCP_GATE_SESSION',
+    'SKYENET_AUTH',
+    'FREE99_ADMIN_CODE',
+    'ZERO_OS_GATE_CODE',
+    'OWNER_ADMIN_CODE',
+    'METRAIYUX_ADMIN_CODE',
+    'SKYGATE_ADMIN_PASSWORD',
+    'FS27_ADMIN_PASSWORD'
+  ].map((key) => ({ key, value: env[key] })).filter((item) => item.value);
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let json = {};
+  try {
+    json = text ? JSON.parse(text) : {};
+  } catch {
+    json = { raw: text.slice(0, 300) };
+  }
+  return { response, json };
+}
+
+async function resolveOwnerBearer(env) {
+  const existing = env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || env.ZERO_OS_GATE_SESSION || env.SKYENET_AUTH || '';
+  if (existing) return existing;
+  const zeroOsBase = String(env.ZERO_OS_BASE_URL || env.METRAIYUX_0S_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
+  for (const item of ownerCredentialCandidates(env)) {
+    if (/SESSION|AUTH/.test(item.key)) return item.value;
+  }
+  for (const item of ownerCredentialCandidates(env)) {
+    for (const route of ['/api/founder-command/login', '/api/owner/admin-login']) {
+      try {
+        const { response, json } = await postJson(`${zeroOsBase}${route}`, { code: item.value });
+        const token = json.gateBearerToken || json.gateToken || json.token || '';
+        if (response.ok && token) return token;
+      } catch {
+        // Try the next shared gate credential without printing secret material.
+      }
+    }
+  }
+  return '';
+}
+
 function gitValue(args, fallback = 'unknown') {
   try {
     return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim() || fallback;
@@ -283,25 +392,38 @@ function outputSummary(stage, archive, excludes) {
   return { fileCount, bytes, excludedSecretLikeFiles: excludes.length };
 }
 
+function vaultBaseUrl(env) {
+  const workerUrl = env.SKYEVAULT_DROP_WORKER_URL || env.SKYEVAULT_DROP_CLOUDFLARE_URL || '';
+  const configured = workerUrl || env.SKYEVAULT_DROP_URL || env.URL || '';
+  const fallback = 'https://skyevault-drop.graylondonskyes.workers.dev';
+  if (/netlify\.app/i.test(configured) && env.SKYEVAULT_ALLOW_NETLIFY_VAULT_URL !== '1') {
+    return (workerUrl || fallback).replace(/\/$/, '');
+  }
+  return String(configured || fallback).replace(/\/$/, '');
+}
+
 async function uploadArchive(archive, archiveHash, summary) {
   const rootEnv = parseEnv(path.join(root, '.env'));
   const vaultEnv = parseEnv(path.join(root, 'SkyeVault-Drop/.env'));
   const env = { ...vaultEnv, ...rootEnv, ...process.env };
-  const baseUrl = String(env.SKYEVAULT_DROP_URL || env.URL || 'https://skyevault-drop.netlify.app').replace(/\/$/, '');
-  const origin = String(env.SKYEVAULT_UPLOAD_ORIGIN || 'https://client-drop-vault-r2.netlify.app').replace(/\/$/, '');
+  const baseUrl = vaultBaseUrl(env);
+  const origin = String(env.SKYEVAULT_UPLOAD_ORIGIN || baseUrl).replace(/\/$/, '');
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   if (!portalKey) throw new Error('Missing CLIENT_PORTAL_KEY or SKYEVAULT_PORTAL_KEY.');
-  const gateBearer = env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || '';
   const free99AdminCode = env.FREE99_ADMIN_CODE || env.SKYEVAULT_FREE99_ADMIN_CODE || '';
   const adminToken = env.SKYEVAULT_ADMIN_TOKEN || env.ADMIN_TOKEN || '';
-  const workspaceId = String(uploadWorkspaceId || env.SKYEVAULT_WORKSPACE_ID || env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim();
+  const ownerCustody = ownerCustodyFields(env);
+  const gateBearer = ownerCustody.custodyScope === 'owner-private'
+    ? await resolveOwnerBearer(env)
+    : (env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || '');
+  const workspaceId = ownerCustody.workspaceId;
   const customerId = String(uploadCustomerId || env.SKYEVAULT_CUSTOMER_ID || env.SKYEVAULT_GATE_CUSTOMER_ID || env.SKYEVAULT_ACCOUNT_ID || '').trim();
   const repoId = String(uploadRepoId || env.SKYEVAULT_REPO_ID || repoName).trim();
   const gateCardId = String(uploadGateCardId || env.SKYEVAULT_GATE_CARD_ID || '').trim();
   const apiKeyId = String(uploadApiKeyId || env.SKYEVAULT_API_KEY_ID || env.SKYEVAULT_GATE_API_KEY_ID || '').trim();
   const gateRole = String(uploadGateRole || env.SKYEVAULT_GATE_ROLE || env.SKYEVAULT_ROLE || '').trim();
-  const developerId = String(uploadDeveloperId || env.SKYEVAULT_DEVELOPER_ID || env.USER || '').trim();
-  const developerName = String(uploadDeveloperName || env.SKYEVAULT_DEVELOPER_NAME || env.GIT_AUTHOR_NAME || '').trim();
+  const developerId = ownerCustody.developerId;
+  const developerName = ownerCustody.developerName;
   const destinationId = String(uploadDestinationId || env.SKYEVAULT_DESTINATION_ID || '').trim();
   const quotas = quotaFromEnv(env);
   const retryOptions = {
@@ -319,8 +441,8 @@ async function uploadArchive(archive, archiveHash, summary) {
     ? 'skipped'
     : gitValue(['status', '--short', '--untracked-files=no'], '').split(/\r?\n/).filter(Boolean).length;
   const body = {
-    clientName: uploadClientName || env.SKYEVAULT_CLIENT_NAME || 'Repository Operator',
-    clientEmail: uploadClientEmail || env.SKYEVAULT_CLIENT_EMAIL || 'operator@example.com',
+    clientName: uploadClientName || env.SKYEVAULT_CLIENT_NAME || ownerCustody.ownerName,
+    clientEmail: uploadClientEmail || env.SKYEVAULT_CLIENT_EMAIL || ownerCustody.ownerEmail,
     projectName: uploadProjectName || env.SKYEVAULT_PROJECT_NAME || `${repoName} repository safe vault snapshot`,
     clientReference: uploadClientReference || `repo:${branch}@${commit}`,
     assetType: uploadAssetType || env.SKYEVAULT_ASSET_TYPE || 'Repository safe archive',
@@ -335,6 +457,16 @@ async function uploadArchive(archive, archiveHash, summary) {
     gateRole,
     developerId,
     developerName,
+    custodyScope: ownerCustody.custodyScope,
+    vaultVisibility: ownerCustody.vaultVisibility,
+    ownerAccountId: ownerCustody.ownerAccountId,
+    ownerSubject: ownerCustody.ownerSubject,
+    ownerEmail: ownerCustody.ownerEmail,
+    ownerWorkspaceId: ownerCustody.ownerWorkspaceId,
+    ownerWorkspaceSlug: ownerCustody.ownerWorkspaceSlug,
+    accessPolicy: ownerCustody.accessPolicy,
+    clientVaultVisible: ownerCustody.clientVaultVisible,
+    clientVaultDownloadAllowed: ownerCustody.clientVaultDownloadAllowed,
     destinationId,
     usageRightsAccepted: true,
     retentionAcknowledged: true,
@@ -486,6 +618,15 @@ async function uploadArchive(archive, archiveHash, summary) {
     gateRole,
     developerId,
     developerName,
+    custodyScope: body.custodyScope,
+    vaultVisibility: body.vaultVisibility,
+    ownerAccountId: body.ownerAccountId,
+    ownerSubject: body.ownerSubject,
+    ownerWorkspaceId: body.ownerWorkspaceId,
+    ownerWorkspaceSlug: body.ownerWorkspaceSlug,
+    accessPolicy: body.accessPolicy,
+    clientVaultVisible: body.clientVaultVisible,
+    clientVaultDownloadAllowed: body.clientVaultDownloadAllowed,
     gitBranch: branch,
     gitCommit: commit,
     dirtyCount,
@@ -566,6 +707,13 @@ function uploadLedgerEvent(receipt, summary, receiptPath) {
     gateRole: receipt.gateRole,
     developerId: receipt.developerId,
     developerName: receipt.developerName,
+    custodyScope: receipt.custodyScope,
+    vaultVisibility: receipt.vaultVisibility,
+    ownerAccountId: receipt.ownerAccountId,
+    ownerSubject: receipt.ownerSubject,
+    ownerWorkspaceId: receipt.ownerWorkspaceId,
+    ownerWorkspaceSlug: receipt.ownerWorkspaceSlug,
+    accessPolicy: receipt.accessPolicy,
     gitBranch: receipt.gitBranch,
     gitCommit: receipt.gitCommit,
     dirtyCount: receipt.dirtyCount,

@@ -48,23 +48,68 @@
   const timelineArchiveCountEl = qs('#timelineArchiveCount');
   const timelineReviewCountEl = qs('#timelineReviewCount');
   const timelineDispatchCountEl = qs('#timelineDispatchCount');
+  const calendarStatusEl = qs('#calendarStatus');
+  const calendarListEl = qs('#calendarList');
+  const calendarTopicEl = qs('#calendarTopic');
+  const calendarStartEl = qs('#calendarStart');
+  const calendarEndEl = qs('#calendarEnd');
+  const calendarAttendeeEl = qs('#calendarAttendee');
+  const calendarNotesEl = qs('#calendarNotes');
+  const calendarLedgerOnlyEl = qs('#calendarLedgerOnly');
   const handoffLabelEl = qs('#handoffLabel');
   const handoffNotesEl = qs('#handoffNotes');
   const handoffTargetsEl = qs('#handoffTargets');
+  const ZERO_OS_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 
   function setNote(msg, kind=''){ setStatus(statusEl, msg, kind); }
+  function setCalendarNote(msg, kind=''){ setStatus(calendarStatusEl, msg, kind); }
   function displayProviderName(value){
-    return String(value || 'SkyeMail').replace(/skymail/ig, 'SkyeMail');
+    return value ? 'Citadel/SkyeNet' : 'SkyeMail';
+  }
+
+  function localDateTimeToIso(value){
+    if(!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value || '') : date.toISOString();
+  }
+
+  async function zeroOsFetch(path, opts = {}){
+    const token = getToken();
+    if(!token) throw new Error('Login through the shared 0S gate to sync calendar.');
+    const headers = Object.assign({
+      Accept:'application/json',
+      'Content-Type':'application/json',
+      Authorization:`Bearer ${token}`,
+      'x-free99-gate-session':token,
+      'x-skye-gate-session':token,
+      'x-skygate-session':token,
+      'x-skye-platform':'skymail',
+      'x-skye-usage-lane':'calendar'
+    }, opts.headers || {});
+    const res = await fetch(`${ZERO_OS_ORIGIN}${path}`, Object.assign({}, opts, {
+      credentials:'omit',
+      headers
+    }));
+    const text = await res.text();
+    let data = {};
+    try{ data = text ? JSON.parse(text) : {}; }catch(_err){ data = { error:'Non-JSON 0S response', raw:text }; }
+    if(!res.ok || data.ok === false){
+      const err = new Error(data.error || `0S calendar request failed (${res.status})`);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
   }
 
   function setHeaderStatus(status){
     if(status && status.connected && status.mailbox){
       const mailboxEmail = status.mailbox.mailbox_email || status.mailbox.google_email || status.mailbox.email || '';
       badgeEl.textContent = `Connected mailbox • ${mailboxEmail}`;
-      watchEl.textContent = `Route ${status.mailbox.provisioning_status || status.mailbox.watch_status || 'active'} • provider ${displayProviderName(status.mailbox.provider)}`;
+      watchEl.textContent = `Route ${status.mailbox.provisioning_status || status.mailbox.watch_status || 'active'} • mail lane ${displayProviderName(status.mailbox.provider)}`;
     } else {
       badgeEl.textContent = 'No SkyeMail mailbox provisioned';
-      watchEl.textContent = 'Connect Google on the onboarding page.';
+      watchEl.textContent = 'Provision a Citadel/SkyeNet SkyeMail mailbox on the onboarding page.';
     }
   }
 
@@ -78,24 +123,28 @@
 
   function selectedTargetValues(){
     if(!handoffTargetsEl) return [];
+    const targetMeta = {
+      SkyeDocxMax:{ lane:'document-compose', reason:'Selected mail should open as an editable SkyeDocxMax document.' },
+      SovereignDocs:{ lane:'governed-document-packet', reason:'Selected mail should become a governed document packet.' },
+      SkyeCalendar:{ lane:'calendar-follow-up', reason:'Selected mail should become a scheduled 0S follow-up.' },
+      VantaCoreCRM:{ lane:'crm-intake', reason:'Selected mail should enter CRM intake and relationship follow-up.' },
+      SkyeProfitConsole:{ lane:'finance-review', reason:'Selected mail implies pricing, revenue, or margin review.' },
+      SkyeSplitEngine:{ lane:'profit-split', reason:'Selected mail includes payout, partner, commission, or split context.' },
+      SkyeProofAudit:{ lane:'audit-evidence', reason:'Selected mail should retain an evidence or audit trail.' },
+      SaaSLaunchPacket:{ lane:'saas-launch', reason:'Selected mail should feed SaaS launch or client platform work.' },
+      GovernmentCaseCommand:{ lane:'government-case', reason:'Selected mail should move into regulated, civic, agency, or case work.' },
+      SkyeVaultPro:{ lane:'source-custody', reason:'Selected mail should be preserved with vault/source custody.' },
+      PwaFactory:{ lane:'app-build', reason:'Selected mail should start an app, tool, or client deliverable build.' },
+      SkyeLeadVault:{ lane:'crm-intake', reason:'Mail follow-up should enter the shared CRM lane.' },
+      'AE-FlowPro':{ lane:'sales-follow-up', reason:'Selected mail should feed activation and follow-up.' },
+      'skyeroutex-workforce-command-v0.4.0':{ lane:'ops-handoff', reason:'Selected mail implies ops, dispatch, or workforce work.' },
+      SkyeProofx:{ lane:'evidence-review', reason:'Selected mail should retain an evidence or audit trail.' },
+      SkyeWebCreatorMax:{ lane:'launch-build', reason:'Selected mail should feed storefront or launch build work.' }
+    };
     return Array.from(handoffTargetsEl.selectedOptions || []).map((option) => ({
       platform: option.value,
-      lane: option.value === 'SkyeLeadVault' ? 'crm-intake'
-        : option.value === 'AE-FlowPro' ? 'sales-follow-up'
-        : option.value === 'skyeroutex-workforce-command-v0.4.0' ? 'ops-handoff'
-        : option.value === 'SkyeProofx' ? 'evidence-review'
-        : 'launch-build',
-      reason: option.value === 'SkyeLeadVault'
-        ? 'Mail follow-up should enter the shared CRM lane.'
-        : option.value === 'AE-FlowPro'
-        ? 'Selected mail should feed activation and follow-up.'
-        : option.value === 'skyeroutex-workforce-command-v0.4.0'
-        ? 'Selected mail implies ops, dispatch, or workforce work.'
-        : option.value === 'SkyeProofx'
-        ? 'Selected mail should retain an evidence or audit trail.'
-        : option.value === 'SkyeWebCreatorMax'
-        ? 'Selected mail should feed storefront or launch build work.'
-        : 'Selected mail should stay attached to a downstream creative or operator lane.'
+      lane: targetMeta[option.value]?.lane || 'operator-handoff',
+      reason: targetMeta[option.value]?.reason || 'Selected mail should stay attached to a downstream 0S operator lane.'
     }));
   }
 
@@ -210,7 +259,18 @@
     if(packet?.dispatch?.channel) return packet.dispatch.channel;
     if(!target?.platform) return '';
     if(target.platform === 'SkyeLeadVault') return 'crm_launch_handoff';
+    if(target.platform === 'VantaCoreCRM') return 'crm_launch_handoff';
     if(target.platform === 'AE-FlowPro') return 'activation_follow_through';
+    if(target.platform === 'SkyeDocxMax') return 'document_compose_handoff';
+    if(target.platform === 'SovereignDocs') return 'governed_document_handoff';
+    if(target.platform === 'SkyeCalendar') return 'calendar_follow_up_handoff';
+    if(target.platform === 'SkyeProfitConsole') return 'finance_review_handoff';
+    if(target.platform === 'SkyeSplitEngine') return 'profit_split_handoff';
+    if(target.platform === 'SkyeProofAudit') return 'audit_evidence_handoff';
+    if(target.platform === 'SaaSLaunchPacket') return 'saas_launch_handoff';
+    if(target.platform === 'GovernmentCaseCommand') return 'government_case_handoff';
+    if(target.platform === 'SkyeVaultPro') return 'source_custody_handoff';
+    if(target.platform === 'PwaFactory') return 'app_build_handoff';
     if(target.platform === 'skyeroutex-workforce-command-v0.4.0') return 'workforce_dispatch_handoff';
     if(target.platform === 'SkyeProofx') return 'proof_review_handoff';
     if(target.platform === 'SkyeWebCreatorMax') return 'launch_build_handoff';
@@ -293,6 +353,103 @@
           </div>
         </div>
       </article>`).join('');
+  }
+
+  function calendarDate(value){
+    if(!value) return '';
+    if(typeof value === 'string') return value;
+    return value.dateTime || value.date || '';
+  }
+
+  function calendarRows(data){
+    const live = Array.isArray(data?.live_events) ? data.live_events.map((item)=>({
+      id: item.id || item.htmlLink || item.summary,
+      source: 'Live',
+      title: item.summary || item.id || 'Calendar event',
+      status: item.status || 'scheduled',
+      start: calendarDate(item.start),
+      end: calendarDate(item.end),
+      attendee: Array.isArray(item.attendees) ? item.attendees.map((row)=>row.email).filter(Boolean).join(', ') : '',
+      href: item.htmlLink || ''
+    })) : [];
+    const ledger = Array.isArray(data?.ledger) ? data.ledger.map((item)=>({
+      id: item.id || item.topic,
+      source: 'Ledger',
+      title: item.topic || item.summary || item.id || 'Calendar item',
+      status: item.status || 'ledger',
+      start: item.start_at || '',
+      end: item.end_at || '',
+      attendee: item.attendee_email || '',
+      href: item.google_calendar?.htmlLink || ''
+    })) : [];
+    const seen = new Set();
+    return [...live, ...ledger].filter((item)=> {
+      const key = `${item.source}:${item.id}:${item.title}:${item.start}`;
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 25);
+  }
+
+  function renderCalendar(data){
+    if(!calendarListEl) return;
+    const rows = calendarRows(data);
+    if(!rows.length){
+      calendarListEl.innerHTML = '<div class="empty">No calendar records yet.</div>';
+      return;
+    }
+    calendarListEl.innerHTML = rows.map((item)=>`
+      <article class="mail">
+        <div class="mail-check"><span class="chip">${safe(item.source)}</span></div>
+        <div class="mail-main">
+          <div class="mail-top">
+            <div>
+              <div class="mail-subject">${safe(item.title)}</div>
+              <div class="mail-from">${safe(item.start ? fmtDate(item.start) : 'Needs schedule')}${item.end ? ` - ${safe(fmtDate(item.end))}` : ''}</div>
+            </div>
+            <div class="mini">${safe(item.status)}</div>
+          </div>
+          <div class="mail-snippet">${safe(item.attendee || 'No attendee assigned')}</div>
+        </div>
+        <div class="mail-actions">${item.href ? `<a class="btn small" href="${safe(item.href)}" target="_blank" rel="noopener">Open</a>` : ''}</div>
+      </article>`).join('');
+  }
+
+  async function refreshCalendar(){
+    if(!calendarListEl) return null;
+    setCalendarNote('Loading 0S calendar...');
+    const data = await zeroOsFetch('/api/founder-command/calendar?limit=25');
+    const liveCount = Array.isArray(data.live_events) ? data.live_events.length : 0;
+    const ledgerCount = Array.isArray(data.ledger) ? data.ledger.length : 0;
+    setCalendarNote(`${liveCount} live event(s) • ${ledgerCount} ledger record(s) • ${data.timezone || '0S time'}`, 'ok');
+    renderCalendar(data);
+    return data;
+  }
+
+  async function saveCalendarItem(){
+    if(!calendarTopicEl) return null;
+    const topic = calendarTopicEl.value.trim();
+    if(!topic) throw new Error('Calendar topic required.');
+    const ledgerOnly = calendarLedgerOnlyEl ? calendarLedgerOnlyEl.checked : true;
+    const body = {
+      source:'skymail-calendar',
+      topic,
+      summary:topic,
+      description:calendarNotesEl?.value?.trim() || '',
+      start_at:localDateTimeToIso(calendarStartEl?.value || ''),
+      end_at:localDateTimeToIso(calendarEndEl?.value || ''),
+      attendee_email:calendarAttendeeEl?.value?.trim() || '',
+      ledger_only:ledgerOnly,
+      create_live:!ledgerOnly
+    };
+    setCalendarNote('Saving calendar item...');
+    const data = await zeroOsFetch('/api/founder-command/calendar', {
+      method:'POST',
+      body:JSON.stringify(body)
+    });
+    setCalendarNote(data.live_event_created ? 'Calendar item saved and mirrored live.' : 'Calendar item saved to the 0S ledger.', 'ok');
+    await refreshCalendar();
+    return data;
   }
 
   function updateRuntimeSummary(status){
@@ -544,10 +701,12 @@
   }
 
   function rowActions(item){
-    const actions = [];
-    actions.push(`<a class="btn small" href="${runtime.href('thread.html', { id: item.thread_id || item.id })}">Thread</a>`);
-    actions.push(`<a class="btn small" href="${runtime.href('message.html', { id: item.id })}">Open</a>`);
-    actions.push(`<button class="btn small" type="button" data-single-star="${item.id}" data-on="${item.starred ? '1':'0'}">${item.starred ? 'Unstar':'Star'}</button>`);
+	    const actions = [];
+	    actions.push(`<a class="btn small" href="${runtime.href('thread.html', { id: item.thread_id || item.id })}">Thread</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('message.html', { id: item.id })}">Open</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('brain.html', { message_id: item.id, subject: item.subject || '' })}">Brain</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('workspace.html', { message_id: item.id, thread_id: item.thread_id || item.id, subject: item.subject || '', from: item.from || '' })}">0S</a>`);
+	    actions.push(`<button class="btn small" type="button" data-single-star="${item.id}" data-on="${item.starred ? '1':'0'}">${item.starred ? 'Unstar':'Star'}</button>`);
     if(state.viewLabel === 'TRASH'){
       actions.push(`<button class="btn small ok" type="button" data-single-restore="${item.id}">Restore</button>`);
       actions.push(`<button class="btn small danger" type="button" data-single-delete="${item.id}">Delete Forever</button>`);
@@ -606,10 +765,11 @@
     document.querySelectorAll('[data-single-star]').forEach((btn)=> btn.onclick = async ()=> {
       try{
         await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: btn.dataset.singleStar, addLabelIds: btn.dataset.on === '1' ? [] : ['STARRED'], removeLabelIds: btn.dataset.on === '1' ? ['STARRED'] : [] }) });
+        SMV.trackGame(btn.dataset.on === '1' ? 'unstar' : 'star');
         await refreshInbox();
       }catch(err){ setNote(err.message || 'Mailbox update failed.', 'danger'); }
     });
-    document.querySelectorAll('[data-single-archive]').forEach((btn)=> btn.onclick = async ()=> { try{ await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: btn.dataset.singleArchive, addLabelIds: [], removeLabelIds:['INBOX'] }) }); await refreshInbox(); }catch(err){ setNote(err.message || 'Archive failed.', 'danger'); } });
+    document.querySelectorAll('[data-single-archive]').forEach((btn)=> btn.onclick = async ()=> { try{ await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: btn.dataset.singleArchive, addLabelIds: [], removeLabelIds:['INBOX'] }) }); SMV.trackGame('archive'); await refreshInbox(); }catch(err){ setNote(err.message || 'Archive failed.', 'danger'); } });
     document.querySelectorAll('[data-single-trash]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.trashMessages([btn.dataset.singleTrash]); await refreshInbox(); }catch(err){ setNote(err.message || 'Trash failed.', 'danger'); } });
     document.querySelectorAll('[data-single-restore]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.untrashMessages([btn.dataset.singleRestore]); await refreshInbox(); }catch(err){ setNote(err.message || 'Restore failed.', 'danger'); } });
     document.querySelectorAll('[data-single-delete]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.deleteMessages([btn.dataset.singleDelete]); await refreshInbox(); }catch(err){ setNote(err.message || 'Delete failed.', 'danger'); } });
@@ -623,6 +783,9 @@
       const includeSpamTrash = ['SPAM','TRASH'].includes(state.viewLabel) ? '&includeSpamTrash=true' : '';
       const page = token ? `&pageToken=${encodeURIComponent(token)}` : '';
       setNote(`Loading ${document.body.dataset.pageName || 'mail'}…`);
+      if(!token && !q && (!state.viewLabel || state.viewLabel === 'INBOX')){
+        await apiFetch('/mail-sync?limit=10').catch(()=>null);
+      }
       const data = await apiFetch(`/gmail-list?max=25&q=${q}&label=${encodeURIComponent(state.viewLabel)}${page}${includeSpamTrash}`);
       if(pushHistory) state.prevStack.push(state.currentToken);
       state.currentToken = token;
@@ -630,6 +793,7 @@
       pageTokenEl.textContent = data.nextPageToken ? 'More mail available' : 'End of current mailbox window';
       render(data.items || []);
       setNote(`Loaded ${data.items?.length || 0} message(s) from ${data.mailbox}.`, 'ok');
+      SMV.trackGame('mailbox_load', { count: Math.max(1, data.items?.length || 1), key: state.viewLabel || 'INBOX' }, { silent:true });
     }catch(err){
       listEl.innerHTML = '<div class="empty">Mailbox load failed.</div>';
       setNote(err.message || 'Mailbox load failed.', 'danger');
@@ -642,10 +806,19 @@
     catch(err){ setNote(err.message || 'Bulk action failed.', 'danger'); }
   }
 
-  qs('#applyBtn').onclick = refreshInbox;
-  qs('#clearBtn').onclick = ()=> { qs('#q').value=''; refreshInbox(); };
-  qs('#refreshBtn').onclick = refreshInbox;
-  qs('#connectBtn').onclick = ()=> SMV.connectGoogle(location.pathname);
+  qs('#applyBtn').onclick = async ()=> { await refreshInbox(); SMV.trackGame('search'); };
+  qs('#clearBtn').onclick = async ()=> { qs('#q').value=''; await refreshInbox(); SMV.trackGame('refresh'); };
+  qs('#refreshBtn').onclick = async ()=> { await refreshInbox(); SMV.trackGame('refresh'); };
+  if(qs('#refreshListBtn')) qs('#refreshListBtn').onclick = async ()=> { await refreshInbox(); SMV.trackGame('refresh'); };
+  if(qs('#refreshCalendarBtn')) qs('#refreshCalendarBtn').onclick = async ()=> {
+    try{ await refreshCalendar(); SMV.trackGame('calendar_refresh'); }
+    catch(err){ setCalendarNote(err.message || 'Calendar refresh failed.', 'danger'); }
+  };
+  if(qs('#saveCalendarBtn')) qs('#saveCalendarBtn').onclick = async ()=> {
+    try{ await saveCalendarItem(); SMV.trackGame('calendar_save'); }
+    catch(err){ setCalendarNote(err.message || 'Calendar save failed.', 'danger'); }
+  };
+  qs('#connectBtn').onclick = ()=> runtime.redirect('onboarding.html');
   const proofLoopBtn = qs('#proofLoopBtn');
   if(proofLoopBtn) proofLoopBtn.onclick = async ()=> {
     try{
@@ -661,6 +834,7 @@
       });
       await refreshInbox();
       setNote('Proof loop created: sent mail and received inbox mail are now in the mailbox list.', 'ok');
+      SMV.trackGame('proof_loop');
     }catch(err){ setNote(err.message || 'Proof loop failed.', 'danger'); }
   };
   qs('#watchBtn').onclick = async ()=> { try{ const data = await SMV.enableWatch(); setNote(`Push watch active until ${fmtDate(data.watch?.expiration || '')}.`, 'ok'); }catch(err){ setNote(err.message || 'Push watch enable failed.', 'danger'); } };
@@ -682,6 +856,7 @@
     try{
       const packet = await archiveRuntimePacket();
       setNote(`Archived mail handoff packet ${packet.packetId}.`, 'ok');
+      SMV.trackGame('packet_archive');
     }catch(err){
       setNote(err.message || 'Packet archive failed.', 'danger');
     }
@@ -695,6 +870,7 @@
     try{
       const packet = await saveLatestPacketReview();
       setNote(`Saved review state for ${packet.packetId}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Review save failed.', 'danger');
     }
@@ -705,6 +881,7 @@
       if(reviewStatusEl) reviewStatusEl.value = nextStatus;
       const packet = await saveLatestPacketReview({ status: nextStatus });
       setNote(`Advanced ${packet.packetId} to ${packet.review?.status || nextStatus}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Review advance failed.', 'danger');
     }
@@ -713,6 +890,7 @@
     try{
       const packet = await queueLatestPacketExecution();
       setNote(`Queued execution for ${packet.packetId}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Execution queue failed.', 'danger');
     }
@@ -723,6 +901,7 @@
       if(executionStatusEl) executionStatusEl.value = nextStatus;
       const packet = await queueLatestPacketExecution({ status: nextStatus });
       setNote(`Advanced execution for ${packet.packetId} to ${packet.execution?.status || nextStatus}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Execution advance failed.', 'danger');
     }
@@ -731,6 +910,7 @@
     try{
       const packet = await queueLatestPacketDispatch();
       setNote(`Queued dispatch for ${packet.packetId}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Dispatch queue failed.', 'danger');
     }
@@ -741,6 +921,7 @@
       if(dispatchStatusEl) dispatchStatusEl.value = nextStatus;
       const packet = await queueLatestPacketDispatch({ status: nextStatus });
       setNote(`Advanced dispatch for ${packet.packetId} to ${packet.dispatch?.status || nextStatus}.`, 'ok');
+      SMV.trackGame('packet_review');
     }catch(err){
       setNote(err.message || 'Dispatch advance failed.', 'danger');
     }
@@ -751,5 +932,6 @@
   if(runtimeSelectionCountEl) runtimeSelectionCountEl.textContent = '0';
   renderRuntimeArchive();
   await refreshRuntime();
+  refreshCalendar().catch((err)=> setCalendarNote(err.message || 'Calendar sync failed.', 'danger'));
   await refreshInbox();
 })();

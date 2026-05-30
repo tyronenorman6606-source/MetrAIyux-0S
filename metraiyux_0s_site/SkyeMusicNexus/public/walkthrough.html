@@ -1,0 +1,174 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus Full Platform Walkthroughs</title>
+  <meta name="description" content="Guided SkyeMusicNexus walkthroughs for listening, artist onboarding, creation, upload, release packaging, store setup, rights, proofs, and SupaBoy handoff." />
+  <meta name="theme-color" content="#050609" />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./nexus-player.css" />
+  <link rel="stylesheet" href="./walkthrough.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="./walkthrough.js"></script>
+</head>
+<body class="walkthrough-body" data-app="skye-music-nexus" data-page="walkthroughs" data-walkthrough-root>
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="walkthrough-topline" aria-label="SkyeMusicNexus walkthrough navigation">
+    <a class="walkthrough-brand" href="../index.html" aria-label="SkyeMusicNexus home">
+      <img src="../assets/skye-music-nexus-logo.png" alt="" />
+      <span>
+        <strong>SkyeMusicNexus</strong>
+        <small>Full platform walkthroughs</small>
+      </span>
+    </a>
+    <nav class="walkthrough-nav" aria-label="Walkthrough links">
+      <a href="./index.html">Workspace</a>
+      <a href="./discover.html">Discover</a>
+      <a href="./daw.html">DAW</a>
+      <a href="./upload.html">Upload</a>
+      <a href="./store.html">Store</a>
+      <a href="../artist-storefronts/supaboy/welcome-pack/">SupaBoy</a>
+    </nav>
+  </header>
+
+  <main class="walkthrough-shell">
+    <section class="walkthrough-hero">
+      <div class="walkthrough-copy">
+        <p class="micro">guided screen pass / artist-ready handoff</p>
+        <h1>Walk the whole Music Nexus in order.</h1>
+        <p class="lede">This page moves through the actual rooms an artist uses: listening, signup, DAW, upload, releases, rights, store, analytics, brain cycles, paperwork, and proof.</p>
+        <div class="walkthrough-actions">
+          <button class="button primary" type="button" data-walkthrough-play>Play Walkthrough</button>
+          <button class="button secondary" type="button" data-walkthrough-prev>Back</button>
+          <button class="button secondary" type="button" data-walkthrough-next>Next</button>
+          <a class="button secondary" href="../docs/FULL_PLATFORM_WALKTHROUGH.md">Open Written Packet</a>
+        </div>
+      </div>
+
+      <div class="walkthrough-live" aria-label="Animated screen walkthrough">
+        <div class="screen-stage" data-screen-stage>
+          <article class="screen-card" data-screen-card="home">
+            <span>Home</span>
+            <strong>Catalog pulse</strong>
+            <div class="screen-meter wide"></div>
+            <div class="screen-row"><i></i><i></i><i></i></div>
+          </article>
+          <article class="screen-card" data-screen-card="workspace">
+            <span>Workspace</span>
+            <strong>Artist rooms</strong>
+            <div class="screen-grid"><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="screen-card" data-screen-card="signup">
+            <span>Signup</span>
+            <strong>Identity and paperwork</strong>
+            <div class="screen-form"><i></i><i></i><i></i></div>
+          </article>
+          <article class="screen-card" data-screen-card="daw">
+            <span>DAW</span>
+            <strong>Create music</strong>
+            <div class="screen-tracks"><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="screen-card" data-screen-card="upload">
+            <span>Upload</span>
+            <strong>Audio vault</strong>
+            <div class="screen-drop">WAV / MP3 / FLAC</div>
+          </article>
+          <article class="screen-card" data-screen-card="release">
+            <span>Release</span>
+            <strong>Forge and rights</strong>
+            <div class="screen-timeline"><i></i><i></i><i></i></div>
+          </article>
+          <article class="screen-card" data-screen-card="store">
+            <span>Store</span>
+            <strong>Products and SkyePay</strong>
+            <div class="screen-price">$4.44</div>
+          </article>
+          <article class="screen-card" data-screen-card="proof">
+            <span>Proof</span>
+            <strong>Receipts and analytics</strong>
+            <div class="screen-bars"><i></i><i></i><i></i><i></i></div>
+          </article>
+          <div class="guide-pin" data-guide-pin aria-hidden="true"></div>
+        </div>
+
+        <aside class="guide-panel" aria-live="polite">
+          <p class="micro" data-step-lane>Artist pass</p>
+          <h2 data-step-title>Loading walkthrough</h2>
+          <p data-step-body></p>
+          <ul data-step-actions></ul>
+          <div class="guide-panel-actions">
+            <a class="button primary" data-step-open href="./index.html">Open This Room</a>
+            <span data-step-count>1 / 10</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="walkthrough-map" aria-label="Walkthrough paths">
+      <article class="path-card is-active" data-walkthrough-jump="0">
+        <span>01</span>
+        <h2>Listener first pass</h2>
+        <p>Home, Discover, Radio, playlists, charts, artist pages, and the persistent player.</p>
+      </article>
+      <article class="path-card" data-walkthrough-jump="1">
+        <span>02</span>
+        <h2>Artist launch pass</h2>
+        <p>Signup, Skye ID, artist photo, paperwork, SkyePay tracking, and founder approval gates.</p>
+      </article>
+      <article class="path-card" data-walkthrough-jump="3">
+        <span>03</span>
+        <h2>Creation pass</h2>
+        <p>Create Hub, DAW, stems, exports, save manifests, and release-ready project packets.</p>
+      </article>
+      <article class="path-card" data-walkthrough-jump="5">
+        <span>04</span>
+        <h2>Release pass</h2>
+        <p>Upload Studio, Release Forge, Rights Vault, takedown holds, previews, and drop packaging.</p>
+      </article>
+      <article class="path-card" data-walkthrough-jump="7">
+        <span>05</span>
+        <h2>Business pass</h2>
+        <p>Artist Store, SkyePay order intents, stream analytics, awards, artist brain, and proof receipts.</p>
+      </article>
+      <article class="path-card" data-walkthrough-jump="9">
+        <span>06</span>
+        <h2>SupaBoy pass</h2>
+        <p>Reserved artist world, welcome pack, upload-song lane, product desk, SLB lane, Houston proof, and shared-gate handoff.</p>
+      </article>
+    </section>
+
+    <section class="walkthrough-library" aria-label="Complete platform rooms">
+      <div class="section-head">
+        <div>
+          <p class="micro">What Music Nexus offers</p>
+          <h2>Every room in the system has a job.</h2>
+        </div>
+        <a class="button secondary" href="../docs/FULL_PLATFORM_WALKTHROUGH.md">Written Walkthrough</a>
+      </div>
+      <div class="room-grid">
+        <a href="./discover.html"><strong>Discover</strong><span>Playlists, charts, new drops, genre lanes, and artist discovery.</span></a>
+        <a href="./radio.html"><strong>Radio</strong><span>All-catalog radio, persistent queue, source-labeled listening, and stream events.</span></a>
+        <a href="./create.html"><strong>Create Hub</strong><span>Start music work, move into DAW, stems, exports, feed, and release ops.</span></a>
+        <a href="./daw.html"><strong>Native DAW</strong><span>Tracks, mixer, pads, keys, arrangement, imports, mic/MIDI hooks, mixdown, and project save.</span></a>
+        <a href="./upload.html"><strong>Upload Studio</strong><span>Large audio intake, protected vault records, track lines, and Release Forge handoff.</span></a>
+        <a href="./releases.html"><strong>Release Forge</strong><span>Artist records, releases, credits, Royalty River, operations sequencing, and launch state.</span></a>
+        <a href="./rights.html"><strong>Rights Vault</strong><span>Ownership attestations, preview-use clearance, distribution boundaries, and takedown holds.</span></a>
+        <a href="./feed.html"><strong>Social Feed</strong><span>Stories, posts, comments, saves, boosts, and provider-safe publishing queues.</span></a>
+        <a href="./store.html"><strong>Artist Store</strong><span>Digital products, merch, tickets, tips, bookings, memberships, orders, and SkyePay routes.</span></a>
+        <a href="./artist-dashboard.html"><strong>Artist Stats</strong><span>Streams, catalog movement, dashboard edits, storefront paths, and collective context.</span></a>
+        <a href="./stream-analytics.html"><strong>Streams</strong><span>Unified Nexus listens, public traffic summaries, live charts, and award thresholds.</span></a>
+        <a href="./brain.html"><strong>Artist Brain</strong><span>Artist memory, network cycles, SkyeMeter, tools, giveaways, and local activity loops.</span></a>
+        <a href="./brain-monitor.html"><strong>Brain Monitor</strong><span>Daemon heartbeat, now-listening queue, allocation gauges, stream impact, alerts, and neural map.</span></a>
+        <a href="./drops.html"><strong>Drop Room</strong><span>Drop pages, private delivery, publish queues, approval brain, batching, and receipts.</span></a>
+        <a href="./artist-apps.html"><strong>Artist Apps</strong><span>Installable artist universes, share links, product rooms, video loops, and Nexus return paths.</span></a>
+        <a href="./achievements.html"><strong>Awards</strong><span>Live stream achievement wall, artist badges, track milestones, and celebration toasts.</span></a>
+        <a href="./admin.html"><strong>Protected Review</strong><span>Owner review, payout queue, analytics prism, exchange console, and capsule wall.</span></a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,255 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "music4u-receipts-in-the-sun",
+  "title": "Receipts In The Sun",
+  "project": "",
+  "createdAt": "2026-05-25T23:07:17.702Z",
+  "provider": {
+    "id": "elevenlabs",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 2400802,
+    "promptStored": true
+  },
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "legacy_music_4u",
+      "slug": "music-4u",
+      "stageName": "Music 4u"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "legacy_music_4u",
+    "slug": "music-4u",
+    "stageName": "Music 4u"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/audio/receipts-in-the-sun.mp3",
+    "audioSha256": "1f3a08f378933116ebdb7b6eaea2878a91139fa81231c84032202e59aad506f2",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/",
+    "productId": "prod_music_4u_receipts_in_the_sun",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "legacy_music_4u",
+      "name": "Music 4u",
+      "shareBps": 10000,
+      "role": "primary artist"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_0b090ea8b443494c",
+      "metadata": {
+        "artist_names": [
+          "Music 4u"
+        ],
+        "audio_sha256": "1f3a08f378933116ebdb7b6eaea2878a91139fa81231c84032202e59aad506f2",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/singles/receipts-in-the-sun",
+        "fs27_tracked": true,
+        "primary_artist": "Music 4u",
+        "product_id": "prod_music_4u_receipts_in_the_sun",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/",
+        "release": "",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 2400802,
+      "package_name": "receipts-in-the-sun.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/audio/receipts-in-the-sun.mp3",
+      "package_sha256": "1f3a08f378933116ebdb7b6eaea2878a91139fa81231c84032202e59aad506f2",
+      "schema": "skye.submission.job",
+      "slug": "receipts-in-the-sun",
+      "title": "Receipts In The Sun",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 2400802,
+      "package_name": "receipts-in-the-sun.mp3",
+      "package_sha256": "1f3a08f378933116ebdb7b6eaea2878a91139fa81231c84032202e59aad506f2",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "receipts-in-the-sun",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Receipts In The Sun",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_0b090ea8b443494c",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_0b090ea8b443494c",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "receipts-in-the-sun:sub_0b090ea8b443494c",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "receipts-in-the-sun",
+      "submitted_at": "2026-05-25T23:07:17.702Z",
+      "title": "Receipts In The Sun",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_1f3a08f378933116",
+      "upload_sha256": "1f3a08f378933116ebdb7b6eaea2878a91139fa81231c84032202e59aad506f2",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/music-4u/drops/receipts-in-the-sun/",
+    "productId": "prod_music_4u_receipts_in_the_sun"
+  }
+}

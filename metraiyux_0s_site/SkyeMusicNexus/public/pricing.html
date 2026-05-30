@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus Pricing Hub</title>
+  <meta name="description" content="SkyeMusicNexus pricing hub for drop packaging, artist apps, song creation, and DAW beta access." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <link rel="stylesheet" href="./nexus-player.css" />
+  <link rel="stylesheet" href="./pricing.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="./nexus-player.js"></script>
+  <script defer src="./neo-nexus.js"></script>
+</head>
+<body class="pricing-surface" data-0s-canonical-platform="true" data-app="skye-music-nexus" data-mode="pricing">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="nexus-topline">
+    <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus home"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Pricing Hub</p>
+      <h1>One money map for drops, artist apps, song creation, and DAW beta access.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav" aria-label="SkyeMusicNexus pricing rooms">
+    <a href="./index.html">Workspace</a>
+    <a class="active" href="./pricing.html" aria-current="page">Pricing</a>
+    <a href="./pricing-drops.html">Drops</a>
+    <a href="./pricing-artist-apps.html">Artist Apps</a>
+    <a href="./pricing-song-creation.html">Song Creation</a>
+    <a href="./pricing-daw.html">DAW Beta</a>
+    <a href="./discover.html">Discover</a>
+    <a href="./store.html">Store</a>
+  </nav>
+
+  <main class="nexus-shell">
+    <section class="panel-xl pricing-hero">
+      <div>
+        <span class="pricing-kicker">Music Nexus offers</span>
+        <h2 class="pricing-title">Pick the realm. Pay for the work that actually happens.</h2>
+        <p class="pricing-lede">Drop packaging, artist apps, kAIxU song generation, and DAW access are separate lanes now. A buyer can pay for just a generated draft, upgrade into a release package, or go all the way into an artist app and campaign surface.</p>
+        <div class="pricing-actions">
+          <a class="primary button-link" href="./pricing-song-creation.html">Song Creation</a>
+          <a class="secondary button-link" href="./pricing-drops.html">Drop Packaging</a>
+          <a class="secondary button-link" href="./pricing-artist-apps.html">Artist Apps</a>
+          <a class="ghost button-link" href="./pricing-daw.html">DAW Beta</a>
+        </div>
+      </div>
+      <aside class="pricing-note">
+        <small>Core rule</small>
+        <h3>Generation and packaging are not the same product.</h3>
+        <p>Song Creation pays for kAIxU drafting. Drop Packaging starts after the audio exists. Artist Apps turn the release into a public/fan surface. DAW access stays free through 2026 while the room is beta.</p>
+      </aside>
+    </section>
+
+    <section class="pricing-card-grid" aria-label="Pricing realms">
+      <article class="pricing-card featured">
+        <small>Realm 01</small>
+        <h2>Drop Packaging</h2>
+        <div class="price-line"><strong>$15+</strong><span>existing songs</span></div>
+        <p>For songs, EPs, and albums that already exist and need Nexus release packaging, proof, store routing, and gated full-file delivery.</p>
+        <div class="card-actions"><a class="secondary button-link" href="./pricing-drops.html">Open Drop Prices</a><a class="ghost button-link" href="./drops.html">Drop Room</a></div>
+      </article>
+      <article class="pricing-card featured">
+        <small>Realm 02</small>
+        <h2>Artist Apps</h2>
+        <div class="price-line"><strong>$239+</strong><span>launch window</span></div>
+        <p>For artist landing pages, EPKs, visualizer pages, installable PWA drops, and custom artist universes.</p>
+        <div class="card-actions"><a class="secondary button-link" href="./pricing-artist-apps.html">Open App Prices</a><a class="ghost button-link" href="./artist-apps.html">Artist Apps</a></div>
+      </article>
+      <article class="pricing-card featured">
+        <small>Realm 03</small>
+        <h2>Song Creation</h2>
+        <div class="price-line"><strong>$23+</strong><span>AI generated</span></div>
+        <p>For buyer-prompted songs with custom duration, structure, lyrics, genre, mood, vocal direction, and receipt-backed generation.</p>
+        <div class="card-actions"><a class="primary button-link" href="./pricing-song-creation.html">Prices</a><a class="ghost button-link" href="./create.html">Create Hub</a></div>
+      </article>
+      <article class="pricing-card">
+        <small>Realm 04</small>
+        <h2>DAW Beta</h2>
+        <div class="price-line"><strong>$0</strong><span>through 2026</span></div>
+        <p>Every user gets the first-party DAW room free through 2026 while it stays honest as a beta creation and release handoff surface.</p>
+        <div class="card-actions"><a class="secondary button-link" href="./pricing-daw.html">Open DAW Terms</a><a class="ghost button-link" href="./daw.html">DAW</a></div>
+      </article>
+    </section>
+
+    <section class="panel-xl">
+      <div class="section-head">
+        <div>
+          <p class="micro">Upgrade Path</p>
+          <h3>A customer can stop at the song or keep building the release world.</h3>
+        </div>
+      </div>
+      <div class="workflow-strip">
+        <article><strong>Song</strong><span>Prompt, lyrics, duration, voice direction, generation receipt.</span></article>
+        <article><strong>Release</strong><span>Metadata, rights checklist, drop page, private/full package access.</span></article>
+        <article><strong>Media</strong><span>Cover/canvas request, SkyeMediaCenter, Pics2Vid/Still2Vid handoff.</span></article>
+        <article><strong>Artist App</strong><span>Landing page, EPK, PWA, store, social/feed, campaign routing.</span></article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

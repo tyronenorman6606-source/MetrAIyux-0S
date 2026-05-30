@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-04-28T03:24:49.801Z",
+  "ok": true,
+  "version": "3.8.0",
+  "route_guards": {
+    "portal_live_guard": "portal-live-not-ready",
+    "stripe_probe_guard": "stripe-probe-not-ready"
+  },
+  "ready_routes": {
+    "channel": "apple_books",
+    "target_mode": "external",
+    "secure": true,
+    "execution_mode": "live-proof",
+    "step_count": 21
+  },
+  "channels": {
+    "apple_books": {
+      "ok": true,
+      "target_mode": "external",
+      "secure": true,
+      "origin": "https://authors.apple.com"
+    },
+    "kdp_ebook": {
+      "ok": true,
+      "target_mode": "external",
+      "secure": true,
+      "origin": "https://kdp.amazon.com"
+    },
+    "kdp_print_prep": {
+      "ok": true,
+      "target_mode": "external",
+      "secure": true,
+      "origin": "https://kdp.amazon.com"
+    },
+    "kobo": {
+      "ok": true,
+      "target_mode": "external",
+      "secure": true,
+      "origin": "https://www.kobo.com"
+    }
+  },
+  "stripe": {
+    "has_secret_key": true,
+    "has_webhook_secret": true,
+    "livemode_expected": false,
+    "probe_ready": true,
+    "provider": "stripe",
+    "provider_mode": "test",
+    "schema": "skye.payment.provider.credential-readiness",
+    "version": "3.8.0",
+    "webhook_ready": true,
+    "probe": {
+      "provider": "stripe",
+      "provider_mode": "test",
+      "api_base": "http://127.0.0.1:40941",
+      "available_count": 1,
+      "livemode": false
+    }
+  }
+}

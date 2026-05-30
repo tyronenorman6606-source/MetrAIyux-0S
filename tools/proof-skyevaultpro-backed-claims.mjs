@@ -4,8 +4,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-const repoRoot = '/workspaces/MetrAIyux-0S';
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'skyevaultpro-backed-claims', stamp);
 const latestPath = path.join(repoRoot, 'test-artifacts', 'skyevaultpro-backed-claims', 'latest-proof.json');

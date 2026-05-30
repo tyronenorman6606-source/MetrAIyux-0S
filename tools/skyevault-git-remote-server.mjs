@@ -46,6 +46,16 @@ function html(res, status, body) {
   res.end(body);
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
 function git(args, options = {}) {
   return execFileSync('git', args, { cwd: options.cwd || root, encoding: options.encoding || 'utf8', stdio: options.stdio || 'pipe' }).trim();
 }
@@ -685,6 +695,55 @@ function parseRepoPath(urlPath) {
     repoPath: path.join(repoRoot, repoRelative),
     pathInfo: `/${repoRelative.split(path.sep).join('/')}${suffix}`
   };
+}
+
+function browserRepoLanding(req, url, repo) {
+  if (req.method !== 'GET') return '';
+  if (url.searchParams.has('service')) return '';
+  if (!url.pathname.endsWith('.git')) return '';
+  const accept = String(req.headers.accept || '');
+  const userAgent = String(req.headers['user-agent'] || '');
+  if (accept && !accept.includes('text/html') && !accept.includes('*/*')) return '';
+  if (/git\//i.test(userAgent)) return '';
+  const cloneUrl = `${url.protocol}//${url.host}${url.pathname}`;
+  const safeCloneUrl = escapeHtml(cloneUrl);
+  const safeRepo = escapeHtml(`${repo.workspaceId}/${repo.repoId}`);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeVault Git Origin</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#101419;color:#f5f7fb}
+    main{max-width:760px;margin:0 auto;padding:40px 20px}
+    h1{font-size:30px;margin:0 0 12px}
+    p{line-height:1.55;color:#cfd6e4}
+    code{background:#202833;color:#fff;padding:3px 6px;border-radius:5px}
+    pre{white-space:pre-wrap;background:#151b24;border:1px solid #303948;border-radius:8px;padding:14px;overflow:auto}
+    .box{border:1px solid #303948;border-radius:8px;padding:18px;margin:18px 0;background:#161d27}
+    a{color:#8ed1ff}
+  </style>
+</head>
+<body>
+<main>
+  <h1>SkyeVault Git Origin</h1>
+  <p>This is the private Git address for <strong>${safeRepo}</strong>. It is not a file-browsing webpage.</p>
+  <div class="box">
+    <p><strong>What it does:</strong> lets a terminal or IDE clone, pull, fetch, and push this repo.</p>
+    <p><strong>Username:</strong> <code>x-token</code></p>
+    <p><strong>Password:</strong> stored locally in <code>.skyevault-out/git-remote/owner-git-origin.env</code> as <code>SKYEVAULT_GIT_REMOTE_TOKEN</code>.</p>
+  </div>
+  <p>Clone command:</p>
+  <pre>git clone ${safeCloneUrl}</pre>
+  <p>Access helper:</p>
+  <pre>npm run vault:origin:access</pre>
+  <p>Reset password helper:</p>
+  <pre>npm run vault:origin:reset-token</pre>
+  <p>Repo console: <a href="/__skyevault/ui">/__skyevault/ui</a></p>
+</main>
+</body>
+</html>`;
 }
 
 function parseCgiHeaders(buffer) {
@@ -1606,6 +1665,13 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  const browserRepo = parseRepoPath(url.pathname);
+  const browserLanding = browserRepo ? browserRepoLanding(req, url, browserRepo) : '';
+  if (browserLanding) {
+    html(res, 200, browserLanding);
+    return;
+  }
+
   let auth;
   try {
     auth = await resolveAuth(req);
@@ -1690,7 +1756,8 @@ server.listen(port, host, () => {
     baseUrl: `http://${host}:${actualPort}`,
     storageRoot,
     repoRoot,
-    token: devNoAuth || gateIntrospectUrl ? null : token,
+    token: null,
+    tokenConfigured: Boolean(!devNoAuth && !gateIntrospectUrl && token),
     auth: devNoAuth ? 'disabled' : gateIntrospectUrl ? 'gate-introspection' : 'static-token',
     gateIntrospectUrl: gateIntrospectUrl ? 'configured' : null,
     gateEnforceWorkspace,

@@ -1,0 +1,38 @@
+{
+  "schema": "metraiyux.0s.agent.v1",
+  "id": "devooderator-field-scribe",
+  "name": "DevodeRator Field Scribe Agent",
+  "created_at": "2026-05-24T02:20:00.000Z",
+  "updated_at": "2026-05-24T02:20:00.000Z",
+  "status": "available_to_0s",
+  "owner_brain": "gray-london-skyes-brain",
+  "proof_brain": "victor-saint-brain",
+  "purpose": "Collect the day's repo activity, proof receipts, deploy evidence, vault/autosync/bin state, MCP receipts, and changed surfaces, then write DevodeRator founder/dev blog posts in Gray's first-person voice without leaking secrets.",
+  "triggers": [
+    "write today's DevodeRator blog",
+    "call up the DevodeRator agent",
+    "turn today's work into a blog",
+    "make the proof blog",
+    "write the founder dev day log",
+    "write the build diary",
+    "DevodeRator Field Scribe"
+  ],
+  "local_instruction_file": ".agents/devooderator-field-scribe/AGENTS.md",
+  "brief_command": "npm run devooderator:agent:brief",
+  "draft_command": "npm run devooderator:agent:draft",
+  "vault_bin": "skyeagents-bin",
+  "output_policy": {
+    "private_briefs": ".skyevault-out/devooderator-blog-agent",
+    "public_posts": "marketing/devooderator/blog",
+    "publish_requires_owner_request": true,
+    "never_print": [
+      "raw env values",
+      "bearer tokens",
+      "passphrases",
+      "peppers",
+      "signed owner URLs",
+      "admin codes",
+      "private handoff file contents"
+    ]
+  }
+}

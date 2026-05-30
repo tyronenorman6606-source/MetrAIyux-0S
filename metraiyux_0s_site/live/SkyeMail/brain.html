@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script defer src="assets/app.js"></script>
+  <script defer src="assets/mail-ui.js"></script>
+  <script defer src="assets/brain-page.js"></script>
+  <link rel="stylesheet" href="assets/mail-ui.css" />
+  <title>Brain - SkyeMail Citadel</title>
+</head>
+<body data-page-id="brain" data-page-name="Brain" data-page-hint="Mailbox brain with metered kAIxu routing">
+<div class="wrap">
+  <div id="pageTopbar"></div>
+  <div class="layout">
+    <aside class="rail" id="leftRail"></aside>
+    <main class="main">
+      <section class="hero">
+        <section class="card">
+          <div class="badge" id="brainMailboxBadge">Checking mailbox brain...</div>
+          <h1 class="h1">SkyeMail Brain</h1>
+          <p class="sub">A mailbox-scoped brain for triage, summaries, response drafts, handoff planning, explicit send-and-monitor work, and metered kAIxu model routing through the shared 0S gate session.</p>
+          <div class="btnrow">
+            <button class="btn gold" data-brain-action="triage" type="button">Triage</button>
+            <button class="btn" data-brain-action="summarize" type="button">Summarize</button>
+            <button class="btn" data-brain-action="draft_reply" type="button">Draft Reply</button>
+            <button class="btn" data-brain-action="ask_brain" type="button">Ask Brain</button>
+            <button class="btn" data-brain-action="handoff_plan" type="button">Handoff Plan</button>
+            <button class="btn ok" data-brain-action="send_and_monitor" type="button">Send + Monitor</button>
+          </div>
+        </section>
+        <aside class="card">
+          <div class="kicker">AI Runtime</div>
+          <div class="notice" id="brainAiStatus" style="margin-top:12px">Checking kAIxu entitlement and usage...</div>
+          <div class="btnrow" id="brainPlanActions" style="margin-top:12px"></div>
+          <div class="notice" style="margin-top:12px">External sends require explicit approval and still pass through the existing SkyeMail send guard.</div>
+        </aside>
+      </section>
+
+      <section class="card brain-workbench">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">Mailbox Brain Workbench</h2>
+            <div class="mini" id="brainStatus">Waiting for brain status...</div>
+          </div>
+          <div class="btnrow" style="margin-top:0">
+            <button class="btn" id="refreshBrainBtn" type="button">Refresh Brain</button>
+            <a class="btn" href="dashboard.html">Inbox</a>
+            <a class="btn" href="compose.html">Compose</a>
+          </div>
+        </div>
+        <div class="brain-action-grid" id="brainCapabilities"></div>
+        <div class="hr"></div>
+        <form class="brain-form-grid" id="brainForm">
+          <label>Action
+            <select id="brainAction">
+              <option value="triage">Triage</option>
+              <option value="summarize">Summarize</option>
+              <option value="draft_reply">Draft Reply</option>
+              <option value="rewrite">Rewrite</option>
+              <option value="ask_brain">Ask Brain</option>
+              <option value="send_and_monitor">Send + Monitor</option>
+              <option value="handoff_plan">Handoff Plan</option>
+              <option value="monitor">Monitor Replies</option>
+            </select>
+          </label>
+          <label>Brain mode
+            <select id="brainMode">
+              <option value="kaixu">kAIxu metered</option>
+              <option value="auto">FS27 gated auto</option>
+              <option value="local">Local deterministic</option>
+            </select>
+          </label>
+          <label>kAIxu model
+            <select id="brainModel">
+              <option value="kaixu-6.7-mini">kAIxu 6.7 Mini</option>
+              <option value="kaixu-6.7">kAIxu 6.7</option>
+              <option value="kaixu-6.7-pro">kAIxu 6.7 Pro</option>
+            </select>
+          </label>
+          <label>Recipient for Send + Monitor
+            <input id="brainTo" type="email" placeholder="recipient@example.com">
+          </label>
+          <label>Subject for Send + Monitor
+            <input id="brainSubject" placeholder="Subject">
+          </label>
+          <label>Prompt or selected message context
+            <textarea id="brainPrompt" placeholder="Ask the mailbox brain what to do, paste a customer email, or arrive here from a message row."></textarea>
+          </label>
+          <label class="checkline"><input id="brainApproveSend" type="checkbox"> Approve external send for Send + Monitor</label>
+          <div class="btnrow">
+            <button class="btn gold" type="submit">Run Brain</button>
+            <button class="btn" id="clearBrainBtn" type="button">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="split">
+        <article class="card">
+          <div class="toolbar">
+            <div>
+              <h2 style="margin:0 0 4px">Output</h2>
+              <div class="mini">Mailbox-scoped local or kAIxu response for this mailbox.</div>
+            </div>
+          </div>
+          <div class="brain-output" id="brainOutput">Run a brain action to see the mailbox answer.</div>
+        </article>
+        <article class="card">
+          <div class="toolbar">
+            <div>
+              <h2 style="margin:0 0 4px">History</h2>
+              <div class="mini">Recent mailbox brain events stored by the SkyeMail Worker.</div>
+            </div>
+          </div>
+          <div class="brain-history" id="brainHistory"><div class="empty">No brain events loaded yet.</div></div>
+        </article>
+      </section>
+      <section class="card">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0 0 4px">Reply Monitors</h2>
+            <div class="mini">Send + Monitor and monitor-only records checked against synced inbox replies.</div>
+          </div>
+        </div>
+        <div class="brain-history" id="brainMonitors"><div class="empty">No reply monitors loaded yet.</div></div>
+      </section>
+    </main>
+  </div>
+  <div id="appFooter"></div>
+</div>
+</body>
+</html>

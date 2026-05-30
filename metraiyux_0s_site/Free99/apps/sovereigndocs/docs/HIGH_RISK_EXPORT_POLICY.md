@@ -22,4 +22,4 @@ Blocked statuses:
 
 ## Static browser behavior
 
-Static mode has no trusted review-decision backend. Therefore high-risk exports are prep worksheet only.
+0S production mode requires a trusted review decision before elevated-review exports become completed documents.

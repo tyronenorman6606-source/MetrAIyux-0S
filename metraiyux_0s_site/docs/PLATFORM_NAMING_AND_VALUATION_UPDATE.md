@@ -1,6 +1,6 @@
 # Platform Naming and Valuation Update
 
-Updated: 2026-05-15 after deployment of the public overview asset.
+Updated: 2026-05-29 after the full-repo Codex valuation audit, source-of-truth refresh, and green 0S operating proof matrix closeout.
 
 ## Selected Platform Name
 
@@ -20,15 +20,30 @@ Cloudflare Worker layer: **Operator Gateway** or **0meg4kAI Security Gateway**
 
 ## Updated Value Bands
 
-Current deployed asset: **$85,000-$220,000**.
+Current valuation source of truth: `metraiyux_0s_site/data/valuation-source-of-truth.json`.
 
-Deployed operating platform with public overview, full system route, Worker/D1/KV/Queues, auth, Resend, isolation, and smoke receipts: **$275,000-$750,000**.
+Full-repo engineering replacement value: **$13.5M-$24M**.
 
-Revenue-backed SaaS with paying tenants: **$750,000-$3.5M+**, depending on MRR/ARR, churn, retention, usage, connector depth, gross margin, and operational proof.
+Founder/operator general range: **$13.5M-$38M**.
 
-## Why The Public Deployment Raises Value
+Strategic integrated-OS ceiling: **$38M-$68M**.
 
-- The system now has a live public overview at `https://metraiyux-0s-public-spectacle.pages.dev/`.
+Component-cost support only: **$2.5M-$3.2M**. This is retained as diligence support, not the current master valuation cap.
+
+Revenue-backed SaaS with paying tenants becomes the primary valuation method only after booked MRR/ARR, churn, retention, usage, connector depth, gross margin, and operational proof exist.
+
+## Why The Full-Repo Audit Raises Value
+
+- The May 25 scan counted `102,469` workspace files, `91,854` tracked files, and `11,087,013` tracked text lines.
+- The static crawler inventoried `23,282` local HTML pages.
+- The SkyeWay atlas contains `2,617` route entries.
+- SovereignDocs alone accounts for `31,652` files.
+- The proof receipt index parsed `11,146` JSON artifacts.
+- The 2026-05-29 operating proof matrix checked `107` mounted app/curated Worker routes with `0` route/auth failures.
+- The behavior matrix is `22` green, `0` yellow, `0` red, with `22/22` update-or-closeout coverage.
+- The truth ledger is `22` built, `0` partial, `0` P0/P1 repair items.
+- Latest 0S Worker deploy receipt is version `3173e0fb-31e6-4f1d-8af7-34c75cf1f92f`.
+- Remediation reruns passed for SkyeMusicNexus e2e, contractor security, SkyeRouteX runtime/v04/stress/e2e, and Free99 mounted-app proof.
 - The public overview routes qualified visitors into the full website at `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/`.
 - The public overview includes guided education, fit scoring, platform map, tech stack, security boundary, value case, and public brief export.
 - The sitemap and robots files make the asset indexable and operationally cleaner.

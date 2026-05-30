@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMusicNexus - Operator Stage</title>
-  <meta name="description" content="SkyeMusicNexus operator stage for music release review, workflow movement, analytics, payouts, and proof visibility." />
+  <title>SkyeMusicNexus - Protected Review</title>
+  <meta name="description" content="SkyeMusicNexus protected review stage for music release review, workflow movement, analytics, payouts, and receipt visibility." />
   <link rel="stylesheet" href="./neo-nexus.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
   <script defer src="../../assets/js/skye-id-bridge.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="./neo-nexus.js"></script>
 </head>
 <body data-app="skye-music-nexus" data-mode="admin">
@@ -20,16 +20,15 @@
 
   <header class="nexus-topline">
     <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus artist stage">
-      <img src="../assets/platform-mark.svg" alt="" />
+      <img src="../assets/skye-music-nexus-logo.png" alt="" />
     </a>
     <div class="top-title">
-      <p class="micro">SkyeMusicNexus // Operator Stage</p>
+      <p class="micro">SkyeMusicNexus // Protected Review</p>
       <h1>Move releases, content requests, and artist signals from one exchange.</h1>
     </div>
     <div class="session-rack">
-      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-      <button class="ghost" data-action="proof-session">Proof Session</button>
-      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
       <button class="ghost" data-action="logout">Disconnect</button>
       <a class="ghost" href="./daw.html">DAW</a>
       <a class="ghost" href="./discover.html">Discover</a>
@@ -43,9 +42,9 @@
   <main class="nexus-shell admin-shell">
     <section class="ops-hero panel-xl">
       <div>
-        <p class="eyebrow">operations control / kinetic music command / exchange console</p>
-        <h2>Review, publish, credit, route content, and prove the music lane from one kinetic stage.</h2>
-        <p class="lede">This view reads the existing Netlify function layer and turns records into action cards, workflow ribbons, royalty pulses, content requests, community signals, and smoke-proof boundaries.</p>
+        <p class="eyebrow">release review / kinetic music command / exchange console</p>
+        <h2>Review, publish, credit, route content, and keep the music lane accountable from one kinetic stage.</h2>
+        <p class="lede">This view reads the live music service layer and turns records into action cards, workflow ribbons, royalty pulses, content requests, community signals, and clear release boundaries.</p>
       </div>
       <div class="admin-kpis">
         <article><span id="meterArtists">0</span><small>artist nodes</small></article>
@@ -73,7 +72,7 @@
 
       <article class="panel action-console">
         <div class="section-head">
-          <p class="micro">Payout Gate</p>
+          <p class="micro">Payout Queue</p>
           <h3>Complete a payout</h3>
         </div>
         <form id="payoutForm" class="field-grid thin">
@@ -86,7 +85,7 @@
       <article class="panel action-console">
         <div class="section-head">
           <p class="micro">Analytics Prism</p>
-          <h3>Runtime readout</h3>
+          <h3>Service readout</h3>
           <button class="ghost mini" data-action="refresh-records">Refresh</button>
         </div>
         <div id="analyticsPrism" class="analytics-prism"></div>
@@ -100,11 +99,11 @@
             <p class="micro">Exchange Console</p>
             <h3>Content requests, Relay13-ready inbox threads, and community signals.</h3>
           </div>
-          <span class="tag">operator visibility</span>
+          <span class="tag">team visibility</span>
         </div>
         <div class="exchange-panels">
           <div>
-            <p class="lede">Artists can ask for cover/canvas work, captions, short clips, EPK copy, and release campaigns. Every request stays behind the gate and creates a local inbox thread ready for ConnectLog + Relay13 bridging.</p>
+            <p class="lede">Artists can ask for cover/canvas work, captions, short clips, EPK copy, and release campaigns. Every request stays behind client access and creates a local inbox thread ready for ConnectLog + Relay13 bridging.</p>
             <div id="progressRail" class="progress-stack"></div>
           </div>
           <div id="achievementOrbit" class="achievement-grid"></div>
@@ -172,30 +171,17 @@
 
     <section class="panel-xl proof-chain">
       <div>
-        <p class="micro">Operator Truth</p>
+        <p class="micro">Release Truth</p>
         <h3>Boundaries stay explicit</h3>
-        <p>The local stage can prove handlers and persistence. It does not claim live distributor ingestion, DSP royalty settlement, or production identity-provider handoff until those providers are connected.</p>
+        <p>The review stage can show records and persistence. It does not claim live distributor ingestion, DSP royalty settlement, or production identity-provider handoff until those providers are connected.</p>
       </div>
       <div class="proof-links">
-        <a href="../PROOF_STATUS.md">Proof Status</a>
-        <a href="../src/runtime-contract.json">Runtime Contract</a>
-        <a href="../smoke/smoke-proof.mjs">Smoke Proof</a>
+        <a href="../skepticks-spectic-override.html">Claim Audit</a>
+        <a href="../proof.html">Readiness</a>
+        <a href="./drops.html">Drop Room</a>
       </div>
     </section>
   </main>
-
-  <dialog id="operatorDialog" class="operator-dialog">
-    <form method="dialog" id="operatorForm">
-      <h3>Local Operator Login</h3>
-      <p>Uses the existing SkyGate local bootstrap variables. No demo secrets are embedded.</p>
-      <label>Email<input name="email" type="email" required /></label>
-      <label>Password<input name="password" type="password" required /></label>
-      <menu>
-        <button class="ghost" value="cancel">Cancel</button>
-        <button class="primary" value="login">Login</button>
-      </menu>
-    </form>
-  </dialog>
 
   <div id="toast" role="status" aria-live="polite"></div>
 </body>

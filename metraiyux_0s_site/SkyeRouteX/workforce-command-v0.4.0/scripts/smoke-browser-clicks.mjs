@@ -134,7 +134,7 @@ try {
   await page.locator('#market-form [name="city"]').fill('Phoenix');
   await page.locator('#market-form [name="state"]').fill('Arizona');
   await page.locator('#market-form button[type="submit"]').click();
-  await page.waitForFunction(() => document.querySelector('#market-select')?.options?.length > 0, null, { timeout: 5000 }).catch(async error => {
+  await page.waitForFunction(() => document.querySelector('#market-select')?.options?.length > 0, null, { timeout: 10000 }).catch(async error => {
     const diagnostic = await page.evaluate(() => ({
       session: localStorage.getItem('skye_session'),
       user: localStorage.getItem('skye_user'),

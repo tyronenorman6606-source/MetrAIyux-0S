@@ -1,0 +1,96 @@
+{
+  "schema": "skyenet.client-app.deploy-target.v1",
+  "updatedAt": "2026-05-30T19:13:18.218Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "projectId": "musicnexus-local-artists",
+  "workspaceId": "local-artists",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530191247",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/musicnexus-local-artists/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/musicnexus-local-artists",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/local-artists",
+  "publicBuildDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/local-artists",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=local-artists&project_id=musicnexus-local-artists&deployment_id=dep_20260530191247",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
+  },
+  "legacyRoutes": [
+    "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/artist-storefronts/local-artists/",
+    "https://skyenet.graylondonskyes.workers.dev/musicnexus/local-artists/"
+  ],
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "hostHeader": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-local-artists",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/musicnexus-local-artists",
+          "url_mode": "path",
+          "workspace_id": "local-artists",
+          "project_id": "musicnexus-local-artists",
+          "active_deployment_id": "dep_20260530191247",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/musicnexus-local-artists/dep_20260530191247",
+          "updated_at": "2026-05-30T19:13:01.112Z"
+        },
+        "elapsed_ms": 412.96
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-local-artists/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-local-artists",
+        "elapsed_ms": 644.03
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 209.17,
+        "error": "",
+        "blocker": ""
+      },
+      "host_header_probe": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html",
+        "elapsed_ms": 47.53,
+        "bytes": 4644,
+        "title": "SkyeNet | Sovereign Deploy Network",
+        "missing_route_header_probe_error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=local-artists&project_id=musicnexus-local-artists&deployment_id=dep_20260530191247",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 106.51
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 96256,
+        "read_truncated": false,
+        "elapsed_ms": 845.62,
+        "error": ""
+      }
+    }
+  }
+}

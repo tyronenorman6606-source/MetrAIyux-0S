@@ -2,12 +2,12 @@
 
 SovereignDocs can run as a static platform or as an optional Node API platform.
 
-Static mode remains valid for Netlify drop deployment. API mode is for local server persistence, future Postgres/D1/R2 adapters, and upstream-auth integration.
+The production lane is the shared 0S Worker API. Local adapters exist for development only.
 
 ## Run API Mode
 
 ```bash
-npm start
+npm run 0s:worker:dev
 ```
 
 Default URL:
@@ -139,7 +139,7 @@ The API must preserve the public product boundary: SovereignDocs is document aut
 
 ## v4 Dataset Endpoints
 
-These endpoints are available only in optional Node API mode (`npm start`). Static Netlify drop mode still serves the same pages and JSON files directly where applicable.
+These endpoints are served by the shared 0S Worker API when the FS27 gate session is present.
 
 - `GET /api/packs` — returns document packet workflow bundles from `data/packs.json`.
 - `GET /api/packs/:id` — returns one packet.

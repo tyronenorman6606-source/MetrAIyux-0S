@@ -5,12 +5,11 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = path.join(repoRoot, 'metraiyux_0s_site/Free99/apps/sovereigndocs');
-const docxRoot = path.join(sourceRoot, 'skye-docx-max');
 const assetsRoot = path.join(sourceRoot, 'assets');
 const deployRoot = path.join(repoRoot, 'test-artifacts/sovereigndocs-docxmax-lane/deploy');
 const receiptPath = path.join(repoRoot, 'test-artifacts/sovereigndocs-docxmax-lane/build-manifest.json');
 const mountRoot = 'Free99/apps/sovereigndocs';
-const canonical0sUrl = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/skye-docx-max/app/index.html';
+const canonical0sUrl = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs&ws_id=sovereigndocs&returnTo=%2FFree99%2Fapps%2Fsovereigndocs%2Fvault%2F';
 
 const copied = [];
 
@@ -47,7 +46,7 @@ function writeGenerated(relativeDestination, content) {
 }
 
 const pagesWorker = String.raw`const MAIN_0S_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
-const CANONICAL_DOCX_PATH = '/Free99/apps/sovereigndocs/skye-docx-max/app/index.html';
+const CANONICAL_DOCX_PATH = '/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs&ws_id=sovereigndocs&returnTo=%2FFree99%2Fapps%2Fsovereigndocs%2Fvault%2F';
 
 function noStore(headers = {}) {
   return {
@@ -65,8 +64,7 @@ function wantsHtml(request) {
 }
 
 function mappedReturnPath(url) {
-  if (url.pathname === '/' || url.pathname === '/index.html') return CANONICAL_DOCX_PATH;
-  return url.pathname + (url.search || '');
+  return CANONICAL_DOCX_PATH;
 }
 
 function redirectToGate(request) {
@@ -130,7 +128,6 @@ export default {
 
 fs.rmSync(deployRoot, { recursive: true, force: true });
 
-copyTree(docxRoot, path.join(mountRoot, 'skye-docx-max'));
 copyTree(assetsRoot, path.join(mountRoot, 'assets'));
 writeGenerated(
   'index.html',
@@ -142,7 +139,7 @@ const manifest = {
   generated_at: new Date().toISOString(),
   purpose: 'lean gated SovereignDocs SkyeDocxMax Pages origin',
   source: {
-    docx: path.relative(repoRoot, docxRoot),
+    docx: 'removed: canonical SkyeDocxMax is served from metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax',
     assets: path.relative(repoRoot, assetsRoot)
   },
   deploy: path.relative(repoRoot, deployRoot),

@@ -1,0 +1,411 @@
+.artist-app-shell {
+  width: 100%;
+  max-width: none;
+  padding: 0 0 72px;
+  gap: 0;
+}
+
+.gray-video-universe-copy {
+  --bg: #030305;
+  --ink: #fff6ee;
+  --soft: rgba(255, 246, 238, 0.76);
+  --muted: rgba(255, 246, 238, 0.56);
+  --line: rgba(255, 246, 238, 0.16);
+  --red: #ff244f;
+  --cyan: #4deaff;
+  --gold: #ffd36a;
+  --violet: #a879ff;
+  --green: #79ffb5;
+  --shadow-red: 0 0 44px rgba(255, 36, 79, 0.24);
+  --shadow-cyan: 0 0 44px rgba(77, 234, 255, 0.18);
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  padding: clamp(7rem, 13vw, 12rem) clamp(1rem, 5vw, 5.4rem) clamp(8.2rem, 12vw, 10rem);
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ink);
+  background: #030305;
+}
+
+.gray-video-universe-copy .scene-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #050506;
+}
+
+.gray-video-universe-copy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(3, 3, 5, 0.9) 0%, rgba(3, 3, 5, 0.48) 42%, rgba(3, 3, 5, 0.18) 62%, rgba(3, 3, 5, 0.78) 100%),
+    linear-gradient(0deg, var(--bg), transparent 38%, rgba(3, 3, 5, 0.28));
+}
+
+.gray-video-universe-copy .hero-copy {
+  position: relative;
+  z-index: 8;
+  width: min(72rem, 100%);
+  max-width: 62rem;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.72);
+}
+
+.gray-video-universe-copy .hero-copy h2 {
+  max-width: 11ch;
+  margin: 0;
+  color: #fff;
+  font-family: "Arial Black", Impact, ui-sans-serif, sans-serif;
+  font-size: clamp(4.8rem, 13vw, 13rem);
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 18px rgba(255, 36, 79, 0.64),
+    0 0 60px rgba(77, 234, 255, 0.24);
+}
+
+.gray-video-universe-copy .lede {
+  max-width: 52rem;
+  margin: 1rem 0 0;
+  color: var(--soft);
+  font-size: clamp(1.08rem, 2vw, 1.58rem);
+  line-height: 1.48;
+}
+
+.gray-video-universe-copy .eyebrow {
+  margin: 0 0 0.7rem;
+  color: var(--cyan);
+  font-size: 0.76rem;
+  font-weight: 1000;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gray-video-universe-copy .gray-video-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  touch-action: none;
+}
+
+.gray-video-universe-copy .gray-video-stage::before,
+.gray-video-universe-copy .gray-video-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.gray-video-universe-copy .gray-video-stage::before {
+  background:
+    radial-gradient(circle at 58% 48%, rgba(255, 36, 79, 0.2), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(77, 234, 255, 0.16), transparent 24%),
+    linear-gradient(90deg, rgba(3, 3, 5, 0.9), rgba(3, 3, 5, 0.22) 54%, rgba(3, 3, 5, 0.86));
+}
+
+.gray-video-universe-copy .gray-video-stage::after {
+  opacity: 0.38;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 8px, rgba(255, 255, 255, 0.06) 9px),
+    linear-gradient(115deg, transparent, rgba(255, 211, 106, 0.12), transparent 62%);
+  mix-blend-mode: screen;
+}
+
+.gray-video-universe-copy .hero-stage-video {
+  position: absolute;
+  inset: 10vh 6vw auto auto;
+  z-index: 1;
+  width: min(48vw, 48rem);
+  height: min(58vh, 36rem);
+  object-fit: cover;
+  opacity: 0.82;
+  border: 1px solid rgba(255, 246, 238, 0.18);
+  border-radius: 0;
+  box-shadow:
+    0 0 54px rgba(255, 36, 79, 0.24),
+    0 28px 82px rgba(0, 0, 0, 0.56);
+  filter: saturate(1.08) contrast(1.05);
+}
+
+.gray-video-universe-copy .floating-video-world {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-style: preserve-3d;
+  transform: rotateX(58deg) rotateZ(var(--video-orbit-z, 0deg));
+  animation: videoOrbitSpin 38s linear infinite;
+}
+
+.gray-video-universe-copy .floating-video-world.is-held {
+  animation-play-state: paused;
+}
+
+.gray-video-universe-copy .video-float-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(9rem, 15vw, 17rem);
+  min-height: clamp(12rem, 19vw, 22rem);
+  display: grid;
+  align-content: end;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--card-color) 60%, rgba(255, 255, 255, 0.2));
+  border-radius: 8px;
+  color: var(--ink);
+  background: #050507;
+  box-shadow: 0 0 30px color-mix(in srgb, var(--card-color) 42%, transparent), 0 20px 54px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  transform:
+    translate(-50%, -50%)
+    rotateZ(calc(var(--card-angle) + var(--manual-angle, 0deg)))
+    translateX(clamp(16rem, 34vw, 34rem))
+    rotateZ(calc((var(--card-angle) + var(--manual-angle, 0deg)) * -1))
+    rotateX(-58deg);
+  transition: scale 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.gray-video-universe-copy .video-float-card.is-active,
+.gray-video-universe-copy .video-float-card:hover {
+  scale: 1.08;
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 0 38px color-mix(in srgb, var(--card-color) 72%, transparent), 0 28px 76px rgba(0, 0, 0, 0.68);
+}
+
+.gray-video-universe-copy .video-float-card video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.82;
+}
+
+.gray-video-universe-copy .video-float-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 18%, rgba(0, 0, 0, 0.88)),
+    repeating-linear-gradient(0deg, transparent 0 8px, rgba(255, 255, 255, 0.055) 9px);
+  pointer-events: none;
+}
+
+.gray-video-universe-copy .video-float-card span,
+.gray-video-universe-copy .video-float-card strong,
+.gray-video-universe-copy .video-float-card small {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin: 0 0.82rem;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.92);
+}
+
+.gray-video-universe-copy .video-float-card span {
+  color: var(--cyan);
+  font-size: 0.66rem;
+  font-weight: 1000;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.gray-video-universe-copy .video-float-card strong {
+  margin-top: 0.35rem;
+  font-family: "Arial Black", Impact, sans-serif;
+  font-size: clamp(1rem, 1.8vw, 1.7rem);
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.gray-video-universe-copy .video-float-card small {
+  margin-top: 0.45rem;
+  margin-bottom: 0.85rem;
+  color: var(--soft);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gray-video-universe-copy .hero-stage-panel {
+  position: absolute;
+  right: clamp(1rem, 4vw, 4rem);
+  bottom: clamp(6rem, 10vw, 8rem);
+  z-index: 6;
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border: 1px solid rgba(255, 246, 238, 0.18);
+  border-radius: 8px;
+  background: rgba(3, 3, 5, 0.76);
+  backdrop-filter: blur(18px);
+}
+
+.gray-video-universe-copy .hero-stage-panel strong {
+  display: block;
+  color: var(--ink);
+  font-family: "Arial Black", Impact, sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.gray-video-universe-copy .hero-stage-panel span {
+  display: block;
+  margin-top: 0.66rem;
+  color: var(--soft);
+  line-height: 1.45;
+}
+
+.gray-video-universe-copy .stage-controls,
+.gray-video-universe-copy .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.76rem;
+}
+
+.gray-video-universe-copy .stage-orbit-controls {
+  position: absolute;
+  left: clamp(1rem, 5vw, 5.4rem);
+  bottom: clamp(3rem, 6vw, 5rem);
+  z-index: 7;
+}
+
+.gray-video-universe-copy .button-row {
+  margin-top: 1.4rem;
+}
+
+.gray-video-universe-copy .button,
+.gray-video-universe-copy button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.78rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.gray-video-universe-copy .button:hover,
+.gray-video-universe-copy button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(77, 234, 255, 0.58);
+  background: rgba(77, 234, 255, 0.11);
+  box-shadow: var(--shadow-cyan);
+}
+
+.gray-video-universe-copy .button.primary,
+.gray-video-universe-copy button.primary {
+  color: #100609;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--red), var(--gold));
+  box-shadow: var(--shadow-red);
+}
+
+.gray-video-universe-copy .neon-gradient-text {
+  color: transparent;
+  background: linear-gradient(90deg, #fff 0%, var(--gold) 31%, var(--cyan) 63%, var(--green) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 0 28px rgba(53, 183, 255, 0.18), 0 0 34px rgba(243, 212, 131, 0.12);
+}
+
+.gray-app-drop-rails {
+  width: min(1540px, calc(100% - clamp(28px, 6vw, 76px)));
+  margin: 22px auto 0;
+}
+
+.artist-app-shell > .dual-grid {
+  width: min(1540px, calc(100% - clamp(28px, 6vw, 76px)));
+  margin: 18px auto 0;
+}
+
+@keyframes videoOrbitSpin {
+  from {
+    transform: rotateX(58deg) rotateZ(var(--video-orbit-z, 0deg));
+  }
+  to {
+    transform: rotateX(58deg) rotateZ(calc(var(--video-orbit-z, 0deg) + 360deg));
+  }
+}
+
+@media (max-width: 1040px) {
+  .gray-video-universe-copy .video-float-card {
+    transform:
+      translate(-50%, -50%)
+      rotateZ(calc(var(--card-angle) + var(--manual-angle, 0deg)))
+      translateX(clamp(12rem, 31vw, 22rem))
+      rotateZ(calc((var(--card-angle) + var(--manual-angle, 0deg)) * -1))
+      rotateX(-58deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .gray-video-universe-copy {
+    min-height: 104svh;
+    padding-top: 10.5rem;
+  }
+
+  .gray-video-universe-copy .hero-copy h2 {
+    font-size: clamp(4rem, 21vw, 6.2rem);
+  }
+
+  .gray-video-universe-copy .hero-stage-video {
+    inset: 6rem 1rem auto auto;
+    width: min(72vw, 23rem);
+    height: min(35vh, 24rem);
+  }
+
+  .gray-video-universe-copy .video-float-card {
+    width: 8.4rem;
+    min-height: 11rem;
+    transform:
+      translate(-50%, -50%)
+      rotateZ(calc(var(--card-angle) + var(--manual-angle, 0deg)))
+      translateX(10.4rem)
+      rotateZ(calc((var(--card-angle) + var(--manual-angle, 0deg)) * -1))
+      rotateX(-58deg);
+  }
+
+  .gray-video-universe-copy .video-float-card strong {
+    font-size: 0.9rem;
+  }
+
+  .gray-video-universe-copy .hero-stage-panel {
+    right: 1rem;
+    bottom: 7.5rem;
+    width: calc(100vw - 2rem);
+  }
+
+  .gray-video-universe-copy .stage-orbit-controls {
+    left: 1rem;
+    right: 1rem;
+    bottom: 2.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gray-video-universe-copy *,
+  .gray-video-universe-copy *::before,
+  .gray-video-universe-copy *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

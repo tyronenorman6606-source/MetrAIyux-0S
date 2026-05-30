@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ames Construction, Inc. | Scottsdale Construction Contractor</title>
+  <meta name="description" content="Ames Construction, Inc. is a Scottsdale construction contractor profile with a Hartford Drive address, direct phone, Chamber category evidence, and contractor-facing visibility.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5d6870;
+      --steel: #476576;
+      --green: #476f4e;
+      --clay: #b65e3d;
+      --paper: #f5f3ee;
+      --white: #fffefa;
+      --line: rgba(23, 32, 42, .16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(71, 101, 118, .18) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(71, 101, 118, .18) 1px, transparent 1px),
+        linear-gradient(180deg, #fbfaf5, var(--paper));
+      background-size: 48px 48px, 48px 48px, auto;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .wrap {
+      width: min(1160px, calc(100% - 34px));
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0 18px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .header img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, .98fr) minmax(320px, 1.02fr);
+      gap: 34px;
+      align-items: center;
+      min-height: 70vh;
+      padding: 48px 0 56px;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--clay);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 790px;
+      margin: 0;
+      font-size: 5rem;
+      line-height: .93;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 700px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid var(--steel);
+      border-radius: 6px;
+      background: white;
+      color: var(--steel);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--steel);
+      color: #fff;
+    }
+
+    .plan {
+      display: grid;
+      grid-profile-columns: 1fr 1fr;
+      border: 1px solid var(--line);
+      background: rgba(255, 254, 250, .92);
+    }
+
+    .plan-cell {
+      min-height: 160px;
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .plan-cell:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .plan-cell:nth-last-child(-n+2) {
+      border-bottom: 0;
+    }
+
+    .plan-cell b {
+      display: block;
+      color: var(--green);
+      font-size: .85rem;
+      text-transform: uppercase;
+    }
+
+    .plan-cell span {
+      display: block;
+      margin-top: 12px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .details {
+      display: grid;
+      grid-profile-columns: .8fr 1.2fr;
+      gap: 20px;
+      padding-bottom: 56px;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255, 254, 250, .9);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .service signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .tag {
+      padding: 8px 10px;
+      border: 1px solid rgba(71, 111, 78, .28);
+      border-radius: 6px;
+      background: #eef6ef;
+      font-weight: 800;
+    }
+
+    .notes {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .notes li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 22px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255, 254, 250, .74);
+    }
+
+    @media (max-width: 920px) {
+      .hero,
+      .details {
+        grid-profile-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 3.4rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .plan {
+        grid-profile-columns: 1fr;
+      }
+
+      .plan-cell,
+      .plan-cell:nth-child(2n),
+      .plan-cell:nth-last-child(-n+2) {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .plan-cell:last-child {
+        border-bottom: 0;
+      }
+
+      h1 {
+        font-size: 2.45rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap header">
+    <img src="assets/logo.svg" alt="Ames Construction listing mark">
+    <span>Valley Verified Network / Home Services</span>
+    <span>Scottsdale, AZ 85255</span>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Construction contractor</p>
+        <h1 id="page-title">Ames Construction, Inc.</h1>
+        <p class="lead">Ames Construction, Inc. gives Scottsdale property owners and project teams a construction contractor contact backed by a public Chamber profile, direct phone, and Hartford Drive address.</p>
+        <div class="actions">
+          <a class="button primary" href="tel:+16024312111">(602) 431-2111</a>
+          <a class="button" href="https://www.amesconstruction.com">amesconstruction.com</a>
+          <a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=8333%20E.%20Hartford%20Dr.%2C%20Scottsdale%2C%20AZ%2085255">Map address</a>
+        </div>
+      </div>
+      <aside class="plan" aria-label="Profile facts">
+        <div class="plan-cell"><b>Category</b><span>Home Services</span></div>
+        <div class="plan-cell"><b>Niche</b><span>Construction Contractor</span></div>
+        <div class="plan-cell"><b>Service type</b><span>Real Estate/Contractors / Construction Contractor</span></div>
+        <div class="plan-cell"><b>Profile date</b><span>2026-05-19</span></div>
+      </aside>
+    </section>
+
+    <section class="details" aria-label="Service Signals and local profile facts">
+      <div class="panel">
+        <h2>Service Signals</h2>
+        <div class="service signals">
+          <span class="tag">Construction contractor</span>
+          <span class="tag">Real Estate/Contractors</span>
+          <span class="tag">Local SMB / service business</span>
+          <span class="tag">Public Chamber profile</span>
+          <span class="tag">Contractor / Home Service</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Local Context</h2>
+        <ul class="notes">
+          <li>Valley Verified centers this profile on clear local business facts.</li>
+          <li>Public Chamber profile supports this business.</li>
+          <li></li>
+          <li>Public business evidence and direct contact routes support this profile.</li>
+          <li>Chamber profile domain differs from website.</li>
+        </ul>
+      </div>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-ames-construction-inc-scottsdale-85255-1a3d9fd" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-ames-construction-inc-scottsdale-85255-1a3d9fd" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says Ames Construction, Inc. is Valley Verified because the Scottsdale business has a clear contractor category, a reachable local office, and public business evidence that helps project callers orient quickly. The profile places Ames at 8333 E. Hartford Dr. in Scottsdale and lists (602) 431-2111 for construction contractor inquiries.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The Greater Phoenix Chamber category evidence and contractor references support the business as a Scottsdale construction contractor serving property owners, managers, and local project teams. Valley Verified keeps the copy focused on the solid facts: category, city, address, phone, and construction use case.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">Ames belongs in Valley Verified because Scottsdale building and property work depends on discoverable, locally anchored contractors, and this profile gives customers the essential public contact route without adding claims public evidence does not support.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Construction contractor services and project conversations tied to Scottsdale property needs.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Homeowners, property managers, and local service callers looking for construction contractor support.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Greater Phoenix Chamber category evidence, Scottsdale address, direct phone, and contractor profile visibility.</span></div>
+        </div>
+      </section>
+  </main>
+
+  <footer>
+      <div class="wrap">Scottsdale, AZ Valley Verified profile.</div>
+    </footer>
+</body>
+</html>

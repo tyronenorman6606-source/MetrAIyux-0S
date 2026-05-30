@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>SOLE Access</title>
+
+<style>
+:root{
+  --bg0:#04010b;
+  --bg1:#07001a;
+  --ink:#eef2ff;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 800px at 20% 15%, rgba(124,58,237,.25), transparent 60%),
+    radial-gradient(1000px 700px at 80% 10%, rgba(255,61,240,.20), transparent 60%),
+    linear-gradient(180deg, var(--bg0), var(--bg1));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px;
+}
+
+.card{
+  width:min(860px,100%);
+  border-radius:26px;
+  padding:36px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 30px 90px rgba(0,0,0,.6);
+}
+
+h1{
+  margin:0 0 10px;
+  font-size:42px;
+  background:linear-gradient(90deg,#ffcc55,#ff3df0,#7c3aed,#2ef6ff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+p{opacity:.8}
+
+input,button{
+  width:100%;
+  padding:16px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.25);
+  background:#0b0617;
+  color:#fff;
+  font-size:16px;
+  margin-top:14px;
+}
+
+button{
+  background:linear-gradient(135deg,#7c3aed,#ff3df0);
+  font-weight:800;
+  cursor:pointer;
+}
+
+#welcome{
+  display:none;
+  margin-top:16px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+/* ====== ROYAL COSMIC RETURN HOME BUTTON ====== */
+.sole-home-wrap{
+  display:flex;
+  justify-content:center;
+  margin:60px 0 0;
+}
+.sole-home-btn{
+  position:relative;
+  padding:16px 36px;
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#ffffff;
+  text-decoration:none;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ffcc55 0%,#ff3df0 35%,#7c3aed 65%,#2ef6ff 100%);
+  box-shadow:
+    0 0 18px rgba(255,61,240,0.45),
+    0 0 36px rgba(124,58,237,0.35),
+    0 0 60px rgba(46,246,255,0.25);
+  transition:all .35s ease;
+  overflow:hidden;
+}
+.sole-home-btn:hover{transform:scale(1.08)}
+/* ====== END BUTTON ====== */
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h1>SOLE Key Access</h1>
+  <p>Authorized clients only.</p>
+
+  <form id="gate">
+    <input id="key" placeholder="••••••"/>
+    <button type="submit">Unlock</button>
+    <div id="welcome">Welcome to SOLE</div>
+  </form>
+
+  <div class="sole-home-wrap">
+    <a href="index.html" class="sole-home-btn">⟵ Return to SOLE</a>
+  </div>
+</div>
+
+<script>
+const REDIRECT="capone1.html";
+const FLAG="sole_gate_v2";
+
+const ALLOWED=new Set([
+
+"3436dc06efdc1e183df4032b24b4d272532ab4030792cb6882bb3a859a768336",
+"8bd87cd6eb4782408ae0de4f91a044f5be2c73e3fc5f74753fba0fd9972018fe",
+"3ae115d7f463145b75728cb19b5d70bbdad11fb1f172ef6bfdd0a972a0352131",
+"ffd6ca845cf32dce623452fc25da82910a95ab4a8bb81c5c95be64e4517f9f83",
+"1aceae38cebce45eb86cbd814163eb24aef14ef830c9abf195e49d059d6e107c",
+"8f6f061f7fb22014e40f54be7e1997bb6e5e1954831e0ebfa3d6d064d5f2276b",
+"f0d46da03b58e9b59d414676ae8b04380f129f2e338ec25d4ea6acc0f342489a"
+]);
+
+async function sha256(t){
+ const d=new TextEncoder().encode(t);
+ const h=await crypto.subtle.digest("SHA-256",d);
+ return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+if(localStorage.getItem(FLAG)==="1"){
+ location.assign(REDIRECT);
+}
+
+document.getElementById("gate").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const v=document.getElementById("key").value.trim();
+ if(!v)return;
+ const h=await sha256(v);
+ if(ALLOWED.has(h)){
+   localStorage.setItem(FLAG,"1");
+   document.getElementById("welcome").style.display="block";
+   setTimeout(()=>location.assign(REDIRECT),700);
+ }
+});
+</script>
+</body>
+</html>

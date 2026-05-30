@@ -1,0 +1,935 @@
+{
+  "schema": "fs27.skynet.deploy.receipt.v1",
+  "completedAt": "2026-05-23T20:01:45.469Z",
+  "origin": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+  "zeroOsProxy": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  "projectId": "skynet-supaboy-artist-landing-nexus",
+  "deploymentId": "dep_20260523200046",
+  "productionUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet-supaboy-artist-landing-nexus/",
+  "supaboyUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet-supaboy-artist-landing-nexus/SUPABOY/",
+  "supaboyMusicUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet-supaboy-artist-landing-nexus/SUPABOY/index.html#sound",
+  "sourceDir": "/home/lordkaixu/Projects/MetrAIyux-0S/.1/supaboy-artist-landing-nexus",
+  "auth": {
+    "loginKey": "FREE99_ADMIN_CODE",
+    "credentialHash": "1face0d671e1",
+    "ownerLoginTokenUsed": true
+  },
+  "init": {
+    "ok": true,
+    "via": "fs27-service-binding",
+    "target_path": "/deploy/init",
+    "skynet": {
+      "ok": true,
+      "project_id": "skynet-supaboy-artist-landing-nexus",
+      "deployment_id": "dep_20260523200046",
+      "asset_prefix": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046",
+      "upload": {
+        "method": "PUT",
+        "path": "/deploy/upload",
+        "query": "projectId=<project_id>&deploymentId=<deployment_id>&path=<asset_path>"
+      }
+    }
+  },
+  "complete": {
+    "ok": true,
+    "via": "fs27-service-binding",
+    "target_path": "/deploy/complete",
+    "skynet": {
+      "ok": true,
+      "project_id": "skynet-supaboy-artist-landing-nexus",
+      "deployment_id": "dep_20260523200046",
+      "asset_prefix": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046",
+      "files": 34
+    }
+  },
+  "routes": [
+    {
+      "ok": true,
+      "via": "fs27-service-binding",
+      "target_path": "/deploy/route",
+      "skynet": {
+        "ok": true,
+        "key": "route:v1:host:skyegatefs27-citadeldb.graylondonskyes.workers.dev:path:/skynet-supaboy-artist-landing-nexus",
+        "route": {
+          "schema": "fs27.route.v1",
+          "hostname": "skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+          "mount_path": "/skynet-supaboy-artist-landing-nexus",
+          "url_mode": "path",
+          "strip_mount_path": true,
+          "customer_id": "31",
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "active_deployment_id": "dep_20260523200046",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_mode": "r2",
+          "asset_prefix": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046",
+          "function_mode": "",
+          "dispatch_name": "",
+          "forward_auth": false,
+          "fallback_origin": "",
+          "updated_at": "2026-05-23T20:01:45.924Z"
+        },
+        "live_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skynet-supaboy-artist-landing-nexus",
+        "url_model": {
+          "schema": "fs27.skynet.url_model.v1",
+          "public_product_name": "SkyeNet",
+          "current_release_default": "host_path_route",
+          "path_route_pattern": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+          "branded_subdomain_pattern": "https://<project>.<your-skynet-domain>",
+          "url_modes": [
+            {
+              "id": "path",
+              "label": "SkyeNet path route",
+              "status": "live_now",
+              "example": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+              "required_fields": [
+                "project_id",
+                "deployment_id"
+              ],
+              "optional_fields": [
+                "hostname",
+                "mount_path"
+              ]
+            },
+            {
+              "id": "subdomain",
+              "label": "SkyeNet branded subdomain",
+              "status": "requires_wildcard_domain",
+              "example": "https://my-site.skynet.example",
+              "required_fields": [
+                "project_id",
+                "deployment_id",
+                "hostname or SKYENET_ROOT_DOMAIN"
+              ],
+              "optional_fields": [
+                "custom_domain"
+              ]
+            }
+          ],
+          "copy_rule": "Customer-facing copy says SkyeNet. Runtime provider details stay internal."
+        }
+      }
+    },
+    {
+      "ok": true,
+      "via": "fs27-service-binding",
+      "target_path": "/deploy/route",
+      "skynet": {
+        "ok": true,
+        "key": "route:v1:host:skyegatefs27-citadeldb.graylondonskyes.workers.dev:path:/SUPABOY-ARTIST-LANDING-NEXUS",
+        "route": {
+          "schema": "fs27.route.v1",
+          "hostname": "skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+          "mount_path": "/SUPABOY-ARTIST-LANDING-NEXUS",
+          "url_mode": "path",
+          "strip_mount_path": true,
+          "customer_id": "31",
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "active_deployment_id": "dep_20260523200046",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_mode": "r2",
+          "asset_prefix": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046",
+          "function_mode": "",
+          "dispatch_name": "",
+          "forward_auth": false,
+          "fallback_origin": "",
+          "updated_at": "2026-05-23T20:01:46.248Z"
+        },
+        "live_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/SUPABOY-ARTIST-LANDING-NEXUS",
+        "url_model": {
+          "schema": "fs27.skynet.url_model.v1",
+          "public_product_name": "SkyeNet",
+          "current_release_default": "host_path_route",
+          "path_route_pattern": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+          "branded_subdomain_pattern": "https://<project>.<your-skynet-domain>",
+          "url_modes": [
+            {
+              "id": "path",
+              "label": "SkyeNet path route",
+              "status": "live_now",
+              "example": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+              "required_fields": [
+                "project_id",
+                "deployment_id"
+              ],
+              "optional_fields": [
+                "hostname",
+                "mount_path"
+              ]
+            },
+            {
+              "id": "subdomain",
+              "label": "SkyeNet branded subdomain",
+              "status": "requires_wildcard_domain",
+              "example": "https://my-site.skynet.example",
+              "required_fields": [
+                "project_id",
+                "deployment_id",
+                "hostname or SKYENET_ROOT_DOMAIN"
+              ],
+              "optional_fields": [
+                "custom_domain"
+              ]
+            }
+          ],
+          "copy_rule": "Customer-facing copy says SkyeNet. Runtime provider details stay internal."
+        }
+      }
+    },
+    {
+      "ok": true,
+      "via": "fs27-service-binding",
+      "target_path": "/deploy/route",
+      "skynet": {
+        "ok": true,
+        "key": "route:v1:host:skyegatefs27-citadeldb.graylondonskyes.workers.dev:path:/supaboy-artist-landing-nexus",
+        "route": {
+          "schema": "fs27.route.v1",
+          "hostname": "skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+          "mount_path": "/supaboy-artist-landing-nexus",
+          "url_mode": "path",
+          "strip_mount_path": true,
+          "customer_id": "31",
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "active_deployment_id": "dep_20260523200046",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_mode": "r2",
+          "asset_prefix": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046",
+          "function_mode": "",
+          "dispatch_name": "",
+          "forward_auth": false,
+          "fallback_origin": "",
+          "updated_at": "2026-05-23T20:01:46.505Z"
+        },
+        "live_url": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/supaboy-artist-landing-nexus",
+        "url_model": {
+          "schema": "fs27.skynet.url_model.v1",
+          "public_product_name": "SkyeNet",
+          "current_release_default": "host_path_route",
+          "path_route_pattern": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+          "branded_subdomain_pattern": "https://<project>.<your-skynet-domain>",
+          "url_modes": [
+            {
+              "id": "path",
+              "label": "SkyeNet path route",
+              "status": "live_now",
+              "example": "https://skyegatefs27.internal/skyenet/skynet-supaboy-artist-landing-nexus",
+              "required_fields": [
+                "project_id",
+                "deployment_id"
+              ],
+              "optional_fields": [
+                "hostname",
+                "mount_path"
+              ]
+            },
+            {
+              "id": "subdomain",
+              "label": "SkyeNet branded subdomain",
+              "status": "requires_wildcard_domain",
+              "example": "https://my-site.skynet.example",
+              "required_fields": [
+                "project_id",
+                "deployment_id",
+                "hostname or SKYENET_ROOT_DOMAIN"
+              ],
+              "optional_fields": [
+                "custom_domain"
+              ]
+            }
+          ],
+          "copy_rule": "Customer-facing copy says SkyeNet. Runtime provider details stay internal."
+        }
+      }
+    }
+  ],
+  "uploadedFiles": [
+    {
+      "path": "artist-id-upload.html",
+      "bytes": 5935,
+      "sha256": "43d1da109852d14e0c16fecf35a486f2c5fc38121e2822ebacb0dbf7f0cfced2",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "artist-id-upload.html",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/artist-id-upload.html",
+          "bytes": 5935,
+          "sha256": "43d1da109852d14e0c16fecf35a486f2c5fc38121e2822ebacb0dbf7f0cfced2",
+          "content_type": "text/html; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "artist-upload-proof.js",
+      "bytes": 12609,
+      "sha256": "346e4b9555331b6f059e1fd0c7944d6d51e9578ab328b71b917d4dcf18ec10d3",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "artist-upload-proof.js",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/artist-upload-proof.js",
+          "bytes": 12609,
+          "sha256": "346e4b9555331b6f059e1fd0c7944d6d51e9578ab328b71b917d4dcf18ec10d3",
+          "content_type": "application/javascript; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "assets/skye-music-nexus-logo.png",
+      "bytes": 758678,
+      "sha256": "ac3c6b4be3a138640becc9c122a97ca95a9b9b0fe2dfb8beaca28c2d087018e9",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "assets/skye-music-nexus-logo.png",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/assets/skye-music-nexus-logo.png",
+          "bytes": 758678,
+          "sha256": "ac3c6b4be3a138640becc9c122a97ca95a9b9b0fe2dfb8beaca28c2d087018e9",
+          "content_type": "image/png"
+        }
+      }
+    },
+    {
+      "path": "index.html",
+      "bytes": 6504,
+      "sha256": "8016d98a5f4b43aab33cd7e908305cc6518e9043df26ecdee815dff11bcea356",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "index.html",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/index.html",
+          "bytes": 6504,
+          "sha256": "8016d98a5f4b43aab33cd7e908305cc6518e9043df26ecdee815dff11bcea356",
+          "content_type": "text/html; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "nexus.css",
+      "bytes": 13251,
+      "sha256": "3d19e8cf4d864026736738e2f053b23461df652b4525dcdb49f8a769c83738ef",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "nexus.css",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/nexus.css",
+          "bytes": 13251,
+          "sha256": "3d19e8cf4d864026736738e2f053b23461df652b4525dcdb49f8a769c83738ef",
+          "content_type": "text/css; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "nexus.js",
+      "bytes": 1382,
+      "sha256": "a7f97a5dc2c5e9ec6c81c30ca1ee5b837be1188f86481518a33eb43314a82973",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "nexus.js",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/nexus.js",
+          "bytes": 1382,
+          "sha256": "a7f97a5dc2c5e9ec6c81c30ca1ee5b837be1188f86481518a33eb43314a82973",
+          "content_type": "application/javascript; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "PROOF_RECEIPT.json",
+      "bytes": 1872,
+      "sha256": "fe32bf3de9fac5c36e1cb56758b262fb202aff8a9f1e4209a199c13cd941ce9b",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "PROOF_RECEIPT.json",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/PROOF_RECEIPT.json",
+          "bytes": 1872,
+          "sha256": "fe32bf3de9fac5c36e1cb56758b262fb202aff8a9f1e4209a199c13cd941ce9b",
+          "content_type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "README.md",
+      "bytes": 1170,
+      "sha256": "f24e37a58e2c7331bb08fb8a118e244c5bb1b59b9cabb7461fa225a23f404fa9",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "README.md",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/README.md",
+          "bytes": 1170,
+          "sha256": "f24e37a58e2c7331bb08fb8a118e244c5bb1b59b9cabb7461fa225a23f404fa9",
+          "content_type": "application/octet-stream"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/assets/app.css",
+      "bytes": 34496,
+      "sha256": "2f54f7148c8d7b8a0bd7e127c2498859c2644eb124e5d744ba2fabf84329fb74",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/assets/app.css",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/assets/app.css",
+          "bytes": 34496,
+          "sha256": "2f54f7148c8d7b8a0bd7e127c2498859c2644eb124e5d744ba2fabf84329fb74",
+          "content_type": "text/css; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/assets/app.js",
+      "bytes": 1382006,
+      "sha256": "8268f79018073f02265d7822804375e03c1b6b6be423872e94192419db8ed126",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/assets/app.js",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/assets/app.js",
+          "bytes": 1382006,
+          "sha256": "8268f79018073f02265d7822804375e03c1b6b6be423872e94192419db8ed126",
+          "content_type": "application/javascript; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/index.html",
+      "bytes": 1100,
+      "sha256": "6779a90a8031cb40857525f711824bfa7c91fa5c5856314c88ad2dbea81e7bb1",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/index.html",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/index.html",
+          "bytes": 1100,
+          "sha256": "6779a90a8031cb40857525f711824bfa7c91fa5c5856314c88ad2dbea81e7bb1",
+          "content_type": "text/html; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/chicago-block.webp",
+      "bytes": 163670,
+      "sha256": "dd1ca1863447c550f0a5435b971753308ccd76328e59c71c4211c77cbc097ae0",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/chicago-block.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/chicago-block.webp",
+          "bytes": 163670,
+          "sha256": "dd1ca1863447c550f0a5435b971753308ccd76328e59c71c4211c77cbc097ae0",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/chicago-walk.webp",
+      "bytes": 155514,
+      "sha256": "fdfccef643fe2f24a0e04c5347ca6b6e39d48c3f6f85ce12565ef6c87b1defd6",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/chicago-walk.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/chicago-walk.webp",
+          "bytes": 155514,
+          "sha256": "fdfccef643fe2f24a0e04c5347ca6b6e39d48c3f6f85ce12565ef6c87b1defd6",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/crew-doorway.webp",
+      "bytes": 175418,
+      "sha256": "f5c3089d595419ebae163951b87ffdaac36b4c602754cffc301c042d4c6ac776",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/crew-doorway.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/crew-doorway.webp",
+          "bytes": 175418,
+          "sha256": "f5c3089d595419ebae163951b87ffdaac36b4c602754cffc301c042d4c6ac776",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/duo-proof.webp",
+      "bytes": 144560,
+      "sha256": "6327d119b1bf0584cdba387ff787b9e3d69f333cfd1f849efb7c320e6627f83e",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/duo-proof.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/duo-proof.webp",
+          "bytes": 144560,
+          "sha256": "6327d119b1bf0584cdba387ff787b9e3d69f333cfd1f849efb7c320e6627f83e",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/glow-figure.html",
+      "bytes": 491284,
+      "sha256": "2e3d815260835f2f676669067c4d909897b92c34a77042abad19486ede8312f6",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/glow-figure.html",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/glow-figure.html",
+          "bytes": 491284,
+          "sha256": "2e3d815260835f2f676669067c4d909897b92c34a77042abad19486ede8312f6",
+          "content_type": "text/html; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/glow-figure.png",
+      "bytes": 367282,
+      "sha256": "293f685f46269e06b4355ff060c4649e1674cae0adfddc2bcc11ddf36caa1696",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/glow-figure.png",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/glow-figure.png",
+          "bytes": 367282,
+          "sha256": "293f685f46269e06b4355ff060c4649e1674cae0adfddc2bcc11ddf36caa1696",
+          "content_type": "image/png"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/green-wall-alt.webp",
+      "bytes": 278442,
+      "sha256": "df4240df580ef08204b434bcf9cc07cd31868077b62fceceb69b0da11945a164",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/green-wall-alt.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/green-wall-alt.webp",
+          "bytes": 278442,
+          "sha256": "df4240df580ef08204b434bcf9cc07cd31868077b62fceceb69b0da11945a164",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/green-wall.webp",
+      "bytes": 272578,
+      "sha256": "5030f21819fcb93315ad8a88490afcef5545827043caf4f005c0e1c22cedaaf4",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/green-wall.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/green-wall.webp",
+          "bytes": 272578,
+          "sha256": "5030f21819fcb93315ad8a88490afcef5545827043caf4f005c0e1c22cedaaf4",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/hero-night.webp",
+      "bytes": 511314,
+      "sha256": "30e09d95aab5bb46398345cde78af8308a79645ba1ff4f83af6d36d7c61da508",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/hero-night.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/hero-night.webp",
+          "bytes": 511314,
+          "sha256": "30e09d95aab5bb46398345cde78af8308a79645ba1ff4f83af6d36d7c61da508",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/houston-mart.webp",
+      "bytes": 344656,
+      "sha256": "ffe32cccb67ace80f78426127d7a9a12e39ed9bea489db92fff8dac9c661fc71",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/houston-mart.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/houston-mart.webp",
+          "bytes": 344656,
+          "sha256": "ffe32cccb67ace80f78426127d7a9a12e39ed9bea489db92fff8dac9c661fc71",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/houston-proof.webp",
+      "bytes": 35872,
+      "sha256": "b12e1bb7dff5e962000f14dba6fe5ad84686e27eefd03260a7e0f3ad5d783448",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/houston-proof.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/houston-proof.webp",
+          "bytes": 35872,
+          "sha256": "b12e1bb7dff5e962000f14dba6fe5ad84686e27eefd03260a7e0f3ad5d783448",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/night-car.webp",
+      "bytes": 94460,
+      "sha256": "45bdf88a1ae096fa62a3d3d13e8425415d3281e4d7d85188383c992fab3a32e2",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/night-car.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/night-car.webp",
+          "bytes": 94460,
+          "sha256": "45bdf88a1ae096fa62a3d3d13e8425415d3281e4d7d85188383c992fab3a32e2",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/night-close.webp",
+      "bytes": 78574,
+      "sha256": "e56ebc83368556ca328e44b7acb79d767c187f28de607cae480932a453503458",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/night-close.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/night-close.webp",
+          "bytes": 78574,
+          "sha256": "e56ebc83368556ca328e44b7acb79d767c187f28de607cae480932a453503458",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/night-fit.webp",
+      "bytes": 81484,
+      "sha256": "3949429291229a0c10c55ab251787cdc069d6fa8cf24d35c02ac9304ecdb1838",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/night-fit.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/night-fit.webp",
+          "bytes": 81484,
+          "sha256": "3949429291229a0c10c55ab251787cdc069d6fa8cf24d35c02ac9304ecdb1838",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/night-motion.webp",
+      "bytes": 87572,
+      "sha256": "d860ebedfa64579513aecfe6acce248909ceec57fbe8afdea25ce25f55c2647a",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/night-motion.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/night-motion.webp",
+          "bytes": 87572,
+          "sha256": "d860ebedfa64579513aecfe6acce248909ceec57fbe8afdea25ce25f55c2647a",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/roses-alt.webp",
+      "bytes": 117770,
+      "sha256": "f603d9cecf81b537fbf3c1b95f3fa08a29c9eefe8b166006dbe7589e89525106",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/roses-alt.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/roses-alt.webp",
+          "bytes": 117770,
+          "sha256": "f603d9cecf81b537fbf3c1b95f3fa08a29c9eefe8b166006dbe7589e89525106",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/roses-color.webp",
+      "bytes": 84972,
+      "sha256": "5885015e0dfece9a532b1ffe224ed7eff26543a5c8256ee894bf27cf305834dd",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/roses-color.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/roses-color.webp",
+          "bytes": 84972,
+          "sha256": "5885015e0dfece9a532b1ffe224ed7eff26543a5c8256ee894bf27cf305834dd",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/roses-mono.webp",
+      "bytes": 138226,
+      "sha256": "9510bec164d9c5c1a4e6d32cea2c307657d5159a3bbbd223e0449de14acd8f50",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/roses-mono.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/roses-mono.webp",
+          "bytes": 138226,
+          "sha256": "9510bec164d9c5c1a4e6d32cea2c307657d5159a3bbbd223e0449de14acd8f50",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/roses-seated.webp",
+      "bytes": 80806,
+      "sha256": "64c7f071d60bdcf17bdbb6be35ae87cc3a4c2c701be933beb5da78f8c8b4093c",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/roses-seated.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/roses-seated.webp",
+          "bytes": 80806,
+          "sha256": "64c7f071d60bdcf17bdbb6be35ae87cc3a4c2c701be933beb5da78f8c8b4093c",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/slb-cover.webp",
+      "bytes": 134330,
+      "sha256": "f194c4f315d8da03362eebb9c9655df3e8a760a54314d176d52223d737a3eed2",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/slb-cover.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/slb-cover.webp",
+          "bytes": 134330,
+          "sha256": "f194c4f315d8da03362eebb9c9655df3e8a760a54314d176d52223d737a3eed2",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/studio-chair.webp",
+      "bytes": 83058,
+      "sha256": "444318620164cf058eb60f5f6332a749d45c0957efef3cb0beae0adede9402e8",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/studio-chair.webp",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/studio-chair.webp",
+          "bytes": 83058,
+          "sha256": "444318620164cf058eb60f5f6332a749d45c0957efef3cb0beae0adede9402e8",
+          "content_type": "image/webp"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/media/supaboy-intro-visualizer.html",
+      "bytes": 42309,
+      "sha256": "3ae4b65153c1dcf3cbc5035f911e86f88d50ff0fcbb736ee058f46ac29b46bef",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/media/supaboy-intro-visualizer.html",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/media/supaboy-intro-visualizer.html",
+          "bytes": 42309,
+          "sha256": "3ae4b65153c1dcf3cbc5035f911e86f88d50ff0fcbb736ee058f46ac29b46bef",
+          "content_type": "text/html; charset=utf-8"
+        }
+      }
+    },
+    {
+      "path": "SUPABOY/robots.txt",
+      "bytes": 23,
+      "sha256": "16ceb5ee3e0dc13aa9adf31a3ebbe45a1d965b8c2b9f72eaf84e5911e140ed95",
+      "upload": {
+        "ok": true,
+        "via": "fs27-service-binding",
+        "target_path": "/deploy/upload",
+        "skynet": {
+          "ok": true,
+          "project_id": "skynet-supaboy-artist-landing-nexus",
+          "deployment_id": "dep_20260523200046",
+          "path": "SUPABOY/robots.txt",
+          "key": "deployments/skynet-supaboy-artist-landing-nexus/dep_20260523200046/SUPABOY/robots.txt",
+          "bytes": 23,
+          "sha256": "16ceb5ee3e0dc13aa9adf31a3ebbe45a1d965b8c2b9f72eaf84e5911e140ed95",
+          "content_type": "text/plain; charset=utf-8"
+        }
+      }
+    }
+  ],
+  "scrollbarFix": {
+    "kept": "SUPABOY app mcp-neon-scroll-rail",
+    "deleted": "outer wrapper drag-scroll-rail element/CSS/JS",
+    "hidden": "outer native html/body browser scrollbar"
+  }
+}

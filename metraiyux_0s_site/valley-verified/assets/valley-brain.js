@@ -62,8 +62,8 @@
         </div>
         <div class="vv-brain-context" data-brain-context></div>
         <form class="vv-admin-login" data-admin-login hidden>
-          <label>Free99 / 0S gate code
-            <input data-admin-token name="token" type="password" autocomplete="current-password" placeholder="Paste the shared gate code or session token" />
+          <label>Admin password or gate token
+            <input data-admin-token name="token" type="password" autocomplete="current-password" placeholder="Paste admin password, operator token, or SkyGate token" />
           </label>
           <div class="vv-admin-login-actions">
             <button type="submit">Unlock admin</button>
@@ -259,9 +259,9 @@
       return htmlBlock('Claim or update a listing', [
         'Use the claim lane when a business owner needs corrections, ownership review, or verification support.',
         linkList([
-          ['Claim lane', link('/claim/'), 'Build a claim packet'],
-          ['For businesses', link('/for-businesses/'), 'Owner-facing route'],
-          ['Directory', link('/directory/'), 'Find the listing first']
+          ['Claim lane', link('/valley-verified/claim/'), 'Build a claim packet'],
+          ['For businesses', link('/valley-verified/for-businesses/'), 'Owner-facing route'],
+          ['Directory', link('/valley-verified/directory/'), 'Find the listing first']
         ])
       ]);
     }
@@ -272,14 +272,14 @@
           ? 'Use revenue, sponsor, activation, and owner CRM together: check sellable inventory, confirm the account, then prepare an activation packet.'
           : 'Visitors can review exposure options and send interest into the relay lane. Paid placement still needs owner/admin approval.',
         linkList(admin ? [
-          ['Pricing', link('/pricing/'), 'Exposure products'],
-          ['Sponsor inventory', link('/sponsor/'), 'Sellable surface model'],
-          ['Owner CRM', link('/owner-crm/'), 'Admin account route'],
-          ['Revenue readiness', link('/revenue/'), 'Operator money path']
+          ['Pricing', link('/valley-verified/pricing/'), 'Exposure products'],
+          ['Sponsor inventory', link('/valley-verified/sponsor/'), 'Sellable surface model'],
+          ['Owner CRM', link('/valley-verified/owner-crm/'), 'Admin account route'],
+          ['Revenue readiness', link('/valley-verified/revenue/'), 'Operator money path']
         ] : [
-          ['Pricing', link('/pricing/'), 'Exposure products'],
-          ['Advertise', link('/advertise/'), 'Public interest route'],
-          ['For businesses', link('/for-businesses/'), 'Owner-facing route']
+          ['Pricing', link('/valley-verified/pricing/'), 'Exposure products'],
+          ['Advertise', link('/valley-verified/advertise/'), 'Public interest route'],
+          ['For businesses', link('/valley-verified/for-businesses/'), 'Owner-facing route']
         ])
       ]);
     }
@@ -429,24 +429,24 @@
   }
 
   function linkList(items) {
-    return `<div class="vv-brain-links">${items.filter(Boolean).map(([label, href, note]) => `<a href="${esc(link(href || '/'))}"><strong>${esc(label || href)}</strong><span>${esc(note || href || '')}</span></a>`).join('')}</div>`;
+    return `<div class="vv-brain-links">${items.filter(Boolean).map(([label, href, note]) => `<a href="${esc(link(href || '/valley-verified/'))}"><strong>${esc(label || href)}</strong><span>${esc(note || href || '')}</span></a>`).join('')}</div>`;
   }
 
   function publicDefaultLinks() {
     return [
-      ['Directory', link('/directory/'), 'Search listings'],
-      ['Match', link('/match/'), 'Rank providers for a request'],
-      ['Claim', link('/claim/'), 'Owner correction and verification'],
-      ['Pricing', link('/pricing/'), 'Exposure products']
+      ['Directory', link('/valley-verified/directory/'), 'Search listings'],
+      ['Match', link('/valley-verified/match/'), 'Rank providers for a request'],
+      ['Claim', link('/valley-verified/claim/'), 'Owner correction and verification'],
+      ['Pricing', link('/valley-verified/pricing/'), 'Exposure products']
     ];
   }
 
   function adminDefaultLinks() {
     return [
-      ['Owner CRM', link('/owner-crm/'), 'Account readiness'],
-      ['Admin Review', link('/admin-review/'), 'Review packets and approvals'],
-      ['Lead Inbox', link('/lead-inbox/'), 'Routing lanes'],
-      ['Data map', link('/data/'), 'Generated artifacts']
+      ['Owner CRM', link('/valley-verified/owner-crm/'), 'Account readiness'],
+      ['Admin Review', link('/valley-verified/admin-review/'), 'Review packets and approvals'],
+      ['Lead Inbox', link('/valley-verified/lead-inbox/'), 'Routing lanes'],
+      ['Data map', link('/valley-verified/data/'), 'Generated artifacts']
     ];
   }
 
@@ -520,7 +520,7 @@
   }
 
   function dataUrl(file) {
-    return `${mountPath()}/data/${file}`.replace(/\/{2,}/g, '/');
+    return `${mountPath()}/data/${file}`.replace(/\/{2,}/g, '/valley-verified/');
   }
 
   function relayEndpoint() {
@@ -530,15 +530,19 @@
   }
 
   function mountPath() {
-    return location.pathname.startsWith('/valley-verified') ? '/valley-verified' : '';
+    if (location.pathname.startsWith('/valley-verified/skyenet/valley-verified')) return '/valley-verified/skyenet/valley-verified';
+    if (location.pathname.startsWith('/valley-verified/valley-verified')) return '/valley-verified/valley-verified';
+    return '';
   }
 
   function link(href) {
-    const value = text(href || '/');
-    if (!value) return mountPath() || '/';
+    const value = text(href || '/valley-verified/');
+    const mount = mountPath();
+    if (!value) return mount || '/valley-verified/';
     if (/^https?:\/\//i.test(value) || value.startsWith('mailto:') || value.startsWith('tel:')) return value;
-    if (value.startsWith('/valley-verified/')) return value;
-    return `${mountPath()}${value.startsWith('/') ? value : `/${value}`}`.replace(/\/{2,}/g, '/');
+    if (value.startsWith('/skyenet/valley-verified/')) return value;
+    if (value.startsWith('/valley-verified/')) return mount === '/valley-verified/skyenet/valley-verified' ? `${mount}${value.slice('/valley-verified/valley-verified'.length)}` : value;
+    return `${mount}${value.startsWith('/valley-verified/') ? value : `/${value}`}`.replace(/\/{2,}/g, '/valley-verified/');
   }
 
   function isAdminRoute() {
@@ -546,13 +550,13 @@
   }
 
   function currentRoute() {
-    const parts = location.pathname.split('/').filter(Boolean);
+    const parts = location.pathname.split('/valley-verified/').filter(Boolean);
     const index = parts.indexOf('valley-verified');
     return cleanRoute(index >= 0 ? (parts[index + 1] || '') : (parts[0] || ''));
   }
 
   function cleanRoute(value) {
-    return text(value).replace(/^\/+|\/+$/g, '').split('/')[0] || 'home';
+    return text(value).replace(/^\/+|\/+$/g, '').split('/valley-verified/')[0] || 'home';
   }
 
   function tokenSet(value) {

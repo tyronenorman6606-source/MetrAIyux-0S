@@ -1,5 +1,5 @@
 (async function(){
-  const boot = await SMV.withBoot('contacts', 'Contacts', 'Google-synced people, recent correspondents, and quick compose');
+  const boot = await SMV.withBoot('contacts', 'Contacts', 'SkyeMail people, recent correspondents, and quick compose');
   if(!boot) return;
   const runtime = window.SMVRuntime || { href: (value) => value };
   const statusEl = qs('#statusText');
@@ -11,7 +11,7 @@
   function note(msg, kind=''){ setStatus(statusEl, msg, kind); }
   function formReset(){ qs('#contact_id').value=''; qs('#email').value=''; qs('#full_name').value=''; qs('#company').value=''; qs('#phone').value=''; qs('#notes').value=''; qs('#favorite').checked=false; qs('#sync_google').checked=!!(boot.status && boot.status.connected); }
   function sourceLabel(source){
-    return source === 'google_contact' ? 'Google Contact' : source === 'other_contact' ? 'Other Contact' : source === 'recent_mail' ? 'Recent Mail' : 'Local';
+    return source === 'google_contact' ? 'Hosted Contact' : source === 'other_contact' ? 'Other Contact' : source === 'recent_mail' ? 'Recent Mail' : 'Local';
   }
   function render(items, el, allowEdit){
     if(!items.length){ el.innerHTML = '<div class="empty">No contacts found in this lane.</div>'; return; }
@@ -52,7 +52,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     el.querySelectorAll('[data-delete]').forEach((btn)=> btn.onclick = async ()=> {
-      if(!confirm('Delete this contact? Google contacts will be removed remotely too.')) return;
+      if(!confirm('Delete this contact from SkyeMail contacts? Sovereign mail records may be updated too.')) return;
       try{
         const data = await apiFetch('/contacts-delete', { method:'POST', body: JSON.stringify({ id: btn.dataset.delete }) });
         await load();
@@ -66,7 +66,7 @@
     if(!el) return;
     if(!syncInfo?.connected){ el.textContent = 'No SkyeMail mailbox provisioned yet.'; return; }
     const last = syncInfo.last_sync_at ? fmtDate(syncInfo.last_sync_at) : 'never';
-    el.textContent = `Google sync ready • last sync ${last} • ${Number(syncInfo.last_sync_count || 0)} synced contact(s)`;
+    el.textContent = `Hosted contact sync ready • last sync ${last} • ${Number(syncInfo.last_sync_count || 0)} synced contact(s)`;
   }
   async function load(){
     try{
@@ -82,11 +82,12 @@
   }
   async function syncGoogle(){
     try{
-      note('Running Google contacts sync…');
+      note('Running SkyeMail contacts sync…');
       const data = await apiFetch('/google-contacts-sync', { method:'POST', body: '{}' });
-      note(`Google contacts synced: ${data.synced_count || 0}.`, 'ok');
+      note(`SkyeMail contacts synced: ${data.synced_count || 0}.`, 'ok');
+      SMV.trackGame('contact_sync', { count: Math.max(1, Number(data.synced_count || 1)) });
       await load();
-    }catch(err){ note(err.message || 'Google contacts sync failed. Reconnect Google if the contacts scope is missing.', 'danger'); }
+    }catch(err){ note(err.message || 'SkyeMail contacts sync failed. Provision the mailbox if the contact lane is missing.', 'danger'); }
   }
   qs('#saveBtn').onclick = async ()=> {
     try{
@@ -102,7 +103,8 @@
       };
       const data = await apiFetch('/contacts-save', { method:'POST', body: JSON.stringify(payload) });
       qs('#contact_id').value = data.contact?.id || '';
-      note(data.synced_google ? 'Contact saved and synced to Google Contacts.' : 'Contact saved.', 'ok');
+      note(data.synced_google ? 'Contact saved and synced to the hosted contact lane.' : 'Contact saved.', 'ok');
+      SMV.trackGame('contact_save');
       await load();
     }catch(err){ note(err.message || 'Contact save failed.', 'danger'); }
   };

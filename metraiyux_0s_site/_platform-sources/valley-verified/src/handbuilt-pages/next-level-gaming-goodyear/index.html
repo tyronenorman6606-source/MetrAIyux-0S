@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Next Level Gaming | Valley Verified Goodyear Trading Card Shop</title>
+  <meta name="description" content="Valley Verified landing page for Next Level Gaming, a Goodyear, AZ trading card and gaming shop.">
+  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/next-level-gaming-goodyear/">
+  <meta property="og:title" content="Next Level Gaming | Valley Verified">
+  <meta property="og:description" content="Goodyear trading card and gaming shop with TCG, collectibles, and retail specialty details.">
+  <meta property="og:url" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/next-level-gaming-goodyear/">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #16191f;
+      --muted: #5e6877;
+      --paper: #fffdf7;
+      --panel: #ffffff;
+      --line: #dfe6df;
+      --green: #1f8a70;
+      --gold: #f2b84b;
+      --coral: #db5a42;
+      --night: #232339;
+      --mint: #e8f7f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(242, 184, 75, 0.24), transparent 30rem),
+        linear-gradient(180deg, #fffdf7 0%, #f4f9f4 48%, #fff7ed 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page-shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      color: var(--night);
+      text-decoration: none;
+    }
+
+    .brand-mark span:first-child {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--night);
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .hero-panel,
+    .status-panel,
+    .content-panel,
+    .skyemail-panel {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 18px 50px rgba(35, 35, 57, 0.09);
+    }
+
+    .hero-panel {
+      padding: clamp(28px, 5vw, 56px);
+      border-radius: 8px;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -100px auto;
+      width: 360px;
+      height: 360px;
+      border: 28px solid rgba(31, 138, 112, 0.14);
+      transform: rotate(18deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--green);
+      font-size: 0.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 11ch;
+      margin-bottom: 18px;
+      color: var(--night);
+      font-size: clamp(3.4rem, 9vw, 6.8rem);
+      line-height: 0.92;
+    }
+
+    .lede {
+      max-width: 660px;
+      margin-bottom: 28px;
+      color: #354052;
+      font-size: clamp(1.05rem, 2vw, 1.24rem);
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      padding: 12px 16px;
+      border: 1px solid var(--night);
+      background: var(--night);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .button.secondary {
+      background: #fff;
+      color: var(--night);
+      border-color: #cbd7cc;
+    }
+
+    .status-panel {
+      border-radius: 8px;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--mint);
+    }
+
+    .score strong {
+      width: 74px;
+      height: 74px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 1.45rem;
+    }
+
+    .score span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .detail-list div {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-list div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .detail-list dt {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .detail-list dd {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .content-panel {
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .content-panel h2,
+    .skyemail-panel h2 {
+      margin-bottom: 12px;
+      color: var(--night);
+      font-size: 1.45rem;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag-cloud span {
+      border: 1px solid #cbd7cc;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fff;
+      color: #354052;
+      font-size: 0.88rem;
+      font-weight: 750;
+    }
+
+    .hours-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hours-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hours-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .skyemail-panel {
+      border-radius: 8px;
+      padding: 26px;
+      background:
+        linear-gradient(135deg, rgba(35, 35, 57, 0.96), rgba(31, 138, 112, 0.94)),
+        #232339;
+      color: #fff;
+    }
+
+    .skyemail-panel h2,
+    .skyemail-panel p {
+      color: #fff;
+    }
+
+    .skyemail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .skyemail-grid div {
+      min-height: 126px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .skyemail-grid strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--gold);
+    }
+
+    .footer-note {
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .content-grid,
+      .skyemail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page-shell {
+        width: min(100% - 20px, 1120px);
+        padding-top: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 17vw, 4.6rem);
+      }
+
+      .hero-panel,
+      .status-panel,
+      .content-panel,
+      .skyemail-panel {
+        padding: 18px;
+      }
+
+      .detail-list div {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-static-hand-page="true">
+  <main class="page-shell">
+    <nav class="topbar" aria-label="Page">
+      <a class="brand-mark" href="/valley-verified/">
+        <span>VV</span>
+        <span>Valley Verified</span>
+      </a>
+      <span>Owner-researched verified status for Goodyear, AZ</span>
+    </nav>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-panel">
+        <div>
+          <p class="eyebrow">Trading Card Shop / Retail And Specialty</p>
+          <h1 id="page-title">Next Level Gaming</h1>
+          <p class="lede">Next Level Gaming is listed as a Goodyear trading card and gaming shop serving TCG players, collectors, and specialty retail customers.</p>
+        </div>
+        <div class="action-row" aria-label="Primary contact links">
+          <a class="button" href="https://www.nextlevelgamingaz.com/">Open business website</a>
+          <a class="button secondary" href="https://btdgamingtcg.tcgplayerpro.com/">Open TCGPlayer shop</a>
+          <a class="button secondary" href="tel:+16232487458">Call (623) 248-7458</a>
+        </div>
+      </div>
+
+      <aside class="status-panel" aria-label="Verification and contact summary">
+        <div class="score">
+          <strong>59</strong>
+          <span>Owner-researched verified status: business profile marked verified in Valley Verified source data. License badge is not marked verified in the source record.</span>
+        </div>
+        <dl class="detail-list">
+          <div>
+            <dt>Business</dt>
+            <dd>Next Level Gaming</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>Goodyear, AZ 85338</dd>
+          </div>
+          <div>
+            <dt>Phone</dt>
+            <dd><a href="tel:+16232487458">(623) 248-7458</a></dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd><a href="mailto:nlgaming2023@gmail.com">nlgaming2023@gmail.com</a></dd>
+          </div>
+          <div>
+            <dt>Language</dt>
+            <dd>English</dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="content-grid" aria-label="Business details">
+      <article class="content-panel">
+        <h2>Business Facts</h2>
+        <dl class="detail-list">
+          <div>
+            <dt>Category</dt>
+            <dd>Retail And Specialty</dd>
+          </div>
+          <div>
+            <dt>Subcategory</dt>
+            <dd>Trading Card Shop</dd>
+          </div>
+          <div>
+            <dt>License</dt>
+            <dd>Business license</dd>
+          </div>
+          <div>
+            <dt>Requests</dt>
+            <dd>Accepts requests in the source record</dd>
+          </div>
+          <div>
+            <dt>Pricing</dt>
+            <dd>Contact for quote. Inventory, pricing, hours, and event availability may vary.</dd>
+          </div>
+        </dl>
+        <div class="tag-cloud" aria-label="Source tags">
+          <span>Skye Client</span>
+          <span>Gaming</span>
+          <span>TCG</span>
+          <span>Collectibles</span>
+          <span>Retail / Specialty Store</span>
+        </div>
+      </article>
+
+      <article class="content-panel">
+        <h2>Hours And Policies</h2>
+        <ul class="hours-list" aria-label="Business hours">
+          <li><span>Monday</span><strong>Call for hours</strong></li>
+          <li><span>Tuesday</span><strong>Call for hours</strong></li>
+          <li><span>Wednesday</span><strong>Call for hours</strong></li>
+          <li><span>Thursday</span><strong>Call for hours</strong></li>
+          <li><span>Friday</span><strong>Call for hours</strong></li>
+          <li><span>Saturday</span><strong>Call for hours</strong></li>
+          <li><span>Sunday</span><strong>Call for hours</strong></li>
+        </ul>
+        <p class="footer-note">Inventory, event, and product pricing should be confirmed directly with the shop. Confirm event and booking details with Next Level Gaming.</p>
+      </article>
+    </section>
+
+    <section class="content-grid" aria-label="Source and profile record">
+      <article class="content-panel">
+        <h2>Contact And Source</h2>
+        <dl class="detail-list">
+          <div>
+            <dt>Website</dt>
+            <dd><a href="https://www.nextlevelgamingaz.com/">nextlevelgamingaz.com</a></dd>
+          </div>
+          <div>
+            <dt>Shop Link</dt>
+            <dd><a href="https://btdgamingtcg.tcgplayerpro.com/">btdgamingtcg.tcgplayerpro.com</a></dd>
+          </div>
+          <div>
+            <dt>Source URL</dt>
+            <dd><a href="https://www.nextlevelgamingaz.com/">https://www.nextlevelgamingaz.com/</a></dd>
+          </div>
+          <div>
+            <dt>Source File</dt>
+            <dd>seed/businesses/clients.json</dd>
+          </div>
+          <div>
+            <dt>Source Hash</dt>
+            <dd>facb37c46f0f</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article class="content-panel">
+        <h2>Record Notes</h2>
+        <dl class="detail-list">
+          <div>
+            <dt>Last Checked</dt>
+            <dd>2026-05-19</dd>
+          </div>
+          <div>
+            <dt>Primary Key</dt>
+            <dd>domain:nextlevelgamingaz.com</dd>
+          </div>
+          <div>
+            <dt>Signals</dt>
+            <dd>domain, phone, email, name/address, name/city/zip</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Business verified: yes. License verified: no.</dd>
+          </div>
+          <div>
+            <dt>Flags</dt>
+            <dd>No moderation flags in the source record.</dd>
+          </div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="skyemail-panel" aria-labelledby="skyemail-title">
+      <h2 id="skyemail-title">SkyEmail Acceptance</h2>
+      <p>Accept the free SkyEmail account for this Valley Verified workspace and sign in through the shared 0S/SkyGate lane when the workspace is provisioned.</p>
+      <div class="skyemail-grid">
+        <div>
+          <strong>Provisioning</strong>
+          <span>Notify the owner to provision the workspace before team activation starts.</span>
+        </div>
+        <div>
+          <strong>Activation</strong>
+          <span>Team activation is expected within 24 hours after provisioning.</span>
+        </div>
+        <div>
+          <strong>Escalation</strong>
+          <span>Use K4i escalation after 24 hours if the team is not active.</span>
+        </div>
+        <div>
+          <strong>Seats</strong>
+          <span>9 seats left. Warn at 2 seats. Buy seats in groups of 5.</span>
+        </div>
+      </div>
+      <p class="footer-note"><a href="/admin/login.html?return=/valley-verified/business/next-level-gaming-goodyear/">Sign in through shared 0S/SkyGate</a></p>
+    </section>
+  </main>
+</body>
+</html>

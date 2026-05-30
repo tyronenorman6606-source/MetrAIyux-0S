@@ -9,7 +9,7 @@
     "smoke": "node tools/smoke-check.mjs",
     "smoke:api": "node tools/platform-api-smoke.mjs",
     "platform:etl": "node -e \"import('./src/platform/seed-etl-worker.mjs').then(m=>m.materializeSeeds({rootDir:process.cwd()})).then(r=>console.log(JSON.stringify({businesses:r.businessDirectory.length,issues:r.validation.issues.length,chunks:r.chunks.length,outDir:r.outDir},null,2)))\"",
-    "test:browser": "node tools/playwright-browser-proof.mjs",
+    "test:browser": "node ../../../../tools/browser-proof-disabled.mjs --lane=skaixu-code-evaluator-browser-proof",
     "build:proof": "node -e \"import('./src/platform/build-executor.mjs').then(m=>m.executeBuildPlan({rootDir:process.cwd(),stages:['test'],dryRun:false})).then(r=>console.log(JSON.stringify({status:r.status,receiptPath:r.receiptPath},null,2)))\"",
     "smoke:closure": "node tools/platform-closure-smoke.mjs",
     "closure:proof": "node -e \"import('./src/platform/platform-closure-orchestrator.mjs').then(m=>m.runPlatformClosure({rootDir:process.cwd()})).then(r=>console.log(JSON.stringify({status:r.status,failed:r.failed,receiptPath:r.receiptPath},null,2)))\""

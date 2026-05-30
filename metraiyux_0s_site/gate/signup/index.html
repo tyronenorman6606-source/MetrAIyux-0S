@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#03070b">
+  <title>0S Gate Signup</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #03070b;
+      --ink: #eff7f8;
+      --muted: #a7b7bd;
+      --panel: rgba(7, 16, 23, .84);
+      --panel-strong: rgba(8, 18, 27, .94);
+      --line: rgba(234, 247, 249, .14);
+      --line-strong: rgba(244, 206, 112, .42);
+      --gold: #f2c76e;
+      --cyan: #36b8ff;
+      --mint: #72f2c7;
+      --violet: #b39cff;
+      --rose: #ff7a90;
+      --danger: #ff7a90;
+      --ok: #72f2c7;
+      --shadow: 0 20px 70px rgba(0, 0, 0, .38);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
+        radial-gradient(circle at 14% 10%, rgba(54, 184, 255, .18), transparent 28rem),
+        radial-gradient(circle at 82% 8%, rgba(242, 199, 110, .18), transparent 30rem),
+        radial-gradient(circle at 50% 92%, rgba(114, 242, 199, .12), transparent 34rem),
+        linear-gradient(145deg, #020406 0%, var(--bg) 54%, #0a1118 100%);
+      background-size: 38px 38px, 38px 38px, auto, auto, auto, auto;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(3,7,11,.12), rgba(3,7,11,.74));
+      z-index: -1;
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 16px 0 36px;
+    }
+    .top {
+      position: sticky;
+      top: 10px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      text-decoration: none;
+    }
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 18px rgba(54, 184, 255, .24)) drop-shadow(0 0 22px rgba(242, 199, 110, .22));
+    }
+    .brand-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0;
+      background: linear-gradient(110deg, #fff, var(--gold) 42%, var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .brand-kicker {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      letter-spacing: 0;
+    }
+    .menu-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 220px;
+    }
+    .menu-status span {
+      border: 1px solid rgba(234, 247, 249, .12);
+      background: rgba(255, 255, 255, .05);
+      color: var(--muted);
+      border-radius: 8px;
+      min-height: 34px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .pill, button, .link-button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      color: var(--ink);
+      min-height: 40px;
+      padding: 10px 13px;
+      font: inherit;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color .16s ease, transform .16s ease, background .16s ease;
+    }
+    .pill:hover, button:hover, .link-button:hover {
+      border-color: rgba(54, 184, 255, .48);
+      background: rgba(54, 184, 255, .1);
+      transform: translateY(-1px);
+    }
+    button:disabled { opacity: .58; cursor: wait; }
+    .primary {
+      border-color: rgba(242, 199, 110, .64);
+      background: linear-gradient(135deg, var(--gold), #ffe2a0);
+      color: #141007;
+      box-shadow: 0 18px 42px rgba(242, 199, 110, .18);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(340px, .72fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(210px, 280px);
+      gap: clamp(18px, 3vw, 34px);
+      padding: clamp(24px, 5vw, 48px);
+      min-height: 100%;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -42% 25%;
+      height: 58%;
+      background: radial-gradient(circle, rgba(54, 184, 255, .18), transparent 62%);
+      pointer-events: none;
+    }
+    .hero-copy, .hero-brand-card { position: relative; z-index: 1; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--cyan);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 850;
+      letter-spacing: .14em;
+    }
+    h1 {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(36px, 6vw, 76px);
+      line-height: .94;
+      letter-spacing: 0;
+    }
+    .lede {
+      margin: 20px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.65;
+    }
+    .hero-brand-card {
+      align-self: stretch;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid rgba(234, 247, 249, .12);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
+    }
+    .hero-logo {
+      width: min(100%, 240px);
+      aspect-ratio: 1;
+      object-fit: contain;
+      filter: drop-shadow(0 0 28px rgba(54, 184, 255, .22)) drop-shadow(0 0 36px rgba(242, 199, 110, .2));
+    }
+    .signal-grid {
+      width: 100%;
+      display: grid;
+      gap: 8px;
+    }
+    .signal-grid span {
+      border: 1px solid rgba(234, 247, 249, .12);
+      border-radius: 8px;
+      background: rgba(3, 7, 11, .42);
+      padding: 9px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .proof-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+    }
+    .proof {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .055);
+      padding: 14px;
+      min-height: 92px;
+    }
+    .proof strong { display: block; font-size: 13px; }
+    .proof span { display: block; color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: 6px; }
+    form {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+    }
+    .form-title h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+    .form-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .field { display: grid; gap: 7px; }
+    label {
+      font-size: 12px;
+      color: rgba(245, 251, 248, .8);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    input, select {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .3);
+      color: var(--ink);
+      padding: 11px 12px;
+      font: inherit;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: rgba(113, 231, 217, .72);
+      box-shadow: 0 0 0 3px rgba(113, 231, 217, .16);
+    }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .id-card, .notice {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .06);
+      padding: 14px;
+    }
+    .id-card .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .id-card b { color: var(--gold); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .status {
+      min-height: 22px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .notice {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .stack { display: grid; gap: 12px; }
+    @media (max-width: 880px) {
+      .layout, .hero, .proof-strip, .two { grid-template-columns: 1fr; }
+      .top { align-items: flex-start; flex-direction: column; }
+      .menu-status { justify-content: flex-start; flex-wrap: wrap; min-width: 0; }
+      .topnav { justify-content: flex-start; width: 100%; }
+      .hero-brand-card { align-content: start; }
+    }
+    @media (max-width: 520px) {
+      .shell { width: min(100% - 20px, 1180px); padding-top: 10px; }
+      .top { top: 6px; }
+      .pill, button, .link-button { width: 100%; justify-content: center; text-align: center; }
+      .actions { display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="/0s/index.html" aria-label="Open MetrAIyux 0S">
+        <img class="brand-logo" src="/assets/metraiyux-0s-emblem-transparent.png" alt="">
+        <span>
+          <strong class="brand-title">MetrAIyux 0S Gate</strong>
+          <span class="brand-kicker">FS27 identity, Skye ID, and SkyEmail</span>
+        </span>
+      </a>
+      <div class="menu-status" aria-label="Gate systems">
+        <span>FS27 Gate</span>
+        <span>Skye-ID Gen</span>
+        <span>SKYEMAIL-GEN</span>
+      </div>
+      <nav class="topnav" aria-label="Gate navigation">
+        <a class="pill" href="/admin/login.html">Owner Login</a>
+        <a class="pill" href="/0s/index.html">Open 0S</a>
+        <a class="pill" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/generators/Skye-ID/" rel="noopener">Skye-ID Gen</a>
+        <a class="pill" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/generators/SKYEMAIL-GEN/" rel="noopener">SKYEMAIL-GEN</a>
+        <a class="pill" href="/live/SkyeMail/signup.html">SkyeMail Vault</a>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <section class="panel hero" aria-labelledby="gateTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">Canonical 0S onboarding</p>
+          <h1 id="gateTitle">One Gate account opens the 0S.</h1>
+          <p class="lede">Create or unlock the shared Gate identity, mint the Skye ID, reserve the SkyEmail address, and carry the same profile into the launcher, SkyeMail, Free99 lanes, and mounted apps.</p>
+          <div class="proof-strip" aria-label="Signup stages">
+            <div class="proof"><strong>Identity</strong><span>Skye ID, profile type, phone, and recovery email are stamped together.</span></div>
+            <div class="proof"><strong>SkyEmail</strong><span>The mailbox claim is generated here and then bound to SkyeMail from the same Gate session.</span></div>
+            <div class="proof"><strong>Observability</strong><span>The Gate mirrors the signup event so app access can be traced from one source.</span></div>
+          </div>
+        </div>
+        <aside class="hero-brand-card" aria-label="MetrAIyux 0S brand">
+          <img class="hero-logo" src="/assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S">
+          <div class="signal-grid">
+            <span>Shared Gate Session</span>
+            <span>Generator Drafts</span>
+            <span>0S Profile Relay</span>
+          </div>
+        </aside>
+      </section>
+
+      <form class="panel" id="signupForm">
+        <div class="form-title">
+          <h2>Start with the Gate</h2>
+          <p>If the account already exists, this same form unlocks it with the existing Gate password and refreshes the shared session.</p>
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label for="displayName">Display name</label>
+            <input id="displayName" autocomplete="name" required placeholder="Your name or artist name">
+          </div>
+          <div class="field">
+            <label for="profileType">Profile type</label>
+            <select id="profileType">
+              <option value="member">Member</option>
+              <option value="artist">Artist</option>
+              <option value="client">Client</option>
+              <option value="operator">Operator</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Recovery and login email</label>
+          <input id="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="two">
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" autocomplete="tel" placeholder="+1 480 000 0000">
+          </div>
+          <div class="field">
+            <label for="password">Gate password</label>
+            <input id="password" type="password" autocomplete="new-password" required placeholder="At least 10 characters">
+          </div>
+        </div>
+
+        <div class="id-card" aria-live="polite">
+          <div class="row"><span>Skye ID</span><b id="skyeIdText">Generating</b></div>
+          <div class="row"><span>SkyEmail</span><b id="skyEmailText">Generating</b></div>
+        </div>
+
+        <div class="field">
+          <label for="skyEmail">SkyEmail address</label>
+          <input id="skyEmail" autocomplete="email" placeholder="name@solenterprises.org">
+        </div>
+
+        <div class="notice">The Gate is the account source. This page generates the Skye ID and SkyEmail claim, creates or unlocks the FS27 session, and hands that same identity to SkyeMail and the rest of the 0S.</div>
+
+        <div class="actions">
+          <button class="primary" id="submitButton" type="submit">Create or unlock Gate</button>
+          <button class="link-button" id="refreshButton" type="button">Refresh ID and email</button>
+        </div>
+        <div class="status" id="status">Ready.</div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+      const $ = (selector) => document.querySelector(selector);
+      const status = $("#status");
+      const form = $("#signupForm");
+      const submitButton = $("#submitButton");
+      const returnTo = new URLSearchParams(location.search).get("return") || "/0s/index.html";
+      const keys = {
+        profile: "METRAIYUX_GATE_PROFILE",
+        profileV1: "metraiyux.gate.profile.v1",
+        identity: "skye0s.identity.current.v1",
+        gateIdentity: "skye0s.gate.onboarding.identity.v1",
+        idDraft: "kx.onboarding.idDraft",
+        emailClaim: "skye0s.skyemail.claim.v1",
+        emailDraft: "kx.onboarding.emailDraft",
+        smvClaim: "SMV_ONBOARDING_CLAIM"
+      };
+      let currentDraft = null;
+      let timer = null;
+
+      function setStatus(message, kind) {
+        status.textContent = message || "";
+        status.style.color = kind === "danger" ? "var(--danger)" : kind === "ok" ? "var(--ok)" : "var(--muted)";
+      }
+      function readJson(key) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      }
+      function writeJson(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          sessionStorage.setItem(key, JSON.stringify(value));
+        } catch {}
+      }
+      function clean(value) {
+        return String(value || "").trim();
+      }
+      function sameOriginReturn(value) {
+        try {
+          const url = new URL(value || "/0s/index.html", location.origin);
+          return url.origin === location.origin ? `${url.pathname}${url.search}${url.hash}` : "/0s/index.html";
+        } catch {
+          return "/0s/index.html";
+        }
+      }
+      function applyStoredDrafts() {
+        const identity = readJson(keys.gateIdentity) || readJson(keys.identity) || readJson(keys.idDraft) || {};
+        const email = readJson(keys.emailClaim) || readJson(keys.smvClaim) || readJson(keys.emailDraft) || {};
+        if (identity.name || identity.display_name) $("#displayName").value = identity.name || identity.display_name;
+        if (identity.profileType) $("#profileType").value = identity.profileType;
+        if (identity.phone) $("#phone").value = identity.phone;
+        const claimedEmail = email.email || email.mailbox?.requested_email || "";
+        if (claimedEmail) $("#skyEmail").value = claimedEmail;
+      }
+      async function suggest(options = {}) {
+        const keepCurrent = !options.fresh && currentDraft;
+        const body = {
+          display_name: clean($("#displayName").value),
+          email: clean($("#email").value),
+          phone: clean($("#phone").value),
+          profile_type: clean($("#profileType").value),
+          skye_id: keepCurrent ? currentDraft.identity?.skyeId || currentDraft.identity?.idNumber || "" : "",
+          skyemail: clean($("#skyEmail").value) || (keepCurrent ? currentDraft.skyemail?.email || "" : "")
+        };
+        const res = await fetch("/api/0s/gate/signup/draft", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+          credentials: "include"
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || "Could not generate Gate draft.");
+        currentDraft = data;
+        $("#skyeIdText").textContent = data.identity?.skyeId || "Pending";
+        $("#skyEmailText").textContent = data.skyemail?.email || "Pending";
+        if (!clean($("#skyEmail").value) && data.skyemail?.email) $("#skyEmail").value = data.skyemail.email;
+        writeJson(keys.gateIdentity, data.identity);
+        writeJson(keys.identity, data.identity);
+        writeJson(keys.idDraft, data.identity);
+        writeJson(keys.emailClaim, data.skyemail);
+        writeJson(keys.emailDraft, data.skyemail);
+        writeJson(keys.smvClaim, data.skyemail);
+        return data;
+      }
+      function scheduleSuggest() {
+        clearTimeout(timer);
+        timer = setTimeout(() => suggest().catch((error) => setStatus(error.message, "danger")), 260);
+      }
+      function persistSession(data) {
+        const token = data.gateToken || data.session?.token || "";
+        if (!token) return;
+        const session = {
+          token,
+          source: "0s-gate-signup",
+          platform_id: "metraiyux-0s",
+          usage_lane: "canonical-gate-signup",
+          email: data.user?.email || $("#email").value,
+          role: data.user?.role || "user",
+          customer_id: data.user?.primary_customer_id || data.gate_card?.customer_id || "",
+          claims: {
+            active: true,
+            email: data.user?.email || $("#email").value,
+            role: data.user?.role || "user",
+            customer_id: data.user?.primary_customer_id || data.gate_card?.customer_id || "",
+            gate_card: data.gate_card || null,
+            profile: data.profile || null,
+            identity: data.identity || null,
+            skyemail: data.skyemail || null
+          }
+        };
+        const serialized = JSON.stringify(session);
+        ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYE_GATE_SESSION", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+          localStorage.setItem(key, serialized);
+          sessionStorage.setItem(key, serialized);
+        });
+        localStorage.setItem("SKYGATE_USER_TOKEN", token);
+        sessionStorage.setItem("SKYGATE_USER_TOKEN", token);
+        sessionStorage.setItem("SKYGATE_SESSION_TOKEN", token);
+        localStorage.setItem("SKYGATE_SESSION_TOKEN", token);
+        writeJson(keys.profile, data.profile || {});
+        writeJson(keys.profileV1, data.profile || {});
+        writeJson(keys.gateIdentity, data.identity || {});
+        writeJson(keys.identity, data.identity || {});
+        writeJson(keys.emailClaim, data.skyemail || {});
+        writeJson(keys.smvClaim, data.skyemail || {});
+        if (window.MetrAIyuxGateBridge?.persist) window.MetrAIyuxGateBridge.persist(session, { silent: true });
+      }
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        setStatus("Creating the Gate session, binding SkyEmail, and staging the 0S profile...", "");
+        try {
+          const draft = currentDraft || await suggest();
+          const res = await fetch("/api/0s/gate/signup", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              display_name: clean($("#displayName").value),
+              email: clean($("#email").value),
+              phone: clean($("#phone").value),
+              profile_type: clean($("#profileType").value),
+              password: $("#password").value,
+              skye_id: draft.identity?.skyeId,
+              skyemail: clean($("#skyEmail").value) || draft.skyemail?.email,
+              return_to: sameOriginReturn(returnTo)
+            })
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) throw new Error(data.error || "Gate signup failed.");
+          persistSession(data);
+          setStatus("Gate is active. Opening the 0S launcher...", "ok");
+          setTimeout(() => { location.href = sameOriginReturn(data.next || returnTo); }, 500);
+        } catch (error) {
+          setStatus(error.message || "Gate signup failed.", "danger");
+          submitButton.disabled = false;
+        }
+      });
+      $("#refreshButton").addEventListener("click", () => {
+        currentDraft = null;
+        suggest({ fresh: true }).then(() => setStatus("Draft refreshed from Skye-ID and SKYEMAIL-GEN.", "ok")).catch((error) => setStatus(error.message, "danger"));
+      });
+      ["displayName", "email", "phone", "profileType", "skyEmail"].forEach((id) => {
+        $("#" + id).addEventListener("input", scheduleSuggest);
+        $("#" + id).addEventListener("change", scheduleSuggest);
+      });
+      applyStoredDrafts();
+      suggest().catch((error) => setStatus(error.message, "danger"));
+    })();
+  </script>
+</body>
+</html>

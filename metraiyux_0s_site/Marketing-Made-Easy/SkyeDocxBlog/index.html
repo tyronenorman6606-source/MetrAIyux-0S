@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeDocx Blog · MetrAIyux 0S</title>
+  <meta name="description" content="Gate-owned editorial package room for SkyeDocxMax, SovereignDocs, DeVisional Riftx, SkyPay, and SkyeNet handoffs.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SkyeDocx Blog</p>
+        <h1>Editorial packages for the 0S document stack.</h1>
+        <p class="lede">This is the missing SuperIDE SkyBlog lane promoted into the 0S. It builds launch posts, campaign rails, CTAs, and signed package JSON without owning a new auth lane or calling an AI provider.</p>
+      </div>
+      <nav class="handoffs" aria-label="0S handoffs">
+        <a href="../SkyeDocxMax/editor.html">SkyeDocxMax</a>
+        <a href="../../Free99/apps/sovereigndocs/">SovereignDocs</a>
+        <a href="../../DeVisional%20Riftx/app/">DeVisional Riftx</a>
+        <a href="../../skyenet/">SkyeNet</a>
+      </nav>
+    </header>
+
+    <section class="status-row" aria-label="Runtime status">
+      <div><strong id="gateStatus">Shared gate required</strong><span>FS27/SkyGate/Free99</span></div>
+      <div><strong id="packageStatus">Package idle</strong><span>local package builder</span></div>
+      <div><strong id="storageStatus">No draft saved</strong><span>browser-local workspace</span></div>
+    </section>
+
+    <section class="grid">
+      <form class="panel controls" id="blogForm">
+        <div class="panel-head">
+          <h2>Campaign Inputs</h2>
+          <button type="button" id="loadSuperidePreset">Load SuperIDE Preset</button>
+        </div>
+        <label>Headline<input id="headline" name="headline" value="The Author Stack Needs a Sovereign Command Layer"></label>
+        <label>Slug<input id="slug" name="slug" value="author-stack-needs-sovereign-command-layer"></label>
+        <label>Author<input id="author" name="author" value="Skyes Over London"></label>
+        <label>Section<input id="section" name="section" value="Publishing Infrastructure"></label>
+        <label>Release Hook<input id="releaseHook" name="releaseHook" value="Launch article tied to a canonical SkyeDocx release package"></label>
+        <label>CTA Label<input id="ctaLabel" name="ctaLabel" value="Open the sovereign release lane"></label>
+        <label>Promo Targets<input id="promoTargets" name="promoTargets" value="site-homepage, author-storefront, bundle-upsell"></label>
+        <label>Callouts<input id="callouts" name="callouts" value="direct-sale first, edition lineage intact, blog seeded from same release"></label>
+        <label>Canonical Collection<input id="canonicalCollection" name="canonicalCollection" value="publishing-os"></label>
+        <div class="button-row">
+          <button type="button" id="buildPreview">Build Preview</button>
+          <button type="button" id="exportPackage">Export Package</button>
+          <button type="button" id="saveDraft">Save Draft</button>
+        </div>
+      </form>
+
+      <section class="panel editor">
+        <div class="panel-head"><h2>Post Body</h2><button type="button" id="insertCta">Insert CTA</button></div>
+        <textarea id="postBody" spellcheck="true"># The Author Stack Needs a Sovereign Command Layer
+
+Independent publishing is strongest when the author owns the master release lane instead of renting the truth from outside portals.
+
+## What changes
+SkyeDocx Blog carries the SuperIDE editorial package lane inside the 0S. The document master can live in SkyeDocxMax, the paperwork and review boundary can live in SovereignDocs, and the public/static deploy can move through SkyeNet.
+
+## Why that matters
+One command surface can prepare manuscript structure, launch editorial, direct-sale framing, and outward export evidence in one sequence.
+
+## Release promise
+The direct-sale lane goes live first through SkyPay handoff records. External channels become owner-approved deploy targets instead of the source of truth.
+</textarea>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel-head"><h2>Preview</h2><button type="button" id="openPreview">Open HTML</button></div>
+        <iframe id="previewFrame" title="SkyeDocx Blog preview"></iframe>
+      </section>
+
+      <section class="panel package-panel">
+        <div class="panel-head"><h2>Package JSON</h2><button type="button" id="copyPackage">Copy</button></div>
+        <textarea id="packageJson" readonly spellcheck="false"></textarea>
+      </section>
+    </section>
+  </main>
+  <script src="/Free99/free99-gate.js" data-platform-id="skyedocx-blog" data-platform-name="SkyeDocx Blog" data-billing-mode="owner-gated-0s" data-price-label="0S owner-gated editorial package workspace" data-app-root="/Marketing-Made-Easy/SkyeDocxBlog/"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

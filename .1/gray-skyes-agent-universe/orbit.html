@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gray Skyes playable song orbit with all kept audio drops, live controls, catalog handoff, and artist dashboard route.">
+  <meta name="theme-color" content="#030305">
+  <title>Gray Skyes | Song Orbit</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body class="room-page orbit-room-page">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <img src="media/images/skyes-over-london-logo.png" alt="">
+      <span>Gray Skyes</span>
+    </a>
+    <nav aria-label="Gray Skyes song orbit">
+      <a href="index.html">Hub</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="hero-video-universe.html">Hero Room</a>
+      <a href="video-rooms.html">Videos</a>
+      <a href="release.html">Release</a>
+      <a href="dashboard.html">Dashboard</a>
+    </nav>
+  </header>
+
+  <div class="command-strip" aria-label="Song orbit quick rooms">
+    <a class="button" href="index.html">Hub</a>
+    <a class="button" href="catalog.html">Catalog</a>
+    <a class="button" href="hero-video-universe.html">Hero Room</a>
+    <a class="button" href="video-rooms.html">Videos</a>
+    <a class="button" href="release.html">Release</a>
+  </div>
+
+  <main>
+    <section class="song-orbit-section orbit-page-section" id="song-orbit" aria-label="Gray Skyes floating song orbit">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">playable song orbit</p>
+          <h1>Sixteen drops in motion</h1>
+        </div>
+        <p class="lede">Drag the field, spin the orbit, or click a media object. Every orbit card is wired to a real Gray Skyes audio file.</p>
+      </div>
+      <div class="song-orbit-stage" id="songOrbitStage">
+        <div class="orbit-visual-core" aria-hidden="true">
+          <img class="orbit-cutout" src="media/images/gray-cutout.png" alt="">
+          <div class="orbit-ring ring-one"></div>
+          <div class="orbit-ring ring-two"></div>
+          <div class="orbit-ring ring-three"></div>
+        </div>
+        <div class="song-orbit-world" id="songOrbitWorld" aria-live="polite"></div>
+      </div>
+      <div class="orbit-console">
+        <div>
+          <p class="eyebrow" id="orbitLane">catalog loaded</p>
+          <h3 id="orbitTitle">Select a song</h3>
+          <p id="orbitSource">The orbiting cards are real tracks from the Gray Skyes drop.</p>
+          <audio id="orbitAudio" controls preload="metadata"></audio>
+        </div>
+        <div class="stage-controls orbit-controls" aria-label="Song orbit controls">
+          <button type="button" class="primary" id="orbitSpin">Spin</button>
+          <button type="button" id="orbitHold">Hold</button>
+          <button type="button" id="orbitPrev">Previous</button>
+          <button type="button" id="orbitNext">Next</button>
+          <button type="button" id="orbitReset">Reset</button>
+          <a class="button" href="catalog.html">Open catalog</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="index.html">Back to Gray Skyes hub</a></p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

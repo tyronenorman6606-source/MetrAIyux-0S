@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onboarding — SkyeMail Vault</title>
+  <title>Onboarding — SkyeMail Citadel</title>
   <script src="assets/app.js"></script>
   <script src="assets/skye0s-onboard-bridge.js"></script>
   <script src="assets/mail-ui.js"></script>
@@ -27,7 +27,7 @@
         <div class="btnrow"><a class="btn" href="dashboard.html">Open Inbox</a><a class="btn" href="compose.html">Compose</a><a class="btn" href="monitoring.html">Monitoring</a><a class="btn" href="settings.html">Settings</a><button class="btn danger" id="disconnectBtn" type="button">Disconnect Mailbox</button></div>
       </section>
       <section class="grid2">
-        <section class="card"><h2 style="margin:0 0 8px">Production contract</h2><div class="notice">SkyeMail can run as a Resend-backed app inbox now: outbound uses the verified sender lane and inbound lands through the Resend webhook into the SkyeMail workspace.</div><div class="notice" style="margin-top:12px">Stalwart is optional later for traditional hosted mailbox-server features like IMAP/SMTP/JMAP accounts and mailbox-server credentials.</div></section>
+        <section class="card"><h2 style="margin:0 0 8px">Production contract</h2><div class="notice">SkyeMail can run as a Citadel-backed app inbox now: outbound uses the verified sender lane and inbound lands through the Citadel webhook into the SkyeMail workspace.</div><div class="notice" style="margin-top:12px">Stalwart is optional later for traditional hosted mailbox-server features like IMAP/SMTP/JMAP accounts and mailbox-server credentials.</div></section>
         <section class="card"><h2 style="margin:0 0 8px">Status</h2><div class="notice" id="statusBox">Waiting for local auth check…</div></section>
       </section>
     </main>
@@ -50,7 +50,7 @@
       const domains = data.domains || [];
       domainSelect.innerHTML = domains.map((domain)=>`<option value="${safe(domain)}">${safe(domain)}</option>`).join('');
       if(data.primary_domain) domainSelect.value = data.primary_domain;
-      if(!data.provisioning_configured) setBox('Mailbox provider env is not configured yet. Provisioning will fail loudly until those env vars are set.', 'danger');
+      if(!data.provisioning_configured) setBox('Citadel mail lane env is not configured yet. Provisioning will fail loudly until those env vars are set.', 'danger');
     }catch(err){ setBox(err.message || 'Unable to load mailbox domains.', 'danger'); }
   }
   async function loadStatus(){
@@ -69,12 +69,13 @@
   qs('#provisionBtn').onclick = async ()=> {
     try{
       setBox('Provisioning mailbox…');
-      const data = await apiFetch('/mailbox-provision', { method:'POST', body: JSON.stringify({ local_part: localPartInput.value, domain: domainSelect.value, allow_local_route: true }) });
+      const data = await apiFetch('/mailbox-provision', { method:'POST', body: JSON.stringify({ local_part: localPartInput.value, domain: domainSelect.value }) });
       setBadge(`Provisioned • ${data.mailbox?.mailbox_email || data.mailbox?.email}`);
-      setBox(data.local_route ? 'SkyeMail local route is active for this inbox. Provider mailbox credentials can be attached later.' : 'Mailbox provisioned and inbound routing registered.', 'ok');
+      setBox('Mailbox provisioned and Citadel inbound routing registered.', 'ok');
+      SMV.trackGame('mailbox_provision');
     }catch(err){ setBox(err.message || 'Mailbox provisioning failed.', 'danger'); }
   };
-  qs('#disconnectBtn').onclick = async ()=> { if(!confirm('Disconnect this mailbox from the hosted SkyeMail workspace?')) return; try{ await SMV.disconnectGoogle(); setBadge('Mailbox disconnected'); setBox('Mailbox disconnected from this workspace.', 'ok'); }catch(err){ setBox(err.message || 'Disconnect failed.', 'danger'); } };
+  qs('#disconnectBtn').onclick = async ()=> { if(!confirm('Disconnect this mailbox from the Citadel/SkyeNet SkyeMail workspace?')) return; try{ await SMV.disconnectGoogle(); setBadge('Mailbox disconnected'); setBox('Mailbox disconnected from this workspace.', 'ok'); }catch(err){ setBox(err.message || 'Disconnect failed.', 'danger'); } };
   qs('#watchBtn').onclick = async ()=> { try{ const data = await SMV.enableWatch(); setBox(`Mailbox watch ${data.watch?.status || 'live'}.`, 'ok'); }catch(err){ setBox(err.message || 'Watch enable failed.', 'danger'); } };
   const defaultLocal = (getHandle() || '').split('@')[0] || 'operator';
   localPartInput.value = defaultLocal.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'operator';

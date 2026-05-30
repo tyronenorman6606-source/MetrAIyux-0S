@@ -20,12 +20,12 @@
           </span>
         </a>
         <div class="nav-actions">
-          <a href="/upload.html">Upload</a>
-          <a href="/vault.html">My Vault</a>
-          <a class="nav-cta" href="/repo.html">Repo Vault</a>
-          <a href="/agent-install.html">AI Install</a>
-          <a href="/process.html">Process</a>
-          <a href="/">Home</a>
+          <a href="/upload.html">Upload 🔐</a>
+          <a href="/vault.html">My Vault 🗃️</a>
+          <a class="nav-cta" href="/repo.html">Repo Vault 💻</a>
+          <a href="/agent-install.html">🧠 AI Install</a>
+          <a href="/process.html">Process 🧾</a>
+          <a href="/">Home ✨</a>
         </div>
       </nav>
 
@@ -34,26 +34,28 @@
           <img src="/assets/skyes-primary-logo.png" alt="" loading="lazy" decoding="async" />
           <div>
             <strong>Repo Room</strong>
-            <span>Archives, Git, receipts</span>
+            <span>Archives, Git, receipts 🧾</span>
           </div>
         </div>
-        <a href="/upload.html"><span>01</span> Secure intake</a>
-        <a href="/vault.html"><span>02</span> My vault files</a>
-        <a href="/repo.html"><span>03</span> Repo workspace</a>
-        <a href="/process.html"><span>04</span> Proof route</a>
-        <a href="/agent-install.html"><span>05</span> AI install guide</a>
+        <a href="/upload.html"><span>01</span> Secure intake 🔐</a>
+        <a href="/vault.html"><span>02</span> My vault files 🗃️</a>
+        <a href="/repo.html"><span>03</span> Repo workspace 💻</a>
+        <a href="/process.html"><span>04</span> Proof route 🧾</a>
+        <a href="/agent-install.html"><span>05</span> AI install guide 🧠</a>
         <div class="sidecar-proof">
-          <strong>Secret boundary</strong>
-          <p>Normal repo packages stay clean. Local-only secrets get documented for a separate private recovery handoff.</p>
+          <strong>Encrypted source custody</strong>
+          <p>Normal handoff packages stay clean. The autosync agent streams source-custody state through the encrypted repo-rescue lane.</p>
         </div>
       </aside>
 
       <section id="repo-snapshots" class="section-grid repo-snapshot-section route-section">
         <article class="panel rich-panel">
           <p class="eyebrow">Repo Vault Lane</p>
-          <h1 class="page-title">Safe archive, Git remote, or working vault folder.</h1>
-          <p class="muted big-copy">For handoff packages, the repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger.</p>
+          <h1 class="page-title">Safe archive, Git remote, or repo rescue agent. 🛟</h1>
+          <p class="muted big-copy">For handoff packages, the repo snapshot command builds one vault-ready archive, runs a local secret scan, uploads through the same R2 receipt flow, and keeps the proof in the ledger. For active dev work, the autosync agent runs the encrypted source-custody lane on repeat.</p>
           <div class="command-stack" aria-label="Repository snapshot commands">
+            <span class="code-pill">npm run vault:agent:start -- --env-file=env.txt --mode=full --interval-seconds=600</span>
+            <span class="code-pill">npm run vault:agent:status</span>
             <span class="code-pill">npm run vault:dry-run</span>
             <span class="code-pill">npm run vault:push</span>
             <span class="code-pill">npm run vault:repo -- status --dir=.</span>
@@ -75,16 +77,27 @@
         </article>
       </section>
 
+      <section class="panel rich-panel shyt-banner route-section" aria-label="Repo rescue no guarantee">
+        <p class="eyebrow">Repo rescue posture 🧾</p>
+        <h2>ShYT may crash, but Skye keeps the sKache.</h2>
+        <p class="muted big-copy">No perfect-tech promises. Just proof receipts, recovery prompts, checkpoints, and rollback-aware workflows built to keep your last clean move from disappearing.</p>
+        <p class="notice-copy">ShYT happens, and noo tech is perfect, so despite our extreme stress test and live testing with the owner's own codebase, we will not make the guarantee.</p>
+        <div class="copy-prompt-actions">
+          <a class="primary-btn link-btn" href="/agent-install.html">Install agent 🧠</a>
+          <a class="secondary-btn link-btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skyevault-autosync-proof.html" target="_blank" rel="noopener">View proof 🧾</a>
+        </div>
+      </section>
+
       <section id="encrypted-zip-restore" class="section-grid route-section restore-lane">
         <article class="panel rich-panel accent-panel">
           <p class="eyebrow">Full Workspace Restore</p>
           <h2>Encrypted artifact plus restore kit.</h2>
-          <p class="muted big-copy">A .zip.enc means encrypted by design. It is not the final ZIP yet; it is the protected wrapper that keeps the repo locked until the direct restore kit unlocks it.</p>
+          <p class="muted big-copy">.zip.enc means encrypted, and a .tar.zst.enc file is encrypted by design too. It is not the final repo archive yet; it is the protected wrapper that keeps the repo locked until the control material unlocks it.</p>
           <ul class="check-list">
-            <li>Download the large `.zip.enc` artifact.</li>
-            <li>Download the matching direct restore kit ZIP.</li>
+            <li>Download the large encrypted artifact.</li>
+            <li>Download the matching direct restore kit or SkyeSecure control pack.</li>
             <li>Run the helper from the restore kit.</li>
-            <li>Open the real `.zip` or extracted repo folder after decrypt finishes.</li>
+            <li>Open the decrypted archive or extracted repo folder after decrypt finishes.</li>
           </ul>
         </article>
         <article class="panel rich-panel">
@@ -94,7 +107,7 @@
             <span class="code-pill">unzip direct-restore-kit.zip -d restore-kit</span>
             <span class="code-pill">node restore-kit/skyevault-restore-encrypted-zip.mjs --artifact=repo.zip.enc --key-file=restore-kit/artifact-key-material.txt --out-dir=./restore-repo --force</span>
           </div>
-          <p class="notice-copy">If a file still ends in `.zip.enc`, it has not been unlocked yet. The real repo ZIP appears only after the restore kit decrypts it.</p>
+          <p class="notice-copy">If a file still ends in `.zip.enc` or `.tar.zst.enc`, it has not been unlocked yet. The decrypted repo archive appears only after the restore material decrypts it.</p>
         </article>
       </section>
 

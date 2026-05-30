@@ -1,0 +1,147 @@
+[classification]
+labels = [
+  "real-app",
+  "partial-app",
+  "docked-menu-shell",
+  "static-marketing-shell",
+  "broken-surface"
+]
+real_app_minimum_score = 80
+partial_app_minimum_score = 55
+docked_menu_shell_maximum_score = 54
+
+[required_context]
+production_url = true
+surface_name = true
+expected_app_promise = true
+user_role = true
+auth_lane = "shared-0s-fs27-skygate-free99"
+reference_app_allowed = true
+
+[live_browser]
+headed_required = true
+production_url_only = true
+desktop_viewport = "1440x980"
+mobile_viewport = "390x844"
+minimum_actions_per_viewport = 12
+minimum_distinct_controls_per_viewport = 8
+minimum_scroll_stops_per_viewport = 3
+minimum_core_workflow_attempts = 2
+refresh_persistence_check_required = true
+console_check_required = true
+network_failure_check_required = true
+screenshots_required = true
+headless_only_counts = false
+text_smoke_only_counts = false
+
+[scoring]
+total_points = 100
+
+[[scoring.criteria]]
+name = "role_and_workspace_context"
+points = 8
+question = "Is the active user role, workspace, tenant, or queue context visible and meaningful?"
+
+[[scoring.criteria]]
+name = "real_data_or_honest_empty_state"
+points = 10
+question = "Does the surface use grounded data, a real API, shared fixtures with labels, or an honest empty state?"
+
+[[scoring.criteria]]
+name = "core_job_loop"
+points = 16
+question = "Can the target user complete the app's main job from start to finish?"
+
+[[scoring.criteria]]
+name = "domain_actions"
+points = 12
+question = "Do buttons, rows, cards, forms, filters, exports, and handoffs perform domain-specific work?"
+
+[[scoring.criteria]]
+name = "state_change_and_persistence"
+points = 12
+question = "Do actions change visible state and survive refresh through a named storage or API path when expected?"
+
+[[scoring.criteria]]
+name = "detail_and_review_depth"
+points = 8
+question = "Can users inspect individual records, documents, leads, assets, or queue items in enough detail to act?"
+
+[[scoring.criteria]]
+name = "search_filter_sort_wayfinding"
+points = 6
+question = "Can users navigate multi-record work through search, filter, sort, pagination, stages, or equivalent controls?"
+
+[[scoring.criteria]]
+name = "error_empty_loading_permission_states"
+points = 8
+question = "Are non-happy-path states visible, accurate, and useful?"
+
+[[scoring.criteria]]
+name = "canonical_shared_components"
+points = 8
+question = "Does the surface reuse canonical 0S components/partials/bridges instead of local duplicate editors or admin panels?"
+
+[[scoring.criteria]]
+name = "product_safe_language"
+points = 4
+question = "Is scary, internal, or legitimacy-damaging copy replaced with contextual user-safe operational language?"
+
+[[scoring.criteria]]
+name = "mobile_core_workflow"
+points = 4
+question = "Can the core job be completed or responsibly managed on mobile?"
+
+[[scoring.criteria]]
+name = "technical_health"
+points = 4
+question = "Are console errors, failed network requests, broken media, and blank sections absent?"
+
+[automatic_red_flags]
+app_specific_auth_or_password = "fail"
+all_controls_are_navigation_or_cosmetic = "docked-menu-shell"
+no_core_workflow_possible = "docked-menu-shell"
+raw_internal_risk_copy_visible_to_normal_user = "partial-app-max"
+local_duplicate_of_known_canonical_editor = "partial-app-max"
+fake_save_export_or_submit = "broken-surface"
+production_route_ungated_when_gate_required = "broken-surface"
+blank_viewport_or_major_blank_section = "broken-surface"
+uncaught_exception_blocks_core_flow = "broken-surface"
+
+[receipt]
+path = "test-artifacts/app-surface-reality-remediator/"
+include_url = true
+include_timestamp = true
+include_classification = true
+include_score = true
+include_viewports = true
+include_actions_performed = true
+include_controls_tested = true
+include_state_changes_observed = true
+include_persistence_results = true
+include_dead_controls = true
+include_placeholder_or_fake_data = true
+include_scary_or_internal_copy = true
+include_duplicate_local_capabilities = true
+include_canonical_shared_surfaces_to_use = true
+include_console_errors = true
+include_failed_network_requests = true
+include_screenshots = true
+include_mobile_findings = true
+include_remediation_plan = true
+include_blocked_reasons = true
+
+[remediation]
+fix_order = [
+  "define_product_job_loop",
+  "ground_data_and_empty_states",
+  "wire_domain_actions",
+  "replace_local_duplicates_with_canonical_shared_surfaces",
+  "clean_product_language",
+  "add_error_loading_permission_states",
+  "prove_desktop_and_mobile_in_live_headed_browser"
+]
+decoration_only_fix_allowed = false
+shared_auth_required = true
+canonical_component_preferred = true
+live_browser_receipt_required_before_ready = true

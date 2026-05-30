@@ -1,0 +1,85 @@
+{
+  "schema": "skyenet.client-app.deploy-target.v1",
+  "updatedAt": "2026-05-30T19:17:04.500Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "projectId": "musicnexus-sam-smith",
+  "workspaceId": "sam-smith",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530191633",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/musicnexus-sam-smith/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/musicnexus-sam-smith",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith",
+  "publicBuildDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=sam-smith&project_id=musicnexus-sam-smith&deployment_id=dep_20260530191633",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
+  },
+  "legacyRoutes": [
+    "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/artist-storefronts/sam-smith/",
+    "https://skyenet.graylondonskyes.workers.dev/musicnexus/sam-smith/"
+  ],
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "hostHeader": {
+      "ok": false,
+      "route_record": {
+        "status": 200,
+        "ok": false,
+        "count": 0,
+        "key": "",
+        "route": null,
+        "elapsed_ms": 506.71
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-sam-smith/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-sam-smith",
+        "elapsed_ms": 783.54
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 110.13,
+        "error": "",
+        "blocker": ""
+      },
+      "host_header_probe": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html",
+        "elapsed_ms": 41.72,
+        "bytes": 4644,
+        "title": "SkyeNet | Sovereign Deploy Network",
+        "missing_route_header_probe_error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=sam-smith&project_id=musicnexus-sam-smith&deployment_id=dep_20260530191633",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 283.54
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 131391,
+        "read_truncated": true,
+        "elapsed_ms": 1194.93,
+        "error": ""
+      }
+    }
+  }
+}

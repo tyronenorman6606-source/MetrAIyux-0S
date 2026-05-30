@@ -16,11 +16,10 @@
     <div class="brand-orb">SMC</div>
     <div class="portal-title"><span>SkyeMediaCenter / intake bay</span><h1>Asset Drop Reactor</h1></div>
     <div class="portal-actions">
-      <div id="auth-state" class="auth-state">Upload Auth Missing</div>
-      <button class="portal-button" onclick="configureUploadAuth()">Operator Login</button>
-      <button class="portal-button" onclick="bootstrapUploadAuth()">Proof Session</button>
+      <div id="auth-state" class="auth-state">Media access required</div>
+      <button class="portal-button" onclick="configureUploadAuth()">Use 0S Session</button>
       <button class="portal-button" onclick="disconnectUploadAuth()">Disconnect</button>
-      <a class="portal-button primary" href="admin.html">Operator Theater →</a>
+      <a class="portal-button primary" href="admin.html">Operator Theater</a>
     </div>
   </header>
 
@@ -28,7 +27,7 @@
     <section class="intake-hero">
       <span class="micro">media intake is a ritual surface</span>
       <h2>Drop matter into the Skye media field.</h2>
-      <p>Images, video, audio, documents, and campaign files enter the library with tags, status, and review state. The production upload contract sends <code>content_base64</code> to <code>/api/media/assets</code>.</p>
+      <p>Images, video, audio, documents, and campaign files enter the library with tags, status, review state, and protected delivery tracking.</p>
       <div id="upload-zone" class="drop-bay" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave()">
         <div class="drop-core"><b>⌁</b><strong>Drag files here</strong><small>or click to browse the machine</small></div>
         <input id="file-input" type="file" multiple onchange="handleFiles(event)">

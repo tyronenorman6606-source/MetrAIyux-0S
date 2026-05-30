@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arizona Hispanic Chamber of Commerce | Valley Verified</title>
+  <meta name="description" content="The Arizona Hispanic Chamber of Commerce supports Hispanic-owned businesses with advocacy, market intelligence, DATOS, MBDA resources, events, education, and membership.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #161616;
+      --paper: #fffefc;
+      --magenta: #c92f7b;
+      --teal: #008b8f;
+      --yellow: #f1c742;
+      --green: #4b9e45;
+      --line: rgba(22, 22, 22, .16);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(201,47,123,.08) 0 18%, transparent 18% 34%, rgba(0,139,143,.08) 34% 52%, transparent 52%),
+        var(--paper);
+      overflow-wrap: anywhere;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    header { background: #fff; border-bottom: 1px solid var(--line); }
+    .bar { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { font-weight: 900; text-transform: uppercase; letter-spacing: .1em; font-size: .78rem; }
+    .area { border: 2px solid var(--ink); background: var(--yellow); padding: 9px 13px; font-weight: 900; }
+    .hero {
+      display: grid;
+      grid-profile-columns: 1.05fr .95fr;
+      gap: 42px;
+      align-items: center;
+      padding: 58px 0 36px;
+    }
+    .eyebrow { margin: 0 0 14px; color: var(--magenta); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; font-size: .82rem; }
+    h1 { margin: 0; font-size: 3.65rem; line-height: .98; letter-spacing: 0; }
+    .lead { margin: 22px 0 0; max-width: 700px; font-size: 1.12rem; line-height: 1.72; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 2px solid var(--ink);
+      background: var(--magenta);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 900;
+    }
+    .button.alt { background: #fff; color: var(--ink); }
+    .mosaic {
+      min-height: 420px;
+      border: 2px solid var(--ink);
+      background:
+        linear-gradient(135deg, var(--teal) 0 18%, transparent 18% 100%),
+        linear-gradient(45deg, transparent 0 55%, var(--yellow) 55% 69%, transparent 69%),
+        linear-gradient(90deg, transparent 0 28%, var(--green) 28% 38%, transparent 38% 70%, var(--magenta) 70% 80%, transparent 80%),
+        #fff;
+      position: relative;
+      box-shadow: 10px 10px 0 var(--teal);
+    }
+    .mosaic::before {
+      content: "Business Association";
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      right: 28px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      padding: 18px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .mosaic::after {
+      content: "1020 E. Missouri Ave";
+      position: absolute;
+      bottom: 28px;
+      left: 28px;
+      right: 28px;
+      background: var(--ink);
+      color: #fff;
+      padding: 18px;
+      font-weight: 900;
+      text-align: center;
+    }
+    .facts {
+      display: grid;
+      grid-profile-columns: repeat(4, 1fr);
+      margin: 20px 0 42px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .fact { padding: 20px; border-right: 1px solid var(--line); }
+    .fact:last-child { border-right: 0; }
+    .fact:nth-child(1) { border-top: 6px solid var(--magenta); }
+    .fact:nth-child(2) { border-top: 6px solid var(--teal); }
+    .fact:nth-child(3) { border-top: 6px solid var(--yellow); }
+    .fact:nth-child(4) { border-top: 6px solid var(--green); }
+    .label { margin: 0 0 8px; color: #606060; font-size: .74rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .value { margin: 0; line-height: 1.48; font-weight: 800; }
+    .section { display: grid; grid-profile-columns: .82fr 1.18fr; gap: 34px; padding: 38px 0 60px; border-top: 1px solid var(--line); }
+    h2 { margin: 0; font-size: 2rem; line-height: 1.04; }
+    .copy { margin: 0; line-height: 1.78; font-size: 1.02rem; }
+    .service signals { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .tag { background: #fff; border: 1px solid var(--line); padding: 10px 12px; font-weight: 900; }
+    footer { border-top: 1px solid var(--line); padding: 24px 0; background: #fff; color: #606060; }
+    @media (max-width: 860px) {
+      .hero, .section { grid-profile-columns: 1fr; }
+      .facts { grid-profile-columns: repeat(2, 1fr); }
+      .fact:nth-child(2) { border-right: 0; }
+      h1 { font-size: 2.65rem; }
+      .mosaic { min-height: 310px; box-shadow: 7px 7px 0 var(--teal); }
+    }
+    @media (max-width: 520px) {
+      .bar, .actions { flex-direction: column; align-items: stretch; }
+      .facts { grid-profile-columns: 1fr; }
+      .fact { border-right: 0; border-bottom: 1px solid var(--line); }
+      h1 { font-size: 2.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <div class="brand">Valley Verified</div>
+      <div class="area">Phoenix, AZ 85014</div>
+    </div>
+  </header>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow">Business &amp; Professional Services</p>
+        <h1>Arizona Hispanic Chamber of Commerce</h1>
+        <p class="lead">The Arizona Hispanic Chamber of Commerce advances Hispanic-owned businesses and Arizona entrepreneurs through advocacy, market intelligence, DATOS research, MBDA support, events, education, and membership.</p>
+        <div class="actions">
+          <a class="button" href="tel:+16022791800">Call (602) 279-1800</a>
+          <a class="button alt" href="https://business.phoenixchamber.com/list/ql/business-professional-services-5">Public Chamber profile</a>
+        </div>
+      </div>
+      <div class="mosaic" aria-hidden="true"></div>
+    </section>
+    <section class="wrap facts" aria-label="Business facts">
+      <div class="fact"><p class="label">Category</p><p class="value">Beauty And Wellness</p></div>
+      <div class="fact"><p class="label">Niche</p><p class="value">Business Association</p></div>
+      <div class="fact"><p class="label">Address</p><p class="value">1020 E. Missouri Ave, Phoenix, AZ 85014</p></div>
+      <div class="fact"><p class="label">Profile Date</p><p class="value">May 19, 2026</p></div>
+    </section>
+    <section class="wrap section">
+      <h2>Association Profile</h2>
+      <div>
+        <p class="copy">The Valley Verified profile identifies Arizona Hispanic Chamber of Commerce under Business &amp; Professional Services / Business Association and as a local service business. Use the listed organization contact route to start the next conversation.</p>
+        <div class="service signals" aria-label="Business service signals">
+          <span class="tag">Business association</span>
+          <span class="tag">Salon / Personal Care</span>
+          <span class="tag">English</span>
+          <span class="tag">conversation-based</span>
+        </div>
+      </div>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-arizona-hispanic-chamber-of-commerce-phoenix-85014-d845ef1" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-arizona-hispanic-chamber-of-commerce-phoenix-85014-d845ef1" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says the Arizona Hispanic Chamber of Commerce is Valley Verified because it is a deep civic and business resource for Arizona's Hispanic-owned businesses and Hispanic consumers. Official pages describe market intelligence, capacity building, advocacy, education, workshops, seminars, networking, signature events, DATOS, MBDA Business Center support, and Capital Readiness programming.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The organization traces its founding to 1948, publishes phone 602-279-1800, and lists a Phoenix contact address at 3104 E. Camelback Rd #2481, while BBB and profile profiles also tie the chamber to 1020 E. Missouri Ave. Public trust markers include BBB accreditation with an A+ rating, DATOS publications, membership options, and official identification of Monica Villalobos as President and CEO.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">AZHCC belongs in Valley Verified because it is more than a membership profile; it is a statewide business platform connecting entrepreneurs to capital, markets, consulting, certifications, education, research, and community influence.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Advocacy, market intelligence, DATOS, MBDA consulting, Capital Readiness support, events, workshops, networking, and membership.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Hispanic-owned businesses, minority entrepreneurs, corporate partners, members, and Arizona Hispanic consumers.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">1948 founding, official programs, DATOS publications, BBB A+ profile, phone, Phoenix addresses, and Chamber evidence.</span></div>
+        </div>
+      </section>
+  </main>
+  <footer>
+    <div class="wrap">Valley Verified local business profile for Arizona Hispanic Chamber of Commerce.</div>
+  </footer>
+</body>
+</html>

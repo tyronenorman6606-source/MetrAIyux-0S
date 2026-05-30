@@ -1,0 +1,57 @@
+{
+  "schema": "skyemusicnexus.pics2vid-release-package.v1",
+  "id": "music4u-receipts-in-the-sun-pics2vid",
+  "songId": "music4u-receipts-in-the-sun",
+  "title": "Receipts In The Sun",
+  "project": "",
+  "artistNames": [
+    "Music 4u"
+  ],
+  "primaryArtistId": "legacy_music_4u",
+  "productId": "prod_music_4u_receipts_in_the_sun",
+  "status": "ready_for_still2vid_export",
+  "requirement": "Song drops must include real artist images and a Still2Vid/SkyePics visual package before the visual release is promoted.",
+  "audioFile": "../audio/receipts-in-the-sun.mp3",
+  "sourceImages": [
+    {
+      "artistId": "legacy_music_4u",
+      "artistName": "Music 4u",
+      "artistSlug": "music-4u",
+      "role": "artist portrait",
+      "source": "assets/artist-portrait.png",
+      "packageFile": "./images/music-4u-artist-portrait.png"
+    }
+  ],
+  "apps": [
+    {
+      "id": "still2vid-forge",
+      "name": "Still2Vid Forge v4",
+      "url": "/Free99/apps/still2vid-forge/index.html",
+      "role": "image-to-video export lane"
+    },
+    {
+      "id": "skyepics",
+      "name": "SkyePics Vault",
+      "url": "/Free99/apps/skyepics/index.html",
+      "role": "artist-image capture/import vault"
+    }
+  ],
+  "outputTargets": [
+    {
+      "type": "still2vid-project",
+      "status": "operator_export_required",
+      "app": "Still2Vid Forge v4"
+    },
+    {
+      "type": "poster",
+      "status": "operator_export_required",
+      "app": "Still2Vid Forge v4"
+    },
+    {
+      "type": "short-form-video",
+      "status": "operator_export_required",
+      "app": "Still2Vid Forge v4"
+    }
+  ],
+  "createdAt": "2026-05-25T23:07:09.603Z"
+}

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0S Command Bridge</title>
+  <style>
+    :root { color-scheme: dark; --bg:#06080d; --panel:#101722; --line:#263244; --text:#f7fbff; --muted:#a7b4c4; --cyan:#58f5ff; --gold:#ffd166; --pink:#ff5cd7; --green:#7cffb2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at 18% 0%, rgba(88,245,255,.14), transparent 30%), radial-gradient(circle at 80% 12%, rgba(255,92,215,.10), transparent 32%), var(--bg); color: var(--text); }
+    main { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 42px; }
+    header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; padding: 14px 0 22px; }
+    h1 { margin: 0; font-size: clamp(34px, 6vw, 72px); line-height: .92; letter-spacing: 0; max-width: 760px; }
+    h2, h3 { letter-spacing: 0; }
+    p { color: var(--muted); line-height: 1.55; }
+    a { color: var(--cyan); }
+    .eyebrow { color: var(--gold); text-transform: uppercase; font-weight: 800; font-size: 12px; letter-spacing: .08em; margin: 0 0 8px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    button, .button { appearance: none; border: 1px solid var(--line); background: #131d2a; color: var(--text); min-height: 40px; border-radius: 8px; padding: 10px 13px; font-weight: 800; cursor: pointer; text-decoration: none; }
+    button.primary, .button.primary { border-color: rgba(88,245,255,.65); background: linear-gradient(135deg, rgba(88,245,255,.18), rgba(255,92,215,.12)); }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+    .panel { border: 1px solid var(--line); background: rgba(16,23,34,.84); border-radius: 8px; padding: 16px; box-shadow: 0 18px 45px rgba(0,0,0,.24); }
+    .wide { grid-column: span 12; }
+    .half { grid-column: span 6; }
+    .third { grid-column: span 4; }
+    .metric { display: grid; gap: 5px; }
+    .metric span { color: var(--muted); font-size: 12px; text-transform: uppercase; font-weight: 800; }
+    .metric strong { font-size: 30px; }
+    .surface-list, .event-list { display: grid; gap: 10px; }
+    .surface, .event { border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.035); border-radius: 8px; padding: 12px; }
+    .surface h3, .event h3 { margin: 0 0 6px; font-size: 16px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chip { border: 1px solid rgba(255,255,255,.13); color: var(--muted); border-radius: 999px; padding: 4px 8px; font-size: 12px; }
+    label { display: grid; gap: 6px; color: var(--muted); font-weight: 800; font-size: 12px; text-transform: uppercase; }
+    input, select, textarea { width: 100%; border: 1px solid var(--line); background: #07101a; color: var(--text); border-radius: 8px; padding: 11px 12px; font: inherit; }
+    textarea { min-height: 96px; resize: vertical; }
+    pre { white-space: pre-wrap; overflow: auto; max-height: 340px; background: #050a11; border: 1px solid var(--line); border-radius: 8px; padding: 12px; color: #d8e7f5; }
+    .graph { min-height: 230px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: stretch; }
+    .node { border: 1px solid rgba(88,245,255,.18); border-radius: 8px; padding: 12px; background: rgba(88,245,255,.055); }
+    .node strong { display: block; }
+    @media (max-width: 760px) { header { display: grid; } .half, .third { grid-column: span 12; } }
+  </style>
+</head>
+<body data-command-bridge-app="founder-command" data-command-bridge-surface="0s-command-bridge">
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Founder Command app</p>
+        <h1>0S Command Bridge</h1>
+        <p>Shared CRM ledger for Nexus, storefronts, SkyPay, SkyeCommerce, docs, workforce, deployment, and artist drops.</p>
+      </div>
+      <div class="actions">
+        <a class="button" href="/founder-command/?view=core">Core Apps</a>
+        <a class="button" href="/nexus/crm-records.html">NEXUS CRM</a>
+        <button class="primary" id="refreshBtn" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <article class="panel third metric"><span>Bridge Events</span><strong id="metricEvents">0</strong><p id="metricStorage">Storage pending.</p></article>
+      <article class="panel third metric"><span>Connected Surfaces</span><strong id="metricSurfaces">0</strong><p>Apps write into one 0S CRM lane.</p></article>
+      <article class="panel third metric"><span>Tracked Revenue</span><strong id="metricMoney">$0.00</strong><p>Only events carrying amount data count here.</p></article>
+
+      <article class="panel half">
+        <h2>Manual CRM Event</h2>
+        <form id="eventForm" class="grid">
+          <label class="half">App
+            <select id="sourceApp">
+              <option value="skymusicnexus">SkyeMusicNexus</option>
+              <option value="artist-storefronts">Artist Storefronts</option>
+              <option value="skyecommerce">SkyeCommerce</option>
+              <option value="skyepay">SkyPay</option>
+              <option value="vantacore-crm">VantaCore CRM</option>
+              <option value="ae-flowpro">AE FlowPro</option>
+              <option value="skyeroutex">SkyeRouteX</option>
+              <option value="sovereigndocs">SovereignDocs</option>
+              <option value="skyemail">SkyeMail</option>
+              <option value="skynet">SkyeNet</option>
+            </select>
+          </label>
+          <label class="half">Entity ID<input id="entityId" placeholder="artist, merchant, order, lead..." /></label>
+          <label class="wide">Summary<textarea id="summary" placeholder="What happened, who it belongs to, and what needs to happen next."></textarea></label>
+          <label class="half">Amount cents<input id="amountCents" type="number" min="0" step="1" placeholder="0" /></label>
+          <label class="half">Stage<input id="stage" placeholder="lead, checkout, payable, release..." /></label>
+          <div class="wide actions"><button class="primary" type="submit">Record Event</button></div>
+        </form>
+      </article>
+
+      <article class="panel half">
+        <h2>Neural Graph</h2>
+        <div class="graph" id="graph"></div>
+      </article>
+
+      <article class="panel half">
+        <h2>Surfaces</h2>
+        <div class="surface-list" id="surfaces"></div>
+      </article>
+
+      <article class="panel half">
+        <h2>Recent Events</h2>
+        <div class="event-list" id="events"></div>
+      </article>
+
+      <article class="panel wide">
+        <h2>Receipt</h2>
+        <pre id="receipt">Waiting for bridge status.</pre>
+      </article>
+    </section>
+  </main>
+  <script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="founder-command" data-command-bridge-surface="0s-command-bridge"></script>
+  <script>
+    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+    const $ = (id) => document.getElementById(id);
+
+    async function getJson(path) {
+      const res = await fetch(path, { credentials: 'include' });
+      const data = await res.json().catch(() => ({ ok: false, status: res.status }));
+      if (!res.ok) data.ok = false;
+      return data;
+    }
+
+    function renderStatus(status, graph) {
+      $('metricEvents').textContent = status.summary?.total || 0;
+      $('metricSurfaces').textContent = status.surfaces?.length || 0;
+      $('metricStorage').textContent = `Storage: ${status.storage || 'unknown'}`;
+      $('metricMoney').textContent = money.format((status.summary?.money_cents || 0) / 100);
+      $('surfaces').innerHTML = (status.surfaces || []).map((surface) => `
+        <article class="surface">
+          <h3>${surface.name}</h3>
+          <p>${surface.lane} · <a href="${surface.href}">open</a></p>
+          <div class="chips">${(surface.crm_records || []).map((item) => `<span class="chip">${item}</span>`).join('')}</div>
+        </article>
+      `).join('');
+      $('events').innerHTML = (status.recent_events || []).map((event) => `
+        <article class="event">
+          <h3>${event.summary || event.type}</h3>
+          <p>${event.source_app} · ${event.lane} · ${event.created_at}</p>
+          <div class="chips"><span class="chip">${event.type}</span><span class="chip">${event.entity?.kind || 'entity'}:${event.entity?.id || 'none'}</span></div>
+        </article>
+      `).join('') || '<p>No bridge events yet.</p>';
+      $('graph').innerHTML = (graph.graph?.nodes || []).slice(0, 24).map((node) => `
+        <div class="node"><strong>${node.label}</strong><span class="chip">${node.type}</span></div>
+      `).join('');
+      $('receipt').textContent = JSON.stringify({ status, graph_summary: { nodes: graph.graph?.nodes?.length || 0, links: graph.graph?.links?.length || 0 } }, null, 2);
+    }
+
+    async function refresh() {
+      const [status, graph] = await Promise.all([
+        getJson('/api/0s-command-bridge/status?limit=80'),
+        getJson('/api/0s-command-bridge/graph?limit=80')
+      ]);
+      renderStatus(status, graph);
+    }
+
+    $('refreshBtn').addEventListener('click', refresh);
+    $('eventForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const body = {
+        source_app: $('sourceApp').value,
+        source_surface: '0s-command-bridge-manual',
+        event_type: `${$('sourceApp').value}.manual_crm_event`,
+        summary: $('summary').value,
+        entity: { kind: 'crm-record', id: $('entityId').value, label: $('entityId').value },
+        crm: { stage: $('stage').value },
+        money: { amount_cents: Number($('amountCents').value || 0), currency: 'USD' },
+        metadata: { entered_from: 'founder-command-app' }
+      };
+      const saved = await window.SkyeCommandBridge.capture(body.event_type, body);
+      $('receipt').textContent = JSON.stringify(saved, null, 2);
+      await refresh();
+    });
+    refresh();
+  </script>
+  <script src="/assets/js/skymail-pocket-tab.js" defer data-skymail-pocket-tab="1"></script>
+</body>
+</html>

@@ -1,6 +1,51 @@
 (function () {
   'use strict';
 
+  (function mountRevealEffects() {
+    if (window.__metraiyuxRevealEffectsMounted) return;
+    window.__metraiyuxRevealEffectsMounted = true;
+
+    function show(el) {
+      el.classList.add('is-visible');
+    }
+
+    function boot() {
+      var items = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+      if (!items.length) return;
+
+      document.documentElement.classList.add('reveal-effects-enabled');
+
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(show);
+        return;
+      }
+
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            show(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+
+      items.forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.96 && rect.bottom > 0) {
+          show(el);
+          return;
+        }
+        observer.observe(el);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot, { once: true });
+    } else {
+      boot();
+    }
+  })();
+
   if (window.SkyeUI || document.querySelector('script[src$="skye-effects.js"]')) return;
 
   var script = document.createElement('script');

@@ -39,7 +39,7 @@
       <p class="eyebrow">House payment gateway</p>
       <img class="hero-platform-logo floating-logo" src="../assets/metraiyux-0s-logo-transparent.png" alt="MetrAIyux 0S transparent floating logo">
       <h1>SkyePay is how clients continue after preview.</h1>
-      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and confirmed payment records paid status before activation follows the plan policy. SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are Free99 gated access. SkyeMusicNexus Lite is Free99, while Studio, Label Command, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid SkyePay offers.</p>
+      <p class="hero-copy">I built SkyePay so client app previews do not end in an unmanaged payment link. The client chooses the lane, Stripe handles Checkout, FS27 keeps the order record, and confirmed payment records paid status before activation follows the plan policy. SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are Free99 gated access. SkyeMusicNexus Lite is Free99, selected May 2026 core artists can receive the no-charge five-song launch package, and Artist Host, Artist Collective, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid SkyePay offers.</p>
       <div class="button-row">
         <a class="button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=metraiyux-starter-command">Open SkyePay</a>
         <a class="button" href="../feature-atlas.html">What the 0S Includes</a>
@@ -51,6 +51,50 @@
         <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Single Song Drop</a>
         <a class="button" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Release Content Kit</a>
         <a class="button" href="../live/skye-content-forge-publisher.html">Free99 Content Forge</a>
+      </div>
+    </section>
+
+    <section class="saas-band platform-launcher" id="platform-launcher" data-platform-launcher>
+      <p class="eyebrow">Interactive platform launcher</p>
+      <h2>Pick the platform first, then open the cards that fit.</h2>
+      <p class="hero-copy">Search the 0S offer map, click into a platform lane, and use the local brain when a buyer needs help choosing the right route.</p>
+      <div class="launcher-shortcuts" aria-label="Platform shortcuts">
+        <button type="button" data-launcher-demo="skyemusicnexus">Music</button>
+        <button type="button" data-launcher-demo="metraiyux-core">0S Core</button>
+        <button type="button" data-launcher-demo="free99">Free99</button>
+        <button type="button" data-launcher-demo="skyepay">SkyePay</button>
+        <button type="button" data-launcher-demo="relay13-connectlog">Relay13</button>
+        <button type="button" data-launcher-demo="sovereign-stack">Sovereign</button>
+        <button type="button" data-launcher-demo="marketing-media">Marketing</button>
+      </div>
+      <div class="launcher-shell">
+        <aside class="launcher-nav" aria-label="Platform lanes">
+          <label for="launcher-search">Search platform, buyer problem, or offer</label>
+          <input id="launcher-search" type="search" data-launcher-search placeholder="Search artists, Free99, Relay13, vault, pricing...">
+          <div class="platform-tabs" data-platform-tabs></div>
+        </aside>
+        <div class="launcher-stage">
+          <div class="platform-detail" data-platform-detail></div>
+          <div class="launcher-cards" data-platform-cards></div>
+        </div>
+      </div>
+      <div class="platform-brain-console" id="platform-brain">
+        <div class="brain-console-head">
+          <div>
+            <p class="eyebrow">Ask the 0S brain</p>
+            <h3>Route a buyer question before checkout.</h3>
+          </div>
+          <p id="brainStatus">Loading platform brain...</p>
+        </div>
+        <label for="brainQuestion">Buyer question</label>
+        <textarea id="brainQuestion" rows="4">Which platform handles artist landing pages with SkyeMerit?</textarea>
+        <div class="button-row">
+          <button id="askBrain" class="button primary" type="button">Ask brain</button>
+          <button id="exampleBrain" class="button" type="button">Example</button>
+          <button id="clearBrain" class="button" type="button">Clear</button>
+        </div>
+        <div id="brainAnswer" class="brain-answer" aria-live="polite"></div>
+        <div id="brainSources" class="brain-sources"></div>
       </div>
     </section>
 
@@ -99,7 +143,7 @@
         </article>
         <article class="saas-card">
           <h3>Free99 boundary</h3>
-          <p>SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are no charge and do not create paid SkyePay products. SkyeMusicNexus Lite also stays $0. Studio, Label Command, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid. Free and paid music lanes still require a 0S, FS27, SkyGate, or local admin gate session before app boot and runtime actions.</p>
+          <p>SkyeProfitConsole, SkyeMediaCenter, and Skye Content Forge are no charge and do not create paid SkyePay products. SkyeMusicNexus Lite also stays $0. The May 2026 core-artist launch package is invite-only and no charge for selected artists. Artist Host, Artist Collective, managed music ops, drop add-ons, content requests, and community campaign add-ons are paid. Free and paid music lanes still require a 0S, FS27, SkyGate, or local admin gate session before app boot and runtime actions.</p>
         </article>
       </div>
     </section>
@@ -143,38 +187,82 @@
         <a class="saas-btn" href="../live/skyemusicnexus-neofront.html">Open music hub</a>
       </article>
       <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus landing build</p>
+        <h3>$2,239 listed / $239 due</h3>
+        <div class="skyemerit-deal-banner">
+          <span>SkyeMerit launch sale</span>
+          <strong>-$2,000</strong>
+          <em>$239 due after merit</em>
+        </div>
+        <p>Single or drop landing page. $2,000 SkyeMerit applies before checkout through 2026-06-26 and the order is delivered to the 0S inbox lane through Relay13.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-drop-landing-page">Start Single / Drop Landing</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus artist hub</p>
+        <h3>$2,444 listed / $444 due</h3>
+        <div class="skyemerit-deal-banner">
+          <span>SkyeMerit launch sale</span>
+          <strong>-$2,000</strong>
+          <em>$444 due after merit</em>
+        </div>
+        <p>Artist page with gallery, EPK, booking/media, and music links. $2,000 SkyeMerit applies before checkout through 2026-06-26.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-artist-page-epk">Start Artist Page + EPK</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus visualizer</p>
+        <h3>$2,796 listed / $796 due</h3>
+        <div class="skyemerit-deal-banner">
+          <span>SkyeMerit launch sale</span>
+          <strong>-$2,000</strong>
+          <em>$796 due after merit</em>
+        </div>
+        <p>Animated artist landing and visualizer page using the artist image, drop metadata, music surfaces, motion, and proof fields.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-animated-visualizer-page">Start Visualizer Page</a>
+      </article>
+      <article class="saas-card">
+        <p class="eyebrow">SkyeMusicNexus universe</p>
+        <h3>$3,197+ listed / $1,197+ due</h3>
+        <div class="skyemerit-deal-banner">
+          <span>SkyeMerit launch sale</span>
+          <strong>-$2,000</strong>
+          <em>$1,197+ due after merit</em>
+        </div>
+        <p>SupaBoy-level custom artist universe quoted manually above the starting floor. $2,000 SkyeMerit applies to the launch-window floor through 2026-06-26.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-custom-artist-universe">Open Custom Universe Floor</a>
+      </article>
+      <article class="saas-card">
         <p class="eyebrow">Single Song Drop</p>
-        <h3>$199 once</h3>
-        <p>One song release capsule, metadata checklist, gated handoff, and proof receipt.</p>
+        <h3>$15 once</h3>
+        <p>One song release capsule, metadata checklist, preview/full package settings, gated handoff, and proof receipt.</p>
         <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-single-song-drop">Buy Single Song Drop</a>
       </article>
       <article class="saas-card">
-        <p class="eyebrow">SkyeMusicNexus Studio</p>
-        <h3>$1,500 setup + $497/mo</h3>
-        <p>Paid music ops room for up to 5 artists, 25 active releases, gated upload studio, proof playback, release workflow, royalty ledger tracking, payout review, and proof exports.</p>
-        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-studio">Start Studio</a>
+        <p class="eyebrow">SkyeMusicNexus Artist Host</p>
+        <h3>$9/mo</h3>
+        <p>Low-cost solo artist host with gated upload studio, proof playback, release workflow, royalty ledger tracking, payout review, live drop updates, and fan preview/private-download surfaces.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-studio">Start Artist Host</a>
       </article>
       <article class="saas-card">
-        <p class="eyebrow">SkyeMusicNexus Label Command</p>
-        <h3>$6,500 setup + $1,497/mo</h3>
-        <p>Label-grade release operations for up to 25 artists, 150 releases, gated upload studio, SkyeVault/R2 storage scoping, approval workflows, payout review controls, analytics, and custom proof receipts.</p>
-        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-label-command">Start Label Command</a>
+        <p class="eyebrow">SkyeMusicNexus Artist Collective</p>
+        <h3>$99 setup + $29/mo</h3>
+        <p>Small-collective release operations for up to 5 artists, 60 active releases, gated upload studio, basic storage scope, approval workflows, payout review controls, analytics, and custom proof receipts.</p>
+        <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-label-command">Start Artist Collective</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Gated Audio Vault Pack</p>
-        <h3>$79/mo</h3>
-        <p>Music-specific SkyeVault/R2 storage lane for larger audio files, proof receipts, and gated handoff. Storage only; no public streaming license claim.</p>
+        <h3>$9/mo</h3>
+        <p>Music-specific SkyeVault/R2 storage lane for larger audio files, fan-paid downloads, proof receipts, and gated handoff. Storage only; no public streaming license claim.</p>
         <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-gated-audio-vault-pack">Add Audio Vault</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Release Content Kit</p>
-        <h3>$499 once</h3>
+        <h3>$79 once</h3>
         <p>Captions, short-form hooks, asset requests, and release runway tasks from the gated artist exchange.</p>
         <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-release-content-kit">Buy Content Kit</a>
       </article>
       <article class="saas-card">
         <p class="eyebrow">Community Campaign Sprint</p>
-        <h3>$899 once</h3>
+        <h3>$149 once</h3>
         <p>Exchange-led campaign sprint with community prompts, inbox coordination, content runway, and proof receipt.</p>
         <a class="saas-btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyemusicnexus-community-campaign-sprint">Buy Campaign Sprint</a>
       </article>
@@ -222,6 +310,8 @@
       </article>
     </section>
   </main>
+  <script src="../assets/js/platform-launcher.js"></script>
+  <script src="../brain/local-brain.js"></script>
   <script src="../assets/js/saas-tools.js"></script>
 <script src="../script.js"></script></body>
 </html>

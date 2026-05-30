@@ -1,0 +1,586 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShYT Happens. Skye Keeps the sKache. | SkyeVault Founder Note</title>
+  <meta name="description" content="Gray Skyes explains the SkyeVault repo rescue daemon, encrypted literal full-repo autosync, IDE/workspace failure boundaries, ten-minute recovery posture, and why MetrAIyux 0S treats repo custody as real infrastructure.">
+  <link rel="canonical" href="https://metraiyux-0s-marketing.pages.dev/founder-notes/skyevault-autosync-daemon.html">
+  <meta property="og:title" content="ShYT Happens. Skye Keeps the sKache.">
+  <meta property="og:description" content="A founder-perspective longform note on the SkyeVault encrypted repo rescue daemon, workspace autosync, proof receipts, and recovery boundaries inside MetrAIyux 0S.">
+  <meta property="og:image" content="https://metraiyux-0s-marketing.pages.dev/assets/skyevault-autosync-daemon-blog-screenshot.png">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/favicon-32.png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .note-shell {
+      width: min(1040px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 72px 0 96px;
+    }
+
+    .note-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(280px, .78fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      min-height: calc(100vh - 120px);
+      padding: 42px 0 56px;
+    }
+
+    .note-eyebrow,
+    .note-meta {
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .note-hero h1 {
+      max-width: 920px;
+      margin: 18px 0;
+      font-family: var(--font-display);
+      font-size: clamp(44px, 8vw, 94px);
+      line-height: .98;
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    .note-hero h1 em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .note-lede {
+      max-width: 780px;
+      margin: 0;
+      color: var(--soft);
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.62;
+    }
+
+    .note-cta-row,
+    .note-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .founder-proof-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(244,199,91,.12), rgba(100,217,255,.07)), rgba(5,8,12,.76);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .founder-proof-panel img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center top;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+
+    .founder-proof-panel div {
+      padding: 22px;
+    }
+
+    .founder-proof-panel strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-family: var(--font-display);
+      font-size: 18px;
+    }
+
+    .founder-proof-panel p {
+      margin: 0;
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.62;
+    }
+
+    .note-quote {
+      margin: 34px 0 0;
+      padding: 24px;
+      border-left: 4px solid var(--gold);
+      background: rgba(244,199,91,.08);
+      color: var(--ink);
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.46;
+    }
+
+    .note-quote small {
+      display: block;
+      margin-top: 12px;
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: clamp(24px, 5vw, 56px);
+      align-items: start;
+    }
+
+    .note-toc {
+      position: sticky;
+      top: 104px;
+      border-left: 1px solid var(--line);
+      padding-left: 16px;
+    }
+
+    .note-toc strong {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--ink);
+      font-family: var(--font-label);
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .note-toc a {
+      display: block;
+      margin: 8px 0;
+      color: var(--soft);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .note-toc a:hover {
+      color: var(--gold);
+    }
+
+    .note-article {
+      min-width: 0;
+    }
+
+    .note-article section {
+      padding: 34px 0;
+      border-top: 1px solid rgba(160,205,226,.16);
+    }
+
+    .note-article h2 {
+      margin: 0 0 18px;
+      font-family: var(--font-display);
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1.08;
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    .note-article h3 {
+      margin: 28px 0 10px;
+      color: var(--gold);
+      font-family: var(--font-label);
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .note-article p,
+    .note-article li {
+      color: var(--soft);
+      font-size: 17px;
+      line-height: 1.82;
+    }
+
+    .note-article p {
+      margin: 0 0 18px;
+    }
+
+    .note-article ul {
+      margin: 0 0 22px;
+      padding-left: 20px;
+    }
+
+    .note-article code {
+      font-family: var(--font-mono);
+      font-size: .86em;
+      color: var(--mint);
+      background: rgba(111,242,199,.09);
+      border: 1px solid rgba(111,242,199,.18);
+      border-radius: 5px;
+      padding: 1px 5px;
+    }
+
+    .lane-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 22px 0 8px;
+    }
+
+    .lane-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: rgba(11,15,20,.72);
+    }
+
+    .lane-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-family: var(--font-label);
+      font-size: 17px;
+    }
+
+    .lane-item span {
+      color: var(--soft);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .timeline {
+      margin: 28px 0;
+      border-left: 1px solid var(--line);
+      padding-left: 22px;
+    }
+
+    .timeline div {
+      position: relative;
+      padding: 0 0 22px;
+    }
+
+    .timeline div::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 8px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 18px rgba(244,199,91,.45);
+    }
+
+    .timeline strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-family: var(--font-label);
+      font-size: 18px;
+    }
+
+    .timeline p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.68;
+    }
+
+    .boundary-callout {
+      margin: 26px 0;
+      padding: 22px;
+      border: 1px solid rgba(255,122,144,.32);
+      border-radius: var(--radius);
+      background: rgba(255,122,144,.08);
+    }
+
+    .boundary-callout strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #ffd0d8;
+      font-family: var(--font-label);
+      font-size: 18px;
+    }
+
+    .proof-links {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .proof-links a {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: var(--ink);
+      background: rgba(255,255,255,.035);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .proof-links a:hover {
+      border-color: var(--line-strong);
+      color: var(--gold);
+    }
+
+    @media (max-width: 860px) {
+      .note-hero,
+      .note-grid,
+      .lane-list,
+      .proof-links {
+        grid-template-columns: 1fr;
+      }
+
+      .note-hero {
+        min-height: auto;
+        padding-top: 24px;
+      }
+
+      .note-toc {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4px 14px;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding: 16px 0 0;
+      }
+
+      .note-toc strong {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .note-shell {
+        width: min(100vw - 28px, 1040px);
+        padding-top: 38px;
+      }
+
+      .note-cta-row .btn-primary,
+      .note-cta-row .btn-ghost,
+      .note-link-row .btn-primary,
+      .note-link-row .btn-ghost {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body class="skyesol-living-page">
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="skyesol-grain" aria-hidden="true"></div>
+  <div class="motion-chrome scroll-progress" data-motion-chrome aria-hidden="true"><span></span></div>
+
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <a class="brand" href="../index.html">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        MetrAIyux 0S
+      </a>
+      <button class="menu-button" type="button" data-menu-button data-menu-toggle aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" data-nav-links>
+        <a href="../index.html">Overview</a>
+        <a href="../proof.html">Live Proof</a>
+        <a href="../proof-ecology.html">Proof Ecology</a>
+        <a class="is-active" href="../founder-drops.html">Founder Drops</a>
+        <a href="../dev-free-sauce.html">Dev Free Sauce</a>
+        <a href="https://skyevault-drop.graylondonskyes.workers.dev/agent-install.html" target="_blank" rel="noopener">SkyeVault Agent</a>
+        <a class="platform-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">Main Platform</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="note-shell">
+    <section class="note-hero" id="top">
+      <div>
+        <p class="note-eyebrow">Founder Note · SkyeVault repo rescue 🗃️</p>
+        <h1>ShYT happens. <em>Skye keeps the sKache.</em></h1>
+        <p class="note-lede">
+          I built the SkyeVault encrypted repo rescue daemon because losing source code is not a vibe, not a learning moment, and not something I am willing to keep treating like "just remember to commit." Git is one lane. My vault is encrypted repo custody.
+        </p>
+        <div class="note-quote">
+          "ShYT may crash, but Skye keeps the sKache."
+          <small>No perfect-tech promises. Just proof receipts, recovery prompts, checkpoints, and rollback-aware workflows built to keep your last clean move from disappearing.</small>
+        </div>
+        <div class="note-cta-row">
+          <a class="btn-primary" href="https://skyevault-drop.graylondonskyes.workers.dev/agent-install.html" target="_blank" rel="noopener">Open Agent Install ⚙️</a>
+          <a class="btn-ghost" href="https://skyevault-drop.graylondonskyes.workers.dev/repo.html" target="_blank" rel="noopener">Repo Rescue Lane 🔐</a>
+          <a class="btn-ghost" href="../founder-drops.html">Founder Drops 🧾</a>
+        </div>
+      </div>
+      <aside class="founder-proof-panel" aria-label="SkyeVault blog screenshot proof">
+        <img src="../assets/skyevault-autosync-daemon-blog-screenshot.png" alt="Screenshot of the SkyeVault autosync daemon founder blog" loading="eager" decoding="async">
+        <div>
+          <strong>Direct founder essay link</strong>
+          <p>This page is the public reading surface for the tech behind the ten-minute encrypted repo rescue posture.</p>
+        </div>
+      </aside>
+    </section>
+
+    <div class="note-grid">
+      <aside class="note-toc" aria-label="Article sections">
+        <strong>Read Path</strong>
+        <a href="#why">Why I Built It</a>
+        <a href="#daemon">What The Daemon Is</a>
+        <a href="#workspace">VS Code vs Workspace</a>
+        <a href="#encrypted">Encrypted Literal Custody</a>
+        <a href="#revisions">Revision Rounds</a>
+        <a href="#limits">No Guarantee Boundary</a>
+        <a href="#proof">Proof Links</a>
+      </aside>
+
+      <article class="note-article">
+        <p class="note-meta">By Gray London Skyes · MetrAIyux 0S Founder · Updated May 29, 2026</p>
+
+        <section id="why">
+          <h2>Why I Built It 🧠</h2>
+          <p>
+            I did not build SkyeVault because I wanted another backup button. I built it because a serious developer can do everything "right" by normal Git standards and still lose the exact files that mattered: the untracked scratch module, the local worker patch, the root env notes, the generated prompt receipt, the script that has not been committed yet, the one-off migration, the thing sitting in a Codespace while the IDE hops from browser to desktop.
+          </p>
+          <p>
+            Git is excellent at versioned history after you stage and commit. GitHub is excellent at shared remote history after you push. Neither one is designed to be a sovereign encrypted repo-custody vault for every local file, every untracked file, every secret-like operator file, and every active workspace artifact before you decide whether it belongs in public source control.
+          </p>
+          <p>
+            That difference matters. My 0S repo is not a toy repo. It has Workers, Pages projects, brain files, proof receipts, legal surfaces, app lanes, and deployment scripts that evolved through months of real production work. I needed a lane where the repo could be protected as a whole workspace, not only as a sanitized public Git shape.
+          </p>
+          <p>
+            So the architecture became clear: Git still exists. Git-style vault pushes still exist. Clean client handoffs still exist. But the owner literal full-repo lane has to be encrypted, receipt-backed, and allowed to carry the whole repo state for recovery. That includes tracked and untracked work. That can include secrets because the vault object is encrypted before storage and unlock-owned by passphrase/control material, not by public Git rules.
+          </p>
+        </section>
+
+        <section id="daemon">
+          <h2>What I Mean By "Daemon" ⚙️</h2>
+          <p>
+            A daemon is just a background process. It is not magic, and it is not a cloud ghost living forever after your computer disappears. In this setup, the SkyeVault autosync daemon is a long-running local agent that wakes up on a schedule, scans the repo, packages the literal full-repo artifact by default, encrypts it, uploads it to the vault/drive lane, writes receipts, and can send a Resend email with the logo and recovery links when a new successful stream lands.
+          </p>
+          <p>
+            The current cadence is roughly ten minutes. That means the agent is designed so your worst normal loss window is the work created after the last completed artifact. If the daemon finishes at 12:00 and your workspace dies at 12:07, the 12:00 artifact is the clean recovery point. If a scan is actively streaming when the machine dies, you recover from the last completed receipt, not from a half-written object.
+          </p>
+          <p>
+            This is why I keep using the word "receipt." A backup you cannot prove is a hope. A vault upload with a digest, byte count, timestamp, artifact receipt, control-pack receipt, and notification trail is evidence. I want the system to show what it captured, when it captured it, and how to get back to it.
+          </p>
+          <div class="lane-list">
+            <div class="lane-item">
+              <strong>🧾 Scan</strong>
+              <span>The daemon checks the repo state and avoids wasting uploads when the current digest already matches the last successful vault receipt.</span>
+            </div>
+            <div class="lane-item">
+              <strong>🗃️ Package</strong>
+              <span>The literal full-repo lane uses an archive format optimized for large repos and repeatable restore, then wraps it in encryption.</span>
+            </div>
+            <div class="lane-item">
+              <strong>🔐 Encrypt</strong>
+              <span>The source artifact is protected before it leaves the workspace, so the storage provider receives custody of ciphertext, not plain source.</span>
+            </div>
+            <div class="lane-item">
+              <strong>☁️ Upload</strong>
+              <span>The encrypted object streams to the Cloudflare-backed vault/drive lane with proof metadata, not to a public repo remote.</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="workspace">
+          <h2>VS Code Closing Is Not The Same As Workspace Death 🖥️</h2>
+          <p>
+            This part matters because developers use the word "workspace" loosely. Closing the VS Code window usually means the editor UI is gone. It does not automatically mean the machine, Codespace, VM, dev container, or file system disappeared. If the underlying workspace is still alive, the daemon can keep running and keep scanning.
+          </p>
+          <p>
+            But if the actual workspace stops, gets deleted, loses disk, or the container is killed before the daemon has completed its next artifact, no local process can keep reading files from a file system that is no longer there. That is not weakness in the vault architecture. That is physics in software clothing.
+          </p>
+          <p>
+            The point of the autosync lane is to keep narrowing the blast radius. It turns "I lost half my repo" into "I should have a recent encrypted receipt." It turns "I forgot to commit" into "the vault captured the uncommitted source state if the daemon finished." It turns IDE switching from browser Codespaces to local VS Code into a workflow with a background repo-custody net under it.
+          </p>
+          <h3>My practical rule</h3>
+          <p>
+            If I am about to do a major risky move, I can still force a manual SkyeVault push. The daemon is the always-on habit. Manual push is the deliberate checkpoint. Git commit is the public or team history move. These lanes are related, but they do not replace each other.
+          </p>
+        </section>
+
+        <section id="encrypted">
+          <h2>Why It Is Not GitHub, And Why That Matters 🔐</h2>
+          <p>
+            Public Git hygiene says do not push secrets. That rule still matters for GitHub, GitLab, public remotes, open-source repos, and client source deliveries. But my owner vault is not a public Git remote. It is an encrypted full-repo custody wrapper. The design goal is different: recover the workspace as it actually existed, including the private operator files that should never be exposed in a public repo.
+          </p>
+          <p>
+            That is why SkyeVault keeps multiple push modes. A sanitized Git-shaped handoff is useful when I need to share a clean repo. A Git bundle lane is useful when I want Git parity. A literal full-repo lane is useful when I never want to lose the active repo state again. The protected vault can carry things that public Git should not carry because the vault object is encrypted and owner-unlocked.
+          </p>
+          <p>
+            Archive format is not the security boundary. A zip, a tar, or a tar compressed with zstd are containers. The security boundary is the encrypted wrapper and the unlock model. The reason I currently prefer the tar/zstd lane for literal full-repo custody is speed, streaming behavior, and large-repo handling. The reason people love zip is convenience. The architecture can expose easy restore/download surfaces while still using the faster archive format under the hood.
+          </p>
+          <p>
+            In plain language: the vault should feel easy to a human, but the transport should be strong enough for the repo. I do not need the storage layer to understand my files. I need it to hold encrypted literal repo custody with receipts.
+          </p>
+        </section>
+
+        <section id="revisions">
+          <h2>The Revision Rounds Were The Point 🛠️</h2>
+          <p>
+            This did not start as one perfect script. It became stronger through pressure. Every time the 0S exposed a weak assumption, I tightened the lane.
+          </p>
+          <div class="timeline">
+            <div>
+              <strong>Git-shaped vault parity</strong>
+              <p>The early lane focused on repo-like pushes, Git bundles, clone/fetch/push patterns, and developer-friendly recovery thinking.</p>
+            </div>
+            <div>
+              <strong>Sanitized handoffs</strong>
+              <p>Then came clean delivery paths for client or public movement, where secrets and private operator material stay out of the shared source lane.</p>
+            </div>
+            <div>
+              <strong>Encrypted literal full-repo mode</strong>
+              <p>The owner lane became explicit: tracked, untracked, local-only, generated, dependency, and secret-like repo material belong in the encrypted vault artifact when the purpose is recovery. Source-custody remains an explicit smaller filtered mode, not the meaning of full.</p>
+            </div>
+            <div>
+              <strong>Direct Cloudflare-backed streaming</strong>
+              <p>The upload path moved toward faster direct streaming, better large-artifact behavior, and receipts that show the vault actually received the object.</p>
+            </div>
+            <div>
+              <strong>Autosync daemon and notification controls</strong>
+              <p>The repo now has a background agent, proof publishing, Resend owner alerts, dashboard enable/disable controls, and links back to unlock/vault/proof surfaces.</p>
+            </div>
+            <div>
+              <strong>Public proof language</strong>
+              <p>The marketing and legal surfaces now explain the no-guarantee boundary without hiding the proof: the founder's own 0S repo is the stress test and live demonstration.</p>
+            </div>
+          </div>
+          <p>
+            That is how real infrastructure grows. Not by pretending failure never happens. By noticing the failure mode, reducing the recovery window, adding receipts, making the next recovery easier, and refusing to let "that was local only" be the reason source disappears.
+          </p>
+        </section>
+
+        <section id="limits">
+          <h2>The Boundary: No Perfect-Tech Promise 🚧</h2>
+          <div class="boundary-callout">
+            <strong>ShYT happens, and noo tech is perfect.</strong>
+            <p>Despite the stress testing, live owner usage, encrypted literal full-repo mode, proof receipts, and ten-minute daemon posture, this is not a guarantee that no data can ever be lost. It is an infrastructure answer built to reduce loss, prove what was captured, and make recovery real.</p>
+          </div>
+          <p>
+            If the workspace dies before the first successful artifact, there is nothing for the vault to restore. If the machine stops while a new stream is in progress, the restore target is the last completed receipt. If a user disables notifications, the upload can still work, but they will not receive every email. If the passphrase/control material is lost, encryption did its job and recovery becomes a custody problem, not a storage problem.
+          </p>
+          <p>
+            That honesty is part of the product. I would rather say the real boundary out loud than sell fake certainty. The claim is not "nothing can ever go wrong." The claim is: when ShYT happens, SkyeVault is built so the last clean move has a better chance of still existing, still being provable, and still being recoverable.
+          </p>
+        </section>
+
+        <section id="proof">
+          <h2>Proof Surfaces And Recovery Links 🧾</h2>
+          <p>
+            The live 0S proof endpoints stay gate-owned because repo-custody proof can point at private operational metadata. Public readers get the architecture story, the install prompt, and the vault lane links. Owners and operators use the shared FS27/SkyGate/Free99 credential lane to see the gated proof details.
+          </p>
+          <div class="proof-links">
+            <a href="https://skyevault-drop.graylondonskyes.workers.dev/agent-install.html" target="_blank" rel="noopener">⚙️ SkyeVault Agent Install and AI Prompt</a>
+            <a href="https://skyevault-drop.graylondonskyes.workers.dev/repo.html" target="_blank" rel="noopener">🔐 Repo Rescue and Literal Custody Lane</a>
+            <a href="https://skyevault-drop.graylondonskyes.workers.dev/#client-vault" target="_blank" rel="noopener">🗃️ Vault Drive Surface</a>
+            <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/skyevault-autosync-proof.json" target="_blank" rel="noopener">🧾 Owner-Gated 0S Autosync Proof</a>
+            <a href="../founder-drops.html">📣 Founder Drops Hub</a>
+            <a href="../proof-ecology.html">📡 0S Proof Ecology</a>
+          </div>
+          <div class="note-link-row">
+            <a class="btn-primary" href="https://metraiyux-0s-marketing.pages.dev/founder-notes/skyevault-autosync-daemon.html">Copy Direct Blog Link</a>
+            <a class="btn-ghost" href="../index.html">Back to MetrAIyux 0S</a>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <script src="../skye-effects.js"></script>
+  <script src="../site-search.js"></script>
+  <script src="../script.js"></script>
+</body>
+</html>

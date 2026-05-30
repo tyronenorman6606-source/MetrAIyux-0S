@@ -167,11 +167,14 @@ function adminAuthHeaders(extra = {}) {
   const token = adminToken.value.trim() || localStorage.getItem('cdv-admin-token') || '';
   const bearer = skygateBearer();
   const headers = { ...extra };
-  if (token) headers['x-admin-token'] = token;
-  else if (bearer) {
+  if (bearer) {
     headers.authorization = `Bearer ${bearer}`;
+    headers['x-free99-gate-session'] = bearer;
+    headers['x-skye-gate-session'] = bearer;
     headers['x-skye-platform'] = 'metraiyux-0s-admin';
     headers['x-skye-usage-lane'] = 'skyevault-admin-dashboard';
+  } else if (token) {
+    headers['x-admin-token'] = token;
   }
   return headers;
 }
@@ -465,7 +468,7 @@ function renderLedger(entries = []) {
           body: JSON.stringify({ receiptId: entry.id })
         });
         window.open(data.downloadUrl, '_blank', 'noopener');
-        showStatus(`Download link ready for ${data.item?.fileName || entry.fileName || 'vault file'}.`, 'success');
+        showStatus(`Gate accepted. Temporary signed download ticket ready for ${data.item?.fileName || entry.fileName || 'vault file'}.`, 'success');
       } catch (error) {
         showStatus(error.message, 'error');
       } finally {

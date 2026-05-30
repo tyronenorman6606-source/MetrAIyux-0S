@@ -6,6 +6,15 @@ function clean(value) {
   return String(value || "").trim();
 }
 
+function normalizeEmail(value) {
+  return clean(value).toLowerCase();
+}
+
+function addressList(value) {
+  if (Array.isArray(value)) return value.flatMap(addressList);
+  return String(value || "").split(",").map(clean).filter(Boolean);
+}
+
 function cleanBaseUrl(value) {
   return clean(value).replace(/\/+$/, "");
 }
@@ -48,6 +57,7 @@ const ZOHO_ENV_ALIASES = {
   ZOHO_REFRESH_TOKEN: ["Refresh_Token_ID", "Refresh_Token_ID2", "Refresh_Token", "ZOHO_MAIL_REFRESH_TOKEN"],
   ZOHO_ORG_ID: ["Org_ID", "Organization_ID", "ZOHO_ORGANIZATION_ID", "ZOHO_ZOID"],
   ZOHO_ACCOUNT_ID: ["Account_ID", "Zoho_User_ID", "ZOHO_MAIL_ACCOUNT_ID"],
+  ZOHO_ORG_USER_ID: ["ZOHO_ZUID", "ZOHO_MAIL_ZUID", "ZOHO_USER_ZUID"],
   ZOHO_DEFAULT_FROM: ["Default_From_Email", "ZOHO_FROM_EMAIL", "ZOHO_MAIL_FROM"],
 };
 
@@ -88,6 +98,16 @@ function providerSetupMessage(provider = "stalwart") {
   return "Set STALWART_BASE_URL and STALWART_MANAGEMENT_API_KEY before live mailbox account creation.";
 }
 
+function shouldAttachExistingAddress(error) {
+  const text = [
+    error?.message,
+    error?.providerResponse?.data?.moreInfo,
+    error?.providerResponse?.status?.description,
+    error?.providerResponse?.raw
+  ].filter(Boolean).join(" ");
+  return /email address already exists|already exists|associated in another organisation|associated in another organization|duplicate/i.test(text);
+}
+
 function randomMailboxPassword() {
   return crypto.randomBytes(24).toString("base64url");
 }
@@ -113,7 +133,7 @@ async function parseZohoResponse(res) {
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
   if (!res.ok) {
-    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `Zoho request failed (${res.status}).`;
+    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `Citadel mail request failed (${res.status}).`;
     const err = new Error(message);
     err.statusCode = res.status;
     err.providerResponse = data;
@@ -124,7 +144,7 @@ async function parseZohoResponse(res) {
 
 async function getZohoAccessToken() {
   if (!zohoApiConfigured()) {
-    const err = new Error("Zoho API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
+    const err = new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
     err.statusCode = 501;
     throw err;
   }
@@ -139,7 +159,7 @@ async function getZohoAccessToken() {
     headers: { "accept": "application/json" }
   }));
   if (!data?.access_token) {
-    const err = new Error(data?.error || "Zoho did not return an access token.");
+    const err = new Error(data?.error || "Citadel mail token unavailable.");
     err.statusCode = 502;
     err.providerResponse = data;
     throw err;
@@ -195,13 +215,56 @@ function extractZohoMessageId(payload) {
   return candidates.find((value) => value != null && clean(value)) ? String(candidates.find((value) => value != null && clean(value))) : null;
 }
 
+function extractZohoAliasId(payload, aliasEmail = "") {
+  const email = normalizeEmail(aliasEmail);
+  const data = payload?.data || payload;
+  const entries = Array.isArray(data) ? data : [data];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    for (const [key, value] of Object.entries(entry)) {
+      if (normalizeEmail(key) === email && value != null && clean(value) && !/OPERATION_NOT_PERMITTED|FAIL|ERROR/i.test(String(value))) return String(value);
+    }
+    const candidates = [entry.aliasId, entry.alias_id, entry.id, entry.emailAliasId];
+    const match = candidates.find((value) => value != null && clean(value));
+    if (match != null) return String(match);
+  }
+  return null;
+}
+
+function extractZohoAliasResult(payload, aliasEmail = "") {
+  const email = normalizeEmail(aliasEmail);
+  const data = payload?.data || payload;
+  const entries = Array.isArray(data) ? data : [data];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    for (const [key, value] of Object.entries(entry)) {
+      if (normalizeEmail(key) === email && value != null && clean(value)) return String(value);
+    }
+  }
+  return "";
+}
+
+function extractZohoOrgUserId(payload, preferredAccountId = "") {
+  const accountId = clean(preferredAccountId);
+  const data = payload?.data || payload;
+  const entries = Array.isArray(data) ? data : [data];
+  const candidates = [];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    if (accountId && clean(entry.accountId) === accountId) candidates.push(entry.zuid, entry.userId, entry.id);
+    candidates.push(entry.zuid, entry.userId, entry.id);
+  }
+  const match = candidates.find((value) => value != null && clean(value));
+  return match != null ? String(match) : null;
+}
+
 async function getZohoOrganizationId() {
   const configured = envValue("ZOHO_ORG_ID");
   if (configured) return configured;
   const payload = await zohoFetch("/api/organization");
   const orgId = extractZohoOrganizationId(payload);
   if (!orgId) {
-    const err = new Error("No Zoho organization id found. Set ZOHO_ORG_ID or generate the refresh token with organization read scope.");
+    const err = new Error("No Citadel organization id found. Check the Citadel mail organization credentials.");
     err.statusCode = 502;
     err.providerResponse = payload;
     throw err;
@@ -215,7 +278,7 @@ async function getZohoMailAccountId(preferredAccountId = null) {
   const payload = await zohoFetch("/api/accounts");
   const accountId = extractZohoAccountId(payload);
   if (!accountId) {
-    const err = new Error("No Zoho Mail accountId found. Set ZOHO_ACCOUNT_ID manually.");
+    const err = new Error("No Citadel mail account id found. Check the Citadel mailbox credentials.");
     err.statusCode = 502;
     err.providerResponse = payload;
     throw err;
@@ -223,9 +286,30 @@ async function getZohoMailAccountId(preferredAccountId = null) {
   return accountId;
 }
 
+async function getZohoOrgUserId(preferredAccountId = null) {
+  const configured = envValue("ZOHO_ORG_USER_ID");
+  if (configured) return configured;
+  const orgId = await getZohoOrganizationId();
+  const defaultFrom = envValue("ZOHO_DEFAULT_FROM");
+  if (defaultFrom) {
+    const byEmail = await zohoFetch(`/api/organization/${encodeURIComponent(orgId)}/accounts/${encodeURIComponent(defaultFrom)}`).catch(() => null);
+    const fromEmail = extractZohoOrgUserId(byEmail, preferredAccountId);
+    if (fromEmail) return fromEmail;
+  }
+  const payload = await zohoFetch(`/api/organization/${encodeURIComponent(orgId)}/accounts`);
+  const zuid = extractZohoOrgUserId(payload, preferredAccountId);
+  if (!zuid) {
+    const err = new Error("No Citadel organization user id found. Check the Citadel mailbox credentials.");
+    err.statusCode = 502;
+    err.providerResponse = payload;
+    throw err;
+  }
+  return zuid;
+}
+
 async function provisionZohoMailbox({ email, localPart, displayName }) {
   if (!zohoProvisioningConfigured()) {
-    const err = new Error("Zoho provider is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, and ZOHO_ORG_ID.");
+    const err = new Error("Citadel/SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
     err.statusCode = 501;
     throw err;
   }
@@ -257,29 +341,144 @@ async function provisionZohoMailbox({ email, localPart, displayName }) {
   };
 }
 
-async function zohoSendMail({ accountId, fromAddress, to, subject, html, text }) {
+async function provisionZohoEmailAlias({ aliasEmail, accountId = null }) {
+  if (!zohoProvisioningConfigured()) {
+    const err = new Error("Citadel/SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
+    err.statusCode = 501;
+    throw err;
+  }
+  const parsed = validateAliasInput(aliasEmail);
+  const orgId = await getZohoOrganizationId();
+  const zohoAccountId = await getZohoMailAccountId(accountId);
+  const zohoOrgUserId = await getZohoOrgUserId(zohoAccountId);
+  const data = await zohoFetch(`/api/organization/${encodeURIComponent(orgId)}/accounts/${encodeURIComponent(zohoOrgUserId)}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      zuid: zohoOrgUserId,
+      mode: "addEmailAlias",
+      emailAlias: [parsed.email],
+    }),
+  });
+  const providerAliasId = extractZohoAliasId(data, parsed.email);
+  if (!providerAliasId) {
+    const result = extractZohoAliasResult(data, parsed.email) || data?.status?.description || "missing alias id";
+    const err = new Error(`Zoho did not create the receiving alias for ${parsed.email}: ${result}`);
+    err.statusCode = 502;
+    err.providerResponse = data;
+    throw err;
+  }
+  return {
+    provider: "zoho",
+    provider_account_id: zohoAccountId,
+    provider_alias_id: providerAliasId,
+    provider_payload: {
+      addEmailAlias: data,
+      organization_id: orgId,
+      account_id: zohoAccountId,
+      zuid: zohoOrgUserId,
+      alias_email: parsed.email,
+      mail_base: zohoMailBase(),
+    },
+  };
+}
+
+async function provisionMailboxAlias({ mailbox, aliasEmail, user = null, auth = null, source = "mailbox-aliases" }) {
+  const parsed = validateAliasInput(aliasEmail);
+  if (normalizeEmail(parsed.email) === normalizeEmail(mailbox?.mailbox_email)) {
+    return {
+      provider: mailbox?.provider || "primary",
+      provider_account_id: mailbox?.provider_account_id || null,
+      provider_alias_id: mailbox?.provider_account_id || null,
+      provider_payload: { source, primary_mailbox: true, alias_email: parsed.email },
+    };
+  }
+  const cfg = providerConfigured();
+  if (mailbox?.provider === "zoho" || cfg.provider === "zoho") {
+    let alias = null;
+    try {
+      alias = await provisionZohoEmailAlias({ aliasEmail: parsed.email, accountId: mailbox?.provider_account_id || null });
+    } catch (error) {
+      if (!shouldAttachExistingAddress(error)) throw error;
+      const zohoAccountId = await getZohoMailAccountId(mailbox?.provider_account_id || null);
+      alias = {
+        provider: "zoho",
+        provider_account_id: zohoAccountId,
+        provider_alias_id: `existing:${parsed.email}`,
+        provider_payload: {
+          alias_email: parsed.email,
+          account_id: zohoAccountId,
+          alias_already_exists: true,
+          provider_response: error.providerResponse || null,
+          mail_base: zohoMailBase(),
+        },
+      };
+    }
+    return {
+      ...alias,
+      provider_payload: {
+        ...alias.provider_payload,
+        source,
+        mailbox_email: mailbox?.mailbox_email || null,
+        requested_by: user?.email || auth?.email || auth?.sub || null,
+        workspace_id: user?.workspace_id || auth?.workspace_id || null,
+      },
+    };
+  }
+  if (mailbox?.provider === "external-webhook" || cfg.provider === "external-webhook") {
+    const data = await postJson(process.env.MAILBOX_PROVISION_WEBHOOK_URL, {
+      platform: "SkyeMail",
+      operation: "alias",
+      email: parsed.email,
+      alias_email: parsed.email,
+      mailbox_email: mailbox?.mailbox_email || null,
+      provider_account_id: mailbox?.provider_account_id || null,
+      user,
+      auth,
+    }, { "x-skymail-provision-secret": process.env.MAILBOX_PROVISION_WEBHOOK_SECRET });
+    return {
+      provider: "external-webhook",
+      provider_account_id: data?.provider_account_id || mailbox?.provider_account_id || null,
+      provider_alias_id: data?.provider_alias_id || data?.id || null,
+      provider_payload: data,
+    };
+  }
+  const err = new Error("This SkyeMail mail lane cannot create receiving aliases automatically. Alias was not activated because replies would bounce.");
+  err.statusCode = 501;
+  throw err;
+}
+
+async function zohoSendMail({ accountId, fromAddress, to, cc = "", bcc = "", replyTo = "", subject, html, text, replyMessageId = "", threadId = "" }) {
   if (!zohoApiConfigured()) {
-    const err = new Error("Zoho API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
+    const err = new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
     err.statusCode = 501;
     throw err;
   }
   const zohoAccountId = await getZohoMailAccountId(accountId);
   const from = clean(fromAddress || envValue("ZOHO_DEFAULT_FROM"));
   if (!from) {
-    const err = new Error("ZOHO_DEFAULT_FROM or a hosted mailbox sender is required for Zoho sending.");
+    const err = new Error("A Citadel default sender or hosted mailbox sender is required for sending.");
     err.statusCode = 501;
     throw err;
   }
+  const sendPayload = {
+    fromAddress: from,
+    toAddress: addressList(to).join(","),
+    subject,
+    content: html || text || "",
+    mailFormat: html ? "html" : "plaintext",
+    askReceipt: "no"
+  };
+  const ccAddress = addressList(cc).join(",");
+  const bccAddress = addressList(bcc).join(",");
+  const replyToAddress = clean(replyTo);
+  if (ccAddress) sendPayload.ccAddress = ccAddress;
+  if (bccAddress) sendPayload.bccAddress = bccAddress;
+  if (replyToAddress) sendPayload.replyTo = replyToAddress;
+  if (replyMessageId) sendPayload.inReplyTo = clean(replyMessageId);
+  if (threadId) sendPayload.references = clean(threadId);
   const payload = await zohoFetch(`/api/accounts/${encodeURIComponent(zohoAccountId)}/messages`, {
     method: "POST",
-    body: JSON.stringify({
-      fromAddress: from,
-      toAddress: Array.isArray(to) ? to.join(",") : String(to || ""),
-      subject,
-      content: html || text || "",
-      mailFormat: html ? "html" : "plaintext",
-      askReceipt: "no"
-    })
+    body: JSON.stringify(sendPayload)
   });
   return {
     ...payload,
@@ -353,6 +552,35 @@ function zohoMessageSummary(message, { accountId, mailbox, label }) {
   };
 }
 
+function extractAddress(value) {
+  const match = String(value || "").match(/<([^>]+)>/);
+  return normalizeEmail(match ? match[1] : value);
+}
+
+function zohoAddressSet(value) {
+  return new Set(String(value || "")
+    .split(/[;,]/)
+    .map((item) => extractAddress(item))
+    .filter(Boolean));
+}
+
+function zohoMessageBelongsToMailbox(message, mailbox = "", label = "") {
+  const wanted = normalizeEmail(mailbox);
+  if (!wanted) return true;
+  const requestedLabel = clean(label).toUpperCase();
+  const inbound = new Set([
+    ...zohoAddressSet(message?.toAddress),
+    ...zohoAddressSet(message?.ccAddress),
+    ...zohoAddressSet(message?.bccAddress),
+  ]);
+  const outbound = new Set([
+    ...zohoAddressSet(message?.fromAddress),
+    ...zohoAddressSet(message?.sender),
+  ]);
+  if (requestedLabel === "SENT") return outbound.has(wanted) || inbound.has(wanted);
+  return inbound.has(wanted) || outbound.has(wanted);
+}
+
 async function zohoListFolders(accountId = null) {
   const zohoAccountId = await getZohoMailAccountId(accountId);
   const payload = await zohoFetch(`/api/accounts/${encodeURIComponent(zohoAccountId)}/folders`);
@@ -410,7 +638,8 @@ async function zohoListMessages({ accountId = null, mailbox = "", label = "", ma
     ? `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages/search?${params.toString()}`
     : `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages/view?${params.toString()}`;
   const payload = await zohoFetch(path);
-  const messages = Array.isArray(payload?.data) ? payload.data : [];
+  const messages = (Array.isArray(payload?.data) ? payload.data : [])
+    .filter((message) => zohoMessageBelongsToMailbox(message, mailbox, requestedLabel || ""));
   return {
     ok: true,
     mailbox: mailbox || envValue("ZOHO_DEFAULT_FROM") || zohoAccountId,
@@ -433,7 +662,7 @@ async function zohoGetMessage({ id, accountId = null, mailbox = "" }) {
     throw err;
   }
   if (!parsed.folderId) {
-    const err = new Error("Zoho message folder id missing. Open the message from a Zoho-backed list result.");
+    const err = new Error("Citadel message folder id missing. Open the message from a Citadel/SkyeNet inbox result.");
     err.statusCode = 400;
     throw err;
   }
@@ -682,6 +911,8 @@ async function saveMailboxAlias({
      on conflict (alias_email)
      do update set
        display_name=coalesce(excluded.display_name, mailbox_aliases.display_name),
+       provider_alias_id=coalesce(excluded.provider_alias_id, mailbox_aliases.provider_alias_id),
+       provider_payload_json=coalesce(excluded.provider_payload_json, mailbox_aliases.provider_payload_json),
        status='active',
        updated_at=now()
      where mailbox_aliases.user_id=excluded.user_id
@@ -761,6 +992,7 @@ module.exports = {
   validateMailboxInput,
   validateAliasInput,
   provisionHostedMailbox,
+  provisionMailboxAlias,
   zohoApiConfigured,
   zohoSendMail,
   zohoListFolders,

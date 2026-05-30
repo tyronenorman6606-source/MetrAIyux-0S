@@ -2,11 +2,11 @@
 
 Generated: 2026-05-18
 
-SkyeMusicNexus has been rebuilt from a generic routed platform shell into a roomed NeoFront music platform. The `public/` deployment surface is now split across dashboard, Create Hub, native fullscreen DAW, Stem Vault, Export Forge, Discover, Feed, upload, player, releases, rights, exchange, and operator rooms, while the root HTML routes remain as a standalone truth shell and launch matrix.
+SkyeMusicNexus has been rebuilt from a generic routed platform shell into a roomed NeoFront music platform. The `public/` deployment surface is now split across artist workspace, Create Hub, native fullscreen DAW, Stem Vault, Export Forge, Discover, Feed, upload, player, releases, rights, exchange, and service-health rooms, while the root HTML routes remain as a standalone truth shell and launch matrix.
 
 ## Primary App Surfaces
 
-- Platform Dashboard: `./public/index.html`
+- Artist Workspace: `./public/index.html`
 - Create Hub: `./public/create.html` with BandLab plus Spotify plus Instagram launch cards and room navigation
 - Native DAW Room: `./public/daw.html` with first-party Nexus transport, arrangement timeline, track controls, mixer, pads, keys, physical keyboard, region editing, loop/metronome, sound packs, mic/Web MIDI hooks, browser WAV mixdown, save, and export controls
 - Native DAW CSS: `./public/nexus-daw.css`
@@ -20,11 +20,11 @@ SkyeMusicNexus has been rebuilt from a generic routed platform shell into a room
 - Releases: `./public/releases.html`
 - Rights: `./public/rights.html`
 - Creator Exchange: `./public/exchange.html`
-- Operator Stage: `./public/admin.html`
+- Protected Review: `./public/admin.html`
 - NeoFront CSS: `./public/neo-nexus.css`
 - NeoFront browser runtime: `./public/neo-nexus.js`
 - Shared Skye ID bridge: `../assets/js/skye-id-bridge.js` reads/writes `skye0s.identity.current.v1` so artist IDs and profile photos can move from the Skye-ID generator into MusicNexus and later 0S app rooms
-- Gated Audio Upload: `./netlify/functions/music-assets.js`
+- Protected Audio Upload: `./netlify/functions/music-assets.js`
 - Durable Upload Backend: `MUSIC_NEXUS_STORAGE_BACKEND=r2` or `MUSIC_NEXUS_USE_R2=1` promotes upload/list/stream/delete to SkyeVault/Cloudflare R2 while preserving SkyGate on every action
 - Direct Upload Sessions: `action=create-upload-session` and `action=complete-upload` are wired behind SkyGate and activate with `MUSIC_NEXUS_ENABLE_DIRECT_UPLOAD=1`
 - Provider Hooks: `./netlify/functions/music-provider-hooks.js` queues transcoding, waveform, CDN, DSP, legal, and royalty jobs until webhook env is configured

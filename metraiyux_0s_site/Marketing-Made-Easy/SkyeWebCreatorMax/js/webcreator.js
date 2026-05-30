@@ -286,7 +286,7 @@ Includes:
   }
 
   async function postRuntime(path, body) {
-    const response = await fetch(path, {
+    const response = await fetch(runtimeApiPath(path), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body || {}),
@@ -297,10 +297,24 @@ Includes:
   }
 
   async function fetchRuntime(path) {
-    const response = await fetch(path);
+    const response = await fetch(runtimeApiPath(path));
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || `runtime request failed (${response.status})`);
     return data;
+  }
+
+  function runtimeApiBase() {
+    const hostLocal = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+    if (hostLocal && location.port === '4396') return '/api/runtime';
+    if (location.pathname.includes('/Marketing-Made-Easy/')) return '/api/marketing-made-easy/webcreator-runtime';
+    return '/api/runtime';
+  }
+
+  function runtimeApiPath(path) {
+    const text = String(path || '');
+    if (/^https?:\/\//i.test(text)) return text;
+    const normalized = text.replace(/^\/api\/runtime\/?/, '/').replace(/^\/+/, '');
+    return `${runtimeApiBase()}/${normalized}`;
   }
 
   function syncLocalDeliveryFromRuntime(item) {

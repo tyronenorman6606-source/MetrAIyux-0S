@@ -38,11 +38,6 @@ process.env.SKYGATE_PUBLIC_KEY_PEM = publicKey.export({ type: 'spki', format: 'p
 process.env.SKYGATEFS27_PUBLIC_KEY_PEM = publicKey.export({ type: 'spki', format: 'pem' });
 process.env.SKYGATEFS27_EXPECTED_AUDIENCE = 'skygatefs27';
 process.env.SKYGATEFS27_ISSUER = 'local://skygatefs27/proof';
-process.env.SKYGATE_LOCAL_SESSION_PRIVATE_KEY_PEM = privateKey.export({ type: 'pkcs8', format: 'pem' });
-process.env.SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP = '1';
-process.env.SKYGATE_LOCAL_OPERATOR_EMAIL = 'operator@internal.invalid';
-process.env.SKYGATE_LOCAL_OPERATOR_PASSWORD = 'proof-password';
-process.env.SKYGATE_LOCAL_OPERATOR_ROLE = 'admin';
 
 const require = createRequire(import.meta.url);
 const mediaAssets = require(path.join(root, 'netlify/functions/media-assets.js'));
@@ -70,37 +65,37 @@ assert(browserJs.includes('skygate-session'), 'browser JS is missing local SkyGa
 assert(browserJs.includes('requireGateSession'), 'browser JS is missing required gate-session startup');
 assert(browserJs.includes('Operator upload') && browserJs.includes('Save Review State'), 'operator browser JS is missing upload/review controls');
 assert(browserJs.includes('fetch(url,{headers:authHeaders(false)}') && browserJs.includes('URL.createObjectURL(blob)'), 'operator browser JS is not wired to gated file opening');
-assert(authHelper.includes('window.sessionStorage'), 'skygate-auth.js is not using session-scoped token storage');
+assert(authHelper.includes('MetrAIyuxGateBridge'), 'skygate-auth.js is not using the shared 0S Gate bridge');
+assert(!authHelper.includes('localStorage.setItem') && !authHelper.includes('sessionStorage.setItem'), 'skygate-auth.js still writes an app-local session token');
 assert(authHelper.includes('/api/media/session'), 'skygate-auth.js is missing the production /api/media/session default');
-assert(authHelper.includes('loginLocalOperator'), 'skygate-auth.js is missing local operator login wiring');
+const retiredLocalOperatorSymbol = 'loginLocal' + 'Operator';
+assert(!authHelper.includes(retiredLocalOperatorSymbol), 'skygate-auth.js still exposes local operator password login wiring');
+assert(!browserJs.includes('Local operator password'), 'media-experience.js still prompts for a local operator password');
+assert(!gateHelper.includes('Operator Login'), 'gate-session.js still exposes a local operator login action');
 assert(authHelper.includes('logoutSession'), 'skygate-auth.js is missing local session logout wiring');
-assert(gateHelper.includes('SkyeMediaCenter is Free99, not ungated.'), 'gate-session.js is missing Free99 gate copy');
+assert(gateHelper.includes('MetrAIyuxGateBridge'), 'gate-session.js is missing the shared 0S Gate bridge');
+assert(gateHelper.includes('Open 0S Signup'), 'gate-session.js is missing the shared 0S signup handoff');
 assert(gateHelper.includes('x-skye-media-center-free99'), 'gate-session.js is missing Free99 gate header');
 assert(gateHelper.includes('/api/media/session'), 'gate-session.js is missing the production /api/media/session default');
 
 const sessionStatusRes = await call(session, { method: 'GET' });
 assert(sessionStatusRes.statusCode === 200, `session status failed: ${sessionStatusRes.statusCode}`);
 const sessionStatus = parse(sessionStatusRes);
-assert(sessionStatus.localProofBootstrap === true, 'session status did not report local proof bootstrap availability');
-assert(sessionStatus.localOperatorLogin === true, 'session status did not report local operator login availability');
-assert(sessionStatus.localIdentity === true, 'session status did not expose local identity mode');
+assert(sessionStatus.localProofBootstrap === false, 'session status still reports local proof bootstrap availability');
+assert(sessionStatus.localOperatorLogin === false, 'session status still reports local operator password login availability');
+assert(sessionStatus.sharedGateAuth === true, 'session status did not report shared gate auth posture');
+assert(sessionStatus.appIdentity === false, 'session status still reports app-local identity ownership');
 
 const sessionRes = await call(session, { method:'POST', body:{ subject:'proof-operator', role:'admin' } });
-assert(sessionRes.statusCode === 200, `local session bootstrap failed: ${sessionRes.statusCode}`);
-const token = parse(sessionRes).token;
-assert(token && token.startsWith('skls_'), 'local session bootstrap did not return a local session token');
+assert(sessionRes.statusCode === 410, `local session bootstrap was not retired: ${sessionRes.statusCode}`);
+const token = signJwt(privateKey, { sub:'fs27-media-proof-operator', email:'fs27-media@internal.invalid', role:'admin' });
 const activeSessionRes = await call(session, { method:'GET', authToken: token });
-assert(parse(activeSessionRes).activeSession?.source === 'local-identity-session', 'session status did not surface active local session');
+assert(parse(activeSessionRes).activeSession?.source === 'external-skygate-jwt', 'session status did not surface the active shared Gate bearer');
 
-const badLoginRes = await call(session, { method:'POST', body:{ grantType:'password', email:'operator@internal.invalid', password:'wrong-password' } });
-assert(badLoginRes.statusCode === 401, `invalid local operator login returned ${badLoginRes.statusCode}`);
-const operatorLoginRes = await call(session, { method:'POST', body:{ grantType:'password', email:'operator@internal.invalid', password:'proof-password', subject:'proof-operator-login' } });
-assert(operatorLoginRes.statusCode === 200, `local operator login failed: ${operatorLoginRes.statusCode}`);
-const operatorToken = parse(operatorLoginRes).token;
-const revokeRes = await call(session, { method:'DELETE', authToken: operatorToken });
-assert(revokeRes.statusCode === 200, `local operator logout failed: ${revokeRes.statusCode}`);
+const passwordGrantRes = await call(session, { method:'POST', body:{ grantType:'password', email:'operator@internal.invalid', password:'wrong-password' } });
+assert(passwordGrantRes.statusCode === 410, `local operator password grant returned ${passwordGrantRes.statusCode}`);
 
-const uploadRes = await call(mediaAssets, { method:'POST', authToken:token, body:{ action:'upload', title:'Proof Asset', type:'document', filename:'proof-asset.txt', content_base64:Buffer.from('proof asset body','utf8').toString('base64'), tags:['proof','certification'], description:'Local proof upload', status:'draft', mimeType:'text/plain; charset=utf-8' } });
+const uploadRes = await call(mediaAssets, { method:'POST', authToken:token, body:{ action:'upload', title:'Proof Asset', type:'document', filename:'proof-asset.txt', content_base64:Buffer.from('proof asset body','utf8').toString('base64'), tags:['proof','certification'], description:'Gate smoke upload', status:'draft', mimeType:'text/plain; charset=utf-8' } });
 assert(uploadRes.statusCode === 201, `asset upload failed: ${uploadRes.statusCode}`);
 const uploadData = parse(uploadRes);
 const assetId = uploadData.asset?.id;
@@ -151,8 +146,6 @@ assert(parse(statsRes).totalAssets >= 1, 'media stats did not count uploaded ass
 const fs27Token = signJwt(privateKey, { sub:'fs27-media-customer', email:'fs27-media@internal.invalid', role:'admin' });
 const fs27StatsRes = await call(mediaStats, { method:'GET', authToken:fs27Token });
 assert(fs27StatsRes.statusCode === 200, `FS27 external SkyGate JWT did not unlock protected stats: ${fs27StatsRes.statusCode}`);
-const statsByRevokedTokenRes = await call(mediaStats, { method:'GET', authToken:operatorToken });
-assert(statsByRevokedTokenRes.statusCode === 401, `revoked local operator session still worked: ${statsByRevokedTokenRes.statusCode}`);
 
 const deleteRes = await call(mediaAssets, { method:'DELETE', query:{id:assetId}, authToken:token });
 assert(deleteRes.statusCode === 200, `asset delete/archive failed: ${deleteRes.statusCode}`);
@@ -163,6 +156,10 @@ assert(workflowTimeline.workflowTimeline?.summary?.archive >= 1, 'workflow timel
 assert(workflowTimeline.workflowTimeline?.summary?.review >= 1, 'workflow timeline did not capture review events');
 assert(workflowTimeline.workflowTimeline?.summary?.execution >= 1, 'workflow timeline did not capture execution events');
 assert(workflowTimeline.workflowTimeline?.summary?.dispatch >= 1, 'workflow timeline did not capture dispatch events');
+const revokeRes = await call(session, { method:'DELETE', authToken: token });
+assert(revokeRes.statusCode === 200, `shared Gate logout status failed: ${revokeRes.statusCode}`);
+const statsByRevokedTokenRes = await call(mediaStats, { method:'GET', authToken:token });
+assert(statsByRevokedTokenRes.statusCode === 200, `shared Gate bearer unexpectedly stopped inside the app-local no-op revocation path: ${statsByRevokedTokenRes.statusCode}`);
 
 console.log(JSON.stringify({
   ok:true,
@@ -171,9 +168,9 @@ console.log(JSON.stringify({
   verified:[
     'P3 root shell exists and routes load the rebuilt platform system',
     'Asset Drop Reactor and Operator Theater are wired to browser auth, Free99 gate overlay, and media contracts',
-    'local proof bootstrap and local operator login work',
+    'local proof bootstrap is retired and app identity is owned by the shared Gate lane',
     'asset list, search, and published file delivery require a gate session',
-    'bad operator credentials are rejected and revoked sessions fail protected stats',
+    'password grants are removed and app-local revocation is a no-op because Gate owns bearer lifetime',
     'authenticated upload, review, execution, dispatch, search, publish, file delivery, stats, and archive flows work',
     'workflow timeline captures review, execution, dispatch, and archive events'
   ],

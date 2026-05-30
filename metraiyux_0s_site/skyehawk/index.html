@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" data-mcp-neon-scrollbar>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#03070b">
+  <title>Skye Hawk Source Cockpit - MetrAIyux 0S</title>
+  <link rel="icon" type="image/png" href="../assets/metraiyux-0s-icon-512.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(6, 12, 20, .76);
+      --panel-strong: rgba(11, 20, 32, .88);
+      --line: rgba(223, 240, 255, .16);
+      --text: #eef6ff;
+      --muted: #aeb9c8;
+      --gold: #d8b65c;
+      --cyan: #42e8ff;
+      --violet: #9b7cff;
+      --green: #7dffbc;
+      --danger: #ff7c9b;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #03070b;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    .skyehawk-living-field {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(circle at var(--skyehawk-x, 22%) var(--skyehawk-y, 18%), rgba(66, 232, 255, .18), transparent 30%),
+        radial-gradient(circle at 82% 20%, rgba(155, 124, 255, .20), transparent 34%),
+        radial-gradient(circle at 48% 82%, rgba(216, 182, 92, .13), transparent 38%),
+        linear-gradient(135deg, #03070b 0%, #07111b 52%, #100d1c 100%);
+    }
+    .field-grid {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.68), transparent 84%);
+    }
+    .scanline {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(66, 232, 255, .07), transparent);
+      height: 38vh;
+      animation: hawkScan 7s linear infinite;
+      opacity: .5;
+    }
+    main {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 46px 0 44px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .02em;
+    }
+    .brand img { width: 34px; height: 34px; object-fit: contain; }
+    .nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .button {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 850;
+      font-size: .92rem;
+    }
+    .button.primary {
+      background: linear-gradient(135deg, rgba(66,232,255,.24), rgba(216,182,92,.20));
+      border-color: rgba(66,232,255,.38);
+    }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
+      gap: 18px;
+      align-items: stretch;
+      padding: 28px 0 16px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 80px rgba(0,0,0,.34);
+    }
+    .hero-copy { padding: clamp(20px, 4vw, 34px); }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: .74rem;
+      font-weight: 900;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 8vw, 6.3rem);
+      line-height: .88;
+      letter-spacing: 0;
+    }
+    .lede {
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.58;
+      max-width: 72ch;
+      margin: 18px 0 0;
+    }
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 16px;
+      align-content: start;
+    }
+    .metric {
+      min-height: 118px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: rgba(0,0,0,.24);
+      padding: 14px;
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .metric strong {
+      display: block;
+      color: var(--text);
+      font-size: clamp(1.08rem, 3vw, 1.55rem);
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+    .metric small {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.42;
+    }
+    .metric.ok strong { color: var(--green); }
+    .metric.warn strong { color: var(--gold); }
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .card {
+      min-height: 194px;
+      padding: 18px;
+    }
+    .card h2, .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.08rem;
+      letter-spacing: 0;
+    }
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.52;
+    }
+    .contract-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .contract-list code {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(66,232,255,.18);
+      background: rgba(66,232,255,.07);
+      color: #dffaff;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .console {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(1, 7, 12, .82);
+      border: 1px solid rgba(66,232,255,.22);
+      color: #dffaff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .87rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    @keyframes hawkScan {
+      0% { transform: translateY(-45vh); }
+      100% { transform: translateY(108vh); }
+    }
+    @media (max-width: 900px) {
+      .hero, .section-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .nav { justify-content: flex-start; }
+    }
+    @media (max-width: 560px) {
+      main { width: min(100% - 22px, 1180px); padding-top: 24px; }
+      .hud { grid-template-columns: 1fr; }
+      .button { width: 100%; text-align: center; }
+      h1 { font-size: clamp(2.4rem, 14vw, 4rem); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scanline { animation: none; display: none; }
+    }
+  </style>
+</head>
+<body data-command-bridge-app="skyehawk" data-command-bridge-surface="Skye Hawk Source Cockpit">
+  <canvas class="skyehawk-living-field skyesol-living-field" aria-hidden="true"></canvas>
+  <div class="field-grid" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+  <main>
+    <div class="topbar">
+      <a class="brand" href="../index.html">
+        <img src="../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+        <span>MetrAIyux 0S</span>
+      </a>
+      <nav class="nav" aria-label="Skye Hawk routes">
+        <a class="button primary" href="../0s/index.html">0S Launcher</a>
+        <a class="button" href="../skyeway.html">SkyWay</a>
+        <a class="button" href="../DeVisional%20Riftx/app/">SuperIDE</a>
+        <a class="button" href="../founder-command/apps/0s-command-bridge/index.html">Command Bridge</a>
+      </nav>
+    </div>
+
+    <section class="hero" aria-label="Skye Hawk">
+      <div class="panel hero-copy">
+        <p class="eyebrow">copied source restructured for the greater 0S</p>
+        <h1>Skye Hawk</h1>
+        <p class="lede">Original marketing runtime preserved, mounted under the shared gate, and extended into command-bridge neural signaling without creating a separate AI lane or app password.</p>
+      </div>
+      <aside class="panel hud" aria-label="Runtime facts">
+        <div class="metric ok"><span>Source Copy</span><strong>sha256 locked</strong><small>c2eae20018c71fa4ec0a5e99c08f03bd3438cf72a5d4c59adec66d366772fc38</small></div>
+        <div class="metric ok"><span>Original Contract</span><strong>restored</strong><small>Global mount function, pointer variables, ready class, and link heat.</small></div>
+        <div class="metric ok"><span>Gate</span><strong>FS27 owned</strong><small>Served under the 0S Worker gate prefix.</small></div>
+        <div class="metric warn"><span>Bridge</span><strong id="bridgeMetric">checking</strong><small>Skye Hawk emits runtime signals through the 0S command bridge when a gate session is present.</small></div>
+      </aside>
+    </section>
+
+    <section class="section-grid" aria-label="Skye Hawk source structure">
+      <article class="panel card">
+        <p class="eyebrow">source</p>
+        <h2>Original file copied into 0S custody</h2>
+        <p><code>marketing/assets/skyehawk-os.js</code> is copied to <code>/skyehawk/source/skyehawk-os.original.js</code> and kept byte-identical by checksum.</p>
+      </article>
+      <article class="panel card">
+        <p class="eyebrow">adapter</p>
+        <h2>0S runtime adapter</h2>
+        <p><code>/assets/js/skyehawk-os.js</code> preserves the original living-field behavior and adds command bridge capture plus <code>SkyeHawkOS.status()</code>.</p>
+      </article>
+      <article class="panel card">
+        <p class="eyebrow">surfaces</p>
+        <h2>Greater 0S mount</h2>
+        <p>The launcher, SkyWay, SuperIDE, home shell, SkyErrors, and this cockpit all load the same gate-owned adapter.</p>
+      </article>
+    </section>
+
+    <section class="section-grid" aria-label="Original Skye Hawk contract">
+      <article class="panel card">
+        <p class="eyebrow">contract</p>
+        <h3>DOM signals</h3>
+        <div class="contract-list">
+          <code>documentElement.skyehawk-ready</code>
+          <code>documentElement.skyehawk-link-hot</code>
+          <code>--skyehawk-x / --skyehawk-y</code>
+        </div>
+      </article>
+      <article class="panel card">
+        <p class="eyebrow">contract</p>
+        <h3>Canvas engine</h3>
+        <div class="contract-list">
+          <code>mountSkyeSolLivingBackground()</code>
+          <code>.skyesol-living-field</code>
+          <code>.skyehawk-living-field</code>
+        </div>
+      </article>
+      <article class="panel card">
+        <p class="eyebrow">contract</p>
+        <h3>0S bridge</h3>
+        <div class="contract-list">
+          <code>SkyeHawkOS.status()</code>
+          <code>skyehawk.surface_ready</code>
+          <code>skyehawk.living_field.ready</code>
+        </div>
+      </article>
+    </section>
+
+    <pre class="console" id="sourceConsole">booting Skye Hawk source cockpit...</pre>
+  </main>
+
+  <script src="../assets/js/0s-command-bridge.js" data-command-bridge-app="skyehawk" data-command-bridge-surface="Skye Hawk Source Cockpit" data-command-bridge-auto="true"></script>
+  <script src="../assets/js/skyehawk-os.js" data-skyehawk-surface="Skye Hawk Source Cockpit"></script>
+  <script>
+    (() => {
+      const consoleEl = document.getElementById('sourceConsole');
+      const bridgeMetric = document.getElementById('bridgeMetric');
+      function render() {
+        const status = window.SkyeHawkOS?.status ? window.SkyeHawkOS.status() : { ok: false };
+        bridgeMetric.textContent = status.command_bridge_ready ? 'online' : 'waiting';
+        consoleEl.textContent = JSON.stringify({
+          skye_hawk: status,
+          source_manifest: '/skyehawk/source/manifest.json',
+          original_source_copy: '/skyehawk/source/skyehawk-os.original.js',
+          mounted_at: new Date().toISOString()
+        }, null, 2);
+      }
+      window.addEventListener('skyehawk:ready', render);
+      document.readyState === 'loading'
+        ? document.addEventListener('DOMContentLoaded', render, { once: true })
+        : render();
+    })();
+  </script>
+</body>
+</html>

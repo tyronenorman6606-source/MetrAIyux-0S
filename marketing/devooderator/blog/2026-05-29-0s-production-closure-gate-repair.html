@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The 0S Got a Real Production Closure Pass + SkyeVault Daemon Correction | DevodeRator</title>
+  <meta name="description" content="Gray London Skyes records the May 29 MetrAIyux 0S production closure pass plus the SkyeVault daemon correction to encrypted literal full-repo custody.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-29-0s-production-closure-gate-repair.html">0S Closure</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 29, 2026 · MetrAIyux 0S · shared gate · production closure · SkyeVault Streams · Codex agents · truth ledger</p>
+    <h1>The 0S got a real production closure pass today.</h1>
+    <p class="lede">
+      Today was not a vibes day. It was a proof day. I asked for the 0S to be scanned end to end, repaired where it was actually broken, deployed to production, and written down honestly where it still is not finished.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        The win was not pretending the platform is all green. The win was catching the places where the proof system itself had blind spots, fixing the production gate behavior, and making the receipts say exactly what is true.
+      </blockquote>
+
+      <h2>What happened.</h2>
+      <p>
+        The work started as a closure pass over the core 0S surfaces: Skye Music Nexus, SkyeMail, Relay13, ConnectLog, Signin Pro, the ascension and expansion levels, government and SaaS lanes, Founder Command, SkyErrors, Content Engine, Admin Brain, and the operating proof matrix.
+      </p>
+      <p>
+        The main thing I needed was not another smoke test saying "yes, a page exists." I needed the system to prove that the 0S can watch itself, tell me what is healthy, and refuse to mark unfinished work as complete.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Final production link</strong>
+        <ul>
+          <li>Main 0S Worker: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/" target="_blank" rel="noopener">https://metraiyux-0s-full-system.graylondonskyes.workers.dev/</a></li>
+          <li>Final Worker version: <code>e4e69cb7-768a-4266-862e-4cd2ec5de685</code></li>
+          <li>Production closure command: <code>npm run 0s:production-closure</code></li>
+          <li>Operating matrix command: <code>npm run 0s:operating-proof-matrix</code></li>
+          <li>Truth ledger command: <code>npm run 0s:truth-ledger</code></li>
+          <li>Browser proof note: browser verification is owner-handled in this repo, so this closure used non-browser live HTTP proof.</li>
+        </ul>
+      </div>
+
+      <h2>Then the vault daemon had to get real.</h2>
+      <p>
+        After the closure pass, I caught the second truth problem: the "full repo" backup lane was still behaving like source-custody. That smaller 1GB-2GB artifact can be useful, but it is not everything when the repo/workspace is much larger than that.
+      </p>
+      <p>
+        So the daemon got corrected. Full mode now means encrypted literal all-bytes repo custody by default. The fast delta journal still runs first, then the daemon streams the repo as an encrypted <code>tar.zst</code> artifact into SkyeVault/R2, writes the SkyeSecure control-pack handoff, and lets a private finalizer mint owner-only download links after the handoff exists.
+      </p>
+      <p>
+        Then I caught the follow-up daemon bug: a completed full-repo stream could be followed by a companion/bin failure, and that later failure kept the finished full artifact from becoming the latest successful custody point. The watcher would wake up and try another 16GB-17GB full upload for the same digest. That is not continuity. That is waste.
+      </p>
+      <p>
+        The daemon now records the main custody lane separately from optional companion work. A successful full-repo stream writes <code>latest-primary-success.json</code> and <code>latest-full-repo-success.json</code>; the watcher uses those receipts to skip same-digest full reuploads and only starts a new full stream when the repo/vault digest actually changes.
+      </p>
+      <p>
+        The dedupe is now lane-aware too. If a digest already has the full encrypted artifact but still needs the Git restore pack, <code>git+full</code> runs only the missing Git lane, merges the old full receipt into the new primary success pointer, and does not burn another 16GB-17GB upload for the same state.
+      </p>
+      <p>
+        One more thing had to be fixed: this repo is large enough that <code>git status</code> can overflow Node's default command buffer. When that happened, autosync could report a false-clean workspace. The scan buffer is now raised for autosync and the delta journal, so dirty and untracked work is visible to the digest instead of disappearing behind a tooling limit.
+      </p>
+      <p>
+        The digest itself also got stricter. It now includes changed-file metadata fingerprints, so editing a file that was already dirty still changes the repo/vault state and triggers custody instead of hiding behind the same path list.
+      </p>
+      <p>
+        The larger product correction is the one that matters most: Codespaces should be treated as disposable compute, not the home of the code. The custody lane now has a single owner wrapper, <code>vault:source:status</code>, that reports the Git-level pack lane, encrypted delta lane, encrypted full snapshot lane, storage ceilings, and recovery links from one place. The daemon default is moving to <code>git+full</code>, so the Git-style restore pack and the full encrypted checkpoint advance together.
+      </p>
+
+      <div class="receipt-box">
+        <strong>SkyeVault stream facts</strong>
+        <ul>
+          <li>Literal artifact name: <code>MetrAIyux-0S-full-repo-20260529T130848Z.tar.zst.enc</code></li>
+          <li>Mode: <code>sourceCustody.enabled:false</code>; full mode now passes <code>--literal-full</code>.</li>
+          <li>Encryption: OpenSSL AES-256-CBC with PBKDF2 before upload; unlock material stays in the SkyeSecure/control-pack lane.</li>
+          <li>Final size/hash: <code>15,660,995,840</code> bytes (<code>14.59</code> GiB), SHA-256 <code>a02e131bef14a87d965a6e8cfb201dfab0130a37e7f0613f4373ce08658c85ca</code>.</li>
+          <li>Full artifact receipt: <code>cdv_f4973647019072d97eb62f11</code>; SkyeSecure control-pack receipt: <code>cdv_654dcc3550c042e62d041617</code>.</li>
+          <li>Latest corrected dirty-state full baseline: <code>MetrAIyux-0S-full-repo-20260529T213111Z.tar.zst.enc</code>, <code>17,323,174,736</code> bytes, SHA-256 <code>9ad319fd784a06ce458a6e04b73f67dd0c4f684ef31a36bef335a30e9da0b0e6</code>, artifact receipt <code>cdv_1cf38e5689280e988baf684e</code>, control-pack receipt <code>cdv_509b88a877b464c28b63d596</code>.</li>
+          <li>Git restore pack: <code>MetrAIyux-0S-git-vault-20260529T232230Z.zip</code>, <code>5,390,708,355</code> bytes, SHA-256 <code>ddc3dbe1b585c3c79c4f0a2bf9b8b17bf193dba3825211c489d01baa398ebd21</code>, receipt <code>cdv_2f05efd07da5cb70d60375f9</code>.</li>
+          <li>Encrypted daemon patch packs: <code>cdv_f9dec7fd7d147220a5bcac15</code> and <code>cdv_2f9793158134de9b6b2f2d38</code>.</li>
+          <li>Restart proof: daemon scan wrote <code>.skyevault-out/autosync/autosync-20260530T002429Z.json</code> with <code>coveredModes:["git","full"]</code> and <code>runModes:[]</code>.</li>
+          <li>Fast delta receipt completed first: <code>cdv_336a7a9682ddb7e1bb79e22a</code>.</li>
+          <li>Daemon dedupe receipts: <code>.skyevault-out/autosync/latest-primary-success.json</code> and <code>.skyevault-out/autosync/latest-full-repo-success.json</code>.</li>
+          <li>Lane-level dedupe: <code>git+full</code> can add a missing Git custody pack without re-streaming an already-covered full artifact for the same digest.</li>
+          <li>Sovereign source wrapper: <code>npm run vault:source:status</code>, <code>npm run vault:source:start</code>, and private restore guide <code>.skyevault-out/sovereign-source/RESTORE_FROM_SKYEVAULT.md</code>.</li>
+          <li>Duplicate same-digest stream stopped: <code>MetrAIyux-0S-full-repo-20260529T211300Z.tar.zst.enc</code>.</li>
+          <li>Corrected dirty-state scan: current Git view sees <code>22,549</code> modified paths, <code>681</code> deleted paths, and <code>1,408</code> untracked paths instead of false-clean output.</li>
+          <li>Digest guard: changed/untracked file metadata now participates in the daemon digest, so already-dirty files still trigger new custody when their contents move.</li>
+          <li>Final owner link output after handoff: <code>.skyevault-out/autosync/latest-full-repo-download-links.json</code>.</li>
+          <li>One-auth correction: the shared 0S/FS27/SkyGate/Free99 gate session is the owner/admin login; signed SkyeVault URLs are short-lived download tickets; SkyeSecure passphrases and peppers are encryption unlock material, not another login.</li>
+          <li>Recovery surfaces: <a href="https://skyevault-drop.graylondonskyes.workers.dev/#client-vault" target="_blank" rel="noopener">SkyeVault Drive</a>, <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/skyevault-command-center.html" target="_blank" rel="noopener">SkyeVault Command Center</a>, and <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-secure-secret-packs/app.html" target="_blank" rel="noopener">SkyeSecure Unlocker</a>.</li>
+        </ul>
+      </div>
+
+      <h2>What broke.</h2>
+      <p>
+        The biggest find was a gate leak in the live operator proof surfaces. The 0S had a default-deny shared gate rule, but a set of curated <code>/live/...</code> proof pages were being treated as public static allowlist entries. Worse, the `.html` route could redirect to an extensionless route, and that extensionless route could return <code>200</code> without the shared FS27/SkyGate/Free99 session.
+      </p>
+      <p>
+        That is exactly the kind of bug a shallow smoke check misses. A shallow check sees "redirect happened" and declares the path gated. The honest check follows the redirect chain and asks what the final unauthenticated response actually did.
+      </p>
+
+      <h2>What got fixed.</h2>
+      <p>
+        I repaired the main Worker gate logic so the live operator surfaces are still serveable assets, but no longer anonymous public entrypoints. The proof pages now pass through the shared 0S gate before rendering, including the extensionless route shape.
+      </p>
+      <p>
+        Then I widened the proof system so this same class of leak is harder to miss next time. The production closure runner now checks the full live proof-surface set. The operating matrix now pulls curated live asset routes out of the Worker deploy script, follows unauthenticated redirect chains, and reads evidence receipts instead of merely counting them.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Live links checked in the final closure pass</strong>
+        <ul>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/0s-production-closure.json" target="_blank" rel="noopener">Production closure receipt</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/0s-truth-ledger.json" target="_blank" rel="noopener">0S truth ledger</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyerrors/live-capability-watch.json" target="_blank" rel="noopener">SkyErrors live capability watch</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/content-engine-lane.html" target="_blank" rel="noopener">Content Engine Lane</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/agentic-growth-layer/" target="_blank" rel="noopener">Agentic Growth Layer</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/" target="_blank" rel="noopener">Client App Factory</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/" target="_blank" rel="noopener">NorthStar</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/key-gate-13th/" target="_blank" rel="noopener">Key Gate 13th</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/blog/" target="_blank" rel="noopener">0S Blog</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-content-forge-publisher.html" target="_blank" rel="noopener">Skye Content Forge Publisher</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/connectlog-relay13-operator-proof.html" target="_blank" rel="noopener">ConnectLog + Relay13 Operator Proof</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-media-center-operator-proof.html" target="_blank" rel="noopener">SkyeMediaCenter Operator Proof</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/relay13-chat-hub.html" target="_blank" rel="noopener">Relay13 Chat Hub</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/company-knowledge-layer-proof.html" target="_blank" rel="noopener">Company Knowledge Layer Proof</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/marketing-made-easy-growth-suite.html" target="_blank" rel="noopener">Marketing Made Easy Growth Suite</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/houseoperations-skyebox-operator-proof.html" target="_blank" rel="noopener">HouseOperations + SkyeBox Operator Proof</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyeroutex-workforce-command.html" target="_blank" rel="noopener">SkyeRouteX Workforce Command</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skyeprofitconsole-profit-console.html" target="_blank" rel="noopener">SkyeProfitConsole</a> - shared gate protected</li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/skye-split-engine-operator-proof.html" target="_blank" rel="noopener">Skye Split Engine</a> - shared gate protected</li>
+        </ul>
+      </div>
+
+      <h2>The proof receipts.</h2>
+      <p>
+        The final production closure receipt came back <code>ok:true</code>. It checked 18 unauthenticated gate paths and 18 authenticated live render paths. No warnings. No failures. The truth ledger matched local. The production-ready flag for owner manual browser check was true.
+      </p>
+      <p>
+        The operating proof matrix checked 107 routes. It found zero gate failures, zero authenticated failures, and zero red behavior lanes. That matters because the live proof assets are now inside the matrix instead of sitting in a separate blind spot.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Local receipt paths from the closure pass</strong>
+        <ul>
+          <li><code>test-artifacts/0s-production-closure/0s-production-closure-latest.json</code></li>
+          <li><code>test-artifacts/0s-worker-deploy/founder-command-full-worker-deploy-latest.json</code></li>
+          <li><code>test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json</code></li>
+          <li><code>metraiyux_0s_site/proof/0s-truth-ledger.json</code></li>
+          <li><code>test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json</code></li>
+        </ul>
+      </div>
+
+      <h2>The agents helped keep it honest.</h2>
+      <p>
+        I had Codex dispatch two read-only agents against the remaining P0s. One scanned Admin Brain automation and confirmed the real boundary: the production-facing CodeStudio lane is still control-plane/queued proof for provider actions. It cannot honestly become <code>executed:true</code> until an owner-approved provider executor or backend binding is wired.
+      </p>
+      <p>
+        The other scanned the operating matrix and found the exact reason the route proof missed the live asset issue: the matrix only parsed the app list from <code>0s/os.js</code>, not the curated Worker asset list, and it did not follow redirect chains deeply enough. That became the repair list, then the repair.
+      </p>
+
+      <h2>The honest remaining P0s.</h2>
+      <p>
+        The truth ledger still returns <code>ok:false</code>, and that is correct. Not because production is failing. Not because the live links are broken. It is false because two P0 lanes remain yellow:
+      </p>
+      <ul>
+        <li><strong>Admin Brain automation:</strong> needs a real approved provider executor/backend binding before any live provider action or dead-letter retry can be claimed as <code>executed:true</code>.</li>
+        <li><strong>Per-app operating proof matrix:</strong> route/auth coverage is green, but update-or-closeout remains yellow until the child lanes prove their closeout behavior end to end.</li>
+      </ul>
+
+      <h2>Why this matters.</h2>
+      <p>
+        This is what I want the 0S to become: not a platform that says "trust me," but a platform that can show me what it did, what it blocked, what it deployed, what still needs a provider, and what should not be sold yet.
+      </p>
+      <p>
+        Today moved the 0S closer to that standard. The gate got stricter. The proof got smarter. The deploy receipt got durable. The public story got cleaner. And the unfinished pieces stayed visible instead of being buried under a green badge they did not earn.
+      </p>
+
+      <blockquote>
+        Real closure is not all-green theater. Real closure is production repair, live proof, and a truth ledger brave enough to stay yellow where the system still needs work.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · build receipts, proof journals, and sovereign infrastructure notes.</footer>
+</body>
+</html>

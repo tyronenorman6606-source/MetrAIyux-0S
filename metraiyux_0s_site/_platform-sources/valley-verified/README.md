@@ -170,19 +170,18 @@ v20 adds quote routing, lead route decisions, AE assignment actions, owner messa
 
 The v21 package fixes the main code gaps from the v20 audit:
 
-- Every business profile route now has generated static HTML with unique canonical metadata and LocalBusiness JSON-LD.
+- Every business profile route publishes from a committed custom static HTML file with unique canonical metadata and LocalBusiness JSON-LD.
 - Heavy duplicated public/API data was compacted and old profile shards were removed.
 - Runtime persistence now includes JSON, D1, and Neon-style adapter paths.
 - `/protected-admin/` is an upstream-auth admin app that calls runtime endpoints without local proof-control fields.
 - Enrichment, lead records, payment activation, notification workers, and claim submissions now have dedicated code modules.
-- `scripts/build.mjs` is now an orchestrator; the original core generator is preserved in `scripts/build-core.mjs` and enhancement layers live in separate scripts.
+- `scripts/build.mjs` is now an orchestrator. The old v21 business-page enhancement script has been removed; business pages publish only from `src/handbuilt-pages/<business-id>/index.html`.
 
 Useful commands:
 
 ```bash
 npm run build
 npm run codecheck
-npm run v21-smoke
 npm run build:enhance
 ```
 

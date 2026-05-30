@@ -1,0 +1,96 @@
+{
+  "schema": "skyenet.client-app.deploy-target.v1",
+  "updatedAt": "2026-05-30T19:15:52.214Z",
+  "deployHost": "SkyeNet shared origin path route",
+  "projectId": "musicnexus-music-4u",
+  "workspaceId": "music-4u",
+  "planName": "skyenet-edge-starter",
+  "deploymentId": "dep_20260530191447",
+  "publicUrl": "https://skyenet.graylondonskyes.workers.dev/musicnexus-music-4u/",
+  "host": "skyenet.graylondonskyes.workers.dev",
+  "mountPath": "/musicnexus-music-4u",
+  "urlMode": "path",
+  "publicAccess": true,
+  "sourceRoot": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u",
+  "publicBuildDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u",
+  "sourceCustody": {
+    "privateSourcePackage": true,
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=music-4u&project_id=musicnexus-music-4u&deployment_id=dep_20260530191447",
+    "auth": "Shared FS27/SkyGate/Free99 bearer session required"
+  },
+  "legacyRoutes": [
+    "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/artist-storefronts/music-4u/",
+    "https://skyenet.graylondonskyes.workers.dev/musicnexus/music-4u/"
+  ],
+  "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
+  "lastSmoke": {
+    "hostHeader": {
+      "ok": true,
+      "route_record": {
+        "status": 200,
+        "ok": true,
+        "count": 1,
+        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-music-4u",
+        "route": {
+          "hostname": "skyenet.graylondonskyes.workers.dev",
+          "mount_path": "/musicnexus-music-4u",
+          "url_mode": "path",
+          "workspace_id": "music-4u",
+          "project_id": "musicnexus-music-4u",
+          "active_deployment_id": "dep_20260530191447",
+          "public_access": true,
+          "default_auth": "public",
+          "asset_prefix": "deployments/musicnexus-music-4u/dep_20260530191447",
+          "updated_at": "2026-05-30T19:15:38.275Z"
+        },
+        "elapsed_ms": 597.49
+      },
+      "dashboard": {
+        "status": 200,
+        "ok": true,
+        "deployment_found": true,
+        "live_url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-music-4u/",
+        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-music-4u",
+        "elapsed_ms": 928.74
+      },
+      "public_http": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html; charset=utf-8",
+        "location": "",
+        "elapsed_ms": 101.34,
+        "error": "",
+        "blocker": ""
+      },
+      "host_header_probe": {
+        "status": 200,
+        "ok": true,
+        "content_type": "text/html",
+        "elapsed_ms": 37.54,
+        "bytes": 4644,
+        "title": "SkyeNet | Sovereign Deploy Network",
+        "missing_route_header_probe_error": ""
+      }
+    },
+    "sourceDownload": {
+      "ok": true,
+      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=music-4u&project_id=musicnexus-music-4u&deployment_id=dep_20260530191447",
+      "unauth": {
+        "status": 401,
+        "ok": true,
+        "content_type": "application/json; charset=utf-8",
+        "elapsed_ms": 268.76
+      },
+      "auth": {
+        "status": 200,
+        "ok": true,
+        "content_type": "application/x-tar",
+        "content_length": 0,
+        "bytes_read": 132416,
+        "read_truncated": true,
+        "elapsed_ms": 1737.25,
+        "error": ""
+      }
+    }
+  }
+}

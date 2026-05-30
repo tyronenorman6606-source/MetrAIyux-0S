@@ -9,12 +9,39 @@ CitadelDB is now mounted as a Gate-owned 0S lane:
 - Catch-up queue: `/api/citadel/catchup-queue`
 - Catch-up request: `/api/citadel/catchup/request`
 - Catch-up completion: `/api/citadel/catchup/mark`
+- Developer connection: `/api/citadel/dev/connection`
+- Developer row write: `/api/citadel/dev/rows`
+- Developer row query: `/api/citadel/dev/query`
+- Helper K4i proof ops: `/api/helper-k4i/status`
 
 ## Operating Model
 
-Neon can remain the primary database until CitadelDB has a remote production server, app-owned credentials, restore proof, smoke proof, and rollback proof.
+CitadelDB is the owned Cloudflare database lane. The 0S Worker binds the dedicated Cloudflare D1 database as `CITADELDB` and uses it for Citadel mirror rows, write receipts, and catch-up jobs. `SITE_EVENTS_KV` remains a secondary receipt mirror/fallback, not the primary CitadelDB database.
+
+Neon can remain an upstream source during cutover. Payload-backed writes are mirrored into CitadelDB D1 immediately; any write that only has a Neon receipt and no row payload stays in the catch-up queue until the row is transferred into CitadelDB.
 
 Local Docker Citadel is for development and proof only. Do not point production at `localhost`, `127.0.0.1`, or a local Docker bridge.
+
+## Developer Database URL
+
+0S users can access CitadelDB through the shared gate using the HTTPS database URL:
+
+```bash
+export CITADELDB_DATABASE_URL="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/citadel/dev"
+export CITADELDB_AUTH="Bearer <0S_GATE_SESSION>"
+```
+
+The developer lane accepts structured row writes, structured row queries, and safe SELECT compatibility. It does not expose arbitrary SQL mutation. Normal 0S accounts are workspace-scoped; owner/operator sessions can inspect other workspaces for support and proof.
+
+Proof commands:
+
+```bash
+node metraiyux_0s_site/tests/citadeldb-adapter.test.mjs
+npm run 0s:helper-k4i:proof
+npm run citadeldb:live-d1-sync-proof
+```
+
+Helper K4i records SkyErrors, health scans, and vault patch plans into CitadelDB and `SITE_EVENTS_KV`, then sends Resend owner alerts when the mail lane is configured.
 
 ## App Write Pattern
 
@@ -53,19 +80,18 @@ await window.MetrAIyuxCitadelMirror.markMirrored({
 });
 ```
 
-## Server Cutover Gate
+## Neon Cutover Gate
 
-Do not cut an app from Neon to Citadel until all of these are true:
+Do not remove Neon from an app until all of these are true:
 
-1. Remote CitadelDB server is online.
-2. App database and app user are provisioned.
-3. App has a scoped Citadel `DATABASE_URL`.
-4. Neon dump or row-select catch-up completed.
-5. Citadel restore/upsert completed.
-6. Row counts and checksums match.
-7. App write-smoke passes against Citadel.
-8. Backup and restore test passes.
-9. Rollback path back to Neon is documented and tested.
+1. CitadelDB D1 has the app/table rows or approved app-owned database mapping.
+2. App write receipts show `mirrored_to_citadel`.
+3. Neon dump or row-select catch-up completed for old rows.
+4. CitadelDB restore/upsert completed.
+5. Row counts and checksums match.
+6. App write-smoke passes against CitadelDB.
+7. Export and restore test passes.
+8. Rollback path back to Neon is documented and tested.
 
 ## Docker Storage
 

@@ -14,8 +14,8 @@ const insightCategories = ['operating-rhythm','local-growth','revenue-systems','
 const home = await read('index.html');
 ok(home.includes('Arizona verified business network'), 'homepage rewritten as public website');
 ok(home.includes('Explore the marketplace'), 'homepage has buyer CTA');
-ok(home.includes('Claim or improve a profile'), 'homepage has owner CTA');
-ok(home.includes('Data honesty'), 'homepage has data honesty section');
+ok(home.includes('SkyEmail provisioning'), 'homepage has SkyEmail CTA');
+ok(home.includes('Current profile depth'), 'homepage has profile depth section');
 ok(home.includes('/insights/'), 'homepage links to operating insights');
 ok(!home.includes('/ae-command/" rel="nofollow">AE Command'), 'public homepage no longer exposes crowded AE command nav');
 ok(home.includes('site-footer public-footer'), 'public homepage has guardrail footer');
@@ -28,7 +28,7 @@ ok(!home.includes('Selected composition'), 'homepage hides component selection t
 ok(!home.includes('SCROLL PROOF FUNNEL'), 'homepage hides internal proof-funnel label');
 ok(await exists('featured/index.html'), '/featured/ exists');
 const featuredPage = await read('featured/index.html');
-ok(featuredPage.includes('Featured businesses get a real public landing'), '/featured/ sells public landing value');
+ok(featuredPage.includes('Featured businesses get a verified public page'), '/featured/ sells verified page value');
 ok(featuredPage.includes('bobs-smoke-shop-litchfield-park') && featuredPage.includes('empire-pallets-phoenix'), '/featured/ includes Bob and Empire');
 for(const route of routes){
   ok(await exists(`${route}/index.html`), `/${route}/ exists`);
@@ -83,7 +83,7 @@ const calendar = json(await read('data/insights-editorial-calendar.json'));
 ok(calendar.version === '23.1.0', 'editorial calendar JSON is v23.1');
 ok(calendar.counts?.total >= 28, 'editorial calendar has full multi-post library');
 ok(calendar.counts?.published >= 18, 'editorial calendar has current published guides');
-ok(calendar.counts?.scheduled >= 9, 'editorial calendar has upcoming guides');
+ok(calendar.counts?.scheduled === (calendar.upcoming || []).length && calendar.counts.published + calendar.counts.scheduled === calendar.counts.total, 'editorial calendar has current scheduled guide counts');
 ok(calendar.worker?.cron === '17 13 * * 1,3,5', 'editorial calendar documents 0S cron');
 ok((calendar.categories || []).length === 6, 'editorial calendar has six topic clusters');
 const calendarApi = json(await read('api/insights-editorial-calendar.json'));
@@ -99,13 +99,13 @@ ok((data.routes || []).includes('/app-builds/'), 'website-content includes app b
 ok((data.routes || []).includes('/insights/'), 'website-content includes insights route');
 ok((data.routes || []).includes('/insights/schedule/'), 'website-content includes schedule route');
 ok(data.counts?.insights >= 18 && data.counts?.insights_total >= 28, 'website-content records published and total insight counts');
-ok((data.claims_guardrails || []).some(x => x.includes('not automatically owner-verified')), 'website-content preserves claim guardrail');
-ok((data.claims_guardrails || []).some(x => x.includes('live app-build examples') && x.includes('preview-only')), 'website-content preserves app-build preview guardrail');
+ok((data.claims_guardrails || []).some(x => x.includes('owner-researched verified local records')), 'website-content preserves verified profile guardrail');
+ok((data.claims_guardrails || []).some(x => x.includes('SkyEmail acceptance') && x.includes('24-hour workspace provisioning')), 'website-content preserves SkyEmail provisioning guardrail');
 const readiness = json(await read('data/v23-website-readiness.json'));
 ok(readiness.version === '23.2.0', 'v23.2 readiness JSON exists');
 ok((readiness.proof?.header_replacements || 0) > 0, 'v23 cleaned generated headers');
 ok(readiness.proof?.client_app_builds >= 2, 'v23.2 readiness records actual client app builds');
-ok(readiness.proof?.insights_scheduled >= 9, 'v23.1 readiness records scheduled content');
+ok(readiness.proof?.insights_scheduled === calendar.counts?.scheduled, 'v23.1 readiness records scheduled content');
 const sitemap = await read('sitemap-pages.xml');
 ok(sitemap.includes('/about/'), 'sitemap includes /about/');
 ok(sitemap.includes('/advertise/'), 'sitemap includes /advertise/');
@@ -121,6 +121,6 @@ const seed = json(await read('seed-report.json'));
 ok(seed.version === '23.2.0', 'seed report promoted to v23.2');
 ok(seed.website?.homepage === 'rewritten_for_marketplace_sales', 'seed report records website rewrite');
 ok(seed.website?.app_build_lane?.client_app_builds >= 2, 'seed report records app build lane');
-ok(seed.website?.insight_publication_engine?.scheduled >= 9, 'seed report records insight publication engine');
+ok(seed.website?.insight_publication_engine?.scheduled === calendar.counts?.scheduled, 'seed report records insight publication engine');
 if(fail){ console.error(`v23 website smoke failed: ${fail} failed, ${pass} passed`); process.exit(1); }
 console.log(`v23 website smoke passed: ${pass} checks passed`);

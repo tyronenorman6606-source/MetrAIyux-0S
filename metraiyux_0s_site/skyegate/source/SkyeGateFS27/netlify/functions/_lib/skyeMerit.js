@@ -22,10 +22,59 @@ function money(cents) {
 }
 
 export const SKYEMERIT_KAIXU_CREDIT_CENTS = 600;
+export const SKYEMERIT_MIN_PAYABLE_CENTS = 50;
 export const SKYEMERIT_FIRST_TIME_PACK_ID = "SKYEMERIT-FIRST-PACK";
 export const SKYEMERIT_AUTO_CODE = "SKYEMERIT-FIRST-BEST";
+export const SKYEMERIT_CART_ADD_ON_CODE = "SKYEMERIT-CART-ADDON-31";
+export const GRAYSCAPE467_CODE = "GRAYSCAPE467";
+export const GRAYSCAPE467_PACK_ID = "GRAYSCAPE467-OWNER-QA-PACK";
+export const SKYEMUSICNEXUS_LANDING_MERIT_CODE = "SKYEMUSICNEXUS-LAUNCH-2000";
+export const SKYEMUSICNEXUS_LANDING_MERIT_ENDS_AT = "2026-06-27T06:59:59.999Z";
+export const SKYEMUSICNEXUS_LANDING_MERIT_OFFER_IDS = [
+  "skyemusicnexus-single-drop-landing-page",
+  "skyemusicnexus-artist-page-epk",
+  "skyemusicnexus-animated-visualizer-page",
+  "skyemusicnexus-custom-artist-universe"
+];
 
 export const SKYEMERIT_RULES = [
+  {
+    id: "grayscape-467-owner-unlimited-zero-balance",
+    code: GRAYSCAPE467_CODE,
+    pack_id: GRAYSCAPE467_PACK_ID,
+    family: "owner_qa_unlimited",
+    title: "GRAYSCAPE467 Owner QA Merit",
+    rate_bps: 10000,
+    floor_cents: 0,
+    cap_cents: null,
+    min_transaction_cents: 1,
+    max_transaction_cents: null,
+    max_discount_cents: null,
+    stackable: false,
+    minimum_payable_cents: 0,
+    allow_free_checkout: true,
+    customer_label: "Owner-issued zero-balance unlimited QA merit",
+    guardrail: "Owner QA only. It can zero a checkout, but it does not bypass FS27/SkyGate auth, owner approval, quota guards, or abuse controls."
+  },
+  {
+    id: "skyemusicnexus-launch-landing-2000",
+    code: SKYEMUSICNEXUS_LANDING_MERIT_CODE,
+    pack_id: "SKYEMUSICNEXUS-LAUNCH-MERIT-PACK",
+    family: "artist_landing_launch",
+    title: "SkyeMusicNexus Launch Merit",
+    rate_bps: 10000,
+    floor_cents: 0,
+    cap_cents: null,
+    min_transaction_cents: 223900,
+    max_transaction_cents: null,
+    max_discount_cents: 200000,
+    stackable: false,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
+    expires_at: SKYEMUSICNEXUS_LANDING_MERIT_ENDS_AT,
+    applicable_offer_ids: SKYEMUSICNEXUS_LANDING_MERIT_OFFER_IDS,
+    customer_label: "$2,000 SkyeMerit applied to eligible SkyeMusicNexus artist landing builds through June 26, 2026",
+    guardrail: "Only the listed SkyeMusicNexus artist landing offer is adjusted; Stripe promotion-code stacking turns off when this merit applies."
+  },
   {
     id: "skyemerit-first-spark-23",
     code: "SKYEMERIT-FIRST-23",
@@ -38,8 +87,9 @@ export const SKYEMERIT_RULES = [
     min_transaction_cents: 1,
     max_transaction_cents: 670000,
     stackable: false,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
     customer_label: "23% off eligible first purchase spend up to $6,700",
-    guardrail: "Only the eligible subtotal is discounted; gate session is still required."
+    guardrail: "Only the eligible subtotal is discounted; gate session is still required; merit cannot make the checkout free without owner approval."
   },
   {
     id: "skyemerit-first-lift-28",
@@ -53,8 +103,9 @@ export const SKYEMERIT_RULES = [
     min_transaction_cents: 670001,
     max_transaction_cents: 940000,
     stackable: false,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
     customer_label: "28% off eligible first purchase spend up to $9,400",
-    guardrail: "Only the eligible subtotal is discounted; gate session is still required."
+    guardrail: "Only the eligible subtotal is discounted; gate session is still required; merit cannot make the checkout free without owner approval."
   },
   {
     id: "skyemerit-first-skyeline-31",
@@ -68,8 +119,25 @@ export const SKYEMERIT_RULES = [
     min_transaction_cents: 940001,
     max_transaction_cents: null,
     stackable: false,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
     customer_label: "31% off eligible first purchase spend, capped at the first $9,400",
-    guardrail: "Purchases above $9,400 do not discount the whole ticket; the over-cap amount stays full price."
+    guardrail: "Purchases above $9,400 do not discount the whole ticket; the over-cap amount stays full price; merit cannot make the checkout free without owner approval."
+  },
+  {
+    id: "skyemerit-cart-addon-31",
+    code: SKYEMERIT_CART_ADD_ON_CODE,
+    pack_id: "SKYEMERIT-SKYCART-PACK",
+    family: "cart_add_on",
+    title: "SkyeCart Add-On Merit 31",
+    rate_bps: 3100,
+    floor_cents: 0,
+    cap_cents: 940000,
+    min_transaction_cents: 50,
+    max_transaction_cents: null,
+    stackable: true,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
+    customer_label: "31% SkyeMerit toward an eligible add-on product in today's SkyeCart",
+    guardrail: "This is for relevant add-on products. It can stack with an add-on sale incentive, but it cannot reduce premium, unlimited, provider-heavy, or quoted plans to free without owner approval."
   },
   {
     id: "skyemerit-skyeline-22",
@@ -83,12 +151,47 @@ export const SKYEMERIT_RULES = [
     min_transaction_cents: 300001,
     max_transaction_cents: null,
     stackable: false,
+    minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
     customer_label: "22% off the eligible spend between $3,000 and $10,000",
     guardrail: "This protects large enterprise tickets by leaving spend below $3,000 and above $10,000 at full price."
   }
 ];
 
+function ruleExpired(rule) {
+  if (!rule?.expires_at) return false;
+  const expiry = Date.parse(rule.expires_at);
+  return Number.isFinite(expiry) && Date.now() > expiry;
+}
+
+function ruleAppliesToOffer(rule, offer = null) {
+  const allowed = Array.isArray(rule?.applicable_offer_ids) ? rule.applicable_offer_ids : [];
+  if (!allowed.length) return true;
+  const offerId = clean(offer?.id || offer?.plan_name || "", 140);
+  return Boolean(offerId && allowed.includes(offerId));
+}
+
 export const SKYEMERIT_PACKS = [
+  {
+    id: GRAYSCAPE467_PACK_ID,
+    title: "GRAYSCAPE467 Owner QA Merit Pack",
+    audience: "owner_qa_unlimited",
+    kaixu_credit_cents: 0,
+    coupon_codes: [GRAYSCAPE467_CODE],
+    delivery_channels: ["skymail", "relay13", "connectlog", "fs27_event_mirror"],
+    gate_required: true,
+    note: "Owner-issued zero-balance QA lane for unlimited readiness audits. It is not a public unlimited free plan."
+  },
+  {
+    id: "SKYEMUSICNEXUS-LAUNCH-MERIT-PACK",
+    title: "SkyeMusicNexus Launch Merit Pack",
+    audience: "artist_landing_launch",
+    kaixu_credit_cents: SKYEMERIT_KAIXU_CREDIT_CENTS,
+    coupon_codes: [SKYEMUSICNEXUS_LANDING_MERIT_CODE],
+    delivery_channels: ["resend", "skymail", "relay13", "connectlog", "fs27_event_mirror"],
+    gate_required: true,
+    expires_at: SKYEMUSICNEXUS_LANDING_MERIT_ENDS_AT,
+    note: "Applies $2,000 SkyeMerit to eligible SkyeMusicNexus artist landing builds through June 26, 2026. It preserves premium listed value while charging the launch-window net price."
+  },
   {
     id: SKYEMERIT_FIRST_TIME_PACK_ID,
     title: "First-Time SkyeMerit Pack",
@@ -116,6 +219,12 @@ export function publicSkyeMeritCatalog() {
     first_time_kaixu_credit_cents: SKYEMERIT_KAIXU_CREDIT_CENTS,
     gate_required: true,
     stripe_stack_rule: "SkyeMerit disables Stripe promotion-code stacking when a merit is applied.",
+    stack_policy: {
+      default_minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
+      owner_free_checkout_override_required: true,
+      skycart_add_on_code: SKYEMERIT_CART_ADD_ON_CODE,
+      note: "SkyeMerit can stack for approved incentive lanes, but premium, unlimited, provider-heavy, or quoted offers cannot be made free unless the owner explicitly marks that rule/checkout as free."
+    },
     rules: SKYEMERIT_RULES.map((rule) => ({
       id: rule.id,
       code: rule.code,
@@ -128,6 +237,11 @@ export function publicSkyeMeritCatalog() {
       cap_cents: rule.cap_cents,
       min_transaction_cents: rule.min_transaction_cents,
       max_transaction_cents: rule.max_transaction_cents,
+      max_discount_cents: rule.max_discount_cents ?? null,
+      minimum_payable_cents: rule.minimum_payable_cents ?? SKYEMERIT_MIN_PAYABLE_CENTS,
+      allow_free_checkout: rule.allow_free_checkout === true,
+      expires_at: rule.expires_at || null,
+      applicable_offer_ids: Array.isArray(rule.applicable_offer_ids) ? rule.applicable_offer_ids.slice() : [],
       stackable: rule.stackable,
       customer_label: rule.customer_label,
       guardrail: rule.guardrail
@@ -136,7 +250,7 @@ export function publicSkyeMeritCatalog() {
   };
 }
 
-export function calculateSkyeMerit(ruleOrCode, subtotalCents) {
+export function calculateSkyeMerit(ruleOrCode, subtotalCents, { offer = null } = {}) {
   const rule = typeof ruleOrCode === "string" ? getSkyeMeritRule(ruleOrCode) : ruleOrCode;
   const subtotal = asCents(subtotalCents);
   if (!rule) {
@@ -150,6 +264,43 @@ export function calculateSkyeMerit(ruleOrCode, subtotalCents) {
     };
   }
 
+  if (ruleExpired(rule)) {
+    return {
+      ok: true,
+      applied: false,
+      reason: "skyemerit_rule_expired",
+      rule_id: rule.id,
+      code: rule.code,
+      pack_id: rule.pack_id,
+      family: rule.family,
+      title: rule.title,
+      expires_at: rule.expires_at || null,
+      subtotal_cents: subtotal,
+      discount_cents: 0,
+      payable_cents: subtotal,
+      customer_label: rule.customer_label,
+      guardrail: rule.guardrail
+    };
+  }
+
+  if (!ruleAppliesToOffer(rule, offer)) {
+    return {
+      ok: true,
+      applied: false,
+      reason: "skyemerit_rule_not_valid_for_offer",
+      rule_id: rule.id,
+      code: rule.code,
+      pack_id: rule.pack_id,
+      family: rule.family,
+      title: rule.title,
+      subtotal_cents: subtotal,
+      discount_cents: 0,
+      payable_cents: subtotal,
+      customer_label: rule.customer_label,
+      guardrail: rule.guardrail
+    };
+  }
+
   const minTransaction = asCents(rule.min_transaction_cents || 0);
   const maxTransaction = rule.max_transaction_cents == null ? null : asCents(rule.max_transaction_cents);
   const transactionApplies = subtotal >= minTransaction && (maxTransaction == null || subtotal <= maxTransaction);
@@ -158,7 +309,11 @@ export function calculateSkyeMerit(ruleOrCode, subtotalCents) {
   const eligible = transactionApplies ? Math.max(0, Math.min(subtotal, cap) - floor) : 0;
   const rawDiscount = Math.round((eligible * asCents(rule.rate_bps)) / 10000);
   const maxDiscount = rule.max_discount_cents == null ? rawDiscount : Math.min(rawDiscount, asCents(rule.max_discount_cents));
-  const discount = Math.min(maxDiscount, subtotal);
+  const minimumPayable = rule.allow_free_checkout === true || subtotal <= 0
+    ? 0
+    : asCents(rule.minimum_payable_cents ?? SKYEMERIT_MIN_PAYABLE_CENTS);
+  const discountCeiling = Math.max(0, subtotal - minimumPayable);
+  const discount = Math.min(maxDiscount, discountCeiling);
   const payable = Math.max(0, subtotal - discount);
 
   return {
@@ -174,24 +329,30 @@ export function calculateSkyeMerit(ruleOrCode, subtotalCents) {
     rate_percent: asCents(rule.rate_bps) / 100,
     floor_cents: floor,
     cap_cents: cap,
+    max_discount_cents: rule.max_discount_cents == null ? null : asCents(rule.max_discount_cents),
     min_transaction_cents: minTransaction,
     max_transaction_cents: maxTransaction,
+    expires_at: rule.expires_at || null,
+    applicable_offer_ids: Array.isArray(rule.applicable_offer_ids) ? rule.applicable_offer_ids.slice() : [],
     subtotal_cents: subtotal,
     eligible_cents: eligible,
     discount_cents: discount,
     payable_cents: payable,
+    minimum_payable_cents: minimumPayable,
+    allow_free_checkout: rule.allow_free_checkout === true,
+    guardrail_floor_applied: maxDiscount > discount,
     customer_label: rule.customer_label,
     guardrail: rule.guardrail,
     summary: `${rule.title}: ${money(discount)} off ${money(eligible)} eligible spend; ${money(payable)} due.`
   };
 }
 
-export function selectSkyeMerit({ subtotalCents = 0, code = "", packId = SKYEMERIT_FIRST_TIME_PACK_ID, firstTimeEligible = true } = {}) {
+export function selectSkyeMerit({ subtotalCents = 0, code = "", packId = SKYEMERIT_FIRST_TIME_PACK_ID, firstTimeEligible = true, offer = null } = {}) {
   const subtotal = asCents(subtotalCents);
   const requested = normalizeCode(code);
 
   if (requested && requested !== SKYEMERIT_AUTO_CODE) {
-    return calculateSkyeMerit(requested, subtotal);
+    return calculateSkyeMerit(requested, subtotal, { offer });
   }
 
   if (!firstTimeEligible && (!requested || requested === SKYEMERIT_AUTO_CODE)) {
@@ -208,10 +369,10 @@ export function selectSkyeMerit({ subtotalCents = 0, code = "", packId = SKYEMER
 
   const candidates = SKYEMERIT_RULES
     .filter((rule) => rule.pack_id === packId && rule.family === "first_time")
-    .map((rule) => calculateSkyeMerit(rule, subtotal))
+    .map((rule) => calculateSkyeMerit(rule, subtotal, { offer }))
     .filter((calc) => calc.ok);
   candidates.sort((a, b) => Number(b.discount_cents || 0) - Number(a.discount_cents || 0));
-  return candidates[0] || calculateSkyeMerit(SKYEMERIT_AUTO_CODE, subtotal);
+  return candidates[0] || calculateSkyeMerit(SKYEMERIT_AUTO_CODE, subtotal, { offer });
 }
 
 export function checkoutLineItemsForOffer(offer, trialDays = 0) {
@@ -242,7 +403,7 @@ export function applySkyeMeritToLineItems(lineItems, calculation, offer) {
     if (offer?.mode === "subscription" && item.type === "recurring") continue;
     if (item.skyemerit_discountable === false) continue;
     const original = asCents(item.amount_cents);
-    const minStripeAmount = 50;
+    const minStripeAmount = calculation?.allow_free_checkout === true ? 0 : SKYEMERIT_MIN_PAYABLE_CENTS;
     const maxReduction = Math.max(0, original - minStripeAmount);
     const reduction = Math.min(remaining, maxReduction);
     if (reduction <= 0) continue;
@@ -265,15 +426,17 @@ export function buildSkyeMeritCheckout({ offer, trialDays = 0, code = "", packId
   const originalLineItems = checkoutLineItemsForOffer(offer, trialDays);
   const originalDue = originalLineItems.reduce((sum, item) => sum + asCents(item.amount_cents), 0);
   const discountableSubtotal = skyeMeritDiscountableSubtotal(originalLineItems, offer);
-  const selected = selectSkyeMerit({ subtotalCents: discountableSubtotal, code, packId, firstTimeEligible });
+  const selected = selectSkyeMerit({ subtotalCents: discountableSubtotal, code, packId, firstTimeEligible, offer });
   const adjusted = selected.applied
     ? applySkyeMeritToLineItems(originalLineItems, selected, offer)
     : { line_items: originalLineItems.map((item) => ({ ...item })), applied_discount_cents: 0, unapplied_discount_cents: 0 };
   const adjustedDue = adjusted.line_items.reduce((sum, item) => sum + asCents(item.amount_cents), 0);
+  const selectedPackId = selected.pack_id || packId;
+  const selectedPack = SKYEMERIT_PACKS.find((pack) => pack.id === selectedPackId) || null;
   return {
     ...selected,
     requested_code: normalizeCode(code) || SKYEMERIT_AUTO_CODE,
-    pack_id: selected.pack_id || packId,
+    pack_id: selectedPackId,
     discountable_subtotal_cents: discountableSubtotal,
     original_due_cents: originalDue,
     adjusted_due_cents: adjustedDue,
@@ -282,7 +445,8 @@ export function buildSkyeMeritCheckout({ offer, trialDays = 0, code = "", packId
     applied: adjusted.applied_discount_cents > 0,
     line_items: adjusted.line_items,
     original_line_items: originalLineItems,
-    kaixu_credit_cents: selected.family === "first_time" || packId === SKYEMERIT_FIRST_TIME_PACK_ID ? SKYEMERIT_KAIXU_CREDIT_CENTS : 0,
+    kaixu_credit_cents: asCents(selectedPack?.kaixu_credit_cents || (selected.family === "first_time" || selectedPackId === SKYEMERIT_FIRST_TIME_PACK_ID ? SKYEMERIT_KAIXU_CREDIT_CENTS : 0)),
+    expires_at: selected.expires_at || null,
     gate_required: true,
     stripe_promotion_codes_allowed: adjusted.applied_discount_cents <= 0
   };
@@ -317,6 +481,11 @@ export function skyeMeritMetadata(checkout = null) {
     skyemerit_rate_bps: String(asCents(c.rate_bps || 0)),
     skyemerit_floor_cents: String(asCents(c.floor_cents || 0)),
     skyemerit_cap_cents: String(asCents(c.cap_cents || 0)),
+    skyemerit_max_discount_cents: String(asCents(c.max_discount_cents || 0)),
+    skyemerit_minimum_payable_cents: String(asCents(c.minimum_payable_cents ?? SKYEMERIT_MIN_PAYABLE_CENTS)),
+    skyemerit_allow_free_checkout: String(c.allow_free_checkout === true),
+    skyemerit_guardrail_floor_applied: String(c.guardrail_floor_applied === true),
+    skyemerit_expires_at: clean(c.expires_at || "", 80),
     skyemerit_discountable_subtotal_cents: String(asCents(c.discountable_subtotal_cents || c.subtotal_cents || 0)),
     skyemerit_eligible_cents: String(asCents(c.eligible_cents || 0)),
     skyemerit_discount_cents: String(asCents(c.applied_discount_cents || c.discount_cents || 0)),

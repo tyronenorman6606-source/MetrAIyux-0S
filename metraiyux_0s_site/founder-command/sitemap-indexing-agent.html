@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sitemap Indexing Agent | Founder Command</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#080b0f" />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .command-page {
+      width: min(100%, 920px);
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom));
+      display: grid;
+      gap: 14px;
+    }
+
+    .wide-shell {
+      width: 100%;
+      max-width: none;
+    }
+
+    .hero-panel,
+    .link-panel,
+    .command-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 16px;
+      box-shadow: 0 22px 80px rgba(0, 0, 0, .24);
+    }
+
+    .hero-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero-actions,
+    .link-grid,
+    .site-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    @media (min-width: 760px) {
+      .hero-panel {
+        grid-template-columns: 1.4fr .9fr;
+        align-items: end;
+      }
+
+      .hero-actions,
+      .link-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .site-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .command-link {
+      display: grid;
+      gap: 5px;
+      min-height: 78px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .055);
+      color: var(--text);
+      text-decoration: none;
+      padding: 12px;
+    }
+
+    .command-link span,
+    .site-card span,
+    .code-line span {
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .command-link strong,
+    .site-card strong {
+      overflow-wrap: anywhere;
+    }
+
+    .code-line {
+      display: grid;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .24);
+      padding: 12px;
+    }
+
+    code {
+      color: #ffe19a;
+      overflow-wrap: anywhere;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .metric-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .site-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .055);
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .tight-list {
+      display: grid;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="command-page">
+    <header class="command-top wide-shell">
+      <div>
+        <p class="eyebrow">Founder Command</p>
+        <h1>Sitemap Indexing Agent</h1>
+      </div>
+      <a class="state-pill unlocked" href="/founder-command/">Back</a>
+    </header>
+
+    <section class="hero-panel">
+      <div>
+        <p class="eyebrow">SEO operations</p>
+        <h2>One command owns sitemap, robots, submit JSON, and the Search Console ledger.</h2>
+        <p class="muted">The agent updates configured public roots, refuses to invent domains, and reports gated 0S surfaces that need public mirrors before Google can crawl them.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="command-link" href="https://search.google.com/search-console" target="_blank" rel="noopener">
+          <strong>Google Search Console</strong>
+          <span>Submit verified sitemap properties.</span>
+        </a>
+        <a class="command-link" href="/seo/sitemap-agent-report.html">
+          <strong>Owner Report</strong>
+          <span>Open the generated agent report.</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="dash-grid metric-grid" aria-label="Sitemap agent status">
+      <article class="status-card">
+        <span>Managed</span>
+        <strong id="managedSites">44</strong>
+      </article>
+      <article class="status-card">
+        <span>URLs</span>
+        <strong id="managedUrls">2017</strong>
+      </article>
+      <article class="status-card">
+        <span>Needs origin</span>
+        <strong id="needsOrigin">1</strong>
+      </article>
+      <article class="status-card">
+        <span>Gated roots</span>
+        <strong id="needsPublic">19</strong>
+      </article>
+      <article class="status-card">
+        <span>Live gaps</span>
+        <strong id="liveGaps">20</strong>
+      </article>
+    </section>
+
+    <section class="command-panel">
+      <div class="panel-head">
+        <p class="eyebrow">Commands</p>
+        <h2>Local agent runs.</h2>
+      </div>
+      <div class="tight-list">
+        <div class="code-line">
+          <strong>All-site sitemap agent</strong>
+          <code>npm run seo:agent</code>
+          <span>Refreshes sitemap.xml, robots.txt, google-indexing-submit.json, and agent reports.</span>
+        </div>
+        <div class="code-line">
+          <strong>Full SEO pass</strong>
+          <code>npm run seo:all</code>
+          <span>Runs the WebGrowthOperator catalog generator, then the all-site agent.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="link-panel">
+      <div class="panel-head">
+        <p class="eyebrow">Submit first</p>
+        <h2>Public indexing links.</h2>
+      </div>
+      <div class="link-grid">
+        <a class="command-link" href="https://metraiyux-0s-marketing.pages.dev/sitemap.xml" target="_blank" rel="noopener">
+          <strong>Media Over London Sitemap</strong>
+          <span>https://metraiyux-0s-marketing.pages.dev/sitemap.xml</span>
+        </a>
+        <a class="command-link" href="https://metraiyux-0s-marketing.pages.dev/robots.txt" target="_blank" rel="noopener">
+          <strong>Media Over London Robots</strong>
+          <span>https://metraiyux-0s-marketing.pages.dev/robots.txt</span>
+        </a>
+        <a class="command-link" href="https://metraiyux-0s-marketing.pages.dev/google-indexing-submit.json" target="_blank" rel="noopener">
+          <strong>Media Submit JSON</strong>
+          <span>https://metraiyux-0s-marketing.pages.dev/google-indexing-submit.json</span>
+        </a>
+        <a class="command-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sitemap.xml" target="_blank" rel="noopener">
+          <strong>0S Sitemap</strong>
+          <span>https://metraiyux-0s-full-system.graylondonskyes.workers.dev/sitemap.xml</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="link-panel">
+      <div class="panel-head">
+        <p class="eyebrow">Managed roots</p>
+        <h2>Agent-managed sitemap surfaces.</h2>
+      </div>
+      <div id="siteGrid" class="site-grid">
+        <article class="site-card">
+          <strong>Loading report</strong>
+          <span>/seo/sitemap-agent-report.json</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="link-panel">
+      <div class="panel-head">
+        <p class="eyebrow">Open items</p>
+        <h2>Origins and mirrors still needing decisions.</h2>
+      </div>
+      <div id="gapList" class="tight-list">
+        <div class="code-line">
+          <strong>Loading open items</strong>
+          <span>The report loads from the owner-gated SEO surface.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (selector) => document.querySelector(selector);
+      const text = (selector, value) => {
+        const node = $(selector);
+        if (node) node.textContent = value;
+      };
+      const escape = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+
+      fetch('/seo/sitemap-agent-report.json', { credentials: 'include' })
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Report ${response.status}`)))
+        .then((report) => {
+          const totalUrls = (report.managed_sites || []).reduce((sum, site) => sum + Number(site.pageCount || 0), 0);
+          text('#managedSites', report.managed_site_count || 0);
+          text('#managedUrls', totalUrls);
+          text('#needsOrigin', report.needs_origin_count || 0);
+          text('#needsPublic', report.needs_public_origin_count || 0);
+          text('#liveGaps', report.live_surface_gap_count || 0);
+          renderSites(report.managed_sites || []);
+          renderGaps(report);
+        })
+        .catch((error) => {
+          $('#siteGrid').innerHTML = `<article class="site-card"><strong>Report gated</strong><span>${escape(error.message)}. Open the owner report link after gate login.</span></article>`;
+          $('#gapList').innerHTML = `<div class="code-line"><strong>Report gated</strong><span>${escape(error.message)}. The static counters above are from the last agent run.</span></div>`;
+        });
+
+      function renderSites(sites) {
+        $('#siteGrid').innerHTML = sites.slice(0, 18).map((site) => `
+          <article class="site-card">
+            <strong>${escape(site.name || site.root)}</strong>
+            <span>${escape(site.pageCount)} URLs</span>
+            <a href="${escape(site.sitemapUrl)}" target="_blank" rel="noopener">${escape(site.sitemapUrl)}</a>
+          </article>
+        `).join('');
+      }
+
+      function renderGaps(report) {
+        const needsOrigin = report.needs_origin || [];
+        const needsPublic = report.needs_public_origin || [];
+        const liveGaps = report.live_surface_gaps || [];
+        const items = [
+          ...needsOrigin.map((item) => ({ title: item.root, body: item.reason })),
+          ...needsPublic.slice(0, 8).map((item) => ({ title: item.root, body: item.reason })),
+          ...liveGaps.slice(0, 8).map((item) => ({ title: item.host, body: item.suggested_sitemap }))
+        ];
+        $('#gapList').innerHTML = items.length ? items.map((item) => `
+          <div class="code-line">
+            <strong>${escape(item.title)}</strong>
+            <span>${escape(item.body)}</span>
+          </div>
+        `).join('') : '<div class="code-line"><strong>Clear</strong><span>No open sitemap gaps reported.</span></div>';
+      }
+    })();
+  </script>
+</body>
+</html>

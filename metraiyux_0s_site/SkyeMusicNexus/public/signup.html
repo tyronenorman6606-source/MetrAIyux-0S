@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkyeMusicNexus - Artist Signup</title>
+  <meta name="description" content="SkyeMusicNexus artist signup connects Skye ID, SkyEmail, artist profile, first upload, and SkyePay tracking." />
+  <link rel="stylesheet" href="./neo-nexus.css" />
+  <script defer src="../gate-session.js"></script>
+  <script defer src="./skygate-auth.js"></script>
+  <script defer src="../../assets/js/skye-id-bridge.js"></script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
+  <script defer src="./neo-nexus.js"></script>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body data-app="skye-music-nexus" data-mode="artist" data-room="artist-signup">
+  <canvas id="pulse-field" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nexus-topline">
+    <a class="sigil" href="../index.html" aria-label="SkyeMusicNexus home"><img src="../assets/skye-music-nexus-logo.png" alt="SkyeMusicNexus logo" /></a>
+    <div class="top-title">
+      <p class="micro">SkyeMusicNexus // Artist Signup</p>
+      <h1>Claim identity, connect email, create the artist profile, and move into first upload.</h1>
+    </div>
+    <div class="session-rack">
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
+      <button class="ghost" data-action="logout">Disconnect</button>
+    </div>
+  </header>
+
+  <nav class="nexus-nav" aria-label="SkyeMusicNexus artist rooms">
+    <a href="../index.html">Home</a>
+    <a href="../platform.html">Platform</a>
+    <a class="active" href="./signup.html">Artist Signup</a>
+    <a href="./upload.html">Upload Studio</a>
+    <a href="./drops.html">Drops</a>
+    <a href="./store.html">Store</a>
+    <a href="./brain.html">Brain</a>
+    <a href="./releases.html">Releases</a>
+    <a href="./rights.html">Rights</a>
+  </nav>
+
+  <main class="nexus-shell signup-shell">
+    <section class="artist-signup-hero">
+      <div>
+        <p class="eyebrow">shared gate first // artist world after</p>
+        <h2>Enter through the 0S Gate, then let the artist world assemble.</h2>
+        <p class="lede">Music Nexus only needs the core identity to start. The extra story, sound, visuals, links, rights, and contact notes are optional signals used to draft the artist webpage/storefront, press kit, artist brain memory, legal/payout readiness, rights/split safety, and SkyeNet artist publishing handoff.</p>
+        <div class="hero-actions">
+          <a class="primary" href="/gate/signup/?return=%2FSkyeMusicNexus%2Fpublic%2Fsignup.html">Open 0S Gate</a>
+          <a class="secondary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyegate/source/SkyeGateFS27/generators/Skye-ID/index.html">Open Skye ID Gen</a>
+          <a class="secondary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyegate/source/SkyeGateFS27/generators/SKYEMAIL-GEN/index.html">Open SkyEmail Gen</a>
+          <a class="ghost" href="./upload.html">Upload First Song</a>
+        </div>
+      </div>
+      <div class="signup-steps" aria-label="Signup steps">
+        <article><span>01</span><strong>0S Gate Owns Access</strong><small>FS27/SkyGate/Free99 issues the shared session; Music Nexus does not create a second artist password.</small></article>
+        <article><span>02</span><strong>Web + Storefront Draft</strong><small>Optional profile notes help shape the public artist page, offers, merch, bookings, and SkyePay storefront context.</small></article>
+        <article><span>03</span><strong>Press Kit Seed</strong><small>Origin, influences, sound, visuals, and links become EPK ingredients the artist can review before publishing.</small></article>
+        <article><span>04</span><strong>Artist Brain Memory</strong><small>Approved notes can become memory for local posts, campaign planning, fan replies, and release story continuity.</small></article>
+        <article><span>05</span><strong>Legal + Payout Readiness</strong><small>Contact, paperwork, booking, and payout notes route toward owner review before money movement.</small></article>
+        <article><span>06</span><strong>Rights + SkyeNet Safety</strong><small>Split concerns, collaborators, samples, and publishing consent stay visible before release/storefront expansion.</small></article>
+      </div>
+    </section>
+
+    <section class="artist-compliance-band">
+      <div>
+        <p class="micro">Paperwork before payout</p>
+        <h3>If the paperwork is not complete, the artist cannot legally be paid through SkyePay.</h3>
+        <p>Every artist can build the workspace, upload music, open drops, and prep the store, but payout release stays on hold until the correct onboarding, contractor/vendor, tax/payment, and owner approval forms are complete.</p>
+      </div>
+      <div class="paperwork-link-grid">
+        <a class="paperwork-link primary-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html?source=SkyeMusicNexus&artist=new-artist"><span>All artists</span><strong>Open paperwork packet</strong></a>
+        <a class="paperwork-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html?source=SkyeMusicNexus&artist=gray-skyes"><span>Gray Skyes</span><strong>Direct form</strong></a>
+        <a class="paperwork-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html?source=SkyeMusicNexus&artist=supaboy"><span>SupaBoy</span><strong>Direct form</strong></a>
+        <a class="paperwork-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeRouteX/workforce-command-v0.4.0/index.html#contractor-panel"><span>Workforce</span><strong>Contractor panel</strong></a>
+        <a class="paperwork-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/connectlog-v7.7-relay13-operator-proof/app.html"><span>ConnectLog</span><strong>Relationship log</strong></a>
+        <a class="paperwork-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/connectlog-v7.7-relay13-operator-proof/relay13-inbox.html"><span>Relay13</span><strong>Inbox</strong></a>
+        <a class="paperwork-link" href="https://skyes-over-london-legal.pages.dev/legal/creator-media/" target="_blank" rel="noopener"><span>Legal Skyes</span><strong>Creator/media notice</strong></a>
+      </div>
+    </section>
+
+    <section class="dual-grid">
+      <article class="panel-xl">
+        <div class="section-head">
+          <div>
+            <p class="micro">Artist Profile</p>
+            <h3>Create the Nexus artist record</h3>
+          </div>
+          <span class="tag">Skye ID + SkyEmail</span>
+        </div>
+        <form id="artistForm" class="field-grid">
+          <div class="identity-card wide" id="artistIdentityCard">
+            <img id="artistPhotoPreview" data-skye-id-photo-preview hidden alt="Artist identity photo preview" />
+            <div>
+              <p class="micro">Shared Identity Bridge</p>
+              <strong id="artistIdentityStatus">No shared identity loaded</strong>
+              <span id="artistPhotoMeta" data-skye-id-photo-meta>No artist photo linked yet.</span>
+            </div>
+            <div class="identity-actions">
+              <button class="ghost mini" type="button" data-action="pull-skye-id">Sync ID</button>
+              <button class="ghost mini" type="button" data-action="pull-skyemail">Sync Email</button>
+            </div>
+          </div>
+          <input type="hidden" name="identityId" />
+          <label>Artist name<input name="name" required placeholder="SupaBoy" /></label>
+          <label>Email<input name="email" required type="email" placeholder="artist@skymail.example" /></label>
+          <label>Skye ID<input name="skyeId" inputmode="numeric" placeholder="10-digit ID" /></label>
+          <label>Profile photo<input name="profilePhotoFile" type="file" accept="image/*" /></label>
+          <label>Phone<input name="phone" placeholder="Optional" /></label>
+          <label>Genre tags<input name="genre" placeholder="rap, r&b, producer" /></label>
+          <label class="wide">Bio<textarea name="bio" rows="4" placeholder="What world does this artist create?"></textarea></label>
+
+          <div class="paperwork-callout wide">
+            <p class="micro">Optional artist-world signals</p>
+            <p>Leave any field blank. Filled fields help build drafts for the artist webpage/storefront, press kit, local artist brain memory, rights/split review, legal/payout readiness, and SkyeNet publishing queue.</p>
+          </div>
+          <label class="wide">Origin / story<textarea name="originStory" rows="4" placeholder="Where did the artist come from, and what shaped the work?"></textarea></label>
+          <label>Influences<input name="influences" placeholder="artists, scenes, places, eras" /></label>
+          <label>Audience<input name="audience" placeholder="core fans, cities, communities, moods" /></label>
+          <label class="wide">Sound / genre details<textarea name="soundDetails" rows="3" placeholder="Tempo, texture, vocal style, production notes, live-band feel, etc."></textarea></label>
+          <label class="wide">Visual identity<textarea name="visualIdentity" rows="3" placeholder="Colors, symbols, fashion, cover-art direction, stage visuals, references."></textarea></label>
+          <label>Brand colors<input name="brandColors" placeholder="#58f5ff, black, chrome, gold" /></label>
+          <label>Goals<input name="artistGoals" placeholder="first drop, bookings, fans, store, label pitch" /></label>
+
+          <div class="paperwork-callout wide">
+            <p class="micro">Links, contact, and rights notes</p>
+            <p>These are routing hints, not public promises. Rights, splits, legal, payout, and publishing decisions still require the appropriate owner/legal review.</p>
+          </div>
+          <label>Website<input name="websiteUrl" placeholder="https://artist.example" /></label>
+          <label>Instagram<input name="instagramUrl" placeholder="@artist or URL" /></label>
+          <label>TikTok<input name="tiktokUrl" placeholder="@artist or URL" /></label>
+          <label>YouTube<input name="youtubeUrl" placeholder="channel URL" /></label>
+          <label>Spotify<input name="spotifyUrl" placeholder="artist URL" /></label>
+          <label>SoundCloud<input name="soundcloudUrl" placeholder="profile URL" /></label>
+          <label>Bandcamp<input name="bandcampUrl" placeholder="profile URL" /></label>
+          <label>Booking email<input name="bookingEmail" type="email" placeholder="booking@artist.example" /></label>
+          <label>Booking preference<select name="bookingPreference"><option value="">Choose if useful</option><option value="email_first">Email first</option><option value="phone_first">Phone first</option><option value="manager_only">Manager/team only</option><option value="not_booking_yet">Not booking yet</option></select></label>
+          <label>Public contact<select name="publicContactPreference"><option value="">Choose if useful</option><option value="show_booking_email">Show booking email</option><option value="show_social_dm">Route to social DM</option><option value="private_owner_review">Keep private until owner review</option></select></label>
+          <label class="wide">Other links<textarea name="otherLinks" rows="3" placeholder="One per line: Link name - URL"></textarea></label>
+          <label class="wide">Rights / splits notes<textarea name="rightsSplitsNotes" rows="4" placeholder="Collaborators, producers, samples, publishing splits, clearance concerns, payout notes."></textarea></label>
+
+          <label class="compliance-check wide"><input name="epkWebsiteConsent" type="checkbox" value="yes" /><span>I consent to using the optional profile notes to draft an EPK, artist webpage, and storefront for owner/artist review.</span></label>
+          <label class="compliance-check wide"><input name="artistBrainMemoryConsent" type="checkbox" value="yes" /><span>I consent to approved notes becoming local artist brain memory for posts, planning, fan replies, and release/story continuity.</span></label>
+          <label class="compliance-check wide"><input name="skynetPublishingConsent" type="checkbox" value="yes" /><span>I consent to approved artist profile/storefront materials being prepared for SkyeNet artist publishing review.</span></label>
+          <label class="compliance-check wide"><input name="storefrontConsent" type="checkbox" value="yes" /><span>I consent to using optional commerce notes to draft store products, bookings, tips, memberships, or merch ideas for review.</span></label>
+          <div class="paperwork-callout wide">
+            <p class="micro">Legal/disclaimer handoff</p>
+            <p>Music Nexus can organize artist data and route paperwork, but it is not legal advice. Review <a href="https://skyes-over-london-legal.pages.dev/legal/creator-media/" target="_blank" rel="noopener">Legal Skyes creator/media terms</a> before relying on publishing, payout, or rights language.</p>
+          </div>
+          <label class="compliance-check wide"><input name="paperworkAcknowledged" type="checkbox" required /><span>I understand paperwork must be completed before SkyePay can legally release artist payouts.</span></label>
+          <button class="primary wide" type="submit">Create Artist Profile</button>
+        </form>
+        <div id="artistResult" class="result-card compact">Artist profile not created yet.</div>
+      </article>
+
+      <aside class="panel-xl artist-next-actions">
+        <div class="section-head">
+          <div>
+            <p class="micro">After Signup</p>
+            <h3>Move directly into the first release.</h3>
+          </div>
+        </div>
+        <div class="platform-room-grid compact-room-grid">
+          <a class="platform-room featured" href="./upload.html"><span>Upload</span><h3>First Song</h3><p>Upload MP3, WAV, FLAC, M4A, OGG, or WebM and create a release line.</p></a>
+          <a class="platform-room featured" href="./drops.html"><span>Drop</span><h3>Release Page</h3><p>Build a single, album, campaign, or private access drop from the same artist record.</p></a>
+          <a class="platform-room featured" href="./store.html"><span>Store</span><h3>SkyePay Route</h3><p>Create products, order intents, and payout review records attached to the artist.</p></a>
+          <a class="platform-room featured" href="./brain.html"><span>Brain</span><h3>Artist Motion</h3><p>Seed memory, plan posts, run local artist cycles, and fill SkyeMeter.</p></a>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

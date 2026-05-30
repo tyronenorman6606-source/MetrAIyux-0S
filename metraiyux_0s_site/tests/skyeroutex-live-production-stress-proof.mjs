@@ -191,7 +191,7 @@ async function desktopProductionPath(browser, artifactDir, report) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 950 }, ignoreHTTPSErrors: true });
   const page = await context.newPage();
   observe(page, entry, [
-    { urlIncludes: '/api/routex/auth/signup', status: 503 },
+    { urlIncludes: '/api/routex/auth/signup', status: 410 },
     { urlIncludes: '/api/routex/payments/', status: 409 },
     { urlIncludes: '/order-background', status: 409 }
   ]);

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">SkyeMusicNexus cover fallback</title>
+  <desc id="desc">A branded fallback image for SkyeMusicNexus tracks and playlists.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#071014"/>
+      <stop offset=".52" stop-color="#111a22"/>
+      <stop offset="1" stop-color="#160914"/>
+    </linearGradient>
+    <radialGradient id="pulse" cx=".22" cy=".22" r=".74">
+      <stop offset="0" stop-color="#6ee7f8" stop-opacity=".72"/>
+      <stop offset=".44" stop-color="#6ee7f8" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#6ee7f8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="heat" cx=".8" cy=".2" r=".7">
+      <stop offset="0" stop-color="#ff75b7" stop-opacity=".62"/>
+      <stop offset=".42" stop-color="#ff75b7" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#ff75b7" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <rect width="1200" height="630" fill="url(#pulse)"/>
+  <rect width="1200" height="630" fill="url(#heat)"/>
+  <g opacity=".24" stroke="#f7f5ea" stroke-width="1">
+    <path d="M0 126h1200M0 252h1200M0 378h1200M0 504h1200"/>
+    <path d="M120 0v630M240 0v630M360 0v630M480 0v630M600 0v630M720 0v630M840 0v630M960 0v630M1080 0v630"/>
+  </g>
+  <g transform="translate(112 100)">
+    <circle cx="132" cy="132" r="112" fill="none" stroke="#6ee7f8" stroke-width="18" opacity=".82" filter="url(#glow)"/>
+    <circle cx="132" cy="132" r="60" fill="#f7f5ea" opacity=".92"/>
+    <circle cx="132" cy="132" r="20" fill="#071014"/>
+    <path d="M308 54h650M308 132h500M308 210h610" fill="none" stroke="#f7f5ea" stroke-linecap="round" stroke-width="22" opacity=".86"/>
+    <path d="M112 338c124-72 210 74 336 0s210 74 336 0 210 74 336 0" fill="none" stroke="#ffd166" stroke-linecap="round" stroke-width="22" opacity=".9" filter="url(#glow)"/>
+  </g>
+  <text x="112" y="544" fill="#f7f5ea" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="900">SkyeMusicNexus</text>
+  <text x="114" y="588" fill="#a4f08a" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">artist discovery / radio / live stream stats</text>
+</svg>

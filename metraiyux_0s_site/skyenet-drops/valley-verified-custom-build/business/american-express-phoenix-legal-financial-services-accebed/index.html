@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>American Express | Phoenix Credit and charge card products</title>
+  <meta name="description" content="American Express is a Valley Verified credit and charge card products profile at Phoenix, AZ, highlighting Credit and charge card.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #10243d;
+      --muted: #5a6878;
+      --blue: #1769aa;
+      --navy: #12375a;
+      --silver: #d9e3eb;
+      --paper: #f7fbff;
+      --white: #ffffff;
+      --line: rgba(16, 36, 61, .15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(23, 105, 170, .13), transparent 42%),
+        linear-gradient(90deg, transparent 0 12px, rgba(16, 36, 61, .05) 12px 13px, transparent 13px 100%),
+        var(--paper);
+      background-size: auto, 26px 26px, auto;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 34px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 38px;
+      align-items: center;
+      min-height: 72vh;
+      padding: 34px 0 54px;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--blue);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 5.6rem;
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 680px;
+      margin: 23px 0 0;
+      color: var(--muted);
+      font-size: 1.24rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid var(--navy);
+      border-radius: 6px;
+      background: white;
+      color: var(--navy);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .button.primary {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .statement {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      overflow: hidden;
+      box-shadow: 0 22px 60px rgba(16, 36, 61, .12);
+    }
+
+    .statement-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .statement-head img {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+      background: white;
+      border-radius: 8px;
+      padding: 6px;
+    }
+
+    .statement-head strong {
+      display: block;
+      font-size: 1.05rem;
+    }
+
+    .statement-head span {
+      color: #dceaf6;
+      font-size: .9rem;
+    }
+
+    .statement-row {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 12px;
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .statement-row b {
+      color: var(--muted);
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 20px;
+      margin-bottom: 56px;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .86);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag {
+      padding: 8px 11px;
+      border: 1px solid rgba(23, 105, 170, .25);
+      border-radius: 8px;
+      background: #eef6fc;
+      font-weight: 800;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 22px 0 34px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255, 255, 255, .72);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .notes {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 3.55rem;
+      }
+    }
+
+    @media (max-width: 560px) {
+      h1 {
+        font-size: 2.65rem;
+      }
+
+      .statement-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Phoenix legal / financial services</p>
+        <h1 id="page-title">American Express</h1>
+        <p class="lead">American Express has a long Phoenix presence tied to payments, travel, business cards, merchant acceptance, corporate programs, and the company’s Desert Ridge campus, with Phoenix history going back to a travel office opened in 1961.</p>
+        <div class="actions">
+          <a class="button primary" href="https://www.americanexpress.com">americanexpress.com</a>
+          <a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Phoenix%2C%20AZ">Phoenix, AZ</a>
+        </div>
+      </div>
+      <aside class="statement" aria-label="Listing statement">
+        <div class="statement-head">
+          <img src="assets/logo.svg" alt="American Express Phoenix listing mark">
+          <div>
+            <strong>Valley Verified Network</strong>
+            <span>Legal And Financial</span>
+          </div>
+        </div>
+        <div class="statement-row"><b>Category</b><span>Legal And Financial</span></div>
+        <div class="statement-row"><b>Niche</b><span>Legal / Financial Services</span></div>
+        <div class="statement-row"><b>License type</b><span>Financial Services</span></div>
+        <div class="statement-row"><b>Profile date</b><span>2026-05-27</span></div>
+      </aside>
+    </section>
+
+    <section class="notes" aria-label="Tags and evidence notes">
+      <div class="panel">
+        <h2>Tags</h2>
+        <div class="tags">
+          <span class="tag">Legal / Financial Services</span>
+          <span class="tag">Financial Services</span>
+          <span class="tag">Phoenix, AZ</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Valley Verified Notes</h2>
+        <ul>
+          <li>American Express Valley Verified profile.</li>
+          <li>Business lane: Financial Services.</li>
+          <li>Website domain signal: americanexpress.com.</li>
+          <li>Public proof is summarized below.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-american-express-phoenix-legal-financial-services-accebed">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-american-express-phoenix-legal-financial-services-accebed">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>Skyes Over London says American Express is Valley Verified because official company materials document a Phoenix campus presence, major Valley employment footprint, and a global payments network accepted at nearly all U.S. places that take credit cards. For Phoenix, the business matters as both a financial-services platform and a large local employer connected to consumers, merchants, businesses, partners, and job seekers.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Credit and charge card products, Global payments network, Consumer payment products and benefits, and Travel search, planning, and booking support for card members</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>Consumers, Travelers, and Businesses of all sizes</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>Phoenix Desert Ridge campus context</span></div>
+      </div>
+      <p class="vv-note-text">Official American Express company website.</p>
+    </section>
+
+
+
+  <footer><div class="vv-footer-inner">American Express in Phoenix - Valley Verified local business profile.</div></footer>
+</body>
+</html>

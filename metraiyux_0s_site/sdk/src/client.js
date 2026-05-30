@@ -1,7 +1,9 @@
 import { AuthError, PlanLimitError, ApprovalRequiredError, MetrAIyuxError } from './errors.js';
+import { createSkyErrorsClient } from './skyerrors.js';
 
 const DEFAULT_FS27_URL = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
 const DEFAULT_GATEWAY_URL = 'https://sovereign-saas-provisioning-worker.graylondonskyes.workers.dev';
+const DEFAULT_ZERO_OS_URL = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 
 export class MetrAIyux0S {
   #token;
@@ -10,7 +12,7 @@ export class MetrAIyux0S {
   #card = null;
   #initialized = false;
 
-  constructor({ token, fs27Url, gatewayUrl } = {}) {
+  constructor({ token, fs27Url, gatewayUrl, zeroOsUrl, skyerrorsUrl } = {}) {
     if (!token) throw new AuthError('token is required — pass your FS27 gate card token');
     this.#token = token;
     this.#fs27Url = (fs27Url || DEFAULT_FS27_URL).replace(/\/$/, '');
@@ -20,6 +22,8 @@ export class MetrAIyux0S {
     this.workspace = this.#workspaceNamespace();
     this.billing = this.#billingNamespace();
     this.proof = this.#proofNamespace();
+    this.errors = createSkyErrorsClient({ token: this.#token, zeroOsUrl: skyerrorsUrl || zeroOsUrl || DEFAULT_ZERO_OS_URL, service: 'metraiyux-0s-sdk' });
+    this.skyerrors = this.errors;
   }
 
   // ── init ───────────────────────────────────────────────────────────────────

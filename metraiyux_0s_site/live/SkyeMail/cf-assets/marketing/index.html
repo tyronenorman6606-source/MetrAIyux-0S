@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SkyeMail | Secure Client Email Workspace</title>
-  <meta name="description" content="SkyeMail is a secure client email workspace with Resend send/receive, vault-key encryption, FS27 auth, proof records, and 0S workspace provisioning.">
+  <meta name="description" content="SkyeMail is a secure client email workspace with Citadel/SkyeNet sovereign routing, sovereign-key encryption, FS27 auth, proof records, and 0S workspace provisioning.">
   <link rel="icon" href="/assets/skyes-over-london-deity-logo.png">
   <link rel="stylesheet" href="/assets/marketing.css">
   <script type="importmap">
@@ -29,6 +29,8 @@
     <a class="brand" href="/"><img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo"><span>SkyeMail</span></a>
     <div class="nav-links">
       <a href="/live-proof">Live Proof</a>
+      <a href="/security">Security</a>
+      <a href="/tech-stack">Tech Stack</a>
       <a href="/changelog">Changelog</a>
       <a href="/pricing">Pricing</a>
       <a href="/suite">Platform</a>
@@ -44,12 +46,14 @@
       <div class="hero-copy-stack">
         <p class="eyebrow">Client-ready secure email</p>
         <h1 class="glow-text">Email workspace without handing the server your inbox.</h1>
-        <p class="lead"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> gives each 0S client a real email lane, a vault-key onboarding card, Resend delivery monitoring, encrypted inbox storage, and a clean workspace they can use before the rest of the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span> gets noisy.</p>
+        <p class="lead"><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> gives each 0S client a real email lane, a sovereign-key onboarding card, Citadel delivery monitoring, encrypted inbox storage, and a clean workspace they can use before the rest of the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">operating system</span> gets noisy.</p>
         <div class="actions">
           <a class="button primary magnetic" href="/live-proof">Watch The Proof Run</a>
+          <a class="button magnetic" href="/security">Security</a>
+          <a class="button magnetic" href="/tech-stack">Tech Stack</a>
           <a class="button magnetic" href="/pricing">Pricing</a>
           <a class="button magnetic" href="/changelog">Changelog</a>
-          <a class="button magnetic" href="/suite">Open Platform</a>
+          <a class="button magnetic" href="/suite">Enter Suite</a>
           <a class="button magnetic" href="/login">Open SkyeMail</a>
         </div>
       </div>
@@ -57,20 +61,20 @@
         <div class="surface-bar">
           <div class="dots"><span></span><span></span><span></span></div>
           <strong>Encrypted Inbox</strong>
-          <span class="mini">Resend + Vault Keys</span>
+          <span class="mini">Citadel + Sovereign Keys</span>
         </div>
         <div class="mail-stage">
           <div class="mail-list">
-            <div class="mail-row active"><b>Client reply received</b><span>Sealed into the workspace vault</span></div>
-            <div class="mail-row"><b>Proposal sent</b><span>Resend delivered and logged</span></div>
-            <div class="mail-row"><b>Vault key card issued</b><span>Setup link and recovery policy ready</span></div>
+            <div class="mail-row active"><b>Client reply received</b><span>Sealed into the sovereign workspace</span></div>
+            <div class="mail-row"><b>Proposal sent</b><span>SkyeNet delivered and logged</span></div>
+            <div class="mail-row"><b>Sovereign key card issued</b><span>Setup link and recovery policy ready</span></div>
             <div class="mail-row"><b>FS27 session active</b><span>Workspace access gated through SkyeGate</span></div>
           </div>
           <div class="reader">
             <p class="eyebrow">What the client gets</p>
             <h2>A private email room connected to the 0S.</h2>
-            <p class="lead">The client can send, receive, reply, monitor delivery, set up vault keys, and carry the workspace identity into the larger MetrAIyux platform.</p>
-            <div class="seal"><b>Security posture</b><span> Message bodies are imported through Resend and stored as encrypted payloads once the client vault key is active.</span></div>
+            <p class="lead">The client can send, receive, reply, monitor delivery, set up sovereign keys, and carry the workspace identity into the larger MetrAIyux platform.</p>
+            <div class="seal"><b>Security posture</b><span> Message bodies are sealed through Citadel and stored as encrypted sovereign payloads once the client sovereign key is active.</span></div>
           </div>
         </div>
       </div>
@@ -83,7 +87,7 @@
       </div>
       <div class="grid two proof-run">
         <article class="proof-item"><b>Two-way mail proof</b><span>A sends to B, B receives it, B replies, and A receives the answer back inside SkyeMail.</span></article>
-        <article class="proof-item"><b>Workspace handoff</b><span>Each client gets an email identity, vault-key onboarding card, delivery monitoring, and a protected login path.</span></article>
+        <article class="proof-item"><b>Workspace handoff</b><span>Each client gets an email identity, sovereign-key onboarding card, delivery monitoring, and a protected login path.</span></article>
       </div>
     </section>
 
@@ -94,15 +98,15 @@
       </div>
       <div class="grid">
         <article class="step"><b>1. 0S creates the workspace</b><span>The SaaS worker provisions the <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">client workspace</span>, asks SkyeMail for an email identity, and stores the mailbox receipt.</span></article>
-        <article class="step"><b>2. SkyeMail issues a key card</b><span>The card includes the mailbox, setup URL, recovery policy, and vault-key security model without exposing private keys.</span></article>
-        <article class="step"><b>3. Resend moves the email</b><span>Outbound messages and inbound webhooks pass through the verified Resend domain and land in SkyeMail monitoring.</span></article>
-        <article class="step"><b>4. Vault keys lock the inbox</b><span>The public key receives encrypted mail. The private key stays wrapped by the client passphrase.</span></article>
+        <article class="step"><b>2. SkyeMail issues a key card</b><span>The card includes the mailbox, setup URL, recovery policy, and sovereign-key security model without exposing private keys.</span></article>
+        <article class="step"><b>3. Citadel moves the email</b><span>Outbound messages and inbound webhooks move through the Citadel mail lane and land in SkyeMail monitoring.</span></article>
+        <article class="step"><b>4. Sovereign keys lock the inbox</b><span>The public key receives encrypted mail. The private key stays wrapped by the client passphrase.</span></article>
         <article class="step"><b>5. Delivery events stay visible</b><span>Sent, delivered, failed, bounced, and received events become proof records without exposing inbox content.</span></article>
         <article class="step"><b>6. The client can reply</b><span>The proof surface shows a two-party exchange: A sends to B, B receives, B replies, A receives.</span></article>
       </div>
     </section>
   </main>
 
-  <footer class="footer">SkyeMail is the secure email workspace layer for MetrAIyux 0S clients. <a href="/changelog">Changelog</a> • <a href="/pricing">Pricing</a></footer>
+  <footer class="footer">SkyeMail is the secure email workspace layer for MetrAIyux 0S clients. <a href="/security">Security</a> • <a href="/tech-stack">Tech Stack</a> • <a href="/changelog">Changelog</a> • <a href="/pricing">Pricing</a></footer>
 </body>
 </html>

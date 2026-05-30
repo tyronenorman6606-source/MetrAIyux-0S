@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post to SkyeNet | Publishing and Pricing</title>
+  <meta name="description" content="How to publish a regular site, landing page, PWA, or static app to the standalone SkyeNet deploy network, with current plan caps and pricing posture.">
+  <link rel="stylesheet" href="/assets/skyenet.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/skyenet-mark.svg" alt="">
+      <span><strong>SkyeNet</strong><small>Publish guide</small></span>
+    </a>
+    <nav aria-label="SkyeNet publishing navigation">
+      <a href="/">Home</a>
+      <a href="#pricing">Pricing</a>
+      <a href="/console">Console</a>
+      <a href="/bobs-smoke-shop/">Example app</a>
+      <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html">0S Gate</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="guide-hero">
+      <div>
+        <p class="eyebrow">Post to SkyeNet</p>
+        <h1>Publish a real app or landing page on the standalone SkyeNet edge.</h1>
+        <p class="lede">SkyeNet gives a workspace, live route, deployment receipt, account-scoped source download, and explicit transfer lane for client-facing static sites, PWAs, and built frontend apps. The shared 0S/FS27 gate owns account access, so there is no second SkyeNet password to manage.</p>
+        <div class="actions">
+          <a class="primary" href="/console">Open console</a>
+          <a href="#pricing">See plan caps</a>
+          <a href="/bobs-smoke-shop/">View live example</a>
+        </div>
+      </div>
+      <aside class="guide-card">
+        <span>Canonical route</span>
+        <strong>https://skyenet.&lt;company-slug&gt;/</strong>
+        <small>Old 0S /skyenet links are legacy or staging. Shared workers.dev path routes are infrastructure or fallback unless the owner approves them as public copy.</small>
+      </aside>
+    </section>
+
+    <section class="band guide-section">
+      <div class="section-heading">
+        <p class="eyebrow">Normal posting flow</p>
+        <h2>From folder to live route.</h2>
+      </div>
+      <div class="step-grid">
+        <article><span>1</span><h3>Open the console</h3><p>Use the standalone console and sign in through the shared 0S/FS27 gate.</p><a href="/console">Open console</a></article>
+        <article><span>2</span><h3>Choose a workspace</h3><p>Create or resume a workspace, pick the plan, and keep the project slug simple.</p></article>
+        <article><span>3</span><h3>Drop the build</h3><p>Upload a built folder. SkyeNet promotes common roots like dist, build, out, and public.</p></article>
+        <article><span>4</span><h3>Publish the route</h3><p>SkyeNet checks for a root index.html, writes the deployment receipt, and returns the live URL.</p></article>
+      </div>
+    </section>
+
+    <section class="band guide-section">
+      <div class="section-heading">
+        <p class="eyebrow">What is ready now</p>
+        <h2>Clean static publishing with account proof.</h2>
+      </div>
+      <div class="feature-list">
+        <span>Landing pages and marketing sites</span>
+        <span>Built frontend apps and PWA shells</span>
+        <span>Public or shared-gate-protected routes</span>
+        <span>Deployment receipts and route records</span>
+        <span>Workspace dashboard and quota posture</span>
+        <span>Gated source download and stored transfers</span>
+      </div>
+      <p class="boundary-note">Current boundary: Free99 is capped, custom domains are paid/approved, and unlimited arbitrary uploaded serverless functions are not sold until the isolated SkyeNet Sovereign Runtime lane has production proof. Full project downloads use the private source package lane, not public asset routes.</p>
+    </section>
+
+    <section class="band guide-section two">
+      <div>
+        <p class="eyebrow">Source custody</p>
+        <h2>Download is not the same thing as client ownership.</h2>
+      </div>
+      <div class="custody-copy">
+        <p>SkyeNet keeps deployed source recovery scoped to the authenticated account that owns the deployment record. Public assets and private full project source packages are separate lanes, so a client can have a live app hosted for them without receiving the source code.</p>
+        <p>When source handoff is approved, the owner can store the transfer in SkyeDrive, store it in SkyeVault, create an instant gated link, or generate a secure encrypted <code>.skye</code> source pack backed by the SkyeSecure v2 lane.</p>
+      </div>
+    </section>
+
+    <section class="band guide-section two">
+      <div>
+        <p class="eyebrow">Environment variables</p>
+        <h2>Project secrets belong in the account console.</h2>
+      </div>
+      <div class="custody-copy">
+        <p>The SkyeNet console includes project environment variables for production workspaces. Values are stored behind the shared gate and shown back only as redacted previews, so operators can verify a key exists without exposing the raw secret in the browser.</p>
+        <p>Use this lane for API keys, runtime toggles, and client-specific configuration that should travel with the SkyeNet deployment record without being copied into public assets.</p>
+      </div>
+    </section>
+
+    <section id="pricing" class="band guide-section">
+      <div class="section-heading">
+        <p class="eyebrow">Plan caps and pricing posture</p>
+        <h2>Start free, upgrade when the surface needs more room.</h2>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card">
+          <span>Free99</span>
+          <h3>$0</h3>
+          <p>Capped demo or tiny public workspace.</p>
+          <ul><li>25 MB bundle cap</li><li>3 deployments per month</li><li>1 public route</li><li>No custom domains</li><li>No serverless functions</li><li>30-day retention</li></ul>
+        </article>
+        <article class="price-card">
+          <span>Edge Starter</span>
+          <h3>$297 setup + $97/mo</h3>
+          <p>Basic hosted app or public landing surface.</p>
+          <ul><li>25 MB bundle cap</li><li>20 deployments per month</li><li>1 public route</li><li>No custom domains</li><li>No serverless functions</li><li>60-day retention</li></ul>
+        </article>
+        <article class="price-card">
+          <span>Edge Growth</span>
+          <h3>$997 setup + $297/mo</h3>
+          <p>Multi-route workspace with one approved custom domain.</p>
+          <ul><li>150 MB bundle cap</li><li>100 deployments per month</li><li>5 public routes</li><li>1 custom domain</li><li>Managed functions review</li><li>120-day retention</li></ul>
+        </article>
+        <article class="price-card">
+          <span>Functions Managed</span>
+          <h3>$1,500 setup + $497/mo</h3>
+          <p>Owner-approved managed function work and larger static releases.</p>
+          <ul><li>250 MB bundle cap</li><li>150 deployments per month</li><li>8 public routes</li><li>2 custom domains</li><li>Approved managed functions</li><li>180-day retention</li></ul>
+        </article>
+        <article class="price-card reserve">
+          <span>Sovereign Runtime Reserve</span>
+          <h3>$5,000 setup + $997/mo</h3>
+          <p>Reserved lane for deeper runtime, domain, and managed infrastructure scope.</p>
+          <ul><li>500 MB bundle cap</li><li>300 deployments per month</li><li>20 public routes</li><li>5 custom domains</li><li>Isolated runtime reserved</li><li>365-day retention</li></ul>
+        </article>
+      </div>
+      <p class="boundary-note">These are current SkyeNet offer caps and owner-review prices. Final paid activation, custom domains, managed functions, and higher limits require owner approval before they are promised to a customer.</p>
+    </section>
+
+    <section class="band guide-section two">
+      <div>
+        <p class="eyebrow">CLI lane</p>
+        <h2>Operators can publish directly from a build folder.</h2>
+      </div>
+      <pre class="code-panel">npm run skyenet:deploy -- \
+  --dir dist \
+  --source-root . \
+  --project my-site \
+  --workspace default-workspace \
+  --host skyenet.my-site \
+  --mount / \
+  --url-mode subdomain \
+  --public \
+  --concurrency 4</pre>
+    </section>
+
+    <section class="band guide-section">
+      <div class="section-heading">
+        <p class="eyebrow">Live examples</p>
+        <h2>See the lane working.</h2>
+      </div>
+      <div class="surface-grid">
+        <a class="surface" href="/"><span>SkyeNet home</span><strong>Standalone deploy edge</strong><small>The public SkyeNet host and route entrypoint.</small></a>
+        <a class="surface" href="/bobs-smoke-shop/"><span>Client app</span><strong>Bob's Smoke Shop</strong><small>A real client app hosted on SkyeNet.</small></a>
+        <a class="surface" href="/bobs-smoke-shop/workspace-preview/"><span>Workspace preview</span><strong>Bob's workspace</strong><small>Client-facing preview of the provisioned workspace value.</small></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/skyenet.js" defer></script>
+</body>
+</html>

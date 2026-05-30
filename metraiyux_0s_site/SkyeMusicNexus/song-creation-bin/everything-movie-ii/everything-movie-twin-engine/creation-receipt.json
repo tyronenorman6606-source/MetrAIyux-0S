@@ -1,0 +1,272 @@
+{
+  "schema": "skyemusicnexus.song-creation-receipt.v1",
+  "songId": "gray-brain-everything-movie-twin-engine",
+  "title": "Everything Movie: Twin Engine",
+  "project": "Everything Movie II",
+  "createdAt": "2026-05-27T18:11:46.314Z",
+  "provider": {
+    "id": "elevenlabs",
+    "model": "elevenlabs-music",
+    "status": 200,
+    "contentType": "audio/mpeg",
+    "bytes": 3920920,
+    "promptStored": true,
+    "generatedText": ""
+  },
+  "qualityGate": null,
+  "languagePolicy": {
+    "required": "English only",
+    "appliesTo": [
+      "lyrics",
+      "spoken sections",
+      "ad-libs",
+      "chants",
+      "tags"
+    ]
+  },
+  "artists": [
+    {
+      "artistId": "444666666666",
+      "slug": "gray-skyes",
+      "stageName": "Gray Skyes"
+    },
+    {
+      "artistId": "gray_london_skyes_brain",
+      "slug": "gray-skyes-brain",
+      "stageName": "Gray Skyes Brain"
+    }
+  ],
+  "primaryArtist": {
+    "artistId": "444666666666",
+    "slug": "gray-skyes",
+    "stageName": "Gray Skyes"
+  },
+  "files": {
+    "audio": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/audio/everything-movie-twin-engine.mp3",
+    "publicAudio": "drops/everything-movie-twin-engine/audio/everything-movie-twin-engine.mp3",
+    "heldAudioFile": "",
+    "audioSha256": "11859cebfd8ecc245e47508d9c1827e41fc8eadf178107fb7bb095951ffa2199",
+    "dropDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine",
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/",
+    "productId": "prod_gray_skyes_everything_movie_twin_engine",
+    "visualPackageUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/pics2vid/",
+    "visualPackageManifest": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/pics2vid/package.json"
+  },
+  "splits": [
+    {
+      "artistId": "444666666666",
+      "name": "Gray Skyes",
+      "shareBps": 5000,
+      "role": "collaborator"
+    },
+    {
+      "artistId": "gray_london_skyes_brain",
+      "name": "Gray Skyes Brain",
+      "shareBps": 5000,
+      "role": "collaborator"
+    }
+  ],
+  "superIdeAssetLane": {
+    "sourceCode": "metraiyux_0s_site/DeVisional Riftx/platform/submission-adapters.js",
+    "importedFunctions": [
+      "createSubmissionJob",
+      "previewSubmissionContract",
+      "submitJob"
+    ],
+    "job": {
+      "channel": "skymusicnexus_audio_asset",
+      "job_id": "sub_f06cebf19eecfa92",
+      "metadata": {
+        "artist_names": [
+          "Gray Skyes",
+          "Gray Skyes Brain"
+        ],
+        "audio_sha256": "11859cebfd8ecc245e47508d9c1827e41fc8eadf178107fb7bb095951ffa2199",
+        "creation_bin": "metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/everything-movie-ii/everything-movie-twin-engine",
+        "fs27_tracked": true,
+        "primary_artist": "Gray Skyes",
+        "product_id": "prod_gray_skyes_everything_movie_twin_engine",
+        "pwa_url": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/",
+        "release": "Everything Movie II",
+        "source_app": "skymusicnexus"
+      },
+      "package_bytes": 3920920,
+      "package_name": "everything-movie-twin-engine.mp3",
+      "package_path": "/home/lordkaixu/Projects/MetrAIyux-0S/metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/audio/everything-movie-twin-engine.mp3",
+      "package_sha256": "11859cebfd8ecc245e47508d9c1827e41fc8eadf178107fb7bb095951ffa2199",
+      "schema": "skye.submission.job",
+      "slug": "everything-movie-twin-engine",
+      "title": "Everything Movie: Twin Engine",
+      "version": "4.0.0"
+    },
+    "preview": {
+      "cancel_method": "POST",
+      "cancel_schema": "skye.submission.cancel.request",
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "external_vendor_dispatch": false,
+      "fs27_tracked": true,
+      "header_names": [
+        "content-type",
+        "x-skye-channel",
+        "x-skye-job-id",
+        "x-skye-package-sha256",
+        "x-skye-platform",
+        "x-skye-usage-lane"
+      ],
+      "package_bytes": 3920920,
+      "package_name": "everything-movie-twin-engine.mp3",
+      "package_sha256": "11859cebfd8ecc245e47508d9c1827e41fc8eadf178107fb7bb095951ffa2199",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.contract.preview",
+      "slug": "everything-movie-twin-engine",
+      "stages": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "verify_fs27_gate_session",
+          "request_schema": "skye.fs27.gate.verification"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "record_package_receipt",
+          "request_schema": "skye.generic.fs27-submission"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "queue_owner_approval",
+          "request_schema": "skye.owner.approval.request"
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "header_names": [
+            "content-type",
+            "x-skye-channel",
+            "x-skye-job-id",
+            "x-skye-package-sha256",
+            "x-skye-platform",
+            "x-skye-usage-lane"
+          ],
+          "method": "POST",
+          "name": "prepare_skyenet_handoff",
+          "request_schema": "skye.skyenet.package.handoff"
+        }
+      ],
+      "status_method": "POST",
+      "status_schema": "skye.submission.status.request",
+      "title": "Everything Movie: Twin Engine",
+      "version": "4.0.0"
+    },
+    "receipt": {
+      "channel": "skymusicnexus_audio_asset",
+      "delivery_mode": "fs27-ledger",
+      "draft_id": "draft_sub_f06cebf19eecfa92",
+      "endpoint": "fs27://skymusicnexus-song-assets",
+      "job_id": "sub_f06cebf19eecfa92",
+      "normalized_channel": "generic",
+      "ok": true,
+      "portal_session_id": null,
+      "remote_receipt": {
+        "external_vendor_dispatch": false,
+        "fs27_tracked": true,
+        "ok": true,
+        "owner_approval_required": true,
+        "status": "queued"
+      },
+      "remote_reference": "everything-movie-twin-engine:sub_f06cebf19eecfa92",
+      "remote_status": "queued_for_fs27_owner_approval",
+      "request_body_kind": "json",
+      "request_schema": "skye.generic.fs27-submission",
+      "schema": "skye.submission.receipt",
+      "slug": "everything-movie-twin-engine",
+      "submitted_at": "2026-05-27T18:11:46.314Z",
+      "title": "Everything Movie: Twin Engine",
+      "transport_history": [
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/gate/verify",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.fs27.gate.verification",
+          "step": "verify_fs27_gate_session",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/package/receipt",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.generic.fs27-submission",
+          "step": "record_package_receipt",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/owner-approval",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.owner.approval.request",
+          "step": "queue_owner_approval",
+          "transport_status": 202
+        },
+        {
+          "body_kind": "json",
+          "endpoint": "fs27://skymusicnexus-song-assets/skyenet/handoff",
+          "method": "POST",
+          "remote_status": "queued",
+          "request_schema": "skye.skyenet.package.handoff",
+          "step": "prepare_skyenet_handoff",
+          "transport_status": 202
+        }
+      ],
+      "transport_status": 202,
+      "upload_reference": "fs27pkg_11859cebfd8ecc24",
+      "upload_sha256": "11859cebfd8ecc245e47508d9c1827e41fc8eadf178107fb7bb095951ffa2199",
+      "version": "4.0.0",
+      "workflow_step_count": 4,
+      "workflow_steps": [
+        "verify_fs27_gate_session",
+        "record_package_receipt",
+        "queue_owner_approval",
+        "prepare_skyenet_handoff"
+      ]
+    }
+  },
+  "resultSummary": {
+    "ok": true,
+    "workerRegistered": true,
+    "pwaUrl": "/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/",
+    "productId": "prod_gray_skyes_everything_movie_twin_engine"
+  }
+}

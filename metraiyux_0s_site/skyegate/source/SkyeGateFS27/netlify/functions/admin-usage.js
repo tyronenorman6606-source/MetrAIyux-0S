@@ -84,6 +84,33 @@ export default wrap(async (req) => {
     [customer_id, month]
   );
 
+  const providerEvents = await q(
+    `select id, source_app, workspace_id, customer_ref, client_ref, provider_id, action,
+            usage_lane, quantity, estimated_cost_cents, billable, chargeback_ready,
+            provider_call_made, receipt_id, event_ts, created_at
+     from provider_usage_events
+     where (gate_customer_id=$1 or customer_ref=$1::text)
+       and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
+     order by created_at desc
+     limit 200`,
+    [customer_id, month]
+  );
+
+  const providerPlatform = await q(
+    `select source_app, provider_id, usage_lane,
+            count(*)::int as calls,
+            coalesce(sum(quantity),0)::int as quantity,
+            coalesce(sum(estimated_cost_cents),0)::int as estimated_cost_cents,
+            bool_or(chargeback_ready) as chargeback_ready
+     from provider_usage_events
+     where (gate_customer_id=$1 or customer_ref=$1::text)
+       and billable = true
+       and to_char(created_at at time zone 'UTC','YYYY-MM')=$2
+     group by source_app, provider_id, usage_lane
+     order by estimated_cost_cents desc, calls desc`,
+    [customer_id, month]
+  );
+
   // Build kAIxu-branded event list (no provider names — safe to share with customer).
   const kaixuEvents = events.rows.map(e => ({
     id: e.id,
@@ -112,6 +139,11 @@ export default wrap(async (req) => {
     rollup: roll.rowCount ? roll.rows[0] : { spent_cents: 0, extra_cents: 0, input_tokens: 0, output_tokens: 0, updated_at: null },
     per_key: perKeyRows,
     per_platform: perPlatform.rows,
+    provider_usage: {
+      events: providerEvents.rows,
+      per_platform: providerPlatform.rows,
+      estimated_cost_cents: providerPlatform.rows.reduce((sum, row) => sum + Number(row.estimated_cost_cents || 0), 0)
+    },
     // Admin-only: raw events with real provider+model for routing analysis
     events: events.rows,
     // Customer-safe: kAIxu branded breakdown (safe to forward to customer)

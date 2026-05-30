@@ -1,15 +1,15 @@
 import crypto from "crypto";
 import { q } from "./db.js";
 import { hashOpaqueToken, randomOpaqueToken } from "./passwords.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./providerRuntime.js";
 
 function webhookUrl() {
   return (process.env.AUTH_EMAIL_WEBHOOK_URL || "").toString().trim();
 }
 
 function resendConfig() {
-  const apiKey = (process.env.RESEND_API_KEY || "").toString().trim();
   const from = (process.env.RESEND_FROM || process.env.RESEND_FROM_EMAIL || process.env.SKYEMAIL_FROM || "").toString().trim();
-  return apiKey && from ? { apiKey, from } : null;
+  return from ? { from } : null;
 }
 
 function esc(value) {
@@ -130,28 +130,31 @@ async function sendResendEmail(kind, payload) {
   if (!config) return { delivered: false, mode: "preview" };
   const message = baseEmail(kind, payload);
   const to = Array.isArray(payload.to) ? payload.to : [payload.to];
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${config.apiKey}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
+  const runtime = await runZeroOsProviderAction({
+    provider_id: "resend",
+    action: "resend.email.send",
+    app_id: "skygatefs27-auth",
+    workspace_id: "skygatefs27",
+    customer_id: to[0] || "auth-email",
+    client_id: to[0] || "",
+    usage_lane: `skygatefs27:auth_email:${kind}`,
+    payload: {
       from: config.from,
       to,
       subject: message.subject,
       text: message.text,
       html: message.html,
       ...(payload.reply_to ? { reply_to: payload.reply_to } : {})
-    })
+    }
   });
-  const data = await res.json().catch(() => ({}));
+  const receipt = runtime.receipt || null;
   return {
-    delivered: res.ok,
-    mode: "resend",
-    status: res.status,
-    id: data.id || null,
-    error: res.ok ? null : (data.message || data.error || "Resend delivery failed")
+    delivered: runtime.ok,
+    mode: "resend-provider-runtime",
+    status: runtime.status,
+    id: receipt?.provider_result?.id || null,
+    error: runtime.ok ? null : (receipt?.error || runtime.response?.error || "Resend delivery failed"),
+    provider_runtime: publicProviderRuntime(receipt)
   };
 }
 

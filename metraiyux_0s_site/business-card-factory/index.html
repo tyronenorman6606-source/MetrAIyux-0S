@@ -1,0 +1,133 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0S Business Card Factory</title>
+  <meta name="description" content="Gated MetrAIyux 0S card factory for Valley Verified client cards, ConnectLog handoffs, QR links, and SkyeMerit activation packets.">
+  <link rel="icon" href="/favicon-32.png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/business-card-factory/business-card-factory.css">
+  <script src="/assets/vendor/qrcode-generator.js"></script>
+</head>
+<body class="bcf-page skyesol-living-page">
+<div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <header class="bcf-topbar">
+    <a class="bcf-brand" href="/0s/index.html">
+      <img src="/assets/metraiyux-0s-emblem-transparent.png" alt="">
+      <span>0S Business Card Factory</span>
+    </a>
+    <nav aria-label="Factory routes">
+      <a href="/business-card-factory/">Factory</a>
+      <a href="https://metraiyux-0s-marketing.pages.dev/business-cards.html" target="_blank" rel="noopener">Regular Cards</a>
+      <a href="/valley-verified/">Valley Verified</a>
+      <a href="/connectlog-v7.7-relay13-operator-proof/app.html">ConnectLog</a>
+      <a href="/live/connectlog-relay13-operator-proof.html">Relay13 Proof</a>
+    </nav>
+  </header>
+
+  <main class="bcf-shell">
+    <section class="bcf-workspace">
+      <div class="bcf-command">
+        <div>
+          <p class="eyebrow">Live client card builder</p>
+          <h1 class="neon-gradient-text">Pick the Valley client. Print the card. Open the handoff.</h1>
+        </div>
+        <div class="bcf-stat">
+          <strong id="directoryCount">...</strong>
+          <span>directory records loaded</span>
+        </div>
+      </div>
+
+      <div class="bcf-grid">
+        <aside class="bcf-panel">
+          <label>
+            <span>Search Valley Verified</span>
+            <input id="clientSearch" type="search" placeholder="Search business, city, category, niche..." autocomplete="off">
+          </label>
+          <div class="bcf-results-meta" id="clientResultsMeta">Loading Valley directory...</div>
+          <div class="bcf-results" id="clientResults" aria-live="polite"></div>
+        </aside>
+
+        <section class="bcf-panel bcf-form-panel" aria-label="Selected card details">
+          <div class="bcf-form-grid">
+            <label><span>Business</span><input id="businessName" type="text"></label>
+            <label><span>City</span><input id="businessCity" type="text"></label>
+            <label><span>Category</span><input id="businessCategory" type="text"></label>
+            <label><span>Contact</span><input id="businessContact" type="text" value="Owner"></label>
+            <label><span>Priority code</span><input id="priorityCode" type="text"></label>
+            <label class="bcf-merit-label"><span><img src="/assets/skyes-over-london-deity-logo.png" alt="">SkyeMerit</span><input id="skyemerit" type="text" value="31% for seven days"></label>
+          </div>
+          <div class="bcf-actions">
+            <button class="bcf-primary" id="openConnectLog" type="button">Open ConnectLog</button>
+            <button id="openClientPage" type="button">Open Client Page</button>
+            <button id="openRegularCards" type="button">Open Regular Cards</button>
+            <button id="generateGatewayCopy" type="button">Generate Gateway Copy</button>
+            <button id="copyHandoff" type="button">Copy Handoff</button>
+            <button id="printCard" type="button">Print Card</button>
+            <button id="downloadReceipt" type="button">Download Receipt</button>
+          </div>
+          <textarea id="handoffUrl" readonly rows="3" aria-label="Generated ConnectLog handoff URL"></textarea>
+          <div class="bcf-ai-panel" aria-label="Gateway generated card copy">
+            <div class="bcf-ai-head">
+              <span>0S gateway copy pass</span>
+              <strong id="gatewayStatus">Checking gateway...</strong>
+            </div>
+            <label><span>In-store script</span><textarea id="aiCardScript" readonly rows="4"></textarea></label>
+            <label><span>ConnectLog welcome</span><textarea id="aiWelcome" readonly rows="4"></textarea></label>
+            <label><span>Follow-up message</span><textarea id="aiFollowup" readonly rows="4"></textarea></label>
+            <div class="bcf-ai-foot" id="aiProof">Copy is generated server-side through the 0S route; provider keys never touch this page.</div>
+          </div>
+        </section>
+
+        <section class="bcf-preview-wrap">
+          <article class="bcf-card" id="factoryCard">
+            <div class="bcf-card-rail">
+              <img class="bcf-deity-logo" src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London deity logo">
+              <span>31% SkyeMerit</span>
+            </div>
+            <div class="bcf-card-main">
+              <div class="bcf-card-top">
+                <span>Valley Verified Access</span>
+                <canvas id="factoryQr" aria-label="Generated ConnectLog QR"></canvas>
+              </div>
+              <h2 id="cardBusiness">BOB'S SMOKE SHOP</h2>
+              <p id="cardMeta">Litchfield Park / Retail & Specialty</p>
+              <div class="bcf-card-bottom">
+                <div>
+                  <span id="cardContact">Contact: Owner</span>
+                  <span>grayskyes@solenterprises.org</span>
+                  <span>1-(800)-484-4788</span>
+                </div>
+                <strong id="cardCode">VV-BOBS-LP</strong>
+              </div>
+            </div>
+          </article>
+          <div class="bcf-proof-strip" id="proofStrip"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="bcf-architecture">
+      <article>
+        <span>01</span>
+        <h2>Directory source</h2>
+        <p>Loads the mounted Valley Verified business dataset from the 0S, then keeps the selected business ID attached to the card, QR, ConnectLog URL, and receipt.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h2>ConnectLog route</h2>
+        <p>The QR opens the shared-gate ConnectLog app with client parameters, Gray's formal company contact packet, legal links, and the seven-day SkyeMerit credit.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h2>Gateway expansion</h2>
+        <p>The next build lane can attach the owner-approved OpenAI gateway for copy variants, image prompts, and card scripts without placing provider keys in the browser.</p>
+      </article>
+    </section>
+  </main>
+
+  <script src="/business-card-factory/business-card-factory.js"></script>
+</body>
+</html>

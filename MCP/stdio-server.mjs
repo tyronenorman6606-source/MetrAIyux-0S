@@ -2048,7 +2048,7 @@ function stackCatalog({ category, libraryId, packageName } = {}) {
 const luxuryTypographySignals = {
   architecturalScale: [/clamp\(\s*(?:3\.[5-9]|[4-9])\s*rem/, /font-size\s*:\s*(?:[4-9]\d*(?:\.\d+)?rem|[6-9]\d*(?:\.\d+)?vw)/i],
   tightLineHeight: [/line-height\s*:\s*0\.(?:9[0-9]|[89]\d)/, /line-height\s*:\s*1\.0[0-5]/],
-  negativeTracking: [/letter-spacing\s*:\s*-0\.0[1-4]em/],
+  negativeTracking: [/letter-spacing\s*:\s*(?:-0\.0[1-4]em|0(?:\.0+)?(?:em|px|rem)?)/],
   displayWeight: [/font-weight\s*:\s*(?:700|800|900|bold|extrabold|black)\b/, /font-weight:\s*(?:7|8|9)00/],
   bodyWeightContrast: [/font-weight\s*:\s*(?:300|400|light|regular|normal)\b/]
 };
@@ -2084,7 +2084,7 @@ function luxuryAudit({ source = '', level = 'full' } = {}) {
 
   if (!detected.typography.architecturalScale) issues.push('Typography: hero headline must use architectural scale — clamp(3.5rem, 8vw, 9rem) or larger. Default font sizes read as $5K, not $50K.');
   if (!detected.typography.tightLineHeight) issues.push('Typography: display headline must have tight line-height (0.9–1.05). Auto or 1.5 line-height on a hero reads as template.');
-  if (!detected.typography.negativeTracking) issues.push('Typography: display headline needs intentional tracking (letter-spacing: -0.02em to -0.04em). Zero or positive tracking on a hero headline reads as unstyled.');
+  if (!detected.typography.negativeTracking) issues.push('Typography: display headline needs intentional tracking. In this repo, keep letter-spacing at 0 unless a brand-specific system explicitly requires tighter display tracking.');
   if (!detected.typography.displayWeight) issues.push('Typography: display headline must use a heavy weight (700+). A medium-weight hero headline looks generic.');
   if (!detected.typography.bodyWeightContrast) issues.push('Typography: body text must contrast with the display weight (300 or 400). Uniform weight throughout reads as template.');
 

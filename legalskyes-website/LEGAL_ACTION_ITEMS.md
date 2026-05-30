@@ -14,6 +14,8 @@ This package is drop-ready, but legal protection also requires operational setup
 - Build signed order forms / statements of work for enterprise and client-service deals.
 - Build contractor IP assignment and confidentiality signature flow.
 - Build creator/artist payout and tax onboarding before media monetization.
+- Review the critical infrastructure facilities packet with Arizona counsel first, then Texas, Colorado, and Illinois counsel before signing leases or installing surveillance/access-control systems in those states.
+- Convert landlord/property-manager requirements into signed lease riders, addenda, security exhibits, and vendor acknowledgments before moving servers, databases, AI systems, backups, or sensitive equipment into a suite.
 
 ## Product controls to wire
 - Consent capture logs: timestamp, URL, IP/user agent where appropriate, form text version, phone/email, source.
@@ -27,3 +29,4 @@ This package is drop-ready, but legal protection also requires operational setup
 - Data export/delete request workflow.
 - Vendor/subprocessor register.
 - Commercial email footer injection with physical mailing address.
+- Physical-facility access roster, visitor log, landlord emergency-entry report workflow, camera footage retention/legal-hold process, and asset inventory chain-of-custody procedure.

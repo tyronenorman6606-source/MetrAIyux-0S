@@ -10,29 +10,29 @@
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
   <script defer src="../../assets/js/skye-id-bridge.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
   <script defer src="./neo-nexus.js"></script>
+  <link rel="stylesheet" href="./nexus-player.css" data-skymusicnexus-player="css">
 </head>
 <body data-app="skye-music-nexus" data-mode="artist" data-room="feed">
   <canvas id="pulse-field" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
 
   <header class="nexus-topline feed-topline">
-    <a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a>
+    <a class="sigil" href="./index.html"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
     <div class="top-title">
       <p class="micro">SkyeMusicNexus // Open Social Feed</p>
       <h1>Artist posts, release signals, stories, comments, saves, and Fediverse pull-ins.</h1>
     </div>
     <div class="session-rack">
-      <span id="sessionChip" class="chip chip-hot">SkyGate required</span>
-      <button class="ghost" data-action="proof-session">Proof Session</button>
-      <button class="ghost" data-action="operator-login">Operator Login</button>
+      <span id="sessionChip" class="chip chip-hot">Client access required</span>
+      <button class="ghost" data-action="proof-session">Use Session</button>
       <button class="ghost" data-action="logout">Disconnect</button>
     </div>
   </header>
 
   <nav class="nexus-nav">
-    <a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a class="active" href="./feed.html" aria-current="page">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./exchange.html">Exchange</a><a href="./drops.html">Drops</a><a href="./admin.html">Operator</a>
+    <a href="./index.html">Workspace</a><a href="./create.html">Create</a><a href="./discover.html">Discover</a><a href="./library.html">Library</a><a href="./stream-analytics.html">Streams</a><a href="./achievements.html">Awards</a><a class="active" href="./feed.html" aria-current="page">Feed</a><a href="./contests.html">Contests</a><a href="./ads.html">Ads</a><a href="./player.html">Player</a><a href="./store.html">Store</a><a href="./brain.html">Brain</a><a href="./drops.html">Drops</a>
   </nav>
 
   <main class="nexus-shell feed-app-shell">
@@ -96,7 +96,7 @@
             <header class="feed-author-row">
               <span class="feed-avatar">GS</span>
               <div>
-                <strong>Gate Signal</strong>
+                <strong>Nexus Signal</strong>
                 <small>skye:preview · local-published</small>
               </div>
               <button class="ghost mini" type="button" data-feed-action="follow" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Follow</button>
@@ -112,15 +112,15 @@
               <button type="button" class="feed-icon" data-feed-action="save" data-feed-target="starter_gate_signal" data-feed-artist="preview_artist">Save</button>
             </div>
             <div class="feed-body">
-              <strong>Gate Signal Preview</strong>
-              <p>First post in the MusicNexus feed: release signal, artist profile, story rail, comments, saves, and provider publishing all stay attached.</p>
+              <strong>Nexus Signal Preview</strong>
+              <p>First post in the MusicNexus feed: release signal, artist profile, story rail, comments, saves, and publishing queues all stay attached.</p>
               <div class="feed-tags"><span>#newmusic</span><span>#musicnexus</span></div>
             </div>
             <div class="feed-stats">
               <span>13 likes</span><span>5 saves</span><span>2 boosts</span>
             </div>
             <div class="feed-comments">
-              <p><strong>operator</strong> Feed mechanics are live in static preview.</p>
+              <p><strong>artist team</strong> Feed mechanics are ready for client sessions.</p>
             </div>
             <form class="feed-comment-form" data-feed-comment-form="starter_gate_signal">
               <input name="body" placeholder="Add a comment" />
@@ -142,8 +142,114 @@
       </aside>
     </section>
 
+    <details class="social-ops-drawer social-pr-drawer" open>
+      <summary><span>PR brain, contests, and feature packages</span><small>Local brain / SkyeNet queue / winner features</small></summary>
+      <section class="social-grid pr-command-grid">
+        <article class="panel-xl glass-panel">
+          <div class="section-head">
+            <div>
+              <p class="micro">Local PR brain</p>
+              <h3>Drop-to-feature command</h3>
+            </div>
+            <span class="tag">provider-free</span>
+          </div>
+          <div id="socialPrAgentSummary" class="social-summary pr-summary-strip"></div>
+          <form id="socialPrAgentForm" class="field-grid">
+            <label>Artist ID<input name="artistId" placeholder="artist id" /></label>
+            <label>Release ID<input name="releaseId" placeholder="optional release id" /></label>
+            <label>Winner artist<input name="winnerArtistId" placeholder="optional contest winner" /></label>
+            <label>Contest<select name="contestId"><option value="">Select contest</option></select></label>
+            <label class="wide">Feature title<input name="title" placeholder="optional feature headline" /></label>
+            <label class="wide">Focus<textarea name="focus" rows="3" placeholder="new drop, artist story, storefront push, playlist moment"></textarea></label>
+            <label>Target site<select name="targetSite"><option value="devoderator-and-skymusicnexus">DevodeRator + Nexus</option><option value="skymusicnexus">Nexus only</option><option value="skyenet-pr-agent">SkyeNet PR agent</option></select></label>
+            <label>Keywords<input name="keywords" placeholder="SkyeMusicNexus, new music, artist feature" /></label>
+            <button class="primary wide" type="submit">Draft Feature Package</button>
+          </form>
+          <div id="socialPrAgentResult" class="result-card compact">PR brain ready.</div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Feature queue</p>
+            <h3>Blog packets</h3>
+          </div>
+          <form id="featuredBlogPublishForm" class="field-grid thin">
+            <label class="wide">Feature<select id="featuredBlogId" name="featuredBlogId"><option value="">Select feature</option></select></label>
+            <label class="wide">Live URL<input name="liveUrl" placeholder="optional live URL" /></label>
+            <button class="secondary wide" type="submit">Queue Publish</button>
+          </form>
+          <div id="featuredBlogPublishResult" class="result-card compact">No feature queued.</div>
+          <div id="featuredBlogList" class="exchange-list"></div>
+        </article>
+      </section>
+
+      <section class="social-grid pr-command-grid">
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Contests</p>
+            <h3>Featured artist lane</h3>
+          </div>
+          <div id="contestSummary" class="social-summary"></div>
+          <form id="contestCreateForm" class="field-grid thin">
+            <label class="wide">Title<input name="title" required placeholder="Featured artist PR contest" /></label>
+            <label>Prize<select name="prizeType"><option value="featured_blog_pr_package">Featured blog PR package</option><option value="content_launch_drop_package">Content launch package</option><option value="agentic_website_boost">Agentic website boost</option><option value="new_drop_package">New drop package</option></select></label>
+            <label>Max entries<input name="maxEntries" type="number" min="1" value="500" /></label>
+            <label class="wide">Prize detail<input name="prizeDescription" placeholder="Feature blog, feed push, SkyeNet PR package" /></label>
+            <label class="wide">Rules<textarea name="rules" rows="3" placeholder="owner approval, safe links, rights-safe assets"></textarea></label>
+            <button class="primary wide" type="submit">Open Contest</button>
+          </form>
+          <div id="contestCreateResult" class="result-card compact">Contest command idle.</div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head">
+            <p class="micro">Entries</p>
+            <h3>Artist and fan submissions</h3>
+          </div>
+          <form id="contestEntryForm" class="field-grid thin">
+            <label class="wide">Contest<select name="contestId" required><option value="">Select contest</option></select></label>
+            <label>Artist ID<input name="artistId" placeholder="optional artist id" /></label>
+            <label>Artist name<input name="artistName" placeholder="display name" /></label>
+            <label class="wide">Links<input name="submittedLinks" placeholder="https://artist-site.example, /public/player.html" /></label>
+            <label class="wide">Note<textarea name="note" rows="3" placeholder="drop, story, pitch, or fan reason"></textarea></label>
+            <button class="secondary wide" type="submit">Enter Contest</button>
+          </form>
+          <div id="contestEntryResult" class="result-card compact">No entry submitted.</div>
+        </article>
+      </section>
+
+      <section class="social-grid pr-command-grid">
+        <article class="panel glass-panel">
+          <div class="section-head"><p class="micro">Winner</p><h3>Draw and package</h3></div>
+          <form id="contestDrawForm" class="field-grid thin">
+            <label class="wide">Contest<select name="contestId" required><option value="">Select contest</option></select></label>
+            <label>Winner index<input name="winnerIndex" type="number" min="0" value="0" /></label>
+            <button class="secondary wide" type="submit">Select Winner</button>
+          </form>
+          <div id="contestDrawResult" class="result-card compact">Winner lane idle.</div>
+          <form id="contestPackageForm" class="field-grid thin">
+            <label class="wide">Package<select name="featurePackageId" required><option value="">Select package</option></select></label>
+            <label>Artist ID<input name="artistId" placeholder="optional override" /></label>
+            <label>Release ID<input name="releaseId" placeholder="optional release" /></label>
+            <label class="wide">Focus<input name="focus" placeholder="winner feature angle" /></label>
+            <button class="primary wide" type="submit">Generate Feature</button>
+          </form>
+          <div id="contestPackageResult" class="result-card compact">No package generated.</div>
+        </article>
+
+        <article class="panel glass-panel">
+          <div class="section-head"><p class="micro">Receipts</p><h3>PR runs and packages</h3></div>
+          <div id="contestList" class="exchange-list"></div>
+          <div id="contestEntryList" class="exchange-list"></div>
+          <div id="socialPrRunList" class="exchange-list"></div>
+          <div id="contestPackageList" class="exchange-list"></div>
+          <div id="contestBacklinkList" class="exchange-list"></div>
+        </article>
+      </section>
+    </details>
+
     <details class="social-ops-drawer">
-      <summary><span>Provider publishing bay</span><small>Pixelfed / Mastodon-compatible / Funkwhale</small></summary>
+      <summary><span>Connected publishing bay</span><small>Pixelfed / Mastodon-compatible / Funkwhale</small></summary>
       <section class="social-grid">
         <article class="panel glass-panel social-catalog-panel">
           <div class="section-head">
@@ -167,8 +273,8 @@
             <label class="wide">Connector name<input name="name" required placeholder="Nexus Pixelfed" /></label>
             <label class="wide">Instance URL<input name="instanceUrl" required placeholder="https://pixelfed.social" /></label>
             <label>Handle<input name="handle" placeholder="@artist@pixelfed.social" /></label>
-            <label>Write token env<input name="tokenEnvKey" placeholder="SKYE_MUSIC_PIXELFED_TOKEN" /></label>
-            <label class="wide">Read token env<input name="readTokenEnvKey" placeholder="optional read token env" /></label>
+            <label>Connected posting account<input name="tokenEnvKey" placeholder="connected account reference" /></label>
+            <label class="wide">Connected reading account<input name="readTokenEnvKey" placeholder="optional connected account reference" /></label>
             <button class="primary wide" type="submit">Save Social Connector</button>
           </form>
           <div id="socialConnectorResult" class="result-card compact">Connector bay idle.</div>
@@ -179,10 +285,10 @@
         <article class="panel-xl glass-panel">
           <div class="section-head">
             <div>
-              <p class="micro">Provider queue</p>
-              <h3>Queue a provider-ready artist post.</h3>
+              <p class="micro">Publishing queue</p>
+              <h3>Queue a connected artist post.</h3>
             </div>
-            <span class="tag">token-safe queue</span>
+            <span class="tag">secure queue</span>
           </div>
           <form id="socialPostForm" class="field-grid">
             <label>Connector<select name="connectorId" required><option value="">Select connector</option></select></label>
@@ -196,19 +302,19 @@
             <label class="wide">Alt text<textarea name="altText" rows="3" placeholder="Describe the image or video for accessibility."></textarea></label>
             <button class="primary wide" type="submit">Queue Social Post</button>
           </form>
-          <div id="socialPostResult" class="result-card compact">No provider post queued yet.</div>
+          <div id="socialPostResult" class="result-card compact">No connected post queued yet.</div>
         </article>
 
         <article class="panel glass-panel">
           <div class="section-head">
-            <p class="micro">Provider publish</p>
+            <p class="micro">Connected publish</p>
             <h3>Push the queued post.</h3>
           </div>
           <form id="socialPublishForm" class="field-grid thin">
             <label class="wide">Queued post<select id="publishPostId" name="postId" required><option value="">Select queued post</option></select></label>
-            <button class="secondary wide" type="submit">Publish Through Provider</button>
+            <button class="secondary wide" type="submit">Publish Connected Post</button>
           </form>
-          <div id="socialPublishResult" class="result-card compact">Publishing gate idle.</div>
+          <div id="socialPublishResult" class="result-card compact">Connected publishing idle.</div>
         </article>
 
         <article class="panel glass-panel">
@@ -237,9 +343,8 @@
         </article>
       </section>
     </details>
-
-    <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog>
     <div id="toast" role="status" aria-live="polite"></div>
   </main>
+  <script src="./nexus-player.js" data-skymusicnexus-player="js" defer></script>
 </body>
 </html>

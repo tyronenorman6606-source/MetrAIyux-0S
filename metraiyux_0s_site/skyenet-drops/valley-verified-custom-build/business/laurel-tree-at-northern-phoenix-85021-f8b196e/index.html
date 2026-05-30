@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laurel Tree at Northern | Apartment Community in Phoenix, AZ</title>
+  <meta name="description" content="Laurel Tree at Northern contact details for an apartment community in Phoenix, Arizona.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1b241e;
+      --muted: #606b63;
+      --paper: #fafbf4;
+      --panel: #ffffff;
+      --accent: #5d7f5b;
+      --accent-two: #dc7e60;
+      --soft: #e8f0df;
+      --line: #d9e1d0;
+    }
+
+    * { box-sizing: border-box; letter-spacing: 0; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      background:
+        linear-gradient(140deg, var(--soft) 0 28%, transparent 28% 100%),
+        var(--paper);
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+    }
+
+    .mark {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+    }
+
+    .top-link,
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .top-link {
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 28px;
+      align-items: center;
+      min-height: 70vh;
+      padding: 34px 0 44px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: .95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: 4.8rem;
+      line-height: .96;
+      overflow-wrap: break-word;
+    }
+
+    .lead {
+      max-width: 690px;
+      margin: 22px 0 0;
+      color: #303a33;
+      font-size: 1.2rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      padding: 0 18px;
+      border: 2px solid var(--ink);
+      background: var(--panel);
+    }
+
+    .button.primary {
+      background: var(--accent-two);
+      color: white;
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    .signal {
+      min-height: 380px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(150deg, var(--accent) 0 48%, transparent 48%),
+        linear-gradient(25deg, var(--accent-two) 0 54%, var(--panel) 54%);
+      box-shadow: 0 20px 60px rgba(27, 36, 30, .12);
+      display: grid;
+      align-content: end;
+      gap: 14px;
+    }
+
+    .signal span,
+    .signal strong {
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      padding: 8px 10px;
+    }
+
+    .signal strong {
+      font-size: 2rem;
+      line-height: 1.05;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 0 0 46px;
+    }
+
+    article,
+    .note {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 12px 30px rgba(27, 36, 30, .08);
+    }
+
+    article {
+      min-height: 150px;
+      padding: 18px;
+    }
+
+    article strong,
+    .note strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: .82rem;
+      text-transform: uppercase;
+    }
+
+    article p,
+    .note p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-bottom: 42px;
+      padding: 20px;
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 860px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .hero,
+      .facts { grid-template-columns: 1fr; }
+      h1 { font-size: 3rem; }
+      .signal { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <span class="mark">LT</span>
+        <span>Apartment Community</span>
+      </div>
+      <a class="top-link" href="tel:+14805068611">(480) 506-8611</a>
+    </header>
+
+    <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Phoenix, AZ 85021 / Real Estate And Property</p>
+          <h1 id="page-title">Laurel Tree at Northern</h1>
+          <p class="lead">Apartment community at 1825 Northern Ave. in Phoenix, with direct phone contact for availability and pricing questions.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14805068611">Call (480) 506-8611</a>
+            <a class="button" href="#facts">Business facts</a>
+          </div>
+        </div>
+        <aside class="signal" aria-label="Business summary">
+          <span>Business type</span>
+          <strong>Apartment Community</strong>
+          <span>Phoenix / English / Quote-based service</span>
+        </aside>
+      </section>
+
+      <section class="facts" id="facts" aria-label="Business facts">
+        <article>
+          <strong>Address</strong>
+          <p>1825 Northern Ave., Phoenix, AZ 85021</p>
+        </article>
+        <article>
+          <strong>Phone</strong>
+          <p>(480) 506-8611</p>
+        </article>
+        <article>
+          <strong>Category</strong>
+          <p>Real Estate And Property / Apartment Community</p>
+        </article>
+        <article>
+          <strong>Website</strong>
+          <p>Not listed</p>
+        </article>
+      </section>
+
+      <section class="note" aria-label="Service tags">
+        <strong>Service Tags</strong>
+        <p>Apartment community, real estate / contractors, property / real estate.</p>
+      </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Laurel Tree at Northern is Valley Verified because official Housing for Hope evidence identifies it as an affordable Phoenix apartment community at 1825 W. Northern Ave. with leasing phone 602-566-8006.</p>
+        <ul>
+          <li>The offering includes studio, one-bedroom, two-bedroom, and three-bedroom floor plans for Phoenix renters.</li>
+          <li>Official amenities include community rooms, elevators, BBQ area, security cameras, laundry rooms, tenant services, playground, and picnic area.</li>
+          <li>RentCafe adds evidence for 70 apartments, Dunlap &amp; Magee Property Management Inc., office hours, and the floor-plan range.</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>

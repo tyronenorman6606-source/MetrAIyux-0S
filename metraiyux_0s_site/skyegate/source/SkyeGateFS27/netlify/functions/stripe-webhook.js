@@ -2,6 +2,7 @@ import { wrap } from "./_lib/wrap.js";
 import { json } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { audit } from "./_lib/audit.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
 import { autoUnlockSkyePayOrder } from "./_lib/skyepayActivation.js";
 import { upsertSkyePayOrderFromSession } from "./_lib/skyepayCatalog.js";
 import {
@@ -15,6 +16,62 @@ function sessionCanMoveToOwnerApproval(session) {
   const paymentStatus = String(session?.payment_status || "").toLowerCase();
   if (["paid", "no_payment_required"].includes(paymentStatus)) return true;
   return !paymentStatus && String(session?.status || "").toLowerCase() === "complete";
+}
+
+export function stripeWebhookRuntimePayload(event, object = {}, { order = null, source = "stripe-webhook" } = {}) {
+  const metadata = object?.metadata || {};
+  return {
+    event_id: event?.id || "",
+    event_type: event?.type || "",
+    object_id: object?.id || "",
+    object_type: object?.object || "",
+    status: object?.status || "",
+    payment_status: object?.payment_status || object?.status || "",
+    client_reference_id: object?.client_reference_id || metadata.client_reference_id || "",
+    customer: typeof object?.customer === "string" ? object.customer : object?.customer?.id || "",
+    stripe_session_id: object?.object === "checkout.session" ? object?.id || "" : metadata.stripe_session_id || "",
+    stripe_subscription_id: object?.object === "subscription" ? object?.id || "" : object?.subscription || metadata.stripe_subscription_id || "",
+    payment_intent_id: typeof object?.payment_intent === "string" ? object.payment_intent : object?.payment_intent?.id || "",
+    amount_total: Number(object?.amount_total || metadata.amount_cents || 0) || 0,
+    currency: object?.currency || metadata.currency || "",
+    skyepay: metadata.skyepay === "true" || metadata.skyepay === true,
+    skyepay_order_id: order?.id || metadata.skyepay_order_id || metadata.order_id || "",
+    offer_id: order?.offer_id || metadata.offer_id || "",
+    workspace_id: metadata.workspace_id || metadata.workspace || order?.workspace_id || "",
+    customer_id: metadata.customer_id || order?.customer_id || "",
+    source
+  };
+}
+
+export async function mirrorStripeWebhookProviderRuntime(event, object = {}, options = {}) {
+  try {
+    const payload = stripeWebhookRuntimePayload(event, object, options);
+    const runtime = await runZeroOsProviderAction({
+      provider_id: "stripe",
+      action: "stripe.webhook.lifecycle",
+      app_id: "skyepay",
+      workspace_id: payload.workspace_id || "skyepay",
+      customer_id: String(payload.customer_id || payload.customer || payload.skyepay_order_id || ""),
+      client_id: String(payload.offer_id || payload.client_reference_id || ""),
+      usage_lane: `stripe:webhook:${payload.event_type || "event"}`.slice(0, 100),
+      live: true,
+      sandbox: false,
+      payload
+    });
+    return {
+      ok: runtime.ok,
+      status: runtime.status,
+      provider_runtime: publicProviderRuntime(runtime.receipt),
+      receipt: runtime.receipt
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 500,
+      provider_runtime: null,
+      error: error?.message || String(error)
+    };
+  }
 }
 
 async function holdSkyePayForPayment(session, eventType) {
@@ -68,6 +125,7 @@ export default wrap(async (req) => {
     const session = event.data.object;
     if (session?.metadata?.skyepay === "true") {
       const order = await upsertSkyePayOrderFromSession({ session, source: event.type });
+      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, session, { order, source: "skyepay-checkout-session" });
       if (!sessionCanMoveToOwnerApproval(session)) {
         await holdSkyePayForPayment(session, event.type);
       } else if (isVaultProvisioningOrder(order)) {
@@ -87,7 +145,8 @@ export default wrap(async (req) => {
       await audit("system", "SKYEPAY_STRIPE_WEBHOOK", `skyepay:${order?.id || session.id}`, {
         event_type: event.type,
         stripe_session_id: session.id,
-        payment_status: session.payment_status || session.status || null
+        payment_status: session.payment_status || session.status || null,
+        provider_runtime: providerRuntime.provider_runtime
       });
       return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
     }
@@ -96,6 +155,7 @@ export default wrap(async (req) => {
   if (event.type === "checkout.session.async_payment_failed") {
     const session = event.data.object;
     if (session?.metadata?.skyepay === "true") {
+      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, session, { source: "skyepay-checkout-session-failed" });
       await q(
         `update skyepay_orders
          set payment_status='payment_failed',
@@ -105,9 +165,9 @@ export default wrap(async (req) => {
              metadata=metadata || $2::jsonb,
              updated_at=now()
          where stripe_session_id=$1`,
-        [session.id, JSON.stringify({ stripe_event_type: event.type })]
+        [session.id, JSON.stringify({ stripe_event_type: event.type, provider_runtime: providerRuntime.provider_runtime })]
       );
-      await audit("system", "SKYEPAY_PAYMENT_FAILED", `stripe:${session.id}`, { event_type: event.type });
+      await audit("system", "SKYEPAY_PAYMENT_FAILED", `stripe:${session.id}`, { event_type: event.type, provider_runtime: providerRuntime.provider_runtime });
       return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
     }
   }
@@ -115,16 +175,18 @@ export default wrap(async (req) => {
   if (event.type === "checkout.session.expired") {
     const session = event.data.object;
     if (session?.metadata?.skyepay === "true") {
+      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, session, { source: "skyepay-checkout-session-expired" });
       await q(
         `update skyepay_orders
          set payment_status='expired',
              approval_status=case when approval_status in ('approved','void') then approval_status else 'expired' end,
              owner_status=case when owner_status in ('approved','void') then owner_status else 'checkout_expired' end,
+             metadata=metadata || $2::jsonb,
              updated_at=now()
          where stripe_session_id=$1`,
-        [session.id]
+        [session.id, JSON.stringify({ stripe_event_type: event.type, provider_runtime: providerRuntime.provider_runtime })]
       );
-      await audit("system", "SKYEPAY_CHECKOUT_EXPIRED", `stripe:${session.id}`, { event_type: event.type });
+      await audit("system", "SKYEPAY_CHECKOUT_EXPIRED", `stripe:${session.id}`, { event_type: event.type, provider_runtime: providerRuntime.provider_runtime });
       return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
     }
   }
@@ -132,6 +194,7 @@ export default wrap(async (req) => {
   if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
     const subscription = event.data.object;
     if (subscription?.metadata?.skyepay === "true") {
+      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, subscription, { source: "skyepay-subscription" });
       await q(
         `update skyepay_orders
          set payment_status=$2,
@@ -144,7 +207,8 @@ export default wrap(async (req) => {
           JSON.stringify({
             subscription_status: subscription.status || null,
             current_period_end: subscription.current_period_end || null,
-            stripe_event_type: event.type
+            stripe_event_type: event.type,
+            provider_runtime: providerRuntime.provider_runtime
           })
         ]
       );
@@ -200,7 +264,8 @@ export default wrap(async (req) => {
       }
       await audit("system", "SKYEPAY_SUBSCRIPTION_EVENT", `stripe-sub:${subscription.id}`, {
         event_type: event.type,
-        status: subscription.status || null
+        status: subscription.status || null,
+        provider_runtime: providerRuntime.provider_runtime
       });
       return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
     }
@@ -216,6 +281,7 @@ export default wrap(async (req) => {
     const amount_cents = parseInt(md.amount_cents, 10);
 
     if (Number.isFinite(customer_id) && /^\d{4}-\d{2}$/.test(month) && Number.isFinite(amount_cents) && amount_cents > 0) {
+      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, session, { source: "usage-topup-checkout-session" });
       // credit cap
       await q(
         `insert into monthly_usage(customer_id, month, spent_cents, extra_cents, input_tokens, output_tokens)
@@ -231,7 +297,7 @@ export default wrap(async (req) => {
         [customer_id, month, amount_cents, session.id]
       );
 
-      await audit("system", "TOPUP_STRIPE", `customer:${customer_id}`, { month, amount_cents, session_id: session.id });
+      await audit("system", "TOPUP_STRIPE", `customer:${customer_id}`, { month, amount_cents, session_id: session.id, provider_runtime: providerRuntime.provider_runtime });
     }
   }
 

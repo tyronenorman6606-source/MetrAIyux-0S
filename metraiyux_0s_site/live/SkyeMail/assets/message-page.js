@@ -7,6 +7,23 @@
   const params = new URLSearchParams(location.search);
   const id = params.get('id') || '';
   function note(msg, kind=''){ setStatus(statusEl, msg, kind); }
+  function arr(value){ return Array.isArray(value) ? value : []; }
+  function attachmentUrl(m, a){
+    const fallback = `/gmail-attachment?id=${encodeURIComponent(m.id)}&attachmentId=${encodeURIComponent(a.attachment_id || '')}&filename=${encodeURIComponent(a.filename || 'attachment')}${a.inline ? '&inline=1' : ''}`;
+    return runtime.apiUrl(a.url || fallback);
+  }
+  function isImageAttachment(a){
+    return /^image\//i.test(a.mime_type || '') || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(a.filename || '');
+  }
+  function renderAttachments(m){
+    const items = arr(m.attachments);
+    if(!items.length) return '';
+    return `<div class="attachments">${items.map((a)=> {
+      const url = attachmentUrl(m, a);
+      const preview = isImageAttachment(a) ? `<img class="attachment-preview" src="${safe(url)}" alt="${safe(a.filename || 'attachment')}" loading="lazy" />` : '';
+      return `<a class="attachment" href="${safe(url)}" target="_blank" rel="noopener">${preview}<span class="attachment-meta">${safe(a.filename || 'attachment')} • ${safe(a.mime_type || 'file')}</span></a>`;
+    }).join('')}</div>`;
+  }
   if(!id){ contentEl.innerHTML = '<div class="empty">Message id missing.</div>'; return; }
   try{
     const data = await apiFetch(`/gmail-get?id=${encodeURIComponent(id)}`);
@@ -22,13 +39,40 @@
       reply_thread_id: m.thread_id || '',
     });
     qs('#threadBtn').href = runtime.href('thread.html', { id: m.thread_id || m.id });
+    const osContext = {
+      mailbox: window.SMVRuntime?.getActiveMailbox?.() || data.mailbox || '',
+      messageId: m.id,
+      threadId: m.thread_id || '',
+      subject: m.headers.subject || '',
+      from: m.headers.from || '',
+      to: m.headers.to || '',
+      text: m.body?.text || m.snippet || '',
+      html: m.body?.html || '',
+      snippet: m.snippet || '',
+      returnUrl: location.href
+    };
+    const workbenchBtn = qs('#workbenchBtn');
+    if(workbenchBtn) workbenchBtn.href = runtime.href('workspace.html', {
+      message_id: osContext.messageId,
+      thread_id: osContext.threadId,
+      subject: osContext.subject,
+      from: osContext.from,
+      to: osContext.to,
+      mailbox: osContext.mailbox
+    });
+    const docxBtn = qs('#docxBtn');
+    if(docxBtn) docxBtn.onclick = ()=> window.SMVZeroOs?.openSkyeDocx(osContext);
     contentEl.innerHTML = `
       <div class="chiprow">
-        ${m.labels.map((label)=>`<span class="chip">${safe(label)}</span>`).join('')}
+        ${arr(m.labels).map((label)=>`<span class="chip">${safe(label)}</span>`).join('')}
       </div>
       <div class="message-body">${SMV.htmlMessage(m.body)}</div>
-      ${m.attachments?.length ? `<div class="attachments">${m.attachments.map((a)=>`<a class="attachment" href="${runtime.apiUrl(`/gmail-attachment?id=${encodeURIComponent(m.id)}&attachmentId=${encodeURIComponent(a.attachment_id)}&filename=${encodeURIComponent(a.filename)}`)}">${safe(a.filename)} • ${safe(a.mime_type)}</a>`).join('')}</div>` : ''}`;
-    if(m.labels.includes('UNREAD')){ await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: m.id, addLabelIds: [], removeLabelIds:['UNREAD'] }) }); }
+      ${renderAttachments(m)}`;
+    if(arr(m.labels).includes('UNREAD')){
+      await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: m.id, addLabelIds: [], removeLabelIds:['UNREAD'] }) });
+      SMV.trackGame('mark_read');
+    }
     note('Message loaded.', 'ok');
+    SMV.trackGame('message_open', { key:id }, { silent:true });
   }catch(err){ contentEl.innerHTML = '<div class="empty">Message load failed.</div>'; note(err.message || 'Message load failed.', 'danger'); }
 })();

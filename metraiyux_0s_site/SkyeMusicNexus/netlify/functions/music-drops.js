@@ -12,6 +12,10 @@ const MUSIC_ROOT = path.resolve(__dirname, '../..');
 const PRICE_FILE = path.join(MUSIC_ROOT, 'data/skyemusicnexus-pricing.json');
 const BUILD_ROOT = process.env.MUSIC_NEXUS_DROPS_BUILD_DIR || path.join(os.tmpdir(), 'skye-musicnexus-drop-build');
 const DROP_SITE_BASE = clean(process.env.MUSIC_NEXUS_DROPS_BASE_URL || '').replace(/\/+$/g, '');
+const NEXUS_LOGO_URL = clean(
+  process.env.MUSIC_NEXUS_LOGO_URL || 'https://skye-music-nexus.pages.dev/assets/skye-music-nexus-logo.png',
+  1200
+);
 const CREDIT_BUDGET = Number(process.env.MUSIC_NEXUS_DROPS_MONTHLY_CREDIT_BUDGET || 3000);
 const MIN_CREDIT_RESERVE = Number(process.env.MUSIC_NEXUS_DROPS_MIN_CREDIT_RESERVE || 600);
 
@@ -204,7 +208,7 @@ function canModify(actor, record) {
 
 function normalizeDropType(value) {
   const type = clean(value || 'single_drop').toLowerCase().replace(/-/g, '_');
-  const allowed = ['single_drop', 'release_drop', 'campaign_drop', 'private_delivery', 'hub_drop'];
+  const allowed = ['single_drop', 'release_drop', 'campaign_drop', 'private_delivery', 'hub_drop', 'app_drop'];
   return allowed.includes(type) ? type : 'single_drop';
 }
 
@@ -233,6 +237,40 @@ function normalizeTracks(tracks) {
     bytes: Number(track.bytes || 0) || 0,
     fileName: clean(track.fileName || track.originalName || '', 180),
   }));
+}
+function gatedAssetDownloadUrl(track) {
+  const id = clean(track?.id || track?.assetId || '', 80);
+  if (!id) return '/SkyeMusicNexus/public/store.html';
+  return `/api/skymusicnexus/music-assets?action=download&id=${encodeURIComponent(id)}`;
+}
+
+function gatedAssetStreamUrl(track) {
+  const id = clean(track?.id || track?.assetId || '', 80);
+  if (!id) return '';
+  return `/api/skymusicnexus/music-assets?action=stream&id=${encodeURIComponent(id)}`;
+}
+
+function normalizeSocialLinks(value) {
+  const input = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  const links = {};
+  for (const [label, url] of Object.entries(input)) {
+    const safeLabel = clean(label, 80);
+    const safeUrl = clean(url, 700);
+    if (safeLabel && safeUrl) links[safeLabel] = safeUrl;
+  }
+  return links;
+}
+
+function normalizeBrandedVideos(value) {
+  return (Array.isArray(value) ? value : []).map((video, index) => ({
+    title: clean(video.title || `Video ${index + 1}`, 160),
+    url: clean(video.url || video.src || '', 700),
+    poster: clean(video.poster || video.posterUrl || '', 700),
+  })).filter((video) => video.url);
+}
+
+function isPwaDrop(drop) {
+  return drop && (drop.pwaEnabled === true || drop.dropType === 'app_drop');
 }
 
 function assetsForDrop(payload) {
@@ -478,24 +516,47 @@ function buildWebCreatorPackage(drop, batch, growth) {
         tierPolicy: drop.tierPolicy,
         visibility: drop.visibility,
       },
-      pages: ['drop', 'artist', 'batch-hub'],
-      features: ['audio-player', 'download-button', 'telemetry', 'share-links'],
+      pages: ['drop', 'artist', 'batch-hub', drop.pwaEnabled || drop.dropType === 'app_drop' ? 'artist-app' : ''].filter(Boolean),
+      features: ['audio-player', 'download-button', 'telemetry', 'share-links', 'social-links', 'branded-video-loop', drop.pwaEnabled || drop.dropType === 'app_drop' ? 'pwa-install' : ''].filter(Boolean),
     },
   };
 }
 
 function renderDropPage(drop, batch, growth, webCreator) {
   const tracks = normalizeTracks(drop.tracks);
+  const socialLinks = normalizeSocialLinks(drop.socialLinks);
+  const brandedVideos = normalizeBrandedVideos(drop.brandedVideos);
   const telemetryToken = signDropToken(drop.dropId);
   const publicPath = publicDropPath(drop);
   const privateDelivery = drop.dropType === 'private_delivery' || drop.visibility === 'private';
+  const pwaEnabled = drop.pwaEnabled === true || drop.dropType === 'app_drop';
+  const appName = clean(drop.appName || `${drop.artistName || drop.artistId || 'Artist'} App`, 180);
+  const artistPageUrl = clean(drop.artistPageUrl || `/artists/${slug(drop.artistId || drop.artistName || 'artist')}/`, 700);
+  const nexusReturnUrl = clean(drop.nexusReturnUrl || '/SkyeMusicNexus/', 700);
+  const socialMarkup = Object.entries(socialLinks).map(([label, url]) => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`).join('');
+  const videoMarkup = brandedVideos.map((video) => `
+      <article class="app-video-card">
+        <video src="${escapeHtml(video.url)}" ${video.poster ? `poster="${escapeHtml(video.poster)}"` : ''} muted loop autoplay playsinline controls preload="none"></video>
+        <strong>${escapeHtml(video.title)}</strong>
+      </article>`).join('');
+  const appRail = (pwaEnabled || socialMarkup || videoMarkup) ? `
+    <aside class="app-rail" aria-label="Artist app actions">
+      <p>artist app</p>
+      <h3>${escapeHtml(appName)}</h3>
+      <button type="button" class="install-app" data-install-app>Install App</button>
+      <button type="button" class="share-app" data-share-app>Share</button>
+      <a class="artist-link" href="${escapeHtml(artistPageUrl)}">Artist Page</a>
+      <a class="artist-link" href="${escapeHtml(nexusReturnUrl)}">Nexus</a>
+      ${socialMarkup ? `<div class="social-links">${socialMarkup}</div>` : ''}
+      ${videoMarkup ? `<div class="app-video-loop">${videoMarkup}</div>` : ''}
+    </aside>` : '';
   const player = privateDelivery
     ? '<div class="drop-private">SkyGate is required for private stems, masters, and client delivery downloads.</div>'
     : tracks.map((track, index) => `
       <article class="drop-track">
         <span>${String(index + 1).padStart(2, '0')}</span>
         <div><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(Math.round(track.duration || 0))} sec</small></div>
-        ${track.previewUrl ? `<audio controls preload="none" data-track-index="${index}" src="${escapeHtml(track.previewUrl)}"></audio>` : '<small>No preview URL linked yet</small>'}
+        ${gatedAssetStreamUrl(track) ? `<audio controls controlsList="nodownload" preload="none" data-track-index="${index}" src="${escapeHtml(gatedAssetStreamUrl(track))}"></audio>` : '<small>Preview unlocks through the gated asset lane.</small>'}
       </article>`).join('');
   return `<!doctype html>
 <html lang="en">
@@ -510,16 +571,17 @@ function renderDropPage(drop, batch, growth, webCreator) {
   ${growth.openGraph.image ? `<meta property="og:image" content="${escapeHtml(growth.openGraph.image)}" />` : ''}
   <meta name="twitter:card" content="${escapeHtml(growth.twitterCard.card)}" />
   <link rel="stylesheet" href="/styles.css" />
+  ${pwaEnabled ? '<link rel="manifest" href="manifest.webmanifest" />' : ''}
   <script type="application/ld+json">${jsonScript(growth.schema)}</script>
 </head>
-<body data-drop-id="${escapeHtml(drop.dropId)}" data-batch-id="${escapeHtml(batch.batchId)}">
+<body data-drop-id="${escapeHtml(drop.dropId)}" data-batch-id="${escapeHtml(batch.batchId)}" data-pwa-enabled="${pwaEnabled ? 'true' : 'false'}">
   <main class="drop-shell">
     <header class="drop-hero">
-      <a class="brand" href="/">SkyeMusicNexus Drops</a>
+      <a class="brand" href="/"><img src="${escapeHtml(NEXUS_LOGO_URL)}" alt="SkyeMusicNexus logo" /> <span>SkyeMusicNexus Drops</span></a>
       <p>${escapeHtml(drop.dropType.replace(/_/g, ' '))}</p>
       <h1>${escapeHtml(drop.title)}</h1>
       <h2>${escapeHtml(drop.artistName || drop.artistId || 'MusicNexus Artist')}</h2>
-      ${drop.coverArtUrl ? `<img class="cover" src="${escapeHtml(drop.coverArtUrl)}" alt="" />` : '<div class="cover generated-cover">SMN</div>'}
+      ${drop.coverArtUrl ? `<img class="cover" src="${escapeHtml(drop.coverArtUrl)}" alt="" />` : `<div class="cover generated-cover"><img src="${escapeHtml(NEXUS_LOGO_URL)}" alt="SkyeMusicNexus logo" /></div>`}
     </header>
     <section class="drop-story">
       <p>${escapeHtml(drop.story || growth.seo.description)}</p>
@@ -530,14 +592,17 @@ function renderDropPage(drop, batch, growth, webCreator) {
       </div>
     </section>
     <section class="track-list">${player}</section>
-    ${drop.downloadAllowed && !privateDelivery ? `<a class="download" href="${escapeHtml(tracks[0]?.downloadUrl || tracks[0]?.previewUrl || '#')}">Download</a>` : ''}
+    ${drop.downloadAllowed && !privateDelivery ? `<a class="download" href="${escapeHtml(gatedAssetDownloadUrl(tracks[0]))}">Unlock download</a>` : ''}
+    ${appRail}
     <footer>
       <a href="/catalog.json">Catalog JSON</a>
       <a href="${escapeHtml(publicPath)}drop.json">Drop JSON</a>
+      <a href="${escapeHtml(artistPageUrl)}">Artist Page</a>
+      <a href="${escapeHtml(nexusReturnUrl)}">Back to Nexus</a>
       <a href="https://metraiyux.com">Back to MetrAIyux</a>
     </footer>
   </main>
-  <script>window.SKYE_DROP=${jsonScript({ dropId: drop.dropId, token: telemetryToken })};</script>
+  <script>window.SKYE_DROP=${jsonScript({ dropId: drop.dropId, token: telemetryToken, pwaEnabled, title: drop.title, appName })};</script>
   <script src="/app.js"></script>
   <script type="application/json" id="webcreator-package">${jsonScript(webCreator)}</script>
 </body>
@@ -547,15 +612,75 @@ function renderDropPage(drop, batch, growth, webCreator) {
 function sharedCss() {
   return `:root{color-scheme:dark;--bg:#05060a;--panel:#111526;--line:rgba(255,255,255,.16);--text:#f8fbff;--soft:#aab6c7;--cyan:#66f4ff;--gold:#ffd166;--pink:#ff5cd7}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0,rgba(102,244,255,.18),transparent 30rem),linear-gradient(135deg,#05060a,#111526)}
-a{color:inherit}.drop-shell,.hub-shell{width:min(980px,100%);margin:0 auto;padding:32px 18px 56px}.drop-hero{display:grid;gap:12px;min-height:58vh;align-content:end;border-bottom:1px solid var(--line);padding-bottom:24px}.brand,.download{width:max-content;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:10px 14px;background:rgba(255,255,255,.06);font-weight:900}.drop-hero p,.meta span{margin:0;text-transform:uppercase;font-size:12px;font-weight:900;color:var(--gold)}h1{font-size:clamp(48px,11vw,120px);line-height:.82;margin:0;letter-spacing:0}h2{font-size:clamp(22px,4vw,42px);margin:0;color:var(--soft)}.cover{width:min(420px,100%);aspect-ratio:1;border-radius:8px;object-fit:cover;border:1px solid var(--line);background:linear-gradient(135deg,var(--cyan),var(--gold));color:#071018;display:grid;place-items:center;font-size:64px;font-weight:1000}.drop-story{font-size:20px;line-height:1.5;color:var(--soft);padding:28px 0}.meta{display:flex;gap:8px;flex-wrap:wrap}.meta span{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--cyan)}.track-list{display:grid;gap:12px}.drop-track{display:grid;grid-template-columns:42px minmax(0,1fr);gap:14px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:14px;background:rgba(255,255,255,.05)}.drop-track audio{grid-column:1/-1;width:100%}.drop-track span{color:var(--gold);font-weight:1000}.drop-track small{display:block;color:var(--soft)}footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px;color:var(--soft)}.hub-grid{display:grid;gap:12px}.hub-card{display:block;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:18px;background:rgba(255,255,255,.05)}.drop-private{border:1px solid var(--line);border-radius:8px;padding:18px;color:var(--gold);background:rgba(255,209,102,.08)}`;
+a{color:inherit}.drop-shell,.hub-shell{width:min(980px,100%);margin:0 auto;padding:32px 18px 56px}.drop-hero{display:grid;gap:12px;min-height:58vh;align-content:end;border-bottom:1px solid var(--line);padding-bottom:24px}.brand,.download,.install-app,.share-app,.artist-link{width:max-content;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:10px 14px;background:rgba(255,255,255,.06);color:var(--text);font-weight:900}.brand{display:inline-flex;align-items:center;gap:10px}.brand img{width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(88,245,255,.5))}.install-app,.share-app{cursor:pointer}.drop-hero p,.meta span,.app-rail p{margin:0;text-transform:uppercase;font-size:12px;font-weight:900;color:var(--gold)}h1{font-size:clamp(48px,11vw,120px);line-height:.82;margin:0;letter-spacing:0}h2{font-size:clamp(22px,4vw,42px);margin:0;color:var(--soft)}.cover{width:min(420px,100%);aspect-ratio:1;border-radius:8px;object-fit:cover;border:1px solid var(--line);background:linear-gradient(135deg,var(--cyan),var(--gold));color:#071018;display:grid;place-items:center;font-size:64px;font-weight:1000}.generated-cover{background:radial-gradient(circle,rgba(255,255,255,.16),rgba(88,245,255,.14) 44%,rgba(5,6,10,.88))}.generated-cover img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 0 22px rgba(88,245,255,.5)) drop-shadow(0 0 34px rgba(255,209,102,.24))}.drop-story{font-size:20px;line-height:1.5;color:var(--soft);padding:28px 0}.meta,.social-links,footer{display:flex;gap:10px;flex-wrap:wrap}.meta span,.social-links a{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--cyan);text-decoration:none}.track-list{display:grid;gap:12px}.drop-track{display:grid;grid-template-columns:42px minmax(0,1fr);gap:14px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:14px;background:rgba(255,255,255,.05)}.drop-track audio{grid-column:1/-1;width:100%}.drop-track span{color:var(--gold);font-weight:1000}.drop-track small{display:block;color:var(--soft)}footer{margin-top:32px;color:var(--soft)}.hub-grid{display:grid;gap:12px}.hub-card{display:block;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:18px;background:rgba(255,255,255,.05)}.drop-private{border:1px solid var(--line);border-radius:8px;padding:18px;color:var(--gold);background:rgba(255,209,102,.08)}.app-rail{display:grid;gap:12px;margin:28px 0;padding:18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.045)}.app-rail h3{margin:0;font-size:clamp(24px,4vw,42px)}.app-video-loop{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.app-video-loop article{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.24)}.app-video-loop video,.app-video-loop img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}.app-video-loop strong{display:block;padding:10px;font-size:13px}`;
 }
 
 function sharedAppJs() {
-  return `(function(){var cfg=window.SKYE_DROP||{};function send(type,extra){if(!cfg.dropId||!cfg.token)return;try{navigator.sendBeacon('/.netlify/functions/music-drops?action=track-public-event',JSON.stringify(Object.assign({action:'track-public-event',dropId:cfg.dropId,token:cfg.token,eventType:type},extra||{})));}catch(e){fetch('/.netlify/functions/music-drops?action=track-public-event',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({action:'track-public-event',dropId:cfg.dropId,token:cfg.token,eventType:type},extra||{}))}).catch(function(){})}}send('page_view');document.querySelectorAll('audio').forEach(function(audio){var started=false;audio.addEventListener('play',function(){started=true;send('play_start',{trackIndex:audio.dataset.trackIndex||0})});audio.addEventListener('timeupdate',function(){if(started&&audio.currentTime>=30){started=false;send('qualified_stream',{trackIndex:audio.dataset.trackIndex||0,listenSeconds:Math.round(audio.currentTime)})}});audio.addEventListener('ended',function(){send('complete_play',{trackIndex:audio.dataset.trackIndex||0})})});document.querySelectorAll('.download').forEach(function(link){link.addEventListener('click',function(){send('download')})})})();`;
+  return `(function(){
+var cfg=window.SKYE_DROP||{};
+var deferredInstall=null;
+function send(type,extra){
+  if(!cfg.dropId||!cfg.token)return;
+  var payload=JSON.stringify(Object.assign({action:'track-public-event',dropId:cfg.dropId,token:cfg.token,eventType:type},extra||{}));
+  try{navigator.sendBeacon('/.netlify/functions/music-drops?action=track-public-event',payload);}
+  catch(e){fetch('/.netlify/functions/music-drops?action=track-public-event',{method:'POST',headers:{'content-type':'application/json'},body:payload}).catch(function(){})}
+}
+send('page_view');
+if(cfg.pwaEnabled&&'serviceWorker'in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}
+window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();deferredInstall=event;});
+document.querySelectorAll('audio').forEach(function(audio){
+  var started=false;
+  audio.addEventListener('play',function(){started=true;send('play_start',{trackIndex:audio.dataset.trackIndex||0})});
+  audio.addEventListener('timeupdate',function(){if(started&&audio.currentTime>=30){started=false;send('qualified_stream',{trackIndex:audio.dataset.trackIndex||0,listenSeconds:Math.round(audio.currentTime)})}});
+  audio.addEventListener('ended',function(){send('complete_play',{trackIndex:audio.dataset.trackIndex||0})});
+});
+document.querySelectorAll('.download').forEach(function(link){link.addEventListener('click',function(){send('download')})});
+document.querySelectorAll('[data-install-app]').forEach(function(button){
+  button.addEventListener('click',function(){
+    send('app_install_click');
+    if(deferredInstall){deferredInstall.prompt();deferredInstall=null;return;}
+    button.textContent='Use browser install';
+  });
+});
+document.querySelectorAll('[data-share-app]').forEach(function(button){
+  button.addEventListener('click',function(){
+    send('share_click');
+    var share={title:cfg.appName||cfg.title||document.title,url:location.href};
+    if(navigator.share){navigator.share(share).catch(function(){});return;}
+    navigator.clipboard&&navigator.clipboard.writeText(location.href).then(function(){button.textContent='Copied'});
+  });
+});
+})();`;
 }
 
 function renderHubPage(batch, drops) {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>SkyeMusicNexus Batch ${escapeHtml(batch.batchId)}</title><link rel="stylesheet" href="/styles.css"/></head><body><main class="hub-shell"><p class="brand">SkyeMusicNexus Drops</p><h1>Batch ${escapeHtml(batch.batchId)}</h1><p>${escapeHtml(drops.length)} drops published in this hub.</p><section class="hub-grid">${drops.map((drop) => `<a class="hub-card" href="${escapeHtml(publicDropPath(drop))}"><strong>${escapeHtml(drop.title)}</strong><small>${escapeHtml(drop.artistName || drop.artistId || '')} - ${escapeHtml(drop.dropType)}</small></a>`).join('')}</section></main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>SkyeMusicNexus Batch ${escapeHtml(batch.batchId)}</title><link rel="stylesheet" href="/styles.css"/></head><body><main class="hub-shell"><p class="brand"><img src="${escapeHtml(NEXUS_LOGO_URL)}" alt="SkyeMusicNexus logo" /> <span>SkyeMusicNexus Drops</span></p><h1>Batch ${escapeHtml(batch.batchId)}</h1><p>${escapeHtml(drops.length)} drops published in this hub.</p><section class="hub-grid">${drops.map((drop) => `<a class="hub-card" href="${escapeHtml(publicDropPath(drop))}"><strong>${escapeHtml(drop.title)}</strong><small>${escapeHtml(drop.artistName || drop.artistId || '')} - ${escapeHtml(drop.dropType)}</small></a>`).join('')}</section></main></body></html>`;
+}
+
+function renderDropManifest(drop) {
+  const name = clean(drop.appName || drop.title || 'SkyeMusicNexus Artist App', 80);
+  const publicPath = publicDropPath(drop);
+  return {
+    name,
+    short_name: name.slice(0, 24),
+    description: clean(drop.story || `Artist app for ${drop.artistName || drop.artistId || 'MusicNexus artist'}`, 220),
+    start_url: publicPath,
+    scope: publicPath,
+    display: 'standalone',
+    background_color: '#05060a',
+    theme_color: '#66f4ff',
+    categories: ['music', 'entertainment'],
+    icons: drop.coverArtUrl ? [
+      { src: drop.coverArtUrl, sizes: '512x512', purpose: 'any maskable' },
+    ] : [],
+  };
+}
+
+function renderServiceWorker() {
+  return `const CACHE='skye-music-nexus-drop-v1';
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(['/styles.css','/app.js','/catalog.json']).catch(()=>{})));self.skipWaiting();});
+self.addEventListener('activate',event=>{event.waitUntil(self.clients.claim());});
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});return response;}).catch(()=>caches.match(event.request)));});`;
 }
 
 function buildStaticBundle(batchId) {
@@ -573,6 +698,7 @@ function buildStaticBundle(batchId) {
   fs.mkdirSync(outDir, { recursive: true });
   writeText(path.join(outDir, 'styles.css'), sharedCss());
   writeText(path.join(outDir, 'app.js'), sharedAppJs());
+  writeText(path.join(outDir, 'sw.js'), renderServiceWorker());
 
   const catalog = [];
   const packageReports = [];
@@ -582,6 +708,7 @@ function buildStaticBundle(batchId) {
     const pagePath = publicDropPath(drop);
     const dir = path.join(outDir, pagePath);
     writeText(path.join(dir, 'index.html'), renderDropPage(drop, batch, growth, webCreator));
+    if (isPwaDrop(drop)) writeJsonFile(path.join(dir, 'manifest.webmanifest'), renderDropManifest(drop));
     writeJsonFile(path.join(dir, 'drop.json'), {
       ...drop,
       telemetryToken: undefined,
@@ -789,6 +916,12 @@ function handleCreateDrop(payload, actor) {
     ownerUserId: actor.ownerUserId || clean(payload.ownerUserId || '', 120),
     releaseId: clean(payload.releaseId || '', 120),
     title: clean(payload.title, 180),
+    appName: clean(payload.appName || payload.title || '', 180),
+    pwaEnabled: payload.pwaEnabled === true || normalizeDropType(payload.dropType) === 'app_drop',
+    artistPageUrl: clean(payload.artistPageUrl || '', 700),
+    nexusReturnUrl: clean(payload.nexusReturnUrl || '/SkyeMusicNexus/', 700),
+    socialLinks: normalizeSocialLinks(payload.socialLinks),
+    brandedVideos: normalizeBrandedVideos(payload.brandedVideos),
     slug: slug(payload.slug || payload.title),
     story: clean(payload.story || payload.description || '', 1400),
     status: 'draft',
@@ -825,6 +958,12 @@ function handleUpdateDrop(payload, actor) {
     artistName: payload.artistName !== undefined ? clean(payload.artistName, 180) : existing.artistName,
     releaseId: payload.releaseId !== undefined ? clean(payload.releaseId, 120) : existing.releaseId,
     title: payload.title ? clean(payload.title, 180) : existing.title,
+    appName: payload.appName !== undefined ? clean(payload.appName, 180) : existing.appName,
+    pwaEnabled: payload.pwaEnabled !== undefined ? payload.pwaEnabled === true : (payload.dropType ? normalizeDropType(payload.dropType) === 'app_drop' : existing.pwaEnabled),
+    artistPageUrl: payload.artistPageUrl !== undefined ? clean(payload.artistPageUrl, 700) : existing.artistPageUrl,
+    nexusReturnUrl: payload.nexusReturnUrl !== undefined ? clean(payload.nexusReturnUrl, 700) : existing.nexusReturnUrl,
+    socialLinks: payload.socialLinks !== undefined ? normalizeSocialLinks(payload.socialLinks) : normalizeSocialLinks(existing.socialLinks),
+    brandedVideos: payload.brandedVideos !== undefined ? normalizeBrandedVideos(payload.brandedVideos) : normalizeBrandedVideos(existing.brandedVideos),
     slug: payload.slug || payload.title ? slug(payload.slug || payload.title) : existing.slug,
     story: payload.story !== undefined ? clean(payload.story, 1400) : existing.story,
     visibility: payload.visibility ? normalizeVisibility(payload.visibility) : existing.visibility,
@@ -1127,7 +1266,7 @@ function handleTrackPublicEvent(payload) {
   const dropId = clean(payload.dropId || payload.id, 120);
   const token = clean(payload.token, 240);
   const eventType = clean(payload.eventType || payload.type || 'page_view', 80);
-  const allowed = ['page_view', 'play_start', 'qualified_stream', 'complete_play', 'download'];
+  const allowed = ['page_view', 'play_start', 'qualified_stream', 'complete_play', 'download', 'share_click', 'app_install_click'];
   if (!dropId || !token || !allowed.includes(eventType)) return respond(400, { ok: false, error: 'Valid dropId, token, and eventType are required.' });
   if (!verifyDropToken(dropId, token)) return respond(401, { ok: false, error: 'Invalid drop telemetry token.' });
   const drops = loadDrops();

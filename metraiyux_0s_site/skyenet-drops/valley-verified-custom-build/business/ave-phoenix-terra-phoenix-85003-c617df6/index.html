@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AVE Phoenix Terra | Phoenix Apartment Community</title>
+  <meta name="description" content="AVE Phoenix Terra is a Valley Verified apartment community profile at 555 N. 5th Avenue, Phoenix, AZ 85003, highlighting Apartment Community, Real.">
+  <style>
+    :root {
+      --ink: #1d2633;
+      --plum: #5b315f;
+      --terra: #ce6f42;
+      --sky: #d8edf1;
+      --paper: #fffdf9;
+      --line: rgba(29, 38, 51, .15);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(91, 49, 95, .08) 0 14px, transparent 14px 46px),
+        linear-gradient(180deg, #f5fbfc, #f9eee7);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    .header {
+      min-height: 570px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .intro {
+      padding: 38px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      display: grid;
+      align-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro:before {
+      content: "";
+      position: absolute;
+      inset: 22px;
+      border: 1px solid rgba(91, 49, 95, .22);
+      pointer-events: none;
+    }
+
+    .intro > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      background: var(--sky);
+      color: var(--plum);
+      padding: 8px 12px;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin: 22px 0 16px;
+      color: var(--plum);
+      font-size: clamp(48px, 8vw, 96px);
+      line-height: .9;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 650px;
+      margin: 0;
+      color: #4b5360;
+      font-size: 19px;
+      line-height: 1.6;
+    }
+
+    .address-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(220px, .8fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .address-band a, .address-band address {
+      padding: 20px;
+      min-height: 120px;
+      display: grid;
+      align-content: center;
+      border: 1px solid var(--line);
+      font-style: normal;
+      text-decoration: none;
+      background: #fff;
+    }
+
+    .address-band a {
+      background: var(--plum);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--terra);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .address-band span {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.28;
+    }
+
+    .tower {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 18px;
+    }
+
+    .visual {
+      min-height: 360px;
+      background:
+        linear-gradient(90deg, transparent 0 28%, rgba(255,255,255,.22) 28% 30%, transparent 30%),
+        linear-gradient(0deg, rgba(255,255,255,.18) 1px, transparent 1px),
+        var(--plum);
+      background-size: auto, 42px 42px, auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(91, 49, 95, .28);
+    }
+
+    .visual img {
+      width: 142px;
+      height: 142px;
+      object-fit: contain;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 12px 12px 0 var(--terra);
+    }
+
+    .panel {
+      background: var(--terra);
+      color: #fff;
+      padding: 24px;
+      min-height: 170px;
+      display: grid;
+      align-content: center;
+    }
+
+    .panel b { color: #ffe2d2; }
+
+    .panel p {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .facts {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .fact {
+      min-height: 132px;
+      padding: 18px;
+      background: rgba(255, 255, 255, .82);
+      border: 1px solid var(--line);
+    }
+
+    .fact span {
+      display: block;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 880px) {
+      .header, .address-band { grid-template-columns: 1fr; }
+      .tower { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 540px) {
+      .wrap { width: min(100% - 20px, 1100px); }
+      .intro { padding: 28px; }
+      .intro:before { inset: 12px; }
+      .facts { grid-template-columns: 1fr; }
+    }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="header" aria-label="AVE Phoenix Terra profile">
+      <div class="intro">
+        <div>
+          <span class="eyebrow">Apartment Community</span>
+          <h1>AVE Phoenix Terra</h1>
+          <p class="summary">AVE Phoenix Terra gives homeowners, buyers, and rental owners a practical Phoenix connection for Apartment Community, Real Estate/Contractors / Apartment Community, Real Estate/Contractors, and Property / Real Estate. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+        </div>
+
+        <div class="address-band" aria-label="AVE Phoenix Terra contact information">
+          <a href="tel:+16028364680"><b>Phone</b><span>(602) 836-4680</span></a>
+          <address><b>Address</b><span>555 N. 5th Avenue<br>Phoenix, AZ 85003</span></address>
+        </div>
+      </div>
+
+      <aside class="tower">
+        <div class="visual">
+          <img src="assets/logo.svg" alt="AVE Phoenix Terra mark">
+        </div>
+        <div class="panel">
+          <b>Valley Verified Network</b>
+          <p>Downtown Phoenix apartment community profile.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="AVE Phoenix Terra facts">
+      <div class="fact"><b>Category</b><span>Real Estate And Property</span></div>
+      <div class="fact"><b>Listing type</b><span>Real Estate/Contractors / Apartment Community</span></div>
+      <div class="fact"><b>Language</b><span>English</span></div>
+      <div class="fact"><b>Profile date</b><span>May 19, 2026</span></div>
+    </section>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-ave-phoenix-terra-phoenix-85003-c617df6">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-ave-phoenix-terra-phoenix-85003-c617df6">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>AVE Phoenix Terra earns this Valley Verified placement because public business evidence connects a real apartment community operation to 555 N. 5th Avenue, Phoenix, AZ 85003 and (602) 836-4680. Greater Phoenix Chamber directory evidence supports this local profile. For homeowners, buyers, and rental owners, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Apartment Community, Real Estate/Contractors / Apartment Community, Real Estate/Contractors, and Property / Real Estate</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>homeowners, buyers, and rental owners</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>555 N. 5th Avenue, Phoenix, AZ 85003; (602) 836-4680</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

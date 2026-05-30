@@ -1,5 +1,5 @@
 (async function(){
-  const boot = await SMV.withBoot('drafts', 'Drafts', 'Saved Gmail drafts inside the Skye shell');
+  const boot = await SMV.withBoot('drafts', 'Drafts', 'Saved SkyeMail drafts inside the Zoho-backed mail lane');
   if(!boot) return;
   const runtime = window.SMVRuntime || { href: (value) => value };
   const statusEl = qs('#statusText');
@@ -7,7 +7,7 @@
   const listEl = qs('#draftList');
   const state = { nextPageToken:null, currentToken:null, prevStack:[] };
   function note(msg, kind=''){ setStatus(statusEl, msg, kind); }
-  badgeEl.textContent = boot.status && boot.status.connected && boot.status.mailbox ? `Connected mailbox • ${boot.status.mailbox.google_email}` : 'No SkyeMail mailbox provisioned';
+  badgeEl.textContent = boot.status && boot.status.connected && boot.status.mailbox ? `Connected mailbox • ${boot.status.mailbox.mailbox_email || boot.status.mailbox.google_email || ''}` : 'No SkyeMail mailbox provisioned';
 
   function render(items){
     if(!items.length){ listEl.innerHTML = '<div class="empty">No drafts found in this mailbox.</div>'; return; }
@@ -29,8 +29,8 @@
         </div>
       </article>`).join('');
     document.querySelectorAll('[data-delete]').forEach((btn)=> btn.onclick = async ()=> {
-      if(!confirm('Delete this Gmail draft permanently?')) return;
-      try{ await apiFetch('/gmail-draft-delete', { method:'POST', body: JSON.stringify({ id: btn.dataset.delete }) }); await refresh(); }
+      if(!confirm('Delete this SkyeMail draft permanently?')) return;
+      try{ await apiFetch('/gmail-draft-delete', { method:'POST', body: JSON.stringify({ id: btn.dataset.delete }) }); SMV.trackGame('draft_delete'); await refresh(); }
       catch(err){ note(err.message || 'Draft delete failed.', 'danger'); }
     });
   }
@@ -45,12 +45,13 @@
       state.nextPageToken = data.nextPageToken || null;
       render(data.items || []);
       note(`Loaded ${data.items?.length || 0} draft(s).`, 'ok');
+      SMV.trackGame('drafts_load', { count: Math.max(1, data.items?.length || 1) }, { silent:true });
     }catch(err){ listEl.innerHTML = '<div class="empty">Draft load failed.</div>'; note(err.message || 'Draft load failed.', 'danger'); }
   }
   async function refresh(){ state.prevStack=[]; state.currentToken=null; state.nextPageToken=null; await load(null, false); }
-  qs('#applyBtn').onclick = refresh;
-  qs('#clearBtn').onclick = ()=> { qs('#q').value=''; refresh(); };
-  qs('#refreshBtn').onclick = refresh;
+  qs('#applyBtn').onclick = async ()=> { await refresh(); SMV.trackGame('search'); };
+  qs('#clearBtn').onclick = async ()=> { qs('#q').value=''; await refresh(); SMV.trackGame('refresh'); };
+  qs('#refreshBtn').onclick = async ()=> { await refresh(); SMV.trackGame('refresh'); };
   qs('#nextBtn').onclick = ()=> state.nextPageToken ? load(state.nextPageToken, true) : null;
   qs('#prevBtn').onclick = ()=> state.prevStack.length ? load(state.prevStack.pop() || null, false) : note('No previous page in this session.');
   await refresh();

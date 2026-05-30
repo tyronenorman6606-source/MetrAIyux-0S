@@ -35,6 +35,7 @@
     .bad { color: var(--danger); }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
   </style>
+  <link rel="stylesheet" href="assets/mail-ui.css" />
 </head>
 <body>
   <main class="card">
@@ -52,6 +53,11 @@
     function readHash() {
       const raw = location.hash.startsWith("#") ? location.hash.slice(1) : location.hash;
       return new URLSearchParams(raw);
+    }
+    function safeNext(value) {
+      const text = String(value || "onboarding.html").replace(/^\/+/, "");
+      if (/^(dashboard|compose|onboarding|settings|mailbox)\.html$/i.test(text)) return text;
+      return "onboarding.html";
     }
     try {
       const h = readHash();
@@ -86,8 +92,9 @@
       localStorage.setItem("SMV_SKYEMAIL_ID", data.skymail_id || "");
       localStorage.setItem("SMV_WORKSPACE_ID", data.workspace_id || "");
       localStorage.setItem("SMV_FS27_GATE_CARD_ID", data.fs27?.gate_card_id || claim.gate_card_id || "");
-      set("FS27 accepted. Opening SkyeMail onboarding...", "ok");
-      setTimeout(() => window.SMVRuntime.redirect("onboarding.html", { gate_return: "1" }), 700);
+      const next = safeNext(h.get("next"));
+      set("FS27 accepted. Opening SkyeMail...", "ok");
+      setTimeout(() => window.SMVRuntime.redirect(next, { gate_return: "1" }), 700);
     } catch (err) {
       set(err.message || "Gate return failed.", "bad");
     }

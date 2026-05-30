@@ -1,0 +1,268 @@
+<!doctype html>
+<html data-mcp-neon-scrollbar lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gray Skyes | Gray Gang Storefront</title>
+  <meta name="description" content="Gray Skyes artist universe, Skye Radio player, $4.44 catalog, Gray Gang collective, and SkyePay storefront lane." />
+  <meta name="theme-color" content="#030305" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/SkyeMusicNexus/public/store.html" />
+  <link rel="stylesheet" href="../artist-storefronts.css" />
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
+</head>
+<body class="skyesol-living-page gray-universe" data-artist-id="444666666666" data-artist-slug="gray-skyes">
+  <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <a class="brandmark" href="../gray-skyes-collective/"><span>GS</span>Gray Skyes</a>
+    <nav class="nav-actions" aria-label="Gray Skyes navigation">
+      <a class="btn primary" href="#radio">Skye Radio</a>
+      <a class="btn" href="../gray-skyes-brain/">Gray Brain</a>
+      <a class="btn" href="../gray-skyes-collective/">Gray Gang</a>
+      <a class="btn" href="/founder-command/apps/pwa-factory-v213/">PWA Factory</a>
+      <a class="btn" href="/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/onboarding.html?source=SkyeMusicNexus&artist=gray-skyes">Paperwork</a>
+    <a class="btn" href="./products/">Products</a></nav>
+  </header>
+
+  <main class="gray-stage">
+    <section class="gray-hero" id="top">
+      <div class="gray-hero-copy">
+        <p class="micro">founder artist / gray gang owner / artist id 444666666666</p>
+        <h1 class="neon-gradient-text">Gray Skyes</h1>
+        <p class="lede">Chicago underground trap-metal pressure, founder command discipline, and a real sellable catalog. This mounted 0S storefront now carries the actual Gray media, the live SkyeMusicNexus store lane, and the Gray Gang collective route.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#radio">Play the catalog</a>
+          <a class="btn" href="#store">Buy tracks at $4.44</a>
+          <a class="btn" href="../gray-skyes-brain/">Open Gray Brain</a>
+          <a class="btn" href="./album-pwa/">Album PWA</a>
+        <a class="btn" href="./products/">Products</a></div>
+      </div>
+      <aside class="gray-hero-visual" aria-label="Gray Skyes visual world">
+        <img src="/SkyeMusicNexus/assets/skye-music-nexus-logo.png" alt="Gray Skyes stage archive" />
+        <img class="gray-cutout" src="/SkyeMusicNexus/assets/skye-music-nexus-logo.png" alt="Gray Skyes cutout portrait" />
+      </aside>
+    </section>
+
+    <section class="gray-quick-grid" aria-label="Gray Skyes business lanes">
+      <article class="stat"><strong>16</strong><span>catalog products</span></article>
+      <article class="stat"><strong>$4.44</strong><span>per digital song</span></article>
+      <article class="stat"><strong>Gray Gang</strong><span>collective payout owner lane</span></article>
+      <article class="stat"><strong>SkyePay</strong><span>order intent and tracking ref</span></article>
+    </section>
+
+    <section id="radio" class="gray-panel gray-radio-grid">
+      <article class="gray-player-card">
+        <p class="micro">skye radio / selected track</p>
+        <img id="nowPlayingArt" src="/SkyeMusicNexus/assets/skye-music-nexus-logo.png" alt="Gray Skyes now playing artwork" />
+        <h2 id="nowPlayingTitle">Blades</h2>
+        <p id="nowPlayingLane" class="lede">ragecore stress test</p>
+        <audio id="grayAudio" controls preload="metadata">
+          <source src="" type="audio/mpeg" />
+        </audio>
+      </article>
+      <article>
+        <p class="micro">live product catalog with local fallback</p>
+        <h2>Every Gray song is a product.</h2>
+        <div id="grayTrackList" class="gray-track-list" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section id="store" class="gray-panel">
+      <p class="micro">skypay-backed storefront</p>
+      <h2>Catalog Store</h2>
+      <div id="grayProductGrid" class="product-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="gray-feature-grid" aria-label="Gray Skyes platform links">
+      <article class="card">
+        <p class="micro">collective</p>
+        <h2>Gray Gang</h2>
+        <p>Gray owns the collective lane. Member releases stay artist-attributed while payout review stays in the company-owned SkyPay lane.</p>
+        <a class="btn primary" href="../gray-skyes-collective/">Open collective</a>
+      </article>
+      <article class="card">
+        <p class="micro">artist brain</p>
+        <h2>Gray Skyes Brain</h2>
+        <p>A separate AI artist-brain page now exists for the founder brain persona, with its own avatar, PWA manifest, and MusicNexus brain-tool handoff lane.</p>
+        <a class="btn primary" href="../gray-skyes-brain/">Open brain artist</a>
+      </article>
+      <article class="card">
+        <p class="micro">album app</p>
+        <h2>Skye Radio PWA</h2>
+        <p>The Gray catalog is packaged as a hosted installable player drop and routed back to the storefront for track purchase and offline support.</p>
+        <a class="btn primary" href="./album-pwa/">Open album PWA</a>
+      </article>
+    </section>
+
+    <section class="gray-panel">
+      <p class="micro">video rooms</p>
+      <h2>Gray Visual Archive</h2>
+      <div id="grayVideoGrid" class="gray-video-grid"></div>
+    </section>
+  </main>
+
+  <script src="../assets/mcp-implementation/mcp-effects.js" data-mcp-generated-js></script>
+  <script>
+    const artistId = document.body.dataset.artistId || '444666666666';
+    const artCycle = [
+      '/SkyeMusicNexus/assets/skye-music-nexus-logo.png',
+      '/SkyeMusicNexus/assets/skye-music-nexus-logo.png',
+      '/SkyeMusicNexus/assets/skye-music-nexus-logo.png',
+      '/SkyeMusicNexus/assets/skye-music-nexus-logo.png'
+    ];
+    const fallbackCheckout = (product) => {
+      const params = new URLSearchParams({
+        client: 'metraiyux-0s',
+        offer: 'skyemusicnexus-artist-store',
+        artistId,
+        productId: product.productId || product.id || '',
+        amountCents: String(product.priceCents || 444)
+      });
+      return '/skyepay-store.html?' + params.toString();
+    };
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+    const typeFor = (file) => file && file.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+    const localProductPayload = fetch('./products/products.json').then((response) => response.json());
+
+    async function loadCatalog() {
+      const local = await localProductPayload.catch(() => ({ products: [] }));
+      const localProducts = Array.isArray(local.products) ? local.products : [];
+      const live = await fetch('/api/skymusicnexus/music-store?artistId=' + encodeURIComponent(artistId), { credentials: 'include' })
+        .then((response) => response.ok ? response.json() : null)
+        .catch(() => null);
+      const liveProducts = Array.isArray(live && live.products) ? live.products : [];
+      const byId = new Map(localProducts.map((product) => [product.productId || product.id, product]));
+      for (const product of liveProducts) {
+        const id = product.productId || product.id;
+        if (id) byId.set(id, { ...(byId.get(id) || {}), ...product });
+      }
+      return [...byId.values()];
+    }
+
+    function setTrack(product, index = 0, shouldPlay = false) {
+      const file = product.audioFile || product.file || '';
+      const audio = document.getElementById('grayAudio');
+      const title = document.getElementById('nowPlayingTitle');
+      const lane = document.getElementById('nowPlayingLane');
+      const art = document.getElementById('nowPlayingArt');
+      if (!audio || !file) return;
+      audio.innerHTML = '<source src="./' + escapeHtml(file) + '" type="' + typeFor(file) + '" />';
+      audio.load();
+      if (title) title.textContent = product.title || 'Gray Skyes track';
+      if (lane) lane.textContent = product.lane || product.status || 'catalog track';
+      if (art) art.src = artCycle[index % artCycle.length];
+      if (shouldPlay) audio.play().catch(() => {});
+    }
+
+    async function createOrder(product) {
+      const payload = { action: 'record-order', productId: product.productId || product.id, quantity: 1 };
+      let response = await fetch('/api/skymusicnexus/music-store', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(() => null);
+      if (response && response.status === 404) {
+        await fetch('/api/skymusicnexus/music-store', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create-product',
+            productId: product.productId || product.id,
+            artistId,
+            title: product.title,
+            description: product.lane || 'Gray Skyes digital song drop',
+            productType: product.productType || 'digital',
+            fulfillmentType: product.fulfillmentType || 'digital-link',
+            priceCents: product.priceCents || 444,
+            currency: product.currency || 'USD',
+            status: 'active',
+            collectiveId: 'gray-skyes-collective'
+          })
+        }).catch(() => null);
+        response = await fetch('/api/skymusicnexus/music-store', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => null);
+      }
+      const data = response ? await response.json().catch(() => null) : null;
+      const url = data && data.checkoutIntent && data.checkoutIntent.url ? data.checkoutIntent.url : fallbackCheckout(product);
+      window.location.href = url;
+    }
+
+    function renderProducts(products) {
+      const list = document.getElementById('grayTrackList');
+      const grid = document.getElementById('grayProductGrid');
+      if (!products.length) {
+        if (list) list.innerHTML = '<article class="product-tile"><h3>Catalog syncing</h3><span>Gray product seed is loading.</span></article>';
+        return;
+      }
+      setTrack(products.find((product) => product.trackId === 'blades') || products[0], 0, false);
+      if (list) {
+        list.innerHTML = products.map((product, index) => `
+          <article class="gray-track-row">
+            <button class="btn primary" type="button" ${product.audioFile ? '' : 'disabled'} data-play-index="${index}">${product.audioFile ? 'Play' : 'R2 pending'}</button>
+            <span><strong>${escapeHtml(product.title)}</strong><br><small>${escapeHtml(product.lane || 'catalog track')}</small></span>
+            <strong>$${((Number(product.priceCents || 444) || 444) / 100).toFixed(2)}</strong>
+            ${product.pwaUrl ? `<a class="btn" href="${escapeHtml(product.pwaUrl)}">Drop PWA</a>` : ''}
+            <button class="btn" type="button" data-buy-index="${index}">Buy</button>
+          </article>
+        `).join('');
+        list.querySelectorAll('[data-play-index]').forEach((button) => {
+          button.addEventListener('click', () => setTrack(products[Number(button.dataset.playIndex)], Number(button.dataset.playIndex), true));
+        });
+        list.querySelectorAll('[data-buy-index]').forEach((button) => {
+          button.addEventListener('click', () => createOrder(products[Number(button.dataset.buyIndex)]));
+        });
+      }
+      if (grid) {
+        grid.innerHTML = products.map((product, index) => `
+          <article class="product-tile">
+            <span>${escapeHtml(product.fulfillmentType || 'digital-link')}</span>
+            <h3>${escapeHtml(product.title)}</h3>
+            <strong>$${((Number(product.priceCents || 444) || 444) / 100).toFixed(2)}</strong>
+            ${product.pwaUrl ? `<a class="btn" href="${escapeHtml(product.pwaUrl)}">Open Drop PWA</a>` : ''}
+            <button class="btn primary" type="button" data-grid-buy="${index}">SkyePay checkout</button>
+          </article>
+        `).join('');
+        grid.querySelectorAll('[data-grid-buy]').forEach((button) => {
+          button.addEventListener('click', () => createOrder(products[Number(button.dataset.gridBuy)]));
+        });
+      }
+    }
+
+    async function renderVideos() {
+      const mount = document.getElementById('grayVideoGrid');
+      if (!mount) return;
+      const data = await fetch('./data/videos.json').then((response) => response.json()).catch(() => ({ videos: [] }));
+      mount.innerHTML = (data.videos || []).slice(0, 6).map((video) => `
+        <article class="gray-video-card">
+          <img src="./${escapeHtml(video.poster || 'media/images/gray-red-portrait.jpg')}" alt="${escapeHtml(video.title)} poster" />
+          <div>
+            <p class="micro">${escapeHtml(video.lane || 'video room')}</p>
+            <h3>${escapeHtml(video.title)}</h3>
+            <a class="btn" href="#radio">Route into release room</a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    loadCatalog().then(renderProducts).catch(() => renderProducts([]));
+    renderVideos();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  </script>
+  <script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="artist-storefronts" data-command-bridge-surface="gray-skyes-storefront"></script>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
+</body>
+</html>

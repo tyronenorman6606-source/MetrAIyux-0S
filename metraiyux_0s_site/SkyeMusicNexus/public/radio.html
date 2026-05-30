@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SkyeMusicNexus // All-Nexus Radio</title>
+    <link rel="stylesheet" href="./neo-nexus.css" />
+    <link rel="stylesheet" href="./nexus-player.css" />
+    <script src="../gate-session.js" defer></script>
+    <script src="./skygate-auth.js" defer></script>
+    <style>
+      :root{color-scheme:dark;--ink:#f7f5ea;--muted:rgba(247,245,234,.68);--line:rgba(247,245,234,.16);--panel:rgba(8,12,16,.88);--cyan:#6ee7f8;--pink:#ff75b7;--gold:#ffd166;--green:#a4f08a}
+      body{min-height:100vh;background:radial-gradient(circle at 14% 8%,rgba(110,231,248,.22),transparent 30rem),radial-gradient(circle at 88% 20%,rgba(255,117,183,.18),transparent 28rem),linear-gradient(135deg,#05070a,#10151a 52%,#090b0f);color:var(--ink)}
+      .radio-shell{width:min(1440px,calc(100% - 32px));margin:0 auto;padding:24px 0 132px}
+      .radio-nav{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0 22px}
+      .radio-nav a{color:var(--muted);text-decoration:none}.radio-nav strong{color:var(--ink)}
+      .radio-nav div{display:flex;gap:10px;flex-wrap:wrap}.radio-nav div a{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.05)}.radio-nav div a[aria-current=page]{background:var(--cyan);border-color:var(--cyan);color:#061013}
+      .hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:18px;align-items:stretch}
+      .panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 18px 60px rgba(0,0,0,.28);padding:18px}
+      .hero-copy{min-height:370px;display:grid;align-content:end;padding:clamp(24px,4vw,44px)}
+      .kicker{color:var(--cyan);font-size:12px;text-transform:uppercase;font-weight:950;letter-spacing:0}
+      h1{font-size:clamp(44px,8vw,104px);line-height:.86;margin:10px 0 14px;letter-spacing:0}h2,h3{letter-spacing:0;margin:0}p{color:var(--muted);line-height:1.55}
+      .radio-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+      .button{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.07);color:var(--ink);min-height:42px;padding:10px 13px;font:inherit;font-weight:950;text-decoration:none;cursor:pointer}.button:hover,.button.is-live{background:var(--cyan);border-color:var(--cyan);color:#061013}.button.primary{background:var(--pink);border-color:var(--pink);color:#120711}
+      .now{display:grid;gap:14px}.now img{width:100%;aspect-ratio:1/1;object-fit:cover;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05)}
+      .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}.stat{border:1px solid var(--line);border-radius:8px;padding:14px;background:rgba(255,255,255,.05)}.stat strong{display:block;font-size:28px;color:var(--ink)}.stat span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase}
+      .grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:18px;margin-top:18px}.track-list{display:grid;gap:10px;max-height:760px;overflow:auto;padding-right:4px}
+      .track-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:10px}.track-row img{width:64px;height:64px;object-fit:cover;border-radius:6px}.track-row strong,.track-row span{display:block;overflow-wrap:anywhere}.track-row span{color:var(--muted);font-size:13px}
+      .map{width:100%;height:420px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04)}
+      @media(max-width:920px){.hero,.grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.radio-nav{align-items:flex-start;flex-direction:column}.track-row{grid-template-columns:56px minmax(0,1fr)}.track-row .button{grid-column:1/-1}}
+    </style>
+  </head>
+  <body data-sky-gate="public">
+    <main class="radio-shell">
+      <nav class="radio-nav" aria-label="Music Nexus">
+        <a href="../index.html"><strong>SkyeMusicNexus</strong></a>
+        <div>
+          <a href="./discover.html">Playlists</a>
+          <a href="./radio.html" aria-current="page">Radio</a>
+          <a href="./stream-analytics.html">Streams</a>
+          <a href="./achievements.html">Awards</a>
+          <a href="./store.html">Store</a>
+          <a href="./ads.html">Ads</a>
+        </div>
+      </nav>
+      <section class="hero">
+        <article class="panel hero-copy">
+          <span class="kicker">All-Nexus Radio</span>
+          <h1>Every active song in one living queue.</h1>
+          <p>Shuffle the full SkyeMusicNexus catalog, keep playback moving from track to track, and watch one unified Nexus stream count update across the network.</p>
+          <div class="radio-actions">
+            <button class="button primary" type="button" data-action="start-radio">Start Radio</button>
+            <button class="button" type="button" data-action="reshuffle">Reshuffle</button>
+            <button class="button" type="button" data-action="next">Next</button>
+            <a class="button" href="./stream-analytics.html">Live Stats</a>
+          </div>
+          <div class="stat-grid" aria-label="Radio totals">
+            <div class="stat"><strong id="stat-tracks">0</strong><span>tracks</span></div>
+            <div class="stat"><strong id="stat-artists">0</strong><span>artists</span></div>
+            <div class="stat"><strong id="stat-nexus">0</strong><span>Nexus streams</span></div>
+            <div class="stat"><strong id="stat-seconds">0</strong><span>listen seconds</span></div>
+          </div>
+        </article>
+        <aside class="panel now">
+          <img id="now-art" src="../assets/og-card.svg" alt="" />
+          <div>
+            <span class="kicker">Now Selected</span>
+            <h2 id="now-title">Radio ready</h2>
+            <p id="now-artist">Start the queue to load the catalog.</p>
+          </div>
+        </aside>
+      </section>
+      <section class="grid">
+        <article class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div><span class="kicker">Queue</span><h2>Full Catalog</h2></div>
+            <button class="button" type="button" data-action="refresh">Refresh</button>
+          </div>
+          <div class="track-list" id="track-list" style="margin-top:14px"></div>
+        </article>
+        <aside class="panel">
+          <span class="kicker">Neural Map</span>
+          <h2>Live Rotation</h2>
+          <canvas id="radio-map" class="map" width="620" height="420" aria-label="All-Nexus radio map"></canvas>
+        </aside>
+      </section>
+    </main>
+    <script src="./nexus-player.js"></script>
+    <script>
+      (() => {
+        const CATALOG_URL = 'https://skye-music-nexus.pages.dev/public/data/playlists.json';
+        const WORKER_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+        const state = { catalog: { tracks: [], artists: [] }, tracks: [], queue: [], summary: null };
+        const els = {
+          list: document.getElementById('track-list'),
+          art: document.getElementById('now-art'),
+          title: document.getElementById('now-title'),
+          artist: document.getElementById('now-artist'),
+          tracks: document.getElementById('stat-tracks'),
+          artists: document.getElementById('stat-artists'),
+          nexus: document.getElementById('stat-nexus'),
+          seconds: document.getElementById('stat-seconds'),
+          map: document.getElementById('radio-map'),
+        };
+        function escapeHtml(value){return String(value ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");}
+        function shuffle(ids){return ids.map((id)=>({id,sort:Math.random()})).sort((a,b)=>a.sort-b.sort).map((row)=>row.id);}
+        async function load(){
+          const [catalog, traffic] = await Promise.all([
+            fetch(CATALOG_URL,{cache:'no-store'}).then((res)=>res.json()).catch(()=>({tracks:[],artists:[]})),
+            fetch(`${WORKER_ORIGIN}/api/skymusicnexus/music-drops?action=traffic-summary`,{cache:'no-store'}).then((res)=>res.ok?res.json():null).catch(()=>null),
+          ]);
+          state.catalog = catalog;
+          state.tracks = catalog.tracks || [];
+          state.summary = traffic?.trafficSummary || null;
+          state.queue = shuffle(state.tracks.map((track)=>track.trackId));
+          render();
+        }
+        function statsFor(track){
+          return state.summary?.tracks?.[track.trackId] || track.streamStats || {};
+        }
+        function setNow(track){
+          if(!track)return;
+          els.art.src = track.coverImage || track.artistImage || '../assets/og-card.svg';
+          els.title.textContent = track.title || track.trackId;
+          els.artist.textContent = `${track.artistName || ''} - ${track.genre || ''}`;
+        }
+        function render(){
+          els.tracks.textContent = state.tracks.length;
+          els.artists.textContent = (state.catalog.artists || []).length;
+          els.nexus.textContent = state.summary?.nexusStreams || state.tracks.reduce((sum, track)=>sum + Number(track.streamStats?.nexusStreams || 0), 0);
+          els.seconds.textContent = Math.round(state.summary?.listenSeconds || state.tracks.reduce((sum, track)=>sum + Number(track.streamStats?.listenSeconds || 0), 0));
+          els.list.innerHTML = state.queue.map((trackId, index)=>{
+            const track = state.tracks.find((item)=>item.trackId===trackId);
+            if(!track)return '';
+            const stats = statsFor(track);
+            return `<article class="track-row">
+              <img src="${escapeHtml(track.coverImage || track.artistImage || '../assets/og-card.svg')}" alt="">
+              <span><strong>${index + 1}. ${escapeHtml(track.title)}</strong><span>${escapeHtml(track.artistName)} - ${escapeHtml(track.genre || '')}</span><span>${Number(stats.nexusStreams || 0)} Nexus streams</span></span>
+              <button class="button" type="button" data-track-id="${escapeHtml(track.trackId)}">Play</button>
+            </article>`;
+          }).join('') || '<p>No active songs loaded.</p>';
+          draw();
+        }
+        function startRadio(seed=''){
+          if(!state.tracks.length)return;
+          const ids = shuffle(state.tracks.map((track)=>track.trackId));
+          if(seed && ids.includes(seed)){ids.splice(ids.indexOf(seed),1);ids.unshift(seed);}
+          state.queue = ids;
+          const first = state.tracks.find((track)=>track.trackId===ids[0]);
+          setNow(first);
+          if(window.SkyeNexusPlayer?.playRadio) window.SkyeNexusPlayer.playRadio(seed);
+          else if(window.SkyeNexusPlayer?.playTrack) window.SkyeNexusPlayer.playTrack(ids[0], ids);
+          render();
+        }
+        function draw(){
+          const ctx = els.map.getContext('2d');
+          const w = els.map.width; const h = els.map.height;
+          ctx.clearRect(0,0,w,h);
+          state.queue.slice(0,36).forEach((trackId,index)=>{
+            const track = state.tracks.find((item)=>item.trackId===trackId) || {};
+            const stats = statsFor(track);
+            const angle = index / 36 * Math.PI * 2 + performance.now() / 9000;
+            const radius = 70 + (index % 5) * 28 + Math.min(70, Number(stats.nexusStreams || 0) * 5);
+            const x = w / 2 + Math.cos(angle) * radius;
+            const y = h / 2 + Math.sin(angle) * radius * .62;
+            const size = 7 + Math.min(28, Number(stats.nexusStreams || 0) * 3);
+            ctx.beginPath(); ctx.arc(x,y,size,0,Math.PI*2);
+            ctx.fillStyle = index % 3 === 0 ? 'rgba(110,231,248,.82)' : index % 3 === 1 ? 'rgba(255,117,183,.76)' : 'rgba(255,209,102,.78)';
+            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(w/2,h/2); ctx.lineTo(x,y); ctx.strokeStyle='rgba(247,245,234,.12)'; ctx.stroke();
+          });
+          requestAnimationFrame(draw);
+        }
+        document.addEventListener('click',(event)=>{
+          const action = event.target.closest('[data-action]')?.dataset.action;
+          const trackId = event.target.closest('[data-track-id]')?.dataset.trackId;
+          if(trackId){
+            const track = state.tracks.find((item)=>item.trackId===trackId);
+            setNow(track);
+            if(window.SkyeNexusPlayer?.playTrack) window.SkyeNexusPlayer.playTrack(trackId, state.queue);
+          }
+          if(action === 'start-radio') startRadio();
+          if(action === 'reshuffle') startRadio();
+          if(action === 'next') window.SkyeNexusPlayer?.next?.();
+          if(action === 'refresh') load();
+        });
+        window.addEventListener('skymusicnexus:stream-event', () => window.setTimeout(load, 450));
+        load();
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Intel Corporation in Chandler, AZ: Semiconductor major employer. Includes researched services, audience fit, local details, and the Valley Verified reason.">
+  <title>Intel Corporation | Valley Verified Chandler, AZ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202b;
+      --muted: #5d6a73;
+      --line: rgba(23, 32, 43, .14);
+      --paper: #fffdf8;
+      --primary: #243c5a;
+      --accent: #a15f38;
+      --wash: #f2f6fb;
+      --warm: #f7efe8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(23, 32, 43, .05) 1px, transparent 1px),
+        linear-gradient(180deg, var(--wash), #fffaf1 58%, #f4f6f3);
+      background-size: 44px 44px, auto;
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 0 0 16px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+      gap: 24px;
+      align-items: stretch;
+      padding: 28px 0;
+    }
+
+    .hero-main {
+      position: relative;
+      min-height: 430px;
+      display: grid;
+      align-content: end;
+      padding: 38px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.06), transparent 45%),
+        linear-gradient(180deg, var(--primary), #14202d);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.26);
+      overflow: hidden;
+    }
+
+    .hero-main:before {
+      content: "";
+      position: absolute;
+      inset: 22px;
+      border: 1px solid rgba(255,255,255,.18);
+      pointer-events: none;
+    }
+
+    .hero-main:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 36%;
+      height: 100%;
+      background:
+        linear-gradient(150deg, transparent 0 38%, rgba(255,255,255,.12) 38% 40%, transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,.12), transparent);
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    .hero-main > * { position: relative; z-index: 1; }
+
+    .eyebrow {
+      width: fit-content;
+      margin: 0 0 22px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,255,255,.34);
+      color: #ffe0b9;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(40px, 7.5vw, 86px);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 720px;
+      margin: 22px 0 0;
+      color: #e7edf2;
+      font-size: 18px;
+      line-height: 1.62;
+    }
+
+    .contact-panel {
+      display: grid;
+      gap: 18px;
+      align-content: stretch;
+    }
+
+    .quick-contact,
+    .address-panel {
+      display: grid;
+      gap: 18px;
+      padding: 24px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 16px 34px rgba(23, 32, 43, .08);
+    }
+
+    .quick-contact { align-content: start; }
+
+    .label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .action {
+      display: block;
+      width: 100%;
+      padding: 15px 16px;
+      text-decoration: none;
+      text-align: center;
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .action.secondary {
+      background: #fff;
+      color: var(--primary);
+      border-color: var(--line);
+    }
+
+    address {
+      margin: 0;
+      color: #26323d;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .fact {
+      min-height: 150px;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .fact span,
+    .fact a {
+      display: block;
+      color: var(--ink);
+      font-size: 19px;
+      line-height: 1.28;
+      font-weight: 800;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 24px;
+      padding: 28px 0 0;
+    }
+
+    .note,
+    .tag-panel {
+      padding: 24px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .note {
+      border-left: 7px solid var(--accent);
+    }
+
+    .note p {
+      margin: 0;
+      color: #31404d;
+      line-height: 1.64;
+    }
+
+    .note p + p { margin-top: 12px; }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tags span {
+      padding: 8px 10px;
+      background: var(--warm);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #2f3a43;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    @media (max-width: 860px) {
+      .hero,
+      .details { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      .hero-main { min-height: 380px; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 22px, 1120px); }
+      .topline { align-items: flex-start; flex-direction: column; }
+      .hero-main { min-height: 340px; padding: 28px; }
+      .hero-main:before { inset: 14px; }
+      .facts { grid-template-columns: 1fr; }
+      .fact { min-height: 128px; }
+      address { font-size: 18px; }
+    }
+    .vv-page { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; color: var(--ink, #17201c); }
+    .vv-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0 22px; color: var(--muted, #5f6863); font-size: 14px; }
+    .vv-brand { display: flex; align-items: center; gap: 12px; min-width: 0; font-weight: 900; color: var(--accent, var(--green, #245f49)); }
+    .vv-brand img { width: 48px; height: 48px; padding: 7px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: var(--panel, var(--paper, #fff)); object-fit: contain; }
+    .vv-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 390px); gap: 32px; align-items: center; min-height: 58vh; padding: 36px 0 46px; }
+    .vv-eyebrow { display: inline-flex; width: fit-content; margin: 0 0 18px; padding: 8px 11px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-left: 5px solid var(--accent, var(--green, #245f49)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+    .vv-page h1 { margin: 0; max-width: 850px; font-size: clamp(42px, 7vw, 84px); line-height: .94; letter-spacing: 0; }
+    .vv-lead { max-width: 730px; margin: 24px 0 0; color: var(--muted, #47524c); font-size: clamp(18px, 2.1vw, 23px); line-height: 1.48; }
+    .vv-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .vv-button { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 12px 17px; border: 1px solid var(--accent, var(--green, #245f49)); border-radius: 8px; text-decoration: none; font-weight: 900; }
+    .vv-button.primary { background: var(--accent, var(--green, #245f49)); color: #fff; }
+    .vv-button.secondary { background: rgba(255,255,255,.78); color: var(--accent, var(--green, #245f49)); }
+    .vv-card, .vv-panel { border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.86); box-shadow: 0 18px 54px rgba(0,0,0,.10); }
+    .vv-card { padding: 24px; }
+    .vv-card h2, .vv-panel h2 { margin: 0 0 14px; color: var(--accent, var(--green, #245f49)); font-size: clamp(20px, 2.4vw, 28px); line-height: 1.1; letter-spacing: 0; text-transform: none; }
+    .vv-card dl { display: grid; gap: 14px; margin: 0; }
+    .vv-card dt { color: var(--muted, #5f6863); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+    .vv-card dd { margin: 4px 0 0; line-height: 1.45; }
+    .vv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0 0 38px; }
+    .vv-panel { padding: 22px; }
+    .vv-panel p { margin: 10px 0 0; color: var(--muted, #47524c); line-height: 1.58; }
+    .vv-wide { grid-column: span 2; }
+    .vv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .vv-chip { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid var(--line, rgba(0,0,0,.14)); border-radius: 8px; background: rgba(255,255,255,.72); color: var(--accent, var(--green, #245f49)); font-size: 13px; font-weight: 800; }
+    .vv-footer { padding: 18px 0 0; border-top: 1px solid var(--line, rgba(0,0,0,.14)); color: var(--muted, #5f6863); font-size: 14px; }
+    @media (max-width: 840px) { .vv-top, .vv-hero, .vv-grid { display: block; } .vv-top span:last-child { display: block; margin-top: 8px; } .vv-card { margin-top: 24px; } .vv-panel { margin-bottom: 14px; } .vv-wide { grid-column: auto; } .vv-page h1 { font-size: 42px; } }
+  </style>
+</head>
+<body>
+  <main class="vv-page">
+    <header class="vv-top" aria-label="Valley Verified business heading">
+      <div class="vv-brand"><img src="assets/logo.svg" alt=""><span>Valley Verified</span></div>
+      <span>Chandler, AZ</span>
+    </header>
+
+    <section class="vv-hero" aria-labelledby="business-title">
+      <div>
+        <p class="vv-eyebrow">Semiconductor major employer</p>
+        <h1 id="business-title">Intel Corporation</h1>
+        <p class="vv-lead">Intel Corporation is one of Chandler's defining major employers, tying the Valley to semiconductor manufacturing, technology, and advanced workforce development.</p>
+        <div class="vv-actions">
+          
+          <a class="vv-button secondary" href="https://www.intel.com/content/www/us/en/homepage.html">Visit official website</a>
+        </div>
+      </div>
+
+      <aside class="vv-card" aria-label="Local business details">
+        <h2>Local Details</h2>
+        <dl>
+          <div><dt>Focus</dt><dd>Semiconductor major employer</dd></div>
+          <div><dt>Address / Area</dt><dd>Chandler, AZ</dd></div>
+          
+          <div><dt>Website</dt><dd><a href="https://www.intel.com/content/www/us/en/homepage.html">www.intel.com/content/www/us/en/homepage.html</a></dd></div>
+          <div><dt>Audience</dt><dd>Relevant for job seekers, suppliers, civic leaders, technology partners, and Valley residents tracking Arizona's semiconductor economy.</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="vv-grid" aria-label="Valley Verified profile sections">
+      <article class="vv-panel">
+        <h2>What They Do</h2>
+        <p>The local profile identifies Intel in Chandler as a major employer in semiconductors, while Intel's official website anchors the global technology brand.</p>
+        <div class="vv-tags">
+          <span class="vv-chip">Semiconductors</span>
+          <span class="vv-chip">Chandler</span>
+          <span class="vv-chip">Major employer</span>
+          <span class="vv-chip">Technology</span>
+        </div>
+      </article>
+      <article class="vv-panel">
+        <h2>Trust Signals</h2>
+        <p>Official Intel web presence supports the brand and semiconductor identity, and the local Valley Verified profile places the major-employer listing in Chandler.</p>
+      </article>
+      <article class="vv-panel vv-wide">
+        <h2>Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Skyes Over London says Intel is Valley Verified because Chandler's semiconductor economy is part of the Valley's identity, and Intel is a cornerstone name in that story. This listing belongs here as a major-employer profile for technology, jobs, and regional economic gravity.</p>
+      </article>
+    </section>
+
+    <footer class="vv-footer">Intel Corporation | Semiconductor major employer | Chandler, AZ | Valley Verified public business profile.</footer>
+  </main>
+</body>
+</html>

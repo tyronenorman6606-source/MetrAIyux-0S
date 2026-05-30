@@ -34,32 +34,32 @@ function checkNode(rel) {
 }
 
 const indexHtml = read("index.html");
-const html = read("app.html");
+const html = indexHtml;
 const app = read("assets/app.js");
 const zipHelper = read("assets/zip.js");
 const runtimeModule = read("runtime/local-runtime.mjs");
 
-assert(indexHtml.includes("BusinessLaunchGo now has routed surfaces"), "index.html is missing the routed command shell");
-assert(indexHtml.includes('href="./app.html"'), "index.html is missing the imported app link");
-assert(html.includes('id="btnGenerateZip"'), "app.html is missing ZIP generation control");
-assert(html.includes('id="btnExportPdf"'), "app.html is missing PDF export control");
-assert(html.includes('id="btnCreateLaunchPlan"'), "app.html is missing local launch plan control");
-assert(html.includes('id="btnCreateHandoffPack"'), "app.html is missing handoff pack control");
-assert(html.includes('id="handoffArchive"'), "app.html is missing handoff archive surface");
-assert(html.includes('id="btnSaveHandoffReview"'), "app.html is missing handoff review save control");
-assert(html.includes('id="btnAdvanceReview"'), "app.html is missing handoff review advance control");
-assert(html.includes('id="handoffReviewBoard"'), "app.html is missing handoff review board surface");
-assert(html.includes('id="btnSaveExecution"'), "app.html is missing execution save control");
-assert(html.includes('id="btnAdvanceExecution"'), "app.html is missing execution advance control");
-assert(html.includes('id="handoffExecutionBoard"'), "app.html is missing execution board surface");
-assert(html.includes('id="btnSaveDispatch"'), "app.html is missing dispatch save control");
-assert(html.includes('id="btnAdvanceDispatch"'), "app.html is missing dispatch advance control");
-assert(html.includes('id="handoffDispatchBoard"'), "app.html is missing dispatch board surface");
-assert(html.includes('id="handoffWorkflowTimeline"'), "app.html is missing workflow timeline surface");
-assert(html.includes('id="runtimeLaneStatus"'), "app.html is missing local runtime status surface");
-assert(html.includes('id="runtimeLaneCounts"'), "app.html is missing local runtime counts surface");
-assert(html.includes('form id="leadForm"'), "app.html is missing the lead form");
-assert(html.includes('id="diagModal"'), "app.html is missing diagnostics modal wiring");
+assert(!exists("app.html"), "app.html should not exist; BusinessLaunchGo must use one canonical root app");
+assert(html.includes('id="btnGenerateZip"'), "index.html is missing ZIP generation control");
+assert(html.includes('id="btnExportPdf"'), "index.html is missing PDF export control");
+assert(html.includes('id="btnCreateLaunchPlan"'), "index.html is missing local launch plan control");
+assert(html.includes('id="btnCreateHandoffPack"'), "index.html is missing handoff pack control");
+assert(html.includes('id="handoffArchive"'), "index.html is missing handoff archive surface");
+assert(html.includes('id="btnSaveHandoffReview"'), "index.html is missing handoff review save control");
+assert(html.includes('id="btnAdvanceReview"'), "index.html is missing handoff review advance control");
+assert(html.includes('id="handoffReviewBoard"'), "index.html is missing handoff review board surface");
+assert(html.includes('id="btnSaveExecution"'), "index.html is missing execution save control");
+assert(html.includes('id="btnAdvanceExecution"'), "index.html is missing execution advance control");
+assert(html.includes('id="handoffExecutionBoard"'), "index.html is missing execution board surface");
+assert(html.includes('id="btnSaveDispatch"'), "index.html is missing dispatch save control");
+assert(html.includes('id="btnAdvanceDispatch"'), "index.html is missing dispatch advance control");
+assert(html.includes('id="handoffDispatchBoard"'), "index.html is missing dispatch board surface");
+assert(html.includes('id="handoffWorkflowTimeline"'), "index.html is missing workflow timeline surface");
+assert(html.includes('id="runtimeLaneStatus"'), "index.html is missing local runtime status surface");
+assert(html.includes('id="runtimeLaneCounts"'), "index.html is missing local runtime counts surface");
+assert(html.includes("SkyeMediaCenter Bridge"), "index.html is missing SkyeMediaCenter integration surface");
+assert(html.includes('form id="leadForm"'), "index.html is missing the lead form");
+assert(html.includes('id="diagModal"'), "index.html is missing diagnostics modal wiring");
 
 assert(app.includes("probeRuntimeLane"), "assets/app.js is missing runtime probing");
 assert(app.includes("/api/runtime/status"), "assets/app.js is missing runtime status endpoint wiring");
@@ -78,6 +78,7 @@ assert(app.includes("/api/runtime/dispatch-board"), "assets/app.js is missing di
 assert(app.includes("/api/runtime/workflow-timeline"), "assets/app.js is missing workflow timeline endpoint wiring");
 assert(app.includes("saveRuntimePackActivity"), "assets/app.js is missing local runtime pack activity wiring");
 assert(app.includes("buildLaunchPlanPayload"), "assets/app.js is missing launch plan payload builder");
+assert(app.includes("SkyeMediaCenter"), "assets/app.js is missing SkyeMediaCenter target inference");
 assert(app.includes("neon-lead-upsert"), "assets/app.js is missing Neon lead upsert endpoint wiring");
 assert(app.includes("neon-health"), "assets/app.js is missing Neon health wiring");
 assert(app.includes("blob-store-pack"), "assets/app.js is missing blob storage wiring");
@@ -92,6 +93,7 @@ assert(runtimeModule.includes("/api/runtime/handoff-packs"), "runtime/local-runt
 assert(runtimeModule.includes("/api/runtime/review-board"), "runtime/local-runtime.mjs is missing review board endpoint");
 assert(runtimeModule.includes("/api/runtime/execution-board"), "runtime/local-runtime.mjs is missing execution board endpoint");
 assert(runtimeModule.includes("/api/runtime/dispatch-board"), "runtime/local-runtime.mjs is missing dispatch board endpoint");
+assert(runtimeModule.includes("SkyeMediaCenter"), "runtime/local-runtime.mjs is missing SkyeMediaCenter handoff support");
 assert(runtimeModule.includes("/api/runtime/workflow-timeline"), "runtime/local-runtime.mjs is missing workflow timeline endpoint");
 assert(runtimeModule.includes("/api/runtime/pack-activity"), "runtime/local-runtime.mjs is missing pack activity endpoint");
 assert(runtimeModule.includes("same-folder-local-runtime"), "runtime/local-runtime.mjs is missing runtime mode identity");
@@ -138,11 +140,7 @@ try {
   const baseUrl = `http://127.0.0.1:${port}`;
 
   const servedIndex = await fetch(`${baseUrl}/`).then((res) => res.text());
-  assert(servedIndex.includes("BusinessLaunchGo now has routed surfaces"), "Runtime root did not serve the routed command shell");
-  assert(servedIndex.includes('href="./app.html"'), "Runtime root did not serve the imported app link");
-
-  const servedApp = await fetch(`${baseUrl}/app.html`).then((res) => res.text());
-  assert(servedApp.includes('id="runtimeLaneStatus"'), "Runtime did not serve updated runtime shell");
+  assert(servedIndex.includes('id="runtimeLaneStatus"'), "Runtime root did not serve the canonical app surface");
 
   const health = await fetch(`${baseUrl}/health`).then((res) => res.json());
   assert(health.ok, "Health endpoint did not report ok");
@@ -217,12 +215,13 @@ try {
       operatorNotes: "Push storefront, invoicing, and hiring follow-up into downstream lanes.",
       inputs: launchPlanResponse.launchPlan.inputs,
       checklist: launchPlanResponse.launchPlan.checklist,
-      downstreamTargets: ["AE-FlowPro", "SkyeWebCreatorMax", "skyeroutex-workforce-command-v0.4.0"],
+      downstreamTargets: ["SkyeMediaCenter", "AE-FlowPro", "SkyeWebCreatorMax", "skyeroutex-workforce-command-v0.4.0"],
       sourcePlan: launchPlanResponse.launchPlan
     })
   }).then((res) => res.json());
   assert(handoffPackResponse.ok, "Handoff pack POST failed");
   assert(Array.isArray(handoffPackResponse.handoffPack.downstreamTargets), "Handoff pack targets were not persisted");
+  assert(handoffPackResponse.handoffPack.downstreamTargets.includes("SkyeMediaCenter"), "Handoff pack media-center target failed to persist");
   assert(handoffPackResponse.handoffPack.downstreamTargets.includes("AE-FlowPro"), "Handoff pack target inference/persistence failed");
   assert(handoffPackResponse.handoffPack.review?.status === "draft", "Handoff pack review did not default to draft");
 
@@ -350,7 +349,7 @@ try {
     app: "BusinessLaunchGo",
     surface: "browser launch generator with same-folder local runtime for leads, launch plans, handoff packs, review workflow, execution workflow, dispatch workflow, and timeline closure",
     verified: [
-      "app.html contains runtime status, handoff archive, handoff review, execution, dispatch, and workflow timeline controls",
+      "index.html contains runtime status, handoff archive, handoff review, execution, dispatch, and workflow timeline controls",
       "browser app wiring references same-folder local runtime leads, launch plans, handoff review, execution, dispatch, workflow timeline, and pack activity",
       "schema, runtime store, Netlify functions, and runtime module exist",
       "Netlify functions and runtime module pass node --check",

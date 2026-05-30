@@ -81,6 +81,16 @@
       position: relative;
     }
 
+    .hero-logo {
+      width: min(142px, 28vw);
+      height: min(142px, 28vw);
+      object-fit: contain;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 18px rgba(100,217,255,.48)) drop-shadow(0 0 24px rgba(246,201,97,.24));
+    }
+
     .stamp::before {
       content: "";
       position: absolute;
@@ -496,6 +506,7 @@
       padding: 2px 8px;
     }
   </style>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
 </head>
 <body>
   <div class="poster">
@@ -504,7 +515,8 @@
     <div class="hero">
       <div class="hero-bg-text">ARTIST</div>
 
-      <div class="stamp">&#9670; Founding Artist Initiative · July 2026</div>
+      <img class="hero-logo" src="./assets/skye-music-nexus-logo.png" alt="SkyeMusicNexus logo">
+      <div class="stamp">&#9670; Core Artist Initiative · May 2026</div>
 
       <div class="hero-eyebrow">SkyeMusicNexus × SOL Enterprises</div>
       <h1 class="hero-title">
@@ -512,13 +524,13 @@
         <span class="line2">For Founding Artists</span>
       </h1>
       <p class="hero-sub">
-        SkyeMusicNexus is building its inaugural artist roster before the July 2026 platform launch.
-        You come in as an independent contractor. We build your storefront, run your content engine,
+        SkyeMusicNexus is building its inaugural artist roster during the May 2026 core artist window.
+        You come in as an independent contractor. We build your artist surface, package up to five launch songs,
         and put you inside the first generation of an autonomous music operations platform.
       </p>
       <div class="hero-pills">
-        <span class="hero-pill"><span class="dot dot-gold"></span> Free Landing Page</span>
-        <span class="hero-pill"><span class="dot dot-cyan"></span> 2-Month Content Engine</span>
+        <span class="hero-pill"><span class="dot dot-gold"></span> Free Artist Surface</span>
+        <span class="hero-pill"><span class="dot dot-cyan"></span> 5 Launch Songs</span>
         <span class="hero-pill"><span class="dot dot-mint"></span> Managed Storefront</span>
         <span class="hero-pill"><span class="dot dot-violet"></span> IC Agreement</span>
         <span class="hero-pill"><span class="dot dot-coral"></span> Real Payouts via SkyePay</span>
@@ -532,7 +544,7 @@
       <div class="deal-grid">
         <div class="deal-card featured">
           <div class="deal-icon">🌐</div>
-          <div class="deal-name">Custom Artist Landing Page</div>
+          <div class="deal-name">Custom Artist Surface</div>
           <div class="deal-desc">
             A full artist portfolio and storefront — bio, links, artist profile, Skye-ID, and release surface — built and deployed on managed infrastructure. You don't touch a line of code.
           </div>
@@ -540,11 +552,11 @@
         </div>
         <div class="deal-card featured">
           <div class="deal-icon">⚡</div>
-          <div class="deal-name">2-Month Content Engine</div>
+          <div class="deal-name">Five-Song Launch Package</div>
           <div class="deal-desc">
-            Social captions, short-form clip briefs, release content kits, and campaign prompts — generated and scheduled for 60 days. Built specifically around your releases and milestones.
+            Up to five launch songs packaged into your live surface with preview/full access settings, release content hooks, and proof receipts. Built specifically around your catalog and milestones.
           </div>
-          <div class="deal-value"><s>$498+</s> FREE for founding artists</div>
+          <div class="deal-value">FREE for May core artists</div>
         </div>
         <div class="deal-card">
           <div class="deal-icon">🏪</div>
@@ -558,7 +570,7 @@
           <div class="deal-icon">💳</div>
           <div class="deal-name">SkyePay Revenue Share</div>
           <div class="deal-desc">
-            Revenue from your storefront and releases flows through SkyePay. Royalty ledger, payout review queue, and IC payment records tracked in your artist dashboard.
+            Revenue from your storefront and releases flows through SkyePay. Royalty ledger, payout review queue, and IC payment records tracked in your artist workspace.
           </div>
           <div class="deal-value">Real payouts · Royalty ledger</div>
         </div>
@@ -582,7 +594,7 @@
           <div class="ic-check">✓</div>
           <div class="ic-body">
             <div class="ic-name">Independent Contractor, Not Employee</div>
-            <div class="ic-desc">You control your schedule, your creative process, and your output. We're the platform operator — you're the talent. The IC agreement defines exactly where the lines are.</div>
+            <div class="ic-desc">You control your schedule, your creative process, and your output. We run the platform team — you're the talent. The IC agreement defines exactly where the lines are.</div>
             <span class="ic-badge badge-violet">IC agreement · Arizona law · Legally sound</span>
           </div>
         </div>
@@ -606,8 +618,8 @@
           <div class="ic-check">✓</div>
           <div class="ic-body">
             <div class="ic-name">First Access. Founding Status. Real Presence.</div>
-            <div class="ic-desc">Founding artists are the first roster on the platform. You're not a late addition — you're part of the launch. Your profile, your page, and your releases will be visible the moment the platform goes live in July.</div>
-            <span class="ic-badge badge-coral">July 2026 · Founding cohort · Limited spots</span>
+            <div class="ic-desc">Core artists are the first roster shaping the platform. You're not a late addition — your profile, artist surface, launch songs, and drops help prove the Nexus in the May 2026 window.</div>
+            <span class="ic-badge badge-coral">May 2026 · Core cohort · Limited spots</span>
           </div>
         </div>
       </div>
@@ -635,13 +647,13 @@
         </div>
         <div class="apply-step">
           <div class="apply-num">04</div>
-          <div class="apply-name">We Build Your Page</div>
-          <div class="apply-desc">Our team builds your portfolio, landing page, and content engine. You review.</div>
+          <div class="apply-name">We Build Your Surface</div>
+          <div class="apply-desc">Our team builds your artist page, release surface, and launch-song package. You review.</div>
         </div>
         <div class="apply-step">
           <div class="apply-num">05</div>
-          <div class="apply-name">July — Go Live</div>
-          <div class="apply-desc">Platform launches. Your artist page is live. You start dropping music. We manage ops.</div>
+          <div class="apply-name">May — Test Live</div>
+          <div class="apply-desc">Your artist surface goes live for testing, music drops, fan previews, and promotion. We manage ops.</div>
         </div>
       </div>
 
@@ -649,12 +661,12 @@
       <div class="urgency-strip" style="margin-top: 1.4rem;">
         <div class="urgency-icon">⏳</div>
         <div class="urgency-body">
-          <div class="urgency-title">Founding Cohort is Limited</div>
-          <div class="urgency-desc">We're not opening this to everyone. The founding artist roster is a fixed number of IC spots for the July 2026 launch. Once the cohort is full, the waitlist closes. If you're serious about your music and want a managed platform behind you — this is the window.</div>
+          <div class="urgency-title">May Core Cohort is Limited</div>
+          <div class="urgency-desc">We're not opening this to everyone. The core artist roster is a fixed number of IC spots for the May 2026 testing and promotion window. Once the cohort is full, the free launch-build offer closes.</div>
         </div>
         <div class="urgency-date">
-          <div class="month">Launching</div>
-          <div class="year">JULY<br>2026</div>
+          <div class="month">Open</div>
+          <div class="year">MAY<br>2026</div>
         </div>
       </div>
     </div>
@@ -690,11 +702,11 @@
       <div class="cta-eyebrow">Step One Is Free</div>
       <div class="cta-headline">Sign Up. Get Your Spot.</div>
       <p class="cta-sub">
-        Create your free MetrAIyux 0S account. That's the door. Once you're in, request your founding artist spot from the waitlist. We'll reach out within 48 hours to start your IC onboarding.
+        Create your free MetrAIyux 0S account. That's the door. Once you're in, request your May core artist spot. We'll reach out within 48 hours to start your IC onboarding.
       </p>
       <div class="cta-buttons">
         <a class="btn-primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/saas/signup.html">
-          Sign Up Free — Get Your Founding Spot →
+          Sign Up Free — Get Your Core Spot →
         </a>
       </div>
       <div class="cta-url-row">
@@ -715,10 +727,11 @@
         <span class="footer-brand">solenterprises.org</span>
       </div>
       <p class="footer-legal">
-        SkyeMusicNexus is a platform owned and operated by Skyes Over London LC. Founding artist participation is governed by an independent contractor agreement under Arizona law. Artists retain full ownership of their music and catalog. SOL Enterprises does not claim ownership of artist intellectual property. IC relationships are established through SkyeRoutexFlow, backed by the LegalSkyes policy framework and SOVEREIGN documentation. Platform access requires a MetrAIyux 0S gate session. Founding cohort is limited. July 2026 launch date is the current target. All platform features require operator-approved onboarding before production activation.
+        SkyeMusicNexus is a platform owned and operated by Skyes Over London LC. Core artist participation is governed by an independent contractor agreement under Arizona law. Artists retain full ownership of their music and catalog. SOL Enterprises does not claim ownership of artist intellectual property. IC relationships are established through SkyeRoutexFlow, backed by the LegalSkyes policy framework and SOVEREIGN documentation. Platform access requires a MetrAIyux 0S gate session. May 2026 core cohort is limited. All platform features require team-approved onboarding before production activation.
       </p>
     </div>
 
   </div>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
 </body>
 </html>

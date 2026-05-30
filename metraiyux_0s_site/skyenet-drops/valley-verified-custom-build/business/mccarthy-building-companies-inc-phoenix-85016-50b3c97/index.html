@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>McCarthy Building Companies, Inc. | Phoenix Construction Contractor</title>
+  <meta name="description" content="McCarthy Building Companies, Inc. is a Valley Verified construction contractor profile at 6225 N 24th St., Ste. 200, Phoenix, AZ 85016, highlighting.">
+  <style>
+    :root { color-scheme: light; --ink:#1d1b18; --muted:#68635c; --paper:#fffaf1; --wash:#f5f1ea; --accent:#806133; --accent-2:#276d73; --line:rgba(29,27,24,.15); }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:linear-gradient(140deg, rgba(128,97,51,.15), transparent 38%), linear-gradient(320deg, rgba(39,109,115,.15), transparent 44%), var(--wash); }
+    a { color: inherit; }
+    .wrap { width:min(1120px, calc(100% - 34px)); margin:0 auto; }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:24px 0 12px; color:var(--muted); font-size:14px; }
+    .brand { display:flex; align-items:center; gap:12px; min-width:0; font-weight:800; color:var(--accent); }
+    .mark { display:grid; place-items:center; width:42px; height:42px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--accent); letter-spacing:0; box-shadow:0 10px 24px rgba(29,27,24,.08); }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:34px; align-items:center; min-height:74vh; padding:48px 0 58px; }
+    .kicker { display:inline-flex; width:fit-content; margin:0 0 18px; padding:8px 11px; border:1px solid var(--line); border-radius:999px; background:rgba(255,250,241,.76); color:var(--accent); font-size:13px; font-weight:800; }
+    h1 { margin:0; max-width:820px; font-size:clamp(40px, 6.4vw, 80px); line-height:.95; letter-spacing:0; }
+    .lead { max-width:700px; margin:24px 0 0; color:#443e35; font-size:clamp(18px, 2vw, 22px); line-height:1.45; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:13px 17px; border:1px solid var(--accent); border-radius:7px; text-decoration:none; font-weight:800; }
+    .primary { background:var(--accent); color:white; box-shadow:0 14px 28px rgba(128,97,51,.24); }
+    .secondary { background:rgba(255,250,241,.82); color:var(--accent); }
+    .panel { border:1px solid var(--line); border-radius:8px; background:rgba(255,250,241,.84); box-shadow:0 24px 70px rgba(29,27,24,.14); overflow:hidden; }
+    .panel-head { padding:22px; color:white; background:linear-gradient(135deg, var(--accent), #56452c); }
+    .panel-head strong { display:block; font-size:20px; line-height:1.25; }
+    .panel-body { padding:22px; }
+    .line { display:grid; gap:5px; padding:15px 0; border-bottom:1px solid var(--line); }
+    .line:last-child { border-bottom:0; }
+    .label { color:var(--muted); font-size:12px; font-weight:800; text-transform:uppercase; }
+    .value { font-size:17px; line-height:1.35; }
+    section { padding:34px 0 56px; }
+    .section-title { margin:0 0 18px; font-size:28px; }
+    .grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; }
+    .fact { min-height:132px; padding:18px; border:1px solid var(--line); border-radius:8px; background:rgba(255,250,241,.72); }
+    .fact b { display:block; margin-bottom:8px; color:var(--accent); }
+    .fact span { color:#4a443b; line-height:1.42; }
+    .note { margin-top:18px; padding:18px; border-left:4px solid var(--accent-2); background:rgba(255,250,241,.76); color:#453f36; line-height:1.55; }
+    .evidence { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; color:var(--muted); font-size:14px; }
+    @media (max-width: 820px) { .hero { grid-template-columns:1fr; min-height:auto; padding-top:34px; } .grid { grid-template-columns:1fr 1fr; } .top { align-items:flex-start; flex-direction:column; } }
+    @media (max-width: 560px) { .grid { grid-template-columns:1fr; } h1 { font-size:40px; } .panel-head, .panel-body { padding:18px; } }
+
+    .vv-says {
+      width: min(1120px, calc(100% - 32px));
+      margin: 34px auto 42px;
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid var(--line, rgba(20, 24, 32, .16));
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card, var(--paper, #ffffff)) 88%, white 12%);
+      color: var(--ink, #101820);
+      box-shadow: 0 22px 54px rgba(16, 24, 32, .10);
+    }
+
+    .vv-says .vv-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--green, var(--gold, #8a5a18)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .vv-says h2 {
+      margin: 0;
+      max-width: 880px;
+      color: var(--navy, var(--deep, var(--ink, #101820)));
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .vv-says p {
+      margin: 16px 0 0;
+      color: var(--muted, #48535f);
+      font-size: 17px;
+      line-height: 1.62;
+    }
+
+    .vv-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .vv-proof-card {
+      padding: 16px;
+      border: 1px solid var(--line, rgba(20, 24, 32, .14));
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .vv-proof-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--accent, var(--green, var(--navy, #123047)));
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vv-proof-card span {
+      color: var(--ink, #101820);
+      line-height: 1.5;
+    }
+
+    .vv-note-text {
+      font-size: 15px;
+      color: var(--muted, #5b6670);
+    }
+
+    @media (max-width: 760px) {
+      .vv-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <div class="wrap">
+      <div class="top">
+        <div class="brand"><span class="mark">MC</span><span>public business profile</span></div>
+        <span>Phoenix, AZ 85016</span>
+      </div>
+      <div class="hero">
+        <div>
+          <p class="kicker">Construction Contractor</p>
+          <h1>McCarthy Building Companies, Inc.</h1>
+          <p class="lead">McCarthy Building Companies, Inc. gives homeowners, property managers, and local service callers a practical Phoenix connection for Construction Contractor, Real Estate/Contractors / Construction Contractor, Real Estate/Contractors, and Contractor / Home Service. The page focuses on services, audience, location, contact path, and the public evidence that makes the business useful in a Valley Verified shortlist.</p>
+          <div class="actions">
+            <a class="button primary" href="tel:+14804494700">Call (480) 449-4700</a>
+            <a class="button secondary" href="https://business.phoenixchamber.com/list/ql/real-estate-moving-storage-20">Public evidence URL</a>
+          </div>
+        </div>
+        <aside class="panel" aria-label="McCarthy Building Companies contact details">
+          <div class="panel-head"><strong>McCarthy Building Companies, Inc.</strong><span>Home Services</span></div>
+          <div class="panel-body">
+            <div class="line"><span class="label">Phone</span><span class="value">(480) 449-4700</span></div>
+            <div class="line"><span class="label">Address</span><span class="value">6225 N 24th St., Ste. 200, Phoenix, AZ 85016</span></div>
+            <div class="line"><span class="label">Language</span><span class="value">English</span></div>
+            <div class="line"><span class="label">Directory date</span><span class="value">May 19, 2026</span></div>
+          </div>
+        </aside>
+      </div>
+      <section>
+        <h2 class="section-title">Profile Details</h2>
+        <div class="grid">
+          <div class="fact"><b>Category</b><span>Home Services</span></div>
+          <div class="fact"><b>Subcategory</b><span>Construction Contractor</span></div>
+          <div class="fact"><b>License type</b><span>Real Estate/Contractors / Construction Contractor</span></div>
+          <div class="fact"><b>Price mode</b><span>Contact for quote</span></div>
+        </div>
+        <p class="note">Website, booking URL, email, and public hours were not listed in the local profile. Availability, scope, and pricing should be confirmed directly with the provider.</p>
+        <div class="evidence"><span>public business profile</span><span>English language</span><span>Contact-for-quote pricing</span></div>
+      </section>
+    </div>
+    
+    
+    <section class="vv-says" id="valley-verified-read" aria-labelledby="vv-mccarthy-building-companies-inc-phoenix-85016-50b3c97">
+      <p class="vv-kicker">Valley Verified read</p>
+      <h2 id="vv-mccarthy-building-companies-inc-phoenix-85016-50b3c97">Why Skyes Over London Says This Business Is Valley Verified</h2>
+      <p>McCarthy Building Companies, Inc. earns this Valley Verified placement because public business evidence connects a real construction contractor operation to 6225 N 24th St., Ste. 200, Phoenix, AZ 85016 and (480) 449-4700. Greater Phoenix Chamber directory evidence supports this local profile. For homeowners, property managers, and local service callers, the page gives concrete local utility: services, audience, location, contact path, and the reason this business belongs in a buyer-ready Valley shortlist.</p>
+      <div class="vv-proof-grid" aria-label="Valley Verified proof points">
+        <div class="vv-proof-card"><strong>Services</strong><span>Construction Contractor, Real Estate/Contractors / Construction Contractor, Real Estate/Contractors, and Contractor / Home Service</span></div>
+        <div class="vv-proof-card"><strong>Audience</strong><span>homeowners, property managers, and local service callers</span></div>
+        <div class="vv-proof-card"><strong>Local proof</strong><span>6225 N 24th St., Ste. 200, Phoenix, AZ 85016; (480) 449-4700</span></div>
+      </div>
+      <p class="vv-note-text">Greater Phoenix Chamber directory evidence supports this local profile.</p>
+    </section>
+
+
+
+    </main>
+</body>
+</html>

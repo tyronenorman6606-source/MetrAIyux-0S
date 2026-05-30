@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drinique | Valley Verified</title>
+  <meta name="description" content="Drinique is a Phoenix bar and restaurant services profile with business phone contact.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #201923;
+      --plum: #513047;
+      --rose: #df7c73;
+      --mint: #8fc8b7;
+      --paper: #fff6f0;
+      --line: rgba(32, 25, 35, .16);
+      --cream: #fffdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(135deg, rgba(143, 200, 183, .22) 0 20%, transparent 20% 80%, rgba(223, 124, 115, .18) 80%),
+        var(--paper);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(1040px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0 18px;
+      border-bottom: 1px solid var(--line);
+      color: var(--plum);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr .82fr;
+      gap: 18px;
+      margin-top: 20px;
+      align-items: stretch;
+    }
+
+    .glass {
+      min-height: 560px;
+      display: grid;
+      align-content: center;
+      padding: 44px;
+      background: var(--plum);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass:after {
+      content: "";
+      position: absolute;
+      right: 36px;
+      top: 58px;
+      width: 170px;
+      height: 300px;
+      border: 12px solid rgba(255, 255, 255, .22);
+      border-top: 0;
+      transform: skewX(-8deg);
+    }
+
+    .glass > * { position: relative; z-index: 1; }
+
+    .tag {
+      display: inline-block;
+      width: fit-content;
+      padding: 8px 12px;
+      background: var(--mint);
+      color: var(--ink);
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 42px 0 18px;
+      font-size: 5.8rem;
+      line-height: .95;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 560px;
+      margin: 0;
+      color: #f8ddd8;
+      font-size: 1.18rem;
+    }
+
+    .menu {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      padding: 22px;
+      background: var(--cream);
+      border: 1px solid var(--line);
+    }
+
+    .panel.call {
+      background: var(--rose);
+      color: #fff;
+    }
+
+    b {
+      display: block;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .panel span, .panel a {
+      display: block;
+      font-size: 1.28rem;
+      font-weight: 900;
+      line-height: 1.3;
+      text-decoration: none;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .fact {
+      min-height: 128px;
+      padding: 18px;
+      background: rgba(255, 253, 248, .88);
+      border: 1px solid var(--line);
+    }
+
+    .fact b { color: var(--plum); }
+
+    .source {
+      margin-top: 12px;
+      padding: 18px;
+      background: #fff;
+      border-left: 8px solid var(--mint);
+    }
+
+    .valley-verified-section {
+      margin: 30px 0 46px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid var(--line, rgba(16, 24, 40, .16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .9);
+      color: var(--ink, #111827);
+      box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
+    }
+
+    .valley-verified-kicker {
+      margin: 0 0 10px;
+      color: var(--accent, var(--teal, var(--blue, var(--red, var(--ink, #111827)))));
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .valley-verified-section h2 {
+      margin: 0 0 16px;
+      max-width: 900px;
+      color: var(--ink, #111827);
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .valley-verified-section p {
+      max-width: 900px;
+      margin: 0 0 16px;
+      color: var(--muted, #4b5563);
+      font-size: 1.02rem;
+      line-height: 1.62;
+    }
+
+    .valley-verified-section ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted, #4b5563);
+    }
+
+    .valley-verified-section li {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 840px) {
+      .hero { grid-template-columns: 1fr; }
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 4rem; }
+    }
+
+    @media (max-width: 540px) {
+      .topline { display: grid; }
+      .glass { min-height: 440px; padding: 28px; }
+      .glass:after { opacity: .35; right: 8px; }
+      h1 { font-size: 3.2rem; }
+      .facts { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <img src="assets/logo.svg" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;">
+    <header class="topline">
+      <span>Valley Verified Network</span>
+      <span>Phoenix, AZ</span>
+    </header>
+
+    <section class="hero" aria-label="Drinique profile">
+      <div class="glass">
+        <span class="tag">Bar / Restaurant Services</span>
+        <h1>Drinique</h1>
+        <p class="lede">Phoenix bar and restaurant services profile. Use the business phone line for current availability, service scope, and pricing.</p>
+      </div>
+      <aside class="menu" aria-label="Contact information">
+        <div class="panel call"><b>Call</b><a href="tel:+14806886934">(480) 688-6934</a></div>
+        <div class="panel"><b>Location</b><span>Phoenix, AZ</span></div>
+        <div class="panel"><b>License type</b><span>Restaurants/Food / Bar / Restaurant Services</span></div>
+      </aside>
+    </section>
+
+    <section class="facts" aria-label="Business facts">
+      <div class="fact"><b>Category</b><span>Food And Events</span></div>
+      <div class="fact"><b>Niche</b><span>Bar / Restaurant Services</span></div>
+      <div class="fact"><b>Languages</b><span>English</span></div>
+      <div class="fact"><b>Last listed</b><span>May 19, 2026</span></div>
+    </section>
+
+    <section class="source">
+      <b>Chamber evidence</b>
+      <p>Phoenix Chamber restaurants and food evidence supports this hospitality profile. <a href="https://business.phoenixchamber.com/list/ql/restaurants-food-beverages-22">Open category evidence</a>.</p>
+    </section>
+
+      <section class="valley-verified-section" aria-labelledby="valley-verified-heading">
+        <p class="valley-verified-kicker">Valley Verified perspective</p>
+        <h2 id="valley-verified-heading">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p>Drinique is Valley Verified because the Phoenix profile identifies a bar and restaurant-services business for local guests, families, and event visitors.</p>
+        <ul>
+          <li>The service category is bar and restaurant services within restaurants and food.</li>
+          <li>The profile lists Phoenix, AZ as the service location and phone (480) 688-6934.</li>
+          <li>Greater Phoenix Chamber restaurant, food, and beverage category evidence supports the business's hospitality placement.</li>
+        </ul>
+      </section>
+
+  </main>
+</body>
+</html>

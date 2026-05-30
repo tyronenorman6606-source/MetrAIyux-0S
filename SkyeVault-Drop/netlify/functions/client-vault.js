@@ -23,6 +23,9 @@ function safeEntry(entry) {
     clientRequestId: entry.clientRequestId || '',
     workspaceId: entry.workspaceId || '',
     developerId: entry.developerId || '',
+    custodyScope: entry.custodyScope || '',
+    vaultVisibility: entry.vaultVisibility || '',
+    ownerAccountId: entry.ownerAccountId || '',
     destinationName: entry.destinationName || entry.destinationId || 'Vault storage',
     clientName: entry.clientName || '',
     clientEmail: entry.clientEmail || '',
@@ -46,10 +49,29 @@ function entryFileId(entry) {
   return cleanText(entry.driveFile?.id || entry.driveFile?.key || '', 500);
 }
 
+function isOwnerPrivateEntry(entry = {}) {
+  const explicit = String(entry.custodyScope || '').toLowerCase() === 'owner-private'
+    || String(entry.vaultVisibility || '').toLowerCase() === 'owner-only'
+    || entry.clientVaultVisible === false
+    || entry.clientVaultDownloadAllowed === false;
+  const combined = [
+    entry.workspaceId,
+    entry.accessType,
+    entry.assetType,
+    entry.projectName,
+    entry.fileName,
+    entry.clientReference
+  ].join(' ');
+  const ownerRepoArtifact = /\b(owner-admin|metraiyux-0s-owner)\b/i.test(combined)
+    && /(full[- ]repo|git vault|skydrive|sovereign source|restore pack|control pack|\.skyesecrets|\.tar\.zst\.enc)/i.test(combined);
+  return explicit || ownerRepoArtifact;
+}
+
 async function clientEntries(email, receiptId = '', portalAccess = {}) {
   const ledger = await loadLedger(2500);
   const wantedReceipt = cleanText(receiptId, 120);
   return ledger.entries
+    .filter((entry) => !isOwnerPrivateEntry(entry))
     .filter((entry) => normalizeEmail(entry.clientEmail) === email)
     .filter((entry) => portalAccess.type !== 'developer-workspace' || entry.workspaceId === portalAccess.workspaceId)
     .filter((entry) => !wantedReceipt || entry.id === wantedReceipt)
@@ -76,6 +98,7 @@ export async function handler(event) {
       if (!receiptId) fail('Receipt ID is required to download a vault file.');
       const entry = entries.find((item) => item.id === receiptId);
       if (!entry) fail('No matching vault receipt was found for that email.', 404);
+      if (isOwnerPrivateEntry(entry)) fail('This vault receipt is owner-private. Use the shared owner/admin gate to mint its download link.', 403);
       const fileId = entryFileId(entry);
       if (!fileId) fail('This receipt does not include a downloadable vault object.', 409);
 

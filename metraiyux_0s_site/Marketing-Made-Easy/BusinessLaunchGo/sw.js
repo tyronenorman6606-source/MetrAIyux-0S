@@ -1,15 +1,15 @@
 /* Business Launch Kit (AZ) Pack — service worker */
 const CACHE = "blk-az-BLK-AZ-P13.1-v1.1.0";
 const ASSETS = [
-  "/",
-  "/index.html",
-  "/assets/svs.css",
-  "/assets/app.js",
-  "/assets/zip.js",
-  "/assets/logo.png",
-  "/assets/icon-192.png",
-  "/assets/icon-512.png",
-  "/manifest.webmanifest"
+  "./",
+  "./index.html",
+  "./assets/svs.css",
+  "./assets/app.js",
+  "./assets/zip.js",
+  "./assets/logo.png",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./manifest.webmanifest"
 ];
 
 self.addEventListener("install", (event) => {
@@ -52,7 +52,7 @@ self.addEventListener("fetch", (event) => {
     } catch (e) {
       // Offline fallback to index for navigations
       if (req.mode === "navigate") {
-        const shell = await cache.match("/index.html");
+        const shell = await cache.match("./index.html");
         if (shell) return shell;
       }
       throw e;

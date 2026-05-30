@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AllThrive 365 Formerly FSL | Phoenix Community Health Services</title>
+  <meta name="description" content="AllThrive 365, formerly Foundation for Senior Living, supports older adults, people with disabilities, caregivers, housing, nutrition, resource navigation, and adult foster care.">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #59616b;
+      --plum: #6f3b6d;
+      --blue: #236b8e;
+      --coral: #c85f4f;
+      --paper: #fffdf8;
+      --wash: #f1eef6;
+      --line: rgba(23, 32, 42, .14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f9f4fb 0%, #f5fbfb 55%, #fffdf8 100%);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .wrap {
+      width: min(1140px, calc(100% - 34px));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 22px 0 14px;
+    }
+
+    .mast {
+      display: grid;
+      grid-profile-columns: 84px 1fr auto;
+      gap: 18px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+    }
+
+    .mast img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .mast strong {
+      display: block;
+      font-size: 1.08rem;
+    }
+
+    .mast span {
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .call {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 8px;
+      background: var(--plum);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-profile-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+      gap: 34px;
+      padding: 48px 0;
+      align-items: stretch;
+    }
+
+    .title-block {
+      padding: 26px 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--coral);
+      font-size: .9rem;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 4.5rem;
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 22px 0 0;
+      max-width: 610px;
+      color: var(--muted);
+      font-size: 1.22rem;
+    }
+
+    .schedule-board {
+      display: grid;
+      grid-profile-columns: 1fr 1fr;
+      min-height: 420px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+    }
+
+    .tile {
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tile:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .tile:nth-last-child(-n+2) {
+      border-bottom: 0;
+    }
+
+    .tile b {
+      display: block;
+      color: var(--blue);
+      font-size: .88rem;
+      text-transform: uppercase;
+    }
+
+    .tile span,
+    .tile a {
+      display: block;
+      margin-top: 14px;
+      color: var(--ink);
+      font-size: 1.12rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .detail-strip {
+      display: grid;
+      grid-profile-columns: 1.1fr .9fr;
+      gap: 0;
+      margin-bottom: 54px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .panel + .panel {
+      border-left: 1px solid var(--line);
+      background: var(--wash);
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .service signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .service signals li {
+      padding: 8px 11px;
+      border: 1px solid rgba(111, 59, 109, .24);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      color: #453344;
+      font-weight: 700;
+    }
+
+    .profile {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .profile li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      padding: 24px 0 34px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .detail-strip {
+        grid-profile-columns: 1fr;
+      }
+
+      .panel + .panel {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h1 {
+        font-size: 3.3rem;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .mast {
+        grid-profile-columns: 64px 1fr;
+      }
+
+      .call {
+        grid-column: 1 / -1;
+      }
+
+      .schedule-board {
+        grid-profile-columns: 1fr;
+      }
+
+      .tile,
+      .tile:nth-child(2n),
+      .tile:nth-last-child(-n+2) {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tile:last-child {
+        border-bottom: 0;
+      }
+
+      h1 {
+        font-size: 2.45rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap mast">
+      <img src="assets/logo.svg" alt="AllThrive 365 mark">
+      <div>
+        <strong>AllThrive 365 (Formerly FSL)</strong>
+        <span>Valley Verified Network / Community Health / Services</span>
+      </div>
+      <a class="call" href="tel:+16022851800">(602) 285-1800</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="title-block">
+        <p class="eyebrow">Phoenix community health services</p>
+        <h1 id="page-title">AllThrive 365 (Formerly FSL)</h1>
+        <p class="lead">AllThrive 365, formerly Foundation for Senior Living, supports Arizona older adults, people with disabilities, families, and caregivers with health, housing, connection, and resource navigation programs.</p>
+      </div>
+      <div class="schedule-board" aria-label="Listing facts">
+        <div class="tile">
+          <b>Category</b>
+          <span>Health And Care</span>
+        </div>
+        <div class="tile">
+          <b>Niche</b>
+          <span>Community Health / Services</span>
+        </div>
+        <div class="tile">
+          <b>Address</b>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=1201%20E.%20Thomas%20Rd.%2C%20Phoenix%2C%20AZ%2085014">1201 E. Thomas Rd., Phoenix, AZ 85014</a>
+        </div>
+        <div class="tile">
+          <b>Profile date</b>
+          <span>2026-05-19</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-strip" aria-label="Service Signals and local profile facts">
+      <div class="panel">
+        <h2>Service Signals</h2>
+        <ul class="service signals">
+          <li>Community health / services</li>
+          <li>Health Care</li>
+          <li>Local service organization / public phone route</li>
+          <li>Public Chamber profile</li>
+          <li>Healthcare / Wellness</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Local Context</h2>
+        <ul class="profile">
+          <li>Valley Verified centers this profile on clear local business facts.</li>
+          <li>Public Chamber profile supports this business.</li>
+          <li></li>
+          <li>Public business evidence and direct contact routes support this profile.</li>
+          <li>Profiled license type: Health Care / Community Health / Services.</li>
+        </ul>
+      </div>
+    </section>
+      <section class="sky-vv" aria-labelledby="vv-allthrive-365-formerly-fsl-phoenix-85014-446ee90" style="width:min(1120px,calc(100% - 32px));margin:0 auto 52px;padding:28px;border:1px solid rgba(20,33,40,.16);border-radius:8px;background:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(17,24,39,.08);">
+        <p style="margin:0 0 10px;color:inherit;font-size:12px;font-weight:900;letter-spacing:0;text-transform:uppercase;">Valley Verified perspective</p>
+        <h2 id="vv-allthrive-365-formerly-fsl-phoenix-85014-446ee90" style="margin:0 0 16px;">Why Skyes Over London Says This Business Is Valley Verified</h2>
+        <p style="margin:0;color:inherit;font-size:18px;line-height:1.6;">Skyes Over London says AllThrive 365 is Valley Verified because its Phoenix profile connects a long-running nonprofit mission with practical support for aging and independence. Public evidence confirms community-based aging services, affordable housing, weatherization, home accessibility modifications, nutrition, health education, adult foster care, behavioral health options, transportation and connection resources, and the Resource Navigator.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">The organization is based at 1201 E. Thomas Rd. in Phoenix, publishes phone (602) 285-1800, and identifies its history as Foundation for Senior Living, founded in 1974 by the Roman Catholic Diocese of Phoenix. The public profile also supports 501(c)(3) status, Tax ID 86-0298945, and Greater Phoenix Chamber Premier Member visibility.</p>
+        <p style="margin:14px 0 0;color:inherit;font-size:18px;line-height:1.6;">AllThrive 365 belongs in Valley Verified because it gives under-resourced Arizonans a credible path to safe housing, care navigation, adult foster care, food programs, and social connection so they can age with more stability and dignity.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:20px;">
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Services</strong><span style="line-height:1.45;">Resource navigation, housing support, home accessibility, food programs, health education, adult foster care, and connection programs.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Who it serves</strong><span style="line-height:1.45;">Older adults, people with disabilities, caregivers, families, and under-resourced Arizonans.</span></div>
+          <div style="padding:16px;border:1px solid rgba(20,33,40,.14);border-radius:8px;background:rgba(255,255,255,.72);"><strong style="display:block;margin-bottom:8px;">Proof points</strong><span style="line-height:1.45;">Phoenix address and phone, 501(c)(3) status, Tax ID, 1974 founding history, Chamber Premier Member profile, and official program pages.</span></div>
+        </div>
+      </section>
+  </main>
+
+  <footer>
+      <div class="wrap">Phoenix, AZ Valley Verified profile.</div>
+    </footer>
+</body>
+</html>

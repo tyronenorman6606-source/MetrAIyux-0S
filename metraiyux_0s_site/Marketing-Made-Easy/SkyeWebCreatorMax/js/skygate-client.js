@@ -1,18 +1,43 @@
 (function () {
   const config = {
-    baseUrl: localStorage.getItem('skyewebcreatormax.skygate.baseUrl') || '',
-    mirrorSecret: localStorage.getItem('skyewebcreatormax.skygate.mirrorSecret') || '',
-    accessToken: localStorage.getItem('skyewebcreatormax.skygate.accessToken') || '',
+    baseUrl: '',
   };
 
+  function cleanOrigin(value) {
+    return String(value || '').trim().replace(/\/+$/, '');
+  }
+
+  function baseUrl() {
+    return cleanOrigin(config.baseUrl || window.MetrAIyuxGateBridge?.origin?.() || window.location.origin);
+  }
+
+  function gateToken() {
+    return window.MetrAIyuxGateBridge?.current?.()?.token
+      || sessionStorage.getItem('adminBrainToken')
+      || sessionStorage.getItem('metraiyux.gate.token')
+      || sessionStorage.getItem('skye.gate.token')
+      || '';
+  }
+
+  function authHeaders(headers = {}) {
+    const bridgeHeaders = window.MetrAIyuxGateBridge?.headers?.({
+      'x-skye-platform': 'skyewebcreator-max',
+      'x-skye-usage-lane': 'marketing-made-easy'
+    }) || {};
+    const token = gateToken();
+    return {
+      ...headers,
+      ...bridgeHeaders,
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    };
+  }
+
   async function postJson(path, body, headers) {
-    if (!config.baseUrl) {
-      return { ok: false, mode: 'standalone', error: 'SKYGATEFS13_BASE_URL not configured in this browser session.' };
-    }
+    const origin = baseUrl();
     try {
-      const response = await fetch(`${config.baseUrl.replace(/\/$/, '')}${path}`, {
+      const response = await fetch(`${origin}${path}`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', ...headers },
+        headers: authHeaders({ 'content-type': 'application/json', ...headers }),
         body: JSON.stringify(body),
       });
       const data = await response.json().catch(() => ({}));
@@ -24,14 +49,11 @@
 
   window.SkyeGateFS13Client = {
     configure(next) {
-      Object.assign(config, next || {});
-      if (next?.baseUrl) localStorage.setItem('skyewebcreatormax.skygate.baseUrl', next.baseUrl);
-      if (next?.mirrorSecret) localStorage.setItem('skyewebcreatormax.skygate.mirrorSecret', next.mirrorSecret);
-      if (next?.accessToken) localStorage.setItem('skyewebcreatormax.skygate.accessToken', next.accessToken);
-      return { ok: true, configured: Boolean(config.baseUrl) };
+      if (next?.baseUrl) config.baseUrl = cleanOrigin(next.baseUrl);
+      return { ok: true, configured: Boolean(baseUrl()), gateOwned: true };
     },
     mirrorEvent(event) {
-      return postJson('/.netlify/functions/platform-event-ingest', {
+      return postJson('/api/skygate/platform-event', {
         source_app: 'skyewebcreator-max',
         actor: event.actor || 'skyewebcreator-user',
         org_id: event.org_id || null,
@@ -39,20 +61,22 @@
         type: event.type || 'webcreator.event',
         meta: event.meta || {},
         event_ts: new Date().toISOString(),
-      }, {
-        'x-skygate-event-mirror-secret': config.mirrorSecret,
       });
     },
     askAI(payload) {
-      return postJson('/.netlify/functions/gateway-chat', payload, config.accessToken ? {
-        authorization: `Bearer ${config.accessToken}`,
-      } : {});
+      return postJson('/api/marketing-made-easy/webcreator-runtime/auren', {
+        message: payload.prompt || payload.message || '',
+        room: 'builder',
+        brief: payload.project || payload.brief || {},
+        runtime: { files: payload.files || {} },
+        allowLiveAi: true,
+      });
     },
     state() {
       return {
-        configured: Boolean(config.baseUrl),
-        hasMirrorSecret: Boolean(config.mirrorSecret),
-        hasAccessToken: Boolean(config.accessToken),
+        configured: Boolean(baseUrl()),
+        gateOwned: true,
+        hasGateSession: Boolean(gateToken()),
       };
     },
   };

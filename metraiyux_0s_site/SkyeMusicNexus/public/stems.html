@@ -6,19 +6,20 @@
   <title>SkyeMusicNexus // Stem Vault</title>
   <link rel="stylesheet" href="./neo-nexus.css" />
   <link rel="stylesheet" href="./open-source-studio.css" />
-  <script defer src="../gate-session.js"></script><script defer src="./skygate-auth.js"></script><script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script><script defer src="./neo-nexus.js"></script><script defer src="./open-source-studio.js"></script>
+  <script defer src="../gate-session.js"></script><script defer src="./skygate-auth.js"></script><script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script><script defer src="./neo-nexus.js"></script><script defer src="./open-source-studio.js"></script>
+  <link rel="stylesheet" href="https://skye-music-nexus.pages.dev/public/nexus-player.css" data-skymusicnexus-player="css">
 </head>
 <body data-app="skye-music-nexus" data-mode="artist" data-room="stem-vault">
   <canvas id="pulse-field" class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
   <main class="nexus-shell open-source-studio-shell">
-    <header class="nexus-topline"><a class="sigil" href="./index.html"><img src="../assets/platform-mark.svg" alt="" /></a><div><p class="micro">SkyeMusicNexus // Stem Vault</p><h1>Stage stems, bounces, samples, and masters before upload.</h1></div><div class="session-rack"><span id="sessionChip" class="chip chip-hot">SkyGate required</span><button class="ghost" data-action="proof-session">Proof Session</button><button class="ghost" data-action="operator-login">Operator Login</button><button class="ghost" data-action="logout">Disconnect</button></div></header>
-    <nav class="nexus-nav"><a href="./index.html">Dashboard</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a><a href="./admin.html">Operator</a></nav>
+    <header class="nexus-topline"><a class="sigil" href="./index.html"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a><div><p class="micro">SkyeMusicNexus // Stem Vault</p><h1>Stage stems, bounces, samples, and masters before upload.</h1></div><div class="session-rack"><span id="sessionChip" class="chip chip-hot">Client access required</span><button class="ghost" data-action="proof-session">Use Session</button><button class="ghost" data-action="logout">Disconnect</button></div></header>
+    <nav class="nexus-nav"><a href="./index.html">Workspace</a><a href="./create.html">Create</a><a href="./daw.html">DAW</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a><a href="./upload.html">Upload</a><a href="./player.html">Player</a><a href="./releases.html">Releases</a><a href="./rights.html">Rights</a></nav>
     <nav class="surface-switcher"><a href="./create.html">Hub</a><a href="./daw.html">DAW</a><a class="active" href="./stems.html" aria-current="page">Stems</a><a href="./exports.html">Exports</a><a href="./discover.html">Discover</a><a href="./feed.html">Feed</a></nav>
     <section class="studio-grid">
       <article class="panel glass-panel"><p class="eyebrow">stem vault</p><h2>Keep the audio session organized before it becomes a release.</h2><p class="subcopy">This is the BandLab-side asset room: stems, bounces, masters, references, loops, and project notes before the gated Upload Studio.</p><label class="drop-zone"><input id="stemFileInput" type="file" multiple accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a,.webm" /><span>Drop stems, bounces, masters, previews, or references</span><small>wav / mp3 / flac / ogg / m4a / webm</small></label><ul id="stemList" class="record-list"></ul></article>
       <article class="panel glass-panel"><p class="eyebrow">sample packs</p><h3>Packs and starter moods</h3><div id="samplePackRail" class="sample-pack-rail"></div><div class="action-row"><a class="ghost-link" href="./upload.html">Send to Upload</a><a class="ghost-link" href="./exports.html">Queue Export</a></div></article>
-    </section>
-    <dialog id="operatorDialog" class="operator-dialog"><form method="dialog" id="operatorForm"><h3>Local Operator Login</h3><label>Email<input name="email" type="email" required /></label><label>Password<input name="password" type="password" required /></label><menu><button class="ghost" value="cancel">Cancel</button><button class="primary" value="login">Login</button></menu></form></dialog><div id="toast" role="status" aria-live="polite"></div>
+    </section><div id="toast" role="status" aria-live="polite"></div>
   </main>
+  <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>
 </body>
 </html>

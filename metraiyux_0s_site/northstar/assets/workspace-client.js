@@ -83,7 +83,7 @@
 
   function isLocalPreview() {
     const params = new URLSearchParams(location.search);
-    return params.get('local') === '1' || location.protocol === 'file:' || /^localhost$|^127\.0\.0\.1$/.test(location.hostname);
+    return location.protocol === 'file:' || ((params.get('local') === '1') && /^localhost$|^127\.0\.0\.1$/.test(location.hostname));
   }
 
   function workspaceHintSlug() {
@@ -171,9 +171,7 @@
   }
 
   async function login(input) {
-    const payload = await api('/auth-login', { method: 'POST', body: JSON.stringify(input || {}) });
-    remember(payload);
-    return Object.assign({ authenticated: true }, payload);
+    throw new Error('Workspace password login is disabled on the mounted 0S app. Use the shared FS27/SkyGate/Free99 session.');
   }
 
   async function ownerAdminLogin(input) {
@@ -229,11 +227,11 @@
   async function backups(limit) { return api(`/workspace-backups?limit=${encodeURIComponent(limit || 25)}`, { method: 'GET' }); }
 
 
-  async function operatorProvision(input, operatorToken) {
-    return api('/operator-provision', { method: 'POST', headers: { authorization: `Bearer ${operatorToken || ''}` }, body: JSON.stringify(input || {}) });
+  async function operatorProvision(input) {
+    return api('/operator-provision', { method: 'POST', body: JSON.stringify(input || {}) });
   }
-  async function operatorWorkspaces(operatorToken) {
-    return api('/operator-workspaces', { method: 'GET', headers: { authorization: `Bearer ${operatorToken || ''}` } });
+  async function operatorWorkspaces() {
+    return api('/operator-workspaces', { method: 'GET' });
   }
 
   function permissions(sessionPayload) {

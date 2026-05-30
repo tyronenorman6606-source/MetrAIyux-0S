@@ -1,8 +1,15 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, webcrypto } from 'node:crypto';
 import worker from '../metraiyux_0s_site/cloudflare/worker.js';
+
+if (!globalThis.crypto?.subtle || !globalThis.crypto?.getRandomValues) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true
+  });
+}
 
 class MemoryKv {
   constructor() {
@@ -87,7 +94,12 @@ async function call(appEnv, path, init = {}) {
 
 const appEnv = env();
 
-const health = await call(appEnv, '/api/marketing-made-easy/ae-vendor-onboarding/health');
+const unauthHealth = await call(appEnv, '/api/marketing-made-easy/ae-vendor-onboarding/health');
+assert.ok([401, 403].includes(unauthHealth.status), `Expected unauthenticated health to be gated, got ${unauthHealth.status}`);
+
+const health = await call(appEnv, '/api/marketing-made-easy/ae-vendor-onboarding/health', {
+  headers: { authorization: 'Bearer local-admin-token' }
+});
 assert.equal(health.status, 200);
 assert.equal(health.body.cloudflare_only, true);
 assert.equal(health.body.netlify, false);
@@ -146,6 +158,7 @@ const report = {
   generated_at: new Date().toISOString(),
   checks: {
     health: health.status,
+    unauthenticated_health: unauthHealth.status,
     unauthenticated_submit: unauth.status,
     authenticated_submit: submitted.status,
     packet_list: listed.body.packets.length,

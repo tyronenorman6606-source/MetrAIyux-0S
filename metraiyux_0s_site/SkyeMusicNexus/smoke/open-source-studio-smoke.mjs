@@ -32,6 +32,23 @@ async function call(handler, { method = "GET", body, authToken, query = {} } = {
   });
 }
 
+function base64urlJson(value) {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+function signJwt(privateKey, payload) {
+  const header = base64urlJson({ alg: "RS256", typ: "JWT", kid: "fs27-proof-key" });
+  const body = base64urlJson({
+    iss: "local://skygatefs13/proof",
+    aud: "skygatefs13",
+    exp: Math.floor(Date.now() / 1000) + 3600,
+    iat: Math.floor(Date.now() / 1000),
+    ...payload,
+  });
+  const signature = crypto.sign("RSA-SHA256", Buffer.from(`${header}.${body}`), privateKey).toString("base64url");
+  return `${header}.${body}.${signature}`;
+}
+
 const createHtml = read("public/create.html");
 const dawHtml = read("public/daw.html");
 const dawJs = read("public/nexus-daw.js");
@@ -123,7 +140,7 @@ for (const [file, html, marker] of [
 for (const page of [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml, stemsHtml, exportsHtml, discoverHtml, feedHtml]) {
   assert(page.includes("./create.html"), "Create Studio nav link missing from an artist room");
 }
-assert(adminHtml.includes("./create.html"), "Create Studio link missing from operator stage");
+assert(adminHtml.includes("./create.html"), "Create Studio link missing from protected review stage");
 assert(rootShellHtml.includes("./public/create.html"), "root launch matrix missing Create Studio");
 assert(rootShellHtml.includes("./public/daw.html"), "root launch matrix missing DAW Room");
 assert(!fs.existsSync(path.join(root, "open-source/vendor")), "third-party DAW vendor folder should not exist");
@@ -142,6 +159,9 @@ for (const marker of [
 }
 assert(studioFunctionSource.includes("registerEngine"), "music-studio.js is missing module registration support");
 assert(!createJs.includes("proof_"), "open-source-studio.js still mints fake local proof tokens");
+assert(createJs.includes("MetrAIyuxGateBridge"), "open-source-studio.js is missing the shared Gate bridge");
+const retiredMusicSessionKey = "SKYE_MUSIC_NEXUS" + "_GATE_SESSION";
+assert(!createJs.includes(retiredMusicSessionKey), "open-source-studio.js still reads the retired Music Nexus session key");
 assert(!createCss.includes("clamp("), "open-source-studio.css should not use viewport-scaled type");
 assert(!createCss.includes("letter-spacing: -"), "open-source-studio.css should not use negative tracking");
 assert(!createCss.includes("iframe"), "open-source-studio.css still has iframe DAW styling");
@@ -158,11 +178,8 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "skye-musicnexus-studio-"))
 process.env.MUSIC_NEXUS_DATA_DIR = tmpDir;
 const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
 process.env.SKYGATE_PUBLIC_KEY_PEM = publicKey.export({ type: "spki", format: "pem" });
-process.env.SKYGATE_LOCAL_SESSION_PRIVATE_KEY_PEM = privateKey.export({ type: "pkcs8", format: "pem" });
-process.env.SKYGATE_ENABLE_LOCAL_SESSION_BOOTSTRAP = "1";
-process.env.SKYGATE_LOCAL_OPERATOR_EMAIL = "operator@internal.invalid";
-process.env.SKYGATE_LOCAL_OPERATOR_PASSWORD = "proof-password";
-process.env.SKYGATE_LOCAL_OPERATOR_ROLE = "admin";
+process.env.SKYGATE_EXPECTED_AUDIENCE = "skygatefs13";
+process.env.SKYGATE_ISSUER = "local://skygatefs13/proof";
 
 const session = require(path.join(root, "netlify/functions/skygate-session.js"));
 const studio = require(path.join(root, "netlify/functions/music-studio.js"));
@@ -179,9 +196,8 @@ const sessionRes = await call(session, {
   method: "POST",
   body: { subject: "studio-proof-operator", role: "admin" },
 });
-assert(sessionRes.statusCode === 200, `local studio proof session failed: ${sessionRes.statusCode}`);
-const token = parse(sessionRes).token;
-assert(token && token.startsWith("skls_"), "local studio proof session did not return a token");
+assert(sessionRes.statusCode === 410, `local studio proof session was not retired: ${sessionRes.statusCode}`);
+const token = signJwt(privateKey, { sub: "fs27-studio-proof-operator", email: "studio-proof@internal.invalid", role: "admin" });
 
 const project = {
   id: "studio_proof_artist_release",

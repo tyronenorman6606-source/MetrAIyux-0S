@@ -16,11 +16,12 @@ const deleteMissing = args.has('--delete-missing');
 const restoreSymlinks = args.has('--restore-symlinks');
 const skipHashCheck = args.has('--skip-hash-check');
 const requireSignature = args.has('--require-signature');
+const fullOverlay = args.has('--full-overlay') || process.env.SKYEVAULT_GIT_FULL_OVERLAY === '1';
 const verifyArchive = argValue('--verify');
 const repoName = path.basename(root).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'repository';
 const schema = 'skyevault.git-vault-pack.v1';
 
-const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.netlify', '.wrangler', '.wrangler-dry-run', '.claude', '.tmp', '.1', 'download-handoffs', 'test-artifacts', 'test-results', 'backups', 'wal_archive', '.staffing-db', '.skyevault-out']);
 const SKIP_EXTS = new Set(['.zip', '.tar', '.gz', '.tgz', '.7z', '.rar', '.dump', '.backup', '.bak', '.sqlite', '.sqlite3', '.db', '.pem', '.key', '.p12', '.pfx']);
 const SECRET_PATTERNS = [
   ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |)?PRIVATE KEY-----/],
@@ -39,6 +40,47 @@ function argValue(name) {
   return rawArgs.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) || '';
 }
 
+function firstCsv(value = '') {
+  return String(value || '').split(',').map((item) => item.trim()).filter(Boolean)[0] || '';
+}
+
+function firstValidEmail(...values) {
+  for (const value of values) {
+    for (const candidate of String(value || '').split(',')) {
+      const email = candidate.trim().replace(/^['"]|['"]$/g, '').toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return email;
+    }
+  }
+  return '';
+}
+
+function ownerCustodyFields() {
+  const ownerEmail = firstValidEmail(
+    process.env.SKYEVAULT_OWNER_EMAIL,
+    process.env.OWNER_EMAIL,
+    process.env.ADMIN_EMAILS,
+    process.env.METRAIYUX_0S_SKYGATE_ADMIN_EMAILS,
+    process.env.LEGAL_REVIEW_ADMIN_EMAIL,
+    process.env.RESEND_FROM_EMAIL,
+    process.env.ZOHO_DEFAULT_FROM,
+    process.env.SKYEVAULT_CLIENT_EMAIL
+  ) || 'owner@metraiyux.local';
+  const ownerName = String(process.env.SKYEVAULT_OWNER_NAME || process.env.OWNER_NAME || process.env.GIT_AUTHOR_NAME || '0S Founder Account').trim();
+  return {
+    ownerEmail,
+    ownerName,
+    ownerWorkspaceId: String(process.env.SKYEVAULT_OWNER_WORKSPACE_ID || 'metraiyux-0s-owner').trim(),
+    ownerWorkspaceSlug: String(process.env.SKYEVAULT_OWNER_WORKSPACE_SLUG || 'metraiyux-0s').trim(),
+    ownerSubject: String(process.env.SKYEVAULT_OWNER_SUBJECT || 'metraiyux-owner-admin').trim(),
+    ownerAccountId: String(process.env.SKYEVAULT_OWNER_ACCOUNT_ID || 'founder-metraiyux-0s-owner').trim(),
+    custodyScope: 'owner-private',
+    vaultVisibility: 'owner-only',
+    accessPolicy: 'shared-gate-owner-admin-only',
+    clientVaultVisible: false,
+    clientVaultDownloadAllowed: false
+  };
+}
+
 function resolveWorkspacePath(value, fallback) {
   const clean = String(value || '').trim();
   if (!clean) return fallback;
@@ -49,8 +91,18 @@ function stamp() {
   return new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
 }
 
+function gitMaxBufferBytes() {
+  const mb = Number(process.env.SKYEVAULT_GIT_MAX_BUFFER_MB || argValue('--git-max-buffer-mb') || 128);
+  return (Number.isFinite(mb) && mb > 0 ? mb : 128) * 1024 * 1024;
+}
+
 function run(file, commandArgs, options = {}) {
-  return execFileSync(file, commandArgs, { cwd: options.cwd || root, encoding: options.encoding || 'utf8', stdio: options.stdio || 'pipe' });
+  return execFileSync(file, commandArgs, {
+    cwd: options.cwd || root,
+    encoding: options.encoding || 'utf8',
+    stdio: options.stdio || 'pipe',
+    maxBuffer: options.maxBuffer || gitMaxBufferBytes()
+  });
 }
 
 function git(commandArgs, fallback = '') {
@@ -137,6 +189,9 @@ function copySanitizedWorkspace(sourceDir, excludes) {
     '--exclude=.wrangler/',
     '--exclude=.wrangler-dry-run/',
     '--exclude=.claude/',
+    '--exclude=.tmp/',
+    '--exclude=.1/',
+    '--exclude=download-handoffs/',
     '--exclude=test-artifacts/',
     '--exclude=test-results/',
     '--exclude=backups/',
@@ -179,6 +234,81 @@ function copySanitizedWorkspace(sourceDir, excludes) {
   if (result.status === 24) {
     console.warn('rsync reported vanished files while copying generated output; continuing with the consistent files that were staged.');
   }
+}
+
+function gitZeroLines(commandArgs) {
+  try {
+    const output = execFileSync('git', commandArgs, {
+      cwd: root,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      maxBuffer: gitMaxBufferBytes()
+    });
+    return output.toString('utf8').split('\0').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function statusOverlayPaths() {
+  const paths = new Set();
+  for (const line of git(['status', '--porcelain=v1', '--untracked-files=all'], '').split(/\r?\n/).filter(Boolean)) {
+    const code = line.slice(0, 2);
+    const raw = line.slice(3).trim();
+    if (!raw || code === 'D ' || code === ' D' || code === 'DD') continue;
+    if (raw.includes(' -> ')) {
+      const [, after] = raw.split(' -> ');
+      if (after) paths.add(after.replace(/^"|"$/g, ''));
+    } else {
+      paths.add(raw.replace(/^"|"$/g, ''));
+    }
+  }
+  for (const line of gitZeroLines(['ls-files', '-z', '--others', '--exclude-standard'])) {
+    if (line) paths.add(line);
+  }
+  return [...paths].sort((a, b) => a.localeCompare(b));
+}
+
+function copyOverlayEntry(relativePath, sourceDir, excludeSet) {
+  const clean = String(relativePath || '').replace(/\\/g, '/').replace(/^\.\/+/, '');
+  if (!clean || clean.includes('\0')) return;
+  const source = path.resolve(root, clean);
+  if (!source.startsWith(root + path.sep) && source !== root) return;
+  if (!fs.existsSync(source) || shouldAlwaysExclude(source)) return;
+
+  const relative = rel(source);
+  if (excludeSet.has(relative)) return;
+  const stat = fs.lstatSync(source);
+  if (stat.isDirectory()) {
+    for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+      copyOverlayEntry(path.join(relative, entry.name), sourceDir, excludeSet);
+    }
+    return;
+  }
+
+  const target = path.join(sourceDir, relative);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  if (stat.isSymbolicLink()) {
+    try { fs.symlinkSync(fs.readlinkSync(source), target); } catch {}
+    return;
+  }
+  if (!stat.isFile()) return;
+  fs.copyFileSync(source, target);
+  try { fs.chmodSync(target, stat.mode & 0o777); } catch {}
+}
+
+function copyDirtyWorkspaceOverlay(sourceDir, excludes) {
+  fs.mkdirSync(sourceDir, { recursive: true });
+  const excludeSet = new Set(excludes.map((item) => item.file));
+  for (const item of statusOverlayPaths()) copyOverlayEntry(item, sourceDir, excludeSet);
+}
+
+function copyWorkspaceOverlay(sourceDir, excludes) {
+  if (fullOverlay) {
+    copySanitizedWorkspace(sourceDir, excludes);
+    return 'full-sanitized-worktree';
+  }
+  copyDirtyWorkspaceOverlay(sourceDir, excludes);
+  return 'dirty-sanitized-overlay';
 }
 
 function scanStage(sourceDir) {
@@ -344,7 +474,7 @@ This pack is meant to restore a developer repo as a clone-capable workspace.
 Contents:
 
 - \`git/repository.bundle\`: Git history, branches, tags, and remote-tracking refs captured by \`git bundle create --all\`.
-- \`source/\`: Sanitized working tree overlay, including uncommitted and untracked files that passed the vault secret scanner.
+- \`source/\`: Sanitized overlay. By default this includes safe dirty and untracked files; the Git bundle supplies committed tracked files. Packs created with \`--full-overlay\` include a full sanitized worktree overlay.
 - \`manifest.json\`: Hashes, refs, status, source file manifest, bundle fingerprint, and excluded secret-looking files.
 - \`neural-map.json\`: Workspace/developer/repo/commit/file graph seed for the account brain map.
 - \`SECRET_BOUNDARY.md\`: Local-only file/folder contract for secrets, databases, generated state, and anything intentionally left out.
@@ -549,8 +679,8 @@ async function createPack() {
   for (const item of excludes.slice(0, 80)) console.log(`Excluding ${item.file} (${item.hits.join(', ')})`);
   if (excludes.length > 80) console.log(`...and ${excludes.length - 80} more excluded files`);
 
-  console.log('Building sanitized working tree overlay...');
-  copySanitizedWorkspace(sourceDir, excludes);
+  console.log(`Building sanitized ${fullOverlay ? 'full worktree' : 'dirty'} overlay...`);
+  const overlayMode = copyWorkspaceOverlay(sourceDir, excludes);
   const stageFindings = scanStage(sourceDir);
   if (stageFindings.length) {
     console.error('Sanitized source scan failed:');
@@ -563,10 +693,21 @@ async function createPack() {
   const head = git(['rev-parse', 'HEAD'], 'unknown');
   const shortHead = git(['rev-parse', '--short', 'HEAD'], 'unknown');
   const statusShort = git(['status', '--short'], '').split(/\r?\n/).filter(Boolean);
+  const ownerCustody = ownerCustodyFields();
   const account = {
-    workspaceId: String(process.env.SKYEVAULT_WORKSPACE_ID || process.env.SKYEVAULT_DEV_WORKSPACE_ID || '').trim(),
-    developerId: String(process.env.SKYEVAULT_DEVELOPER_ID || process.env.USER || '').trim(),
-    developerName: String(process.env.SKYEVAULT_DEVELOPER_NAME || process.env.GIT_AUTHOR_NAME || '').trim()
+    workspaceId: String(process.env.SKYEVAULT_WORKSPACE_ID || process.env.SKYEVAULT_DEV_WORKSPACE_ID || ownerCustody.ownerWorkspaceId).trim(),
+    developerId: String(process.env.SKYEVAULT_DEVELOPER_ID || ownerCustody.ownerSubject).trim(),
+    developerName: String(process.env.SKYEVAULT_DEVELOPER_NAME || ownerCustody.ownerName).trim(),
+    custodyScope: ownerCustody.custodyScope,
+    vaultVisibility: ownerCustody.vaultVisibility,
+    ownerAccountId: ownerCustody.ownerAccountId,
+    ownerSubject: ownerCustody.ownerSubject,
+    ownerEmail: ownerCustody.ownerEmail,
+    ownerWorkspaceId: ownerCustody.ownerWorkspaceId,
+    ownerWorkspaceSlug: ownerCustody.ownerWorkspaceSlug,
+    accessPolicy: ownerCustody.accessPolicy,
+    clientVaultVisible: ownerCustody.clientVaultVisible,
+    clientVaultDownloadAllowed: ownerCustody.clientVaultDownloadAllowed
   };
   const manifest = {
     schema,
@@ -595,6 +736,7 @@ async function createPack() {
     },
     source: {
       path: 'source/',
+      overlayMode,
       fileCount: source.files.filter((item) => item.type === 'file').length,
       entryCount: source.files.length,
       totalBytes: source.totalBytes,
@@ -797,6 +939,11 @@ if (dryRun) {
     '--asset-type=Git vault restore pack',
     `--project-name=${repoName} Git vault restore pack`,
     `--client-reference=git-vault:${manifest.git.branch}@${manifest.git.shortHead}`,
+    `--client-name=${manifest.account.developerName}`,
+    `--client-email=${manifest.account.ownerEmail}`,
+    `--workspace-id=${manifest.account.workspaceId}`,
+    `--developer-id=${manifest.account.developerId}`,
+    `--developer-name=${manifest.account.developerName}`,
     `--notes=Git bundle plus sanitized working tree overlay. Bundle restores clone/history; source overlay restores safe dirty workspace state. Excluded ${manifest.security.excludedSecretLikeFiles.length} secret-looking files.`
   ], { cwd: root, encoding: 'utf8', stdio: 'inherit' });
   if (result.status !== 0) process.exit(result.status || 1);

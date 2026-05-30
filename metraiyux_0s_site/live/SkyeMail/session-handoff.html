@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0S Gate Handoff - SkyeMail</title>
+  <script src="assets/app.js"></script>
+  <link rel="stylesheet" href="assets/mail-ui.css" />
+  <style>
+    body { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .handoff-card { width: min(680px, 100%); padding: 24px; border: 1px solid rgba(137, 240, 216, .18); border-radius: 8px; background: rgba(5, 7, 7, .84); box-shadow: 0 24px 80px rgba(0,0,0,.28); }
+    .handoff-card h1 { margin: 0 0 10px; color: #fff; font-size: clamp(30px, 6vw, 54px); line-height: 1; letter-spacing: 0; }
+    .handoff-card p { color: var(--muted); line-height: 1.55; }
+    .handoff-status { margin-top: 16px; font-weight: 850; color: var(--muted); }
+    .handoff-status.ok { color: var(--mint); }
+    .handoff-status.bad { color: var(--danger); }
+    .handoff-claim { margin-top: 12px; padding: 12px; border: 1px solid rgba(137, 240, 216, .14); border-radius: 8px; background: rgba(0,0,0,.22); color: rgba(244,251,247,.86); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main class="handoff-card">
+    <div class="badge">Shared 0S Gate Session</div>
+    <h1>Opening SkyeMail Citadel.</h1>
+    <p>The gate session is being accepted once, then SkyeMail will open the selected inbox under the shared FS27/SkyGate owner lane.</p>
+    <div class="handoff-claim" id="claimText">Reading gate return...</div>
+    <div class="handoff-status" id="status">Waiting for the 0S bearer...</div>
+  </main>
+  <script>
+  (async function(){
+    const status = document.getElementById('status');
+    const claimText = document.getElementById('claimText');
+    const allowedPages = new Set(['dashboard.html','compose.html','onboarding.html','settings.html','mailbox.html','monitoring.html','contacts.html','sent.html','drafts.html','spam.html','trash.html']);
+    function set(message, cls=''){ status.textContent = message; status.className = `handoff-status ${cls}`; }
+    function mergedParams(){
+      const params = new URLSearchParams(location.search || '');
+      const hash = location.hash && location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
+      const hashParams = new URLSearchParams(hash || '');
+      hashParams.forEach((value, key)=> params.set(key, value));
+      return params;
+    }
+    function pick(params, names){
+      for(const name of names){
+        const value = String(params.get(name) || '').trim();
+        if(value) return value;
+      }
+      return '';
+    }
+    function safeNext(value){
+      const raw = String(value || 'dashboard.html').trim() || 'dashboard.html';
+      try{
+        const url = new URL(raw, location.href);
+        const page = url.pathname.split('/').pop() || 'dashboard.html';
+        if(!allowedPages.has(page)) return 'dashboard.html';
+        return `${page}${url.search || ''}`;
+      }catch(_err){
+        return allowedPages.has(raw) ? raw : 'dashboard.html';
+      }
+    }
+    try{
+      const params = mergedParams();
+      const token = pick(params, ['fs27_token','gate_session','skygate_session','skye_gate_session','free99_gate_session','session','token','bearer']) || getToken();
+      if(!token) throw new Error('Missing 0S/SkyGate bearer. Open SkyeMail from the 0S Gate again so the app return includes the session.');
+      const mailboxEmail = pick(params, ['mailbox_email','mailbox','selected_mailbox','email']).toLowerCase();
+      const claim = {
+        source: pick(params, ['source']) || 'skymail-session-handoff',
+        gate_card_id: pick(params, ['gate_card_id','card_id']),
+        skye_id_number: pick(params, ['skye_id_number','skye_id']),
+        email: mailboxEmail || pick(params, ['gate_email','owner_email']).toLowerCase(),
+        mailbox: {
+          requested_email: mailboxEmail,
+          local_part: pick(params, ['mailbox_local_part','local_part']),
+          domain: pick(params, ['mailbox_domain','domain'])
+        },
+        profile: {
+          display_name: pick(params, ['display_name','name']),
+          gate_email: pick(params, ['gate_email','owner_email']).toLowerCase()
+        }
+      };
+      claimText.textContent = `${claim.profile.display_name || claim.profile.gate_email || '0S owner'} -> ${claim.mailbox.requested_email || 'mailbox selector'}`;
+      localStorage.setItem('SMV_ONBOARDING_CLAIM', JSON.stringify(claim));
+      localStorage.setItem('skye0s.skyemail.claim.v1', JSON.stringify(claim));
+      if(claim.mailbox.requested_email && window.SMVRuntime?.setActiveMailbox) window.SMVRuntime.setActiveMailbox(claim.mailbox.requested_email);
+      set('Accepting the shared gate session...', '');
+      const data = await apiFetch('/auth-fs27-session', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ claim })
+      });
+      setToken(data.token || token);
+      if(data.handle) setHandle(data.handle);
+      localStorage.setItem('SMV_SKYEMAIL_ID', data.skymail_id || '');
+      localStorage.setItem('SMV_WORKSPACE_ID', data.workspace_id || '');
+      localStorage.setItem('SMV_FS27_GATE_CARD_ID', data.fs27?.gate_card_id || claim.gate_card_id || '');
+      const next = safeNext(params.get('next'));
+      set('Gate accepted. Opening the selected inbox...', 'ok');
+      setTimeout(()=> { location.href = `${next}${next.includes('?') ? '&' : '?'}gate_return=1`; }, 450);
+    }catch(err){
+      set(err.message || '0S Gate handoff failed.', 'bad');
+    }
+  })();
+  </script>
+</body>
+</html>

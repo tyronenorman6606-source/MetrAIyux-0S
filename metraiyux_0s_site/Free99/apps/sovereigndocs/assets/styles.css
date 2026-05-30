@@ -1116,7 +1116,36 @@ html {
 .section-title h2{
   letter-spacing:0;
 }
+.editor-card{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  color:inherit;
+  text-decoration:none;
+}
+.editor-card .button{
+  align-self:flex-start;
+  margin-top:auto;
+}
+.editor-card:hover{
+  transform:translateY(-1px);
+  border-color:rgba(230,193,111,.34);
+  box-shadow:0 26px 74px rgba(0,0,0,.34),0 0 28px rgba(230,193,111,.08);
+}
 @media(max-width:740px){
   .sd-hero-logo{max-height:86px}
   .sd-website-hero:before{display:none}
+}
+
+html[data-mcp-neon-scrollbar],
+html[data-mcp-neon-scrollbar] body{
+  scrollbar-width:none !important;
+  -ms-overflow-style:none !important;
+}
+
+html[data-mcp-neon-scrollbar]::-webkit-scrollbar,
+html[data-mcp-neon-scrollbar] body::-webkit-scrollbar{
+  width:0 !important;
+  height:0 !important;
+  display:none !important;
 }
