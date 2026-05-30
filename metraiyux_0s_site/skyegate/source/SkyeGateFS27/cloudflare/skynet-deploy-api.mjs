@@ -7,6 +7,10 @@ const MAX_DEPLOYMENT = 180;
 const MAX_PATH = 700;
 const MAX_SOURCE_DOWNLOAD_FILES = 5000;
 const MAX_SOURCE_PACKAGE_FILES = 20000;
+const MAX_SOURCE_INDEX_FILES = 500000;
+const MAX_SOURCE_QUERY_LIMIT = 5000;
+const MAX_SOURCE_SEARCH_RESULTS = 250;
+const MAX_SOURCE_FILE_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_SOURCE_TRANSFER_ARCHIVE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_PLAN = 'free99';
 const SOURCE_TRANSFER_METHODS = {
@@ -299,6 +303,33 @@ function sourceDownloadPath(workspaceId, projectId, deploymentId) {
   return `/api/skyenet/source-download?${params.toString()}`;
 }
 
+function sourceManifestPath(workspaceId, projectId, deploymentId) {
+  const params = new URLSearchParams({
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  });
+  return `/api/skyenet/source-manifest?${params.toString()}`;
+}
+
+function sourceTreePath(workspaceId, projectId, deploymentId) {
+  const params = new URLSearchParams({
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  });
+  return `/api/skyenet/source-tree?${params.toString()}`;
+}
+
+function sourceSearchPath(workspaceId, projectId, deploymentId) {
+  const params = new URLSearchParams({
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  });
+  return `/api/skyenet/source-search?${params.toString()}`;
+}
+
 function sourceTransferPath() {
   return '/api/skyenet/source-transfer';
 }
@@ -313,6 +344,82 @@ function sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, ex
     `project-${projectId}`,
     `deployment-${deploymentId}`
   ].join('/');
+}
+
+function sourceManifestKeyForPackage(sourcePackage = {}) {
+  const explicit = cleanText(sourcePackage.manifest_key || sourcePackage.manifestKey || '', MAX_PATH * 2).replace(/^\/+/, '');
+  if (explicit) return explicit;
+  const prefix = cleanText(sourcePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  return prefix ? `${prefix}/.skyenet/source-package.json` : '';
+}
+
+function sourceIndexKeyForPackage(sourcePackage = {}) {
+  const explicit = cleanText(sourcePackage.index_key || sourcePackage.indexKey || '', MAX_PATH * 2).replace(/^\/+/, '');
+  if (explicit) return explicit;
+  const prefix = cleanText(sourcePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  return prefix ? `${prefix}/.skyenet/source-index.jsonl` : '';
+}
+
+function sourcePackageHasFiles(sourcePackage = {}) {
+  return Boolean(
+    sourcePackage
+    && typeof sourcePackage === 'object'
+    && (
+      Number(sourcePackage.file_count || sourcePackage.fileCount || 0) > 0
+      || (Array.isArray(sourcePackage.files) && sourcePackage.files.length > 0)
+      || sourceManifestKeyForPackage(sourcePackage)
+      || sourceIndexKeyForPackage(sourcePackage)
+    )
+  );
+}
+
+function sourceFileRecord(value) {
+  if (typeof value === 'string') return { path: normalizeSourcePath(value) };
+  if (value && typeof value === 'object') {
+    const sourcePath = normalizeSourcePath(value.path || value.name || value.source_path || value.sourcePath || '');
+    return {
+      path: sourcePath,
+      size: Number(value.size ?? value.bytes ?? 0) || 0,
+      sha256: cleanText(value.sha256 || value.hash || '', 160),
+      content_type: cleanText(value.content_type || value.contentType || '', 160)
+    };
+  }
+  return null;
+}
+
+function sourcePathFromRecord(value) {
+  if (typeof value === 'string') return normalizeSourcePath(value);
+  if (value && typeof value === 'object') return normalizeSourcePath(value.path || value.name || value.source_path || value.sourcePath || '');
+  return '';
+}
+
+function dedupeSourceFiles(files = []) {
+  const seen = new Set();
+  const out = [];
+  for (const item of files) {
+    const record = sourceFileRecord(item);
+    if (!record || seen.has(record.path)) continue;
+    seen.add(record.path);
+    out.push(record);
+  }
+  return out;
+}
+
+function sourceRecordListForResponse(records = []) {
+  return records.map((record) => {
+    const item = sourceFileRecord(record);
+    return item && (item.size || item.sha256 || item.content_type)
+      ? item
+      : item?.path || sourcePathFromRecord(record);
+  }).filter(Boolean);
+}
+
+function sourceTextFileLikely(pathname = '', contentType = '') {
+  const type = String(contentType || '').toLowerCase();
+  const path = String(pathname || '').toLowerCase();
+  return type.startsWith('text/')
+    || /json|javascript|typescript|xml|svg|yaml|toml|markdown|x-sh|shellscript/.test(type)
+    || /\.(txt|md|markdown|json|js|mjs|cjs|ts|tsx|jsx|css|html|htm|svg|xml|yml|yaml|toml|ini|env|sh|bash|zsh|fish|py|rb|go|rs|java|c|cc|cpp|h|hpp|cs|php|sql|mjs|vue|svelte)$/i.test(path);
 }
 
 function storageSegment(value, fallback = 'item') {

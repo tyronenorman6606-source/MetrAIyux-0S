@@ -1,6 +1,6 @@
 # SkyeNet 73 Client App Closure Ledger
 
-Generated: 2026-05-30T19:14:27.333Z
+Generated: 2026-05-30T19:17:54.377Z
 
 ## Guardrails
 
@@ -11,13 +11,13 @@ Generated: 2026-05-30T19:14:27.333Z
 ## Counts
 
 - Candidates classified: 73
-- Candidates with matched deploy-target evidence: 28
-- Candidate-root deploy-target files found: 45
-- Shared-origin HTTP checks attempted: 27
-- Shared-origin HTTP checks passing: 27
+- Candidates with matched deploy-target evidence: 31
+- Candidate-root deploy-target files found: 48
+- Shared-origin HTTP checks attempted: 30
+- Shared-origin HTTP checks passing: 30
 
-- live-public-skynet: 27
-- deployable-pending: 11
+- live-public-skynet: 30
+- deployable-pending: 8
 - deployed-pages-not-skynet: 0
 - template-held: 1
 - gated-review-held: 16
@@ -85,11 +85,11 @@ Generated: 2026-05-30T19:14:27.333Z
 | 45 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-gray-skyes-collective`<br>SkyeMusicNexus Gray Skyes Collective | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes-collective` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.gray-skyes-collective/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 46 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-jessica-walsh`<br>SkyeMusicNexus Jessica Walsh | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/jessica-walsh` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-jessica-walsh/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/jessica-walsh/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
 | 47 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-local-artists`<br>SkyeMusicNexus Local Artists | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/local-artists` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-local-artists/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/local-artists/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
-| 48 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-music-4u`<br>SkyeMusicNexus Music 4u | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.music-4u/ | deploy-target: none; HTTP skipped; receipts: 1 |
+| 48 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-music-4u`<br>SkyeMusicNexus Music 4u | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-music-4u/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/music-4u/deploy-target.json`; HTTP 200 via HEAD; receipts: 1 |
 | 49 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-NexusArtistPrimePackage`<br>SkyeMusicNexus NexusArtistPrimePackage | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/NexusArtistPrimePackage` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.NexusArtistPrimePackage/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 50 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-radio-vibez`<br>SkyeMusicNexus Radio Vibez | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/radio-vibez` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-radio-vibez/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/radio-vibez/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
-| 51 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-reflection`<br>SkyeMusicNexus Reflection | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.reflection/ | deploy-target: none; HTTP skipped; receipts: 0 |
-| 52 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-sam-smith`<br>SkyeMusicNexus Sam Smith | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.sam-smith/ | deploy-target: none; HTTP skipped; receipts: 0 |
+| 51 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-reflection`<br>SkyeMusicNexus Reflection | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-reflection/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
+| 52 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-sam-smith`<br>SkyeMusicNexus Sam Smith | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-sam-smith/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
 | 53 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku77m6`<br>SkyeMusicNexus Smoke Artist Mpku77m6 | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku77m6` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.smoke-artist-mpku77m6/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 54 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku84sm`<br>SkyeMusicNexus Smoke Artist Mpku84sm | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku84sm` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.smoke-artist-mpku84sm/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 55 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-supaboy`<br>SkyeMusicNexus Supaboy | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/supaboy` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.supaboy/ | deploy-target: none; HTTP skipped; receipts: 10 |
@@ -141,15 +141,15 @@ Generated: 2026-05-30T19:14:27.333Z
 - `musicnexus-gray-skyes-brain`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 - `musicnexus-jessica-walsh`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 - `musicnexus-local-artists`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-music-4u`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 - `musicnexus-radio-vibez`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-reflection`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-sam-smith`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 
 ### deployable-pending
 - `musicnexus-gray-skyes`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-gray-skyes-collective`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-music-4u`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-NexusArtistPrimePackage`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-reflection`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-sam-smith`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-smoke-artist-mpku77m6`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-smoke-artist-mpku84sm`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-supaboy`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
