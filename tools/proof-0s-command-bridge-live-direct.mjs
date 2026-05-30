@@ -251,7 +251,10 @@ const graph = await request('/api/0s-command-bridge/graph?limit=120', owner.toke
 const skyecommerceEvents = await requestUntil(
   '/api/0s-command-bridge/events?app=skyecommerce&limit=120',
   owner.token,
-  result => (result.json?.events || []).some(event => String(event.summary || '').includes(productTitle))
+  result => (result.json?.events || []).some(event => String(event.summary || '').includes(productTitle)),
+  {},
+  12,
+  1500
 );
 const musicEvents = await request('/api/0s-command-bridge/events?app=skymusicnexus&limit=80', owner.token);
 const stressResult = await stress(owner.token);

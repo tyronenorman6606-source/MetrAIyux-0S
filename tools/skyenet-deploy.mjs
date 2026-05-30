@@ -38,9 +38,11 @@ Common:
   --plan free99
   --host skyenet.my-project
   --mount /
-  --url-mode subdomain
-  --source-root <full-project-folder>
-  --no-source
+	  --url-mode subdomain
+	  --source-root <full-project-folder>
+	  --source-archive <archive.tar|archive.tar.zst>
+	  --source-index-only
+	  --no-source
   --concurrency 6
   --resume
   --public
@@ -220,6 +222,8 @@ const token = cleanToken(arg('token', process.env.SKYENET_AUTH || process.env.ZE
 const dirArg = arg('dir');
 const zipArg = arg('zip');
 const sourceRootArg = arg('source-root', process.env.SKYENET_SOURCE_ROOT || '');
+const sourceArchiveArg = arg('source-archive', process.env.SKYENET_SOURCE_ARCHIVE || '');
+const sourceIndexOnly = flag('source-index-only') || /^(1|true|yes)$/i.test(process.env.SKYENET_SOURCE_INDEX_ONLY || '');
 const projectId = arg('project', process.env.SKYENET_PROJECT || '');
 const deploymentId = arg('deployment', `dep_${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`);
 const workspaceId = arg('workspace', process.env.SKYENET_WORKSPACE || 'default-workspace');
@@ -302,24 +306,47 @@ await apiFetch(api, token, '/deploy/complete', {
   retryDelayMs: 900
 });
 
+let uploadedSourceArchive = null;
 if (uploadSourcePackage && sourceFiles.length) {
   process.stderr.write(`skyenet-deploy: uploading private full source package ${sourceFiles.length} files from ${privateSourceRoot}\n`);
-  await uploadWithConcurrency(sourceFiles, concurrency, async (file) => {
-    const params = new URLSearchParams({ workspaceId, projectId, deploymentId, path: file.rel });
-    const body = await fs.readFile(file.full);
-    try {
-      await apiFetch(api, token, `/deploy/source-upload?${params.toString()}`, {
-        method: 'PUT',
-        headers: { 'content-type': contentTypeForPath(file.rel) },
-        body,
-        retries: 5,
-        retryDelayMs: 900
-      });
-    } catch (error) {
-      error.message = `Private source upload failed for ${file.rel}: ${error.message}`;
-      throw error;
-    }
-  });
+  if (sourceIndexOnly) {
+    process.stderr.write('skyenet-deploy: source-index-only enabled; skipping per-file private source upload\n');
+  } else {
+    await uploadWithConcurrency(sourceFiles, concurrency, async (file) => {
+      const params = new URLSearchParams({ workspaceId, projectId, deploymentId, path: file.rel });
+      const body = await fs.readFile(file.full);
+      try {
+        await apiFetch(api, token, `/deploy/source-upload?${params.toString()}`, {
+          method: 'PUT',
+          headers: { 'content-type': contentTypeForPath(file.rel) },
+          body,
+          retries: 5,
+          retryDelayMs: 900
+        });
+      } catch (error) {
+        error.message = `Private source upload failed for ${file.rel}: ${error.message}`;
+        throw error;
+      }
+    });
+  }
+  if (sourceArchiveArg) {
+    const archivePath = path.resolve(sourceArchiveArg);
+    const archiveBody = await fs.readFile(archivePath);
+    const params = new URLSearchParams({
+      workspaceId,
+      projectId,
+      deploymentId,
+      filename: path.basename(archivePath)
+    });
+    const archiveResponse = await apiFetch(api, token, `/deploy/source-archive?${params.toString()}`, {
+      method: 'PUT',
+      headers: { 'content-type': contentTypeForPath(archivePath) },
+      body: archiveBody,
+      retries: 5,
+      retryDelayMs: 900
+    });
+    uploadedSourceArchive = archiveResponse.source_archive || null;
+  }
   await apiFetch(api, token, '/deploy/source-complete', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -328,16 +355,17 @@ if (uploadSourcePackage && sourceFiles.length) {
       plan_name: planName,
       project_id: projectId,
       deployment_id: deploymentId,
-      files: sourceFiles.map((file) => ({
-        path: file.rel,
-        size: file.size || 0,
-        content_type: contentTypeForPath(file.rel)
-      })),
-      meta: {
-        source_root: privateSourceRoot,
-        public_build_root: sourceRoot,
-        upload_mode: sourceRootArg ? 'explicit-source-root' : 'deploy-dir-source-root',
-        public_asset_exposure: false
+	      files: sourceFiles.map((file) => ({
+	        path: file.rel,
+	        size: file.size || 0,
+	        content_type: contentTypeForPath(file.rel)
+	      })),
+	      archive: uploadedSourceArchive,
+	      meta: {
+	        source_root: privateSourceRoot,
+	        public_build_root: sourceRoot,
+	        upload_mode: sourceIndexOnly ? 'source-index-with-archive' : (sourceRootArg ? 'explicit-source-root' : 'deploy-dir-source-root'),
+	        public_asset_exposure: false
       }
     }),
     retries: 5,
@@ -367,12 +395,14 @@ console.log(JSON.stringify({
   ok: true,
   project_id: projectId,
   deployment_id: deploymentId,
-  workspace_id: workspaceId,
-  file_count: files.length,
+	  workspace_id: workspaceId,
+	  file_count: files.length,
 	  private_source_package: uploadSourcePackage ? {
 	    root: privateSourceRoot,
 	    file_count: sourceFiles.length,
 	    uploaded: sourceFiles.length > 0,
+	    source_index_only: sourceIndexOnly,
+	    source_archive_uploaded: Boolean(uploadedSourceArchive),
 	    source_manifest_url: `/api/skyenet/source-manifest?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
 	    source_tree_url: `/api/skyenet/source-tree?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
 	    source_search_url: `/api/skyenet/source-search?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
