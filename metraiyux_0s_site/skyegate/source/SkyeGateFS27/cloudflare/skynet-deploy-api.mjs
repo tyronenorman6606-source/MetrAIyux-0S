@@ -847,16 +847,11 @@ function sourceArchiveError(status, code, message, extra = {}) {
 async function buildSourceArchiveBytes(env, principal, workspaceId, projectId, deploymentId, deployment) {
   const bucket = deploymentBucket(env);
   if (!bucket?.get) throw sourceArchiveError(500, 'NO_DEPLOYMENT_BUCKET_READ', 'DEPLOYMENT_ASSET_BUCKET read is not configured');
-  const privatePackage = deployment.source_package && Array.isArray(deployment.source_package.files) && deployment.source_package.files.length
-    ? deployment.source_package
-    : null;
-  const files = privatePackage
-    ? privatePackage.files.map((file) => normalizeSourcePath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
-    : Array.isArray(deployment.files)
-      ? deployment.files.map((file) => normalizeAssetPath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
-      : [];
+  const source = await sourceFilesForDeployment(env, deployment);
+  const privatePackage = source.source_package;
+  const files = source.files.map((file) => sourcePathFromRecord(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES);
   if (!files.length) throw sourceArchiveError(409, 'DEPLOYMENT_SOURCE_EMPTY', 'Deployment has no recorded files to transfer');
-  const totalRecordedFiles = privatePackage ? privatePackage.files.length : (Array.isArray(deployment.files) ? deployment.files.length : 0);
+  const totalRecordedFiles = source.file_count || source.files.length;
   if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
     throw sourceArchiveError(
       413,
@@ -866,7 +861,7 @@ async function buildSourceArchiveBytes(env, principal, workspaceId, projectId, d
     );
   }
   const prefix = cleanText(
-    privatePackage?.prefix || deployment.asset_prefix || assetPrefix(projectId, deploymentId),
+    source.prefix || privatePackage?.prefix || deployment.asset_prefix || assetPrefix(projectId, deploymentId),
     MAX_PATH
   ).replace(/^\/+|\/+$/g, '');
   const objects = [];
@@ -2524,6 +2519,201 @@ async function handleRoutes(request, env, cors) {
   return httpJson(200, { ok: true, prefix, workspace_id: workspaceId, count: routes.length, routes, cursor: listed.cursor || null, list_complete: listed.list_complete !== false }, cors);
 }
 
+async function handleSourceManifest(request, env, cors) {
+  const context = await sourceQueryContext(request, env, cors);
+  const prefixFilter = cleanText(context.params.prefix || context.params.path_prefix || context.params.pathPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(context.params.limit || 1000)));
+  const offset = Math.max(0, Number(context.params.cursor || context.params.offset || 0));
+  const filtered = prefixFilter
+    ? context.source.files.filter((file) => sourcePathFromRecord(file).startsWith(prefixFilter))
+    : context.source.files;
+  const page = filtered.slice(offset, offset + limit);
+  const nextCursor = offset + page.length < filtered.length ? String(offset + page.length) : null;
+  return httpJson(200, {
+    ok: true,
+    schema: 'fs27.skynet.source_manifest_response.v1',
+    source_mode: context.source.source_mode,
+    workspace_id: context.workspaceId,
+    project_id: context.projectId,
+    deployment_id: context.deploymentId,
+    prefix: context.prefix,
+    path_prefix: prefixFilter,
+    file_count: context.source.file_count || context.source.files.length,
+    indexed_file_count: context.source.files.length,
+    listed_count: filtered.length,
+    limit,
+    cursor: String(offset),
+    next_cursor: nextCursor,
+    list_complete: nextCursor === null,
+    files: sourceRecordListForResponse(page),
+    source_package: sourcePackageSummary(context.source.source_package),
+    manifest_key: context.source.manifest?.manifest_key || sourceManifestKeyForPackage(context.source.source_package || {})
+  }, cors);
+}
+
+async function handleSourceTree(request, env, cors) {
+  const context = await sourceQueryContext(request, env, cors);
+  const rawPrefix = cleanText(context.params.prefix || context.params.path || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  if (rawPrefix && rawPrefix.split('/').some((part) => part === '.' || part === '..')) {
+    return httpJson(400, { ok: false, error: 'Invalid source tree prefix', code: 'BAD_SOURCE_TREE_PREFIX' }, cors);
+  }
+  const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(context.params.limit || 1000)));
+  const offset = Math.max(0, Number(context.params.cursor || context.params.offset || 0));
+  const directories = new Map();
+  const files = new Map();
+  for (const record of context.source.files) {
+    const sourcePath = sourcePathFromRecord(record);
+    if (rawPrefix && sourcePath !== rawPrefix && !sourcePath.startsWith(`${rawPrefix}/`)) continue;
+    const relative = rawPrefix ? sourcePath.slice(rawPrefix.length).replace(/^\/+/, '') : sourcePath;
+    if (!relative) continue;
+    const [head, ...rest] = relative.split('/');
+    const fullPath = rawPrefix ? `${rawPrefix}/${head}` : head;
+    if (rest.length) {
+      directories.set(fullPath, { type: 'directory', name: head, path: fullPath });
+    } else {
+      const file = sourceFileRecord(record);
+      files.set(fullPath, {
+        type: 'file',
+        name: head,
+        path: fullPath,
+        size: file?.size || 0,
+        sha256: file?.sha256 || '',
+        content_type: file?.content_type || contentTypeForPath(fullPath)
+      });
+    }
+  }
+  const entries = [
+    ...[...directories.values()].sort((a, b) => a.path.localeCompare(b.path)),
+    ...[...files.values()].sort((a, b) => a.path.localeCompare(b.path))
+  ];
+  const page = entries.slice(offset, offset + limit);
+  const nextCursor = offset + page.length < entries.length ? String(offset + page.length) : null;
+  return httpJson(200, {
+    ok: true,
+    schema: 'fs27.skynet.source_tree_response.v1',
+    source_mode: context.source.source_mode,
+    workspace_id: context.workspaceId,
+    project_id: context.projectId,
+    deployment_id: context.deploymentId,
+    prefix: rawPrefix,
+    file_count: context.source.file_count || context.source.files.length,
+    entry_count: entries.length,
+    limit,
+    cursor: String(offset),
+    next_cursor: nextCursor,
+    list_complete: nextCursor === null,
+    entries: page,
+    source_package: sourcePackageSummary(context.source.source_package)
+  }, cors);
+}
+
+async function handleSourceSearch(request, env, cors) {
+  const context = await sourceQueryContext(request, env, cors);
+  const query = cleanText(context.params.q || context.params.query || context.params.term || '', 240).toLowerCase();
+  const prefixFilter = cleanText(context.params.prefix || context.params.path_prefix || context.params.pathPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  if (!query) return httpJson(400, { ok: false, error: 'source-search requires q=', code: 'MISSING_SOURCE_SEARCH_QUERY' }, cors);
+  const limit = Math.max(1, Math.min(MAX_SOURCE_SEARCH_RESULTS, Number(context.params.limit || 50)));
+  const results = [];
+  for (const record of context.source.files) {
+    const sourcePath = sourcePathFromRecord(record);
+    if (prefixFilter && !sourcePath.startsWith(prefixFilter)) continue;
+    if (!sourcePath.toLowerCase().includes(query)) continue;
+    const file = sourceFileRecord(record);
+    results.push({
+      path: sourcePath,
+      match: 'path',
+      size: file?.size || 0,
+      sha256: file?.sha256 || '',
+      content_type: file?.content_type || contentTypeForPath(sourcePath)
+    });
+    if (results.length >= limit) break;
+  }
+  return httpJson(200, {
+    ok: true,
+    schema: 'fs27.skynet.source_search_response.v1',
+    source_mode: context.source.source_mode,
+    workspace_id: context.workspaceId,
+    project_id: context.projectId,
+    deployment_id: context.deploymentId,
+    query,
+    mode: 'path',
+    prefix: prefixFilter,
+    limit,
+    result_count: results.length,
+    searched_file_count: context.source.files.length,
+    source_package: sourcePackageSummary(context.source.source_package),
+    results
+  }, cors);
+}
+
+async function handleSourceFile(request, env, cors) {
+  const context = await sourceQueryContext(request, env, cors);
+  const bucket = deploymentBucket(env);
+  if (!bucket?.get) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET read is not configured', code: 'NO_DEPLOYMENT_BUCKET_READ' }, cors);
+  const sourcePath = normalizeSourcePath(context.params.path || context.params.source_path || context.params.sourcePath || '');
+  const recorded = context.source.files.some((file) => sourcePathFromRecord(file) === sourcePath);
+  if (context.source.files.length && !recorded) {
+    return httpJson(404, {
+      ok: false,
+      error: 'Source file is not recorded in this deployment source index',
+      code: 'SOURCE_FILE_NOT_INDEXED',
+      path: sourcePath
+    }, cors);
+  }
+  const objectKey = `${context.prefix}/${sourcePath}`.replace(/\/+/g, '/');
+  const object = await bucket.get(objectKey).catch(() => null);
+  if (!object) {
+    return httpJson(404, {
+      ok: false,
+      error: 'Source file object was not found in SkyeNet private storage',
+      code: 'SOURCE_FILE_NOT_FOUND',
+      path: sourcePath,
+      key: objectKey
+    }, cors);
+  }
+  const headers = new Headers();
+  if (typeof object.writeHttpMetadata === 'function') object.writeHttpMetadata(headers);
+  const contentType = headers.get('content-type') || contentTypeForPath(sourcePath);
+  const bytes = await readObjectBytes(object);
+  const raw = truthy(context.params.raw || context.params.download) || cleanText(context.params.format || '', 40).toLowerCase() === 'raw';
+  if (raw) {
+    const responseHeaders = new Headers(cors);
+    responseHeaders.set('content-type', contentType);
+    responseHeaders.set('cache-control', 'no-store');
+    responseHeaders.set('x-skynet-source-file', sourcePath);
+    responseHeaders.set('x-skynet-project-id', context.projectId);
+    responseHeaders.set('x-skynet-deployment-id', context.deploymentId);
+    return new Response(bytes, { status: 200, headers: responseHeaders });
+  }
+  if (bytes.byteLength > MAX_SOURCE_FILE_JSON_BYTES) {
+    return httpJson(413, {
+      ok: false,
+      error: `Source file is ${bytes.byteLength} bytes; max JSON read is ${MAX_SOURCE_FILE_JSON_BYTES}. Use format=raw for direct download.`,
+      code: 'SOURCE_FILE_JSON_LIMIT',
+      path: sourcePath,
+      bytes: bytes.byteLength,
+      raw_supported: true
+    }, cors);
+  }
+  const isText = sourceTextFileLikely(sourcePath, contentType);
+  return httpJson(200, {
+    ok: true,
+    schema: 'fs27.skynet.source_file_response.v1',
+    source_mode: context.source.source_mode,
+    workspace_id: context.workspaceId,
+    project_id: context.projectId,
+    deployment_id: context.deploymentId,
+    path: sourcePath,
+    key: objectKey,
+    bytes: bytes.byteLength,
+    content_type: contentType,
+    encoding: isText ? 'utf-8' : 'base64',
+    text: isText ? new TextDecoder().decode(bytes) : undefined,
+    base64: isText ? undefined : bytesToBase64(bytes),
+    source_package: sourcePackageSummary(context.source.source_package)
+  }, cors);
+}
+
 async function handleSourceTransfer(request, env, cors) {
   const auth = await requireDeployAuth(request, cors);
   const url = new URL(request.url);
@@ -2690,31 +2880,13 @@ async function handleSourceTransfer(request, env, cors) {
 }
 
 async function handleSourceDownload(request, env, cors) {
-  const auth = await requireDeployAuth(request, cors);
   const bucket = deploymentBucket(env);
   if (!bucket?.get) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET read is not configured', code: 'NO_DEPLOYMENT_BUCKET_READ' }, cors);
-  const url = new URL(request.url);
-  const principal = authPrincipal(auth);
-  const params = Object.fromEntries(url.searchParams.entries());
-  const workspaceId = workspaceIdFromInput(params, principal);
-  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
-  const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), '', MAX_DEPLOYMENT);
-  if (!projectId || !deploymentId) return httpJson(400, { error: 'project_id and deployment_id are required', code: 'MISSING_SOURCE_DOWNLOAD_TARGET' }, cors);
-  const key = deploymentKey(principal.customer_id, workspaceId, projectId, deploymentId);
-  const deployment = await kvGetJson(receiptKv(env), key, null);
-  if (!deployment || deployment.schema !== 'fs27.skynet.deployment.v1') {
-    return httpJson(404, { error: 'Deployment not found for this SkyeNet account/workspace', code: 'DEPLOYMENT_NOT_FOUND' }, cors);
-  }
-  const privatePackage = deployment.source_package && Array.isArray(deployment.source_package.files) && deployment.source_package.files.length
-    ? deployment.source_package
-    : null;
-  const files = privatePackage
-    ? privatePackage.files.map((file) => normalizeSourcePath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
-    : Array.isArray(deployment.files)
-      ? deployment.files.map((file) => normalizeAssetPath(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES)
-      : [];
+  const context = await sourceQueryContext(request, env, cors);
+  const privatePackage = context.source.source_package;
+  const files = context.source.files.map((file) => sourcePathFromRecord(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES);
   if (!files.length) return httpJson(409, { error: 'Deployment has no recorded files to download', code: 'DEPLOYMENT_SOURCE_EMPTY', deployment }, cors);
-  const totalRecordedFiles = privatePackage ? privatePackage.files.length : (Array.isArray(deployment.files) ? deployment.files.length : 0);
+  const totalRecordedFiles = context.source.file_count || context.source.files.length;
   if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
     return httpJson(413, {
       error: `Deployment source bundle has ${totalRecordedFiles} files; max downloadable files per request is ${MAX_SOURCE_DOWNLOAD_FILES}.`,
@@ -2724,7 +2896,7 @@ async function handleSourceDownload(request, env, cors) {
     }, cors);
   }
   const prefix = cleanText(
-    privatePackage?.prefix || deployment.asset_prefix || assetPrefix(projectId, deploymentId),
+    context.prefix || privatePackage?.prefix || context.deployment.asset_prefix || assetPrefix(context.projectId, context.deploymentId),
     MAX_PATH
   ).replace(/^\/+|\/+$/g, '');
   const objects = [];
@@ -2748,29 +2920,29 @@ async function handleSourceDownload(request, env, cors) {
       error: 'Deployment source bundle is incomplete; one or more recorded files are missing from the SkyeNet vault.',
       code: 'SOURCE_DOWNLOAD_INCOMPLETE',
       missing,
-      deployment: { project_id: projectId, deployment_id: deploymentId, workspace_id: workspaceId }
+      deployment: { project_id: context.projectId, deployment_id: context.deploymentId, workspace_id: context.workspaceId }
     }, cors);
   }
   const manifest = {
     schema: 'fs27.skynet.source_download_manifest.v1',
     generated_at: new Date().toISOString(),
     account: {
-      customer_id: principal.customer_id,
-      workspace_id: workspaceId,
-      email: principal.email || '',
-      role: principal.role || ''
+      customer_id: context.principal.customer_id,
+      workspace_id: context.workspaceId,
+      email: context.principal.email || '',
+      role: context.principal.role || ''
     },
     deployment: {
-      project_id: projectId,
-      deployment_id: deploymentId,
-      status: deployment.status || '',
-      live_url: deployment.live_url || '',
-      route_key: deployment.route_key || '',
+      project_id: context.projectId,
+      deployment_id: context.deploymentId,
+      status: context.deployment.status || '',
+      live_url: context.deployment.live_url || '',
+      route_key: context.deployment.route_key || '',
       asset_prefix: prefix,
       source_mode: privatePackage ? 'private-full-project' : 'public-deployment-files',
       source_package: privatePackage ? {
         mode: privatePackage.mode || 'private-full-project',
-        file_count: privatePackage.file_count || files.length,
+        file_count: privatePackage.file_count || context.source.file_count || files.length,
         total_bytes: privatePackage.total_bytes || totalBytes,
         public_asset_exposure: false,
         completed_at: privatePackage.completed_at || ''
@@ -2781,7 +2953,7 @@ async function handleSourceDownload(request, env, cors) {
     files
   };
   const manifestBytes = encodeUtf8(JSON.stringify(manifest, null, 2));
-  const downloadName = `${safeDownloadName(projectId, deploymentId, 'source')}.tar`;
+  const downloadName = `${safeDownloadName(context.projectId, context.deploymentId, 'source')}.tar`;
   const stream = new ReadableStream({
     async start(controller) {
       const enqueueEntry = async (name, bodyBytes, typeflag = '0') => {
@@ -2811,9 +2983,9 @@ async function handleSourceDownload(request, env, cors) {
   headers.set('content-disposition', `attachment; filename="${downloadName}"`);
   headers.set('cache-control', 'no-store');
   headers.set('x-skynet-source-download', 'tar');
-  headers.set('x-skynet-project-id', projectId);
-  headers.set('x-skynet-deployment-id', deploymentId);
-  headers.set('x-skynet-workspace-id', workspaceId);
+  headers.set('x-skynet-project-id', context.projectId);
+  headers.set('x-skynet-deployment-id', context.deploymentId);
+  headers.set('x-skynet-workspace-id', context.workspaceId);
   return new Response(stream, { status: 200, headers });
 }
 

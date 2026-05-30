@@ -2353,6 +2353,7 @@ function founderCommandSkyeNetRedirectResponse(url, method = 'GET') {
   if (!(path === '/founder-command' || path === '/founder-command/' || path.startsWith('/founder-command/'))) return null;
   if (path === '/founder-command/apps/0s-command-bridge' || path.startsWith('/founder-command/apps/0s-command-bridge/')) return null;
   if (path === '/founder-command/apps/0s-calendar' || path.startsWith('/founder-command/apps/0s-calendar/')) return null;
+  if (path === '/founder-command/apps/pwa-factory-v213' || path.startsWith('/founder-command/apps/pwa-factory-v213/')) return null;
   const rest = path === '/founder-command' || path === '/founder-command/' ? '/' : path.slice('/founder-command'.length);
   const target = new URL(`/skyenet/founder-command${rest}`, url.origin);
   url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
@@ -2516,6 +2517,19 @@ async function handleSkyeNetPublishedSurfaceRoute(request, env, url) {
 }
 function sovereignDocsLaneOrigin(env) {
   return String(env.SOVEREIGNDOCS_LANE_ORIGIN || DEFAULT_SOVEREIGNDOCS_LANE_ORIGIN).replace(/\/+$/, '');
+}
+const SKYEMAIL_POCKET_SCRIPT_TAG = '<script src="/assets/js/skymail-pocket-tab.js" defer data-skymail-pocket-tab="1"></script>';
+function injectSkyEmailPocketScript(body = '') {
+  const text = String(body || '');
+  if (text.includes('skymail-pocket-tab.js')) return { body: text, injected: false, present: true };
+  if (/<\/body>/i.test(text)) {
+    return {
+      body: text.replace(/<\/body>/i, `${SKYEMAIL_POCKET_SCRIPT_TAG}</body>`),
+      injected: true,
+      present: false
+    };
+  }
+  return { body: `${text}${SKYEMAIL_POCKET_SCRIPT_TAG}`, injected: true, present: false };
 }
 function isSovereignDocsStaticPath(pathname) {
   return pathname === SOVEREIGNDOCS_STATIC_MOUNT
@@ -27759,8 +27773,11 @@ async function rewriteSovereignDocsStaticLaneResponse(response, headers, url) {
     .replaceAll(oldGuidedBuilderCopy, 'Open in SkyeDocxMax')
     .replaceAll('Open Builder', 'Open SkyeDocxMax')
     .replaceAll('/Free99/apps/sovereigndocs/builder/', skyeDocxHref);
+  const pocket = injectSkyEmailPocketScript(body);
+  body = pocket.body;
   headers.delete('content-length');
   headers.set('x-0s-sovereigndocs-rewrite', 'canonical-skydocxmax-governance-copy');
+  headers.set('x-0s-skyemail-pocket', pocket.injected ? 'injected' : 'present');
   return new Response(body, {
     status: response.status,
     statusText: response.statusText,
