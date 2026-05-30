@@ -57,7 +57,9 @@ Make SkyeNet the Netlify replacement for full project custody: public build depl
 
 - [x] Local SkyeNet deploy/proxy proof passes.
 - [x] Standalone SkyeNet Worker route proof passes.
-- [ ] Update live Netlify parity proof to require source manifest/tree/file/search.
+- [x] Update live Netlify parity proof to require source manifest/tree/file/search.
+- [x] Wrangler dry-run packaging passes under Node 22 for FS27 runtime and standalone SkyeNet.
+- [ ] Deploy FS27 runtime and standalone SkyeNet to production after `CLOUDFLARE_API_TOKEN` is available.
 - [ ] Run live SkyeNet Netlify parity proof.
 - [ ] Add 165k-manifest stress without loading all bytes into Worker memory.
 - [ ] Add giant archive download/range proof.

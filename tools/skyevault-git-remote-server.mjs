@@ -462,9 +462,9 @@ function installHook(repoPath, workspaceId, repoId) {
   const hooksDir = path.join(repoPath, 'hooks');
   fs.mkdirSync(hooksDir, { recursive: true });
   const preReceiveHook = `#!/usr/bin/env node
-const fs = require('node:fs');
-const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 function git(args) {
   try {
@@ -563,9 +563,9 @@ if (errors.length) {
 }
 `;
   const postReceiveHook = `#!/usr/bin/env node
-const fs = require('node:fs');
-const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+import fs from 'node:fs';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 function append(file, event) {
   if (!file) return;
