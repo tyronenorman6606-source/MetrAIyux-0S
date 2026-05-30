@@ -30,12 +30,13 @@ Make SkyeNet the Netlify replacement for full project custody: public build depl
 
 ## Phase 3 - Archive-First Huge Package Custody
 
-- [ ] Add a source archive upload/registration lane for huge packages.
-- [ ] Store the canonical source archive in SkyeVault/R2 with SHA-256, byte count, file count, and owner/workspace/project metadata.
-- [ ] Return prebuilt archives directly from source download instead of rebuilding multi-GB tar files inside the Worker.
+- [x] Add a source archive upload/registration lane for huge packages.
+- [x] Store the canonical source archive in SkyeVault/R2 with SHA-256, byte count, file count, and owner/workspace/project metadata.
+- [x] Return prebuilt archives directly from source download instead of rebuilding multi-GB tar files inside the Worker.
 - [ ] Add range-read proof for giant source archives.
 - [ ] Add direct binding from recovered Netlify/SkyeVault receipts to SkyeNet source packages.
-- [ ] Support `165144` files and the `quantumskyes` recovered archive as a real proof target.
+- [x] Add CLI support for `--source-archive` and `--source-index-only`.
+- [ ] Support `165144` files and the `quantumskyes` recovered archive as a live proof target.
 
 ## Phase 4 - SkyeDrive/SkyeVault Codebase Mounts
 
