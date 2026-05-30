@@ -350,11 +350,11 @@ if (uploadSourcePackage && sourceFiles.length) {
   await apiFetch(api, token, '/deploy/source-complete', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      workspace_id: workspaceId,
-      plan_name: planName,
-      project_id: projectId,
-      deployment_id: deploymentId,
+	    body: JSON.stringify({
+	      workspace_id: workspaceId,
+	      plan_name: planName,
+	      project_id: projectId,
+	      deployment_id: deploymentId,
 	      files: sourceFiles.map((file) => ({
 	        path: file.rel,
 	        size: file.size || 0,
@@ -366,8 +366,8 @@ if (uploadSourcePackage && sourceFiles.length) {
 	        public_build_root: sourceRoot,
 	        upload_mode: sourceIndexOnly ? 'source-index-with-archive' : (sourceRootArg ? 'explicit-source-root' : 'deploy-dir-source-root'),
 	        public_asset_exposure: false
-      }
-    }),
+	      }
+	    }),
     retries: 5,
     retryDelayMs: 900
   });
@@ -392,9 +392,9 @@ const route = await apiFetch(api, token, '/deploy/route', {
 });
 
 console.log(JSON.stringify({
-  ok: true,
-  project_id: projectId,
-  deployment_id: deploymentId,
+	  ok: true,
+	  project_id: projectId,
+	  deployment_id: deploymentId,
 	  workspace_id: workspaceId,
 	  file_count: files.length,
 	  private_source_package: uploadSourcePackage ? {

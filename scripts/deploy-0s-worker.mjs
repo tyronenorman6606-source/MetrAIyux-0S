@@ -61,6 +61,7 @@ const WORKER_ASSET_DIR_INCLUDES = [
   'signin-pro',
   'signinpro',
   'nexus',
+  'skyenet',
   'skye-vault-os',
   'skye-content-repurposer-local',
   'skye-secure-platform',

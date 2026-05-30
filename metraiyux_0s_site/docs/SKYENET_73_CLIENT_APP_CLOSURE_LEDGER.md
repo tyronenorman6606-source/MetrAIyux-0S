@@ -1,6 +1,6 @@
 # SkyeNet 73 Client App Closure Ledger
 
-Generated: 2026-05-30T19:17:54.377Z
+Generated: 2026-05-30T19:42:06.142Z
 
 ## Guardrails
 
@@ -11,13 +11,13 @@ Generated: 2026-05-30T19:17:54.377Z
 ## Counts
 
 - Candidates classified: 73
-- Candidates with matched deploy-target evidence: 31
-- Candidate-root deploy-target files found: 48
-- Shared-origin HTTP checks attempted: 30
-- Shared-origin HTTP checks passing: 30
+- Candidates with matched deploy-target evidence: 36
+- Candidate-root deploy-target files found: 53
+- Shared-origin HTTP checks attempted: 35
+- Shared-origin HTTP checks passing: 35
 
-- live-public-skynet: 30
-- deployable-pending: 8
+- live-public-skynet: 35
+- deployable-pending: 3
 - deployed-pages-not-skynet: 0
 - template-held: 1
 - gated-review-held: 16
@@ -90,11 +90,11 @@ Generated: 2026-05-30T19:17:54.377Z
 | 50 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-radio-vibez`<br>SkyeMusicNexus Radio Vibez | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/radio-vibez` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-radio-vibez/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/radio-vibez/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
 | 51 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-reflection`<br>SkyeMusicNexus Reflection | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-reflection/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
 | 52 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-sam-smith`<br>SkyeMusicNexus Sam Smith | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-sam-smith/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/sam-smith/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
-| 53 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku77m6`<br>SkyeMusicNexus Smoke Artist Mpku77m6 | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku77m6` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.smoke-artist-mpku77m6/ | deploy-target: none; HTTP skipped; receipts: 0 |
-| 54 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku84sm`<br>SkyeMusicNexus Smoke Artist Mpku84sm | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku84sm` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.smoke-artist-mpku84sm/ | deploy-target: none; HTTP skipped; receipts: 0 |
-| 55 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-supaboy`<br>SkyeMusicNexus Supaboy | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/supaboy` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.supaboy/ | deploy-target: none; HTTP skipped; receipts: 10 |
-| 56 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-tha-stoves`<br>SkyeMusicNexus Tha Stoves | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/tha-stoves` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.tha-stoves/ | deploy-target: none; HTTP skipped; receipts: 0 |
-| 57 | `deployable-pending` | `musicnexus-artist-storefront` | `musicnexus-william-parker`<br>SkyeMusicNexus William Parker | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/william-parker` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.william-parker/ | deploy-target: none; HTTP skipped; receipts: 0 |
+| 53 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku77m6`<br>SkyeMusicNexus Smoke Artist Mpku77m6 | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku77m6` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-smoke-artist-mpku77m6/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku77m6/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
+| 54 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-smoke-artist-mpku84sm`<br>SkyeMusicNexus Smoke Artist Mpku84sm | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku84sm` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-smoke-artist-mpku84sm/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/smoke-artist-mpku84sm/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
+| 55 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-supaboy`<br>SkyeMusicNexus Supaboy | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/supaboy` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-supaboy/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/supaboy/deploy-target.json`; HTTP 200 via HEAD; receipts: 10 |
+| 56 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-tha-stoves`<br>SkyeMusicNexus Tha Stoves | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/tha-stoves` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-tha-stoves/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/tha-stoves/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
+| 57 | `live-public-skynet` | `musicnexus-artist-storefront` | `musicnexus-william-parker`<br>SkyeMusicNexus William Parker | `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/william-parker` | `metraiyux_0s_site/SkyeMusicNexus` | https://skyenet.graylondonskyes.workers.dev/musicnexus-william-parker/ | deploy-target: `metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/william-parker/deploy-target.json`; HTTP 200 via HEAD; receipts: 0 |
 | 58 | `gated-review-held` | `free99-mounted-app-review` | `free99-sovereigndocs`<br>Free99 Sovereigndocs | `metraiyux_0s_site/Free99/apps/sovereigndocs` | `metraiyux_0s_site/Free99/apps/sovereigndocs` | https://skyenet.sovereigndocs/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 59 | `gated-review-held` | `free99-mounted-app-review` | `free99-skyevaultpro`<br>Free99 Skyevaultpro | `metraiyux_0s_site/Free99/apps/skyevaultpro` | `metraiyux_0s_site/Free99/apps/skyevaultpro` | https://skyenet.skyevaultpro/ | deploy-target: none; HTTP skipped; receipts: 0 |
 | 60 | `gated-review-held` | `free99-mounted-app-review` | `free99-skyebox-authenticator`<br>Free99 Skyebox Authenticator | `metraiyux_0s_site/Free99/apps/skyebox-authenticator` | `metraiyux_0s_site/Free99/apps/skyebox-authenticator` | https://skyenet.skyebox-authenticator/ | deploy-target: none; HTTP skipped; receipts: 0 |
@@ -145,16 +145,16 @@ Generated: 2026-05-30T19:17:54.377Z
 - `musicnexus-radio-vibez`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 - `musicnexus-reflection`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 - `musicnexus-sam-smith`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-smoke-artist-mpku77m6`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-smoke-artist-mpku84sm`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-supaboy`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-tha-stoves`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
+- `musicnexus-william-parker`: SkyeNet shared-origin deploy target exists and the public URL passed non-browser HTTP verification.
 
 ### deployable-pending
 - `musicnexus-gray-skyes`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-gray-skyes-collective`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 - `musicnexus-NexusArtistPrimePackage`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-smoke-artist-mpku77m6`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-smoke-artist-mpku84sm`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-supaboy`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-tha-stoves`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
-- `musicnexus-william-parker`: Source and build roots exist; no current SkyeNet deploy-target closure record is matched.
 
 ### template-held
 - `skye-app-template`: Template candidate is intentionally held as a reusable starter, not a public client closure.
