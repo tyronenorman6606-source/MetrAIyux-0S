@@ -1176,6 +1176,94 @@ async function objectJson(object, fallback = null) {
   return fallback;
 }
 
+async function sourcePackageManifest(env, sourcePackage = {}) {
+  const bucket = deploymentBucket(env);
+  const manifestKey = sourceManifestKeyForPackage(sourcePackage);
+  if (!bucket?.get || !manifestKey) return null;
+  const manifest = await objectJson(await bucket.get(manifestKey).catch(() => null), null);
+  return manifest && typeof manifest === 'object' ? { ...manifest, manifest_key: manifestKey } : null;
+}
+
+async function sourcePackageIndexFiles(env, sourcePackage = {}) {
+  const bucket = deploymentBucket(env);
+  const indexKey = sourceIndexKeyForPackage(sourcePackage);
+  if (!bucket?.get || !indexKey) return [];
+  const object = await bucket.get(indexKey).catch(() => null);
+  if (!object) return [];
+  const text = typeof object.text === 'function' ? await object.text() : new TextDecoder().decode(await readObjectBytes(object));
+  const files = [];
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    try {
+      files.push(sourceFileRecord(JSON.parse(line)));
+    } catch {
+      try { files.push(sourceFileRecord(line)); } catch {}
+    }
+  }
+  return files.filter(Boolean);
+}
+
+async function sourceFilesForDeployment(env, deployment = {}) {
+  const privatePackage = sourcePackageHasFiles(deployment.source_package) ? deployment.source_package : null;
+  if (privatePackage) {
+    const manifest = await sourcePackageManifest(env, privatePackage);
+    const manifestFiles = Array.isArray(manifest?.files) ? dedupeSourceFiles(manifest.files) : [];
+    const indexFiles = manifestFiles.length ? [] : await sourcePackageIndexFiles(env, privatePackage);
+    const packageFiles = manifestFiles.length
+      ? manifestFiles
+      : indexFiles.length
+        ? dedupeSourceFiles(indexFiles)
+        : dedupeSourceFiles(privatePackage.files || privatePackage.sample_files || []);
+    return {
+      source_mode: 'private-full-project',
+      source_package: privatePackage,
+      manifest,
+      files: packageFiles,
+      file_count: Number(privatePackage.file_count || manifest?.file_count || manifest?.files?.length || packageFiles.length || 0),
+      prefix: cleanText(privatePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '')
+    };
+  }
+  const publicFiles = Array.isArray(deployment.files) ? dedupeSourceFiles(deployment.files.map((file) => ({ path: normalizeAssetPath(file) }))) : [];
+  return {
+    source_mode: 'public-deployment-files',
+    source_package: null,
+    manifest: null,
+    files: publicFiles,
+    file_count: Number(deployment.file_count || publicFiles.length || 0),
+    prefix: cleanText(deployment.asset_prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '')
+  };
+}
+
+async function sourceQueryContext(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const url = new URL(request.url);
+  const principal = authPrincipal(auth);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const workspaceId = workspaceIdFromInput(params, principal);
+  const projectId = normalizeSlug(url.searchParams.get('projectId') || url.searchParams.get('project_id'), '', MAX_PROJECT);
+  const deploymentId = normalizeSlug(url.searchParams.get('deploymentId') || url.searchParams.get('deployment_id'), '', MAX_DEPLOYMENT);
+  if (!projectId || !deploymentId) {
+    const error = new Error('project_id and deployment_id are required');
+    error.status = 400;
+    error.code = 'MISSING_SOURCE_QUERY_TARGET';
+    throw error;
+  }
+  const key = deploymentKey(principal.customer_id, workspaceId, projectId, deploymentId);
+  const deployment = await kvGetJson(receiptKv(env), key, null);
+  if (!deployment || deployment.schema !== 'fs27.skynet.deployment.v1') {
+    const error = new Error('Deployment not found for this SkyeNet account/workspace');
+    error.status = 404;
+    error.code = 'DEPLOYMENT_NOT_FOUND';
+    throw error;
+  }
+  const source = await sourceFilesForDeployment(env, deployment);
+  const prefix = source.prefix || (source.source_package
+    ? cleanText(source.source_package.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '')
+    : assetPrefix(projectId, deploymentId));
+  return { auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
+}
+
 async function kvGetJson(kv, key, fallback = null) {
   if (!kv?.get || !key) return fallback;
   try {
@@ -1818,10 +1906,22 @@ async function handleSourceComplete(request, env, cors) {
   })).deployment;
   const priorPackage = existing.source_package || {};
   const files = Array.isArray(body.files)
-    ? body.files.map((item) => normalizeSourcePath(item)).slice(0, MAX_SOURCE_PACKAGE_FILES)
-    : (priorPackage.files || []);
+    ? dedupeSourceFiles(body.files)
+    : dedupeSourceFiles(priorPackage.files || priorPackage.sample_files || []);
   if (!files.length) return httpJson(400, { ok: false, error: 'Private source package requires at least one source file.', code: 'SOURCE_PACKAGE_EMPTY' }, cors);
+  if (files.length > MAX_SOURCE_INDEX_FILES) {
+    return httpJson(413, {
+      ok: false,
+      error: `SkyeNet private source index has ${files.length} files; max indexed files per source package is ${MAX_SOURCE_INDEX_FILES}.`,
+      code: 'SOURCE_INDEX_FILE_LIMIT',
+      file_count: files.length,
+      limit: MAX_SOURCE_INDEX_FILES
+    }, cors);
+  }
   const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, body.source_prefix || body.sourcePrefix || priorPackage.prefix || '');
+  const manifestKey = `${prefix}/.skyenet/source-package.json`;
+  const indexKey = `${prefix}/.skyenet/source-index.jsonl`;
+  const responseFiles = sourceRecordListForResponse(files);
   const manifest = {
     schema: 'fs27.skynet.source_package_manifest.v1',
     mode: 'private-full-project',
@@ -1831,20 +1931,32 @@ async function handleSourceComplete(request, env, cors) {
     workspace_id: workspaceId,
     completed_at: new Date().toISOString(),
     public_asset_exposure: false,
-    files,
+    file_count: files.length,
+    files: responseFiles,
+    index_key: indexKey,
     meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
   };
-  await bucket.put(`${prefix}/.skyenet/source-package.json`, JSON.stringify(manifest, null, 2), {
+  await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
     httpMetadata: { contentType: 'application/json; charset=utf-8' }
   });
+  const indexBody = files.map((file) => JSON.stringify(file)).join('\n');
+  await bucket.put(indexKey, `${indexBody}\n`, {
+    httpMetadata: { contentType: 'application/x-ndjson; charset=utf-8' }
+  });
+  const keepInlineFiles = files.length <= MAX_SOURCE_PACKAGE_FILES;
   const sourcePackage = {
     schema: 'fs27.skynet.source_package.v1',
     mode: 'private-full-project',
     prefix,
-    files,
+    files: keepInlineFiles ? responseFiles : [],
+    sample_files: responseFiles.slice(0, Math.min(1000, responseFiles.length)),
+    files_truncated: !keepInlineFiles,
     file_count: files.length,
     total_bytes: Number(body.total_bytes ?? body.totalBytes ?? priorPackage.total_bytes ?? 0),
     downloadable: true,
+    manifest_key: manifestKey,
+    index_key: indexKey,
+    index_file_count: files.length,
     public_asset_exposure: false,
     completed_at: manifest.completed_at,
     updated_at: manifest.completed_at
@@ -1861,6 +1973,9 @@ async function handleSourceComplete(request, env, cors) {
     source_prefix: prefix,
     files: files.length,
     total_bytes: sourcePackage.total_bytes,
+    manifest_key: manifestKey,
+    index_key: indexKey,
+    files_truncated: sourcePackage.files_truncated,
     public_asset_exposure: false
   });
   return httpJson(200, {
