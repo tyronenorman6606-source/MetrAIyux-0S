@@ -270,6 +270,7 @@ function candidateSelection(inventory) {
 function planNameFor(candidate) {
   if (process.env.SKYENET_CLIENT_APP_PLAN) return process.env.SKYENET_CLIENT_APP_PLAN;
   const bytes = Number(candidate.stats?.bytes || 0);
+  if (bytes > 150 * 1024 * 1024) return 'skyenet-sovereign-runtime-reserve';
   return bytes > 24 * 1024 * 1024 ? 'skyenet-edge-growth' : 'skyenet-edge-starter';
 }
 

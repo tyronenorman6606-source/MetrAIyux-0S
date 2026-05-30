@@ -27989,6 +27989,45 @@ function isSkyeMusicProtectedCreativeAssetPath(pathname) {
   if (/\/(?:audio|media\/audio)\//i.test(clean) && !/\/drops\/[^/]+\/audio\//i.test(clean)) return true;
   return /\.(?:zip|rar|7z|stems?|als|aup3|logicx|band|ptx|psd|ai|pdf)$/i.test(clean);
 }
+function isGrayGangCollectiveDirectPath(pathname) {
+  return /^\/SkyeMusicNexus\/artist-storefronts\/gray-skyes-collective(?:\/|\/index\.html)?$/i.test(String(pathname || ''));
+}
+function grayGangCollectiveBridgePageResponse() {
+  return new Response(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gray Gang Collective | SkyeMusicNexus</title>
+  <style>
+    :root{color-scheme:dark;--bg:#050607;--panel:#101517;--line:rgba(255,255,255,.14);--text:#f8fbf6;--muted:#aeb8b2;--gold:#f5d36a;--cyan:#7ae7ff}
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;background:radial-gradient(circle at 20% 10%,rgba(122,231,255,.18),transparent 30%),linear-gradient(145deg,#050607,#101517 58%,#151106);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:inherit}.shell{width:min(1160px,calc(100% - 32px));margin:auto;padding:28px 0 70px}.topbar,.actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.topbar{justify-content:space-between;margin-bottom:54px}.brand{font-weight:950;text-decoration:none}.brand span{display:inline-grid;place-items:center;width:38px;height:38px;margin-right:10px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--cyan));color:#050607}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;text-decoration:none;background:rgba(16,21,23,.72);font-weight:850}.btn.primary{border:0;background:linear-gradient(135deg,var(--gold),var(--cyan));color:#050607}.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:18px;align-items:stretch}.panel,.card{border:1px solid var(--line);border-radius:8px;background:rgba(16,21,23,.74);box-shadow:0 24px 70px rgba(0,0,0,.28)}.panel{padding:26px}.micro{margin:0 0 10px;color:var(--gold);font-size:12px;font-weight:950;letter-spacing:.13em;text-transform:uppercase}h1{max-width:840px;margin:0 0 16px;font-size:clamp(42px,7vw,86px);line-height:.94;letter-spacing:0}p{color:var(--muted);line-height:1.55}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}.card{padding:18px}.card h2{margin:0 0 8px;font-size:20px}@media(max-width:820px){.hero,.grid{grid-template-columns:1fr}.topbar{align-items:flex-start}.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/SkyeMusicNexus/"><span>GG</span>Gray Gang Collective</a>
+      <nav class="actions" aria-label="Gray Gang routes"><a class="btn primary" href="/SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/gray-x-gray-five/">Gray x Gray Five</a><a class="btn" href="/SkyeMusicNexus/artist-storefronts/NexusArtistPrimePackage/originals/gray-skyes-collective/">Prime Room</a><a class="btn" href="/SkyeMusicNexus/artist-storefronts/gray-skyes/">Gray</a><a class="btn" href="/SkyeMusicNexus/artist-storefronts/gray-skyes-brain/">Gray Brain</a></nav>
+    </header>
+    <section class="hero">
+      <div class="panel"><p class="micro">SkyeMusicNexus collective</p><h1>Gray Gang routes artists, releases, products, PWA drops, and payouts through one command layer.</h1><p>This direct collective surface keeps the public storefront path alive while the deeper Prime package carries the full generated universe.</p><div class="actions"><a class="btn primary" href="/SkyeMusicNexus/artist-storefronts/NexusArtistPrimePackage/originals/gray-skyes-collective/">Open Full Collective</a><a class="btn" href="/SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases/gray-x-gray-five/">Open Release Room</a><a class="btn" href="/SkyeMusicNexus/dashboard.html">Nexus Dashboard</a></div></div>
+      <aside class="panel"><p class="micro">0S bridge</p><p>Views and interaction signals on this surface are wired into the 0S Command Bridge as artist-storefront CRM events.</p></aside>
+    </section>
+    <section class="grid" aria-label="Collective lanes"><article class="card"><h2>Artist Apps</h2><p>Storefronts, app shells, release rooms, and product surfaces connect back to the Nexus workspace.</p></article><article class="card"><h2>Commerce</h2><p>Product intent, checkout routing, and SkyePay records stay attached to the artist CRM spine.</p></article><article class="card"><h2>Proof</h2><p>Command Bridge events keep live storefront activity visible to Founder Command.</p></article></section>
+  </main>
+  <script src="/assets/js/0s-command-bridge.js" data-command-bridge-app="artist-storefronts" data-command-bridge-surface="gray-gang-collective"></script>
+</body>
+</html>`, {
+    status: 200,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-0s-skymusicnexus-direct-surface': 'gray-gang-collective'
+    }
+  });
+}
 function skyeMusicProtectedCreativeAssetResponse(url) {
   return json({
     ok:false,
@@ -28086,6 +28125,9 @@ export default {
         error:'artist_raw_dossier_not_public',
         message:'Use the artist app, storefront, or gated SkyeMusicNexus APIs for curated artist/product access.'
       }, 404);
+    }
+    if (isGrayGangCollectiveDirectPath(url.pathname)) {
+      return grayGangCollectiveBridgePageResponse();
     }
     if (isSkyeMusicProtectedCreativeAssetPath(url.pathname)) {
       return skyeMusicProtectedCreativeAssetResponse(url);

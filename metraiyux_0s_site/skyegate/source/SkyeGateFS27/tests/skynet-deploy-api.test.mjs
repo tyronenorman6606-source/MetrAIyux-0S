@@ -475,12 +475,25 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   assert.equal(treeBody.entries.length, 2);
   assert.equal(treeBody.next_cursor, '2');
 
+  const archive = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-archive?project_id=large-source&deployment_id=dep_large_index&filename=large-source.tar.zst',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/zstd' }),
+      body: 'stored-archive-bytes'
+    }
+  ), context);
+  assert.equal(archive.status, 200);
+  const archiveBody = await archive.json();
+  assert.equal(archiveBody.source_archive.filename, 'large-source.tar.zst');
+  assert.match(archiveBody.source_archive.key, /\.skyenet\/archive\/large-source\.tar\.zst$/);
+
   const download = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-download?project_id=large-source&deployment_id=dep_large_index',
     { method: 'GET', headers: authHeaders() }
   ), context);
-  assert.equal(download.status, 413);
-  const downloadBody = await download.json();
-  assert.equal(downloadBody.code, 'SOURCE_DOWNLOAD_FILE_LIMIT');
-  assert.equal(downloadBody.file_count, 20001);
+  assert.equal(download.status, 200);
+  assert.equal(download.headers.get('x-skynet-source-download'), 'stored-archive');
+  assert.equal(download.headers.get('content-disposition'), 'attachment; filename="large-source.tar.zst"');
+  assert.equal(await download.text(), 'stored-archive-bytes');
 });

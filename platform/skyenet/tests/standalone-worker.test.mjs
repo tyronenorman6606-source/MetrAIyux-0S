@@ -68,7 +68,7 @@ function env() {
             env: [{ key: 'API_TOKEN', value_preview: '****1234' }]
           });
         }
-        if (url.pathname === '/deploy/source-upload' || url.pathname === '/deploy/source-complete') {
+        if (url.pathname === '/deploy/source-upload' || url.pathname === '/deploy/source-archive' || url.pathname === '/deploy/source-complete') {
           return Response.json({ ok: true, service: 'fs27-skynet', path: url.pathname });
         }
         if (url.pathname.startsWith('/deploy/')) {
@@ -182,10 +182,13 @@ test('standalone SkyeNet env and private source APIs map to FS27', async () => {
     [2, '/api/skyenet/source-manifest?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-manifest'],
     [3, '/api/skyenet/source-tree?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-tree'],
     [4, '/api/skyenet/source-file?workspace_id=demo&project_id=demo&deployment_id=dep_1&path=package.json', '/deploy/source-file'],
-    [5, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search']
+    [5, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search'],
+    [6, '/api/skyenet/source-archive?workspace_id=demo&project_id=demo&deployment_id=dep_1&filename=source.tar.zst', '/deploy/source-archive']
   ]) {
     const response = await worker.fetch(req(path, {
-      headers: { authorization: 'Bearer gate-token' }
+      method: expected === '/deploy/source-archive' ? 'PUT' : 'GET',
+      headers: { authorization: 'Bearer gate-token' },
+      body: expected === '/deploy/source-archive' ? 'archive' : undefined
     }), e);
     assert.equal(response.status, 200);
     assert.equal((await response.json()).path, expected);
