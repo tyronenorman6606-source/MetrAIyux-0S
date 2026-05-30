@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>0S Honest Repair Report | DevodeRator</title>
+  <meta name="description" content="May 30 0S repair report: production deploys, Signin Pro/NorthStar no-browser proof, Command Bridge repair, LLC-to-0S wiring, SkyErrors health watch, and the remaining per-app matrix gap.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-30-0s-honest-repair-report.html">0S Repair</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 30, 2026 · 0S repair · production proof · truth ledger · SkyErrors · Signin Pro · Command Bridge</p>
+    <h1>Today was a real 0S repair day, not a victory lap.</h1>
+    <p class="lede">
+      The system got materially better today: production deploys are moving again, Signin Pro/NorthStar has a no-browser proof, Command Bridge is green, LLC-to-0S is wired into Founder Command CRM, and SkyErrors now has a health-watch receipt. The final closure is still guarded-partial because the strict per-app matrix has 84 app-depth rows left to close.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        The honest win is that the red behavior lane is gone. The honest warning is that route/auth green is not the same as literal per-app behavior depth.
+      </blockquote>
+
+      <h2>What actually got fixed.</h2>
+      <p>
+        Cloudflare Worker deploys recovered after the earlier `/versions` error. The main 0S Worker was redeployed through the existing lane, not a side channel, and the latest deploy receipt is green at version <code>9c2e2d33-49ef-4ac1-bc73-ef62f209265d</code>.
+      </p>
+      <p>
+        Signin Pro/NorthStar had a policy problem: the mapped proof was still browser-based. I replaced that with a no-browser receipt that proves shared FS27/SkyGate/Free99 auth, the Free99 demo-code handoff locally, live NorthStar session/workspace sync, and disabled app-local password login. The aliases <code>/signinpro/</code> and <code>/signin-pro/</code> are now staged and live.
+      </p>
+      <p>
+        Command Bridge had two problems: SkyeCommerce was not proving its bridge event in the current live receipt, and the proof script could hang because it had no fetch timeout. The bounded proof now passes manual bridge writes, MusicNexus events, SkyeCommerce product-event mirroring, graph/status reads, and stress.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Green receipts from the repair pass</strong>
+        <ul>
+          <li>Worker deploy: <code>test-artifacts/0s-worker-deploy/founder-command-full-worker-deploy-latest.json</code></li>
+          <li>Signin Pro/NorthStar: <code>test-artifacts/free99-signinpro-demo-live/free99-signinpro-demo-live-latest.json</code></li>
+          <li>Command Bridge: <code>test-artifacts/0s-command-bridge/live-direct-proof-latest.json</code></li>
+          <li>LLC-to-0S workflow: <code>test-artifacts/llc-to-0s-business-workflow/llc-to-0s-business-workflow-live-http-latest.json</code></li>
+          <li>SkyErrors watch: <code>test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json</code></li>
+          <li>Provider runtime: <code>test-artifacts/0s-provider-runtime/0s-provider-runtime-smoke-latest.json</code></li>
+          <li>Operating matrix route/auth and family behavior: <code>107</code> apps checked, <code>0</code> route/auth failures, <code>22/22</code> behavior lanes green.</li>
+        </ul>
+      </div>
+
+      <h2>What is still not closed.</h2>
+      <p>
+        The truth ledger is not green. It is now cleaner, but it is still not closed: <code>21</code> workflows built, <code>1</code> partial, <code>0</code> failing proof, and the remaining P0 item is <code>per-app-operating-proof-matrix</code>.
+      </p>
+      <p>
+        The strict app-depth matrix is yellow: <code>107</code> total mounted rows, <code>23</code> green, <code>84</code> yellow, <code>0</code> red. Those yellow rows are not route failures. They need app-specific scenarios or valid read-only/local-first proof models before production closure can honestly turn green.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Live proof links</strong>
+        <ul>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/0s-truth-ledger.json">0S truth ledger JSON</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/proof/0s-production-closure.json">0S production closure JSON</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyerrors/live-capability-watch.json">SkyErrors live capability watch</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/">NorthStar canonical</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/signinpro/">Signin Pro alias</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/signin-pro/">Signin Pro hyphen alias</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/">SkyeNet control surface</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-command-bridge/">0S Command Bridge app</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/business-formation/">LLC-to-0S workflow</a></li>
+        </ul>
+      </div>
+
+      <h2>The next correction is narrow.</h2>
+      <p>
+        The next build pass should not create a new lane. It should build on the strict matrix that exists now: one per-app behavior-depth receipt row per mounted app route. Read-only/proof pages need marker integrity, provenance, stress, and mutation denial. Local-first apps need export/vault/static behavior proof with browser-only storage called out as owner-handled. Remote stateful apps need product-specific create/read/update-or-closeout/receipt/stress evidence.
+      </p>
+      <p>
+        Until that exists, the production closure receipt has to stay guarded-partial. That is the point of the repair: the 0S should prove what it can do, and name what it has not proven yet.
+      </p>
+
+      <blockquote>
+        No browser proof was run. The repo policy says browser verification is owner-handled, so this pass stayed on build, deploy, HTTP/API, static, route, and stress receipts.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · build receipts, proof journals, and sovereign infrastructure notes.</footer>
+</body>
+</html>

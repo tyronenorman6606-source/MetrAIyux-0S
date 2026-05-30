@@ -287,7 +287,17 @@ async function smokeDevooderator() {
   const urls = [
     {
       url: 'https://devooderator.pages.dev/',
-      contains: ['blog/2026-05-29-0s-production-closure-gate-repair.html']
+      contains: ['blog/2026-05-30-0s-honest-repair-report.html']
+    },
+    {
+      url: 'https://devooderator.pages.dev/blog/2026-05-30-0s-honest-repair-report.html',
+      contains: [
+        'Today was a real 0S repair day',
+        '9c2e2d33-49ef-4ac1-bc73-ef62f209265d',
+        'per-app matrix has 84 app-depth rows left',
+        '0S production closure JSON',
+        'No browser proof was run'
+      ]
     },
     {
       url: 'https://devooderator.pages.dev/blog/2026-05-29-0s-production-closure-gate-repair',
@@ -324,6 +334,7 @@ async function smokeDevooderator() {
     {
       url: 'https://devooderator.pages.dev/sitemap.xml',
       contains: [
+        'blog/2026-05-30-0s-honest-repair-report',
         'blog/2026-05-29-0s-production-closure-gate-repair',
         'blog/2026-05-27-bobs-skynet-sovereign-client-app',
         'blog/2026-05-26-valley-verified-static-closure'
