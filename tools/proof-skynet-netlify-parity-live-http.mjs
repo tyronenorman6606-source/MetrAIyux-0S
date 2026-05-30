@@ -397,9 +397,9 @@ async function main() {
         const response = await fetch(sourceUrl, { headers: authHeaders(token), redirect: 'manual' });
         const bytes = Buffer.from(await response.arrayBuffer());
         const bodyText = bytes.toString('utf8');
-        receipt.source_download = {
-          url: sourceUrl,
-          status: response.status,
+	        receipt.source_download = {
+	          url: sourceUrl,
+	          status: response.status,
           ok: response.ok
             && response.headers.get('content-type') === 'application/x-tar'
             && hasAll(bodyText, ['.skyenet/source-manifest.json', 'package.json', 'src/main.js', 'netlify/functions/hello.mjs', 'README.md']),
@@ -414,10 +414,46 @@ async function main() {
             has_netlify_function: bodyText.includes('netlify/functions/hello.mjs'),
             has_public_index: bodyText.includes('index.html')
           },
-          elapsed_ms: Number((performance.now() - started).toFixed(2))
-        };
+	          elapsed_ms: Number((performance.now() - started).toFixed(2))
+	        };
 
-        const exposedUrl = `${skynetBase}${mount}/netlify/functions/hello.mjs`;
+	        const sourceApiUrl = (path, extra = {}) => {
+	          const target = new URL(sourceUrl);
+	          target.pathname = `/api/skyenet/${path}`;
+	          target.searchParams.set('workspace_id', workspaceId);
+	          target.searchParams.set('project_id', projectId);
+	          target.searchParams.set('deployment_id', deploymentId);
+	          for (const [key, value] of Object.entries(extra)) target.searchParams.set(key, value);
+	          return target.toString();
+	        };
+	        const manifest = await fetchJson(sourceApiUrl('source-manifest', { limit: '20' }), { headers: authHeaders(token), redirect: 'manual' });
+	        const tree = await fetchJson(sourceApiUrl('source-tree'), { headers: authHeaders(token), redirect: 'manual' });
+	        const sourceFile = await fetchJson(sourceApiUrl('source-file', { path: 'src/main.js' }), { headers: authHeaders(token), redirect: 'manual' });
+	        const search = await fetchJson(sourceApiUrl('source-search', { q: 'handler' }), { headers: authHeaders(token), redirect: 'manual' });
+	        receipt.source_codebase = {
+	          manifest: {
+	            status: manifest.status,
+	            ok: manifest.ok && manifest.body?.source_mode === 'private-full-project' && hasAll(JSON.stringify(manifest.body.files || []), ['package.json', 'src/main.js', 'netlify/functions/hello.mjs']),
+	            file_count: manifest.body?.file_count || 0
+	          },
+	          tree: {
+	            status: tree.status,
+	            ok: tree.ok && hasAll(JSON.stringify(tree.body?.entries || []), ['src', 'netlify', 'package.json']),
+	            entry_count: tree.body?.entry_count || 0
+	          },
+	          file: {
+	            status: sourceFile.status,
+	            ok: sourceFile.ok && sourceFile.body?.path === 'src/main.js' && String(sourceFile.body?.text || '').includes('SkyeNet parity proof'),
+	            bytes: sourceFile.body?.bytes || 0
+	          },
+	          search: {
+	            status: search.status,
+	            ok: search.ok && Array.isArray(search.body?.results) && search.body.results.some((item) => item.path === 'netlify/functions/hello.mjs'),
+	            result_count: search.body?.result_count || 0
+	          }
+	        };
+
+	        const exposedUrl = `${skynetBase}${mount}/netlify/functions/hello.mjs`;
         const exposure = await fetchText(exposedUrl);
         receipt.public_source_exposure = {
           url: exposedUrl,
@@ -437,9 +473,10 @@ async function main() {
       if (!receipt.env_list.ok || !receipt.env_list.has_key || receipt.env_list.raw_secret_exposed) receipt.failures.push('Env list failed, missed the key, or exposed the raw secret.');
       if (!receipt.deploy.ok) receipt.failures.push('SkyeNet CLI deploy did not upload a private full source package.');
       if (!receipt.public_static.ok) receipt.failures.push('Published SkyeNet public app route did not render expected content.');
-      if (!receipt.public_assets?.ok) receipt.failures.push('Published SkyeNet public assets did not resolve under the mounted route.');
-      if (!receipt.source_download?.ok) receipt.failures.push('Gated source download did not include full private project files.');
-      if (!receipt.public_source_exposure?.ok) receipt.failures.push('Private source file was exposed through the public route.');
+	      if (!receipt.public_assets?.ok) receipt.failures.push('Published SkyeNet public assets did not resolve under the mounted route.');
+	      if (!receipt.source_download?.ok) receipt.failures.push('Gated source download did not include full private project files.');
+	      if (!receipt.source_codebase?.manifest?.ok || !receipt.source_codebase?.tree?.ok || !receipt.source_codebase?.file?.ok || !receipt.source_codebase?.search?.ok) receipt.failures.push('Gated source codebase manifest/tree/file/search APIs did not prove IDE-readable source custody.');
+	      if (!receipt.public_source_exposure?.ok) receipt.failures.push('Private source file was exposed through the public route.');
     }
   }
 

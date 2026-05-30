@@ -10,6 +10,8 @@ const MAX_SOURCE_PACKAGE_FILES = 20000;
 const MAX_SOURCE_INDEX_FILES = 500000;
 const MAX_SOURCE_QUERY_LIMIT = 5000;
 const MAX_SOURCE_SEARCH_RESULTS = 250;
+const MAX_SOURCE_SEARCH_CONTENT_FILES = 500;
+const MAX_SOURCE_SEARCH_CONTENT_BYTES = 256 * 1024;
 const MAX_SOURCE_FILE_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_SOURCE_TRANSFER_ARCHIVE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_PLAN = 'free99';
@@ -435,9 +437,37 @@ function sourcePackageSummary(sourcePackage = null) {
     index_file_count: Number(sourcePackage.index_file_count || sourcePackage.file_count || 0),
     files_inline: Array.isArray(sourcePackage.files) ? sourcePackage.files.length : 0,
     files_truncated: Boolean(sourcePackage.files_truncated),
+    archive: sourcePackage.archive ? {
+      key: sourcePackage.archive.key || '',
+      filename: sourcePackage.archive.filename || '',
+      bytes: Number(sourcePackage.archive.bytes || 0),
+      sha256: sourcePackage.archive.sha256 || '',
+      content_type: sourcePackage.archive.content_type || 'application/octet-stream',
+      downloadable: sourcePackage.archive.downloadable !== false
+    } : null,
     public_asset_exposure: sourcePackage.public_asset_exposure === false ? false : 'public_assets_only',
     completed_at: sourcePackage.completed_at || '',
     updated_at: sourcePackage.updated_at || ''
+  };
+}
+
+function normalizeArchiveFilename(value, projectId = 'project', deploymentId = 'deployment') {
+  const raw = cleanText(value || '', 240).split('/').pop().replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
+  return raw || `${safeDownloadName(projectId, deploymentId, 'source-archive')}.tar`;
+}
+
+function sourceArchiveForPackage(sourcePackage = {}) {
+  const archive = sourcePackage?.archive && typeof sourcePackage.archive === 'object' ? sourcePackage.archive : null;
+  if (!archive?.key) return null;
+  return {
+    key: cleanText(archive.key, MAX_PATH * 2).replace(/^\/+/, ''),
+    filename: normalizeArchiveFilename(archive.filename || archive.name || archive.key.split('/').pop()),
+    bytes: Number(archive.bytes || archive.size || 0),
+    sha256: cleanText(archive.sha256 || '', 160),
+    content_type: cleanText(archive.content_type || archive.contentType || 'application/octet-stream', 160) || 'application/octet-stream',
+    bucket_binding: cleanText(archive.bucket_binding || archive.bucketBinding || '', 120),
+    downloadable: archive.downloadable !== false,
+    uploaded_at: archive.uploaded_at || archive.created_at || ''
   };
 }
 
@@ -1278,6 +1308,26 @@ async function sourceQueryContext(request, env, cors) {
   return { auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
 }
 
+async function sourceArchiveResponse(env, archive, context, cors) {
+  const bucket = sourceTransferBucket(env) || deploymentBucket(env);
+  if (!bucket?.get) return null;
+  const object = await bucket.get(archive.key).catch(() => null);
+  if (!object) return null;
+  const headers = new Headers(cors);
+  const objectHeaders = new Headers();
+  if (typeof object.writeHttpMetadata === 'function') object.writeHttpMetadata(objectHeaders);
+  headers.set('content-type', archive.content_type || objectHeaders.get('content-type') || 'application/octet-stream');
+  headers.set('content-disposition', `attachment; filename="${normalizeArchiveFilename(archive.filename, context.projectId, context.deploymentId)}"`);
+  headers.set('cache-control', 'no-store');
+  headers.set('x-skynet-source-download', 'stored-archive');
+  headers.set('x-skynet-project-id', context.projectId);
+  headers.set('x-skynet-deployment-id', context.deploymentId);
+  headers.set('x-skynet-workspace-id', context.workspaceId);
+  if (archive.sha256) headers.set('x-skynet-source-archive-sha256', archive.sha256);
+  const body = object.body && typeof object.body.getReader === 'function' ? object.body : await readObjectBytes(object);
+  return new Response(body, { status: 200, headers });
+}
+
 async function kvGetJson(kv, key, fallback = null) {
   if (!kv?.get || !key) return fallback;
   try {
@@ -1933,6 +1983,10 @@ async function handleSourceComplete(request, env, cors) {
     }, cors);
   }
   const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, body.source_prefix || body.sourcePrefix || priorPackage.prefix || '');
+  const archiveInput = body.archive && typeof body.archive === 'object' ? body.archive : null;
+  const archive = archiveInput
+    ? sourceArchiveForPackage({ archive: archiveInput })
+    : sourceArchiveForPackage(priorPackage);
   const manifestKey = `${prefix}/.skyenet/source-package.json`;
   const indexKey = `${prefix}/.skyenet/source-index.jsonl`;
   const responseFiles = sourceRecordListForResponse(files);
@@ -1948,6 +2002,7 @@ async function handleSourceComplete(request, env, cors) {
     file_count: files.length,
     files: responseFiles,
     index_key: indexKey,
+    archive,
     meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
   };
   await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
@@ -1971,6 +2026,7 @@ async function handleSourceComplete(request, env, cors) {
     manifest_key: manifestKey,
     index_key: indexKey,
     index_file_count: files.length,
+    archive,
     public_asset_exposure: false,
     completed_at: manifest.completed_at,
     updated_at: manifest.completed_at
@@ -2155,15 +2211,21 @@ async function handleDashboard(request, env, cors) {
     .map((deployment) => ({
       ...deployment,
       source_download_url: sourceDownloadPath(workspace.workspace_id, deployment.project_id || '', deployment.deployment_id || ''),
+      source_manifest_url: sourceManifestPath(workspace.workspace_id, deployment.project_id || '', deployment.deployment_id || ''),
+      source_tree_url: sourceTreePath(workspace.workspace_id, deployment.project_id || '', deployment.deployment_id || ''),
+      source_search_url: sourceSearchPath(workspace.workspace_id, deployment.project_id || '', deployment.deployment_id || ''),
       source_transfer_url: sourceTransferPath(),
       source_custody: {
         account_scoped: true,
         visible_to_authenticated_account: true,
         client_handoff_requires_transfer: true,
         package_mode: deployment.source_package?.mode || 'public-deployment-files',
-        private_full_project_package: Boolean(deployment.source_package?.files?.length),
+        private_full_project_package: sourcePackageHasFiles(deployment.source_package),
         private_source_file_count: deployment.source_package?.file_count || 0,
         private_source_total_bytes: deployment.source_package?.total_bytes || 0,
+        manifest_key: deployment.source_package?.manifest_key || sourceManifestKeyForPackage(deployment.source_package || {}),
+        index_key: deployment.source_package?.index_key || sourceIndexKeyForPackage(deployment.source_package || {}),
+        ide_readable_codebase: true,
         public_asset_exposure: deployment.source_package?.public_asset_exposure === false ? false : 'public_assets_only',
         direct_download_format: 'tar',
         secure_pack_extension: '.skye',
@@ -2405,11 +2467,16 @@ async function handleStatus(request, env, cors) {
       'GET /deploy/routes',
       'GET/POST /deploy/workspace',
       'GET /deploy/dashboard',
-      'GET/POST/DELETE /deploy/env',
-      'PUT /deploy/source-upload',
-      'POST /deploy/source-complete',
-      'GET /deploy/source-download',
-      'POST /deploy/source-transfer',
+	      'GET/POST/DELETE /deploy/env',
+	      'PUT /deploy/source-upload',
+	      'PUT /deploy/source-archive',
+	      'POST /deploy/source-complete',
+	      'GET /deploy/source-manifest',
+	      'GET /deploy/source-tree',
+	      'GET /deploy/source-file',
+	      'GET /deploy/source-search',
+	      'GET /deploy/source-download',
+	      'POST /deploy/source-transfer',
       'GET /deploy/receipts',
       'POST /deploy/rollback',
       'GET /deploy/observability',
@@ -2435,10 +2502,19 @@ async function handleStatus(request, env, cors) {
       static_deploy_root_index_required: true,
       asset_missing_route_diagnostic: true,
       direct_live_link_after_publish: true,
-      source_downloads: true,
-      netlify_style_deploy_file_downloads: true,
-      private_full_project_source_packages: true,
-      source_package_public_asset_exposure: false,
+	      source_downloads: true,
+	      source_archive_uploads: true,
+	      source_archive_direct_downloads: true,
+	      netlify_style_deploy_file_downloads: true,
+	      private_full_project_source_packages: true,
+	      private_source_manifest_api: true,
+	      private_source_tree_api: true,
+	      private_source_file_api: true,
+	      private_source_search_api: true,
+	      ide_readable_source_codebases: true,
+	      source_index_format: 'jsonl',
+	      source_index_max_files: MAX_SOURCE_INDEX_FILES,
+	      source_package_public_asset_exposure: false,
       source_bundle_format: 'tar',
       env_variable_registry: true,
       env_values_redacted_in_dashboard: true,
@@ -2517,6 +2593,95 @@ async function handleRoutes(request, env, cors) {
     ? scoped.filter((item) => normalizeSlug(item.route?.project_id || item.route?.projectId || '', '', MAX_PROJECT) === projectId)
     : scoped;
   return httpJson(200, { ok: true, prefix, workspace_id: workspaceId, count: routes.length, routes, cursor: listed.cursor || null, list_complete: listed.list_complete !== false }, cors);
+}
+
+async function handleSourceArchiveUpload(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const bucket = sourceTransferBucket(env) || deploymentBucket(env);
+  if (!bucket?.put) return httpJson(500, { error: 'SkyeNet source archive bucket is not configured', code: 'NO_SOURCE_ARCHIVE_BUCKET' }, cors);
+  const url = new URL(request.url);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const principal = authPrincipal(auth);
+  const workspaceResult = await ensureWorkspace(env, auth, request, params);
+  const workspaceId = workspaceResult.workspace.workspace_id;
+  const projectId = normalizeSlug(params.projectId || params.project_id, 'project', MAX_PROJECT);
+  const deploymentId = normalizeSlug(params.deploymentId || params.deployment_id, 'dep_missing', MAX_DEPLOYMENT);
+  const filename = normalizeArchiveFilename(params.filename || params.name || params.path, projectId, deploymentId);
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, params.sourcePrefix || params.source_prefix || '');
+  const body = await request.arrayBuffer();
+  const sha256 = await sha256Hex(body);
+  const contentType = cleanText(request.headers.get('content-type') || contentTypeForPath(filename), 160) || 'application/octet-stream';
+  const key = `${prefix}/.skyenet/archive/${filename}`.replace(/\/+/g, '/');
+  await bucket.put(key, body, {
+    httpMetadata: { contentType },
+    customMetadata: {
+      schema: 'fs27.skynet.source_archive.v1',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      workspace_id: workspaceId,
+      sha256
+    }
+  });
+  const existing = (await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  })).deployment;
+  const priorPackage = existing.source_package || {};
+  const now = new Date().toISOString();
+  const archive = {
+    key,
+    filename,
+    bytes: body.byteLength,
+    sha256,
+    content_type: contentType,
+    bucket_binding: sourceTransferBucketBinding(env),
+    downloadable: true,
+    uploaded_at: now
+  };
+  const sourcePackage = {
+    schema: 'fs27.skynet.source_package.v1',
+    mode: priorPackage.mode || 'private-full-project',
+    prefix: priorPackage.prefix || prefix,
+    files: Array.isArray(priorPackage.files) ? priorPackage.files : [],
+    sample_files: Array.isArray(priorPackage.sample_files) ? priorPackage.sample_files : [],
+    files_truncated: Boolean(priorPackage.files_truncated),
+    file_count: Number(priorPackage.file_count || 0),
+    total_bytes: Number(priorPackage.total_bytes || 0),
+    downloadable: true,
+    manifest_key: priorPackage.manifest_key || sourceManifestKeyForPackage({ prefix }),
+    index_key: priorPackage.index_key || sourceIndexKeyForPackage({ prefix }),
+    index_file_count: Number(priorPackage.index_file_count || priorPackage.file_count || 0),
+    archive,
+    public_asset_exposure: false,
+    completed_at: priorPackage.completed_at || null,
+    updated_at: now
+  };
+  const deployment = await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_package: sourcePackage
+  });
+  const receipt = await saveReceipt(env, auth, workspaceId, 'skynet.source.archive.uploaded', {
+    project_id: projectId,
+    deployment_id: deploymentId,
+    key,
+    filename,
+    bytes: body.byteLength,
+    sha256,
+    content_type: contentType
+  });
+  return httpJson(200, {
+    ok: true,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId,
+    source_archive: archive,
+    source_package: sourcePackage,
+    deployment: deployment.deployment,
+    receipt
+  }, cors);
 }
 
 async function handleSourceManifest(request, env, cors) {
@@ -2613,18 +2778,47 @@ async function handleSourceSearch(request, env, cors) {
   const prefixFilter = cleanText(context.params.prefix || context.params.path_prefix || context.params.pathPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
   if (!query) return httpJson(400, { ok: false, error: 'source-search requires q=', code: 'MISSING_SOURCE_SEARCH_QUERY' }, cors);
   const limit = Math.max(1, Math.min(MAX_SOURCE_SEARCH_RESULTS, Number(context.params.limit || 50)));
+  const contentSearch = context.params.content === '0' || context.params.content === 'false' ? false : true;
+  const bucket = deploymentBucket(env);
   const results = [];
+  let content_scanned = 0;
   for (const record of context.source.files) {
     const sourcePath = sourcePathFromRecord(record);
     if (prefixFilter && !sourcePath.startsWith(prefixFilter)) continue;
-    if (!sourcePath.toLowerCase().includes(query)) continue;
     const file = sourceFileRecord(record);
+    const contentType = file?.content_type || contentTypeForPath(sourcePath);
+    if (sourcePath.toLowerCase().includes(query)) {
+      results.push({
+        path: sourcePath,
+        match: 'path',
+        size: file?.size || 0,
+        sha256: file?.sha256 || '',
+        content_type: contentType
+      });
+      if (results.length >= limit) break;
+      continue;
+    }
+    if (!contentSearch || !bucket?.get || content_scanned >= MAX_SOURCE_SEARCH_CONTENT_FILES) continue;
+    if (file?.size && Number(file.size) > MAX_SOURCE_SEARCH_CONTENT_BYTES) continue;
+    if (!sourceTextFileLikely(sourcePath, contentType)) continue;
+    content_scanned += 1;
+    const objectKey = `${context.prefix}/${sourcePath}`.replace(/\/+/g, '/');
+    const object = await bucket.get(objectKey).catch(() => null);
+    if (!object) continue;
+    const bytes = await readObjectBytes(object);
+    if (bytes.byteLength > MAX_SOURCE_SEARCH_CONTENT_BYTES) continue;
+    const text = new TextDecoder().decode(bytes);
+    const index = text.toLowerCase().indexOf(query);
+    if (index < 0) continue;
+    const start = Math.max(0, index - 80);
+    const end = Math.min(text.length, index + query.length + 120);
     results.push({
       path: sourcePath,
-      match: 'path',
-      size: file?.size || 0,
+      match: 'content',
+      size: bytes.byteLength,
       sha256: file?.sha256 || '',
-      content_type: file?.content_type || contentTypeForPath(sourcePath)
+      content_type: contentType,
+      snippet: text.slice(start, end).replace(/\s+/g, ' ').trim()
     });
     if (results.length >= limit) break;
   }
@@ -2636,11 +2830,14 @@ async function handleSourceSearch(request, env, cors) {
     project_id: context.projectId,
     deployment_id: context.deploymentId,
     query,
-    mode: 'path',
+    mode: contentSearch ? 'path-and-small-text-content' : 'path',
     prefix: prefixFilter,
     limit,
     result_count: results.length,
     searched_file_count: context.source.files.length,
+    content_scanned,
+    content_scan_limit: MAX_SOURCE_SEARCH_CONTENT_FILES,
+    content_scan_byte_limit: MAX_SOURCE_SEARCH_CONTENT_BYTES,
     source_package: sourcePackageSummary(context.source.source_package),
     results
   }, cors);
@@ -2884,8 +3081,13 @@ async function handleSourceDownload(request, env, cors) {
   if (!bucket?.get) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET read is not configured', code: 'NO_DEPLOYMENT_BUCKET_READ' }, cors);
   const context = await sourceQueryContext(request, env, cors);
   const privatePackage = context.source.source_package;
+  const archive = sourceArchiveForPackage(privatePackage || {});
+  if (archive?.downloadable && (!context.source.files.length || (context.source.file_count || context.source.files.length) > MAX_SOURCE_DOWNLOAD_FILES)) {
+    const archiveResponse = await sourceArchiveResponse(env, archive, context, cors);
+    if (archiveResponse) return archiveResponse;
+  }
   const files = context.source.files.map((file) => sourcePathFromRecord(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES);
-  if (!files.length) return httpJson(409, { error: 'Deployment has no recorded files to download', code: 'DEPLOYMENT_SOURCE_EMPTY', deployment }, cors);
+  if (!files.length) return httpJson(409, { error: 'Deployment has no recorded files to download', code: 'DEPLOYMENT_SOURCE_EMPTY', deployment: context.deployment }, cors);
   const totalRecordedFiles = context.source.file_count || context.source.files.length;
   if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
     return httpJson(413, {
@@ -3042,7 +3244,12 @@ export async function handleSkyeNetDeployRequest(request, context = {}) {
     if (url.pathname === '/deploy/dashboard' && request.method === 'GET') return await handleDashboard(request, env, cors);
     if (url.pathname === '/deploy/env' && ['GET', 'POST', 'DELETE'].includes(request.method)) return await handleEnvVars(request, env, cors);
     if (url.pathname === '/deploy/source-upload' && ['PUT', 'POST'].includes(request.method)) return await handleSourceUpload(request, env, cors);
+    if (url.pathname === '/deploy/source-archive' && ['PUT', 'POST'].includes(request.method)) return await handleSourceArchiveUpload(request, env, cors);
     if (url.pathname === '/deploy/source-complete' && request.method === 'POST') return await handleSourceComplete(request, env, cors);
+    if (url.pathname === '/deploy/source-manifest' && request.method === 'GET') return await handleSourceManifest(request, env, cors);
+    if (url.pathname === '/deploy/source-tree' && request.method === 'GET') return await handleSourceTree(request, env, cors);
+    if (url.pathname === '/deploy/source-file' && request.method === 'GET') return await handleSourceFile(request, env, cors);
+    if (url.pathname === '/deploy/source-search' && request.method === 'GET') return await handleSourceSearch(request, env, cors);
     if (url.pathname === '/deploy/source-download' && request.method === 'GET') return await handleSourceDownload(request, env, cors);
     if (url.pathname === '/deploy/source-transfer' && request.method === 'POST') return await handleSourceTransfer(request, env, cors);
     if (url.pathname === '/deploy/receipts' && request.method === 'GET') return await handleReceipts(request, env, cors);

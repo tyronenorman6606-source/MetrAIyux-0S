@@ -177,6 +177,20 @@ test('standalone SkyeNet env and private source APIs map to FS27', async () => {
   assert.equal(uploadResponse.status, 200);
   assert.equal((await uploadResponse.json()).path, '/deploy/source-upload');
   assert.equal(e.calls[1].path, '/deploy/source-upload');
+
+  for (const [index, path, expected] of [
+    [2, '/api/skyenet/source-manifest?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-manifest'],
+    [3, '/api/skyenet/source-tree?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-tree'],
+    [4, '/api/skyenet/source-file?workspace_id=demo&project_id=demo&deployment_id=dep_1&path=package.json', '/deploy/source-file'],
+    [5, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search']
+  ]) {
+    const response = await worker.fetch(req(path, {
+      headers: { authorization: 'Bearer gate-token' }
+    }), e);
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).path, expected);
+    assert.equal(e.calls[index].path, expected);
+  }
 });
 
 test('standalone SkyeNet client app routes stay on the standalone host', async () => {

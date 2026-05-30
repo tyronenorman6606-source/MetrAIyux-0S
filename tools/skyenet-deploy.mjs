@@ -76,7 +76,8 @@ async function collectFiles(root, options = {}) {
       } else if (entry.isFile()) {
         const rel = path.relative(root, full).replace(/\\/g, '/');
         if (options.publicBundle && !isSafePublicPath(rel)) continue;
-        out.push({ full, rel });
+        const stat = await fs.stat(full);
+        out.push({ full, rel, size: stat.size });
       }
     }
   }
@@ -327,7 +328,11 @@ if (uploadSourcePackage && sourceFiles.length) {
       plan_name: planName,
       project_id: projectId,
       deployment_id: deploymentId,
-      files: sourceFiles.map((file) => file.rel),
+      files: sourceFiles.map((file) => ({
+        path: file.rel,
+        size: file.size || 0,
+        content_type: contentTypeForPath(file.rel)
+      })),
       meta: {
         source_root: privateSourceRoot,
         public_build_root: sourceRoot,
@@ -364,12 +369,15 @@ console.log(JSON.stringify({
   deployment_id: deploymentId,
   workspace_id: workspaceId,
   file_count: files.length,
-  private_source_package: uploadSourcePackage ? {
-    root: privateSourceRoot,
-    file_count: sourceFiles.length,
-    uploaded: sourceFiles.length > 0,
-    public_asset_exposure: false
-  } : {
+	  private_source_package: uploadSourcePackage ? {
+	    root: privateSourceRoot,
+	    file_count: sourceFiles.length,
+	    uploaded: sourceFiles.length > 0,
+	    source_manifest_url: `/api/skyenet/source-manifest?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
+	    source_tree_url: `/api/skyenet/source-tree?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
+	    source_search_url: `/api/skyenet/source-search?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
+	    public_asset_exposure: false
+	  } : {
     uploaded: false,
     reason: '--no-source'
   },

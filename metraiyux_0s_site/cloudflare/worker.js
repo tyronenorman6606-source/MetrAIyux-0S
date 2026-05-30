@@ -2273,6 +2273,11 @@ function skynetDeployPath(url) {
   if (suffix === '/routes') return '/deploy/routes';
   if (suffix === '/workspace') return '/deploy/workspace';
   if (suffix === '/dashboard') return '/deploy/dashboard';
+  if (suffix === '/source-archive') return '/deploy/source-archive';
+  if (suffix === '/source-manifest') return '/deploy/source-manifest';
+  if (suffix === '/source-tree') return '/deploy/source-tree';
+  if (suffix === '/source-file') return '/deploy/source-file';
+  if (suffix === '/source-search') return '/deploy/source-search';
   if (suffix === '/source-download') return '/deploy/source-download';
   if (suffix === '/receipts') return '/deploy/receipts';
   if (suffix === '/rollback') return '/deploy/rollback';
@@ -2298,11 +2303,12 @@ async function handleSkyeNetRoute(request, env, ctx, url) {
     headers: skynetForwardHeaders(request, auth, '', env),
     body
   });
-  if (targetPath === '/deploy/source-download') {
+  const rawSourceFile = targetPath === '/deploy/source-file' && !(response.headers.get('content-type') || '').includes('application/json');
+  if (targetPath === '/deploy/source-download' || rawSourceFile) {
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.set('cache-control', 'no-store');
-    headers.set('x-0s-skynet-source-download-proxy', 'passthrough');
+    headers.set(targetPath === '/deploy/source-download' ? 'x-0s-skynet-source-download-proxy' : 'x-0s-skynet-source-file-proxy', 'passthrough');
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
@@ -4929,15 +4935,16 @@ async function readKVLedgerByPrefix(env, prefix, limit = 100, options = {}) {
   let cursor = '';
   let scanned = 0;
   while (scanned < maxScan) {
-    const pageLimit = Math.min(1000, Math.max(1, Math.min(maxScan - scanned, Math.max(safeLimit, 100))));
+    const pageLimit = Math.min(1000, Math.max(1, Math.min(maxScan - scanned, safeLimit)));
     const listOptions = cursor ? {prefix, limit:pageLimit, cursor} : {prefix, limit:pageLimit};
     const listed = await env.SITE_EVENTS_KV.list(listOptions);
     const keys = listed.keys || [];
     scanned += keys.length;
-    for (const key of keys) {
+    const items = await Promise.all(keys.map(async key => {
       const item = await env.SITE_EVENTS_KV.get(key.name, {type:'json'}).catch(() => null);
-      if (item) rows.push({...item, kv_key:key.name});
-    }
+      return item ? {...item, kv_key:key.name} : null;
+    }));
+    for (const item of items) if (item) rows.push(item);
     cursor = listed.cursor || '';
     if (listed.list_complete || !cursor || !keys.length) break;
   }
@@ -5546,7 +5553,7 @@ async function commandBridgeEventsPayload(env, url) {
     events = await readKVLedgerByPrefix(env, `${COMMAND_BRIDGE_LANE_PREFIX}${lane}:`, limit, {maxScan:Math.max(limit, 1000)});
   }
   if (!events.length && !entity) {
-    events = await readKVLedgerByPrefix(env, COMMAND_BRIDGE_EVENT_PREFIX, app || lane ? Math.max(limit, 250) : limit, {maxScan:app || lane ? 5000 : Math.max(limit, 1000)});
+    events = await readKVLedgerByPrefix(env, COMMAND_BRIDGE_EVENT_PREFIX, app || lane ? Math.max(limit, 250) : limit, {maxScan:app || lane ? 1000 : Math.max(limit, 250)});
   }
   if (app) events = events.filter(event => event.source_app === app);
   if (lane) events = events.filter(event => event.lane === lane);

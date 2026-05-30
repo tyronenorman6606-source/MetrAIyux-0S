@@ -137,6 +137,7 @@ const WORKER_ASSET_FILE_INCLUDES = [
   'live/skye-split-engine-operator-proof.html',
   'Marketing-Made-Easy/index.html',
   'skyegate/index.html',
+  'brain/live-surface-registry.json',
   'brain/skyevault-vault-map.json',
   'data/skyenet-client-route-index.json',
   'SkyeMusicNexus/public/data/playlists.json',

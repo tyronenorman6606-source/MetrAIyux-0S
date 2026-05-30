@@ -45,6 +45,7 @@ const CUSTOMER_PATH_STEPS = [
       { label: "Open Free Stack Pitch", route: "free-stack-pitch" },
       { label: "Open Print Flyer", route: "free-stack-flyer" },
       { label: "Open Valley Verified", route: "valley-verified" },
+      { label: "Open SkyeNet Valley", route: "valley-verified-skynet" },
       { label: "Open Business Card Factory", route: "business-card-factory" }
     ]
   },
@@ -147,7 +148,7 @@ const REVENUE_LANES = [
     badge: "ad system",
     free: "Business profile, featured proof route, app-build examples, and QR pitch handoff.",
     upgrade: "Sponsored placement, category boosts, lead-routing, local ads, and managed profile upgrades.",
-    routes: ["valley-verified", "../valley-verified/advertise/", "../valley-verified/sponsor/"]
+    routes: ["valley-verified-skynet", "valley-verified", "../valley-verified/advertise/", "../valley-verified/sponsor/"]
   },
   {
     title: "Owned Messaging",
@@ -256,8 +257,8 @@ const PRODUCT_ADS = [
   {
     slot: "natural upgrade",
     title: "Valley Verified Exposure",
-    text: "Profile upgrades, sponsored placements, category boosts, and lead-routing after the business sees value.",
-    route: "../valley-verified/advertise/"
+    text: "The SkyeNet rebuild keeps the heavy client-facing landings separate while the 0S keeps discovery and operator routing.",
+    route: "valley-verified-skynet"
   },
   {
     slot: "owned browser",
@@ -300,7 +301,7 @@ const PLATFORM_GROUPS = [
   {
     title: "Client Acquisition",
     text: "Walk-in sales, QR handoff, local discovery, custom app previews, and proof-backed landing experiences.",
-    apps: ["free-stack-pitch", "free-stack-flyer", "valley-verified", "business-card-factory", "pricing", "skyewebcreatormax", "webgrowthoperator", "arizona-growth-index"]
+    apps: ["free-stack-pitch", "free-stack-flyer", "valley-verified-skynet", "valley-verified", "business-card-factory", "pricing", "skyewebcreatormax", "webgrowthoperator", "arizona-growth-index"]
   },
   {
     title: "Workspace + Messaging",
@@ -1383,6 +1384,16 @@ const APP_DEFS = [
     size: [1120, 720]
   },
   {
+    id: "valley-verified-skynet",
+    name: "Valley Verified on SkyeNet",
+    icon: "VS",
+    kind: "skyenet public",
+    summary: "SkyeNet-hosted Valley Verified rebuild with 339 researched business landings; the 0S keeps discovery, proof, and operator routing.",
+    url: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skyenet/valley-verified-custom-preview/",
+    dock: true,
+    size: [1120, 720]
+  },
+  {
     id: "gate",
     name: "0S SkyGate",
     icon: "G7",
@@ -2049,7 +2060,7 @@ function renderDashboard(body) {
         ${PRODUCT_ADS.map(productAdCard).join("")}
       </div>
       <div class="app-grid">
-        ${APP_DEFS.filter(app => ["customer-path", "offer-engine", "browser", "free-stack-pitch", "free-stack-flyer", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified", "business-card-factory", "pricing", "marketing", "media", "content-forge", "skyecommerce", "atlas", "terminal"].includes(app.id)).map(app => appCard(app)).join("")}
+        ${APP_DEFS.filter(app => ["customer-path", "offer-engine", "browser", "free-stack-pitch", "free-stack-flyer", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified-skynet", "valley-verified", "business-card-factory", "pricing", "marketing", "media", "content-forge", "skyecommerce", "atlas", "terminal"].includes(app.id)).map(app => appCard(app)).join("")}
       </div>
     </section>
   `;
@@ -2173,7 +2184,7 @@ function commandCard(command) {
 
 function renderBrowser(body) {
   const routeApps = APP_DEFS.filter(app => app.url);
-  const priorityRoutes = ["customer-path", "offer-engine", "free-stack-pitch", "free-stack-flyer", "pricing", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified", "business-card-factory", "skyecommerce", "marketing", "music", "routex", "founder-command"];
+  const priorityRoutes = ["customer-path", "offer-engine", "free-stack-pitch", "free-stack-flyer", "pricing", "gate-signup", "skyemail", "connectlog", "relay13", "ae-flowpro", "valley-verified-skynet", "valley-verified", "business-card-factory", "skyecommerce", "marketing", "music", "routex", "founder-command"];
   body.innerHTML = `
     <section class="browser-view">
       <form class="browser-bar" data-browser-form>

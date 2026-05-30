@@ -300,6 +300,24 @@ test('SN-03 SkyeNet proxy initializes, uploads, completes, and registers a route
   assert.match(tarText, /\.skyenet\/source-manifest\.json/);
   assert.match(tarText, /index\.html/);
   assert.match(tarText, /SkyeNet demo/);
+
+  const manifest = await call(e, `/api/skyenet/source-manifest?project_id=${projectId}&deployment_id=${deploymentId}`, { token });
+  assert.equal(manifest.response.status, 200);
+  assert.equal(manifest.data.skynet.source_mode, 'public-deployment-files');
+  assert.deepEqual(manifest.data.skynet.files, ['index.html']);
+
+  const tree = await call(e, `/api/skyenet/source-tree?project_id=${projectId}&deployment_id=${deploymentId}`, { token });
+  assert.equal(tree.response.status, 200);
+  assert.ok(tree.data.skynet.entries.some((entry) => entry.type === 'file' && entry.path === 'index.html'));
+
+  const file = await call(e, `/api/skyenet/source-file?project_id=${projectId}&deployment_id=${deploymentId}&path=index.html`, { token });
+  assert.equal(file.response.status, 200);
+  assert.equal(file.data.skynet.path, 'index.html');
+  assert.match(file.data.skynet.text, /SkyeNet demo/);
+
+  const search = await call(e, `/api/skyenet/source-search?project_id=${projectId}&deployment_id=${deploymentId}&q=demo`, { token });
+  assert.equal(search.response.status, 200);
+  assert.ok(search.data.skynet.results.some((result) => result.path === 'index.html'));
 });
 
 test('SN-04 SkyeNet published path serves uploaded asset without 0S gate redirect', async () => {
