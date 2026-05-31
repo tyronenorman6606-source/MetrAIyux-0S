@@ -7104,6 +7104,145 @@ function zeroOsForwardHeaders(auth = {}, lane = "skymail-workbench") {
   };
 }
 
+function mailOsContextDescription(action = {}, context = {}) {
+  return [
+    `Source: SkyeMail 0S Workbench`,
+    `Target: ${action.label || action.id || "0S action"}`,
+    `Mailbox: ${clean(context.mailbox || context.mailbox_email) || "unknown"}`,
+    `Message: ${clean(context.message_id || context.messageId) || "none"}`,
+    `Thread: ${clean(context.thread_id || context.threadId) || "none"}`,
+    `From: ${clean(context.from) || "unknown"}`,
+    `To: ${clean(context.to) || "unknown"}`,
+    `Subject: ${clean(context.subject) || "(no subject)"}`,
+    clean(context.snippet || context.text) ? `Context:\n${clean(context.snippet || context.text).slice(0, 2400)}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function mailOsAttendeeEmail(context = {}) {
+  const candidate = clean(context.attendee_email || context.attendeeEmail || context.from || context.to || "");
+  const match = candidate.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return match ? match[0].toLowerCase() : "";
+}
+
+function mailOsCommandBridgeParams(action = {}, context = {}) {
+  const subject = clean(context.subject || `${action.label || "SkyeMail"} handoff`).slice(0, 240);
+  const messageId = clean(context.message_id || context.messageId);
+  const threadId = clean(context.thread_id || context.threadId);
+  return {
+    source_app: "skymail",
+    source_surface: "skyemail-0s-workbench",
+    event_type: `skymail.${(action.lane || action.id || "0s").replace(/[^a-z0-9]+/gi, "_").toLowerCase()}`,
+    status: "recorded_from_skyemail",
+    summary: `${action.label || "0S"}: ${subject}`,
+    entity_kind: threadId ? "mail-thread" : "mail-message",
+    entity_id: threadId || messageId || `skymail-${Date.now().toString(36)}`,
+    entity_label: subject,
+    provider: "skymail",
+  };
+}
+
+function mailOsDirectApiPayload(action = {}, context = {}) {
+  const subject = clean(context.subject || `${action.label || "0S"} from SkyeMail`).slice(0, 240);
+  const description = mailOsContextDescription(action, context);
+  if (action.id === "founder-calendar") {
+    const startAt = clean(context.start_at || context.startAt || context.start || "");
+    const endAt = clean(context.end_at || context.endAt || context.end || "");
+    return {
+      route: "/api/founder-command/calendar",
+      body: {
+        source: "skymail-0s-workbench",
+        summary: subject,
+        description,
+        start_at: startAt,
+        end_at: endAt,
+        timezone: clean(context.timezone || context.tz || ""),
+        attendee_email: mailOsAttendeeEmail(context),
+        create_live: Boolean(startAt && endAt && context.create_live !== false),
+        ledger_only: !(startAt && endAt),
+      },
+    };
+  }
+  if (action.id === "pwa-factory") {
+    const htmlSource = [
+      `<h1>${subject}</h1>`,
+      `<p>${clean(context.snippet || context.text || action.summary || "").slice(0, 4000)}</p>`,
+      `<dl><dt>Mailbox</dt><dd>${clean(context.mailbox || context.mailbox_email)}</dd><dt>Thread</dt><dd>${clean(context.thread_id || context.threadId)}</dd></dl>`,
+    ].join("\n");
+    return {
+      route: "/api/founder-command/pwa-factory/analyze",
+      body: {
+        source: "skymail-0s-workbench",
+        htmlSource,
+        manifest: {
+          name: subject.slice(0, 45) || "SkyeMail PWA",
+          short_name: "SkyeMail",
+          description: clean(context.snippet || action.summary || "SkyeMail generated PWA launch context.").slice(0, 240),
+        },
+      },
+    };
+  }
+  if (action.apiAction || action.id === "founder-command-bridge" || action.bridge === "command_bridge_event") {
+    return {
+      route: "/api/founder-command/actions/execute",
+      body: {
+        action_id: action.apiAction || "command-bridge.event.record",
+        params: mailOsCommandBridgeParams(action, context),
+      },
+    };
+  }
+  return null;
+}
+
+async function executeMailOsDirectApi(env, auth, action = {}, context = {}) {
+  const payload = mailOsDirectApiPayload(action, context);
+  if (!payload) {
+    return {
+      attempted: false,
+      ok: false,
+      mode: action.bridge || "workflow_packet",
+      action_id: action.id || "",
+      reason: "no_direct_api_for_action",
+    };
+  }
+  const target = new URL(payload.route, zeroOsGateOrigin(env));
+  const started = Date.now();
+  const headers = {
+    ...zeroOsForwardHeaders(auth, `skymail-workbench:${action.lane || action.id || "direct-api"}`),
+    "content-type": "application/json",
+  };
+  try {
+    const response = await fetch(target.toString(), {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload.body),
+      redirect: "manual",
+    });
+    const data = await response.json().catch(() => ({}));
+    const ok = response.status >= 200 && response.status < 300 && data?.ok !== false;
+    return {
+      attempted: true,
+      ok,
+      mode: "direct_api",
+      action_id: action.id || "",
+      route: payload.route,
+      status: response.status,
+      elapsed_ms: Date.now() - started,
+      result: data,
+    };
+  } catch (error) {
+    return {
+      attempted: true,
+      ok: false,
+      mode: "direct_api",
+      action_id: action.id || "",
+      route: payload.route,
+      status: 0,
+      elapsed_ms: Date.now() - started,
+      error: clean(error?.message || "direct_api_failed", 500),
+    };
+  }
+}
+
 function mailOsHealthRouteFor(action = {}) {
   if (action.capability === "live_api" && action.apiRoute) return action.apiRoute;
   return action.path || action.apiRoute || "/";
@@ -7226,7 +7365,7 @@ async function handleMailOsHealth(request, env) {
 }
 
 async function handleMailOsHandoff(request, env) {
-  const auth = await requireAuth(request, env);
+  const auth = { ...await requireAuth(request, env), gate_token: bearer(request) };
   const body = await request.json().catch(() => ({}));
   const action = mailOsActionById(body.action_id || body.actionId || body.action?.id);
   const context = body.context && typeof body.context === "object" ? body.context : {};
@@ -7248,6 +7387,7 @@ async function handleMailOsHandoff(request, env) {
       source: "skymail-0s-workbench",
     }
     : null;
+  const directExecution = await executeMailOsDirectApi(env, auth, action, context);
   const packet = {
     label: clean(body.label || `${action.label}${labelSubject}`).slice(0, 240),
     notes: clean(body.notes || `SkyeMail routed this context into ${action.label}.`).slice(0, 4000),
@@ -7275,9 +7415,16 @@ async function handleMailOsHandoff(request, env) {
       talksTo: action.talksTo || [],
       iframe: false,
       launchUrl,
+      directExecution: {
+        attempted: Boolean(directExecution.attempted),
+        ok: Boolean(directExecution.ok),
+        route: directExecution.route || "",
+        status: Number(directExecution.status || 0),
+        mode: directExecution.mode || action.bridge || "",
+      },
     }],
     recommendedActions: [
-      `Open ${action.label} through the shared 0S gate.`,
+      directExecution.ok ? `Review the live ${action.label} execution receipt.` : `Open ${action.label} through the shared 0S gate.`,
       "Keep the original SkyeMail message id attached to the packet.",
       "Return any finished document, schedule, CRM, finance, audit, or build artifact to the SkyeMail thread before dispatch.",
     ],
@@ -7288,10 +7435,25 @@ async function handleMailOsHandoff(request, env) {
       capabilities: [action.capability || "packet_bridge"],
       bridges: [action.bridge || "workflow_packet"],
       launchUrl,
+      directApi: directExecution,
     },
     review: { status: "ready", owner: "0S operator", checkpoint: `${action.label} packet created` },
-    execution: { status: "queued", owner: "", checkpoint: `${action.lane} handoff queued`, nextAction: `Open ${action.label}` },
-    dispatch: { status: "queued", owner: "", channel: `${action.lane.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_handoff`, nextAction: "Dispatch after downstream work is complete." },
+    execution: directExecution.attempted
+      ? {
+        status: directExecution.ok ? "executed" : "direct_api_failed",
+        owner: "0S Worker",
+        checkpoint: directExecution.ok ? `${action.lane} direct API executed` : `${action.lane} direct API failed`,
+        nextAction: directExecution.ok ? `Review ${action.label} receipt` : `Open ${action.label} and inspect the direct API error`,
+        directApi: directExecution,
+      }
+      : { status: "queued", owner: "", checkpoint: `${action.lane} handoff queued`, nextAction: `Open ${action.label}` },
+    dispatch: {
+      status: directExecution.ok ? "ready_after_direct_api" : "queued",
+      owner: "",
+      channel: `${action.lane.replace(/[^a-z0-9]+/gi, "_").toLowerCase()}_handoff`,
+      nextAction: directExecution.ok ? "Dispatch after reviewing the downstream receipt." : "Dispatch after downstream work is complete.",
+      directApi: directExecution.attempted ? { ok: directExecution.ok, route: directExecution.route || "", status: directExecution.status || 0 } : null,
+    },
     launchUrl,
     action,
   };

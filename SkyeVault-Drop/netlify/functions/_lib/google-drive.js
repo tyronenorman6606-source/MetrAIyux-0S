@@ -198,7 +198,7 @@ async function r2Request(method, key = '', { query = new URLSearchParams(), head
       'x-amz-date': amzDate,
       authorization
     },
-    body: method === 'GET' || method === 'HEAD' ? undefined : payload
+    body: method === 'GET' || method === 'HEAD' || !payload ? undefined : payload
   });
   return response;
 }

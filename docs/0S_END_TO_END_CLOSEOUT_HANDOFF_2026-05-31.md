@@ -733,3 +733,193 @@ AI gate-only state: not current right now.
 Audio: bytes reachable, MIME type wrong right now.
 
 
+# HANDOFF: SkyeMusicNexus Current State
+
+Date: 2026-05-31
+Repo: /home/lordkaixu/Projects/MetrAIyux-0S
+Browser proof: not run. Owner will browser-check.
+
+## Status
+
+SkyeMusicNexus is not complete yet.
+
+The rejected song creator route was mostly retired from public routing, but the Worker still contains dead song-creation helper/state code.
+
+The requested long cinematic song was not created correctly. The only found “Everything Movie: Twin Engine” audio is about 4:05, not a single 10-13 minute record.
+
+## Confirmed Current Evidence
+
+Current dirty files checked:
+
+- metraiyux_0s_site/cloudflare/worker.js
+- scripts/deploy-0s-worker.mjs
+
+Relevant files with remaining issues:
+
+- metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection/index.html
+- metraiyux_0s_site/SkyeMusicNexus/public/index.html
+- metraiyux_0s_site/SkyeMusicNexus/_redirects
+- metraiyux_0s_site/SkyeMusicNexus/_headers
+- metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/products/index.html
+
+## What Was Actually Done
+
+- Removed music-song-creation from the Worker function manifest/dispatcher.
+- Removed /public/create.html from the production live-browser route list.
+- Deployed Worker after that removal.
+- Last known Worker deploy version: 0c6f69c0-3465-4530-a170-98b4a4ae01d8.
+- Confirmed Worker syntax passes:
+  node --check metraiyux_0s_site/cloudflare/worker.js
+
+## Long Song Status
+
+Found asset:
+
+metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/audio/everything-movie-twin-engine.mp3
+
+Bytes: 3,920,920
+Estimated duration: about 245 seconds, roughly 4:05
+
+Receipt folder:
+
+metraiyux_0s_site/SkyeMusicNexus/song-creation-bin/everything-movie-ii/everything-movie-twin-engine/
+
+Files found there:
+
+- creation-receipt.json
+- everything-movie-twin-engine.mp3
+- prompt.txt
+- superide-asset-job.json
+- superide-submission-receipt.json
+
+Conclusion: the requested 10-13 minute single long song is missing.
+
+## Remaining Breaks
+
+1. Reflection page still advertises Wooooah Factor.
+
+File:
+metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/reflection/index.html
+
+Problem:
+The page still contains Wooooah Factor, empty audio src="", and an empty store href.
+
+2. Public copy still overclaims.
+
+File:
+metraiyux_0s_site/SkyeMusicNexus/public/index.html
+
+Problem:
+Still says:
+BandLab plus Spotify-style discovery plus Instagram
+
+This needs to be changed to honest first-party/local parity language unless fully proven.
+
+3. Storefront checkout is not end-to-end public live.
+
+File:
+metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/gray-skyes/products/index.html
+
+Problem:
+The product room still falls back to missing SkyePay offer:
+skyemusicnexus-artist-store
+
+4. Worker store fallback also uses missing offer.
+
+File:
+metraiyux_0s_site/cloudflare/worker.js
+
+Problem:
+musicStoreCheckoutUrl still builds a SkyePay URL using:
+skyemusicnexus-artist-store
+
+5. Worker public asset staging is incomplete.
+
+File:
+scripts/deploy-0s-worker.mjs
+
+Problem:
+Music Nexus allowed public release prefixes exist, but the staging flow does not actually copy those allowed release directories into the Worker asset stage. This caused Worker Crooked Reflection route smoke to fail with 404.
+
+6. Stream policy still needs one rule.
+
+Problem:
+Catalog says qualifiedStreamSeconds is 30, but Worker/player policy previously accepted looser thresholds. Needs one rule everywhere.
+
+7. Release stream reporting still needs rights/takedown guard.
+
+Problem:
+Worker report-streams can increment release stats without the same rights checks as the local Netlify function.
+
+8. Legacy admin bypass still exists in Music gate path.
+
+Problem:
+requireMusicGate still accepts legacy admin token/env bypass. Repo rule says mounted apps should use FS27/SkyGate/Free99 shared auth only.
+
+9. Product entitlement is incomplete.
+
+Problem:
+Many product records do not have assetId or releaseId, and product-room checkout does not reliably capture buyerEmail before checkout. This means paid entitlement matching cannot be considered complete.
+
+## Direct Links To Check
+
+Public Nexus:
+https://skye-music-nexus.pages.dev/
+
+Song creation pricing page:
+https://skye-music-nexus.pages.dev/public/pricing-song-creation.html
+
+Twin Engine drop:
+https://skye-music-nexus.pages.dev/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/
+
+Gray Skyes product room needing checkout repair:
+https://skye-music-nexus.pages.dev/artist-storefronts/gray-skyes/products/
+
+Stale bad drop route to verify after fix:
+https://skye-music-nexus.pages.dev/artist-storefronts/gray-skyes/drops/wooooah-factor/
+
+0S gated Nexus:
+https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/
+
+## Next Exact Work
+
+1. Remove Wooooah Factor from Reflection and public cards/catalog references.
+2. Move retired-drop redirects above generic audio allows.
+3. Add exact slash retired-drop redirect blocks.
+4. Replace missing SkyePay fallback offer with valid existing offer or create a real dynamic checkout lane.
+5. Make product rooms call the 0S Worker origin instead of same-origin /api on Pages.
+6. Require buyerEmail before checkout/order intent.
+7. Patch Worker store fallback URL.
+8. Patch Worker deploy staging so allowed Music Nexus public release directories actually deploy.
+9. Align catalog, player, and Worker to one unified qualified stream rule.
+10. Add rights/takedown checks before stream/report increments.
+11. Remove legacy Music gate admin bypass and rely on FS27/SkyGate auth.
+12. Redeploy Pages.
+13. Redeploy Worker.
+14. Run non-browser smoke/stress/API checks.
+15. Save receipts.
+16. Give owner direct links for manual browser verification.
+
+## Current Verification
+
+Worker syntax:
+PASS
+
+Command:
+node --check metraiyux_0s_site/cloudflare/worker.js
+
+Browser proof:
+NOT RUN
+
+Song app:
+Public route removed from Worker manifest/dispatcher, but dead helper/state code remains.
+
+Long song:
+NOT DONE as requested.
+
+Storefront commerce:
+NOT production-ready yet.
+
+Spotify/SoundCloud/Instagram/Shopify parity:
+NOT honestly claimable yet. The system has real pieces, but public checkout, product entitlement, claim language, route cleanup, Worker asset staging, and stream-policy enforcement still need repair.
+

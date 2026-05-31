@@ -6,9 +6,9 @@ import { resolveZeroOsGateAuth } from '../../tools/lib/zero-os-gate-auth.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
+const repoRoot = path.resolve(root, '..');
 
-function loadDotEnv() {
-  const file = path.join(root, '.env');
+function loadDotEnvFile(file) {
   if (!fs.existsSync(file)) return;
   for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -21,6 +21,25 @@ function loadDotEnv() {
       value = value.slice(1, -1);
     }
     if (!process.env[key]) process.env[key] = value;
+  }
+}
+
+function loadDotEnv() {
+  [
+    path.join(repoRoot, '.env'),
+    path.join(repoRoot, 'env.txt'),
+    path.join(root, '.env')
+  ].forEach(loadDotEnvFile);
+
+  const aliases = {
+    R2_ACCOUNT_ID: ['CLOUDFLARE_R2_ACCOUNT_ID'],
+    R2_ACCESS_KEY_ID: ['CLOUDFLARE_R2_ACCESS_KEY', 'CLOUDFLARE_R2_ACCESS_KEY_ID'],
+    R2_SECRET_ACCESS_KEY: ['CLOUDFLARE_R2_SECRET_KEY', 'CLOUDFLARE_R2_SECRET_ACCESS_KEY']
+  };
+  for (const [target, sources] of Object.entries(aliases)) {
+    if (process.env[target]) continue;
+    const value = sources.map((source) => process.env[source]).find(Boolean);
+    if (value) process.env[target] = value;
   }
 }
 
@@ -70,7 +89,7 @@ if (!process.env.R2_CONFIG_PREFIX && !process.env.R2_CONFIG_FOLDER_ID && !proces
   process.exit(1);
 }
 
-const gateAuth = await resolveZeroOsGateAuth({ envFiles: [path.join(root, '.env'), path.join(root, '..', '.env'), path.join(root, '..', 'env.txt')] });
+const gateAuth = await resolveZeroOsGateAuth({ envFiles: [path.join(root, '.env'), path.join(repoRoot, '.env'), path.join(repoRoot, 'env.txt')] });
 if (!gateAuth.ok || !gateAuth.token) {
   console.error('Missing shared FS27/SkyGate bearer for SkyeVault live smoke.');
   process.exit(1);

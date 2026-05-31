@@ -21,6 +21,8 @@ import { handler as uploadStatus } from '../netlify/functions/upload-status.js';
 import { hasValidFs27BoundOperatorSession, introspectSkygateBearer, introspectZeroOsOwnerBearer } from '../netlify/functions/_lib/security.js';
 import { ADMIN_HTML, SETUP_HTML } from './internal-pages.generated.mjs';
 
+const DEFAULT_ZERO_OS_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+
 const HANDLERS = {
   'admin-backup': adminBackup,
   'admin-config': adminConfig,
@@ -169,6 +171,17 @@ function redirect(location) {
   return html(302, '', { location });
 }
 
+function sharedGateLoginUrl(request, returnTo) {
+  const zeroOsOrigin = String(
+    globalThis.process?.env?.ZERO_OS_ORIGIN
+    || globalThis.process?.env?.ZERO_OS_BASE_URL
+    || globalThis.process?.env?.METRAIYUX_ZERO_OS_ORIGIN
+    || DEFAULT_ZERO_OS_ORIGIN
+  ).replace(/\/+$/, '');
+  const returnUrl = new URL(returnTo, request.url).href;
+  return `${zeroOsOrigin}/admin/login.html?return=${encodeURIComponent(returnUrl)}`;
+}
+
 function gateScopeList(scope) {
   if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
   return String(scope || '').split(/\s+/).filter(Boolean);
@@ -231,7 +244,7 @@ async function operatorPage(request, page) {
   const gate = await requireSkyVaultGateAdmin(request);
   if (!gate.ok) {
     const returnTo = page === 'setup' ? '/setup.html' : '/admin.html';
-    return redirect(`/admin/login.html?return=${encodeURIComponent(returnTo)}`);
+    return redirect(sharedGateLoginUrl(request, returnTo));
   }
   return html(200, page === 'setup' ? SETUP_HTML : ADMIN_HTML);
 }

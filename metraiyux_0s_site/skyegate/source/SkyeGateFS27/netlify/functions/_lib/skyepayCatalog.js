@@ -2462,7 +2462,7 @@ export const SKYPAY_OFFERS = [
       default_rpd_limit: 200,
       allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
+        fs27_skygate_brain: ["KAIXU_6_7_MINI", "KAIXU_6_7", "KAIXU_6_7_PRO"]
       },
       skyemail_ai: {
         enabled_after_stripe: true,
@@ -2525,7 +2525,7 @@ export const SKYPAY_OFFERS = [
       default_rpd_limit: 400,
       allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
+        fs27_skygate_brain: ["KAIXU_6_7_MINI", "KAIXU_6_7", "KAIXU_6_7_PRO"]
       },
       skyemail_ai: {
         enabled_after_stripe: true,
@@ -2589,7 +2589,7 @@ export const SKYPAY_OFFERS = [
       default_rpd_limit: 800,
       allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
+        fs27_skygate_brain: ["KAIXU_6_7_MINI", "KAIXU_6_7", "KAIXU_6_7_PRO"]
       },
       skyemail_ai: {
         enabled_after_stripe: true,

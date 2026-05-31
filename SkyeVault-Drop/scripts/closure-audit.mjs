@@ -57,7 +57,7 @@ const checks = [
   ['completion validates request identity', files.uploadComplete.includes('clientRequestId') && files.drive.includes('client-request-id')],
   ['public page has no operator links', !files.index.includes('/admin.html') && !files.index.includes('/setup.html')],
   ['admin/setup pages are not public static files', !fs.existsSync(path.join(root, 'public/admin.html')) && !fs.existsSync(path.join(root, 'public/setup.html'))],
-  ['operator pages require HttpOnly session cookie', files.security.includes('hasValidOperatorSession') && files.security.includes('HttpOnly') && files.operatorPage.includes('hasValidOperatorSession')],
+  ['operator pages require HttpOnly session cookie', files.security.includes('hasValidFs27BoundOperatorSession') && files.security.includes('HttpOnly') && files.operatorPage.includes('hasValidFs27BoundOperatorSession')],
   ['operator redirects protect admin/setup routes', files.netlifyToml.includes('operator-page?page=admin') && files.netlifyToml.includes('operator-page?page=setup')],
   ['upload completion notification path exists', files.uploadComplete.includes('notifyUploadComplete') && files.notifications.includes('NOTIFY_WEBHOOK_URL') && files.notifications.includes('RESEND_API_KEY')],
   ['admin notification test exists', files.notificationTest.includes('sendNotificationTest') && files.admin.includes('admin-notification-test')],
