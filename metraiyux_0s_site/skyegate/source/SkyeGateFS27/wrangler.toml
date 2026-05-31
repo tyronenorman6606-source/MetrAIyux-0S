@@ -9,6 +9,7 @@ workers_dev = true
 RELAY13_0S_API_BASE_URL = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/relay13"
 CONTACT_INTAKE_0S_ORIGIN = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
 CONTACT_INTAKE_RELAY13_WORKSPACE = "connectlog-main"
+FS27_RUNTIME_DIRECT_ARCHIVE = "sync"
 
 [[services]]
 binding = "RELAY13_WORKER"
@@ -49,12 +50,10 @@ bucket_name = "zero-os-deploy-artifacts"
 binding = "ROUTING_KV"
 id = "62d5bbc0c9e946b489dc44507fb8c40b"
 
-# Create and bind after the D1 database exists:
-# npx wrangler d1 create fs27-runtime-rollups
-# [[d1_databases]]
-# binding = "RUNTIME_ROLLUP_DB"
-# database_name = "fs27-runtime-rollups"
-# database_id = "<runtime-rollup-d1-id>"
+[[d1_databases]]
+binding = "RUNTIME_ROLLUP_DB"
+database_name = "metraiyux-citadeldb"
+database_id = "5b572a90-75e0-4126-8d91-0bf370a8ba9d"
 
 [assets]
 directory = "public"

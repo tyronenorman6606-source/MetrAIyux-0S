@@ -1,6 +1,23 @@
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const state = { tag:'', pos:null };
+const TELEMETRY_BOUNDARY = Object.freeze({
+  SEED: 'seed',
+  PROOF_ONLY: 'proof_only'
+});
+const proofOnlyBoundary = () => ({
+  boundary: TELEMETRY_BOUNDARY.PROOF_ONLY,
+  proof_only: true,
+  worker_confirmed: false,
+  worker_receipt: null
+});
+const seedBoundary = () => ({
+  boundary: TELEMETRY_BOUNDARY.SEED,
+  seed: true,
+  live_telemetry: false,
+  worker_confirmed: false,
+  worker_receipt: null
+});
 
 function toast(title, detail=''){
   const el = $('#toast');
@@ -70,7 +87,7 @@ function bindShortlistPage(){
   let packet = null;
   $('[data-build-shortlist-request]')?.addEventListener('click', () => {
     const raw = formObject(form);
-    packet = { id:`shortlist-request-${Date.now()}`, created_at:new Date().toISOString(), source:'phx-verified-shortlist', contact:raw.contact || null, details:raw.details || '', businesses:getShortlist(), status:'shortlist_request_packet' };
+    packet = { id:`shortlist-request-${Date.now()}`, created_at:new Date().toISOString(), source:'phx-verified-shortlist', ...proofOnlyBoundary(), contact:raw.contact || null, details:raw.details || '', businesses:getShortlist(), status:'shortlist_request_packet_proof_only' };
     if(output) output.textContent = JSON.stringify(packet, null, 2);
     if(dl) dl.disabled = false;
     toast('Shortlist request built', `${packet.businesses.length} provider(s) included.`);
@@ -151,7 +168,11 @@ function bindDirectory(){
     visible.forEach(card => cardsHost.appendChild(card));
     empty?.classList.toggle('hidden', visible.length !== 0);
     if(visibleCount) visibleCount.textContent = `${visible.length} shown`;
-    if(liveCount) liveCount.textContent = `${visible.length}`;
+    if(liveCount){
+      liveCount.textContent = `${visible.length} seed`;
+      liveCount.title = 'Seed-filtered count, not live traffic telemetry.';
+      liveCount.dataset.boundary = TELEMETRY_BOUNDARY.SEED;
+    }
   }
   controls.forEach(el => el.addEventListener('input', apply));
   controls.forEach(el => el.addEventListener('change', apply));
@@ -371,10 +392,10 @@ function bindSeedBuilder(){
       accepts_requests: true,
       last_verified: new Date().toISOString().slice(0,10)
     };
-    payload = { updated_at: new Date().toISOString().slice(0,10), source: 'submit-page-seed-builder', businesses: [record] };
+    payload = { updated_at: new Date().toISOString().slice(0,10), source: 'submit-page-seed-builder', ...seedBoundary(), businesses: [record] };
     output.textContent = JSON.stringify(payload, null, 2);
     if(dl) dl.disabled = false;
-    toast('Seed JSON built', 'Review it before adding it to the seed inbox.');
+    toast('Seed JSON built', 'Seed boundary: review before adding it to the inbox.');
   }
   $('[data-build-seed]')?.addEventListener('click', build);
   dl?.addEventListener('click', () => { if(payload) downloadJson(`${payload.businesses[0].id || 'business'}-seed.json`, payload); });
@@ -394,6 +415,7 @@ function bindRequestBuilder(){
       id: `request-${Date.now()}`,
       created_at: new Date().toISOString(),
       source: 'phx-verified-request-builder',
+      ...proofOnlyBoundary(),
       business_id: raw.business_id || null,
       category: raw.category || null,
       city: raw.city || null,
@@ -401,12 +423,12 @@ function bindRequestBuilder(){
       timeline: raw.timeline || null,
       contact: raw.contact || null,
       details: raw.details || '',
-      status: 'new_request_packet'
+      status: 'new_request_packet_proof_only'
     };
     output.textContent = JSON.stringify(packet, null, 2);
     if(dl) dl.disabled = false;
     try{ localStorage.setItem('phx:lastRequestPacket', JSON.stringify(packet)); }catch{}
-    toast('Request packet built', 'Saved in this browser and ready to download.');
+    toast('Request packet built', 'Proof-only packet saved in this browser.');
   }
   $('[data-build-request]')?.addEventListener('click', build);
   dl?.addEventListener('click', () => packet && downloadJson(`${packet.id}.json`, packet));
@@ -425,6 +447,7 @@ function bindClaimBuilder(){
       id: `claim-${raw.business_id || 'listing'}-${Date.now()}`,
       created_at: new Date().toISOString(),
       source: 'phx-verified-claim-builder',
+      ...proofOnlyBoundary(),
       business_id: raw.business_id || null,
       owner: { name: raw.owner_name, email: raw.owner_email, phone: raw.owner_phone },
       requested_response_time: raw.response_time || null,
@@ -434,12 +457,12 @@ function bindClaimBuilder(){
         insured: !!raw.insured,
         no_hidden_fees: !!raw.no_hidden_fees
       },
-      status: 'claim_review_packet'
+      status: 'claim_review_packet_proof_only'
     };
     output.textContent = JSON.stringify(packet, null, 2);
     if(dl) dl.disabled = false;
     try{ localStorage.setItem('phx:lastClaimPacket', JSON.stringify(packet)); }catch{}
-    toast('Claim packet built', 'Ready to download or submit.');
+    toast('Claim packet built', 'Proof-only claim packet ready to download.');
   }
   $('[data-build-claim]')?.addEventListener('click', build);
   dl?.addEventListener('click', () => packet && downloadJson(`${packet.id}.json`, packet));
@@ -485,13 +508,13 @@ function bindMatchPage(){
     await ensureData();
     const req = { city:$('#matchCity')?.value || '', category:$('#matchCategory')?.value || '', budget:$('#matchBudget')?.value || '', terms:$('#matchTerms')?.value || '', verified:!!$('#matchVerified')?.checked, transparent:!!$('#matchTransparent')?.checked, mobile:!!$('#matchMobile')?.checked };
     const matches = data.map(b=>score(b, req)).filter(b => (!req.city || b.city === req.city) && (!req.category || b.category === req.category)).sort((a,b)=>b.match_score-a.match_score || b.score-a.score).slice(0,12);
-    packet = { id:`match-${Date.now()}`, created_at:new Date().toISOString(), request:req, matches };
-    if(count) count.textContent = `${matches.length} matches`;
+    packet = { id:`match-${Date.now()}`, created_at:new Date().toISOString(), ...seedBoundary(), request:req, matches };
+    if(count) count.textContent = `${matches.length} seed matches`;
     if(exportBtn) exportBtn.disabled = !matches.length;
     results.innerHTML = matches.length ? matches.map(b => `<article class="business-card"><div class="card-top"><div><p class="eyebrow">${escapeHtml(b.city)} • ${escapeHtml(b.category)}</p><h3><a href="${escapeHtml(b.url)}">${escapeHtml(b.name)}</a></h3></div><div class="score"><strong>${escapeHtml(b.match_score)}</strong><small>match</small></div></div><p class="card-desc">${escapeHtml((b.reasons || []).join(' • ') || 'Ranked by seeded profile strength.')}</p><div class="mini-grid"><span>Profile score ${escapeHtml(b.score)}</span><span>${b.accepts_requests ? 'Accepts requests' : 'Review first'}</span><span>${b.price ? '$'+escapeHtml(b.price) : 'Quote required'}</span><span>${b.mobile ? 'Mobile' : 'Location-based'}</span></div><div class="card-actions"><a class="btn small primary" href="${escapeHtml(b.url)}">Open profile</a><button class="btn small" data-save-business data-business-id="${escapeHtml(b.id)}" data-business-name="${escapeHtml(b.name)}" data-url="${escapeHtml(b.url)}">Save</button><a class="btn small" href="/valley-verified/request/?business=${escapeHtml(b.id)}">Request</a></div></article>`).join('') : '<p class="muted">No matches. Loosen city/category filters or seed more businesses in this lane.</p>';
     bindShortlistButtons();
   }
-  $('[data-run-match]')?.addEventListener('click', () => { render(); toast('Match run complete'); });
+  $('[data-run-match]')?.addEventListener('click', () => { render(); toast('Seed match run complete'); });
   exportBtn?.addEventListener('click', () => packet && downloadJson(`${packet.id}.json`, packet));
   render();
 }

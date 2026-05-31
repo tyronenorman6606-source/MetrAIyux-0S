@@ -1,6 +1,13 @@
 const $ = (id) => document.getElementById(id);
 const output = $('admin-console-output');
-const VALLEY_DECISION_URL = '/valley-verified/VALLEY_RUNTIME_DECISION.json';
+const VALLEY_DECISION_URL = `${valleyMountPath()}/VALLEY_RUNTIME_DECISION.json`;
+function valleyMountPath(){
+  const parts = location.pathname.split('/').filter(Boolean);
+  if(parts[0] === 'valley-verified-marketplace') return '/valley-verified-marketplace';
+  if(parts[0] === 'skyenet' && parts[1] === 'valley-verified') return '/skyenet/valley-verified';
+  if(parts[0] === 'valley-verified') return '/valley-verified';
+  return '';
+}
 const VALLEY_GATE_OFFER = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=valley-verified&offer=valley-verified-app-build-lane';
 function readHeaders(){
   const token = $('fs27-gate-token')?.value || window.localStorage?.getItem('fs27_gate_token') || '';
@@ -28,7 +35,7 @@ async function proofOnly(action, payload = {}){
 }
 window.phxAdminConsole = {
   async queueSummary(){ print(await readDecision()); },
-  exposureCatalog(){ return proofOnly('exposure_catalog_model', { model:'/valley-verified/data/exposure-products.json' }); },
+  exposureCatalog(){ return proofOnly('exposure_catalog_model', { model:`${valleyMountPath()}/data/exposure-products.json` }); },
   paymentService(){ return proofOnly('payment_service_model', { gate_offer:VALLEY_GATE_OFFER }); },
   createDryRunCheckout(){
     return proofOnly('create_checkout_session', { business_id:$('checkout-business-id')?.value || 'demo-business', product:$('checkout-product')?.value || 'verified_profile_upgrade', tier:$('checkout-tier')?.value || 'starter', customer_email:$('checkout-email')?.value || 'owner@example.com', gate_offer:VALLEY_GATE_OFFER });

@@ -15,6 +15,19 @@ const VaultPage = {
     return `/Marketing-Made-Easy/SkyeDocxMax/editor.html?${params.toString()}`;
   },
 
+  custodyLabel(item = {}) {
+    if (item.custody?.liveBridgeReceipt) return 'Live bridge receipt';
+    return item.custody?.label || (item.diskSyncedAt ? 'Local/offline + disk copy' : 'Local/offline IndexedDB');
+  },
+
+  custodyBadge(item = {}) {
+    return `<span class="badge">${this.custodyLabel(item)}</span>`;
+  },
+
+  hostedReceiptId(result = {}) {
+    return result?.receipt?.id || result?.backup?.id || result?.snapshot?.id || result?.id || '';
+  },
+
   async boot() {
     await window.SkyePersonalVault.ensureSeed();
     await this.loadSettings();
@@ -120,9 +133,10 @@ const VaultPage = {
     document.querySelector('#backup-cloud-button')?.addEventListener('click', async () => {
       try {
         window.SkyeHosted.setStatus('Saving hosted backup…');
-        await window.SkyeHosted.backupVault();
-        window.SkyeHosted.setStatus('Sovereign backup snapshot saved.', 'good');
-        window.SKYE.toast('Sovereign backup snapshot saved.');
+        const receipt = await window.SkyeHosted.backupVault();
+        const receiptId = this.hostedReceiptId(receipt);
+        window.SkyeHosted.setStatus(receiptId ? `Hosted backup accepted; bridge receipt ${receiptId}.` : 'Hosted backup accepted; no bridge receipt id returned.', 'good');
+        window.SKYE.toast(receiptId ? `Hosted backup receipt ${receiptId}.` : 'Hosted backup response returned.');
       } catch (error) {
         window.SkyeHosted.setStatus(error.message, 'warn');
         window.SKYE.toast(error.message, 'warn');
@@ -134,7 +148,8 @@ const VaultPage = {
         window.SkyeHosted.setStatus('Restoring hosted backup…');
         const result = await window.SkyeHosted.restoreVault();
         await this.refresh();
-        window.SkyeHosted.setStatus(`Sovereign backup restored (${result.count} item${result.count === 1 ? '' : 's'}).`, 'good');
+        const receiptId = this.hostedReceiptId(result);
+        window.SkyeHosted.setStatus(`Hosted backup restored (${result.count} item${result.count === 1 ? '' : 's'}). ${receiptId ? `Bridge receipt ${receiptId}.` : 'Local IndexedDB refreshed from hosted response.'}`, 'good');
         window.SKYE.toast(`Restored ${result.count} item${result.count === 1 ? '' : 's'} from hosted backup.`);
       } catch (error) {
         window.SkyeHosted.setStatus(error.message, 'warn');
@@ -147,7 +162,7 @@ const VaultPage = {
       try {
         const data = await window.SkyeHosted.saveProfile(new FormData(event.currentTarget));
         window.SKYE.toast(`Membership profile saved (${data.profile.thumb_drive_tier}).`);
-        window.SkyeHosted.setStatus(`Profile synced to ${data.backend}.`, 'good');
+        window.SkyeHosted.setStatus(`Profile saved through hosted profile bridge (${data.backend}).`, 'good');
       } catch (error) {
         window.SkyeHosted.setStatus(error.message, 'warn');
         window.SKYE.toast(error.message, 'warn');
@@ -477,18 +492,18 @@ const VaultPage = {
     const synced = files.filter((item) => item.diskSyncedAt).length;
     if (list) {
       list.innerHTML = `
-        <div class="metric"><strong>${files.length}</strong><span>stored files</span></div>
+        <div class="metric"><strong>${files.length}</strong><span>local/offline files</span></div>
         <div class="metric"><strong>${folders.length}</strong><span>folders</span></div>
         <div class="metric"><strong>${window.SKYE.formatBytes(bytes)}</strong><span>vault weight</span></div>
         <div class="metric"><strong>${docs}</strong><span>editable docs</span></div>
-        <div class="metric"><strong>${synced}</strong><span>disk-synced items</span></div>
+        <div class="metric"><strong>${synced}</strong><span>local disk copies</span></div>
         <div class="metric"><strong>${this.currentFolderPath || 'Root'}</strong><span>current lane</span></div>
       `;
     }
     const status = document.querySelector('#vault-status');
-    if (status) status.textContent = navigator.onLine ? 'Vault ready' : 'Vault ready · offline';
+    if (status) status.textContent = navigator.onLine ? 'Vault ready · local/offline IndexedDB' : 'Vault ready · offline';
     const stateNode = document.querySelector('#sync-status');
-    if (stateNode) stateNode.textContent = navigator.onLine ? 'Local vault live · disk sync lives in Settings' : 'Offline mode active · local vault still available';
+    if (stateNode) stateNode.textContent = navigator.onLine ? 'Local/offline vault ready · disk sync lives in Settings' : 'Offline mode active · local vault still available';
   },
 
   async paintActivity() {
@@ -499,7 +514,7 @@ const VaultPage = {
       <div class="list-item compact-item">
         <div>
           <strong>${String(event.type || '').replace(/_/g, ' ')}</strong>
-          <p>${window.SKYE.formatDate(event.createdAt)}${event.detail?.path ? ` · ${event.detail.path}` : ''}</p>
+          <p>Local/offline event · ${window.SKYE.formatDate(event.createdAt)}${event.detail?.path ? ` · ${event.detail.path}` : ''}</p>
         </div>
       </div>
     `).join('') : '<div class="empty-state notice">Vault activity will show up here.</div>';
@@ -587,7 +602,7 @@ const VaultPage = {
       <article class="folder-card-drive drop-target" data-drop-folder="${folder.path}" data-draggable-item="${folder.id}" draggable="true">
         <div class="folder-card-head">
           <div class="file-name"><span class="file-icon">📁</span><span>${folder.name}</span></div>
-          <span class="badge">Folder</span>
+          <span class="badge">Folder</span>${this.custodyBadge(folder)}
         </div>
         <p class="small">${folder.path || 'Root'} · updated ${window.SKYE.formatDate(folder.updatedAt)}</p>
         <div class="actions" style="margin-top:12px;">
@@ -618,7 +633,7 @@ const VaultPage = {
             <span class="file-icon">${item.extension === '.skye' ? '✦' : item.extension === '.zip' ? '🗜️' : '📄'}</span>
             <div>
               <div>${item.name}</div>
-              <div class="small">${item.folderPath || 'Root'}${item.previewText ? ` · ${item.previewText.slice(0, 110)}${item.previewText.length > 110 ? '…' : ''}` : ''}</div>
+              <div class="small">${item.folderPath || 'Root'} · ${this.custodyLabel(item)}${item.previewText ? ` · ${item.previewText.slice(0, 110)}${item.previewText.length > 110 ? '…' : ''}` : ''}</div>
             </div>
           </div>
         </td>
@@ -627,6 +642,7 @@ const VaultPage = {
         <td>${window.SKYE.formatDate(item.updatedAt)}</td>
         <td>
           <div class="actions">
+            ${this.custodyBadge(item)}
             ${item.editable ? `<button data-edit-item="${item.id}">Edit</button>` : `<button data-open-item="${item.id}">Open</button>`}
             <button data-download-item="${item.id}">Download</button>
             <button data-rename-item="${item.id}">Rename</button>

@@ -145,18 +145,18 @@ if (truthy(process.env.PUBLISHER_AUTORUN)) {
 async function handleApi(req, res, url) {
   setSecurityHeaders(res);
 
-  if (requiresAppAccessToken(req, url) && !hasValidAppAccessToken(req, url)) {
+  if (requiresAppAccessToken(req, url) && !(await hasValidAppAccessToken(req, url))) {
     sendJson(res, 401, { ok: false, error: gateAccessErrorMessage() });
     return;
   }
 
   if (url.pathname.startsWith('/api/automation/') && !hasValidSchedulerToken(req, url)) {
-    sendJson(res, 401, { ok: false, error: 'Scheduler token required. Set SCHEDULER_API_KEY and pass it as X-App-Token, Bearer token, or ?key=.' });
+    sendJson(res, 401, { ok: false, error: 'Scheduler token required. Set SCHEDULER_API_KEY and pass it as X-Scheduler-Key, Bearer token, or ?key=.' });
     return;
   }
 
   if (url.pathname.startsWith('/api/backup/') && !hasValidSchedulerToken(req, url)) {
-    sendJson(res, 401, { ok: false, error: 'Backup token required. Set SCHEDULER_API_KEY and pass it as X-App-Token, Bearer token, or ?key=.' });
+    sendJson(res, 401, { ok: false, error: 'Backup token required. Set SCHEDULER_API_KEY and pass it as X-Scheduler-Key, Bearer token, or ?key=.' });
     return;
   }
 
@@ -823,47 +823,120 @@ function runtimeStatus() {
 }
 
 function getRequestToken(req, url) {
-  return getRequestTokens(req, url)[0] || '';
+  return getGateTokens(req, url)[0] || getSchedulerTokens(req, url)[0] || '';
 }
 
-function getRequestTokens(req, url) {
+function headerValue(req, name) {
+  return String(req.headers[String(name || '').toLowerCase()] || '').trim();
+}
+
+function bearerToken(req) {
   const auth = req.headers.authorization || '';
+  return /^Bearer\s+/i.test(auth) ? auth.replace(/^Bearer\s+/i, '').trim() : '';
+}
+
+function cookieValue(req, name) {
+  const wanted = String(name || '').trim();
+  return String(req.headers.cookie || '')
+    .split(';')
+    .map((part) => part.trim())
+    .map((part) => {
+      const idx = part.indexOf('=');
+      return idx >= 0 ? [part.slice(0, idx), part.slice(idx + 1)] : [part, ''];
+    })
+    .find(([key]) => key === wanted)?.[1] || '';
+}
+
+function tokenFromCookie(value) {
+  const raw = decodeURIComponent(String(value || '')).replace(/^Bearer\s+/i, '').trim();
+  if (!raw) return '';
+  try {
+    const parsed = JSON.parse(raw);
+    return String(parsed.token || parsed.session || parsed.sessionToken || '').replace(/^Bearer\s+/i, '').trim();
+  } catch {
+    return raw;
+  }
+}
+
+function getGateTokens(req, _url) {
   const candidates = [
-    /^Bearer\s+/i.test(auth) ? auth.replace(/^Bearer\s+/i, '').trim() : '',
-    req.headers['x-app-token'],
-    req.headers['x-skye-gate-session'],
-    req.headers['x-scheduler-key'],
-    url.searchParams.get('token'),
+    bearerToken(req),
+    headerValue(req, 'x-skye-gate-session'),
+    headerValue(req, 'x-free99-gate-session'),
+    headerValue(req, 'x-0s-gate-session'),
+    headerValue(req, 'x-skygate-session'),
+    tokenFromCookie(cookieValue(req, 'free99_gate_session')),
+    tokenFromCookie(cookieValue(req, 'skye_gate_session')),
+    tokenFromCookie(cookieValue(req, 'skygate_session')),
+    tokenFromCookie(cookieValue(req, 'FREE99_PLATFORM_GATE_SESSION')),
+    tokenFromCookie(cookieValue(req, 'METRAIYUX_GATE_SESSION'))
+  ];
+  return [...new Set(candidates.map((value) => String(value || '').trim()).filter(Boolean))];
+}
+
+function getSchedulerTokens(req, url) {
+  const candidates = [
+    bearerToken(req),
+    headerValue(req, 'x-scheduler-key'),
     url.searchParams.get('key')
   ];
   return [...new Set(candidates.map((value) => String(value || '').trim()).filter(Boolean))];
 }
 
+function fs27Origin() {
+  return String(process.env.SKYGATEFS27_ORIGIN || process.env.SKYGATE_ORIGIN || process.env.ZERO_OS_GATE_ORIGIN || '').trim().replace(/\/+$/, '');
+}
+
+function localDevGateAllowed() {
+  return (process.env.NODE_ENV || 'development') !== 'production'
+    && truthy(process.env.SKYE_CONTENT_ALLOW_LOCAL_DEV_GATE || process.env.ZERO_OS_DEV_LOCAL_GATE_FALLBACK);
+}
+
+async function introspectFs27Token(token) {
+  const origin = fs27Origin();
+  if (!origin || !token) return { ok: false, active: false, error: origin ? 'missing_gate_token' : 'fs27_origin_not_configured' };
+  const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
+  let last = null;
+  for (const pathName of paths) {
+    const response = await fetch(`${origin}${pathName}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ token })
+    }).catch((error) => ({ ok: false, status: 502, json: async () => ({ active: false, error: error.message }) }));
+    const data = await response.json().catch(() => ({ active: false, error: 'invalid_fs27_response' }));
+    last = { status: response.status, data, pathName };
+    if (response.status === 404) continue;
+    return { ok: response.ok && data.active === true, active: data.active === true, status: response.status, data, pathName };
+  }
+  return { ok: false, active: false, status: last?.status || 404, data: last?.data || null, error: 'fs27_introspection_not_found' };
+}
+
 function appAccessTokenState() {
-  const configured = process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
-  if (configured) return { required: true, token: configured, localDev: false };
   if (!GATE_SESSION_REQUIRED) return { required: false, token: '', localDev: false };
-  if ((process.env.NODE_ENV || 'development') !== 'production') return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true };
-  return { required: true, token: '', localDev: false };
+  if (localDevGateAllowed()) return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true, fs27Origin: fs27Origin() };
+  return { required: true, token: '', localDev: false, fs27Origin: fs27Origin() };
 }
 
 function schedulerTokenState() {
-  const configured = process.env.SCHEDULER_API_KEY || process.env.APP_ACCESS_TOKEN || process.env.ADMIN_ACCESS_TOKEN || '';
+  const configured = process.env.SCHEDULER_API_KEY || '';
   if (configured) return { required: true, token: configured, localDev: false };
   if (!GATE_SESSION_REQUIRED) return { required: false, token: '', localDev: false };
-  if ((process.env.NODE_ENV || 'development') !== 'production') return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true };
+  if (localDevGateAllowed()) return { required: true, token: LOCAL_DEV_GATE_TOKEN, localDev: true };
   return { required: true, token: '', localDev: false };
 }
 
-function hasValidAppAccessToken(req, url) {
+async function hasValidAppAccessToken(req, url) {
   const { required, token: expected } = appAccessTokenState();
   if (!required) return true;
-  if (!expected) return false;
-  const incoming = getRequestTokens(req, url);
-  if (incoming.some((token) => safeCompare(token, expected))) return true;
   if (url.pathname.startsWith('/api/automation/') || url.pathname.startsWith('/api/backup/')) {
     const scheduler = schedulerTokenState().token;
-    return Boolean(scheduler && incoming.some((token) => safeCompare(token, scheduler)));
+    if (scheduler && getSchedulerTokens(req, url).some((token) => safeCompare(token, scheduler))) return true;
+  }
+  const incoming = getGateTokens(req, url);
+  if (expected && incoming.some((token) => safeCompare(token, expected))) return true;
+  for (const token of incoming) {
+    const gate = await introspectFs27Token(token);
+    if (gate.ok) return true;
   }
   return false;
 }
@@ -872,7 +945,7 @@ function hasValidSchedulerToken(req, url) {
   const { required, token: expected } = schedulerTokenState();
   if (!required) return true;
   if (!expected) return false;
-  return getRequestTokens(req, url).some((token) => safeCompare(token, expected));
+  return getSchedulerTokens(req, url).some((token) => safeCompare(token, expected));
 }
 
 function requiresAppAccessToken(req, url) {
@@ -883,8 +956,8 @@ function requiresAppAccessToken(req, url) {
 
 function gateAccessErrorMessage() {
   const state = appAccessTokenState();
-  if (!state.token && state.required) return 'Gate session required. Set APP_ACCESS_TOKEN or ADMIN_ACCESS_TOKEN before exposing this Free99 app.';
-  if (state.localDev) return `Gate session required. Use the local admin gate token ${LOCAL_DEV_GATE_TOKEN} or set APP_ACCESS_TOKEN in .env.`;
+  if (!state.fs27Origin && state.required && !state.localDev) return 'Gate session required. Configure SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN so this Free99 app can verify the shared 0S gate.';
+  if (state.localDev) return `Gate session required. Local dev fallback only works when SKYE_CONTENT_ALLOW_LOCAL_DEV_GATE or ZERO_OS_DEV_LOCAL_GATE_FALLBACK is enabled.`;
   return 'Gate session required. Free99 means no charge, not anonymous access.';
 }
 

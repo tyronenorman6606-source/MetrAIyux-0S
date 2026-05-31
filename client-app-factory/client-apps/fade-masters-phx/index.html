@@ -226,6 +226,41 @@
       overflow-wrap: anywhere;
     }
 
+    .fm-powered-by {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      border: 1px solid rgba(244,198,106,.34);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--fm-ink);
+      text-decoration: none;
+      background: rgba(0,0,0,.26);
+      box-shadow: inset 0 0 0 1px rgba(81,214,255,.08);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .fm-powered-by img {
+      width: 30px;
+      height: 30px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+
+    .fm-powered-by span {
+      display: grid;
+      gap: 1px;
+      color: var(--fm-muted);
+    }
+
+    .fm-powered-by b {
+      color: #fff;
+    }
+
     .fm-nav {
       display: flex;
       flex-wrap: wrap;
@@ -862,6 +897,11 @@
         height: 38px;
       }
 
+      .fm-powered-by {
+        align-self: flex-start;
+        white-space: normal;
+      }
+
       .fm-hero-brand {
         width: min(520px, 100%);
         margin-top: 0;
@@ -951,6 +991,10 @@
         <img src="assets/brand/fade-masters-phx-brand-mark.svg" alt="" aria-hidden="true">
         <span>Fade Masters PHX</span>
       </a>
+      <a class="fm-powered-by" href="https://gray-skyes-founder-portfolio.pages.dev/skyeknowlogy" target="_blank" rel="noopener" aria-label="Powered by SkyeKnowlogy">
+        <img src="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/assets/brand/skyes-over-london-deity-logo.png" alt="" aria-hidden="true">
+        <span>Powered by <b>SkyeKnowlogy</b></span>
+      </a>
       <nav class="fm-nav" aria-label="Fade Masters app navigation">
         <a href="#services" data-fm-scroll-target="#services">Services</a>
         <a href="#media" data-fm-scroll-target="#media">Media</a>
@@ -972,7 +1016,7 @@
           <div class="fm-hero-actions">
             <a class="fm-btn primary" href="#book" data-fm-scroll-target="#book">Start booking</a>
             <a class="fm-btn" href="#queue" data-fm-scroll-target="#queue">Join walk-in queue</a>
-            <a class="fm-btn" href="/northstar/?workspace=fade-masters-phx&client=fade-masters-phx">Open NorthStar</a>
+            <a class="fm-btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/index.html?workspace=fade-masters-phx&client=fade-masters-phx">Open NorthStar</a>
             <button class="fm-btn" type="button" data-fm-share>Share app</button>
           </div>
           <div class="fm-status-grid" aria-label="Booking status">
@@ -1055,12 +1099,12 @@
       <section id="northstar" class="fm-panel fm-booking fm-signinpro-panel" aria-labelledby="signinpro-title">
         <p class="fm-eyebrow">NorthStar / SignInPro runtime</p>
         <h2 id="signinpro-title">Customer requests become SignInPro check-ins.</h2>
-        <p>The public booking and queue forms load the NorthStar core, create SignInPro-compatible guest records, and write the Fade Masters workspace state that the operator opens from the NorthStar app.</p>
+        <p>The public booking and queue forms load the NorthStar core from the 0S origin, create SignInPro-compatible guest records, and write the Fade Masters workspace state that the operator opens through the shared 0S NorthStar lane.</p>
         <div class="fm-signinpro-strip" aria-label="SignInPro wiring status">
           <span>Workspace: fade-masters-phx</span>
           <span>State: signinpro_workspace_state_v4:fade-masters-phx</span>
-          <span>Route: /northstar/</span>
-          <span>API: /api/northstar</span>
+          <span>0S route: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/</span>
+          <span>0S API: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/northstar</span>
         </div>
         <div class="fm-northstar-console" aria-label="NorthStar handoff status">
           <div class="fm-northstar-signal"><span>Runtime</span><strong data-fm-runtime-status>Loading</strong></div>
@@ -1069,7 +1113,7 @@
           <div class="fm-northstar-signal"><span>Remote sync</span><strong data-fm-remote-status>Waiting for operator session</strong></div>
         </div>
         <div class="fm-action-row">
-          <a class="fm-btn primary" href="/northstar/?workspace=fade-masters-phx&client=fade-masters-phx">Open Fade Masters NorthStar</a>
+          <a class="fm-btn primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/index.html?workspace=fade-masters-phx&client=fade-masters-phx">Open Fade Masters NorthStar</a>
           <button class="fm-btn" type="button" data-fm-signinpro-proof>Show local SignInPro mirror</button>
         </div>
       </section>
@@ -1198,8 +1242,8 @@
     </main>
   </div>
 
-  <script src="/northstar/assets/core.js"></script>
-  <script src="/northstar/assets/workspace-client.js"></script>
+  <script src="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/assets/core.js"></script>
+  <script src="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/assets/workspace-client.js"></script>
   <script src="script.js"></script>
   <script src="fade-booking.js"></script>
 </body>

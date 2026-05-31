@@ -23,6 +23,43 @@
     free99Href: '/data/free99-entitlements.json',
     skyePayHref: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&skyemerit_code=SKYEMUSICNEXUS-LAUNCH-2000'
   };
+  const VALLEY_VERIFIED_ROUTE_INDEX_URL = '/data/skyenet-client-route-index.json';
+  const VALLEY_VERIFIED_CLIENT_NAMES = {
+    'arizona-biltmore-dentistry': 'Arizona Biltmore Dentistry',
+    'as-you-wish-pottery-westgate': 'As You Wish Pottery Westgate',
+    'burch-and-cracchiolo-p-a-phoenix-85004-acf6c6b': 'Burch & Cracchiolo, P.A.',
+    'dental-depot-orthodontics-phoenix': 'Dental Depot Orthodontics Phoenix',
+    'empire-pallets': 'Empire Pallets',
+    'fade-masters-phx': 'Fade Masters PHX',
+    'fennemore-phoenix-85016-eb81f5b': 'Fennemore Phoenix',
+    'gallagher-and-kennedy-p-a-phoenix-85016-887b1be': 'Gallagher & Kennedy, P.A.',
+    'general-dentistry-4-kids-phoenix': 'General Dentistry 4 Kids Phoenix',
+    'greenberg-traurig-llp-phoenix-85016-5f86b1d': 'Greenberg Traurig LLP Phoenix',
+    'kutak-rock-llp-scottsdale-85253-00c0044': 'Kutak Rock LLP Scottsdale',
+    'milligan-lawless-p-c-phoenix-85018-94ab8a4': 'Milligan Lawless P.C.',
+    'next-level-gaming-az': 'Next Level Gaming AZ',
+    'next-level-gaming-goodyear': 'Next Level Gaming Goodyear',
+    'platz-juris-pllc-phoenix-85016-4e77b1f': 'PLATZ JURIS, PLLC',
+    'valley-verified-marketplace': 'Valley Verified Marketplace'
+  };
+  const VALLEY_VERIFIED_SKYENET_FALLBACK_ROUTES = [
+    { client_id: 'valley-verified-marketplace', public_url: 'https://skyenet.graylondonskyes.workers.dev/valley-verified-marketplace/', lane: 'marketplace-client-network' },
+    { client_id: 'arizona-biltmore-dentistry', public_url: 'https://skyenet.graylondonskyes.workers.dev/arizona-biltmore-dentistry/' },
+    { client_id: 'as-you-wish-pottery-westgate', public_url: 'https://skyenet.graylondonskyes.workers.dev/as-you-wish-pottery-westgate/' },
+    { client_id: 'burch-and-cracchiolo-p-a-phoenix-85004-acf6c6b', public_url: 'https://skyenet.graylondonskyes.workers.dev/burch-and-cracchiolo-p-a-phoenix-85004-acf6c6b/' },
+    { client_id: 'dental-depot-orthodontics-phoenix', public_url: 'https://skyenet.graylondonskyes.workers.dev/dental-depot-orthodontics-phoenix/' },
+    { client_id: 'empire-pallets', public_url: 'https://skyenet.graylondonskyes.workers.dev/empire-pallets/' },
+    { client_id: 'fade-masters-phx', public_url: 'https://skyenet.graylondonskyes.workers.dev/fade-masters-phx/' },
+    { client_id: 'fennemore-phoenix-85016-eb81f5b', public_url: 'https://skyenet.graylondonskyes.workers.dev/fennemore-phoenix-85016-eb81f5b/' },
+    { client_id: 'gallagher-and-kennedy-p-a-phoenix-85016-887b1be', public_url: 'https://skyenet.graylondonskyes.workers.dev/gallagher-and-kennedy-p-a-phoenix-85016-887b1be/' },
+    { client_id: 'general-dentistry-4-kids-phoenix', public_url: 'https://skyenet.graylondonskyes.workers.dev/general-dentistry-4-kids-phoenix/' },
+    { client_id: 'greenberg-traurig-llp-phoenix-85016-5f86b1d', public_url: 'https://skyenet.graylondonskyes.workers.dev/greenberg-traurig-llp-phoenix-85016-5f86b1d/' },
+    { client_id: 'kutak-rock-llp-scottsdale-85253-00c0044', public_url: 'https://skyenet.graylondonskyes.workers.dev/kutak-rock-llp-scottsdale-85253-00c0044/' },
+    { client_id: 'milligan-lawless-p-c-phoenix-85018-94ab8a4', public_url: 'https://skyenet.graylondonskyes.workers.dev/milligan-lawless-p-c-phoenix-85018-94ab8a4/' },
+    { client_id: 'next-level-gaming-az', public_url: 'https://skyenet.graylondonskyes.workers.dev/next-level-gaming-az/' },
+    { client_id: 'next-level-gaming-goodyear', public_url: 'https://skyenet.graylondonskyes.workers.dev/next-level-gaming-goodyear/' },
+    { client_id: 'platz-juris-pllc-phoenix-85016-4e77b1f', public_url: 'https://skyenet.graylondonskyes.workers.dev/platz-juris-pllc-phoenix-85016-4e77b1f/' }
+  ];
 
   const VIEW_LABELS = {
     command: 'Command',
@@ -877,14 +914,9 @@
   ];
 
   const GATE_STORAGE_KEYS = [
-    'FREE99_PLATFORM_GATE_SESSION',
-    'FREE99_PLATFORM_GATE_SESSION_FOUNDER_COMMAND',
     'METRAIYUX_GATE_SESSION',
     'SKYGATEFS27_GATE_SESSION',
-    'SKYGATE_USER_TOKEN',
-    'SKYE_GATE_SESSION',
-    'quantumskyes_mcp_owner_token',
-    'adminBrainToken'
+    'SKYE_GATE_SESSION'
   ];
 
   const DEFAULT_FOUNDER = {
@@ -1014,6 +1046,9 @@
     repoVault: null,
     workSystem: null,
     actionCatalog: null,
+    valleyVerifiedRoutes: [],
+    valleyVerifiedLoadedAt: '',
+    valleyVerifiedLoadError: '',
     repoVaultLoadedEntries: [],
     repoVaultLoadedChunk: '',
     repoVaultLoadedAll: false,
@@ -1023,7 +1058,8 @@
     activeCoreAppId: 'core-pocket-skyemail',
     activeProjectId: 'project-0meg4command-6-7-canon',
     activeTemplateId: 'template-founder-command-intro',
-    activeRepoMemoryId: ''
+    activeRepoMemoryId: '',
+    activeValleyVerifiedRouteId: 'valley-verified-marketplace'
   };
 
   const $ = (id) => document.getElementById(id);
@@ -1206,6 +1242,10 @@
   }
 
   function storedGateToken() {
+    const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    const bridgeSession = bridge?.requireSession?.({ platformId: 'founder-command', usageLane: 'founder-command' }) || bridge?.current?.();
+    const bridgeToken = cleanGateToken(bridgeSession?.token || '');
+    if (bridgeToken) return bridgeToken;
     for (const key of GATE_STORAGE_KEYS) {
       for (const store of [sessionStorage, localStorage]) {
         try {
@@ -1225,7 +1265,6 @@
     if (!token) return {};
     return {
       authorization: `Bearer ${token}`,
-      'x-admin-token': token,
       'x-skye-gate-session': token,
       'x-free99-gate-session': token
     };
@@ -1364,6 +1403,7 @@
       state.activeProjectId = parsed.activeProjectId || state.projects[0]?.id || '';
       state.activeTemplateId = parsed.activeTemplateId || state.templates[0]?.id || '';
       state.activeRepoMemoryId = parsed.activeRepoMemoryId || state.repoMemory[0]?.id || '';
+      state.activeValleyVerifiedRouteId = parsed.activeValleyVerifiedRouteId || state.activeValleyVerifiedRouteId;
     } catch {
       state.repoMemory = normalizeRepoMemory();
       state.assets = mergeAssets([]);
@@ -1383,7 +1423,8 @@
       activeCoreAppId: state.activeCoreAppId,
       activeProjectId: state.activeProjectId,
       activeTemplateId: state.activeTemplateId,
-      activeRepoMemoryId: state.activeRepoMemoryId
+      activeRepoMemoryId: state.activeRepoMemoryId,
+      activeValleyVerifiedRouteId: state.activeValleyVerifiedRouteId
     }));
   }
 
@@ -2669,6 +2710,205 @@
       `).join('');
     }
     if ($('indexingSubmitPack')) $('indexingSubmitPack').textContent = indexingSubmitText();
+  }
+
+  function titleFromValleySlug(slug = '') {
+    if (VALLEY_VERIFIED_CLIENT_NAMES[slug]) return VALLEY_VERIFIED_CLIENT_NAMES[slug];
+    return String(slug || 'Valley Verified Client')
+      .split('-')
+      .filter(Boolean)
+      .map((part) => part.length <= 3 ? part.toUpperCase() : `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join(' ');
+  }
+
+  function safeValleyVerifiedPublicUrl(value = '') {
+    const text = String(value || '').trim();
+    if (!text) return '';
+    try {
+      const url = new URL(text, window.location.origin);
+      if (!['http:', 'https:'].includes(url.protocol)) return '';
+      return url.toString();
+    } catch {
+      return '';
+    }
+  }
+
+  function normalizeValleyVerifiedRoute(route = {}, source = 'fallback') {
+    const clientId = String(route.client_id || route.slug || route.project_id || '').trim();
+    const publicUrl = safeValleyVerifiedPublicUrl(route.public_url || route.skynet_public_url || route.live_url || route.url);
+    if (!clientId || !publicUrl) return null;
+    return {
+      client_id: clientId,
+      business_name: route.business_name || route.name || VALLEY_VERIFIED_CLIENT_NAMES[clientId] || titleFromValleySlug(clientId),
+      public_url: publicUrl,
+      workspace_id: route.workspace_id || clientId,
+      project_id: route.project_id || clientId,
+      deployment_id: route.deployment_id || '',
+      route_key: route.route_key || '',
+      source_download_api: route.source_download_api || '',
+      source_auth: route.source_auth || 'Shared FS27/SkyGate/Free99 bearer session required',
+      lane: route.lane || (clientId === 'valley-verified-marketplace' ? 'marketplace-client-network' : 'valley-verified-client-app'),
+      proof_state: source === 'fallback'
+        ? 'unverified-route-record'
+        : route.deployment_proof_state?.state || route.proof_state || (route.deployment_id ? 'proof-recorded' : 'public-route-recorded'),
+      source
+    };
+  }
+
+  function mergeValleyVerifiedRoutes(routes = []) {
+    const order = VALLEY_VERIFIED_SKYENET_FALLBACK_ROUTES.map((route) => route.client_id);
+    const byId = new Map();
+    for (const route of VALLEY_VERIFIED_SKYENET_FALLBACK_ROUTES) {
+      const normalized = normalizeValleyVerifiedRoute(route, 'fallback');
+      if (normalized) byId.set(normalized.client_id, normalized);
+    }
+    for (const route of routes) {
+      const normalized = normalizeValleyVerifiedRoute(route, 'route-index');
+      if (!normalized) continue;
+      byId.set(normalized.client_id, { ...(byId.get(normalized.client_id) || {}), ...normalized });
+      if (!order.includes(normalized.client_id)) order.push(normalized.client_id);
+    }
+    return order.map((id) => byId.get(id)).filter(Boolean);
+  }
+
+  async function loadValleyVerifiedRoutes() {
+    state.valleyVerifiedRoutes = mergeValleyVerifiedRoutes([]);
+    state.valleyVerifiedLoadedAt = new Date().toISOString();
+    state.valleyVerifiedLoadError = '';
+    try {
+      const response = await fetch(VALLEY_VERIFIED_ROUTE_INDEX_URL, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`route index returned ${response.status}`);
+      const data = await response.json();
+      state.valleyVerifiedRoutes = mergeValleyVerifiedRoutes(data.routes || []);
+      state.valleyVerifiedLoadedAt = data.generated_at || new Date().toISOString();
+    } catch (error) {
+      state.valleyVerifiedLoadError = error?.message || 'route index unavailable; showing unverified fallback route records';
+    }
+    if (!findValleyVerifiedRoute(state.activeValleyVerifiedRouteId)) {
+      state.activeValleyVerifiedRouteId = state.valleyVerifiedRoutes[0]?.client_id || '';
+    }
+  }
+
+  function findValleyVerifiedRoute(id = '') {
+    return state.valleyVerifiedRoutes.find((route) => route.client_id === id) || state.valleyVerifiedRoutes[0] || null;
+  }
+
+  function valleyVerifiedBlast(route = findValleyVerifiedRoute()) {
+    if (!route) return 'No Valley Verified route selected.';
+    if (route.source === 'fallback') {
+      return [
+        `${route.business_name} has a saved SkyeNet route record: ${route.public_url}`,
+        'Founder Command could not verify the live route index in this session, so do not call this a live client app until Refresh Routes confirms it from SkyeNet.',
+        `It is not an official ${route.business_name} site unless they approve and adopt it.`
+      ].join(' ');
+    }
+    return [
+      `Hey ${route.business_name}, I built you a free live SkyeNet preview app: ${route.public_url}`,
+      'This is a working prototype hosted on Skyes Over London sovereign SkyeNet infrastructure, not just a mockup or a generic agency landing page.',
+      `It is not an official ${route.business_name} site unless you approve and adopt it; we can remove it, update it, or hand it over on request.`
+    ].join(' ');
+  }
+
+  function valleyVerifiedLinksText() {
+    return state.valleyVerifiedRoutes
+      .map((route) => `${route.business_name} | ${route.client_id} | ${route.public_url}`)
+      .join('\n');
+  }
+
+  function valleyVerifiedRouteReceipt(route = findValleyVerifiedRoute()) {
+    if (!route) return {};
+    return {
+      selected: route.business_name,
+      client_id: route.client_id,
+      live_url: route.public_url,
+      proof_state: route.proof_state,
+      deployment_id: route.deployment_id || 'recorded externally',
+      source_download_api: route.source_download_api || 'not recorded in fallback',
+      source_auth: route.source_auth,
+      loaded_at: state.valleyVerifiedLoadedAt,
+      route_index: VALLEY_VERIFIED_ROUTE_INDEX_URL,
+      load_warning: state.valleyVerifiedLoadError || ''
+    };
+  }
+
+  function renderValleyVerifiedShowroom({ forceFrameReload = false } = {}) {
+    const routes = state.valleyVerifiedRoutes.length ? state.valleyVerifiedRoutes : mergeValleyVerifiedRoutes([]);
+    state.valleyVerifiedRoutes = routes;
+    const active = findValleyVerifiedRoute(state.activeValleyVerifiedRouteId) || routes[0] || null;
+    if (active) state.activeValleyVerifiedRouteId = active.client_id;
+    if ($('valleyVerifiedRouteCount')) $('valleyVerifiedRouteCount').textContent = String(routes.length);
+    if ($('valleyVerifiedLiveCount')) $('valleyVerifiedLiveCount').textContent = String(routes.filter((route) => route.public_url && route.source !== 'fallback').length);
+    if ($('valleyVerifiedProofState')) $('valleyVerifiedProofState').textContent = state.valleyVerifiedLoadError ? 'Unverified fallback' : 'Route index';
+    if ($('valleyVerifiedActiveName')) $('valleyVerifiedActiveName').textContent = active?.business_name || 'Select client';
+    if ($('valleyVerifiedActiveUrl')) $('valleyVerifiedActiveUrl').textContent = active?.public_url || '';
+    if ($('valleyVerifiedOpenLink')) $('valleyVerifiedOpenLink').href = active?.public_url || '#';
+    if ($('valleyVerifiedOutput')) $('valleyVerifiedOutput').textContent = valleyVerifiedBlast(active);
+    const list = $('valleyVerifiedClientList');
+    if (list) {
+      list.innerHTML = routes.map((route) => `
+        <article class="route-card valley-client-card${route.client_id === active?.client_id ? ' active' : ''}">
+          <strong>${escapeHtml(route.business_name)}</strong>
+          <span>${escapeHtml(route.client_id)}</span>
+          <span>${escapeHtml(route.public_url)} · ${route.source === 'fallback' ? 'unverified fallback' : 'route index'}</span>
+          <div class="tool-row">
+            <button class="button secondary" data-valley-route-preview="${escapeAttr(route.client_id)}" type="button">Preview</button>
+            <a class="button secondary" href="${escapeAttr(route.public_url)}" target="_blank" rel="noopener">Open</a>
+            <button class="button secondary" data-valley-route-copy="${escapeAttr(route.client_id)}" type="button">Copy</button>
+          </div>
+        </article>
+      `).join('');
+    }
+    const frame = $('valleyVerifiedFrame');
+    if (frame && active && (forceFrameReload || frame.getAttribute('src') !== active.public_url)) {
+      frame.removeAttribute('srcdoc');
+      if (forceFrameReload) frame.removeAttribute('src');
+      frame.src = active.public_url;
+    }
+  }
+
+  function previewValleyVerifiedRoute(id = '') {
+    const route = findValleyVerifiedRoute(id);
+    if (!route) return;
+    state.activeValleyVerifiedRouteId = route.client_id;
+    renderValleyVerifiedShowroom();
+    showJson('valleyVerifiedOutput', valleyVerifiedRouteReceipt(route));
+    saveState();
+  }
+
+  async function copyValleyVerifiedRoute(id = '') {
+    const route = findValleyVerifiedRoute(id);
+    if (!route) return;
+    await copyText(`${route.business_name}\n${route.public_url}\n\n${valleyVerifiedBlast(route)}`);
+    showJson('valleyVerifiedOutput', valleyVerifiedRouteReceipt(route));
+  }
+
+  async function refreshValleyVerifiedRoutes() {
+    await loadValleyVerifiedRoutes();
+    renderRoutes(state.valleyVerifiedRoutes.map((route) => ({ label: route.business_name, href: route.public_url, kind: 'Valley Verified SkyeNet' })));
+    renderValleyVerifiedShowroom({ forceFrameReload: true });
+    showJson('valleyVerifiedOutput', {
+      refreshed: true,
+      routes: state.valleyVerifiedRoutes.length,
+      source: VALLEY_VERIFIED_ROUTE_INDEX_URL,
+      warning: state.valleyVerifiedLoadError || ''
+    });
+  }
+
+  function openActiveValleyVerifiedRoute() {
+    const route = findValleyVerifiedRoute(state.activeValleyVerifiedRouteId);
+    if (!route?.public_url) return toast('Choose a Valley Verified route first.', true);
+    window.open(route.public_url, '_blank', 'noopener');
+  }
+
+  async function copyActiveValleyVerifiedBlast() {
+    const route = findValleyVerifiedRoute(state.activeValleyVerifiedRouteId);
+    await copyText(valleyVerifiedBlast(route));
+    showJson('valleyVerifiedOutput', valleyVerifiedRouteReceipt(route));
+  }
+
+  async function copyAllValleyVerifiedLinks() {
+    await copyText(valleyVerifiedLinksText());
+    showJson('valleyVerifiedOutput', valleyVerifiedLinksText());
   }
 
   function clientCredentialPayload(client = CLIENT_CREDENTIALS[0]) {
@@ -4677,6 +4917,15 @@
     if ($('copyBobCredentialPackBtn')) $('copyBobCredentialPackBtn').addEventListener('click', () => copyClientCredentialPack('bobs-smoke-shop'));
     if ($('exportBobCredentialPackBtn')) $('exportBobCredentialPackBtn').addEventListener('click', () => exportClientCredentialPack('bobs-smoke-shop'));
     if ($('prefillBobHandoffBtn')) $('prefillBobHandoffBtn').addEventListener('click', () => prefillClientSkyEmailHandoff('bobs-smoke-shop'));
+    if ($('refreshValleyVerifiedRoutesBtn')) $('refreshValleyVerifiedRoutesBtn').addEventListener('click', refreshValleyVerifiedRoutes);
+    if ($('copyValleyVerifiedLinksBtn')) $('copyValleyVerifiedLinksBtn').addEventListener('click', copyAllValleyVerifiedLinks);
+    if ($('copyValleyVerifiedBlastBtn')) $('copyValleyVerifiedBlastBtn').addEventListener('click', copyActiveValleyVerifiedBlast);
+    if ($('openValleyVerifiedRouteBtn')) $('openValleyVerifiedRouteBtn').addEventListener('click', openActiveValleyVerifiedRoute);
+    if ($('fullscreenValleyVerifiedPreviewBtn')) $('fullscreenValleyVerifiedPreviewBtn').addEventListener('click', () => {
+      const frame = $('valleyVerifiedPreviewShell');
+      if (!frame?.requestFullscreen) return toast('Fullscreen is not available in this browser.', true);
+      frame.requestFullscreen().catch((error) => toast(error.message || 'Fullscreen failed.', true));
+    });
     if ($('refreshCompanyOpsBtn')) $('refreshCompanyOpsBtn').addEventListener('click', refreshCompanyOps);
     if ($('refreshFounderActionsBtn')) $('refreshFounderActionsBtn').addEventListener('click', refreshFounderActions);
     if ($('planFounderActionBtn')) $('planFounderActionBtn').addEventListener('click', planFounderAction);
@@ -4703,6 +4952,8 @@
       if (button.dataset.clientExport) exportClientCredentialPack(button.dataset.clientExport);
       if (button.dataset.clientPrefill) prefillClientSkyEmailHandoff(button.dataset.clientPrefill);
       if (button.dataset.clientCopyField) copyClientCredentialField(button.dataset.clientCopyField);
+      if (button.dataset.valleyRoutePreview) previewValleyVerifiedRoute(button.dataset.valleyRoutePreview);
+      if (button.dataset.valleyRouteCopy) copyValleyVerifiedRoute(button.dataset.valleyRouteCopy);
     });
     if ($('songSearch')) $('songSearch').addEventListener('input', renderSongVault);
     if ($('songCollectionFilter')) $('songCollectionFilter').addEventListener('change', renderSongVault);
@@ -5150,10 +5401,11 @@
   }
 
   function renderAll() {
-    renderRoutes();
+    renderRoutes(state.valleyVerifiedRoutes.map((route) => ({ label: route.business_name, href: route.public_url, kind: 'Valley Verified SkyeNet' })));
     renderCoreApps();
     renderAssets();
     renderSongVault();
+    renderValleyVerifiedShowroom();
     renderClientCredentials();
     renderRepoMemory();
     renderFounderForm();
@@ -5170,6 +5422,7 @@
   async function boot() {
     await db.init();
     loadState();
+    await loadValleyVerifiedRoutes();
     bindEvents();
     renderAll();
     const pwaRegistration = await registerFounderPwa();

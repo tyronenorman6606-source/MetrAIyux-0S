@@ -136,13 +136,42 @@ function workerEnv() {
   return globalThis.__SKYEVAULT_WORKER_ENV || {};
 }
 
+function stripBearer(value) {
+  return String(value || '').replace(/^Bearer\s+/i, '').trim();
+}
+
+const GATE_COOKIE_NAMES = [
+  'metraiyux_admin_session',
+  'skye_gate_session',
+  'skygate_session',
+  'skyegate_session',
+  'metraiyux_gate_session',
+  'free99_gate_session',
+  'zero_os_gate_session'
+];
+
+function gateCredentialCandidates(event) {
+  const cookies = parseCookies(event);
+  return [
+    getHeader(event, 'authorization'),
+    getHeader(event, 'x-admin-token'),
+    getHeader(event, 'x-skye-gate-session'),
+    getHeader(event, 'x-skygate-session'),
+    getHeader(event, 'x-free99-gate-session'),
+    getHeader(event, 'x-free99-admin-code'),
+    ...GATE_COOKIE_NAMES.map((name) => cookies[name] || '')
+  ].map(stripBearer).filter(Boolean);
+}
+
 function bearerToken(event) {
+  const cookies = parseCookies(event);
   const raw = getHeader(event, 'authorization')
     || getHeader(event, 'x-skye-gate-session')
+    || getHeader(event, 'x-skygate-session')
     || getHeader(event, 'x-free99-gate-session')
-    || getHeader(event, 'x-free99-admin-code')
+    || GATE_COOKIE_NAMES.map((name) => cookies[name] || '').find(Boolean)
     || '';
-  return String(raw || '').replace(/^Bearer\s+/i, '').trim();
+  return stripBearer(raw);
 }
 
 const SHARED_GATE_CREDENTIAL_ENV_NAMES = [
@@ -198,9 +227,13 @@ function sharedGateCredentialValues() {
 }
 
 function matchesSharedGateCredential(token) {
-  const provided = String(token || '').replace(/^Bearer\s+/i, '').trim();
+  const provided = stripBearer(token);
   if (!provided) return false;
   return sharedGateCredentialValues().some((candidate) => constantTimeEqual(provided, candidate));
+}
+
+function sharedGateCredentialFromEvent(event) {
+  return gateCredentialCandidates(event).find((candidate) => matchesSharedGateCredential(candidate)) || '';
 }
 
 function skygateOrigin() {
@@ -225,6 +258,28 @@ async function skygateFetch(path, token) {
     return binding.fetch(new Request(`https://skyegatefs27.internal${path}`, init));
   }
   return fetch(`${skygateOrigin()}${path}`, init);
+}
+
+function zeroOsOrigin() {
+  return String(
+    process.env.METRAIYUX_0S_ORIGIN
+    || process.env.METRAIYUX_0S_WORKER_ORIGIN
+    || process.env.ZERO_OS_BASE_URL
+    || process.env.ZERO_OS_ORIGIN
+    || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev'
+  ).replace(/\/+$/, '');
+}
+
+async function zeroOsOwnerSessionFetch(token) {
+  return fetch(`${zeroOsOrigin()}/api/owner/admin-session`, {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'x-skye-gate-session': token,
+      'x-free99-gate-session': token
+    }
+  });
 }
 
 function scopeList(scope) {
@@ -314,6 +369,46 @@ export async function introspectSkygateBearer(event) {
   };
 }
 
+export async function introspectZeroOsOwnerBearer(event) {
+  const token = bearerToken(event);
+  if (!token) return { ok: false, statusCode: 401, error: 'Missing 0S owner bearer token.' };
+  try {
+    const response = await zeroOsOwnerSessionFetch(token);
+    const data = await response.json().catch(() => ({ ok: false, authenticated: false, error: 'Invalid 0S owner session response.' }));
+    const user = data.user || data.session?.user || data.identity || {};
+    const role = cleanText(data.role || user.role || 'owner', 80).toLowerCase();
+    const email = cleanText(data.email || user.email || data.identity?.email || '', 180).toLowerCase();
+    const subject = cleanText(data.subject || user.id || user.sub || email || 'zero-os-owner-session', 180);
+    const ok = response.ok && (data.authenticated === true || data.ok === true);
+    return {
+      ok,
+      active: ok,
+      statusCode: ok ? 200 : (response.ok ? 401 : response.status),
+      path: '/api/owner/admin-session',
+      claims: {
+        active: ok,
+        ok,
+        role,
+        email,
+        sub: subject,
+        session_id: cleanText(data.sessionId || data.sid || data.session?.id || '', 160),
+        scope: ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin'],
+        user: { role, email, id: subject }
+      },
+      error: ok ? '' : (data.error || '0S owner session is inactive or not accepted.')
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      active: false,
+      statusCode: 401,
+      path: '/api/owner/admin-session',
+      claims: null,
+      error: error.message || `0S owner session endpoint was not reachable at ${zeroOsOrigin()}.`
+    };
+  }
+}
+
 export function requireAdmin(event) {
   assertAllowedOrigin(event);
   const configured = process.env.ADMIN_TOKEN;
@@ -334,20 +429,39 @@ export function requireAdmin(event) {
 
 export async function requireAdminAccess(event) {
   assertAllowedOrigin(event);
+  if (sharedGateCredentialFromEvent(event)) {
+    return publicAdminActor('shared-0s-gate', {
+      active: true,
+      ok: true,
+      role: 'owner',
+      sub: 'shared-0s-gate',
+      scope: ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin']
+    });
+  }
+
   const bearer = bearerToken(event);
   if (bearer) {
-    const gate = await introspectSkygateBearer(event);
+    let gate = await introspectSkygateBearer(event);
     if (!gate.ok) {
-      const error = new Error(gate.error || 'FS27 bearer is invalid or inactive.');
-      error.statusCode = gate.statusCode || 401;
-      throw error;
+      const zeroOs = await introspectZeroOsOwnerBearer(event);
+      if (zeroOs.ok) gate = zeroOs;
+      else {
+        const error = new Error(gate.error || zeroOs.error || 'FS27 bearer is invalid or inactive.');
+        error.statusCode = gate.statusCode || zeroOs.statusCode || 401;
+        throw error;
+      }
     }
     if (!allowsSkyeVaultAdmin(gate.claims)) {
-      const error = new Error('FS27 bearer is active, but it is not admin-scoped for SkyeVault.');
-      error.statusCode = 403;
-      throw error;
+      const zeroOs = gate.path === '/api/owner/admin-session' ? gate : await introspectZeroOsOwnerBearer(event);
+      if (zeroOs.ok && allowsSkyeVaultAdmin(zeroOs.claims)) {
+        gate = zeroOs;
+      } else {
+        const error = new Error('Shared gate bearer is active, but it is not admin-scoped for SkyeVault.');
+        error.statusCode = 403;
+        throw error;
+      }
     }
-    return publicAdminActor('fs27-skygate', gate.claims);
+    return publicAdminActor(gate.path === '/api/owner/admin-session' ? 'zero-os-owner-session' : 'fs27-skygate', gate.claims);
   }
 
   const configured = process.env.ADMIN_TOKEN;
@@ -425,13 +539,9 @@ function ownerAdminPortalAccess(body = {}, admin = {}) {
 
 export async function resolvePortalAccess(event, body = {}) {
   assertAllowedOrigin(event);
-  const adminMaterial = getHeader(event, 'authorization')
-    || getHeader(event, 'x-admin-token')
-    || getHeader(event, 'x-skye-gate-session')
-    || getHeader(event, 'x-free99-gate-session')
-    || getHeader(event, 'x-free99-admin-code');
-  if (adminMaterial) {
-    const sharedGateToken = bearerToken(event) || getHeader(event, 'x-admin-token');
+  const adminMaterial = gateCredentialCandidates(event);
+  if (adminMaterial.length) {
+    const sharedGateToken = sharedGateCredentialFromEvent(event);
     if (matchesSharedGateCredential(sharedGateToken)) {
       recordPortalKeySuccess(event);
       return ownerAdminPortalAccess(body, publicAdminActor('shared-0s-gate', {

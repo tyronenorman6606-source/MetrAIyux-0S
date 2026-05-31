@@ -1,26 +1,44 @@
 # James Patrick Photography Research
 
-Status: limited
-Researched: 2026-05-28T06:07:04.853Z
+Status: limited-source-grounded
+Researched: 2026-05-30T00:00:00-07:00
+Agent: Curie
 
-## Confirmed Facts
-- Services: Commercial Photography / Video, Advertising & Media / Commercial Photography / Video, Commercial photography / video, Advertising & Media, Local SMB / service business, Public directory record, Business / Professional Services
-- Audience: local businesses, operators, professional teams
-- Service area: Phoenix, AZ, 85040
-- Address: 4620 E Elwood Street Suite 7, Phoenix, AZ 85040
+## Why Skyes Over London Says Valley Verified
+
+Skyes Over London says James Patrick Photography is Valley Verified because the customer-facing page is grounded in public facts: business name, category, service lane, phone, address, source lineage, last-reviewed date, and source policy. The page does not add guessed private contacts, invented pricing, or hidden owner/admin credentials.
+
+## Customer-Relevant Facts
+
+- Business: James Patrick Photography
+- Category: Business Services
+- Service lane: Commercial Photography / Video
+- Location: 4620 E Elwood Street Suite 7, Phoenix, AZ 85040
 - Phone: (520) 409-5202
-- Pricing: Pricing not confirmed in available sources; contact business for current scope and quote.
+- Website in local record: Not listed in local source record
+- Last local verification: 2026-05-19
+- Verification score: 13
 
-## Landing Page Use
-- James Patrick Photography serves Phoenix with Commercial Photography / Video.
-- Phoenix Commercial Photography / Video details, contact routes, and verified public-source facts.
-- A local landing page centered on what James Patrick Photography actually offers.
+## Source-Grounded Notes
 
-## Source URLs
+- The Phoenix Chamber import identifies the business as commercial photography and video at the Elwood Street studio address.
+- The source record carries a public phone, source lines, and source hash, but no website or booking URL.
+
+## Customer Fit
+
+Best fit for companies that need commercial photography or video and want a direct phone-first contact route before discussing scope.
+
+## Proof Boundary
+
+No official website was confidently verified during this pass, so customers should confirm current portfolio, availability, usage rights, and estimate details by phone.
+
+## Sources
+
 - Advertising & Media QuickLink Category | Greater Phoenix Chamber: https://business.phoenixchamber.com/list/ql/advertising-media-1
 
-## Warnings
-- No official website was present in the local business record.
-- No confirmed official website source was found during this pass.
-- Hours were not confirmed in the local business record.
-- Pricing was not confirmed; landing copy should ask visitors to contact the business.
+## Landing Page Use
+
+- Lead with why this record is Valley Verified from Skyes Over London's point of view.
+- Keep business facts, source trail, and customer decision points ahead of SkyEmail.
+- Preserve the Accept SkyEmail action as a short owner-workspace handoff.
+- Ask customers to confirm current scope, pricing, hours, eligibility, and availability directly with the business.

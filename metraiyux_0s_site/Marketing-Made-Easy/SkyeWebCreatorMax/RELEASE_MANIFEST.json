@@ -36,5 +36,11 @@
     "aiGateway": "/api/marketing-made-easy/webcreator-runtime/auren",
     "appClientAuth": "/gate/signup/"
   },
-  "productionReadinessRule": "All local smokes must pass. Production may be blocked only by missing variables in envContract.productionRequired."
+  "runtimeBoundary": {
+    "staticEndpointFiles": "Route contracts only; not live telemetry or customer visibility.",
+    "liveWorkerRuntime": "/api/marketing-made-easy/webcreator-runtime/*",
+    "localRuntime": "runtime/local-runtime.mjs is a same-folder proof harness, not production delivery proof.",
+    "auth": "FS27/SkyGate/Free99 shared 0S gate only"
+  },
+  "productionReadinessRule": "Local smokes prove local package behavior only. Production readiness also requires shared-gated Worker runtime proof for live telemetry, customer visibility, and delivery handoff claims."
 }

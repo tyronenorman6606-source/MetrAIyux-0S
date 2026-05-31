@@ -531,7 +531,7 @@
         <a href="../index.html"><strong>SkyeMusicNexus</strong></a>
         <div class="playlist-nav__links">
           <a href="../index.html">Home</a>
-          <a href="./create.html">Create</a>
+          
           <a href="./feed.html">Feed</a>
           <a href="./discover.html" aria-current="page">Playlists</a>
           <a href="./radio.html">Radio</a>
@@ -672,6 +672,7 @@
           adPlacements: [],
           remoteTraffic: null,
           liveOverallIds: [],
+          pendingStreamEvents: [],
         };
 
         const el = {
@@ -771,16 +772,11 @@
 
         function mergeLocalStreamEvent(event) {
           if (!event?.trackId || !state.trackById.has(event.trackId)) return;
-          const track = state.trackById.get(event.trackId);
-          const stats = track.streamStats || {};
-          const isQualified = event.eventType === 'qualified_stream';
-          track.streamStats = {
-            ...stats,
-            playStarts: Number(stats.playStarts || 0) + (event.eventType === 'play_start' ? 1 : 0),
-            completePlays: Number(stats.completePlays || 0) + (event.eventType === 'complete_play' ? 1 : 0),
-            nexusStreams: Number(stats.nexusStreams || 0) + (isQualified ? 1 : 0),
-            listenSeconds: Number(stats.listenSeconds || 0) + Number(event.listenSeconds || 0),
-          };
+          state.pendingStreamEvents.unshift({
+            ...event,
+            receiptLane: event.serverConfirmed ? 'worker-confirmed' : 'browser-pending'
+          });
+          state.pendingStreamEvents = state.pendingStreamEvents.slice(0, 50);
         }
 
         function trackRankScore(track) {
@@ -829,8 +825,8 @@
           state.catalog.charts.artistCharts = [...artistMap.values()].sort((a, b) => b.score - a.score || a.artistName.localeCompare(b.artistName));
           const livePlaylist = {
             playlistId:'live-nexus-trending',
-            title:'Live Nexus Trending',
-            description:'Real MusicNexus chart order from one unified Nexus stream count plus player movement receipts.',
+            title:'Confirmed Nexus Trending',
+            description:'Worker-confirmed MusicNexus chart order from the unified Nexus stream count. Browser playback receipts stay pending until the Worker summary returns them.',
             trackIds:state.liveOverallIds,
             liveRanked:true,
           };
@@ -1204,11 +1200,6 @@
 
         window.addEventListener('skymusicnexus:stream-event', (event) => {
           mergeLocalStreamEvent(event.detail || {});
-          rebuildLiveCharts();
-          renderSystemPlaylists();
-          renderQueue();
-          renderGenreChart();
-          renderArtistCharts();
           window.setTimeout(async () => {
             state.remoteTraffic = await fetch(`${WORKER_ORIGIN}/api/skymusicnexus/music-drops?action=traffic-summary`, { cache: 'no-store' }).then((res) => res.ok ? res.json() : null).catch(() => null);
             mergeTrafficSummary(state.remoteTraffic?.trafficSummary);

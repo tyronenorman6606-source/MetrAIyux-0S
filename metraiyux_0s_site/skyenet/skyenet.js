@@ -50,12 +50,9 @@ const els = {
 };
 
 const tokenKeys = [
-  'adminBrainToken',
-  'metraiyux_admin_session',
-  'metraiyux_0s_gate_session',
-  'skye_gate_session',
-  'skygate_session',
-  'quantumskyes_mcp_owner_token'
+  'METRAIYUX_GATE_SESSION',
+  'SKYGATEFS27_GATE_SESSION',
+  'SKYE_GATE_SESSION'
 ];
 
 const buildRootNames = new Set(['dist', 'build', 'out', 'public', 'site', 'www', 'static']);
@@ -113,9 +110,19 @@ function workspaceQuery() {
 }
 
 function loadToken() {
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  const bridgeSession = bridge?.requireSession?.({ platformId: 'skyenet', usageLane: 'skyenet-console' }) || bridge?.current?.();
+  if (bridgeSession?.token) return String(bridgeSession.token).replace(/^Bearer\s+/i, '').trim();
   for (const key of tokenKeys) {
     const value = localStorage.getItem(key) || sessionStorage.getItem(key);
-    if (value) return value.replace(/^Bearer\s+/i, '').trim();
+    if (!value) continue;
+    try {
+      const parsed = value.startsWith('{') ? JSON.parse(value) : null;
+      const token = String(parsed?.token || value).replace(/^Bearer\s+/i, '').trim();
+      if (token) return token;
+    } catch {
+      return value.replace(/^Bearer\s+/i, '').trim();
+    }
   }
   return '';
 }
@@ -806,7 +813,13 @@ els.saveTokenButton.addEventListener('click', () => {
   const value = els.manualToken.value.replace(/^Bearer\s+/i, '').trim();
   if (!value) return;
   state.token = value;
-  localStorage.setItem('metraiyux_0s_gate_session', value);
+  window.MetrAIyuxGateBridge?.persist?.({
+    token: value,
+    source: 'skyenet-console-shared-gate-entry',
+    platform_id: 'skyenet',
+    usage_lane: 'skyenet-console',
+    issued_at: new Date().toISOString()
+  }, { silent: true });
   els.authPanel.hidden = true;
   refresh();
 });

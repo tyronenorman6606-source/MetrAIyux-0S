@@ -1,6 +1,31 @@
 {
   "reviewPacks": [
     {
+      "id": "review-mpt1x5li-6un2fq",
+      "label": "Neo-front smoke pack",
+      "target": "AE-FlowPro",
+      "notes": "Runtime proof for the new app surface.",
+      "snapshot": {
+        "runtime": "Runtime mode: smoke proof",
+        "auditScore": "91 / 100",
+        "closePackCount": "1",
+        "capturedAt": "2026-05-31T00:38:34.127Z"
+      },
+      "recommended_actions": [
+        "Verify runtime persistence",
+        "Queue execution",
+        "Queue dispatch"
+      ],
+      "review": {
+        "status": "dispatched",
+        "owner": "profit-ops",
+        "checkpoint": "smoke_ready",
+        "notes": "Queue proof.",
+        "updatedAt": "2026-05-31T00:38:34.146Z"
+      },
+      "createdAt": "2026-05-31T00:38:34.134Z"
+    },
+    {
       "id": "review-mpsq54pv-wlf8fp",
       "label": "Neo-front smoke pack",
       "target": "AE-FlowPro",
@@ -528,6 +553,35 @@
   ],
   "closeBriefs": [
     {
+      "id": "brief-mpt1x5ml-xl7kxp",
+      "packId": "",
+      "label": "Neo-front smoke close brief",
+      "target": "AE-FlowPro",
+      "owner": "profit-ops",
+      "ask": 9900,
+      "directCost": 2700,
+      "grossProfit": 7200,
+      "expectedProfit": 6552,
+      "margin": 72.7,
+      "paybackMultiple": 3.7,
+      "confidence": 91,
+      "action": "ask for the close",
+      "deadline": "2026-06-01",
+      "splitAllocation": [
+        {
+          "name": "ae",
+          "percent": 40,
+          "amount": 2880
+        }
+      ],
+      "risks": [
+        "clean enough to move"
+      ],
+      "notes": "Smoke proof close brief.",
+      "status": "archived",
+      "createdAt": "2026-05-31T00:38:34.173Z"
+    },
+    {
       "id": "brief-mpsq54qz-c41fsh",
       "packId": "",
       "label": "Neo-front smoke close brief",
@@ -880,6 +934,28 @@
   ],
   "executionItems": [
     {
+      "id": "exec-mpt1x5lu-u7rehh",
+      "reviewPackId": "review-mpt1x5li-6un2fq",
+      "label": "Neo-front smoke execution",
+      "target": "AE-FlowPro",
+      "owner": "profit-ops",
+      "status": "completed",
+      "notes": "Execution proof.",
+      "recommended_actions": [
+        "Verify runtime persistence",
+        "Queue execution",
+        "Queue dispatch"
+      ],
+      "snapshot": {
+        "runtime": "Runtime mode: smoke proof",
+        "auditScore": "91 / 100",
+        "closePackCount": "1",
+        "capturedAt": "2026-05-31T00:38:34.127Z"
+      },
+      "createdAt": "2026-05-31T00:38:34.146Z",
+      "updatedAt": "2026-05-31T00:38:34.156Z"
+    },
+    {
       "id": "exec-mpsq54q7-1l6sjg",
       "reviewPackId": "review-mpsq54pv-wlf8fp",
       "label": "Neo-front smoke execution",
@@ -1101,6 +1177,31 @@
     }
   ],
   "dispatchItems": [
+    {
+      "id": "dispatch-mpt1x5m3-ihqn96",
+      "executionItemId": "exec-mpt1x5lu-u7rehh",
+      "reviewPackId": "review-mpt1x5li-6un2fq",
+      "label": "Neo-front smoke execution dispatch",
+      "target": "AE-FlowPro",
+      "owner": "profit-ops",
+      "channel": "activation",
+      "status": "ready",
+      "checkpoint": "dispatch_ready",
+      "notes": "Dispatch proof.",
+      "recommended_actions": [
+        "Verify runtime persistence",
+        "Queue execution",
+        "Queue dispatch"
+      ],
+      "snapshot": {
+        "runtime": "Runtime mode: smoke proof",
+        "auditScore": "91 / 100",
+        "closePackCount": "1",
+        "capturedAt": "2026-05-31T00:38:34.127Z"
+      },
+      "createdAt": "2026-05-31T00:38:34.155Z",
+      "updatedAt": "2026-05-31T00:38:34.155Z"
+    },
     {
       "id": "dispatch-mpsq54qh-blegq8",
       "executionItemId": "exec-mpsq54q7-1l6sjg",
@@ -1353,6 +1454,66 @@
     }
   ],
   "workflowEvents": [
+    {
+      "id": "event-mpt1x5ml-l2z97b",
+      "type": "close_brief_archived",
+      "category": "brief",
+      "detail": "Archived close brief Neo-front smoke close brief",
+      "owner": "profit-ops",
+      "target": "AE-FlowPro",
+      "reviewPackId": "",
+      "closeBriefId": "brief-mpt1x5ml-xl7kxp",
+      "executionItemId": "",
+      "dispatchItemId": "",
+      "status": "archived",
+      "checkpoint": "ask for the close",
+      "createdAt": "2026-05-31T00:38:34.173Z"
+    },
+    {
+      "id": "event-mpt1x5m4-kssmwo",
+      "type": "review_pack_dispatch_updated",
+      "category": "dispatch",
+      "detail": "Queued dispatch for Neo-front smoke execution",
+      "owner": "profit-ops",
+      "target": "AE-FlowPro",
+      "reviewPackId": "review-mpt1x5li-6un2fq",
+      "closeBriefId": "",
+      "executionItemId": "exec-mpt1x5lu-u7rehh",
+      "dispatchItemId": "dispatch-mpt1x5m3-ihqn96",
+      "status": "ready",
+      "checkpoint": "dispatch_ready",
+      "createdAt": "2026-05-31T00:38:34.156Z"
+    },
+    {
+      "id": "event-mpt1x5lu-smsno8",
+      "type": "review_pack_execution_updated",
+      "category": "execution",
+      "detail": "Queued execution for Neo-front smoke pack",
+      "owner": "profit-ops",
+      "target": "AE-FlowPro",
+      "reviewPackId": "review-mpt1x5li-6un2fq",
+      "closeBriefId": "",
+      "executionItemId": "exec-mpt1x5lu-u7rehh",
+      "dispatchItemId": "",
+      "status": "queued",
+      "checkpoint": "execution_queued",
+      "createdAt": "2026-05-31T00:38:34.146Z"
+    },
+    {
+      "id": "event-mpt1x5li-pz2r7d",
+      "type": "review_pack_archived",
+      "category": "archive",
+      "detail": "Archived review pack Neo-front smoke pack",
+      "owner": "profit-ops",
+      "target": "AE-FlowPro",
+      "reviewPackId": "review-mpt1x5li-6un2fq",
+      "closeBriefId": "",
+      "executionItemId": "",
+      "dispatchItemId": "",
+      "status": "ready",
+      "checkpoint": "smoke_ready",
+      "createdAt": "2026-05-31T00:38:34.134Z"
+    },
     {
       "id": "event-mpsq54r0-dujw6h",
       "type": "close_brief_archived",
@@ -2119,5 +2280,5 @@
       "createdAt": "2026-05-17T18:43:00.250Z"
     }
   ],
-  "updatedAt": "2026-05-30T19:08:50.892Z"
+  "updatedAt": "2026-05-31T00:38:34.173Z"
 }

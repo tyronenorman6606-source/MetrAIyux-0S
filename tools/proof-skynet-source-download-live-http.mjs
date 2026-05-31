@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const zeroOsBase = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -13,64 +13,6 @@ const latestReceipt = path.join(artifactRoot, 'skyenet-source-download-live-http
 const workspaceId = process.env.SKYENET_PROOF_WORKSPACE || 'bobs-smoke-shop';
 const projectId = process.env.SKYENET_PROOF_PROJECT || 'bobs-smoke-shop';
 const defaultDeploymentId = process.env.SKYENET_PROOF_DEPLOYMENT || 'dep_20260528063233';
-
-const credentialKeys = [
-  'ZERO_OS_GATE_CODE',
-  'METRAIYUX_OWNER_ADMIN_CODE',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  if (!file || !existsSync(file)) return {};
-  const rows = {};
-  const text = await fs.readFile(file, 'utf8');
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-    if (match) rows[match[1]] = unquote(match[2]);
-  }
-  return rows;
-}
-
-function expandEnvRefs(values) {
-  const out = { ...values };
-  for (let pass = 0; pass < 3; pass += 1) {
-    for (const [key, value] of Object.entries(out)) {
-      out[key] = String(value || '').replace(/\$\{([A-Z0-9_]+)\}/g, (_match, ref) => out[ref] || '');
-    }
-  }
-  return out;
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean).map((file) => path.resolve(file));
-  let merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(file));
-  merged = expandEnvRefs(merged);
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
 
 async function fetchJson(url, init = {}) {
   const started = performance.now();
@@ -91,7 +33,6 @@ function authHeaders(token) {
   return {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };
@@ -102,7 +43,8 @@ function hasAll(text, needles) {
 }
 
 async function main() {
-  const credential = await ownerCredential();
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase });
+  const token = auth.token || '';
   const receipt = {
     schema: 'skyenet.source-download.live-http-proof.v1',
     ok: false,
@@ -112,7 +54,7 @@ async function main() {
     zero_os_base: zeroOsBase,
     skynet_base: skynetBase,
     target: { workspace_id: workspaceId, project_id: projectId, deployment_id: defaultDeploymentId },
-    credential_source: credential.key || 'missing',
+    credential_source: auth.credential?.key || auth.credential?.source || 'missing',
     unauth_source_download: null,
     unauth_source_transfer: null,
     login: null,
@@ -157,24 +99,16 @@ async function main() {
   if (!receipt.unauth_source_download.ok) receipt.failures.push('Unauthenticated SkyeNet source download was not rejected.');
   if (!receipt.unauth_source_transfer.ok) receipt.failures.push('Unauthenticated SkyeNet source transfer was not rejected.');
 
-  if (!credential.value) {
-    receipt.failures.push('No shared owner gate credential found in process env, .env, or env.txt.');
+  receipt.login = {
+    status: Number(auth.response?.status || 0) || 0,
+    ok: Boolean(auth.ok && token),
+    token_received: Boolean(token),
+    via: auth.response?.via || auth.credential?.source || ''
+  };
+
+  if (!token) {
+    receipt.failures.push(auth.response?.body?.error || auth.response?.error || 'No shared FS27/SkyGate bearer or owner gate exchange credential found.');
   } else {
-    const login = await fetchJson(`${zeroOsBase}/api/founder-command/login`, {
-      method: 'POST',
-      headers: { accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({ code: credential.value })
-    });
-    const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-    receipt.login = {
-      status: login.status,
-      ok: Boolean(login.ok && token),
-      token_received: Boolean(token),
-      elapsed_ms: login.elapsed_ms
-    };
-    if (!token) {
-      receipt.failures.push(login.body?.error || 'Shared gate login did not return a bearer token.');
-    } else {
       const headers = authHeaders(token);
       const query = new URLSearchParams({ workspace_id: workspaceId });
       const status = await fetchJson(`${skynetBase}/api/skyenet/status?${query.toString()}`, { headers });
@@ -315,7 +249,6 @@ async function main() {
       if (!receipt.download.ok) receipt.failures.push('SkyeNet source download did not return a valid gated tar bundle.');
       if (!receipt.zero_os_proxy_download.ok || receipt.zero_os_proxy_download.proxy_header !== 'passthrough') receipt.failures.push('0S SkyeNet source download proxy did not preserve the gated tar bundle.');
       if (!tarChecks.has_bob_copy) receipt.failures.push("Downloaded source bundle did not include Bob's Smoke Shop copy.");
-    }
   }
 
   receipt.ok = receipt.failures.length === 0;

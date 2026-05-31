@@ -7,7 +7,7 @@ export default wrap(async (req) => {
   const cors = buildCors(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
   if (req.method !== "GET") return json(405, { ok: false, error: "Method not allowed." }, cors);
-  requireOperatorBearer(req);
+  await requireOperatorBearer(req);
 
   const rows = await q(
     `select

@@ -102,7 +102,7 @@ async function main() {
     return;
   }
 
-  const login = await fetchJson(`${BASE_URL}/api/founder-command/login`, {
+  const login = await fetchJson(`${BASE_URL}/api/owner/admin-login`, {
     method: 'POST',
     headers: {'content-type': 'application/json', accept: 'application/json'},
     body: JSON.stringify({code: credential.value})

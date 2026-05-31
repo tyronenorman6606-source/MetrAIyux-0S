@@ -50,16 +50,6 @@
     catch(_err){ return ""; }
   }
 
-  function readStoredToken(raw){
-    if(!raw) return "";
-    try{
-      const parsed = raw.startsWith("{") ? JSON.parse(raw) : null;
-      return clean(parsed?.token || parsed?.session || parsed?.sessionToken || raw);
-    }catch(_err){
-      return clean(raw);
-    }
-  }
-
   function gateToken(){
     try{
       if(typeof getToken === "function"){
@@ -67,16 +57,7 @@
         if(token) return token;
       }
     }catch(_err){}
-    const keys = ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYGATE_USER_TOKEN","SKYE_GATE_SESSION","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"];
-    for(const key of keys){
-      for(const store of [sessionStorage, localStorage]){
-        try{
-          const token = readStoredToken(store.getItem(key));
-          if(token) return token;
-        }catch(_err){}
-      }
-    }
-    return "";
+    return clean(window.MetrAIyuxGateBridge?.current?.()?.token || "");
   }
 
   function safeText(value, limit = 24000){
@@ -229,8 +210,6 @@
       "Content-Type":"application/json",
       "Accept":"application/json",
       "Authorization":`Bearer ${token}`,
-      "x-admin-token":token,
-      "x-free99-admin-code":token,
       "x-free99-gate-session":token,
       "x-skye-gate-session":token,
       "x-skygate-session":token,

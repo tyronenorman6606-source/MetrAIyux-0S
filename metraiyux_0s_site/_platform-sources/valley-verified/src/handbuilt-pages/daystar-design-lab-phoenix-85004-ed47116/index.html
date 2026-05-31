@@ -1,555 +1,155 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daystar Design Lab | Valley Verified Phoenix</title>
-  <meta name="description" content="Owner-researched Valley Verified listing for Daystar Design Lab, a Phoenix creative services and design business at 130 N. Central Ave., Ste. 307, Phoenix, AZ 85004.">
-  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/daystar-design-lab-phoenix-85004-ed47116/">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #191d24;
-      --muted: #59616d;
-      --line: #d8dde5;
-      --page: #f7f7f2;
-      --panel: #ffffff;
-      --blue: #2368a2;
-      --rose: #b94666;
-      --leaf: #527a38;
-      --butter: #f7df89;
-      --ice: #dfeefa;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background:
-        linear-gradient(120deg, rgba(247, 223, 137, 0.42), transparent 34rem),
-        linear-gradient(180deg, #ffffff 0%, #f3f6f8 100%);
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .page {
-      width: min(1140px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 58px;
-    }
-
-    .mast {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .markline {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      text-decoration: none;
-      color: var(--ink);
-    }
-
-    .markline span:first-child {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      place-items: center;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--blue), var(--rose));
-      color: #ffffff;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: 20px;
-      align-items: stretch;
-      margin-bottom: 20px;
-    }
-
-    .hero-card,
-    .proof-board,
-    .panel,
-    .skyemail {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 18px 46px rgba(25, 29, 36, 0.08);
-    }
-
-    .hero-card {
-      padding: clamp(26px, 5vw, 50px);
-    }
-
-    .eyebrow {
-      margin: 0 0 16px;
-      color: var(--blue);
-      font-size: 0.78rem;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h1 {
-      margin-bottom: 18px;
-      font-size: clamp(2.5rem, 7vw, 5.5rem);
-      line-height: 0.98;
-      letter-spacing: 0;
-    }
-
-    .summary {
-      color: var(--muted);
-      font-size: clamp(1.04rem, 2vw, 1.24rem);
-      line-height: 1.66;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .action {
-      display: inline-flex;
-      min-height: 46px;
-      align-items: center;
-      justify-content: center;
-      padding: 0 18px;
-      border: 1px solid var(--ink);
-      border-radius: 8px;
-      background: var(--ink);
-      color: #ffffff;
-      font-weight: 850;
-      text-decoration: none;
-    }
-
-    .action.alt {
-      background: #ffffff;
-      color: var(--ink);
-    }
-
-    .proof-board {
-      display: grid;
-      gap: 16px;
-      padding: 20px;
-      background:
-        linear-gradient(150deg, rgba(223, 238, 250, 0.9), rgba(247, 223, 137, 0.48)),
-        #ffffff;
-    }
-
-    .proof-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .proof-title h2 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-
-    .pill {
-      display: inline-flex;
-      min-height: 32px;
-      align-items: center;
-      border-radius: 8px;
-      padding: 0 10px;
-      background: var(--leaf);
-      color: #ffffff;
-      font-size: 0.8rem;
-      font-weight: 900;
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .metric {
-      min-height: 128px;
-      padding: 16px;
-      border: 1px solid rgba(25, 29, 36, 0.12);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.76);
-    }
-
-    .metric strong {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 1.85rem;
-      line-height: 1;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.45;
-    }
-
-    .quick-facts {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .quick {
-      min-height: 94px;
-      padding: 15px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #ffffff;
-    }
-
-    .label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 0.74rem;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .value {
-      font-weight: 850;
-      line-height: 1.35;
-    }
-
-    .details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .panel {
-      padding: 22px;
-    }
-
-    .panel h2,
-    .skyemail h2 {
-      margin-bottom: 16px;
-      font-size: 1.34rem;
-      line-height: 1.2;
-    }
-
-    dl {
-      display: grid;
-      gap: 14px;
-      margin: 0;
-    }
-
-    dt {
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    dd {
-      margin: 4px 0 0;
-      line-height: 1.5;
-    }
-
-    .source-panel {
-      border-top: 5px solid var(--blue);
-    }
-
-    .contact-panel {
-      border-top: 5px solid var(--rose);
-    }
-
-    .skyemail {
-      margin-top: 18px;
-      padding: 22px;
-      background:
-        linear-gradient(90deg, rgba(35, 104, 162, 0.10), rgba(185, 70, 102, 0.08)),
-        #ffffff;
-    }
-
-    .skyemail-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-      gap: 20px;
-    }
-
-    .skyemail-list {
-      display: grid;
-      gap: 12px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .skyemail-list li {
-      min-height: 48px;
-      padding: 12px 14px;
-      border-left: 4px solid var(--blue);
-      background: #ffffff;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .seat-card {
-      display: grid;
-      gap: 12px;
-      align-content: start;
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #ffffff;
-    }
-
-    .seat-number {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 14px;
-      color: var(--muted);
-    }
-
-    .seat-number strong {
-      color: var(--ink);
-      font-size: 3rem;
-      line-height: 0.9;
-    }
-
-    .blocks {
-      display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 5px;
-    }
-
-    .blocks span {
-      height: 12px;
-      border-radius: 3px;
-      background: var(--rose);
-    }
-
-    footer {
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 900px) {
-      .hero,
-      .details,
-      .skyemail-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-facts {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 560px) {
-      .page {
-        width: min(100% - 20px, 1140px);
-        padding-top: 18px;
-      }
-
-      .mast {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .hero-card,
-      .proof-board,
-      .panel,
-      .skyemail {
-        padding: 18px;
-      }
-
-      .quick-facts,
-      .metric-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .action {
-        width: 100%;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daystar Design Lab | Valley Verified Phoenix</title>
+<meta name="description" content="Daystar Design Lab Valley Verified profile: source-backed Design / Professional Services facts, contact route, why Skyes Over London verifies it, and concise SkyEmail handoff.">
+<link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/daystar-design-lab-phoenix-85004-ed47116/">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="Daystar Design Lab | Valley Verified Phoenix">
+<meta property="og:description" content="Daystar Design Lab is Valley Verified on the strength of the Phoenix Chamber record and supporting design-profile sources, with current operating status kept deliberately conservative.">
+<meta property="og:url" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/daystar-design-lab-phoenix-85004-ed47116/">
+<meta property="og:image" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/assets/valley-verified-logo.png">
+<meta name="theme-color" content="#23444a">
+<link rel="icon" href="/assets/valley-verified-logo.png">
+<link rel="stylesheet" href="/assets/styles.css">
+<style> :root { color-scheme: light; --ink: #172124; --muted: #5d686b; --page: #f7f7f1; --paper: #ffffff; --line: #d9ded8; --pine: #23444a; --river: #2f6f83; --gold: #d79335; --clay: #b94d3f; --sage: #6d8d75; --shadow: 0 20px 54px rgba(23, 33, 36, 0.12); } * { box-sizing: border-box; } html { scroll-behavior: smooth; } body { margin: 0; background: linear-gradient(130deg, rgba(215, 147, 53, 0.18), transparent 34rem), linear-gradient(180deg, #ffffff 0%, var(--page) 82%); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.58; letter-spacing: 0; } a { color: inherit; } .page { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 56px; } .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 8px 0 26px; color: var(--muted); } .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 900; } .brand img { width: 38px; height: 38px; border-radius: 8px; } nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; } nav a, .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 8px; padding: 0 15px; background: rgba(255,255,255,.88); text-decoration: none; font-weight: 850; } .button.primary { border-color: var(--pine); background: var(--pine); color: #fff; } .button.source { border-color: rgba(35,68,74,.28); } .hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(300px, .72fr); gap: 18px; align-items: stretch; } .hero-copy, .record-card, .panel, .skyemail { border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); } .hero-copy { padding: clamp(30px, 6vw, 62px); } .eyebrow { margin: 0 0 12px; color: var(--river); font-size: .78rem; font-weight: 950; text-transform: uppercase; letter-spacing: 0; } h1, h2, h3, p { margin-top: 0; } h1 { max-width: 900px; margin-bottom: 18px; font-size: clamp(2.75rem, 7vw, 6.25rem); line-height: .94; letter-spacing: 0; } h2 { margin-bottom: 14px; font-size: clamp(1.6rem, 3.2vw, 2.72rem); line-height: 1.04; letter-spacing: 0; } h3 { margin-bottom: 8px; font-size: 1.05rem; letter-spacing: 0; } .lede, .panel p, .skyemail p { color: var(--muted); font-size: 1.04rem; } .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; } .record-card { overflow: hidden; display: grid; align-content: space-between; } .plate { min-height: 230px; padding: 24px; color: #fff; background: linear-gradient(135deg, rgba(35,68,74,.96), rgba(47,111,131,.9)), linear-gradient(90deg, var(--gold), var(--clay)); } .plate span { display: inline-flex; border: 1px solid rgba(255,255,255,.48); border-radius: 999px; padding: 7px 11px; font-size: .78rem; font-weight: 950; text-transform: uppercase; } .plate strong { display: block; margin-top: 54px; font-size: clamp(1.8rem, 4.5vw, 3.45rem); line-height: .98; letter-spacing: 0; } .status-list { display: grid; gap: 0; padding: 20px 22px; } .status-list div { display: flex; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); padding: 12px 0; color: var(--muted); } .status-list div:first-child { border-top: 0; } .status-list strong { color: var(--ink); text-align: right; } .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; } .panel { padding: 24px; } .wide { grid-column: span 2; } .full { grid-column: 1 / -1; } .list, .contact-list, .source-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; } .list li, .source-list li { border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .list li:first-child, .source-list li:first-child { border-top: 0; padding-top: 0; } .list strong, .contact-list strong, .source-list a, dd { color: var(--ink); } .contact-list li { display: grid; gap: 5px; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .contact-list li:first-child { border-top: 0; padding-top: 0; } .contact-list strong { font-size: .78rem; font-weight: 950; text-transform: uppercase; } dl.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; } dl.facts div { border-top: 1px solid var(--line); padding-top: 12px; } dt { color: var(--muted); font-size: .76rem; font-weight: 950; text-transform: uppercase; } dd { margin: 3px 0 0; font-weight: 800; } .source-list li { display: grid; gap: 5px; } .source-list span { color: var(--muted); font-size: .95rem; } .note { border-left: 4px solid var(--gold); padding-left: 14px; } .skyemail { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 18px; margin-top: 18px; padding: clamp(24px, 5vw, 42px); } .seat-meter { display: grid; gap: 10px; align-content: start; } .meter-bar { height: 14px; overflow: hidden; border-radius: 999px; background: #e3e7e4; } .meter-bar span { display: block; width: 90%; height: 100%; background: linear-gradient(90deg, var(--sage), var(--gold), var(--clay)); } .footer { margin-top: 22px; color: var(--muted); font-size: .92rem; } @media (max-width: 920px) { .topline, .hero, .skyemail { display: grid; grid-template-columns: 1fr; } .topline { align-items: start; } .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } } @media (max-width: 560px) { .page { width: min(100% - 20px, 1160px); } nav, .actions { width: 100%; } nav a, .button { width: 100%; } .status-list div, dl.facts { display: grid; grid-template-columns: 1fr; } .status-list strong { text-align: left; } } </style>
+<script type="application/ld+json"> { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/daystar-design-lab-phoenix-85004-ed47116/#business", "name": "Daystar Design Lab", "description": "Daystar Design Lab is Valley Verified on the strength of the Phoenix Chamber record and supporting design-profile sources, with current operating status kept deliberately conservative.", "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/daystar-design-lab-phoenix-85004-ed47116/", "telephone": "(602) 490-0847", "address": { "@type": "PostalAddress", "streetAddress": "130 N. Central Ave., Ste. 307", "addressLocality": "Phoenix", "addressRegion": "AZ", "postalCode": "85004", "addressCountry": "US" }, "areaServed": "Phoenix, AZ 85004", "additionalType": "Creative Services", "identifier": "9e8ecde97255", "sameAs": "https://business.phoenixchamber.com/list/ql/business-professional-services-5" } </script>
 </head>
-<body data-static-hand-page="true">
-  <main class="page">
-    <nav class="mast" aria-label="Valley Verified">
-      <a class="markline" href="/valley-verified/">
-        <span>VV</span>
-        <span>Valley Verified</span>
-      </a>
-      <span>Creative services listing for Phoenix review</span>
-    </nav>
-
-    <section class="hero" aria-labelledby="page-title">
-      <div class="hero-card">
-        <p class="eyebrow">Owner-researched verified status</p>
-        <h1 id="page-title">Daystar Design Lab</h1>
-        <p class="summary">Daystar Design Lab is a Phoenix creative services listing for design and professional services. The public record includes a direct phone contact and downtown Phoenix address; contact the provider directly to confirm availability, scope, and pricing.</p>
-        <div class="actions" aria-label="Primary contact">
-          <a class="action" href="tel:+16024900847">Call (602) 490-0847</a>
-          <a class="action alt" href="https://business.phoenixchamber.com/list/ql/business-professional-services-5" rel="nofollow noopener">Source record</a>
-        </div>
-      </div>
-
-      <aside class="proof-board" aria-label="Verification summary">
-        <div class="proof-title">
-          <h2>Public Directory Record</h2>
-          <span class="pill">Unclaimed</span>
-        </div>
-        <div class="metric-grid">
-          <div class="metric">
-            <strong>13</strong>
-            <span>Verification score in the Valley Verified data file.</span>
-          </div>
-          <div class="metric">
-            <strong>85004</strong>
-            <span>ZIP code for the Central Avenue address.</span>
-          </div>
-          <div class="metric">
-            <strong>May 19</strong>
-            <span>Last verified in 2026 from the public source file.</span>
-          </div>
-          <div class="metric">
-            <strong>Yes</strong>
-            <span>Record is marked as accepting requests.</span>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="quick-facts" aria-label="Listing facts">
-      <div class="quick">
-        <span class="label">Category</span>
-        <span class="value">Creative Services</span>
-      </div>
-      <div class="quick">
-        <span class="label">Niche</span>
-        <span class="value">Design / Professional Services</span>
-      </div>
-      <div class="quick">
-        <span class="label">Directory status</span>
-        <span class="value">Public directory verified</span>
-      </div>
-      <div class="quick">
-        <span class="label">Price mode</span>
-        <span class="value">Contact for quote</span>
-      </div>
-    </section>
-
-    <section class="details" aria-label="Business facts and contact">
-      <article class="panel contact-panel">
-        <h2>Business Facts and Contact</h2>
-        <dl>
-          <div>
-            <dt>Business name</dt>
-            <dd>Daystar Design Lab</dd>
-          </div>
-          <div>
-            <dt>License type</dt>
-            <dd>Business Services / Design / Professional Services</dd>
-          </div>
-          <div>
-            <dt>Phone</dt>
-            <dd><a href="tel:+16024900847">(602) 490-0847</a></dd>
-          </div>
-          <div>
-            <dt>Address</dt>
-            <dd>130 N. Central Ave., Ste. 307, Phoenix, AZ 85004</dd>
-          </div>
-          <div>
-            <dt>Email</dt>
-            <dd>No public email listed.</dd>
-          </div>
-          <div>
-            <dt>Website or booking</dt>
-            <dd>No public website or booking URL listed.</dd>
-          </div>
-        </dl>
-      </article>
-
-      <article class="panel source-panel">
-        <h2>Source and Review Trail</h2>
-        <dl>
-          <div>
-            <dt>Source URL</dt>
-            <dd><a href="https://business.phoenixchamber.com/list/ql/business-professional-services-5" rel="nofollow noopener">Phoenix Chamber public directory</a></dd>
-          </div>
-          <div>
-            <dt>Source lines</dt>
-            <dd>L627-L632</dd>
-          </div>
-          <div>
-            <dt>Source hash</dt>
-            <dd>9e8ecde97255</dd>
-          </div>
-          <div>
-            <dt>Source policy</dt>
-            <dd>Public directory/company listing only; no synthetic contacts or guessed emails.</dd>
-          </div>
-          <div>
-            <dt>Claim status</dt>
-            <dd>Unclaimed public record.</dd>
-          </div>
-        </dl>
-      </article>
-    </section>
-
-    <section class="skyemail" aria-labelledby="skyemail-title">
-      <div class="skyemail-grid">
-        <div>
-          <p class="eyebrow">SkyEmail acceptance panel</p>
-          <h2 id="skyemail-title">Accept the free SkyEmail account</h2>
-          <p class="summary">Daystar Design Lab can sign in through the shared 0S/SkyGate lane after the owner provisions the workspace. Team activation within 24 hours after provisioning.</p>
-          <a class="action" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=daystar-design-lab-phoenix-85004-ed47116">Accept SkyEmail</a>
-        </div>
-        <div class="seat-card" aria-label="SkyEmail seat status">
-          <div class="seat-number">
-            <span>9 seats left</span>
-            <strong>9</strong>
-          </div>
-          <div class="blocks" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <ul class="skyemail-list">
-            <li>Notify owner to provision workspace.</li>
-            <li>K4i escalation starts after 24 hours if activation remains pending.</li>
-            <li>Warn at 2, buy in groups of 5.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      Valley Verified owner-researched verified status is based on the public directory record last verified on May 19, 2026. No synthetic contact details were added.
-    </footer>
-  </main>
+<body data-static-hand-page="true" class="vv-static-page daystar-design-lab-page">
+<div class="page">
+<header class="topline" aria-label="Valley Verified navigation">
+<a class="brand" href="/valley-verified/">
+<img src="/assets/valley-verified-logo.png" alt="" aria-hidden="true">
+<span>Valley Verified</span>
+</a>
+<nav>
+<a href="#why">Why verified</a>
+<a href="#facts">Facts</a>
+<a href="#source">Sources</a>
+<a href="#skyemail">SkyEmail</a>
+</nav>
+</header>
+<main>
+<section class="hero" aria-labelledby="daystar-design-lab-title">
+<div class="hero-copy">
+<p class="eyebrow">Skyes Over London says Valley Verified</p>
+<h1 id="daystar-design-lab-title">Daystar Design Lab</h1>
+<p class="lede">Daystar Design Lab is Valley Verified on the strength of the Phoenix Chamber record and supporting design-profile sources, with current operating status kept deliberately conservative.</p>
+<div class="actions">
+<a class="button primary" href="tel:+16024900847">Call (602) 490-0847</a>
+<a class="button" href="#source">Read source trail</a>
+<a class="button source" href="#skyemail">Accept SkyEmail</a>
+</div>
+</div>
+<aside class="record-card" aria-label="Daystar Design Lab verification record">
+<div class="plate">
+<span>Creative Services</span>
+<strong>Design / Professional Services</strong>
+</div>
+<div class="status-list">
+<div><span>Verification read</span><strong>Public record reviewed</strong></div>
+<div><span>Owner claim</span><strong>unclaimed</strong></div>
+<div><span>Last local review</span><strong>2026-05-19</strong></div>
+<div><span>Source count</span><strong>4</strong></div>
+</div>
+</aside>
+</section>
+<section class="grid" id="why" aria-label="Why Daystar Design Lab is Valley Verified">
+<article class="panel wide">
+<p class="eyebrow">Customer read</p>
+<h2>Why this business is here</h2>
+<p>Public design profiles describe interior and exterior design support, space planning, furnishings, fabrics, lighting, window treatments, bathroom fixtures, landscaping details, and Central Phoenix consultation routes.</p>
+<p class="note">Skyes Over London marks this profile Valley Verified because the page is built from a named public record, local contact facts, and live source checks. Where sources are thin or conflicting, the page says so plainly.</p>
+</article>
+<article class="panel">
+<p class="eyebrow">Best fit</p>
+<h2>Who uses it</h2>
+<ul class="list">
+<li>Homeowners comparing interior-design help for a room, remodel, or full-home plan.</li>
+<li>Clients who want a downtown Phoenix design contact record with phone and suite details.</li>
+<li>Customers who value transparent source notes when public listings do not fully agree.</li>
+</ul>
+</article>
+</section>
+<section class="grid" id="facts" aria-label="Daystar Design Lab facts and contact details">
+<article class="panel">
+<p class="eyebrow">Contact</p>
+<h2>Public route</h2>
+<ul class="contact-list">
+<li><strong>Phone</strong><a href="tel:+16024900847">(602) 490-0847</a></li>
+<li><strong>Address</strong><span>130 N. Central Ave., Ste. 307, Phoenix, AZ 85004</span></li>
+<li><strong>Website</strong><span>No official website confirmed in the local record.</span></li>
+<li><strong>Email</strong><span>No public email in the local record.</span></li>
+</ul>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Verified facts</p>
+<h2>What the sources support</h2>
+<dl class="facts">
+<div><dt>Category</dt><dd>Creative Services</dd></div>
+<div><dt>Service lane</dt><dd>Design / Professional Services</dd></div>
+<div><dt>Market</dt><dd>Phoenix, AZ 85004</dd></div>
+<div><dt>Verified basis</dt><dd>Public record with disclosed limits</dd></div>
+<div><dt>Claim status</dt><dd>unclaimed</dd></div>
+<div><dt>Last reviewed</dt><dd>2026-05-19</dd></div>
+</dl>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Proof points</p>
+<h2>Why Skyes trusts this profile</h2>
+<ul class="list">
+<li>Chamber record supplies the imported address and phone at 130 N. Central Avenue Suite 307.</li>
+<li>Qdexx and Porch profiles describe interior/exterior design services and service-area context.</li>
+<li>A map listing reports closed status, so Valley Verified does not overstate current availability.</li>
+</ul>
+</article>
+<article class="panel">
+<p class="eyebrow">Timing</p>
+<h2>Hours note</h2>
+<p>Public hours were not confirmed in the local business record. Use the business phone or official site for time-sensitive visits.</p>
+</article>
+<article class="panel full" id="source">
+<p class="eyebrow">Source trail</p>
+<h2>Research used for this rewrite</h2>
+<ul class="source-list">
+<li><a href="https://www.qdexx.com/US/AZ/Phoenix/Interior%20Designers/US-AZ-Phoenix-Interior-Designers-Daystar-Design-Lab/" target="_blank" rel="noopener">Daystar Design Lab Qdexx profile</a><span>Public profile describes Daystar Design Lab as an interior/exterior design company at the Central Avenue suite with phone and email.</span></li>
+<li><a href="https://pro.porch.com/phoenix-az/interior-designers/daystar-design-lab/pp" target="_blank" rel="noopener">Daystar Design Lab Porch profile</a><span>Public project profile describes interior design, decorating, space planning, furnishings, lighting, window treatment, and landscaping support.</span></li>
+<li><a href="https://www.mapquest.com/us/arizona/daystar-design-lab-442300028" target="_blank" rel="noopener">Daystar Design Lab MapQuest listing</a><span>Map listing shows the Central Avenue address but also reports a closed status, so current operations remain lower-confidence.</span></li>
+<li><a href="https://business.phoenixchamber.com/list/ql/business-professional-services-5" target="_blank" rel="noopener">Business &amp; Professional Services QuickLink Category | Greater Phoenix Chamber</a><span>Source description references: Greater Phoenix Chamber | Business &amp; Professional Services Relevant topic cues found: Business Services / Design / Professional Services, Business Services, Local SMB / service business, Public directory record. Use this source to confirm company positioning, contact details, and page-specific service language before publishing.</span></li>
+</ul>
+</article>
+<article class="panel full">
+<p class="eyebrow">Important boundary</p>
+<h2>What is not overstated</h2>
+<p>Because public listings conflict on operating status, the page verifies the source trail and contact record rather than claiming current appointment availability.</p>
+</article>
+</section>
+<section class="skyemail" id="skyemail" aria-labelledby="daystar-design-lab-skyemail">
+<div>
+<p class="eyebrow">SkyEmail acceptance</p>
+<h2 id="daystar-design-lab-skyemail">Accept the free SkyEmail account for Daystar Design Lab.</h2>
+<p>Use the shared 0S/SkyGate sign-in lane to accept the mailbox handoff. The business profile remains customer-focused; SkyEmail is only the owner action route.</p>
+<div class="actions">
+<a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=daystar-design-lab-phoenix-85004-ed47116">Accept SkyEmail</a>
+<a class="button" href="/skyegate/">Sign in through 0S/SkyGate</a>
+</div>
+</div>
+<div class="seat-meter">
+<h3>Provisioning checklist</h3>
+<ul class="list">
+<li><strong>Owner handoff:</strong> route the Daystar Design Lab acceptance through the shared 0S owner queue.</li>
+<li><strong>K4i escalation:</strong> escalate if the mailbox is not active 24 hours after provisioning starts.</li>
+<li><strong>Seat pool:</strong> 9 seats left; warn at 2 seats and buy in groups of 5.</li>
+</ul>
+<div class="meter-bar" aria-label="9 seats left"><span></span></div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<p>Valley Verified source record: seed/businesses/inbox/valley_verified_public_lead_build_2026-05-19_v4.csv | 9e8ecde97255. Browser verification is owner-handled for this repo.</p>
+</footer>
+</div>
 </body>
 </html>

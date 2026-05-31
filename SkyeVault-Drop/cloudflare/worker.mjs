@@ -10,6 +10,7 @@ import { handler as clientVault } from '../netlify/functions/client-vault.js';
 import { handler as maintenanceSweep } from '../netlify/functions/maintenance-sweep.js';
 import { handler as operatorLogout } from '../netlify/functions/operator-logout.js';
 import { handler as operatorSession } from '../netlify/functions/operator-session.js';
+import { handler as provisionWorkspace } from '../netlify/functions/provision-workspace.js';
 import { handler as publicConfig } from '../netlify/functions/public-config.js';
 import { handler as setupDiagnostics } from '../netlify/functions/setup-diagnostics.js';
 import { handler as setupFolderHelper } from '../netlify/functions/setup-folder-helper.js';
@@ -17,7 +18,7 @@ import { handler as uploadComplete } from '../netlify/functions/upload-complete.
 import { handler as uploadPartUrl } from '../netlify/functions/upload-part-url.js';
 import { handler as uploadSession } from '../netlify/functions/upload-session.js';
 import { handler as uploadStatus } from '../netlify/functions/upload-status.js';
-import { hasValidOperatorSession } from '../netlify/functions/_lib/security.js';
+import { introspectSkygateBearer } from '../netlify/functions/_lib/security.js';
 import { ADMIN_HTML, SETUP_HTML } from './internal-pages.generated.mjs';
 
 const HANDLERS = {
@@ -33,6 +34,7 @@ const HANDLERS = {
   'maintenance-sweep': maintenanceSweep,
   'operator-logout': operatorLogout,
   'operator-session': operatorSession,
+  'provision-workspace': provisionWorkspace,
   'public-config': publicConfig,
   'setup-diagnostics': setupDiagnostics,
   'setup-folder-helper': setupFolderHelper,
@@ -60,6 +62,23 @@ const SECURITY_HEADERS = {
     'upgrade-insecure-requests'
   ].join('; ')
 };
+
+const GATE_PROTECTED_FUNCTIONS = new Set([
+  'admin-backup',
+  'admin-config',
+  'admin-drive-test',
+  'admin-export',
+  'admin-health',
+  'admin-notification-replay',
+  'admin-notification-test',
+  'admin-vault-download',
+  'maintenance-sweep',
+  'provision-workspace',
+  'setup-diagnostics',
+  'setup-folder-helper'
+]);
+
+const LOCAL_OPERATOR_FUNCTIONS = new Set(['operator-session', 'operator-logout']);
 
 function bindEnv(env, request) {
   globalThis.__SKYEVAULT_WORKER_ENV = env || {};
@@ -90,6 +109,21 @@ async function toNetlifyEvent(request) {
     headers,
     queryStringParameters: queryStringParameters(url),
     body: ['GET', 'HEAD'].includes(request.method) ? '' : await request.text(),
+    isBase64Encoded: false
+  };
+}
+
+function headerOnlyNetlifyEvent(request) {
+  const url = new URL(request.url);
+  const headers = {};
+  for (const [key, value] of request.headers.entries()) headers[key] = value;
+  return {
+    httpMethod: request.method,
+    path: url.pathname,
+    rawUrl: request.url,
+    headers,
+    queryStringParameters: queryStringParameters(url),
+    body: '',
     isBase64Encoded: false
   };
 }
@@ -135,11 +169,57 @@ function redirect(location) {
   return html(302, '', { location });
 }
 
+function gateScopeList(scope) {
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope || '').split(/\s+/).filter(Boolean);
+}
+
+function allowsSkyeVaultOwnerAdmin(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = String(claims.role || claims.user?.role || '').toLowerCase();
+  const scopes = new Set(gateScopeList(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
+  return ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)
+    || scopes.has('admin.write')
+    || scopes.has('admin.read')
+    || scopes.has('gateway.invoke')
+    || scopes.has('skyevault.admin')
+    || scopes.has('vault.admin');
+}
+
+function gateDeniedResponse(statusCode, error) {
+  return toWorkerResponse({
+    statusCode,
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+    body: JSON.stringify({ ok: false, error })
+  });
+}
+
+async function requireSkyVaultGateAdmin(request) {
+  const gate = await introspectSkygateBearer(headerOnlyNetlifyEvent(request));
+  if (!gate.ok) {
+    return {
+      ok: false,
+      response: gateDeniedResponse(gate.statusCode || 401, gate.error || 'FS27/SkyGate owner-admin bearer is required for SkyeVault mounted admin access.')
+    };
+  }
+  if (!allowsSkyeVaultOwnerAdmin(gate.claims)) {
+    return {
+      ok: false,
+      response: gateDeniedResponse(403, 'FS27/SkyGate bearer is active, but it is not owner/admin scoped for SkyeVault.')
+    };
+  }
+  return { ok: true };
+}
+
+function localOperatorSessionsAllowed() {
+  return String(globalThis.process?.env?.SKYEVAULT_ALLOW_LOCAL_OPERATOR_SESSION || '').toLowerCase() === 'true';
+}
+
 async function operatorPage(request, page) {
-  const event = await toNetlifyEvent(request);
-  if (!hasValidOperatorSession(event)) {
+  const gate = await requireSkyVaultGateAdmin(request);
+  if (!gate.ok) {
     const returnTo = page === 'setup' ? '/setup.html' : '/admin.html';
-    return redirect(`/operator.html?return=${encodeURIComponent(returnTo)}`);
+    return redirect(`/admin/login.html?return=${encodeURIComponent(returnTo)}`);
   }
   return html(200, page === 'setup' ? SETUP_HTML : ADMIN_HTML);
 }
@@ -159,6 +239,13 @@ async function routeFunction(request, pathname) {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
       body: JSON.stringify({ ok: false, error: `Function ${name || pathname} was not found.` })
     }, pathname);
+  }
+  if (LOCAL_OPERATOR_FUNCTIONS.has(name) && !localOperatorSessionsAllowed()) {
+    return gateDeniedResponse(410, 'SkyeVault local operator sessions are disabled on the mounted 0S surface. Use the shared FS27/SkyGate owner session.');
+  }
+  if (GATE_PROTECTED_FUNCTIONS.has(name)) {
+    const gate = await requireSkyVaultGateAdmin(request);
+    if (!gate.ok) return gate.response;
   }
   const result = await handler(await toNetlifyEvent(request));
   return toWorkerResponse(result, pathname);

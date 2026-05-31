@@ -4,7 +4,7 @@ const { getAuthorizedGmail, gmailRequest, parseMessageSummary } = require('./_gm
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const { accessToken, mailbox } = await getAuthorizedGmail(auth.sub);
     const qs = event.queryStringParameters || {};
     const max = Math.max(1, Math.min(30, Number(qs.max || 20)));

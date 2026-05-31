@@ -445,7 +445,7 @@ async function main() {
   if (!credential.value) {
     receipt.failures.push('No shared owner gate credential found in process env, .env, or env.txt.');
   } else {
-    const login = await fetchJson(`${zeroOsBase}/api/founder-command/login`, {
+    const login = await fetchJson(`${zeroOsBase}/api/owner/admin-login`, {
       method: 'POST',
       headers: { accept: 'application/json', 'content-type': 'application/json' },
       body: JSON.stringify({ code: credential.value })

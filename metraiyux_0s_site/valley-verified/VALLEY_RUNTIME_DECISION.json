@@ -22,6 +22,15 @@
     "/valley-verified/.netlify/functions/phx-lead"
   ],
   "operatorTruth": "The 0S Valley mount serves public directory/search/data/proof pages. Admin mutation, PHX action, and payment execution do not run on the 0S static mount. Those pages are proof/model surfaces unless a future gated Valley backend is deliberately mounted.",
+  "telemetryBoundary": {
+    "publicDirectoryCounts": "seed",
+    "adminConsole": "proof_only",
+    "adminActions": "dry_run",
+    "leadRouting": "proof_only_until_worker_receipt",
+    "claims": "proof_only_until_worker_receipt",
+    "revenue": "proof_only_model",
+    "workerConfirmedRequires": "API/Worker receipt"
+  },
   "liveBackends": {
     "northstar0sMount": "/northstar/",
     "northstarApiBase": "/api/northstar",

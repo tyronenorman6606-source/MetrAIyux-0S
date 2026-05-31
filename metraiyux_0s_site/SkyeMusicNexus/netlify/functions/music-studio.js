@@ -1,4 +1,4 @@
-// SkyeMusicNexus Native Creation Studio function
+// SkyeMusicNexus Native DAW Studio function
 // CommonJS Netlify Function, proof-safe by default.
 //
 // Responsibilities:

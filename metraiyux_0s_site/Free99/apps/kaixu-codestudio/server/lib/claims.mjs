@@ -18,7 +18,8 @@ export function signClaims(claims, {secret=process.env.CODESTUDIO_UPSTREAM_CLAIM
 
 export function verifyClaimsEnvelope({encoded, signature, timestamp, bodyClaims=null}={}){
   const secret = process.env.CODESTUDIO_UPSTREAM_CLAIMS_SECRET;
-  const strict = process.env.CODESTUDIO_REQUIRE_SIGNED_CLAIMS === '1' || !!secret;
+  const allowUnsignedDev = process.env.CODESTUDIO_ALLOW_UNSIGNED_DEV_CLAIMS === '1';
+  const strict = !allowUnsignedDev || process.env.CODESTUDIO_REQUIRE_SIGNED_CLAIMS === '1' || !!secret;
   if (encoded){
     let claims = {};
     try { claims = JSON.parse(Buffer.from(String(encoded), 'base64url').toString('utf8')); }
@@ -58,4 +59,84 @@ export function claimsFromHeaders(headers={}, body={}){
   const signature = headers['x-kaixu-claims-signature'] || headers['x-codestudio-claims-signature'];
   const timestamp = headers['x-kaixu-claims-ts'] || headers['x-codestudio-claims-ts'];
   return verifyClaimsEnvelope({encoded, signature, timestamp, bodyClaims:body?.claims || null});
+}
+
+function cleanBearer(value = ''){
+  const raw = String(value || '').trim();
+  return raw.toLowerCase().startsWith('bearer ') ? raw.slice(7).trim() : raw;
+}
+
+function fs27Origin(){
+  return String(process.env.SKYGATEFS27_ORIGIN || process.env.SKYGATE_ORIGIN || '').replace(/\/+$/, '');
+}
+
+function bearerFromHeaders(headers = {}){
+  return cleanBearer(
+    headers.authorization
+    || headers.Authorization
+    || headers['x-skye-gate-session']
+    || headers['x-skygate-session']
+    || headers['x-fs27-session']
+    || headers['x-0s-gate-session']
+    || ''
+  );
+}
+
+function fs27Error(message, status = 401, code = 'fs27_required'){
+  const err = new Error(message);
+  err.status = status;
+  err.code = code;
+  return err;
+}
+
+function rolesFromFs27(data = {}){
+  const role = String(data.role || data.user?.role || '').trim().toLowerCase();
+  const scopes = Array.isArray(data.scopes) ? data.scopes : String(data.scope || data.user?.scope || '').split(/\s+/).filter(Boolean);
+  const roles = new Set([role, ...scopes.map(scope => String(scope).replace(/\..*$/, ''))].filter(Boolean));
+  if (['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)) roles.add(role);
+  if (scopes.some(scope => ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke'].includes(String(scope).toLowerCase()))) roles.add('admin');
+  return [...roles];
+}
+
+async function introspectFs27Bearer(token){
+  const origin = fs27Origin();
+  if (!origin) throw fs27Error('FS27/SkyGate origin is required for CodeStudio platform auth.', 503, 'fs27_origin_missing');
+  const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
+  let last = null;
+  for (const path of paths){
+    const res = await fetch(`${origin}${path}`, {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({token})
+    });
+    const data = await res.json().catch(() => ({active:false, error:'Invalid FS27 response'}));
+    last = {res, data, path};
+    if (res.status === 404) continue;
+    if (!res.ok || data.active !== true) throw fs27Error(data.error || 'FS27/SkyGate bearer token is inactive.', res.ok ? 401 : res.status, 'fs27_inactive');
+    const roles = rolesFromFs27(data);
+    return {
+      sub:data.sub || data.user_id || data.user?.id || data.email || data.username || 'fs27-user',
+      email:data.email || data.username || data.user?.email || '',
+      roles,
+      role:data.role || data.user?.role || '',
+      scope:data.scope || data.scopes || data.user?.scope || '',
+      scopes:Array.isArray(data.scopes) ? data.scopes : String(data.scope || data.user?.scope || '').split(/\s+/).filter(Boolean),
+      projectId:data.project_id || data.projectId || data.workspace || data.workspace_id || 'default',
+      projectRoles:data.projectRoles || { [data.project_id || data.projectId || data.workspace || data.workspace_id || 'default']: roles },
+      fs27:data,
+      __claimVerification:{ok:true, mode:'fs27-introspection', path}
+    };
+  }
+  throw fs27Error(last?.data?.error || 'FS27/SkyGate introspection endpoint was not found.', 503, 'fs27_introspection_missing');
+}
+
+export async function claimsFromRequest(req, body={}){
+  try {
+    return claimsFromHeaders(req.headers || {}, body || {});
+  } catch (error) {
+    if (!bearerFromHeaders(req.headers || {})) throw error;
+  }
+  const bearer = bearerFromHeaders(req.headers || {});
+  if (!bearer) throw fs27Error('FS27/SkyGate bearer or signed upstream claims are required.', 401, 'fs27_bearer_required');
+  return introspectFs27Bearer(bearer);
 }

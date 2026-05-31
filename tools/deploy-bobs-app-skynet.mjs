@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const sourceDir = path.resolve('Skye-Clients/bobs-smoke-shop-mcp-redo');
@@ -55,51 +56,6 @@ const leanExcludeFiles = new Set([
   'google-indexing-submit.json',
   'netlify.toml'
 ]);
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
-
 async function fetchAny(url, init = {}) {
   const started = performance.now();
   const response = await fetch(url, { redirect: 'manual', ...init });
@@ -261,15 +217,7 @@ async function stageSkyeNetApp() {
 }
 
 async function login() {
-  const credential = await ownerCredential();
-  if (!credential.value) return { credential, token: '', response: null };
-  const response = await fetchAny(`${zeroOsBase}/api/founder-command/login`, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = response.body?.gateBearerToken || response.body?.gateToken || response.body?.token || '';
-  return { credential, token, response };
+  return resolveZeroOsGateAuth({ zeroOsBase });
 }
 
 function runSkyeNetDeploy(token) {
@@ -330,7 +278,6 @@ async function updateFounderAccount(token, skynetLiveUrl, deployedDeploymentId =
   const headers = {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token,
     'content-type': 'application/json'

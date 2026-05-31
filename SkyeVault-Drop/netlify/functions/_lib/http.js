@@ -64,7 +64,7 @@ export function noStoreCors(event) {
     'access-control-allow-origin': resolveCorsOrigin(event),
     'vary': 'Origin',
     'access-control-allow-methods': 'GET,POST,OPTIONS',
-    'access-control-allow-headers': 'content-type,authorization,x-admin-token,x-portal-key,x-skye-gate-session,x-skye-platform,x-skye-usage-lane,x-skyevault-provisioning-secret',
+    'access-control-allow-headers': 'content-type,authorization,x-admin-token,x-free99-admin-code,x-free99-gate-session,x-skye-gate-session,x-skygate-session,x-portal-key,x-skye-platform,x-skye-usage-lane,x-skyevault-provisioning-secret',
     'access-control-max-age': '86400'
   };
 }

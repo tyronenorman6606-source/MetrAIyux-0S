@@ -24,10 +24,18 @@ function toast(message, bad = false) {
 }
 
 function gateSession() {
-  return safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION'));
+  const platformGate = window.Free99PlatformGate?.requireSession?.();
+  if (platformGate?.token) return platformGate;
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  const bridgeSession = bridge?.requireSession?.({ platformId: 'skyeroutex', usageLane: 'skyeroutex-gate-readiness' }) || bridge?.current?.();
+  if (bridgeSession?.token) return {
+    ...bridgeSession,
+    platform_id: bridgeSession.platform_id || 'skyeroutex',
+    usage_lane: bridgeSession.usage_lane || 'skyeroutex-gate-readiness',
+    source: bridgeSession.source || '0s-gate-card-bridge'
+  };
+  const tour = safeJson(sessionStorage.getItem('SKYEROUTEX_TOUR_SESSION'));
+  return tour?.readonly === true && tour?.token ? tour : null;
 }
 
 function gateHeaders() {

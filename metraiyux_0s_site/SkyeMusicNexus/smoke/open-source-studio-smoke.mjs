@@ -49,7 +49,6 @@ function signJwt(privateKey, payload) {
   return `${header}.${body}.${signature}`;
 }
 
-const createHtml = read("public/create.html");
 const dawHtml = read("public/daw.html");
 const dawJs = read("public/nexus-daw.js");
 const dawCss = read("public/nexus-daw.css");
@@ -72,18 +71,6 @@ const localServer = read("scripts/local-dev-server.mjs");
 const netlifyToml = read("netlify.toml");
 const runtimeContract = JSON.parse(read("src/runtime-contract.json"));
 const nativeManifest = JSON.parse(read("open-source/open-source-manifest.json"));
-
-for (const marker of [
-  "Native Creation Studio",
-  "BandLab / Spotify / Instagram command layer",
-  "Save Studio Project",
-  "engineLedgerGrid",
-  "skygate-auth.js",
-  "open-source-studio.js",
-  "SKYE_MUSIC_NEXUS_STATIC_PREVIEW",
-]) {
-  assert(createHtml.includes(marker), `public/create.html missing ${marker}`);
-}
 
 for (const marker of [
   "SkyeMusicNexus // Native DAW",
@@ -138,10 +125,10 @@ for (const [file, html, marker] of [
 }
 
 for (const page of [indexHtml, uploadHtml, playerHtml, releasesHtml, rightsHtml, exchangeHtml, stemsHtml, exportsHtml, discoverHtml, feedHtml]) {
-  assert(page.includes("./create.html"), "Create Studio nav link missing from an artist room");
+  assert(!page.includes("./create.html"), "deleted standalone song app link is still present in an artist room");
 }
-assert(adminHtml.includes("./create.html"), "Create Studio link missing from protected review stage");
-assert(rootShellHtml.includes("./public/create.html"), "root launch matrix missing Create Studio");
+assert(!adminHtml.includes("./create.html"), "deleted standalone song app link is still present in protected review stage");
+assert(!rootShellHtml.includes("./public/create.html"), "root launch matrix still links the deleted standalone song app");
 assert(rootShellHtml.includes("./public/daw.html"), "root launch matrix missing DAW Room");
 assert(!fs.existsSync(path.join(root, "open-source/vendor")), "third-party DAW vendor folder should not exist");
 assert(!fs.existsSync(path.join(root, "open-source/scripts/run-" + "open" + "daw" + "-studio.sh")), "third-party DAW runner should not exist");
@@ -169,7 +156,7 @@ assert(localServer.includes('"music-studio"'), "local-dev-server is missing musi
 assert(localServer.includes("permissions-policy"), "local-dev-server is missing cross-origin-isolated permissions policy");
 assert(netlifyToml.includes("/api/music/studio"), "netlify.toml is missing the studio redirect");
 assert(netlifyToml.includes("Permissions-Policy"), "netlify.toml is missing cross-origin-isolated permissions policy");
-assert(runtimeContract.launchTargets.some((target) => target.href === "./public/create.html"), "runtime contract is missing Create Studio launch target");
+assert(!runtimeContract.launchTargets.some((target) => target.href === "./public/create.html"), "runtime contract still exposes the deleted standalone song app");
 assert(runtimeContract.launchTargets.some((target) => target.href === "./public/daw.html"), "runtime contract is missing DAW launch target");
 assert(runtimeContract.launchTargets.some((target) => target.href === "./public/feed.html"), "runtime contract is missing Feed launch target");
 assert(runtimeContract.frontEndSystem.forbidden.includes("third-party DAW iframe"), "runtime contract must forbid third-party DAW iframe");
@@ -267,9 +254,9 @@ assert(ledger.engines.some((item) => item.name === "SkyeMusicNexus Native DAW"),
 
 console.log(JSON.stringify({
   ok: true,
-  app: "SkyeMusicNexus Native Creation Studio",
+  app: "SkyeMusicNexus Native DAW Studio",
   verified: [
-    "Create Hub route",
+    "DAW Room route",
     "native fullscreen DAW route",
     "no third-party DAW iframe",
     "no vendored third-party DAW source",

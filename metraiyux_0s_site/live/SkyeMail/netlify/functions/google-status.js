@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const mailbox = await loadGoogleMailbox(auth.sub);
     const watchConfigured = Boolean(getWatchConfig());
     return json(200, {

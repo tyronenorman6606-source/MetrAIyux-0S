@@ -11,43 +11,16 @@
     profiles: [{
       artistId: DEFAULT_ARTIST_ID,
       artistName: "Gray Skyes Brain",
-      status: "active",
+      status: "api-unavailable",
       activityMix: { listen: 70, create: 10, social: 20 },
     }],
-    actions: [
-      { actionId: "fallback_listen", type: "listen_release", status: "executed", title: "Discovery listen", releaseTitle: "Twin Signal", targetArtistId: "gray-skyes", createdAt: new Date(Date.now() - 1000 * 60 * 6).toISOString() },
-      { actionId: "fallback_draft", type: "create_song_draft", status: "planned", title: "Queue non-public song draft", createdAt: new Date(Date.now() + 1000 * 60 * 9).toISOString() },
-      { actionId: "fallback_social", type: "engage_post", status: "planned", title: "Comment on network post", targetArtistId: "music-4u", createdAt: new Date(Date.now() + 1000 * 60 * 18).toISOString() },
-    ],
-    cycles: [{
-      cycleId: "fallback_cycle",
-      goal: "70 listen / 10 create / 20 social monitor fallback",
-      executed: true,
-      weightedMix: true,
-      activityMix: { listen: 70, create: 10, social: 20 },
-      createdAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-      receipts: [
-        { kind: "listen_release", title: "Twin Signal", metricLane: "nexusStreams", nexusMetricEligible: true },
-        { kind: "engage_post", feedAction: "comment", postId: "fallback_post" },
-      ],
-    }],
-    systemListens: [{
-      systemListenId: "fallback_system_listen",
-      artistId: DEFAULT_ARTIST_ID,
-      listenerArtistId: DEFAULT_ARTIST_ID,
-      targetArtistId: "gray-skyes",
-      artistName: "Gray Skyes Brain",
-      targetArtistName: "Gray Skyes",
-      title: "Twin Signal",
-      trackTitle: "Twin Signal",
-      releaseTitle: "Reflection",
-      listenSeconds: 82,
-      createdAt: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
-    }],
-    songDrafts: [{ songDraftId: "fallback_draft_receipt", title: "Static Check Hook", status: "draft", createdAt: new Date(Date.now() - 1000 * 60 * 16).toISOString() }],
+    actions: [],
+    cycles: [],
+    systemListens: [],
+    songDrafts: [],
     toolRuns: [],
     activityMix: { listen: 70, create: 10, social: 20 },
-    summary: { profiles: 1, actions: 3, executedActions: 1, cycles: 1, toolRuns: 0, systemListens: 1, songDrafts: 1 },
+    summary: { profiles: 0, actions: 0, executedActions: 0, cycles: 0, toolRuns: 0, systemListens: 0, songDrafts: 0 },
     generatedAt: new Date().toISOString(),
     fallback: true,
   });
@@ -55,15 +28,11 @@
   const FALLBACK_TRAFFIC = Object.freeze({
     ok: true,
     trafficSummary: {
-      nexusStreams: 18,
-      playStarts: 31,
-      completePlays: 9,
-      listenSeconds: 1490,
-      topTracks: [
-        { trackId: "fallback_twin_signal", title: "Twin Signal", artistName: "Gray Skyes x Gray Skyes Brain", nexusStreams: 8, playStarts: 11, completePlays: 5, listenSeconds: 680 },
-        { trackId: "fallback_proof_engine", title: "Proof Engine", artistName: "Gray Skyes x Gray Skyes Brain", nexusStreams: 6, playStarts: 10, completePlays: 2, listenSeconds: 490 },
-        { trackId: "fallback_slow_rain_reply", title: "Slow Rain Reply", artistName: "Gray Skyes x Vox Selene", nexusStreams: 4, playStarts: 10, completePlays: 2, listenSeconds: 320 },
-      ],
+      nexusStreams: 0,
+      playStarts: 0,
+      completePlays: 0,
+      listenSeconds: 0,
+      topTracks: [],
     },
     traffic: [],
     fallback: true,
@@ -212,7 +181,7 @@
         errors.push(`${candidate.lane}: ${error.message || error.name || "request failed"}`);
       }
     }
-    return { data: fallback, lane: "static fallback", errors };
+    return { data: fallback, lane: "api unavailable", errors };
   }
 
   function brainEventsCandidate() {
@@ -468,20 +437,21 @@
   function simulateCycle(body) {
     const now = new Date().toISOString();
     return {
-      ok: true,
+      ok: false,
       profile: { artistId: body.artistId, artistName: body.artistId, activityMix: { listen: 70, create: 10, social: 20 } },
       cycle: {
-        cycleId: `local_cycle_${Date.now()}`,
+        cycleId: `blocked_cycle_${Date.now()}`,
         artistId: body.artistId,
         goal: body.goal,
-        executed: true,
+        executed: false,
         weightedMix: true,
         activityMix: { listen: 70, create: 10, social: 20 },
-        receipts: [{ kind: "listen_release", title: "Local static fallback", metricLane: "nexusStreams", nexusMetricEligible: true }],
+        receipts: [],
         createdAt: now,
       },
-      actions: FALLBACK.actions,
-      receipts: [{ kind: "listen_release", title: "Local static fallback", metricLane: "nexusStreams" }],
+      actions: [],
+      receipts: [],
+      error: "brain_runtime_unavailable",
       fallback: true,
     };
   }
@@ -574,7 +544,7 @@
     const traffic = state.traffic || normalizeTraffic(FALLBACK_TRAFFIC);
     const listen = brain.systemListens.find((item) => item.status === "listening") || brain.systemListens[0] || traffic.traffic.find((item) => /stream|play/i.test(item.eventType || item.type || "")) || null;
     const topTrack = traffic.trafficSummary.topTracks[0] || null;
-    return listen || topTrack || FALLBACK.systemListens[0];
+    return listen || topTrack || null;
   }
 
   function titleOf(item) {
@@ -651,9 +621,9 @@
     const errorCount = state.errors.length + daemonErrors.length + daemonAlerts.length;
 
     el.nowListening.textContent = `${actorOf(listen)}${targetOf(listen) ? ` -> ${targetOf(listen)}` : ""}`;
-    el.trackDetail.textContent = `${duration(listen.listenSeconds || listen.durationSeconds || 0)} / ${clock(listen.createdAt || listen.at)}`;
+    el.trackDetail.textContent = `${duration(listen?.listenSeconds || listen?.durationSeconds || 0)} / ${clock(listen?.createdAt || listen?.at)}`;
     el.trackTitle.textContent = titleOf(listen);
-    el.trackMeta.textContent = [listen.releaseTitle, listen.metricLane || "nexusStreams", listen.sourceType || listen.source || ""].filter(Boolean).join(" / ") || "No active track metadata";
+    el.trackMeta.textContent = [listen?.releaseTitle, listen?.metricLane || "nexusStreams", listen?.sourceType || listen?.source || ""].filter(Boolean).join(" / ") || "No active track metadata";
     el.lastAction.textContent = lastAction ? titleOf(lastAction) : "Idle";
     el.lastActionMeta.textContent = lastAction ? `${lastAction.type || "action"} / ${lastAction.status || "queued"} / ${compactDate(lastAction.executedAt || lastAction.createdAt)}` : "No action receipt yet";
     el.nextAction.textContent = nextAction ? titleOf(nextAction) : "Not queued";
@@ -663,7 +633,7 @@
     el.alertCard.dataset.tone = alert.tone;
     el.alertStatus.textContent = alert.title;
     el.alertMeta.textContent = alert.meta;
-    el.dataLane.textContent = state.lane || "static fallback";
+    el.dataLane.textContent = state.lane || "api unavailable";
     el.lastSync.textContent = state.lastLoadedAt ? compactDate(state.lastLoadedAt) : "--";
 
     setGauge(el.listenGauge, "listen", mix.listen ?? targetMix.listen ?? 70);
@@ -699,7 +669,7 @@
     if (state.paused) return { tone: "warn", title: "Paused", meta: "Local monitor hold is active" };
     if (daemonStatus?.status === "stalled" || daemonStatus?.status === "error") return { tone: "error", title: daemonStatus.status, meta: `last tick ${compactDate(daemonStatus.lastTickAt)}` };
     if (daemonStatus?.status === "paused" || daemonStatus?.status === "quiet" || daemonStatus?.status === "locked") return { tone: "warn", title: daemonStatus.status, meta: `next ${compactDate(daemonStatus.nextTickAt)}` };
-    if (errorCount > 0 && state.lane === "static fallback") return { tone: "error", title: "Fallback", meta: `${errorCount} API lane miss${errorCount === 1 ? "" : "es"}` };
+    if (errorCount > 0 && /api unavailable/i.test(state.lane || "")) return { tone: "error", title: "API unavailable", meta: `${errorCount} API lane miss${errorCount === 1 ? "" : "es"}` };
     if (errorCount > 0) return { tone: "warn", title: "Degraded", meta: `${errorCount} fallback note${errorCount === 1 ? "" : "s"}` };
     if (backlog > 14) return { tone: "warn", title: "Backlog", meta: `${backlog} queued actions` };
     return { tone: "ok", title: daemonStatus?.status || "Nominal", meta: state.loading ? "Refreshing" : `next ${compactDate(daemonStatus?.nextTickAt)}` };
@@ -730,7 +700,7 @@
   }
 
   function renderStreams(tracks) {
-    const rows = Array.isArray(tracks) && tracks.length ? tracks : FALLBACK_TRAFFIC.trafficSummary.topTracks;
+    const rows = Array.isArray(tracks) && tracks.length ? tracks : [];
     el.trackCount.textContent = `${fmt(rows.length)} tracks`;
     el.streamList.innerHTML = rows.slice(0, 20).map((track) => {
       return `<article class="row">

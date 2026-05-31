@@ -374,26 +374,6 @@ const SOVEREIGN_STACK = {
   ]
 };
 
-const PREVIEW_CLIENTS = {
-  "bobs-smoke-shop": {
-    client_id: "bobs-smoke-shop",
-    client: "Bob's Smoke Shop",
-    workspace_id: "bob-smoke-shop-preview-001",
-    workspace_slug: "bobs-smoke-shop-private-preview",
-    workspace: "Bob's Smoke Shop Private Preview",
-    email: "bob@bobs-smoke-shop-preview.com",
-    access_code: "BOBS-FREE-WEEK-2026",
-    plan_id: "starter-command",
-    status: "free_7_day_tester",
-    preview_url: "https://bobs-smoke-shop-metraiyux-preview.pages.dev/",
-    qr_url: "https://bobs-smoke-shop-metraiyux-preview.pages.dev/workspace-preview/",
-    included_usage: { scans: 7, commands: 25, proof_exports: 5, tester_seats: 2 },
-    services: ["website_scan", "specials_update", "inventory_content", "proof_export"],
-    discount: "First six months discounted if Bob keeps the workspace after the free trial.",
-    company_contact: { email: "SkyesOverLondonLC@solenterprises.org", phone: "(623) 260-7073", contact_page: "https://skyesol.netlify.app/contact" }
-  }
-};
-
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
@@ -758,26 +738,6 @@ async function mirrorToFs27(env, event) {
   }
 }
 
-function previewSession(client) {
-  return {
-    token: `preview_${client.client_id}_${Date.now()}`,
-    client_id: client.client_id,
-    workspace_id: client.workspace_id,
-    workspace_slug: client.workspace_slug,
-    client: client.client,
-    email: client.email,
-    workspace: client.workspace,
-    status: client.status,
-    expires_in_days: 7,
-    issued_at: now()
-  };
-}
-
-function previewPublic(client) {
-  const { access_code, ...safe } = client;
-  return safe;
-}
-
 function omegaScan(text) {
   const t = String(text || "");
   const findings = [];
@@ -1094,6 +1054,41 @@ async function safeAll(env, sql, bindings = []) {
   }
 }
 
+async function loadWorkspaceByIdOrSlug(env, value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  const slug = slugify(raw);
+  let workspace = await safeFirst(env, "SELECT * FROM workspaces WHERE id=? OR slug=? LIMIT 1", [raw, slug]);
+  if (workspace) return workspace;
+  if (!env.SAAS_KV) return null;
+  workspace = await env.SAAS_KV.get(`workspace:${raw}`, "json");
+  if (workspace) return workspace;
+  const indexed = await env.SAAS_KV.get(`workspace_slug:${slug}`, "json");
+  if (indexed?.id) return env.SAAS_KV.get(`workspace:${indexed.id}`, "json");
+  return null;
+}
+
+async function indexWorkspace(env, workspace) {
+  if (!env.SAAS_KV || !workspace?.id) return;
+  await env.SAAS_KV.put(`workspace:${workspace.id}`, JSON.stringify(workspace));
+  if (workspace.slug) await env.SAAS_KV.put(`workspace_slug:${workspace.slug}`, JSON.stringify({ id: workspace.id, slug: workspace.slug, updated_at: now() }));
+}
+
+function workspaceSession(workspace = {}) {
+  return {
+    token: "",
+    client_id: workspace.slug || workspace.id || "",
+    workspace_id: workspace.id || workspace.workspace_id || "",
+    workspace_slug: workspace.slug || workspace.workspace_slug || "",
+    client: workspace.company_name || workspace.company || workspace.slug || "",
+    email: workspace.approval_email || workspace.owner_email || "",
+    workspace: workspace.company_name || workspace.company || workspace.id || "",
+    status: workspace.status || "workspace_recorded",
+    shared_gate: true,
+    issued_at: now()
+  };
+}
+
 async function recordWorkspaceMailbox(env, workspaceId, skymail) {
   const mailbox = skymail?.data?.mailbox || null;
   const row = {
@@ -1260,7 +1255,7 @@ function buildVisualRows(env, workspace, plan, stack, commands, events) {
   const eventRows = Array.isArray(events) ? events : [];
   const approvalCount = commandRows.filter((cmd) => Number(cmd.approval_required || 0) || /approval/i.test(String(cmd.status || ""))).length;
   const openCommands = commandRows.filter((cmd) => !/complete|done|closed/i.test(String(cmd.status || ""))).length;
-  const workspaceId = workspace?.id || workspace?.workspace_id || "bob-smoke-shop-preview-001";
+  const workspaceId = workspace?.id || workspace?.workspace_id || "workspace";
   const planId = workspace?.plan_id || plan?.id || "starter-command";
   const aiCap = Number(limits.monthly_ai_cap_usd || 250);
   const dailyLimit = Number(limits.requests_per_day || 600);
@@ -1379,22 +1374,16 @@ async function proxyFs27Gateway(req, env, targetPath) {
 }
 
 async function buildCustomerVisuals(env, workspaceId) {
-  const idToFind = workspaceId || "bob-smoke-shop-preview-001";
-  let workspace = await safeFirst(env, "SELECT * FROM workspaces WHERE id=? OR slug=? LIMIT 1", [idToFind, idToFind]);
-  if (!workspace && env.SAAS_KV) {
-    workspace = await env.SAAS_KV.get(`workspace:${idToFind}`, "json") || await env.SAAS_KV.get(`preview_workspace:${idToFind}`, "json");
-  }
-  if (!workspace && PREVIEW_CLIENTS["bobs-smoke-shop"]?.workspace_id === idToFind) {
-    const client = PREVIEW_CLIENTS["bobs-smoke-shop"];
-    workspace = { id: client.workspace_id, company_name: client.client, plan_id: client.plan_id, status: client.status };
-  }
-  if (!workspace) workspace = { id: idToFind, company_name: "Customer workspace", plan_id: "starter-command", status: "workspace_pending" };
+  const idToFind = String(workspaceId || "").trim();
+  if (!idToFind) return { ok: false, error: "workspace_id_required" };
+  const workspace = await loadWorkspaceByIdOrSlug(env, idToFind);
+  if (!workspace) return { ok: false, error: "workspace_not_found", workspace_id: idToFind };
   const plan = PLANS[workspace.plan_id] || PLANS["starter-command"];
   let stack = await safeFirst(env, "SELECT * FROM workspace_stack_lanes WHERE workspace_id=? LIMIT 1", [workspace.id]);
   if (!stack && env.SAAS_KV) stack = await env.SAAS_KV.get(`workspace_stack:${workspace.id}`, "json");
   const commands = await safeAll(env, "SELECT * FROM customer_commands WHERE workspace_id=? ORDER BY created_at DESC LIMIT 50", [workspace.id]);
   const events = await safeAll(env, "SELECT * FROM provisioning_events WHERE workspace_id=? ORDER BY created_at DESC LIMIT 50", [workspace.id]);
-  return buildVisualRows(env, workspace, plan, stack || {}, commands, events);
+  return { ok: true, ...buildVisualRows(env, workspace, plan, stack || {}, commands, events) };
 }
 
 export default {
@@ -1431,27 +1420,33 @@ export default {
 
       if (path === "/api/saas/skyemerit/catalog") return json(publicSkyeMeritCatalog());
 
-      if (path === "/api/saas/skyemerit/preview" && req.method === "POST") {
-        const b = await body(req);
+      if (path === "/api/saas/skyemerit/preview" && (req.method === "POST" || req.method === "GET")) {
+        const b = req.method === "POST" ? await body(req) : {
+          subtotal_cents: url.searchParams.get("subtotal_cents"),
+          subtotal_usd: url.searchParams.get("subtotal"),
+          code: url.searchParams.get("code"),
+          first_time_eligible: url.searchParams.get("first_time_eligible") !== "false"
+        };
         const subtotal = Math.round(Number(b.subtotal_cents ?? Number(b.subtotal_usd || 0) * 100));
         const code = b.code || b.skyemerit_code || SKYEMERIT_AUTO_CODE;
         const result = code === SKYEMERIT_AUTO_CODE
           ? selectSkyeMerit({ subtotalCents: subtotal, code, firstTimeEligible: b.first_time_eligible !== false })
           : calculateSkyeMerit(code, subtotal);
-        return json({ ok: result.ok !== false, result, catalog: publicSkyeMeritCatalog() });
+        return json({ ok: result.ok !== false, result, selected: result, catalog: publicSkyeMeritCatalog() });
       }
 
       if (path === "/api/saas/skyemerit/issue" && req.method === "POST") {
         if (!auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
         const b = await body(req);
         const pack = await issueSkyeMeritPack(env, b, b.source || "owner_dashboard");
-        return json({ ok: true, pack, catalog: publicSkyeMeritCatalog() });
+        return json({ ok: true, pack, skyemerit: pack, catalog: publicSkyeMeritCatalog() });
       }
 
       if (path === "/api/saas/customer-visuals") {
         if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
-        const workspaceId = url.searchParams.get("workspace_id") || url.searchParams.get("workspace") || "bob-smoke-shop-preview-001";
+        const workspaceId = url.searchParams.get("workspace_id") || url.searchParams.get("workspace") || "";
         const visuals = await buildCustomerVisuals(env, workspaceId);
+        if (visuals.ok === false) return json(visuals, visuals.error === "workspace_id_required" ? 400 : 404);
         await audit(env, workspaceId, "customer_visuals_view", "customer_visuals", workspaceId, { workspace_id: workspaceId, status: "rendered", billable: false });
         return json({ ok: true, visuals });
       }
@@ -1479,56 +1474,22 @@ export default {
 
       if (path === "/api/saas/client-preview") {
         if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
-        const clientId = slugify(url.searchParams.get("client") || "bobs-smoke-shop");
-        const client = PREVIEW_CLIENTS[clientId];
-        if (!client) return json({ ok: false, error: "client_preview_not_found" }, 404);
-        return json({ ok: true, workspace: previewPublic(client) });
+        const clientId = String(url.searchParams.get("client") || url.searchParams.get("workspace") || url.searchParams.get("workspace_id") || "").trim();
+        if (!clientId) return json({ ok: false, error: "client_or_workspace_required" }, 400);
+        const workspace = await loadWorkspaceByIdOrSlug(env, clientId);
+        if (!workspace) return json({ ok: false, error: "workspace_not_found", client: clientId }, 404);
+        return json({ ok: true, workspace, session: workspaceSession(workspace) });
       }
 
       if (path === "/api/saas/client-workspace/claim" && req.method === "POST") {
         if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
-        const clientId = slugify(b.client_id || "bobs-smoke-shop");
-        const client = PREVIEW_CLIENTS[clientId];
-        if (!client) return json({ ok: false, error: "client_preview_not_found" }, 404);
-        if (String(b.workspace_id || "") !== client.workspace_id) return json({ ok: false, error: "workspace_mismatch" }, 403);
-        let existing = null;
-        if (env.SAAS_DB) existing = await env.SAAS_DB.prepare("SELECT * FROM workspaces WHERE slug=? OR id=? LIMIT 1").bind(client.workspace_slug, client.workspace_id).first();
-        else if (env.SAAS_KV) existing = await env.SAAS_KV.get(`preview_workspace:${client.workspace_id}`, "json");
-        if (existing) {
-          await audit(env, client.email, "client_workspace_claim_existing", "workspace", client.workspace_id, { client_id: clientId });
-          return json({ ok: true, claimed: true, already_exists: true, workspace: existing, preview: previewPublic(client) });
-        }
-        const customer_id = id("cus");
-        const workspace = {
-          id: client.workspace_id,
-          customer_id,
-          company_name: client.client,
-          slug: client.workspace_slug,
-          plan_id: client.plan_id,
-          status: "preview_workspace_claimed",
-          approval_email: client.email,
-          created_at: now(),
-          updated_at: now(),
-          services: client.services,
-          database_lane: "citadeldb_or_neon_owner_choice",
-          vault_lane: "skyevault",
-          mail_lane: "skyemail"
-        };
-        const customer = { id: customer_id, full_name: "Bob Smoke Shop Preview User", email: client.email, company_name: client.client, phone: "", plan_id: client.plan_id, status: "preview_claimed", created_at: now() };
-        if (env.SAAS_KV) {
-          await env.SAAS_KV.put(`customer:${customer_id}`, JSON.stringify(customer));
-          await env.SAAS_KV.put(`preview_workspace:${client.workspace_id}`, JSON.stringify(workspace));
-        }
-        if (env.SAAS_DB) {
-          await env.SAAS_DB.prepare("INSERT INTO customers (id,full_name,email,company_name,phone,plan_id,status,created_at) VALUES (?,?,?,?,?,?,?,?)").bind(customer.id, customer.full_name, customer.email, customer.company_name, customer.phone, customer.plan_id, customer.status, customer.created_at).run();
-          await env.SAAS_DB.prepare("INSERT INTO workspaces (id,customer_id,company_name,slug,plan_id,status,approval_email,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)").bind(workspace.id, workspace.customer_id, workspace.company_name, workspace.slug, workspace.plan_id, workspace.status, workspace.approval_email, workspace.created_at, workspace.updated_at).run();
-          for (const s of workspace.services) await env.SAAS_DB.prepare("INSERT INTO workspace_services (id,workspace_id,service_key,status,created_at) VALUES (?,?,?,?,?)").bind(id("svc"), workspace.id, String(s), "preview_included", now()).run();
-        }
-        const stackReceipt = await recordWorkspaceStackLanes(env, workspace);
-        await recordProvisioningEvent(env, workspace.id, "client_preview.claimed", { client: previewPublic(client), stackReceipt }, "completed");
-        await audit(env, client.email, "client_workspace_claim", "workspace", workspace.id, { client_id: clientId, services: workspace.services });
-        return json({ ok: true, claimed: true, already_exists: false, workspace, preview: previewPublic(client), persistence: env.SAAS_DB ? "d1" : "kv_fallback" });
+        const workspaceId = String(b.workspace_id || b.workspace || b.client_id || "").trim();
+        if (!workspaceId) return json({ ok: false, error: "workspace_id_required" }, 400);
+        const workspace = await loadWorkspaceByIdOrSlug(env, workspaceId);
+        if (!workspace) return json({ ok: false, error: "workspace_not_found", workspace_id: workspaceId }, 404);
+        await audit(env, workspace.approval_email || workspace.owner_email || "shared-gate-user", "client_workspace_claim", "workspace", workspace.id, { workspace_id: workspace.id, shared_gate: true });
+        return json({ ok: true, claimed: true, workspace, session: workspaceSession(workspace), persistence: env.SAAS_DB ? "d1" : "kv" });
       }
 
       if (path === "/api/saas/signup" && req.method === "POST") {
@@ -1558,14 +1519,14 @@ export default {
       if (path === "/api/saas/workspaces" && req.method === "POST") {
         if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
-        const workspace_id = id("ws");
-        const slug = slugify(b.company_name || b.slug || workspace_id);
-        const plan_id = normalizePlanId(b.plan_id, "starter-command");
+        const workspace_id = String(b.workspace_id || "").trim() || id("ws");
+        const slug = slugify(b.workspace_slug || b.company_name || b.slug || workspace_id);
+        const plan_id = normalizePlanId(b.plan_id || b.plan, "starter-command");
         const database_lane = String(b.database_lane || b.database_provider || "citadeldb_or_neon_owner_choice").slice(0, 80);
         const vault_lane = String(b.vault_lane || b.file_storage_provider || "skyevault").slice(0, 80);
         const mail_lane = String(b.mail_lane || b.email_provider || "skyemail").slice(0, 80);
-        const workspace = { id: workspace_id, customer_id: b.customer_id || "", company_name: b.company_name || slug, slug, plan_id, status: "pending_provisioning", approval_email: b.approval_email || "", created_at: now(), updated_at: now(), services: Array.isArray(b.services) ? b.services : [], database_lane, vault_lane, mail_lane, sovereign_stack: SOVEREIGN_STACK };
-        if (env.SAAS_KV) await env.SAAS_KV.put(`workspace:${workspace_id}`, JSON.stringify(workspace));
+        const workspace = { id: workspace_id, customer_id: b.customer_id || "", company_name: b.company_name || slug, slug, plan_id, status: "pending_provisioning", approval_email: b.approval_email || b.owner_email || b.email || "", created_at: now(), updated_at: now(), services: Array.isArray(b.services) ? b.services : [], database_lane, vault_lane, mail_lane, sovereign_stack: SOVEREIGN_STACK };
+        await indexWorkspace(env, workspace);
         if (env.SAAS_DB) {
           await env.SAAS_DB.prepare("INSERT INTO workspaces (id,customer_id,company_name,slug,plan_id,status,approval_email,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)").bind(workspace_id, workspace.customer_id, workspace.company_name, slug, plan_id, workspace.status, workspace.approval_email, workspace.created_at, workspace.updated_at).run();
           for (const s of workspace.services) await env.SAAS_DB.prepare("INSERT INTO workspace_services (id,workspace_id,service_key,status,created_at) VALUES (?,?,?,?,?)").bind(id("svc"), workspace_id, String(s), "selected", now()).run();
@@ -1583,7 +1544,7 @@ export default {
         if (env.SAAS_QUEUE) await env.SAAS_QUEUE.send({ type: "workspace_provisioning", workspace_id, plan_id, services: workspace.services, skymail: mailboxReceipt, at: now() });
         await audit(env, "system", "create_workspace", "workspace", workspace_id, { ...b, workspace_id, plan_id, database_lane, vault_lane, mail_lane });
         await email(env, "Workspace provisioning receipt", `<h2>Workspace provisioning recorded</h2><p>Workspace ${workspace_id} for ${b.company_name || slug} is pending provisioning.</p><p>Plan: ${plan_id}</p><p>Database lane: ${database_lane}</p><p>Vault lane: ${vault_lane}</p><p>Mail lane: ${mail_lane}</p><p>SkyeMail: ${mailboxReceipt.mailbox_email || mailboxReceipt.provisioning_status}</p><p>Vault key card: ${keyCard.setup_url}</p>`);
-        return json({ ok: true, workspace_id, slug, status: "pending_provisioning", queued: !!env.SAAS_QUEUE, persistence: env.SAAS_DB ? "d1" : "kv_fallback", sovereign_stack: { database_lane, vault_lane, mail_lane, fs27_event_mirror: !!fs27MirrorUrl(env), receipt: stackReceipt }, skymail: { ok: skymail.ok, skipped: !!skymail.skipped, mailbox: mailboxReceipt, key_card: keyCard, response: skymail.data || null, error: skymail.error || null }, skyemerit });
+        return json({ ok: true, workspace, workspace_id, slug, status: "pending_provisioning", queued: !!env.SAAS_QUEUE, persistence: env.SAAS_DB ? "d1" : "kv_fallback", sovereign_stack: { database_lane, vault_lane, mail_lane, fs27_event_mirror: !!fs27MirrorUrl(env), receipt: stackReceipt }, skymail: { ok: skymail.ok, skipped: !!skymail.skipped, mailbox: mailboxReceipt, key_card: keyCard, response: skymail.data || null, error: skymail.error || null }, skyemerit });
       }
 
       if (path === "/api/saas/skymail/status") {

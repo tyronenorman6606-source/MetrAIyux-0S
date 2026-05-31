@@ -174,7 +174,10 @@ function readOwnerGitOriginStatus() {
     remoteName: status?.remoteName || 'skyevault',
     workspaceId: status?.workspaceId || 'metraiyux-0s-owner',
     repoId: status?.repoId || repoName,
-    tokenStoredAt: status?.tokenStoredAt || '.skyevault-out/git-remote/owner-git-origin.env',
+    auth: status?.auth || sync?.auth || proof?.auth || {
+      mode: 'unknown',
+      runtimeEnv: '.skyevault-out/git-remote/owner-git-origin.env'
+    },
     storageRoot: status?.storageRoot || '.skyevault-out/git-remote/storage',
     remoteMatchesLocalHead: Boolean(status?.remoteMatchesLocalHead || sync?.remoteMatchesLocalHead || proof?.headMatches),
     latestSync: sync ? {

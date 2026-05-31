@@ -215,7 +215,57 @@ function sharedGateActor(request, env) {
     env.SKYECOMMERCE_OWNER_NAME ||
     'MetrAIyux 0S Owner'
   ).trim();
-  return { email, name };
+  const sub = String(request.headers.get('x-skyecommerce-gate-sub') || '').trim();
+  const customerId = String(request.headers.get('x-skyecommerce-gate-customer-id') || '').trim();
+  const workspaceId = String(request.headers.get('x-skyecommerce-gate-workspace-id') || '').trim();
+  return { email, name, sub, customerId, workspaceId };
+}
+
+async function ensureSharedGateIdentityLinksTable(env) {
+  await dbRun(env, `
+    CREATE TABLE IF NOT EXISTS shared_gate_identity_links (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      gate_email TEXT NOT NULL,
+      fs27_sub TEXT NOT NULL DEFAULT '',
+      fs27_customer_id TEXT NOT NULL DEFAULT '',
+      workspace_id TEXT NOT NULL DEFAULT '',
+      local_merchant_email TEXT NOT NULL DEFAULT '',
+      actor_json TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE,
+      UNIQUE (merchant_id, gate_email)
+    )
+  `);
+}
+
+async function upsertSharedGateIdentityLink(env, merchant, actor) {
+  if (!merchant?.id || !actor?.email) return null;
+  await ensureSharedGateIdentityLinksTable(env);
+  const existing = await dbFirst(env, `SELECT id FROM shared_gate_identity_links WHERE merchant_id = ? AND lower(gate_email) = lower(?) LIMIT 1`, [merchant.id, actor.email]);
+  const id = existing?.id || uid('sgl');
+  const actorJson = JSON.stringify({
+    email: actor.email,
+    name: actor.name || '',
+    fs27_sub: actor.sub || '',
+    fs27_customer_id: actor.customerId || '',
+    workspace_id: actor.workspaceId || '',
+    linked_at: new Date().toISOString()
+  });
+  if (existing?.id) {
+    await dbRun(env, `
+      UPDATE shared_gate_identity_links
+      SET fs27_sub = ?, fs27_customer_id = ?, workspace_id = ?, local_merchant_email = ?, actor_json = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [actor.sub || '', actor.customerId || '', actor.workspaceId || '', merchant.email || '', actorJson, id]);
+  } else {
+    await dbRun(env, `
+      INSERT INTO shared_gate_identity_links (id, merchant_id, gate_email, fs27_sub, fs27_customer_id, workspace_id, local_merchant_email, actor_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [id, merchant.id, actor.email, actor.sub || '', actor.customerId || '', actor.workspaceId || '', merchant.email || '', actorJson]);
+  }
+  return { id, merchantId: merchant.id, gateEmail: actor.email, fs27Sub: actor.sub || '', customerId: actor.customerId || '', workspaceId: actor.workspaceId || '' };
 }
 
 async function ensureSharedGateMerchant(env, request) {
@@ -249,22 +299,29 @@ async function ensureSharedGateMerchant(env, request) {
     ]);
     row = await dbFirst(env, `SELECT * FROM merchants WHERE id = ? LIMIT 1`, [id]);
   }
+  await upsertSharedGateIdentityLink(env, row, actor);
   return row;
 }
 
 async function getSharedGateSession(request, env) {
   if (!hasSharedGateHandoff(request, env)) return null;
+  const actor = sharedGateActor(request, env);
   const merchant = await ensureSharedGateMerchant(env, request);
   return {
     id: 'shared-0s-gate',
     merchantId: merchant.id,
-    email: merchant.email,
+    email: actor.email || merchant.email,
     role: 'merchant_owner',
     merchantSlug: merchant.slug || null,
     merchantName: merchant.brand_name || null,
     permissions: ['*'],
     staffMemberId: '',
-    sharedGate: true
+    sharedGate: true,
+    gateEmail: actor.email || '',
+    fs27Sub: actor.sub || '',
+    fs27CustomerId: actor.customerId || '',
+    workspaceId: actor.workspaceId || '',
+    localMerchantEmail: merchant.email || ''
   };
 }
 
@@ -526,8 +583,26 @@ async function requireApiBearer(request, env, requiredScope = '') {
   if (!row) return { error: unauthorized('Invalid or revoked bearer token.') };
   const token = apiTokenRecord(row);
   if (!hasApiScope(token.scopes, requiredScope)) return { error: json({ error: `Bearer token missing required scope: ${requiredScope}` }, 403) };
+  const sharedGateSession = await getSharedGateSession(request, env);
+  if (sharedGateSession && sharedGateSession.merchantId !== row.merchant_id) {
+    return {
+      error: json({
+        error: 'Bearer token merchant does not match the active shared 0S gate merchant.',
+        code: 'shared_gate_api_token_merchant_mismatch'
+      }, 403)
+    };
+  }
   await dbRun(env, `UPDATE api_access_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?`, [row.id]);
-  return { api: { tokenId: row.id, merchantId: row.merchant_id, scopes: token.scopes, label: token.label } };
+  return {
+    api: {
+      tokenId: row.id,
+      merchantId: row.merchant_id,
+      scopes: token.scopes,
+      label: token.label,
+      sharedGate: Boolean(sharedGateSession),
+      gateEmail: sharedGateSession?.gateEmail || ''
+    }
+  };
 }
 
 async function listCustomDomains(env, merchantId) {
@@ -854,53 +929,7 @@ async function createSession(env, { merchantId = null, email = '', role = 'merch
 async function getSession(request, env) {
   const sharedGateSession = await getSharedGateSession(request, env);
   if (sharedGateSession) return sharedGateSession;
-  const cookies = parseCookie(request.headers.get('cookie') || '');
-  const token = cookies[SESSION_COOKIE];
-  if (!token) return null;
-  try {
-    await verifyToken(env.SESSION_SECRET, token);
-  } catch {
-    return null;
-  }
-  const tokenHash = await sha256Hex(token);
-  const row = await dbFirst(env, `
-    SELECT sessions.id, sessions.merchant_id, sessions.email, sessions.role, sessions.expires_at,
-           merchants.slug, merchants.brand_name
-    FROM sessions
-    LEFT JOIN merchants ON merchants.id = sessions.merchant_id
-    WHERE sessions.token_hash = ?
-      AND datetime(sessions.expires_at) > datetime('now')
-    LIMIT 1
-  `, [tokenHash]);
-  if (!row) return null;
-  const session = {
-    id: row.id,
-    merchantId: row.merchant_id,
-    email: row.email,
-    role: row.role,
-    merchantSlug: row.slug || null,
-    merchantName: row.brand_name || null,
-    permissions: [],
-    staffMemberId: ''
-  };
-  if (session.role === 'merchant_staff' && session.merchantId) {
-    const staff = await dbFirst(env, `
-      SELECT staff_members.*, staff_roles.name AS role_name, staff_roles.permissions_json AS role_permissions_json
-      FROM staff_members
-      LEFT JOIN staff_roles ON staff_roles.id = staff_members.role_id
-      WHERE staff_members.merchant_id = ?
-        AND lower(staff_members.email) = lower(?)
-        AND staff_members.status = 'active'
-      LIMIT 1
-    `, [session.merchantId, session.email]);
-    if (!staff) return null;
-    const rolePermissions = (() => { try { return JSON.parse(staff.role_permissions_json || '[]'); } catch { return []; } })();
-    const directPermissions = (() => { try { return JSON.parse(staff.permissions_json || '[]'); } catch { return []; } })();
-    session.staffMemberId = staff.id || '';
-    session.staffName = staff.name || '';
-    session.permissions = [...new Set([...rolePermissions, ...directPermissions])];
-  }
-  return session;
+  return null;
 }
 
 function unauthorized(message = 'Unauthorized.') {
@@ -2363,91 +2392,19 @@ async function handleApi(request, env, url) {
   }
 
   if (request.method === 'POST' && url.pathname === '/api/merchant/register') {
-    const body = await readJson(request) || {};
-    if (!body.brandName || !body.slug || !body.email || !body.password) return json({ error: 'brandName, slug, email, and password are required.' }, 400);
-    const slug = slugify(body.slug);
-    const exists = await dbFirst(env, `SELECT id FROM merchants WHERE slug = ? OR lower(email) = lower(?) LIMIT 1`, [slug, body.email]);
-    if (exists) return json({ error: 'Merchant with that slug or email already exists.' }, 409);
-    const merchantId = uid('mrc');
-    const passwordHash = await hashPassword(body.email, body.password);
-    const theme = normalizeMerchantUpdate(body);
-    await dbRun(env, `
-      INSERT INTO merchants (
-        id, slug, brand_name, email, password_hash, currency,
-        accent_color, surface_color, background_color, text_color,
-        hero_title, hero_tagline, checkout_note
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [merchantId, slug, body.brandName, body.email, passwordHash, theme.currency, theme.accentColor, theme.surfaceColor, theme.backgroundColor, theme.textColor, theme.heroTitle || body.brandName, theme.heroTagline, theme.checkoutNote]);
-    const token = await createSession(env, { merchantId, email: body.email, role: 'merchant_owner' });
-    return json({ ok: true, merchant: merchantRecord(await dbFirst(env, `SELECT * FROM merchants WHERE id = ?`, [merchantId])) }, 201, { 'Set-Cookie': setSessionCookie(token, 60 * 60 * 24 * 7, shouldUseSecureCookies(request, env)) });
+    return json({ error: 'SkyeCommerce merchant registration runs through the shared 0S FS27/SkyGate account provisioning lane.', code: 'shared_gate_required' }, 410);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/auth/login') {
-    const body = await readJson(request) || {};
-    const email = String(body.email || '').trim().toLowerCase();
-    const guard = await guardAuthAttempt(request, env, 'merchant_login', email);
-    if (guard.locked) return guard.locked;
-    const merchant = await dbFirst(env, `SELECT * FROM merchants WHERE lower(email) = lower(?) LIMIT 1`, [email]);
-    if (!merchant) {
-      await recordAuthFailure(env, guard, 'merchant_login', email, 'merchant_not_found');
-      return unauthorized('Invalid credentials.');
-    }
-    const passwordOk = await verifyPassword(merchant.email, body.password || '', merchant.password_hash);
-    if (!passwordOk) {
-      await recordAuthFailure(env, guard, 'merchant_login', email, 'bad_password');
-      return unauthorized('Invalid credentials.');
-    }
-    await recordAuthSuccess(env, guard, 'merchant_login', email);
-    const token = await createSession(env, { merchantId: merchant.id, email: merchant.email, role: 'merchant_owner' });
-    return json({ ok: true, merchant: merchantRecord(merchant) }, 200, { 'Set-Cookie': setSessionCookie(token, 60 * 60 * 24 * 7, shouldUseSecureCookies(request, env)) });
+    return json({ error: 'SkyeCommerce local password login is disabled. Use the shared 0S FS27/SkyGate gate.', code: 'shared_gate_required' }, 410);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/staff/login') {
-    const body = await readJson(request) || {};
-    const slug = slugify(body.slug || '');
-    const staffEmail = String(body.email || '').trim().toLowerCase();
-    if (!slug || !staffEmail || !body.password) return json({ error: 'slug, email, and password are required.' }, 400);
-    const guard = await guardAuthAttempt(request, env, 'staff_login', `${slug}:${staffEmail}`);
-    if (guard.locked) return guard.locked;
-    const merchant = await dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE slug = ? LIMIT 1`, [slug]);
-    if (!merchant) {
-      await recordAuthFailure(env, guard, 'staff_login', `${slug}:${staffEmail}`, 'merchant_not_found');
-      return unauthorized('Invalid staff credentials.');
-    }
-    const staffRow = await dbFirst(env, `SELECT staff_members.*, staff_roles.name AS role_name, staff_roles.permissions_json AS role_permissions_json FROM staff_members LEFT JOIN staff_roles ON staff_roles.id = staff_members.role_id WHERE staff_members.merchant_id = ? AND lower(staff_members.email) = lower(?) AND staff_members.status = 'active' LIMIT 1`, [merchant.id, staffEmail]);
-    if (!staffRow || !staffRow.password_hash) {
-      await recordAuthFailure(env, guard, 'staff_login', `${slug}:${staffEmail}`, 'staff_not_found_or_no_password');
-      return unauthorized('Invalid staff credentials.');
-    }
-    const passwordOk = await verifyPassword(staffRow.email, body.password || '', staffRow.password_hash);
-    if (!passwordOk) {
-      await recordAuthFailure(env, guard, 'staff_login', `${slug}:${staffEmail}`, 'bad_password');
-      return unauthorized('Invalid staff credentials.');
-    }
-    await recordAuthSuccess(env, guard, 'staff_login', `${slug}:${staffEmail}`);
-    await dbRun(env, `UPDATE staff_members SET last_login_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND merchant_id = ?`, [staffRow.id, merchant.id]);
-    const token = await createSession(env, { merchantId: merchant.id, email: staffRow.email, role: 'merchant_staff' });
-    const rolePermissions = (() => { try { return JSON.parse(staffRow.role_permissions_json || '[]'); } catch { return []; } })();
-    const directPermissions = (() => { try { return JSON.parse(staffRow.permissions_json || '[]'); } catch { return []; } })();
-    return json({ ok: true, merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name }, staff: staffMemberRecord(staffRow, { permissions: rolePermissions }), permissions: [...new Set([...rolePermissions, ...directPermissions])] }, 200, { 'Set-Cookie': setSessionCookie(token, 60 * 60 * 24 * 7, shouldUseSecureCookies(request, env)) });
+    return json({ error: 'SkyeCommerce staff password login is disabled. Use the shared 0S FS27/SkyGate gate.', code: 'shared_gate_required' }, 410);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/staff/invitations/accept') {
-    const body = await readJson(request) || {};
-    if (!body.token || !body.password) return json({ error: 'token and password are required.' }, 400);
-    const tokenHash = await sha256Hex(String(body.token || ''));
-    const invitation = await dbFirst(env, `SELECT staff_invitations.*, merchants.slug AS merchant_slug, merchants.brand_name AS merchant_brand_name FROM staff_invitations INNER JOIN merchants ON merchants.id = staff_invitations.merchant_id WHERE staff_invitations.token_hash = ? AND staff_invitations.status = 'pending' LIMIT 1`, [tokenHash]);
-    if (!invitation) return json({ error: 'Invitation not found or already used.' }, 404);
-    if (invitation.expires_at && Date.parse(invitation.expires_at) && Date.parse(invitation.expires_at) < Date.now()) return json({ error: 'Invitation has expired.' }, 410);
-    const existing = await dbFirst(env, `SELECT id FROM staff_members WHERE merchant_id = ? AND lower(email) = lower(?) LIMIT 1`, [invitation.merchant_id, invitation.email]);
-    if (existing) return json({ error: 'Staff member already exists for this invitation.' }, 409);
-    const memberId = uid('stm');
-    const passwordHash = await hashPassword(invitation.email, body.password);
-    const name = String(body.name || invitation.name || '').trim();
-    await dbRun(env, `INSERT INTO staff_members (id, merchant_id, role_id, email, name, status, permissions_json, password_hash) VALUES (?, ?, ?, ?, ?, 'active', ?, ?)`, [memberId, invitation.merchant_id, invitation.role_id || null, invitation.email, name, invitation.permissions_json || '[]', passwordHash]);
-    await dbRun(env, `UPDATE staff_invitations SET status = 'accepted', accepted_at = CURRENT_TIMESTAMP WHERE id = ? AND merchant_id = ?`, [invitation.id, invitation.merchant_id]);
-    const token = await createSession(env, { merchantId: invitation.merchant_id, email: invitation.email, role: 'merchant_staff' });
-    return json({ ok: true, merchant: { id: invitation.merchant_id, slug: invitation.merchant_slug, brandName: invitation.merchant_brand_name }, staffMemberId: memberId }, 201, { 'Set-Cookie': setSessionCookie(token, 60 * 60 * 24 * 7, shouldUseSecureCookies(request, env)) });
+    return json({ error: 'SkyeCommerce staff invitation password acceptance is disabled. Staff access is bound through the shared 0S FS27/SkyGate gate.', code: 'shared_gate_required' }, 410);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/auth/logout') {
@@ -2881,7 +2838,7 @@ async function handleApi(request, env, url) {
     const payload = normalizeStaffMemberInput(rawBody);
     if (!payload.email) return json({ error: 'email is required.' }, 400);
     const id = uid('stm');
-    const passwordHash = rawBody.password ? await hashPassword(payload.email, rawBody.password) : '';
+    const passwordHash = '';
     await dbRun(env, `INSERT INTO staff_members (id, merchant_id, role_id, email, name, status, permissions_json, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [id, auth.session.merchantId, payload.roleId || null, payload.email, payload.name, payload.status, JSON.stringify(payload.permissions), passwordHash]);
     return json({ ok: true, member: (await listStaffMembers(env, auth.session.merchantId)).find((entry) => entry.id === id) }, 201);
   }

@@ -1,7 +1,11 @@
 {
   "version": "19.0.0",
   "generated_at": "2026-05-27T23:30:00.388Z",
-  "purpose": "Browser-side operational console that calls runtime functions with an FS27 gate token. The function layer strips public x-upstream headers and injects trusted identity after gate introspection.",
+  "purpose": "Browser-side operational console model. On the 0S static Valley mount these controls are proof_only/dry_run unless a Worker/API response returns a worker_confirmed receipt.",
+  "boundary": "proof_only",
+  "proof_only": true,
+  "worker_confirmed": false,
+  "worker_receipt": null,
   "assets": [
     "/valley-verified/assets/admin-console.js"
   ],
@@ -13,5 +17,5 @@
     "approveAction",
     "processOutbox"
   ],
-  "limitation": "Browser code cannot create trustworthy auth by itself. Production must configure SKYGATEFS27_ORIGIN and PHX_GATE_AUTH_REQUIRED=true."
+  "limitation": "Browser code cannot create trustworthy auth or live telemetry by itself. Production must configure SKYGATEFS27_ORIGIN and PHX_GATE_AUTH_REQUIRED=true, and live status must come back as an API/Worker receipt."
 }

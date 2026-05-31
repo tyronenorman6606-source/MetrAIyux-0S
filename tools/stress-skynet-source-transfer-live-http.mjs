@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const zeroOsBase = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -13,69 +13,10 @@ const latestReceipt = path.join(artifactRoot, 'skyenet-source-transfer-stress-la
 const rounds = Math.max(1, Math.min(5, Number(process.env.SKYENET_SOURCE_TRANSFER_STRESS_ROUNDS || 2)));
 const methods = ['skyedrive', 'skyevault', 'secure-skye-pack'];
 
-const credentialKeys = [
-  'ZERO_OS_GATE_CODE',
-  'METRAIYUX_OWNER_ADMIN_CODE',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  if (!file || !existsSync(file)) return {};
-  const rows = {};
-  const text = await fs.readFile(file, 'utf8');
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-    if (match) rows[match[1]] = unquote(match[2]);
-  }
-  return rows;
-}
-
-function expandEnvRefs(values) {
-  const out = { ...values };
-  for (let pass = 0; pass < 3; pass += 1) {
-    for (const [key, value] of Object.entries(out)) {
-      out[key] = String(value || '').replace(/\$\{([A-Z0-9_]+)\}/g, (_match, ref) => out[ref] || '');
-    }
-  }
-  return out;
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean).map((file) => path.resolve(file));
-  let merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(file));
-  merged = expandEnvRefs(merged);
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
-
 function authHeaders(token) {
   return {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };
@@ -127,7 +68,8 @@ function okTransfer(method, item) {
 }
 
 async function main() {
-  const credential = await ownerCredential();
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase });
+  const token = auth.token || '';
   const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
   const workspaceId = process.env.SKYENET_SOURCE_TRANSFER_STRESS_WORKSPACE || 'source-transfer-stress';
   const projectId = process.env.SKYENET_SOURCE_TRANSFER_STRESS_PROJECT || `source-transfer-stress-${stamp}`;
@@ -142,7 +84,7 @@ async function main() {
     owner_manual_browser_verification: true,
     zero_os_base: zeroOsBase,
     skynet_base: skynetBase,
-    credential_source: credential.key || 'missing',
+    credential_source: auth.credential?.key || auth.credential?.source || 'missing',
     target: { workspace_id: workspaceId, project_id: projectId, deployment_id: deploymentId, rounds, methods },
     login: null,
     setup: {},
@@ -153,24 +95,16 @@ async function main() {
     failures: []
   };
 
-  if (!credential.value) {
-    receipt.failures.push('No shared owner gate credential found in process env, .env, or env.txt.');
+  receipt.login = {
+    status: Number(auth.response?.status || 0) || 0,
+    ok: Boolean(auth.ok && token),
+    token_received: Boolean(token),
+    via: auth.response?.via || auth.credential?.source || ''
+  };
+
+  if (!token) {
+    receipt.failures.push(auth.response?.body?.error || auth.response?.error || 'No shared FS27/SkyGate bearer or owner gate exchange credential found.');
   } else {
-    const login = await fetchJson(`${zeroOsBase}/api/founder-command/login`, {
-      method: 'POST',
-      headers: { accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({ code: credential.value })
-    });
-    const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-    receipt.login = {
-      status: login.status,
-      ok: Boolean(login.ok && token),
-      token_received: Boolean(token),
-      elapsed_ms: login.elapsed_ms
-    };
-    if (!token) {
-      receipt.failures.push(login.body?.error || 'Shared gate login did not return a bearer token.');
-    } else {
       const unauth = await fetchJson(`${skynetBase}/api/skyenet/source-transfer`, {
         method: 'POST',
         headers: { accept: 'application/json', 'content-type': 'application/json' },
@@ -312,7 +246,6 @@ async function main() {
         elapsed_ms: Number((performance.now() - liveStarted).toFixed(2))
       };
       if (!receipt.live_route.ok) receipt.failures.push('Stress deployment public route did not serve the uploaded app.');
-    }
   }
 
   receipt.ok = receipt.failures.length === 0;

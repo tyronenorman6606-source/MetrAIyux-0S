@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, request as playwrightRequest } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const FULL_URL = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/';
 const PUBLIC_URL = 'https://metraiyux-0s-public-spectacle.pages.dev/';
@@ -8,7 +9,7 @@ const FS27_PROOF_URL = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.d
 const FS27_ACTUAL_GATE_URL = 'https://skygatefs13-quantumskyes.netlify.app/';
 const REPORT_PATH = 'metraiyux_0s_live_e2e_report.json';
 const ARTIFACT_DIR = 'test-artifacts/live-e2e-metraiyux';
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || process.env.ADMIN_PASSWORD || '';
+let adminGateAuth = null;
 
 mkdirSync(ARTIFACT_DIR, { recursive: true });
 
@@ -319,6 +320,12 @@ async function apiPost(api, path, body, shape, headers = {}) {
 }
 
 async function runApiFlow(api) {
+  const adminGateHeaders = adminGateAuth?.token ? {
+    authorization: `Bearer ${adminGateAuth.token}`,
+    'x-skye-gate-session': adminGateAuth.token,
+    'x-free99-gate-session': adminGateAuth.token
+  } : null;
+
   await apiStatus(api, '/api/site-operator/live-surfaces', (data) =>
     data.ok &&
     Array.isArray(data.surfaces) &&
@@ -329,19 +336,19 @@ async function runApiFlow(api) {
   await apiStatus(api, '/api/site-operator/ledger', (data) => data.ok && data.persistence === 'd1' && Array.isArray(data.events));
 
   await apiStatus(api, '/api/admin/status', (data) => data.ok && data.brains === 16 && data.durable_mode === true);
-  if (ADMIN_TOKEN) {
+  if (adminGateHeaders) {
     await apiPost(api, '/api/admin/brain/chat', { message: 'Live E2E internal QA proof receipt, no external action.' }, (data) => data.ok && data.receipt?.id, {
-      authorization: `Bearer ${ADMIN_TOKEN}`,
+      ...adminGateHeaders,
     });
   } else {
-    warn('api:/api/admin/brain/chat:skipped', { reason: 'ADMIN_TOKEN/ADMIN_PASSWORD not available in process env' });
+    warn('api:/api/admin/brain/chat:skipped', { reason: 'shared FS27/SkyGate bearer not available in process env' });
   }
-  if (ADMIN_TOKEN) {
+  if (adminGateHeaders) {
     await apiStatus(api, '/api/admin/ledger', (data) => data.ok && Array.isArray(data.ledger), {
-      authorization: `Bearer ${ADMIN_TOKEN}`,
+      ...adminGateHeaders,
     });
   } else {
-    warn('api:/api/admin/ledger:skipped', { reason: 'ADMIN_TOKEN/ADMIN_PASSWORD not available in process env' });
+    warn('api:/api/admin/ledger:skipped', { reason: 'shared FS27/SkyGate bearer not available in process env' });
   }
 
   await apiStatus(api, '/api/saas/status', (data) => data.ok && data.d1 === true && data.kv === true && data.queue === true);
@@ -351,7 +358,7 @@ async function runApiFlow(api) {
     { email: `live-e2e-${Date.now()}@example.com`, company_name: 'Live E2E Smoke Test', plan: 'starter-command' },
     (data) => data.ok && data.persistence === 'd1' && data.customer_id
   );
-  await apiStatus(api, '/api/saas/ledger', (data) => data.ok && Array.isArray(data.rows), ADMIN_TOKEN ? { authorization: `Bearer ${ADMIN_TOKEN}` } : {});
+  await apiStatus(api, '/api/saas/ledger', (data) => data.ok && Array.isArray(data.rows), adminGateHeaders || {});
 
   await apiStatus(api, '/api/omega/status', (data) => data.ok && data.d1 === true && data.kv === true && data.queue === true);
   await apiPost(api, '/api/omega/scan', { workspace_id: 'live-e2e', command_text: 'Create an internal onboarding checklist.' }, (data) => data.ok && data.event?.decision);
@@ -371,6 +378,7 @@ async function runApiFlow(api) {
 
 async function main() {
   const api = await playwrightRequest.newContext({ ignoreHTTPSErrors: true });
+  adminGateAuth = await resolveZeroOsGateAuth({ zeroOsBase: FULL_URL });
 
   const publicSitemap = await fetchText(api, new URL('/sitemap.xml', PUBLIC_URL).href, 'public:sitemap');
   const publicUrls = sitemapUrls(publicSitemap.text);

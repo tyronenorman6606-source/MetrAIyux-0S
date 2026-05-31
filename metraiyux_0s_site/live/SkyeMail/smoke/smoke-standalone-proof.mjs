@@ -62,8 +62,8 @@ for (const rel of requiredFiles) {
 const read = (rel) => readFileSync(path.join(root, rel), "utf8");
 
 const rootIndex = read("index.html");
-if (!rootIndex.includes("kAIxuGateway13 ready")) {
-  throw new Error("Root marketing surface no longer declares the gateway-backed assistant lane.");
+if (!rootIndex.includes("SkyEmail Brain ready")) {
+  throw new Error("Root marketing surface no longer declares the FS27-backed SkyEmail Brain lane.");
 }
 
 const dashboard = read("dashboard.html");

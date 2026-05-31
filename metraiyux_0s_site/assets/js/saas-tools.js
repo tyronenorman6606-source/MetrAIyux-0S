@@ -12,7 +12,7 @@
     String(value).split('').forEach((char)=>{ hash ^= char.charCodeAt(0); hash = Math.imul(hash, 16777619); });
     return (hash >>> 0).toString(36).slice(0,8);
   }
-  function identityPreview(data={}, source='static_preview'){
+  function identityPreview(data={}, source='identity_preview'){
     const email = String(data.email || data.customer_email || data.approval_email || '').trim().toLowerCase();
     const company = String(data.company_name || data.company || data.client || email.split('@')[0] || 'customer').trim();
     const workspace_slug = slugify(data.workspace_slug || company);
@@ -24,7 +24,7 @@
       company_name: company,
       owner_email: email,
       gate_username: email || `${workspace_slug}@gate.metraiyux.local`,
-      proposed_skyemail_alias: `${workspace_slug}@skymail.local`,
+      proposed_skyemail_alias: `${workspace_slug}@skyemail.online`,
       plan: data.plan || 'starter-command',
       client_login_path: `client-login.html?client=${encodeURIComponent(workspace_slug)}`,
       founder_recovery_path: `/founder-command/?tab=recovery&workspace=${encodeURIComponent(workspace_slug)}`,
@@ -32,27 +32,8 @@
       generated_at: now()
     };
   }
-  const previewClients = {
-    'bobs-smoke-shop': {
-      client_id:'bobs-smoke-shop',
-      client:"Bob's Smoke Shop",
-      workspace_id:'bob-smoke-shop-preview-001',
-      workspace_slug:'bobs-smoke-shop-private-preview',
-      workspace:"Bob's Smoke Shop Private Preview",
-      email:'bob@bobs-smoke-shop-preview.com',
-      access_code:'BOBS-FREE-WEEK-2026',
-      status:'free_7_day_tester',
-      preview_url:'https://bobs-smoke-shop-metraiyux-preview.pages.dev/',
-      qr_url:'https://bobs-smoke-shop-metraiyux-preview.pages.dev/workspace-preview/',
-      included_usage:{scans:7,commands:25,proof_exports:5,tester_seats:2},
-      services:['website_scan','specials_update','inventory_content','proof_export'],
-      discount:'First six months discounted if Bob keeps the workspace after the free trial.',
-      company_contact:{email:'SkyesOverLondonLC@solenterprises.org',phone:'(623) 260-7073',contact_page:'https://skyesol.netlify.app/contact'}
-    }
-  };
   function output(id, data){ const el=$(id); if(el) el.textContent = typeof data==='string'?data:JSON.stringify(data,null,2); }
   function getForm(formId){ const form=$(formId); const data={}; if(!form) return data; new FormData(form).forEach((v,k)=>{data[k]=v}); return data; }
-  function clientSafe(client){ const copy={...client}; delete copy.access_code; return copy; }
   const quoteOnlyPlanRoutes = {
     'houseoperations-command':'/sales/pricing-offer-router.html#houseoperations-stack-included',
     'houseoperations-managed':'/sales/pricing-offer-router.html#houseoperations-stack-included',
@@ -101,27 +82,10 @@
     url.searchParams.set('skyemerit_code', 'SKYEMERIT-FIRST-BEST');
     return url.toString();
   }
-  function issueSkyeMeritPack(data={}, source='static_onboarding'){
-    const email=String(data.email || data.customer_email || data.approval_email || '').trim().toLowerCase();
-    const pack={
-      id:rid('skyemerit'),
-      pack_id:'SKYEMERIT-FIRST-PACK',
-      type:'skyemerit_pack',
-      status:'issued_static_mode',
-      source,
-      email,
-      customer_id:data.customer_id || '',
-      workspace_id:data.workspace_id || '',
-      issued_at:now(),
-      gate_required:true,
-      kaixu_credit_cents:600,
-      kaixu_credit_label:'$6 premium kAIxu model spend credit',
-      coupon_codes:['SKYEMERIT-FIRST-23','SKYEMERIT-FIRST-28','SKYEMERIT-FIRST-31'],
-      channels:['resend','skymail','relay13','connectlog','fs27_event_mirror'],
-      rule:'Discount only applies to eligible spend bands; Free99 still requires a gate session.'
-    };
-    write('saas_skyemerit_pack', pack);
-    return pack;
+  async function issueSkyeMeritPack(data={}, source='onboarding'){
+    const result = await postJson('/api/saas/skyemerit/issue', {...data, source});
+    if (result.skyemerit) write('saas_skyemerit_pack', result.skyemerit);
+    return result.skyemerit || result;
   }
   function wirePlanLinks(){
     document.querySelectorAll('a[data-plan]').forEach((link)=>{
@@ -154,7 +118,39 @@
     form.addEventListener('change', render);
     render();
   }
-	  function getActiveSession(){ return read('saas_client_session', null); }
+  const ACTIVE_WORKSPACE_KEY = 'saas_active_workspace';
+  const LEGACY_CLIENT_SESSION_KEY = 'saas_client_session';
+  function removeLocal(key){ try{ localStorage.removeItem(key); }catch(e){} }
+  function gateBridge(){ return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null); }
+  function workspaceContext(input={}){
+    const source = input || {};
+    const context = {
+      client_id: source.client_id || source.workspace_slug || source.workspace_id || query.get('client') || '',
+      workspace_id: source.workspace_id || '',
+      workspace_slug: source.workspace_slug || source.client_id || '',
+      client: source.client || source.company_name || source.workspace || source.workspace_slug || '',
+      email: source.email || source.owner_email || '',
+      workspace: source.workspace || source.company_name || source.workspace_id || source.workspace_slug || '',
+      status: source.status || 'shared_gate_workspace',
+      issued_at: source.issued_at || now(),
+      shared_gate: true
+    };
+    return context.workspace_id || context.workspace_slug || context.client_id ? context : null;
+  }
+  function saveActiveWorkspace(input={}){
+    const context = workspaceContext(input);
+    if (!context) return null;
+    write(ACTIVE_WORKSPACE_KEY, context);
+    removeLocal(LEGACY_CLIENT_SESSION_KEY);
+    return context;
+  }
+  function getActiveSession(){
+    const active = workspaceContext(read(ACTIVE_WORKSPACE_KEY, null));
+    if (active) return active;
+    const legacy = workspaceContext(read(LEGACY_CLIENT_SESSION_KEY, null));
+    if (legacy) return saveActiveWorkspace({...legacy, migrated_from:'legacy_saas_client_session'});
+    return null;
+  }
 	  function htmlEscape(value){ return String(value ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 	  function linkButton(label, href){ return href ? `<a class='saas-btn' href='${htmlEscape(href)}'>${htmlEscape(label)}</a>` : ''; }
 	  async function loadLlcWorkflowStatus(){
@@ -189,43 +185,127 @@
       el.innerHTML = `<span class="status-pill">Signed in</span><h3>${session.client}</h3><p><strong>Workspace:</strong> ${session.workspace}</p><p><strong>Email:</strong> ${session.email}</p><p><strong>Status:</strong> ${session.status}</p><p><strong>Usage:</strong> ${workspace.included_usage?.scans ?? 0} scans, ${workspace.included_usage?.commands ?? 0} commands, ${workspace.included_usage?.proof_exports ?? 0} proof exports, ${workspace.included_usage?.tester_seats ?? 0} tester seats</p>${merit ? `<p><strong>SkyeMerit:</strong> ${merit.kaixu_credit_label}; ${merit.coupon_codes.join(', ')}. Gate required.</p>` : ''}`;
     });
   }
-  async function postJson(url, payload){
-    const res = await fetch(url, {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload)});
+  const sharedGateKeys = [
+    'METRAIYUX_GATE_SESSION',
+    'SKYGATEFS27_GATE_SESSION',
+    'SKYE_GATE_SESSION'
+  ];
+  function cleanToken(value){ return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim(); }
+  function tokenFromStore(store, key){
+    try{
+      const raw=store.getItem(key);
+      if(!raw) return '';
+      const parsed=raw.startsWith('{') ? JSON.parse(raw) : null;
+      return cleanToken(parsed?.token || parsed?.gate_token || raw);
+    }catch(e){ return ''; }
+  }
+  function sharedGateToken(){
+    const bridge = gateBridge();
+    const bridgeSession = bridge?.requireSession?.({platformId:'metraiyux-0s', usageLane:'saas-customer-workspace'})
+      || bridge?.current?.();
+    const bridgeToken = cleanToken(bridgeSession?.token || '');
+    if (bridgeToken) return bridgeToken;
+    for(const key of sharedGateKeys){
+      const token=tokenFromStore(sessionStorage,key) || tokenFromStore(localStorage,key);
+      if(token) return token;
+    }
+    return '';
+  }
+  function authHeaders(extra={}){
+    const token=sharedGateToken();
+    const headers={accept:'application/json', ...extra};
+    if(token){
+      headers.authorization=`Bearer ${token}`;
+      headers['x-free99-gate-session']=token;
+      headers['x-skye-gate-session']=token;
+      headers['x-skygate-session']=token;
+    }
+    return headers;
+  }
+  async function apiJson(url, init={}){
+    const res = await fetch(url, {cache:'no-store', credentials:'include', ...init, headers:authHeaders(init.headers || {})});
     const data = await res.json().catch(()=>({ok:false,error:'invalid_json_response'}));
     if(!res.ok || data.ok === false) throw new Error(data.error || `Request failed: ${res.status}`);
     return data;
   }
+  async function postJson(url, payload){
+    const res = await fetch(url, {method:'POST', credentials:'include', headers:authHeaders({'content-type':'application/json'}), body:JSON.stringify(payload)});
+    const data = await res.json().catch(()=>({ok:false,error:'invalid_json_response'}));
+    if(!res.ok || data.ok === false) throw new Error(data.error || `Request failed: ${res.status}`);
+    return data;
+  }
+  async function recordAction(event_type, payload={}){
+    const workspace=read('saas_active_workspace',{}) || read('saas_workspace',{}) || {};
+    const session=getActiveSession() || {};
+    const body={
+      type:event_type,
+      action:event_type,
+      lane:payload.lane || 'saas-ui',
+      summary:payload.summary || event_type,
+      event_type,
+      workspace_id: payload.workspace_id || workspace.workspace_id || session.workspace_id || query.get('workspace_id') || query.get('workspace') || '',
+      workspace_slug: payload.workspace_slug || workspace.workspace_slug || session.workspace_slug || query.get('client') || '',
+      source:'saas-tools',
+      surface:document.title || location.pathname,
+      metadata:{
+        ...payload,
+        pathname:location.pathname,
+        search:location.search,
+        title:document.title || ''
+      }
+    };
+    try{
+      const res=await fetch('/api/saas/action-event',{method:'POST',credentials:'include',headers:authHeaders({'content-type':'application/json'}),body:JSON.stringify(body)});
+      const data=await res.json().catch(()=>({ok:res.ok,status:res.status}));
+      return {...data, ok:Boolean(res.ok && data?.ok !== false), status:res.status};
+    }catch(error){
+      return {ok:false,error:error.message || 'saas_action_event_failed'};
+    }
+  }
   window.SaaSUpgrade = {
     async clientLogin(){
       const data=getForm('clientLoginForm');
-      const clientId=data.client_id || 'bobs-smoke-shop';
-      let result;
-      try {
-        result = await postJson('/api/saas/client-login', data);
-      } catch(error) {
-        const client=previewClients[clientId];
-        if(!client || String(data.email||'').trim().toLowerCase() !== client.email || String(data.access_code||'').trim() !== client.access_code) {
-          output('clientLoginReceipt',{ok:false,error:error.message || 'invalid_preview_access'});
-          return null;
-        }
-        result = {ok:true, session:{token:rid('preview'), client_id:client.client_id, workspace_id:client.workspace_id, workspace_slug:client.workspace_slug, client:client.client, email:client.email, workspace:client.workspace, status:client.status, issued_at:now(), static_mode:true}, workspace:clientSafe(client), static_fallback:true};
+      const clientId=data.client_id || query.get('client') || query.get('workspace') || query.get('workspace_id') || '';
+      if(!clientId){
+        output('clientLoginReceipt',{ok:false,error:'workspace_or_client_slug_required'});
+        return null;
       }
-      write('saas_client_session', result.session);
-      write('saas_active_workspace', result.workspace);
-      window.MetrAIyuxGateBridge?.persist?.({
-        ...result.session,
-        source: result.static_fallback ? '0s-client-session-static-preview' : '0s-client-session',
-        platform_id: 'metraiyux-0s',
-        usage_lane: 'customer-workspace',
-        gate_cards: [
-          { id: '0s-core', name: '0S Core', scope: 'customer-workspace' },
-          { id: 'fs27', name: 'FS27 SkyGate', scope: 'identity-auth' },
-          { id: 'skyerunners', name: 'SkyeRunners', scope: 'workspace-routing' }
-        ]
-      });
-      output('clientLoginReceipt', {...result, next:'Open or claim workspace.'});
-      renderSession();
-      return result;
+      try {
+        const result = await apiJson(`/api/saas/client-preview?client=${encodeURIComponent(clientId)}`);
+        const workspace = result.workspace || {};
+        const session = saveActiveWorkspace(result.session || {
+          client_id: workspace.workspace_slug || clientId,
+          workspace_id: workspace.workspace_id,
+          workspace_slug: workspace.workspace_slug,
+          client: workspace.company_name || clientId,
+          email: workspace.owner_email || data.email || '',
+          workspace: workspace.company_name || workspace.workspace_id,
+          status: workspace.status || 'shared_gate_workspace',
+          issued_at: now(),
+          shared_gate: true
+        });
+        write('saas_active_workspace', workspace);
+        const gateToken = sharedGateToken();
+        if (gateToken) gateBridge()?.persist?.({
+          ...session,
+          token: gateToken,
+          source: '0s-client-session-shared-gate',
+          platform_id: 'metraiyux-0s',
+          usage_lane: 'customer-workspace',
+          gate_cards: [
+            { id: '0s-core', name: '0S Core', scope: 'customer-workspace' },
+            { id: 'fs27', name: 'FS27 SkyGate', scope: 'identity-auth' },
+            { id: 'skyerunners', name: 'SkyeRunners', scope: 'workspace-routing' }
+          ]
+        });
+        output('clientLoginReceipt', {...result, session, next:'Claim workspace or open dashboard.'});
+        recordAction('client_login.opened_workspace', {workspace_id: workspace.workspace_id, workspace_slug: workspace.workspace_slug, client_id: clientId});
+        renderSession();
+        return result;
+      } catch(error) {
+        output('clientLoginReceipt',{ok:false,error:error.message || 'workspace_unavailable', gate:'FS27/SkyGate/Free99'});
+        return null;
+      }
     },
     async claimClientWorkspace(){
       const session=getActiveSession();
@@ -234,14 +314,12 @@
       try {
         result = await postJson('/api/saas/client-workspace/claim', {client_id:session.client_id, workspace_id:session.workspace_id});
       } catch(error) {
-        const workspace = read('saas_active_workspace', previewClients[session.client_id] ? clientSafe(previewClients[session.client_id]) : {});
-        const local = {id:session.workspace_id, type:'client_workspace', status:'preview_workspace_claimed_static_mode', claimed_at:now(), session, workspace};
-        write('saas_workspace', local);
-        output('clientClaimReceipt', {ok:true, claimed:true, static_fallback:true, workspace:local, note:error.message});
-        return local;
+        output('clientClaimReceipt',{ok:false,error:error.message || 'workspace_claim_failed'});
+        return null;
       }
       write('saas_workspace', result.workspace);
       output('clientClaimReceipt', result);
+      recordAction('client_workspace.claimed', {workspace_id: result.workspace?.workspace_id || session.workspace_id, workspace_slug: result.workspace?.workspace_slug || session.workspace_slug});
       return result;
     },
     openClientDashboard(){
@@ -249,19 +327,130 @@
       if(!session){ location.href='client-login.html'; return; }
       location.href=`customer-dashboard.html?workspace=${encodeURIComponent(session.workspace_id)}`;
     },
-    saveSignup(){ const data=getForm('signupForm'); const form=$('signupForm'); if(form && form.legal_acknowledgment && !form.legal_acknowledgment.checked){ output('signupReceipt',{ok:false,error:'legal_acknowledgment_required', required_links:['https://skyes-over-london-legal.pages.dev/legal/twilio-sms/','https://skyes-over-london-legal.pages.dev/legal/terms/','https://skyes-over-london-legal.pages.dev/legal/privacy/']}); return null; } const skyemerit=issueSkyeMeritPack(data,'signup'); const identity=identityPreview(data,'signup'); const rec={...data,id:rid('signup'), type:'signup_intent', status:'local_saved_needs_backend', created_at:now(), legal_acknowledgment:data.legal_acknowledgment === 'yes', legal_notice_url:'https://skyes-over-london-legal.pages.dev/legal/twilio-sms/', terms_url:'https://skyes-over-london-legal.pages.dev/legal/terms/', privacy_url:'https://skyes-over-london-legal.pages.dev/legal/privacy/', sms_data_notice:'User acknowledged the Twilio SMS Consent and 0S Data Notice during signup.', identity, skyemerit}; const all=read('saas_signups',[]); all.push(rec); write('saas_signups',all); write('saas_identity_preview',identity); output('signupReceipt',rec); return rec; },
-    saveOnboarding(){ const data=getForm('onboardingForm'); const skyemerit=issueSkyeMeritPack(data,'onboarding'); const signup=read('saas_signups',[]).slice(-1)[0]||{}; const identity=identityPreview({...signup,...data,email:data.approval_email||signup.email},'onboarding'); const rec={id:rid('onboarding'), type:'customer_onboarding', status:'ready_for_workspace_provisioning', created_at:now(), identity, skyemerit, ...data}; const all=read('saas_onboarding',[]); all.push(rec); write('saas_onboarding',all); write('saas_identity_preview',identity); output('onboardingReceipt',rec); return rec; },
-    saveCompanyProfile(){ const data=getForm('companyProfileForm'); const rec={id:rid('company'), type:'company_profile', status:'profile_saved', updated_at:now(), ...data}; write('saas_company_profile',rec); output('companyProfileReceipt',rec); return rec; },
-    saveServices(){ const data=getForm('serviceSelectorForm'); const services=[...document.querySelectorAll('input[name="services"]:checked')].map(x=>x.value); const rec={id:rid('services'), type:'service_selection', status:'services_selected', created_at:now(), plan:data.plan, services, notes:data.notes||''}; write('saas_service_selection',rec); output('serviceReceipt',rec); return rec; },
-    createWorkspace(){ const profile=read('saas_company_profile',{}), services=read('saas_service_selection',{}), onboarding=read('saas_onboarding',[]).slice(-1)[0]||{}, identity=read('saas_identity_preview', null)||identityPreview({...profile,...onboarding},'workspace'); const workspace={id:identity.workspace_id||rid('ws'), type:'customer_workspace', status:'local_workspace_ready_for_cloudflare_provisioning', created_at:now(), identity, profile, services, onboarding, modules:['admin_brain','approval_inbox','company_profile','service_selector','client_os','proof_vault','skyemail_key_card','gate_backup_codes','skyeprofitconsole_free99']}; write('saas_workspace',workspace); output('workspaceReceipt',workspace); return workspace; },
-    makeBillingIntent(){ const data=getForm('billingForm'); const plan=data.plan || query.get('plan') || 'starter-command'; const quoteOnly=isQuoteOnlyPlan(plan); const checkout_url=skyePayUrl(plan, data.client_slug || 'metraiyux-0s'); const skyemerit=read('saas_skyemerit_pack', null) || issueSkyeMeritPack({email:data.billing_email},'billing'); const rec={id:rid('bill'), type:quoteOnly ? 'quote_only_billing_review' : 'skyepay_billing_intent', status:quoteOnly ? 'quote_only_owner_review' : 'ready_for_skyepay_checkout', created_at:now(), checkout_url, skyemerit, owner_approval_required:true, ...data, plan, next:quoteOnly ? 'Open the pricing router for owner-approved quote review. This plan does not create a standalone SkyePay checkout in this pass.' : 'Open SkyePay to create the Stripe Checkout Session. FS27 applies SkyeMerit only to eligible spend and keeps activation behind the gate.'}; const all=read('saas_billing_intents',[]); all.push(rec); write('saas_billing_intents',all); output('billingReceipt',rec); return rec; },
-    openSkyePay(){ const data=getForm('billingForm'); const url=skyePayUrl(data.plan || query.get('plan') || 'starter-command', data.client_slug || 'metraiyux-0s'); this.makeBillingIntent(); location.href=url; },
-    command(){ const data=getForm('customerCommandForm'); const session=getActiveSession(); const rec={id:rid('cmd'), type:'customer_workspace_command', workspace_id:data.workspace_id || query.get('workspace') || session?.workspace_id || '', client:session?.client || '', status:'routed_to_site_operator_brain_static_mode', created_at:now(), command:data.command||'', priority:data.priority||'normal', route:this.routeCommand(data.command||'')}; const all=read('saas_customer_commands',[]); all.push(rec); write('saas_customer_commands',all); output('commandReceipt',rec); return rec; },
+    async saveSignup(){
+      const data=getForm('signupForm');
+      const form=$('signupForm');
+      if(form && form.legal_acknowledgment && !form.legal_acknowledgment.checked){
+        output('signupReceipt',{ok:false,error:'legal_acknowledgment_required', required_links:['https://skyes-over-london-legal.pages.dev/legal/twilio-sms/','https://skyes-over-london-legal.pages.dev/legal/terms/','https://skyes-over-london-legal.pages.dev/legal/privacy/']});
+        return null;
+      }
+      try{
+        const identity=identityPreview(data,'signup');
+        const result=await postJson('/api/saas/signup', {...data, legal_acknowledgment:data.legal_acknowledgment === 'yes', workspace_id:identity.workspace_id, workspace_slug:identity.workspace_slug});
+        write('saas_identity_preview', result.identity || identity);
+        const all=read('saas_signups',[]);
+        all.push(result.signup || result);
+        write('saas_signups',all);
+        recordAction('signup.submitted', {workspace_id: identity.workspace_id, workspace_slug: identity.workspace_slug, plan: identity.plan});
+        output('signupReceipt',result);
+        return result;
+      }catch(error){
+        output('signupReceipt',{ok:false,error:error.message || 'signup_failed'});
+        return null;
+      }
+    },
+    async saveOnboarding(){
+      const data=getForm('onboardingForm');
+      const signup=read('saas_signups',[]).slice(-1)[0]||{};
+      const identity=identityPreview({...signup.identity,...signup,...data,email:data.approval_email||signup.email},'onboarding');
+      const rec={id:rid('onboarding'), type:'customer_onboarding', status:'staged_until_workspace_create', created_at:now(), identity, ...data};
+      const all=read('saas_onboarding',[]);
+      all.push(rec);
+      write('saas_onboarding',all);
+      write('saas_identity_preview',identity);
+      try{ rec.skyemerit=await issueSkyeMeritPack({...data, email:data.approval_email || signup.email || identity.owner_email, workspace_id:identity.workspace_id},'onboarding'); }catch(error){ rec.skyemerit_error=error.message; }
+      recordAction('onboarding.staged', {workspace_id: identity.workspace_id, workspace_slug: identity.workspace_slug, approval_email: data.approval_email || ''});
+      output('onboardingReceipt',{ok:true, staged:true, receipt:rec, next:'Create Workspace posts this staged packet to the live Worker.'});
+      return rec;
+    },
+    saveCompanyProfile(){
+      const data=getForm('companyProfileForm');
+      const rec={id:rid('company'), type:'company_profile', status:'staged_until_workspace_create', updated_at:now(), ...data};
+      write('saas_company_profile',rec);
+      recordAction('company_profile.staged', {company_name: data.company_name || data.brand_name || '', workspace_slug: slugify(data.company_name || data.brand_name || '')});
+      output('companyProfileReceipt',{ok:true, staged:true, receipt:rec, next:'Create Workspace persists this profile to the live Worker.'});
+      return rec;
+    },
+    saveServices(){
+      const data=getForm('serviceSelectorForm');
+      const services=[...document.querySelectorAll('input[name="services"]:checked')].map(x=>x.value);
+      const rec={id:rid('services'), type:'service_selection', status:'staged_until_workspace_create', created_at:now(), plan:data.plan, services, notes:data.notes||''};
+      write('saas_service_selection',rec);
+      recordAction('services.staged', {plan:data.plan || '', services});
+      output('serviceReceipt',{ok:true, staged:true, receipt:rec, next:'Create Workspace persists this service selection to the live Worker.'});
+      return rec;
+    },
+    async createWorkspace(){
+      const profile=read('saas_company_profile',{}), services=read('saas_service_selection',{}), onboarding=read('saas_onboarding',[]).slice(-1)[0]||{};
+      const identity=read('saas_identity_preview', null)||identityPreview({...profile,...onboarding},'workspace');
+      const payload={...identity, company_name:identity.company_name || profile.company_name || profile.brand_name, email:identity.owner_email || onboarding.approval_email, plan:services.plan || identity.plan_id || query.get('plan') || 'starter-command', profile, services:services.services || [], onboarding, mailbox_email:identity.proposed_skyemail_alias || identity.requested_skyemail || ''};
+      try{
+        const result=await postJson('/api/saas/workspaces', payload);
+        write('saas_workspace',result.workspace);
+        write('saas_active_workspace',result.workspace);
+        if(result.workspace?.workspace_id){
+          saveActiveWorkspace({workspace_id:result.workspace.workspace_id, workspace_slug:result.workspace.workspace_slug, client:result.workspace.company_name, email:result.workspace.owner_email, workspace:result.workspace.company_name, status:result.workspace.status, issued_at:now(), shared_gate:true});
+        }
+        recordAction('workspace.created', {workspace_id: result.workspace?.workspace_id || payload.workspace_id, workspace_slug: result.workspace?.workspace_slug || payload.workspace_slug, plan: payload.plan});
+        output('workspaceReceipt',result);
+        renderSession();
+        return result;
+      }catch(error){
+        output('workspaceReceipt',{ok:false,error:error.message || 'workspace_create_failed'});
+        return null;
+      }
+    },
+    async makeBillingIntent(){
+      const data=getForm('billingForm');
+      const plan=data.plan || query.get('plan') || 'starter-command';
+      if(isQuoteOnlyPlan(plan)){
+        const rec={ok:false,error:'quote_only_owner_review_required', plan, review_url:skyePayUrl(plan, data.client_slug || 'metraiyux-0s')};
+        output('billingReceipt',rec);
+        return rec;
+      }
+      try{
+        const workspace=read('saas_workspace',{}) || {};
+        const result=await postJson('/api/saas/billing/checkout-session', {...data, plan_id:plan, workspace_id:data.workspace_id || workspace.workspace_id || data.client_slug || query.get('workspace') || 'metraiyux-0s'});
+        const all=read('saas_billing_intents',[]);
+        all.push(result.billing_intent || result);
+        write('saas_billing_intents',all);
+        recordAction('billing.checkout_session_created', {workspace_id:data.workspace_id || workspace.workspace_id || data.client_slug || query.get('workspace') || 'metraiyux-0s', plan});
+        output('billingReceipt',result);
+        return result;
+      }catch(error){
+        output('billingReceipt',{ok:false,error:error.message || 'billing_intent_failed'});
+        return null;
+      }
+    },
+    async openSkyePay(){
+      const data=getForm('billingForm');
+      const result=await this.makeBillingIntent();
+      location.href=result?.checkout_url || result?.billing_intent?.checkout_url || skyePayUrl(data.plan || query.get('plan') || 'starter-command', data.client_slug || 'metraiyux-0s');
+    },
+    async command(){
+      const data=getForm('customerCommandForm');
+      const session=getActiveSession();
+      const workspace_id=data.workspace_id || query.get('workspace') || query.get('workspace_id') || session?.workspace_id || '';
+      try{
+        const result=await postJson('/api/saas/customer-command', {...data, workspace_id});
+        const all=read('saas_customer_commands',[]);
+        all.push(result.command || result);
+        write('saas_customer_commands',all);
+        recordAction('customer_command.submitted', {workspace_id, command:data.command || data.request || ''});
+        output('commandReceipt',result);
+        return result;
+      }catch(error){
+        output('commandReceipt',{ok:false,error:error.message || 'command_route_failed', workspace_id});
+        return null;
+      }
+    },
     routeCommand(text){ const t=text.toLowerCase(); if(/post|social|content|blog|marketing/.test(t)) return {primary:'Valentina Reyes / Marketing Brain', secondary:'Victor Saint / QA Brain', approval_required:true}; if(/hire|candidate|recruit|staff|worker/.test(t)) return {primary:'Sienna Brooks / Staffing Brain', secondary:'Marcus Vale / Operations Brain', approval_required:true}; if(/contract|legal|compliance|filing|claim/.test(t)) return {primary:'Julian Mercer / Compliance Brain', secondary:'Victor Saint / QA Brain', approval_required:true}; if(/invoice|price|billing|payment/.test(t)) return {primary:'Naomi Sterling / Finance Brain', secondary:'Marcus Vale / Operations Brain', approval_required:true}; if(/lead|sale|proposal|close/.test(t)) return {primary:'Celeste Monroe / Revenue Brain', secondary:'Adrian Cross / Client Success Brain', approval_required:false}; return {primary:'Site Operator Brain', secondary:'Central Company Command Brain', approval_required:false}; },
-    exportAll(){ const keys=['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands']; const bundle={exported_at:now()}; keys.forEach(k=>bundle[k]=read(k, null)); output('exportReceipt',bundle); const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='saas-customer-portal-export.json'; a.click(); },
-    clearAll(){ ['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands'].forEach(k=>localStorage.removeItem(k)); output('exportReceipt',{cleared_at:now()}); }
+    exportAll(){ const keys=['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands','saas_active_workspace','saas_skyemerit_pack']; const bundle={exported_at:now(), note:'Browser cache export only. Production records live behind /api/saas and the 0S Command Bridge.'}; keys.forEach(k=>bundle[k]=read(k, null)); recordAction('browser_cache.exported',{keys}); output('exportReceipt',bundle); const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='saas-customer-portal-cache-export.json'; a.click(); },
+    clearAll(){ ['saas_signups','saas_onboarding','saas_company_profile','saas_service_selection','saas_workspace','saas_billing_intents','saas_customer_commands','saas_client_session','saas_active_workspace','saas_skyemerit_pack'].forEach(k=>localStorage.removeItem(k)); recordAction('browser_cache.cleared',{}); output('exportReceipt',{cleared_at:now(), cleared:'browser_cache_only'}); renderSession(); }
   }
 	  document.addEventListener('DOMContentLoaded', ()=>{
+	    const workspaceFromUrl=query.get('workspace') || query.get('workspace_id') || '';
+	    if(workspaceFromUrl) document.querySelectorAll('input[name="workspace_id"]').forEach((input)=>{ if(!input.value) input.value=workspaceFromUrl; });
 	    renderSession();
 	    loadLlcWorkflowStatus();
 	    wirePlanLinks();

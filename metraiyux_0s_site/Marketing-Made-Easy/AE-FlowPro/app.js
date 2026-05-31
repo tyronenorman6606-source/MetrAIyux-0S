@@ -319,25 +319,8 @@ Aggressive | 0.50 | 0.25`,
     };
 
     const $ = (id) => document.getElementById(id);
-    const GATE_SESSION_KEYS = [
-      "FREE99_PLATFORM_GATE_SESSION",
-      "FREE99_PLATFORM_GATE_SESSION_FOUNDER_COMMAND",
-      "METRAIYUX_GATE_SESSION",
-      "SKYGATEFS27_GATE_SESSION",
-      "SKYGATE_USER_TOKEN",
-      "skye_gate_session",
-      "skygate_session",
-      "metraiyux_gate_session"
-    ];
-
     function gateSessionHeaders(){
-      let token = "";
-      try{
-        for(const key of GATE_SESSION_KEYS){
-          const value = localStorage.getItem(key) || sessionStorage.getItem(key);
-          if(value && value.length > 12){ token = value; break; }
-        }
-      }catch(e){}
+      const token = window.MetrAIyuxGateBridge?.current?.()?.token || "";
       if(!token) return {};
       return {
         authorization: token.startsWith("Bearer ") ? token : `Bearer ${token}`,

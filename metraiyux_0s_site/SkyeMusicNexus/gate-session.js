@@ -1,21 +1,12 @@
 (() => {
   "use strict";
 
-  const STORAGE_OWNER = "MetrAIyuxGateBridge";
-  const LEGACY_KEYS = [
-    "SKYGATE_USER_TOKEN",
-    "SKYE_GATE_SESSION",
-    "SKYGATE_SESSION_TOKEN",
-    "METRAIYUX_GATE_SESSION",
-    "SKYE_PROFIT_GATE_SESSION"
-  ];
-  const SAAS_SESSION_KEY = "saas_client_session";
   const EVENT_READY = "skyemusicnexus:gate-ready";
   let resolvedSession = null;
   let waitingResolve = null;
-  const STANDALONE_STATIC_PREVIEW = location.hostname === "skye-music-nexus.pages.dev"
-    || location.hostname.endsWith(".skye-music-nexus.pages.dev")
-    || globalThis.SKYE_MUSIC_NEXUS_STATIC_PREVIEW === true;
+  const query = new URLSearchParams(location.search);
+  const STANDALONE_STATIC_PREVIEW = globalThis.SKYE_MUSIC_NEXUS_ALLOW_STATIC_PREVIEW === true
+    && (globalThis.SKYE_MUSIC_NEXUS_STATIC_PREVIEW === true || query.get("static_preview") === "1");
 
   const safeToken = (value) => String(value || "").trim().replace(/[^a-zA-Z0-9:_.-]/g, "").slice(0, 240);
   const tokenLooksValid = (value) => /^[a-zA-Z0-9:_.-]{8,240}$/.test(String(value || ""));
@@ -32,7 +23,7 @@
     globalThis.__mcpVisibleNeonScrollbars = true;
     const previewSession = {
       token: "static-preview-session",
-      source: "cloudflare-pages-static-preview",
+      source: "explicit-static-preview",
       client: "SkyeMusicNexus public preview",
       status: "public_static_preview",
       issued_at: new Date().toISOString()
@@ -58,7 +49,7 @@
 
   function clientLoginHref() {
     const returnTo = `${location.pathname || "/"}${location.search || ""}${location.hash || ""}`;
-    return `/gate/signup/?return=${encodeURIComponent(returnTo)}`;
+    return `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=${encodeURIComponent(returnTo)}`;
   }
 
   function fromStorage() {
@@ -74,45 +65,6 @@
         status: bridgeSession.status || "free99_gate_session"
       };
     }
-
-    const query = new URLSearchParams(location.search);
-    const queryToken = safeToken(query.get("gate_session") || query.get("skygate_session") || query.get("session"));
-    if (tokenLooksValid(queryToken)) {
-      const session = {
-        token: queryToken,
-        source: "url-gate-session",
-        workspace_id: query.get("workspace") || "",
-        client: query.get("client") || "MetrAIyux 0S Free99 Lite"
-      };
-      query.delete("gate_session");
-      query.delete("skygate_session");
-      query.delete("session");
-      const next = `${location.pathname}${query.toString() ? `?${query.toString()}` : ""}${location.hash || ""}`;
-      history.replaceState({}, document.title, next);
-      return session;
-    }
-
-    const saasSession = readJson(localStorage, SAAS_SESSION_KEY);
-    if (saasSession && tokenLooksValid(saasSession.token)) {
-      return {
-        token: safeToken(saasSession.token),
-        source: "0s-client-session",
-        workspace_id: saasSession.workspace_id || "",
-        client: saasSession.client || "0S client workspace",
-        email: saasSession.email || "",
-        status: saasSession.status || ""
-      };
-    }
-
-    for (const key of LEGACY_KEYS) {
-      const parsed = readJson(sessionStorage, key) || readJson(localStorage, key);
-      const token = safeToken(parsed && parsed.token ? parsed.token : sessionStorage.getItem(key) || localStorage.getItem(key));
-      if (tokenLooksValid(token)) return { token, source: key, client: "SkyeGate session" };
-    }
-
-    const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || {};
-    const runtimeToken = safeToken(runtime.userToken || runtime.sessionToken || runtime.authToken || runtime.bearerToken || runtime.auth?.token || runtime.auth?.bearerToken);
-    if (tokenLooksValid(runtimeToken)) return { token: runtimeToken, source: "skygate-runtime", client: "SkyeGate runtime" };
 
     return null;
   }
@@ -146,15 +98,16 @@
   }
 
   function useClientSession() {
-    const session = readJson(localStorage, SAAS_SESSION_KEY);
+    const session = gateBridge()?.requireSession?.({ platformId: "skyemusicnexus", usageLane: "music-nexus" })
+      || gateBridge()?.current?.();
     const status = document.getElementById("skyeMusicGateStatus");
     if (!session || !tokenLooksValid(session.token)) {
-      if (status) status.textContent = "No 0S client session found in this browser. Open Client Login first.";
+      if (status) status.textContent = "No active 0S gate bridge session found. Open Client Login first.";
       return;
     }
     persist({
       token: session.token,
-      source: "0s-client-session",
+      source: session.source || "0s-gate-card-bridge",
       workspace_id: session.workspace_id,
       client: session.client,
       email: session.email,
@@ -580,7 +533,6 @@ function mountSkyeSolLivingBackground({
     window.removeEventListener('mousemove', onPointerMove);
   };
 }
-
 
 (function(){
   if(window.__mcpSkyeSolLivingBackgroundMounted) return;

@@ -346,6 +346,51 @@ const mediaOverLondonOffers = [
   })
 ];
 
+const skyEmailOffers = [
+  {
+    planId: "skyemail-ai-response-starter",
+    productName: "SkyEmail AI Response Starter",
+    description: "Paid SkyEmail Brain starter add-on with FS27/SkyGate metering, SkyPay entitlement claims, mailbox-scoped usage ledgering, owner-reviewed response drafts, and no browser-side provider keys.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    brainOwner: "skyemail-fs27-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail AI Response Starter monthly", lookupKey: "skyemail_ai_response_starter_monthly", amount: 3500, interval: "month" }
+    ],
+    includes: "skyemail_brain_125_metered_calls_fs27_skygate_skypay_entitlement"
+  },
+  {
+    planId: "skyemail-ai-response-plus",
+    productName: "SkyEmail AI Response Plus",
+    description: "Higher-volume SkyEmail Brain add-on with FS27/SkyGate metering, SkyPay entitlement claims, usage caps, priority draft work, expanded FAQ tuning, and no direct provider exposure.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    brainOwner: "skyemail-fs27-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail AI Response Plus monthly", lookupKey: "skyemail_ai_response_plus_monthly", amount: 7900, interval: "month" }
+    ],
+    includes: "skyemail_brain_425_metered_calls_fs27_skygate_skypay_entitlement"
+  },
+  {
+    planId: "skyemail-managed-ai-inbox",
+    productName: "SkyEmail Managed AI Inbox",
+    description: "Managed SkyEmail Brain inbox add-on with FS27/SkyGate metering, SkyPay entitlement claims, monitored usage caps, allowlisted routine response policy, and human escalation boundaries.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    brainOwner: "skyemail-fs27-brain",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Managed AI Inbox monthly", lookupKey: "skyemail_managed_ai_inbox_monthly", amount: 14900, interval: "month" }
+    ],
+    includes: "skyemail_managed_inbox_1000_metered_calls_fs27_skygate_skypay_entitlement"
+  }
+];
+
 const offers = [
   {
     planId: "starter-command",
@@ -561,6 +606,7 @@ const offers = [
     ],
     includes: "json_ledger_citadeldb_primary_neon_fallback_two_day_external_sync"
   },
+  ...skyEmailOffers,
   ...mediaOverLondonOffers,
   ...musicOffers,
   {

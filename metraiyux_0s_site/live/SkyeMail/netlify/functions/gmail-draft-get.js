@@ -22,7 +22,7 @@ async function enrichDraftAttachments(accessToken, messageId, attachments) {
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const { accessToken, mailbox } = await getAuthorizedGmail(auth.sub);
     const qs = event.queryStringParameters || {};
     const id = String(qs.id || '').trim();

@@ -18,7 +18,9 @@ import {
   getSkyePayOffer,
   makeDemoSession,
   normalizeSkyePayCheckoutBody,
+  skyePayDeliveryReturnUrl,
   resolveSkyePayTrialDays,
+  stripeSafeSkyePayMetadata,
   upsertSkyePayOrderFromSession
 } from "./_lib/skyepayCatalog.js";
 import {
@@ -41,7 +43,8 @@ function allowDryRun(req) {
   return String(process.env.SKYPAY_ALLOW_PUBLIC_DRY_RUN || "").toLowerCase() === "true";
 }
 
-function sessionReturnUrls(req, origin, clientSlug, body = {}) {
+function sessionReturnUrls(req, origin, client, offer, body = {}) {
+  const clientSlug = client?.slug || "metraiyux-0s";
   const success = new URL("/skyepay.html", origin);
   success.searchParams.set("client", clientSlug);
   success.searchParams.set("status", "success");
@@ -51,8 +54,16 @@ function sessionReturnUrls(req, origin, clientSlug, body = {}) {
   cancel.searchParams.set("client", clientSlug);
   cancel.searchParams.set("status", "cancelled");
 
+  const deliverySuccess = skyePayDeliveryReturnUrl({
+    client,
+    offer,
+    origin,
+    sessionParam: "session_id",
+    sessionValue: "{CHECKOUT_SESSION_ID}"
+  });
+
   return {
-    success_url: process.env.SKYPAY_SUCCESS_URL || resolveSkyePayReturnUrl(req, body.success_url, success.toString()),
+    success_url: process.env.SKYPAY_SUCCESS_URL || resolveSkyePayReturnUrl(req, body.success_url, deliverySuccess || success.toString()),
     cancel_url: process.env.SKYPAY_CANCEL_URL || resolveSkyePayReturnUrl(req, body.cancel_url, cancel.toString())
   };
 }
@@ -231,7 +242,8 @@ export default wrap(async (req, _cors, context) => {
     : null;
   const bodyWithMerit = { ...bodyWithSkyCart, skyeMeritCheckout };
   const metadata = buildSkyePayMetadata({ client, offer, body: bodyWithMerit, orderId, trialDays });
-  const { success_url, cancel_url } = sessionReturnUrls(req, origin, client.slug, bodyWithSkyCart);
+  const stripeMetadata = stripeSafeSkyePayMetadata(metadata);
+  const { success_url, cancel_url } = sessionReturnUrls(req, origin, client, offer, bodyWithSkyCart);
 
   if (skyeMeritCheckout?.applied
     && skyeMeritCheckout.allow_free_checkout === true
@@ -269,6 +281,7 @@ export default wrap(async (req, _cors, context) => {
       id: session.id,
       order_id: order?.id || orderId,
       url: session.success_url,
+      delivery_success_url: success_url,
       payment_status: session.payment_status,
       approval_status: order?.approval_status || (offer.owner_approval_required === true ? "paid_pending_owner_approval" : "auto_unlock_after_confirmed_payment"),
       owner_approval_required: offer.owner_approval_required === true,
@@ -293,12 +306,12 @@ export default wrap(async (req, _cors, context) => {
     client_reference_id: orderId,
     allow_promotion_codes: skyeMeritCheckout?.applied ? false : true,
     line_items: await buildStripeLineItemsWithCatalogPrices({ stripe: null, offer, client, trialDays, skyeMeritCheckout }),
-    metadata,
+    metadata: stripeMetadata,
     expires_at: Math.floor(Date.now() / 1000) + (60 * 60 * 2),
     ...(offer.mode === "subscription" ? {
       payment_method_collection: "always",
       subscription_data: {
-        metadata,
+        metadata: stripeMetadata,
         ...(trialDays > 0 ? {
           trial_period_days: trialDays,
           trial_settings: {
@@ -309,7 +322,7 @@ export default wrap(async (req, _cors, context) => {
         } : {})
       }
     } : {
-      payment_intent_data: { metadata }
+      payment_intent_data: { metadata: stripeMetadata }
     })
   };
   const runtime = await runZeroOsProviderAction({
@@ -396,6 +409,7 @@ export default wrap(async (req, _cors, context) => {
     id: session.id,
     order_id: order?.id || orderId,
     url: session.url,
+    delivery_success_url: success_url,
     payment_status: session.payment_status || "created",
     approval_status: order?.approval_status || "checkout_created",
     owner_approval_required: offer.owner_approval_required === true,

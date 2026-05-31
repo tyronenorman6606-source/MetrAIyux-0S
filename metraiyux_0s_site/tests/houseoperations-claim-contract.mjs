@@ -9,7 +9,10 @@ const indexHtml = fs.readFileSync(path.join(appDir, 'index.html'), 'utf8');
 const tutorialHtml = fs.readFileSync(path.join(appDir, 'tutorial.html'), 'utf8');
 const billingHtml = fs.readFileSync(path.join(appDir, 'billing.html'), 'utf8');
 const runtimeSummary = JSON.parse(fs.readFileSync(path.join(appDir, 'v1', 'runtime-summary'), 'utf8'));
-const skyepayCatalog = fs.readFileSync(path.join(root, 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js'), 'utf8');
+const skyepayCatalogPath = fs.existsSync(path.join(root, 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js'))
+  ? path.join(root, 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js')
+  : path.join(root, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js');
+const skyepayCatalog = fs.readFileSync(skyepayCatalogPath, 'utf8');
 const stripeSync = fs.readFileSync(path.join(root, 'tools', 'sync-metraiyux-stripe-products.mjs'), 'utf8');
 const saasTools = fs.readFileSync(path.join(root, 'metraiyux_0s_site', 'assets', 'js', 'saas-tools.js'), 'utf8');
 const pricingPage = fs.readFileSync(path.join(root, 'metraiyux_0s_site', 'saas', 'pricing.html'), 'utf8');

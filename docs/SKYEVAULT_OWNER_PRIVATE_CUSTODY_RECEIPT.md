@@ -70,13 +70,13 @@ Current clone URL:
 http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git
 ```
 
-The service credential is stored privately at:
+The runtime metadata is stored privately at:
 
 ```text
 .skyevault-out/git-remote/owner-git-origin.env
 ```
 
-It is not a separate founder/admin password. Founder/admin identity stays in the shared 0S/FS27/SkyGate/Free99 gate lane.
+Normal Git origin auth is not a separate founder/admin password. The owner origin uses shared 0S/FS27/SkyGate/Free99 gate introspection, and terminal clone/fetch/push commands send `Authorization: Bearer <shared gate bearer>`. Static-token mode is emergency-local only and must be explicitly requested.
 
 Proof receipts:
 

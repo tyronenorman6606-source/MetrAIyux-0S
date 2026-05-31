@@ -6,6 +6,9 @@ import crownWorker from '../cloudflare-crown-operator/src/worker.js';
 import nexusWorker from '../cloudflare-worker-nexus/src/worker.js';
 import sentinelWorker from '../cloudflare-sentinel-operator/sentinel-worker.js';
 import saasWorker from '../cloudflare-saas-provisioning-worker/src/index.js';
+import siteOperatorWorker from '../cloudflare-worker-site-operator/site-operator-worker.js';
+import omegaWorker from '../cloudflare-security-gateway-worker/src/worker.js';
+import kaixuWorker from '../cloudflare-kaixu-brain/kaixu-worker.js';
 
 class MemoryKV {
   constructor() { this.map = new Map(); }
@@ -45,6 +48,36 @@ function siteEnv(overrides = {}) {
     SITE_TASK_QUEUE: new MemoryQueue(),
     ...overrides
   };
+}
+
+function skygateWorkerMock(claimOverrides = {}) {
+  return {
+    async fetch(request) {
+      const body = await request.json().catch(() => ({}));
+      const token = String(body.token || '').trim();
+      if (!token) {
+        return Response.json({active:false, ok:false, error:'Missing Authorization bearer token.'}, {status:401});
+      }
+      return Response.json({
+        active:true,
+        ok:true,
+        sub:'fs27-owner-test',
+        email:'owner@example.com',
+        username:'owner@example.com',
+        role:'owner',
+        scope:'admin.read admin.write keys.write gateway.invoke',
+        scopes:['admin.read', 'admin.write', 'keys.write', 'gateway.invoke'],
+        ...claimOverrides
+      });
+    }
+  };
+}
+
+function siteEnvWithFs27(overrides = {}, claimOverrides = {}) {
+  return siteEnv({
+    SKYGATEFS27_WORKER: skygateWorkerMock(claimOverrides),
+    ...overrides
+  });
 }
 
 function saasEnv(overrides = {}) {
@@ -110,7 +143,6 @@ test('SEC-01 blocks nested implementation source paths before static asset servi
 test('SEC-02 preserves explicit public proof/static allowlist paths', async () => {
   const allowed = [
     '/cloudflare/index.html',
-    '/live/skye-media-center-operator-proof.html',
     '/proof/public-browser-proof.json',
     '/favicon.ico'
   ];
@@ -119,6 +151,10 @@ test('SEC-02 preserves explicit public proof/static allowlist paths', async () =
     const res = await siteWorker.fetch(req(path), siteEnv(), ctx());
     assert.equal(res.status, 200, path);
   }
+
+  const liveAppProof = await siteWorker.fetch(req('/live/skye-media-center-operator-proof.html'), siteEnv(), ctx());
+  assert.equal(liveAppProof.status, 302);
+  assert.match(liveAppProof.headers.get('location') || '', /\/admin\/login\.html\?return=/);
 });
 
 test('SEC-03 preserves SkyeMail mounted handoff without exposing implementation source', async () => {
@@ -128,12 +164,20 @@ test('SEC-03 preserves SkyeMail mounted handoff without exposing implementation 
   assert.match(await handoff.text(), /data-skyemail-session-handoff="true"/);
 
   const mountedInbox = await siteWorker.fetch(
-    req('/live/SkyeMail/dashboard.html', { headers: { 'x-admin-token': 'test-admin' } }),
-    siteEnv({ ADMIN_TOKEN: 'test-admin' }),
+    req('/live/SkyeMail/dashboard.html', { token:'fs27-owner-token' }),
+    siteEnvWithFs27(),
     ctx()
   );
   assert.equal(mountedInbox.status, 302);
   assert.match(mountedInbox.headers.get('location') || '', /^https:\/\/skyemail-platform\.graylondonskyes\.workers\.dev\/dashboard\.html/i);
+
+  const legacyAdminToken = await siteWorker.fetch(
+    req('/live/SkyeMail/dashboard.html', { headers: { 'x-admin-token': 'test-admin' } }),
+    siteEnv({ ADMIN_TOKEN: 'test-admin' }),
+    ctx()
+  );
+  assert.equal(legacyAdminToken.status, 302);
+  assert.match(legacyAdminToken.headers.get('location') || '', /\/admin\/login\.html\?return=/);
 
   const blockedSource = await siteWorker.fetch(
     req('/live/SkyeMail/netlify/functions/mailbox-provider.js', { headers: { 'x-admin-token': 'test-admin' } }),
@@ -156,9 +200,9 @@ test('SEC-04 requires operator auth for site-operator mutation routes', async ()
     assert.equal(res.status, 401, path);
   }
 
-  const e = siteEnv({ADMIN_TOKEN:'admin-token'});
+  const e = siteEnvWithFs27();
   const authed = await siteWorker.fetch(
-    req('/api/site-operator/task', {method:'POST', token:'admin-token', body:{title:'authorized smoke'}}),
+    req('/api/site-operator/task', {method:'POST', token:'fs27-owner-token', body:{title:'authorized smoke'}}),
     e,
     ctx()
   );
@@ -166,6 +210,37 @@ test('SEC-04 requires operator auth for site-operator mutation routes', async ()
   const data = await authed.json();
   assert.equal(data.ok, true);
   assert.equal(data.task.title, 'authorized smoke');
+});
+
+test('SEC-04 rejects legacy admin/free99 codes when FS27 is not configured', async () => {
+  const res = await siteWorker.fetch(
+    req('/api/site-operator/task', {method:'POST', token:'legacy-admin-code', body:{title:'legacy should fail'}}),
+    siteEnv({ADMIN_TOKEN:'legacy-admin-code'}),
+    ctx()
+  );
+  assert.equal(res.status, 503);
+  const data = await res.json();
+  assert.equal(data.code, 'fs27_required');
+  assert.equal(data.local_shared_gate_code, 'disabled');
+});
+
+test('SEC-04 gates the site-operator ledger behind FS27 operator auth', async () => {
+  const kv = new MemoryKV();
+  await kv.put('evt_1', JSON.stringify({id:'evt_1', type:'test'}));
+
+  const blocked = await siteWorker.fetch(req('/api/site-operator/ledger'), siteEnv({SITE_EVENTS_KV:kv}), ctx());
+  assert.equal(blocked.status, 401);
+
+  const allowed = await siteWorker.fetch(
+    req('/api/site-operator/ledger', {token:'fs27-owner-token'}),
+    siteEnvWithFs27({SITE_EVENTS_KV:kv}),
+    ctx()
+  );
+  assert.equal(allowed.status, 200);
+  const data = await allowed.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.events.length, 1);
+  assert.equal(data.events[0].id, 'evt_1');
 });
 
 test('SEC-05 blocks unauthenticated crown/nexus/sentinel/omega proxy mutations at the 0S edge', async () => {
@@ -192,10 +267,9 @@ test('SEC-05 blocks unauthenticated crown/nexus/sentinel/omega proxy mutations a
   }
 });
 
-test('SEC-05 allows protected proxy reads and authenticated proxy mutations', async () => {
+test('SEC-05 gates protected proxy reads and allows FS27-authenticated proxy mutations', async () => {
   const calls = [];
-  const e = siteEnv({
-    ADMIN_TOKEN:'admin-token',
+  const e = siteEnvWithFs27({
     CROWN_WORKER: {
       async fetch(request) {
         calls.push({method:request.method, path:new URL(request.url).pathname});
@@ -204,11 +278,15 @@ test('SEC-05 allows protected proxy reads and authenticated proxy mutations', as
     }
   });
 
-  const read = await siteWorker.fetch(req('/api/crown/status'), e, ctx());
+  const blockedRead = await siteWorker.fetch(req('/api/crown/status'), e, ctx());
+  assert.equal(blockedRead.status, 401);
+  assert.deepEqual(calls, []);
+
+  const read = await siteWorker.fetch(req('/api/crown/status', {token:'fs27-owner-token'}), e, ctx());
   assert.equal(read.status, 200);
 
   const write = await siteWorker.fetch(
-    req('/api/crown/task', {method:'POST', token:'admin-token', body:{title:'allowed'}}),
+    req('/api/crown/task', {method:'POST', token:'fs27-owner-token', body:{title:'allowed'}}),
     e,
     ctx()
   );
@@ -220,7 +298,7 @@ test('SEC-05 allows protected proxy reads and authenticated proxy mutations', as
 });
 
 test('SEC-05 confirms admin worker mutations reject missing auth', async () => {
-  const adminEnv = {ADMIN_TOKEN:'admin-token'};
+  const adminEnv = {ADMIN_TOKEN:'admin-token', SKYGATEFS27_WORKER:skygateWorkerMock()};
   const protectedAdminMutations = [
     '/api/admin/brain/chat',
     '/api/admin/task',
@@ -232,6 +310,17 @@ test('SEC-05 confirms admin worker mutations reject missing auth', async () => {
     const res = await adminWorker.fetch(req(path, {method:'POST', body:{title:'blocked'}}), adminEnv, ctx());
     assert.equal(res.status, 401, path);
   }
+});
+
+test('SEC-05 direct admin worker fails closed when only legacy admin token is configured', async () => {
+  const res = await adminWorker.fetch(
+    req('/api/admin/task', {method:'POST', token:'legacy-admin-code', body:{title:'legacy should fail'}}),
+    {ADMIN_TOKEN:'legacy-admin-code'},
+    ctx()
+  );
+  assert.equal(res.status, 503);
+  const data = await res.json();
+  assert.equal(data.code, 'fs27_required');
 });
 
 test('SEC-06 gives public site-operator requests an intake lane without opening operator tasks', async () => {
@@ -276,12 +365,15 @@ test('SEC-06 allows proxy public intake while keeping proxy operator tasks locke
 
 test('SEC-06 direct crown/nexus/sentinel workers split intake from operator mutation', async () => {
   const workers = [
-    {name:'crown', worker:crownWorker, base:'/api/crown', env:{ADMIN_TOKEN:'admin-token'}},
-    {name:'nexus', worker:nexusWorker, base:'/api/nexus', env:{ADMIN_TOKEN:'admin-token'}},
-    {name:'sentinel', worker:sentinelWorker, base:'/api/sentinel', env:{ADMIN_TOKEN:'admin-token'}}
+    {name:'crown', worker:crownWorker, base:'/api/crown', env:{SKYGATEFS27_WORKER:skygateWorkerMock(), ADMIN_TOKEN:'admin-token'}},
+    {name:'nexus', worker:nexusWorker, base:'/api/nexus', env:{SKYGATEFS27_WORKER:skygateWorkerMock(), ADMIN_TOKEN:'admin-token'}},
+    {name:'sentinel', worker:sentinelWorker, base:'/api/sentinel', env:{SKYGATEFS27_WORKER:skygateWorkerMock(), ADMIN_TOKEN:'admin-token'}}
   ];
 
   for (const item of workers) {
+    const status = await item.worker.fetch(req(`${item.base}/status`), item.env, ctx());
+    assert.equal(status.status, 200, `${item.name} public status`);
+
     const intake = await item.worker.fetch(req(`${item.base}/intake`, {method:'POST', body:{message:`${item.name} public intake`}}), item.env, ctx());
     assert.equal(intake.status, 200, `${item.name} intake`);
     const data = await intake.json();
@@ -290,9 +382,89 @@ test('SEC-06 direct crown/nexus/sentinel workers split intake from operator muta
     const blocked = await item.worker.fetch(req(`${item.base}/task`, {method:'POST', body:{title:'blocked'}}), item.env, ctx());
     assert.equal(blocked.status, 401, `${item.name} unauth task`);
 
-    const allowed = await item.worker.fetch(req(`${item.base}/task`, {method:'POST', token:'admin-token', body:{title:'allowed'}}), item.env, ctx());
+    const legacyOnly = await item.worker.fetch(req(`${item.base}/task`, {method:'POST', token:'admin-token', body:{title:'legacy blocked'}}), {ADMIN_TOKEN:'admin-token'}, ctx());
+    assert.equal(legacyOnly.status, 503, `${item.name} legacy token without FS27`);
+    assert.equal((await legacyOnly.json()).code, 'fs27_required', `${item.name} legacy token fs27 code`);
+
+    const ledgerBlocked = await item.worker.fetch(req(`${item.base}/ledger`), item.env, ctx());
+    assert.equal(ledgerBlocked.status, 401, `${item.name} unauth ledger`);
+
+    const allowed = await item.worker.fetch(req(`${item.base}/task`, {method:'POST', token:'fs27-owner-token', body:{title:'allowed'}}), item.env, ctx());
     assert.equal(allowed.status, 200, `${item.name} auth task`);
   }
+});
+
+test('SEC-06 direct site-operator helper gates ledgers and mutations through FS27 while keeping intake public', async () => {
+  const publicIntake = await siteOperatorWorker.fetch(
+    req('/api/site-operator/intake', {method:'POST', body:{message:'public buyer route'}}),
+    {SITE_OPERATOR_KV:new MemoryKV()},
+    ctx()
+  );
+  assert.equal(publicIntake.status, 200);
+  assert.equal((await publicIntake.json()).ok, true);
+
+  const blockedLedger = await siteOperatorWorker.fetch(
+    req('/api/site-operator/ledger'),
+    {SITE_OPERATOR_KV:new MemoryKV()},
+    ctx()
+  );
+  assert.equal(blockedLedger.status, 401);
+
+  const legacyCode = await siteOperatorWorker.fetch(
+    req('/api/site-operator/task', {method:'POST', token:'legacy-admin-code', body:{title:'legacy direct task'}}),
+    {SITE_OPERATOR_KV:new MemoryKV(), ADMIN_TOKEN:'legacy-admin-code'},
+    ctx()
+  );
+  assert.equal(legacyCode.status, 503);
+  assert.equal((await legacyCode.json()).code, 'fs27_required');
+
+  const allowed = await siteOperatorWorker.fetch(
+    req('/api/site-operator/task', {method:'POST', token:'fs27-owner-token', body:{title:'fs27 direct task'}}),
+    {SITE_OPERATOR_KV:new MemoryKV(), SKYGATEFS27_WORKER:skygateWorkerMock()},
+    ctx()
+  );
+  assert.equal(allowed.status, 200);
+  assert.equal((await allowed.json()).task.title, 'fs27 direct task');
+});
+
+test('SEC-06 direct omega and kAIxu workers require FS27 instead of open or local key auth', async () => {
+  const omegaScan = await omegaWorker.fetch(
+    req('/api/omega/scan', {method:'POST', body:{command:'scan privileged command'}}),
+    {},
+    ctx()
+  );
+  assert.equal(omegaScan.status, 401);
+
+  const omegaCustomer = await omegaWorker.fetch(
+    req('/api/omega/customer-command', {method:'POST', body:{command:'customer command'}}),
+    {},
+    ctx()
+  );
+  assert.equal(omegaCustomer.status, 401);
+
+  const omegaAllowed = await omegaWorker.fetch(
+    req('/api/omega/scan', {method:'POST', token:'fs27-owner-token', body:{command:'scan privileged command'}}),
+    {SKYGATEFS27_WORKER:skygateWorkerMock()},
+    ctx()
+  );
+  assert.equal(omegaAllowed.status, 200);
+  assert.equal((await omegaAllowed.json()).ok, true);
+
+  const kaixuBlocked = await kaixuWorker.fetch(
+    req('/chat', {method:'POST', body:{messages:[{role:'user', content:'hi'}]}}),
+    {},
+    ctx()
+  );
+  assert.equal(kaixuBlocked.status, 503);
+  const kaixuBody = await kaixuBlocked.json();
+  assert.equal(kaixuBody.code, 'fs27_required');
+
+  const kaixuDisabledAuthBlocked = await kaixuWorker.fetch(
+    req('/chat', {method:'POST', body:{messages:[{role:'user', content:'hi'}]}}),
+    {KAIXU_AUTH_REQUIRED:'false'},
+    ctx()
+  );
+  assert.equal(kaixuDisabledAuthBlocked.status, 503);
 });
 
 test('SEC-07 rate-limits public SaaS signup by source IP', async () => {

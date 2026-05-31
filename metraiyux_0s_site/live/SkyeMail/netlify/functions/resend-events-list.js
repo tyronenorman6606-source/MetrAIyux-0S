@@ -9,7 +9,7 @@ function toInt(value, fallback, max){
 
 exports.handler = async (event) => {
   try{
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const limit = toInt(event.queryStringParameters?.limit, 100, 250);
 
     const [summaryRes, eventsRes, webhookRes] = await Promise.all([
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
       ),
       query(
         `select
-           id, event_type, delivery_status, provider_message_id, recipient_email,
+           id, provider, event_type, delivery_status, provider_message_id, recipient_email,
            from_email, subject, svix_id, event_created_at, created_at
          from message_delivery_events
          where user_id=$1

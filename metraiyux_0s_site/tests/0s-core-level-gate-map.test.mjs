@@ -5,6 +5,7 @@ import siteWorker from '../cloudflare/worker.js';
 import saasWorker from '../cloudflare-saas-provisioning-worker/src/index.js';
 
 const OWNER_CODE = 'owner-code';
+const GATE_TOKEN = 'fs27-test-admin-session';
 const PROXY_SECRET = 'shared-proxy-secret-for-tests';
 const GATE_HEADERS = {
   accept: 'text/html',
@@ -33,11 +34,51 @@ function apiReq(pathname, { method = 'GET', headers = {}, body } = {}) {
   });
 }
 
+function fs27GateMock() {
+  return {
+    async fetch(request) {
+      const url = new URL(request.url);
+      if (url.pathname === '/admin/login') {
+        const body = await request.json().catch(() => ({}));
+        if (body.password === OWNER_CODE) {
+          return Response.json({
+            ok: true,
+            token: GATE_TOKEN,
+            email: 'owner@example.com',
+            role: 'owner',
+            active: true,
+            scope: 'admin.read admin.write gateway.invoke'
+          });
+        }
+        return Response.json({ ok: false, error: 'invalid_gate_password' }, { status: 401 });
+      }
+      if (['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'].includes(url.pathname)) {
+        const body = await request.json().catch(() => ({}));
+        const token = String(body.token || '').trim();
+        if (token === GATE_TOKEN) {
+          return Response.json({
+            ok: true,
+            active: true,
+            email: 'owner@example.com',
+            sub: 'owner-test-user',
+            role: 'owner',
+            scope: 'admin.read admin.write gateway.invoke',
+            scopes: ['admin.read', 'admin.write', 'gateway.invoke']
+          });
+        }
+        return Response.json({ ok: false, active: false, error: 'inactive_token' }, { status: 401 });
+      }
+      return Response.json({ ok: false, error: 'not_found', path: url.pathname }, { status: 404 });
+    }
+  };
+}
+
 function env(overrides = {}) {
   const saasCalls = overrides.saasCalls || [];
   return {
     FREE99_ADMIN_CODE: OWNER_CODE,
     ZERO_OS_INTERNAL_PROXY_SECRET: PROXY_SECRET,
+    SKYGATEFS27_WORKER: fs27GateMock(),
     SAAS_WORKER: {
       async fetch(request) {
         const url = new URL(request.url);
@@ -62,6 +103,30 @@ function env(overrides = {}) {
       }
     },
     ...overrides
+  };
+}
+
+function memoryKv() {
+  const map = new Map();
+  return {
+    async put(key, value) {
+      map.set(key, String(value));
+    },
+    async get(key, options = {}) {
+      const value = map.get(key);
+      if (value == null) return null;
+      return options.type === 'json' ? JSON.parse(value) : value;
+    },
+    async list(options = {}) {
+      const prefix = options.prefix || '';
+      const limit = options.limit || 1000;
+      const keys = [...map.keys()]
+        .filter((name) => name.startsWith(prefix))
+        .sort()
+        .slice(0, limit)
+        .map((name) => ({ name }));
+      return { keys, list_complete: true };
+    }
   };
 }
 
@@ -158,9 +223,40 @@ test('0S SaaS API mount forwards only after shared gate/operator auth and stamps
   }
   assert.equal(saasCalls.length, SAAS_API_ROUTES.length);
   for (const call of saasCalls) {
-    assert.equal(call.sharedGate, 'operator', call.path);
+    assert.equal(call.sharedGate, 'gate', call.path);
     assert.equal(call.proxySecret, PROXY_SECRET, call.path);
   }
+});
+
+test('0S SaaS built-in adapter records live workspace, command, and visual receipts when no side worker is mounted', async () => {
+  const kv = memoryKv();
+  const e = env({ SAAS_WORKER: undefined, SAAS_KV: kv, SITE_EVENTS_KV: kv });
+  const headers = { ...GATE_HEADERS, accept: 'application/json' };
+  const workspaceRes = await siteWorker.fetch(apiReq('/api/saas/workspaces', {
+    method: 'POST',
+    headers,
+    body: { company_name: 'Live Gate Test Co', email: 'owner@example.com', plan: 'starter-command', mailbox_email: 'live-gate-test@skyemail.online' }
+  }), e, ctx());
+  assert.equal(workspaceRes.status, 201);
+  const workspaceData = await workspaceRes.json();
+  assert.equal(workspaceData.ok, true);
+  assert.equal(workspaceData.workspace.status, 'workspace_recorded_live');
+
+  const commandRes = await siteWorker.fetch(apiReq('/api/saas/customer-command', {
+    method: 'POST',
+    headers,
+    body: { workspace_id: workspaceData.workspace.workspace_id, command: 'email the customer a launch status' }
+  }), e, ctx());
+  assert.equal(commandRes.status, 201);
+  const commandData = await commandRes.json();
+  assert.equal(commandData.command.status, 'recorded_live');
+
+  const visualsRes = await siteWorker.fetch(apiReq(`/api/saas/customer-visuals?workspace_id=${encodeURIComponent(workspaceData.workspace.workspace_id)}`, { headers }), e, ctx());
+  assert.equal(visualsRes.status, 200);
+  const visualsData = await visualsRes.json();
+  assert.equal(visualsData.ok, true);
+  assert.equal(visualsData.visuals.workspace.workspace_id, workspaceData.workspace.workspace_id);
+  assert.ok(visualsData.visuals.kpis.some((row) => row.label === 'Commands' && row.value === '1'));
 });
 
 test('SaaS worker direct preview/admin fallbacks fail closed without internal shared-gate proof', async () => {
@@ -179,6 +275,26 @@ test('SaaS worker direct preview/admin fallbacks fail closed without internal sh
     const res = await saasWorker.fetch(apiReq(path, { method, body }), {}, ctx());
     assert.equal(res.status, status, path);
   }
+});
+
+test('SaaS worker direct authenticated routes do not fabricate static preview workspaces', async () => {
+  const headers = {
+    accept: 'application/json',
+    'x-0s-shared-gate': 'gate',
+    'x-0s-internal-proxy-secret': PROXY_SECRET
+  };
+  const e = { ZERO_OS_INTERNAL_PROXY_SECRET: PROXY_SECRET };
+  const preview = await saasWorker.fetch(apiReq('/api/saas/client-preview?client=bobs-smoke-shop', { headers }), e, ctx());
+  assert.equal(preview.status, 404);
+  assert.equal((await preview.json()).error, 'workspace_not_found');
+
+  const visuals = await saasWorker.fetch(apiReq('/api/saas/customer-visuals?workspace_id=bob-smoke-shop-preview-001', { headers }), e, ctx());
+  assert.equal(visuals.status, 404);
+  assert.equal((await visuals.json()).error, 'workspace_not_found');
+
+  const merit = await saasWorker.fetch(apiReq('/api/saas/skyemerit/preview?subtotal_cents=1300000&code=SKYEMERIT-SKYELINE-22', { headers }), e, ctx());
+  assert.equal(merit.status, 200);
+  assert.equal((await merit.json()).selected.code, 'SKYEMERIT-SKYELINE-22');
 });
 
 test('NorthStar mounted password and operator-token lanes are disabled by the shared gate', async () => {

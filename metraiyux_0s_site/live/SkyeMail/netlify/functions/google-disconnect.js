@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     try { await stopGoogleWatch(auth.sub); } catch {}
     await query('delete from google_mailboxes where user_id=$1', [auth.sub]);
     return json(200, { ok: true });

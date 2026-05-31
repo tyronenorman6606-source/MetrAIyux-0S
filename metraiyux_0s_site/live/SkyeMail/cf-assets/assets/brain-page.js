@@ -40,15 +40,24 @@
     if(!node) return;
     const plan = ai?.entitlement || {};
     const month = ai?.month || {};
-    const status = month.ai_call_allowed ? "kAIxu ready" : "local-only until plan/gateway is active";
+    const status = month.ai_call_allowed ? "FS27 Brain ready" : "local-only until SkyPay entitlement/gateway is active";
     const remaining = month.calls_remaining === null || month.calls_remaining === undefined ? "unlimited" : String(month.calls_remaining);
-    node.textContent = `${status}. Plan: ${plan.name || plan.id || "SkyeMail AI"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}.`;
+    node.textContent = `${status}. Plan: ${plan.name || plan.id || "SkyEmail Brain"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}.`;
     const modelSelect = el("brainModel");
     if(modelSelect && Array.isArray(ai?.models) && ai.models.length){
       const current = modelSelect.value || ai.default_model || ai.models[0];
-      modelSelect.innerHTML = ai.models.map((item)=>`<option value="${safe(item)}">${safe(item)}</option>`).join("");
+      modelSelect.innerHTML = ai.models.map((item)=>`<option value="${safe(item)}">${safe(formatModelLabel(item))}</option>`).join("");
       modelSelect.value = ai.models.includes(current) ? current : (ai.default_model || ai.models[0]);
     }
+  }
+
+  function formatModelLabel(model){
+    const labels = {
+      "skyemail-brain-fast": "SkyEmail Brain Fast",
+      "skyemail-brain-deep": "SkyEmail Brain Deep",
+      "skyemail-brain-operator": "SkyEmail Brain Operator"
+    };
+    return labels[model] || String(model || "").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
   async function renderPlans(){
@@ -57,7 +66,7 @@
     try{
       const data = await apiFetch("/mail-brain-plans");
       const paid = (data.plans || []).filter((plan)=> plan.provider_calls);
-      root.innerHTML = paid.slice(0, 3).map((plan)=>`<button class="btn small" type="button" data-ai-plan="${safe(plan.id)}">${safe(plan.id.replace(/^relay13-/, ""))}</button>`).join("");
+      root.innerHTML = paid.slice(0, 3).map((plan)=>`<button class="btn small" type="button" data-ai-plan="${safe(plan.id)}">${safe(plan.name || plan.id)}</button>`).join("");
     }catch(_err){
       root.innerHTML = "";
     }
@@ -136,8 +145,8 @@
       action: selected,
       prompt,
       source: "skymail-brain-page",
-      model_mode: el("brainMode")?.value || "kaixu",
-      model: el("brainModel")?.value || "kaixu-6.7-mini",
+      model_mode: el("brainMode")?.value || "fs27_metered_v1",
+      model: el("brainModel")?.value || "skyemail-brain-fast",
       to: el("brainTo")?.value || "",
       subject: el("brainSubject")?.value || "",
       message: prompt,
@@ -194,15 +203,14 @@
       if(el("brainSubject")) el("brainSubject").value = state.urlSubject;
     }
     try{
-      state.boot = await SMV.withBoot("brain", "Brain", "Local mailbox brain + kAIxu upgrade lane");
+      state.boot = await SMV.withBoot("brain", "Brain", "Local mailbox brain + FS27 metered Brain lane");
       bind();
       const returnedSession = params.get("session_id") || params.get("checkout_id") || params.get("stripe_session_id") || "";
-      const returnedDemo = params.get("demo_session") || "";
-      if(returnedSession || returnedDemo){
-        setText("brainStatus", "Claiming SkyePay AI entitlement...");
+      if(returnedSession){
+        setText("brainStatus", "Claiming SkyPay Brain entitlement...");
         await apiFetch("/mail-brain-claim", {
           method:"POST",
-          body: JSON.stringify({ session_id: returnedSession, demo_session: returnedDemo, plan_id: params.get("plan") || params.get("offer") || "" })
+          body: JSON.stringify({ session_id: returnedSession, plan_id: params.get("plan") || params.get("offer") || "" })
         }).catch((err)=> setText("brainStatus", err.message || "Entitlement claim failed."));
       }
       await refreshBrain();

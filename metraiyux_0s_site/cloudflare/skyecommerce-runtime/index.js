@@ -254,17 +254,20 @@ async function ensureSharedGateMerchant(env, request) {
 
 async function getSharedGateSession(request, env) {
   if (!hasSharedGateHandoff(request, env)) return null;
+  const actor = sharedGateActor(request, env);
   const merchant = await ensureSharedGateMerchant(env, request);
   return {
     id: 'shared-0s-gate',
     merchantId: merchant.id,
-    email: merchant.email,
+    email: actor.email || merchant.email,
     role: 'merchant_owner',
     merchantSlug: merchant.slug || null,
     merchantName: merchant.brand_name || null,
     permissions: ['*'],
     staffMemberId: '',
-    sharedGate: true
+    sharedGate: true,
+    gateEmail: actor.email || '',
+    localMerchantEmail: merchant.email || ''
   };
 }
 
@@ -526,8 +529,26 @@ async function requireApiBearer(request, env, requiredScope = '') {
   if (!row) return { error: unauthorized('Invalid or revoked bearer token.') };
   const token = apiTokenRecord(row);
   if (!hasApiScope(token.scopes, requiredScope)) return { error: json({ error: `Bearer token missing required scope: ${requiredScope}` }, 403) };
+  const sharedGateSession = await getSharedGateSession(request, env);
+  if (sharedGateSession && sharedGateSession.merchantId !== row.merchant_id) {
+    return {
+      error: json({
+        error: 'Bearer token merchant does not match the active shared 0S gate merchant.',
+        code: 'shared_gate_api_token_merchant_mismatch'
+      }, 403)
+    };
+  }
   await dbRun(env, `UPDATE api_access_tokens SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?`, [row.id]);
-  return { api: { tokenId: row.id, merchantId: row.merchant_id, scopes: token.scopes, label: token.label } };
+  return {
+    api: {
+      tokenId: row.id,
+      merchantId: row.merchant_id,
+      scopes: token.scopes,
+      label: token.label,
+      sharedGate: Boolean(sharedGateSession),
+      gateEmail: sharedGateSession?.gateEmail || ''
+    }
+  };
 }
 
 async function listCustomDomains(env, merchantId) {

@@ -241,7 +241,6 @@ function listen(port) {
     const baseUrl = `http://127.0.0.1:${address.port}`;
     console.log(`SkyeMusicNexus local platform server: ${baseUrl}`);
     console.log(`Dashboard: ${baseUrl}/SkyeMusicNexus/public/index.html`);
-    console.log(`Create Studio: ${baseUrl}/SkyeMusicNexus/public/create.html`);
     console.log(`DAW Room: ${baseUrl}/SkyeMusicNexus/public/daw.html`);
     console.log(`Discover: ${baseUrl}/SkyeMusicNexus/public/discover.html`);
     console.log(`Feed: ${baseUrl}/SkyeMusicNexus/public/feed.html`);

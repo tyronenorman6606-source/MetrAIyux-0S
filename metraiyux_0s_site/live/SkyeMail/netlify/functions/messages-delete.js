@@ -3,7 +3,7 @@ const { json, verifyAuth, parseJson } = require("./_utils");
 
 exports.handler = async (event) => {
   try{
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const userId = auth.sub;
 
     const body = parseJson(event);

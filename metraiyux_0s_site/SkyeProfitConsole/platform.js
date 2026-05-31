@@ -2,10 +2,14 @@
   "use strict";
 
   const STORAGE_KEY = "skyeprofitconsole.neo_front.v3";
+  const COMMAND_BRIDGE_ENDPOINT = "/api/0s-command-bridge/events";
+  const STARTER_PACK_IDS = new Set(["pack-phoenix-sprint", "pack-proof-wall", "pack-workforce"]);
+  const isLocalHost = () => /^(localhost|127\.0\.0\.1|::1)?$/i.test(globalThis.location?.hostname || "");
+  const localSeedAllowed = () => isLocalHost() || globalThis.SKYE_PROFIT_ALLOW_LOCAL_SEED === true;
   function profitRuntimeBase() {
     const configured = globalThis.METRAIYUX_API_BASES?.profit || globalThis.METRAIYUX_API_BASES?.skyeprofitconsole;
     if (configured) return String(configured).replace(/\/+$/, "");
-    if (/^(localhost|127\.0\.0\.1)$/i.test(globalThis.location?.hostname || "")) return "./api/runtime";
+    if (isLocalHost()) return "./api/runtime";
     return "/api/profit";
   }
   const RUNTIME_BASE = profitRuntimeBase();
@@ -33,56 +37,64 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const uid = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
-  const defaultState = () => ({
-    selectedId: "pack-phoenix-sprint",
-    splits: Object.fromEntries(splitDefaults),
-    runtime: { online: false, counts: null, lastSync: null },
-    packs: [
-      {
-        id: "pack-phoenix-sprint",
-        label: "Phoenix conversion sprint",
-        target: "AE-FlowPro",
-        owner: "profit-ops",
-        status: "ready",
-        revenue: 13000,
-        cost: 3900,
-        chance: 67,
-        heat: 82,
-        notes: "Starter data. Replace it with a real offer lane after launch.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 48).toISOString()
-      },
-      {
-        id: "pack-proof-wall",
-        label: "Proof wall upsell",
-        target: "SkyeProofx",
-        owner: "audit-lane",
-        status: "approved",
-        revenue: 7200,
-        cost: 1600,
-        chance: 81,
-        heat: 91,
-        notes: "Turns verified proof artifacts into a paid client retention lane.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 21).toISOString()
-      },
-      {
-        id: "pack-workforce",
-        label: "Staffing command retainer",
-        target: "Workforce Command",
-        owner: "field-ae",
-        status: "draft",
-        revenue: 18500,
-        cost: 7800,
-        chance: 41,
-        heat: 58,
-        notes: "Needs tighter service boundary and final close sequence.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 9).toISOString()
-      }
-    ],
-    proofEvents: [
-      { id: "event-seed", type: "field_booted", category: "local", detail: "Neo-front profit field initialized with local starter packs.", createdAt: new Date().toISOString() }
-    ],
-    closeBriefs: []
-  });
+  const starterPacks = () => [
+    {
+      id: "pack-phoenix-sprint",
+      label: "Phoenix conversion sprint",
+      target: "AE-FlowPro",
+      owner: "profit-ops",
+      status: "ready",
+      revenue: 13000,
+      cost: 3900,
+      chance: 67,
+      heat: 82,
+      source: "starter_local_seed",
+      notes: "Starter data for localhost planning only. Replace it with a real offer lane after launch.",
+      createdAt: new Date(Date.now() - 1000 * 60 * 48).toISOString()
+    },
+    {
+      id: "pack-proof-wall",
+      label: "Proof wall upsell",
+      target: "SkyeProofx",
+      owner: "audit-lane",
+      status: "approved",
+      revenue: 7200,
+      cost: 1600,
+      chance: 81,
+      heat: 91,
+      source: "starter_local_seed",
+      notes: "Localhost starter lane. Runtime metrics only count Worker-backed packs.",
+      createdAt: new Date(Date.now() - 1000 * 60 * 21).toISOString()
+    },
+    {
+      id: "pack-workforce",
+      label: "Staffing command retainer",
+      target: "Workforce Command",
+      owner: "field-ae",
+      status: "draft",
+      revenue: 18500,
+      cost: 7800,
+      chance: 41,
+      heat: 58,
+      source: "starter_local_seed",
+      notes: "Localhost starter lane. Runtime metrics only count Worker-backed packs.",
+      createdAt: new Date(Date.now() - 1000 * 60 * 9).toISOString()
+    }
+  ];
+
+  const defaultState = () => {
+    const packs = localSeedAllowed() ? starterPacks() : [];
+    return {
+      selectedId: packs[0]?.id || null,
+      splits: Object.fromEntries(splitDefaults),
+      runtime: { online: false, counts: null, lastSync: null },
+      packs,
+      proofEvents: localSeedAllowed()
+        ? [{ id: "event-seed", type: "field_booted", category: "local", detail: "Localhost starter packs loaded for planning only.", createdAt: new Date().toISOString() }]
+        : [],
+      closeBriefs: []
+    };
+  };
 
   let state = loadState();
   let animationTick = 0;
@@ -92,11 +104,19 @@
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (!parsed || !Array.isArray(parsed.packs)) return defaultState();
+      const base = defaultState();
+      const packs = parsed.packs
+        .filter((pack) => localSeedAllowed() || !STARTER_PACK_IDS.has(pack?.id))
+        .map((pack) => ({
+          ...pack,
+          source: pack.source || (pack.runtimeId ? "worker_runtime" : "browser_local")
+        }));
       return {
-        ...defaultState(),
+        ...base,
         ...parsed,
         splits: { ...Object.fromEntries(splitDefaults), ...(parsed.splits || {}) },
-        packs: parsed.packs,
+        selectedId: packs.some((pack) => pack.id === parsed.selectedId) ? parsed.selectedId : packs[0]?.id || null,
+        packs,
         proofEvents: Array.isArray(parsed.proofEvents) ? parsed.proofEvents : [],
         closeBriefs: Array.isArray(parsed.closeBriefs) ? parsed.closeBriefs : []
       };
@@ -114,13 +134,107 @@
     }
   }
 
-  function addProof(type, detail, category = "local") {
-    state.proofEvents.unshift({ id: uid("event"), type, category, detail, createdAt: new Date().toISOString() });
+  function gateHeaders() {
+    const headers = gate?.headers?.() || {};
+    for (const storage of [sessionStorage, localStorage]) {
+      for (const key of ["ZERO_OS_GATE_SESSION", "FREE99_GATE_SESSION", "SKYE_GATE_SESSION", "skye:gate:session"]) {
+        const token = storage.getItem(key);
+        if (token && !headers.Authorization) headers.Authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+      }
+    }
+    return headers;
+  }
+
+  function commandBridgePayload(event) {
+    return {
+      type: event.type || "skyeprofitconsole.event",
+      action: event.type || "skyeprofitconsole.event",
+      lane: "skyeprofitconsole",
+      summary: event.detail || event.type || "SkyeProfitConsole event",
+      source: "SkyeProfitConsole",
+      status: event.category || "local",
+      ids: {
+        pack_id: event.packId || event.reviewPackId || "",
+        close_brief_id: event.closeBriefId || ""
+      },
+      metadata: {
+        app: "SkyeProfitConsole",
+        category: event.category || "local",
+        runtime_base: RUNTIME_BASE,
+        created_at: event.createdAt || new Date().toISOString()
+      }
+    };
+  }
+
+  async function postCommandBridgeEvent(event) {
+    if (!COMMAND_BRIDGE_ENDPOINT || isLocalHost()) return null;
+    const response = await fetch(COMMAND_BRIDGE_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...gateHeaders() },
+      body: JSON.stringify(commandBridgePayload(event))
+    });
+    if (!response.ok) throw new Error(`command bridge ${response.status}`);
+    return response.json().catch(() => ({ ok: true }));
+  }
+
+  async function postRuntimeProofEvent(event) {
+    if (event.skipRuntimeProof) return null;
+    const response = await runtimeRequest("/proof", {
+      method: "POST",
+      body: JSON.stringify({
+        type: event.type,
+        category: event.category,
+        detail: event.detail,
+        owner: event.owner,
+        target: event.target,
+        status: event.status,
+        checkpoint: event.checkpoint
+      })
+    });
+    return response;
+  }
+
+  function mirrorProofEvent(event) {
+    Promise.allSettled([postCommandBridgeEvent(event), postRuntimeProofEvent(event)]).then((results) => {
+      const failed = results.find((result) => result.status === "rejected");
+      state.proofEvents = state.proofEvents.map((item) => item.id === event.id
+        ? {
+            ...item,
+            live_status: failed ? "live_write_failed" : "posted",
+            live_error: failed ? String(failed.reason?.message || failed.reason).slice(0, 180) : ""
+          }
+        : item);
+      saveState(failed ? "proof local" : "proof live");
+      renderProof();
+      renderMetrics();
+    }).catch(() => {});
+  }
+
+  function addProof(type, detail, category = "local", extra = {}) {
+    const event = { id: uid("event"), type, category, detail, createdAt: new Date().toISOString(), ...extra };
+    state.proofEvents.unshift(event);
     state.proofEvents = state.proofEvents.slice(0, 80);
+    if (category !== "runtime_sync") mirrorProofEvent(event);
   }
 
   function selectedPack() {
     return state.packs.find((pack) => pack.id === state.selectedId) || state.packs[0] || null;
+  }
+
+  function isSeedPack(pack) {
+    return STARTER_PACK_IDS.has(pack?.id) || pack?.source === "starter_local_seed" || pack?.source === "scenario_local_seed";
+  }
+
+  function isRuntimeBackedPack(pack) {
+    return Boolean(pack?.runtimeId || pack?.source === "worker_runtime" || pack?.runtime_backed === true);
+  }
+
+  function livePacks() {
+    return state.packs.filter(isRuntimeBackedPack);
+  }
+
+  function runtimeProofCount() {
+    return state.proofEvents.filter((event) => event.source === "worker_runtime" || event.live_status === "posted" || event.category === "runtime").length;
   }
 
   function grossProfit(pack) {
@@ -176,16 +290,17 @@
   }
 
   function metrics() {
-    const totalRevenue = state.packs.reduce((sum, pack) => sum + Number(pack.revenue || 0), 0);
-    const totalCost = state.packs.reduce((sum, pack) => sum + Number(pack.cost || 0), 0);
-    const expected = state.packs.reduce((sum, pack) => sum + expectedProfit(pack), 0);
+    const packs = livePacks();
+    const totalRevenue = packs.reduce((sum, pack) => sum + Number(pack.revenue || 0), 0);
+    const totalCost = packs.reduce((sum, pack) => sum + Number(pack.cost || 0), 0);
+    const expected = packs.reduce((sum, pack) => sum + expectedProfit(pack), 0);
     const margin = totalRevenue ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0;
-    const cashNow = state.packs
+    const cashNow = packs
       .filter((pack) => ["ready", "approved", "dispatched"].includes(pack.status) && grossProfit(pack) > 0)
       .sort((a, b) => packScore(b) - packScore(a))
       .slice(0, 3)
       .reduce((sum, pack) => sum + expectedProfit(pack), 0);
-    const blockedMargin = state.packs
+    const blockedMargin = packs
       .filter((pack) => pack.status === "blocked" || grossProfit(pack) <= 0 || Number(pack.chance || 0) < 45)
       .reduce((sum, pack) => sum + Math.max(grossProfit(pack), 0), 0);
     return { totalRevenue, totalCost, expected, margin, cashNow, blockedMargin };
@@ -196,7 +311,7 @@
     $("#metricBooked").textContent = money(m.totalRevenue);
     $("#metricExpected").textContent = money(m.expected);
     $("#metricMargin").textContent = `${Math.round(m.margin)}%`;
-    $("#metricProof").textContent = String(state.proofEvents.length);
+    $("#metricProof").textContent = String(runtimeProofCount());
   }
 
   function renderLegend() {
@@ -227,7 +342,8 @@
       button.style.left = `${pos.x}%`;
       button.style.top = `${pos.y}%`;
       button.dataset.id = pack.id;
-      button.innerHTML = `<i style="color:${statusColors[pack.status] || statusColors.draft};background:currentColor"></i><b>${escapeHtml(pack.label)}</b><span>${money(pack.revenue)} · ${pack.chance}%</span>`;
+      const sourceLabel = isRuntimeBackedPack(pack) ? "runtime" : "local draft";
+      button.innerHTML = `<i style="color:${statusColors[pack.status] || statusColors.draft};background:currentColor"></i><b>${escapeHtml(pack.label)}</b><span>${money(pack.revenue)} · ${pack.chance}% · ${sourceLabel}</span>`;
       container.appendChild(button);
     });
   }
@@ -295,6 +411,7 @@
         <div><span>Owner</span><b>${escapeHtml(pack.owner || "unassigned")}</b></div>
         <div><span>Gross profit</span><b>${money(profit)}</b></div>
         <div><span>Expected</span><b>${money(expected)}</b></div>
+        <div><span>Source</span><b>${isRuntimeBackedPack(pack) ? "0S runtime" : "local draft"}</b></div>
       </div>
       <div class="card-actions">
         <button class="micro-button" data-pack-action="approve" data-id="${pack.id}" type="button">approve</button>
@@ -322,7 +439,8 @@
           card.type = "button";
           card.className = "loom-card";
           card.dataset.id = pack.id;
-          card.innerHTML = `<b>${escapeHtml(pack.label)}</b><span>${money(pack.revenue)} · ${pack.chance}% close · ${escapeHtml(pack.target)}</span>`;
+          const sourceLabel = isRuntimeBackedPack(pack) ? "runtime-backed" : "local draft";
+          card.innerHTML = `<b>${escapeHtml(pack.label)}</b><span>${money(pack.revenue)} · ${pack.chance}% close · ${escapeHtml(pack.target)} · ${sourceLabel}</span>`;
           column.appendChild(card);
         });
       }
@@ -339,7 +457,7 @@
     feed.innerHTML = state.proofEvents.slice(0, 40).map((event) => `
       <article class="proof-event">
         <time>${new Date(event.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time>
-        <div><b>${escapeHtml(event.type)}</b><span>${escapeHtml(event.detail)} · ${escapeHtml(event.category)}</span></div>
+        <div><b>${escapeHtml(event.type)}</b><span>${escapeHtml(event.detail)} · ${escapeHtml(event.category)}${event.live_status ? ` · ${escapeHtml(event.live_status)}` : ""}</span></div>
       </article>
     `).join("");
   }
@@ -359,7 +477,9 @@
   }
 
   function moneyBoard() {
-    const items = state.packs.map((pack) => ({
+    const runtimePacks = livePacks();
+    const boardPacks = runtimePacks.length ? runtimePacks : state.packs;
+    const items = boardPacks.map((pack) => ({
       pack,
       gross: grossProfit(pack),
       expected: expectedProfit(pack),
@@ -386,9 +506,9 @@
     $("#moneyFastest").textContent = fastest ? money(fastest.expected) : "$0";
     $("#moneyFastestLabel").textContent = fastest ? `${fastest.pack.label} · ${fastest.move}` : "Create a pack to rank fastest cash.";
     $("#moneyCashNow").textContent = money(board.metrics.cashNow);
-    $("#moneyCashNowLabel").textContent = "Top ready or approved packs weighted by close odds.";
+    $("#moneyCashNowLabel").textContent = "Runtime-backed ready or approved packs weighted by close odds.";
     $("#moneyBlocked").textContent = money(board.metrics.blockedMargin);
-    $("#moneyBlockedLabel").textContent = "Gross margin trapped in blocked, weak, or underwater lanes.";
+    $("#moneyBlockedLabel").textContent = "Runtime-backed margin trapped in blocked, weak, or underwater lanes.";
     $("#moneyPayback").textContent = board.selected ? `${paybackMultiple(board.selected).toFixed(1)}x` : "0.0x";
     $("#moneyPaybackLabel").textContent = board.selected ? `${board.selected.label} revenue over direct cost.` : "Select a pack to see payback.";
 
@@ -400,7 +520,7 @@
         <button class="money-move${item.pack.id === state.selectedId ? " active" : ""}" type="button" data-id="${item.pack.id}">
           <span>${String(index + 1).padStart(2, "0")}</span>
           <b>${escapeHtml(item.pack.label)}</b>
-          <em>${escapeHtml(item.move)} · ${money(item.expected)} expected · ${Math.round(item.margin)}% margin</em>
+          <em>${escapeHtml(item.move)} · ${money(item.expected)} expected · ${Math.round(item.margin)}% margin · ${isRuntimeBackedPack(item.pack) ? "runtime" : "local draft"}</em>
         </button>
       `).join("");
     }
@@ -470,6 +590,7 @@
       cost,
       chance,
       heat: clamp(Math.round((chance * 0.62) + ((revenue - cost) / Math.max(revenue, 1)) * 48), 8, 100),
+      source: isRuntimeBackedPack(existing) ? "worker_runtime" : "operator_entry",
       notes: $("#packNotes").value.trim(),
       createdAt: existing.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -481,7 +602,7 @@
     const pack = packFromForm();
     state.packs.unshift(pack);
     state.selectedId = pack.id;
-    addProof("profit_pack_forged", `${pack.label} entered the field at ${money(pack.revenue)} with ${pack.chance}% close probability.`, "local");
+    addProof("profit_pack_forged", `${pack.label} entered the field at ${money(pack.revenue)} with ${pack.chance}% close probability.`, "operator", { packId: pack.id, owner: pack.owner, target: pack.target });
     saveState("pack forged");
     renderAll();
     pushPackToRuntime(pack);
@@ -492,7 +613,7 @@
     if (!active) return;
     const next = packFromForm(active);
     state.packs = state.packs.map((pack) => pack.id === active.id ? next : pack);
-    addProof("profit_pack_rewritten", `${next.label} was rewritten inside the local field.`, "local");
+    addProof("profit_pack_rewritten", `${next.label} was rewritten inside the planning field.`, "operator", { packId: next.id, owner: next.owner, target: next.target });
     saveState("pack rewritten");
     renderAll();
   }
@@ -508,19 +629,20 @@
       cost: 900 + Math.round(Math.random() * 8500),
       chance: 32 + Math.round(Math.random() * 61),
       heat: 45 + Math.round(Math.random() * 52),
-      notes: "Generated local scenario. Replace with a real close lane when ready.",
+      source: "scenario_local_seed",
+      notes: "Generated local planning scenario. It cannot be archived as live revenue until rewritten from a real close lane.",
       createdAt: new Date().toISOString()
     };
     state.packs.unshift(scenario);
     state.selectedId = scenario.id;
-    addProof("scenario_seeded", `${scenario.label} created as a local planning specimen.`, "local");
+    addProof("scenario_seeded", `${scenario.label} created as a local planning specimen.`, "local", { skipRuntimeProof: true });
     saveState("scenario seeded");
     renderAll();
   }
 
   function clearState() {
     state = defaultState();
-    addProof("local_state_reset", "Local neo-front app state was reset to starter packs.", "local");
+    addProof("local_state_reset", localSeedAllowed() ? "Local neo-front app state was reset to localhost starter packs." : "Local neo-front app state was reset; live data will reload from the 0S runtime.", "local", { skipRuntimeProof: true });
     saveState("state reset");
     renderAll();
   }
@@ -532,7 +654,7 @@
     link.download = `skyeprofitconsole-state-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(link.href);
-    addProof("state_exported", "The current local profit field was exported as JSON.", "local");
+    addProof("state_exported", "The current profit field browser cache was exported as JSON.", "local", { skipRuntimeProof: true });
     saveState("state exported");
     renderAll();
   }
@@ -575,7 +697,7 @@
     const brief = buildCloseBrief(pack);
     state.closeBriefs.unshift(brief);
     state.closeBriefs = state.closeBriefs.slice(0, 24);
-    addProof("close_brief_generated", `${pack.label} close brief generated with ${money(brief.expectedProfit)} expected profit and ${Math.round(brief.margin)}% margin.`, "local");
+    addProof("close_brief_generated", `${pack.label} close brief generated with ${money(brief.expectedProfit)} expected profit and ${Math.round(brief.margin)}% margin.`, "operator", { packId: pack.id, owner: pack.owner, target: pack.target });
     saveState("brief generated");
     renderAll();
     pushCloseBriefToRuntime(brief);
@@ -583,28 +705,108 @@
 
   async function runtimeRequest(path, options = {}) {
     const response = await fetch(`${RUNTIME_BASE}${path}`, {
-      headers: { "content-type": "application/json", ...(gate?.headers?.() || {}), ...(options.headers || {}) },
+      headers: { "content-type": "application/json", ...gateHeaders(), ...(options.headers || {}) },
       ...options
     });
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     return response.json();
   }
 
+  function chanceFromSnapshot(pack) {
+    const explicit = Number(pack?.chance ?? pack?.confidence);
+    if (Number.isFinite(explicit) && explicit > 0) return explicit;
+    const match = String(pack?.snapshot?.auditScore || "").match(/(\d+(?:\.\d+)?)/);
+    return match ? Number(match[1]) : 0;
+  }
+
+  function runtimePackToFieldPack(pack) {
+    const chance = chanceFromSnapshot(pack);
+    const revenue = Number(pack?.revenue || pack?.ask || pack?.snapshot?.revenue || 0);
+    const cost = Number(pack?.cost || pack?.directCost || pack?.snapshot?.cost || 0);
+    return {
+      id: pack.id,
+      runtimeId: pack.id,
+      label: pack.label || "Runtime profit pack",
+      target: pack.target || "MetrAIyux 0S",
+      owner: pack.review?.owner || pack.owner || "profit-ops",
+      status: pack.review?.status || pack.status || "draft",
+      revenue,
+      cost,
+      chance,
+      heat: Number(pack?.heat || pack?.snapshot?.heat || Math.min(100, Math.max(8, chance || 50))),
+      notes: pack.notes || pack.review?.notes || "",
+      createdAt: pack.createdAt || new Date().toISOString(),
+      updatedAt: pack.review?.updatedAt || pack.updatedAt,
+      source: "worker_runtime",
+      runtime_backed: true
+    };
+  }
+
+  function runtimeBrief(brief) {
+    return {
+      ...brief,
+      runtimeId: brief.id,
+      source: "worker_runtime"
+    };
+  }
+
+  function runtimeProof(event) {
+    return {
+      id: event.id || uid("event"),
+      type: event.type || "runtime_event",
+      category: event.category || "runtime",
+      detail: event.detail || event.checkpoint || "Runtime event",
+      createdAt: event.createdAt || new Date().toISOString(),
+      source: "worker_runtime",
+      live_status: "posted"
+    };
+  }
+
+  function localDraftPacks() {
+    return state.packs.filter((pack) => !isRuntimeBackedPack(pack) && !isSeedPack(pack));
+  }
+
+  function localDraftBriefs() {
+    return state.closeBriefs.filter((brief) => !brief.runtimeId && brief.source !== "worker_runtime");
+  }
+
   async function syncRuntime() {
     try {
-      const status = await runtimeRequest("/status");
+      const [status, packsPayload, briefsPayload, proofPayload] = await Promise.all([
+        runtimeRequest("/status"),
+        runtimeRequest("/close-review-packs"),
+        runtimeRequest("/close-briefs"),
+        runtimeRequest("/proof")
+      ]);
+      const runtimePacks = Array.isArray(packsPayload.review_packs) ? packsPayload.review_packs.map(runtimePackToFieldPack) : [];
+      const runtimeBriefs = Array.isArray(briefsPayload.close_briefs) ? briefsPayload.close_briefs.map(runtimeBrief) : [];
+      const runtimeProofs = Array.isArray(proofPayload.proof_events) ? proofPayload.proof_events.map(runtimeProof) : [];
+      const drafts = localDraftPacks();
+      const draftBriefs = localDraftBriefs();
+      state.packs = [...runtimePacks, ...drafts];
+      state.closeBriefs = [...runtimeBriefs, ...draftBriefs].slice(0, 40);
+      const localProofs = state.proofEvents.filter((event) => event.source !== "worker_runtime" && !event.runtimeId);
+      state.proofEvents = [...runtimeProofs, ...localProofs].slice(0, 80);
+      if (!state.packs.some((pack) => pack.id === state.selectedId)) state.selectedId = state.packs[0]?.id || null;
       state.runtime = { online: true, counts: status, lastSync: new Date().toISOString() };
-      addProof("runtime_sync", `Runtime connected: ${status.review_pack_count} review packs, ${status.close_brief_count || 0} close briefs, ${status.execution_item_count} execution items, ${status.dispatch_item_count} dispatch items.`, "runtime");
+      addProof("runtime_sync", `Runtime connected: ${status.review_pack_count} review packs, ${status.close_brief_count || 0} close briefs, ${status.execution_item_count} execution items, ${status.dispatch_item_count} dispatch items.`, "runtime", { skipRuntimeProof: true });
       saveState("runtime synced");
     } catch (error) {
       state.runtime = { online: false, counts: null, lastSync: new Date().toISOString() };
-      addProof("runtime_offline", `Runtime not available from this launch mode: ${error.message}. Browser-local app controls still work.`, "runtime");
+      addProof("runtime_offline", `Runtime not available from this launch mode: ${error.message}. Local planning stays separate from live revenue telemetry.`, "runtime", { skipRuntimeProof: true });
       saveState("runtime offline");
     }
     renderAll();
   }
 
   async function pushCloseBriefToRuntime(brief) {
+    const pack = state.packs.find((item) => item.id === brief.packId);
+    if (pack && isSeedPack(pack)) {
+      addProof("runtime_close_brief_blocked", `${brief.label} close brief stayed local because it came from a starter or scenario seed.`, "runtime", { skipRuntimeProof: true, packId: pack.id });
+      saveState("brief local only");
+      renderAll();
+      return;
+    }
     try {
       const payload = await runtimeRequest("/close-briefs", {
         method: "POST",
@@ -623,16 +825,31 @@
   }
 
   async function pushPackToRuntime(pack) {
+    if (isSeedPack(pack)) {
+      addProof("runtime_archive_blocked", `${pack.label} stayed local because starter/scenario packs cannot become live runtime revenue.`, "runtime", { skipRuntimeProof: true, packId: pack.id });
+      saveState("local seed blocked");
+      renderAll();
+      return;
+    }
     try {
       const grossProfit = Number(pack.revenue || 0) - Number(pack.cost || 0);
       const payload = await runtimeRequest("/close-review-packs", {
         method: "POST",
         body: JSON.stringify({
+          id: pack.id,
           label: pack.label,
           target: pack.target,
           notes: pack.notes,
+          revenue: Number(pack.revenue || 0),
+          cost: Number(pack.cost || 0),
+          chance: Number(pack.chance || 0),
+          heat: Number(pack.heat || 0),
           snapshot: {
             runtime: state.runtime.online ? "Runtime mode: connected" : "Runtime mode: local-only",
+            revenue: Number(pack.revenue || 0),
+            cost: Number(pack.cost || 0),
+            chance: Number(pack.chance || 0),
+            heat: Number(pack.heat || 0),
             auditScore: `${pack.chance} / 100 close confidence`,
             closePackCount: String(state.packs.length),
             capturedAt: new Date().toISOString()
@@ -667,7 +884,7 @@
     if (!pack) return;
     const nextStatus = action === "approve" ? "approved" : action === "execute" ? "dispatched" : "dispatched";
     state.packs = state.packs.map((item) => item.id === id ? { ...item, status: nextStatus, updatedAt: new Date().toISOString() } : item);
-    addProof(`pack_${action}`, `${pack.label} moved through ${action}.`, "local");
+    addProof(`pack_${action}`, `${pack.label} moved through ${action}.`, isRuntimeBackedPack(pack) ? "runtime" : "operator", { packId: pack.id, owner: pack.owner, target: pack.target });
     saveState(`pack ${action}`);
     renderAll();
 

@@ -14,7 +14,7 @@
  *
  * Secrets (set via `wrangler secret put`):
  *   OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY
- *   KAIXU_ADMIN_KEY, KAIXU_ALLOWED_KEYS (comma-separated bearer keys)
+ *   FS27/SkyGate bearer sessions for user access. Legacy kAIxu keys are explicit dev/service fallback only.
  *
  * Service bindings (optional):
  *   SITE_OPERATOR → sovereign-13-site-operator-quantum (event forwarding)
@@ -145,13 +145,82 @@ function getBearer(req) {
   return m ? m[1].trim() : null;
 }
 
-function checkAuth(token, env) {
-  if (String(env.KAIXU_AUTH_REQUIRED || "true").toLowerCase() === "false") return true;
+function boolEnv(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || "").trim());
+}
+
+function skygateOrigin(env) {
+  return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || "").replace(/\/+$/, "");
+}
+
+function fs27Configured(env) {
+  return Boolean(env.SKYGATEFS27_WORKER?.fetch || skygateOrigin(env));
+}
+
+function scopeList(scope) {
+  if (Array.isArray(scope)) return scope.map(String);
+  return String(scope || "").split(/\s+/).filter(Boolean);
+}
+
+function allowsKaixuGate(claims) {
+  if (!claims?.active && !claims?.ok) return false;
+  const role = String(claims.role || claims.user?.role || "").toLowerCase();
+  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((item) => item.toLowerCase()));
+  return ["founder", "owner", "admin", "operator"].includes(role)
+    || scopes.has("gateway.invoke")
+    || scopes.has("ai.invoke")
+    || scopes.has("kaixu.invoke")
+    || scopes.has("admin.write")
+    || scopes.has("admin.read");
+}
+
+async function skygateRequest(env, path, init = {}) {
+  const origin = skygateOrigin(env);
+  if (env.SKYGATEFS27_WORKER?.fetch) {
+    const response = await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skygatefs27.internal${path}`, init));
+    if (response.status !== 404 || !origin) return response;
+  }
+  if (!origin) throw new Error("SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured.");
+  return fetch(`${origin}${path}`, init);
+}
+
+async function introspectGate(token, env) {
+  if (!fs27Configured(env)) return { ok: false, status: 503, code: "fs27_required", error: "Canonical FS27/SkyGate session is required for kAIxu." };
+  if (!token) return { ok: false, status: 401, error: "Missing FS27/SkyGate bearer." };
+  for (const path of ["/auth-introspect", "/auth/introspect", "/.netlify/functions/auth-introspect"]) {
+    const res = await skygateRequest(env, path, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token })
+    });
+    if (res.status === 404) continue;
+    const data = await res.json().catch(() => ({ active: false, error: "Invalid FS27/SkyGate response" }));
+    if (!res.ok || data.active !== true) return { ok: false, status: res.ok ? 401 : res.status, error: data.error || "FS27/SkyGate token is inactive or invalid.", skygate: data };
+    if (!allowsKaixuGate(data)) return { ok: false, status: 403, error: "FS27/SkyGate token is active but does not include kAIxu/AI entitlement.", skygate: data };
+    return { ok: true, via: "fs27-skygate", skygate: data };
+  }
+  return { ok: false, status: 404, error: "FS27/SkyGate introspection endpoint was not found." };
+}
+
+function legacyKeyAuth(token, env) {
+  if (!boolEnv(env.KAIXU_ALLOW_LEGACY_KEY_AUTH)) return false;
   if (!token) return false;
   if (env.KAIXU_ADMIN_KEY && token === env.KAIXU_ADMIN_KEY) return true;
   const allowed = String(env.KAIXU_ALLOWED_KEYS || "")
     .split(",").map(k => k.trim()).filter(Boolean);
   return allowed.includes(token);
+}
+
+async function checkAuth(token, env) {
+  if (String(env.KAIXU_AUTH_REQUIRED || "true").toLowerCase() === "false") {
+    return boolEnv(env.KAIXU_ALLOW_AUTH_DISABLED_DEV)
+      ? { ok: true, via: "explicit-dev-auth-disabled" }
+      : { ok: false, status: 503, code: "fs27_required", error: "kAIxu auth cannot be disabled outside explicit dev mode." };
+  }
+  const gate = await introspectGate(token, env);
+  if (gate.ok) return gate;
+  if (legacyKeyAuth(token, env)) return { ok: true, via: "explicit-legacy-kaixu-key" };
+  return gate;
 }
 
 // Inject the kAIxu canon as the first system message; strip any client-supplied canon block.
@@ -557,8 +626,13 @@ export default {
 
     // ── Auth gate ──
     const token = getBearer(request);
-    if (!checkAuth(token, env)) {
-      return json({ error: "Unauthorized. Provide a valid kAIxu key via: Authorization: Bearer <key>" }, 401);
+    const auth = await checkAuth(token, env);
+    if (!auth.ok) {
+      return json({
+        error: auth.error || "Unauthorized. Sign into FS27/SkyGate and pass the shared gate bearer.",
+        code: auth.code || "FS27_GATE_REQUIRED",
+        legacy_key_auth: boolEnv(env.KAIXU_ALLOW_LEGACY_KEY_AUTH) ? "explicitly-enabled" : "disabled"
+      }, auth.status || 401);
     }
 
     // ── Chat inference ──

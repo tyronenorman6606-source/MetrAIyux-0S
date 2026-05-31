@@ -3,6 +3,20 @@
   const SIGNINPRO_WORKSPACE_SLUG = 'fade-masters-phx';
   const SIGNINPRO_STATE_FALLBACK_KEY = `signinpro_workspace_state_v4:${SIGNINPRO_WORKSPACE_SLUG}`;
   const API_ENDPOINT = '/api/client-app-factory/factory/intake';
+  const NORTHSTAR_OS_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+  const NORTHSTAR_APP_URL = `${NORTHSTAR_OS_ORIGIN}/northstar/index.html?workspace=${SIGNINPRO_WORKSPACE_SLUG}&client=${SIGNINPRO_WORKSPACE_SLUG}`;
+  const NORTHSTAR_API_BASE = `${NORTHSTAR_OS_ORIGIN}/api/northstar`;
+  const SHARED_GATE_KEYS = [
+    'FREE99_PLATFORM_GATE_SESSION',
+    'METRAIYUX_GATE_SESSION',
+    'SKYGATEFS27_GATE_SESSION',
+    'SKYGATE_USER_TOKEN',
+    'SKYE_GATE_SESSION',
+    'quantumskyes_mcp_owner_token',
+    'metraiyux.founderCommand.token',
+    'adminBrainToken'
+  ];
+  let northStarCsrfToken = '';
   const services = [
     { id: 'skin-fade', name: 'Skin Fade', desc: 'Razor fade, blend, neckline, and style finish.', price: 45, minutes: 45 },
     { id: 'classic-cut', name: 'Classic Cut', desc: 'Clipper/scissor cut with neckline cleanup.', price: 35, minutes: 35 },
@@ -81,7 +95,7 @@
         role: 'operator'
       },
       settings: {
-        logo: './assets/brand/signinpro-northstar-skye-tiger-logo.png',
+        logo: `${NORTHSTAR_OS_ORIGIN}/northstar/assets/brand/signinpro-northstar-skye-tiger-logo.png`,
         eventName: 'Fade Masters PHX Chair Check-In',
         idLabel: 'Chair Code',
         enableSound: true,
@@ -140,13 +154,92 @@
     ]);
   }
 
+  function cleanToken(value) {
+    return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+  }
+
+  function readTokenFromStorage(store, key) {
+    try {
+      const raw = store.getItem(key);
+      if (!raw) return '';
+      const parsed = raw.startsWith('{') ? JSON.parse(raw) : null;
+      return cleanToken(parsed && parsed.token ? parsed.token : raw);
+    } catch {
+      return '';
+    }
+  }
+
+  function readSharedGateToken() {
+    for (const key of SHARED_GATE_KEYS) {
+      const token = readTokenFromStorage(sessionStorage, key) || readTokenFromStorage(localStorage, key);
+      if (token) return token;
+    }
+    return cleanToken(window.MetrAIyuxGateBridge?.current?.()?.token || window.Free99PlatformGate?.requireSession?.()?.token || '');
+  }
+
+  async function northStarApi(path, options = {}) {
+    const method = String(options.method || 'GET').toUpperCase();
+    const headers = Object.assign({}, options.headers || {});
+    if (method !== 'GET' || options.body) headers['content-type'] = headers['content-type'] || 'application/json';
+    const gateToken = readSharedGateToken();
+    if (gateToken) {
+      headers.authorization = `Bearer ${gateToken}`;
+      headers['x-skye-gate-session'] = gateToken;
+      headers['x-free99-gate-session'] = gateToken;
+    }
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && northStarCsrfToken) {
+      headers['x-csrf-token'] = northStarCsrfToken;
+    }
+    const response = await fetch(`${NORTHSTAR_API_BASE}${path}`, Object.assign({ credentials: 'include' }, options, { headers }));
+    const text = await response.text();
+    let payload = {};
+    try {
+      payload = text ? JSON.parse(text) : {};
+    } catch {
+      payload = { ok: false, error: text || 'Invalid JSON response.' };
+    }
+    if (payload && payload.csrfToken) northStarCsrfToken = payload.csrfToken;
+    if (!response.ok) throw new Error(payload.error || `0S NorthStar returned ${response.status}`);
+    return payload;
+  }
+
+  async function northStarSession() {
+    const Workspace = window.SignInProWorkspace;
+    if (Workspace?.isLocalPreview?.()) return Workspace.session();
+    try {
+      const payload = await northStarApi('/auth-session', { method: 'GET' });
+      if (payload && payload.ok && payload.workspace) return Object.assign({ authenticated: true }, payload);
+      return { authenticated: false };
+    } catch (error) {
+      return { authenticated: false, error: error.message || 'Session unavailable.' };
+    }
+  }
+
+  async function northStarPush(state, reason, makeBackup) {
+    return northStarApi('/workspace-sync', {
+      method: 'POST',
+      body: JSON.stringify({
+        state,
+        reason: String(reason || '').slice(0, 160),
+        makeBackup: makeBackup === true
+      })
+    });
+  }
+
+  function northStarCanWrite(session) {
+    const Workspace = window.SignInProWorkspace;
+    if (Workspace?.can) return Workspace.can(session, 'write');
+    const permissions = session?.user?.permissions;
+    return Array.isArray(permissions) ? permissions.includes('write') : true;
+  }
+
   function renderNorthStarStatus(remoteText) {
     const Core = window.SignInProCore;
     const Workspace = window.SignInProWorkspace;
     const key = signInProStateKey();
     const state = readSignInProState();
     const count = Array.isArray(state.attendees) ? state.attendees.length : 0;
-    if (runtimeStatus) runtimeStatus.textContent = Core?.createAttendee && Workspace?.stateKey ? 'NorthStar core + workspace client loaded' : 'NorthStar local bridge loaded';
+    if (runtimeStatus) runtimeStatus.textContent = Core?.createAttendee && Workspace?.stateKey ? '0S NorthStar core + workspace client loaded' : 'NorthStar local bridge loaded';
     if (coreStatus) coreStatus.textContent = Core?.createAttendee ? `SignInProCore ${Core.APP_VERSION || 'loaded'}` : 'SignInPro core unavailable';
     if (workspaceKeyStatus) workspaceKeyStatus.textContent = key;
     if (mirrorCountStatus) mirrorCountStatus.textContent = String(count);
@@ -154,19 +247,18 @@
   }
 
   async function tryRemoteNorthStarSync(state, reason) {
-    const Workspace = window.SignInProWorkspace;
-    if (!Workspace?.session || !Workspace?.push) return { ok: false, status: 'Local mirror only; NorthStar client unavailable' };
+    if (!window.fetch) return { ok: false, status: 'Local mirror only; browser fetch unavailable' };
     try {
-      const session = await withTimeout(Workspace.session(), 2500, 'NorthStar session check');
+      const session = await withTimeout(northStarSession(), 2500, 'Shared 0S NorthStar session check');
       if (session && session.timedOut) return { ok: false, status: session.status };
-      if (!session || !session.authenticated) return { ok: false, status: 'Local mirror ready; operator login required for remote sync' };
+      if (!session || !session.authenticated) return { ok: false, status: 'Local mirror ready; shared 0S operator login required for remote sync' };
       if (session.localPreview) return { ok: false, status: 'Local preview mirror ready' };
-      if (Workspace.can && !Workspace.can(session, 'write')) return { ok: false, status: 'NorthStar session lacks write permission' };
-      const pushed = await withTimeout(Workspace.push(state, reason, true), 4000, 'NorthStar remote push');
+      if (!northStarCanWrite(session)) return { ok: false, status: 'Shared 0S session lacks NorthStar write permission' };
+      const pushed = await withTimeout(northStarPush(state, reason, true), 4000, 'Shared 0S NorthStar push');
       if (pushed && pushed.timedOut) return { ok: false, status: pushed.status };
-      return { ok: true, status: 'Synced to NorthStar workspace' };
+      return { ok: true, status: 'Synced to shared 0S NorthStar workspace' };
     } catch (error) {
-      return { ok: false, status: `Local mirror ready; remote sync pending (${error.message})` };
+      return { ok: false, status: `Local mirror ready; shared 0S NorthStar sync pending (${error.message})` };
     }
   }
 
@@ -469,7 +561,7 @@
       `Workspace: ${state.workspace?.name || SIGNINPRO_WORKSPACE_SLUG}`,
       `Mirrored records: ${count}`,
       latest ? `Latest: ${latest.name} / ${latest.eventId}` : 'Latest: none yet',
-      'Open /northstar/?workspace=fade-masters-phx&client=fade-masters-phx to use the provisioned NorthStar lane.'
+      `Open ${NORTHSTAR_APP_URL} to use the shared 0S NorthStar lane.`
     ].join('\n');
   });
 

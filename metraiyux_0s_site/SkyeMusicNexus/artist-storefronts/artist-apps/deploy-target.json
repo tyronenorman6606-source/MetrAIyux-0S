@@ -1,96 +1,84 @@
 {
   "schema": "skyenet.client-app.deploy-target.v1",
-  "updatedAt": "2026-05-30T19:09:11.739Z",
+  "updatedAt": "2026-05-30T23:02:11.824Z",
   "deployHost": "SkyeNet shared origin path route",
   "projectId": "musicnexus-artist-apps",
   "workspaceId": "artist-apps",
   "planName": "skyenet-edge-starter",
-  "deploymentId": "dep_20260530190837",
+  "deploymentId": "dep_20260530230004",
   "publicUrl": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/",
   "host": "skyenet.graylondonskyes.workers.dev",
   "mountPath": "/musicnexus-artist-apps",
   "urlMode": "path",
   "publicAccess": true,
-  "sourceRoot": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-apps",
-  "publicBuildDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-apps",
+  "sourceRoot": ".tmp/skyenet-musicnexus-public-bundles/musicnexus-artist-apps",
+  "publicBuildDir": ".tmp/skyenet-musicnexus-public-bundles/musicnexus-artist-apps",
   "sourceCustody": {
     "privateSourcePackage": true,
-    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-apps&project_id=musicnexus-artist-apps&deployment_id=dep_20260530190837",
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-apps&project_id=musicnexus-artist-apps&deployment_id=dep_20260530230004",
     "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "legacyRoutes": [
-    "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/artist-storefronts/artist-apps/",
-    "https://skyenet.graylondonskyes.workers.dev/musicnexus/artist-apps/"
-  ],
   "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
   "lastSmoke": {
-    "hostHeader": {
-      "ok": true,
-      "route_record": {
+    "ok": true,
+    "assets": [
+      {
+        "id": "root",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/",
         "status": 200,
         "ok": true,
-        "count": 1,
-        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-artist-apps",
-        "route": {
-          "hostname": "skyenet.graylondonskyes.workers.dev",
-          "mount_path": "/musicnexus-artist-apps",
-          "url_mode": "path",
-          "workspace_id": "artist-apps",
-          "project_id": "musicnexus-artist-apps",
-          "active_deployment_id": "dep_20260530190837",
-          "public_access": true,
-          "default_auth": "public",
-          "asset_prefix": "deployments/musicnexus-artist-apps/dep_20260530190837",
-          "updated_at": "2026-05-30T19:09:00.980Z"
-        },
-        "elapsed_ms": 655.81
-      },
-      "dashboard": {
-        "status": 200,
-        "ok": true,
-        "deployment_found": true,
-        "live_url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/",
-        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-artist-apps",
-        "elapsed_ms": 749.01
-      },
-      "public_http": {
-        "status": 200,
-        "ok": true,
+        "elapsed_ms": 224.44,
         "content_type": "text/html; charset=utf-8",
-        "location": "",
-        "elapsed_ms": 153.08,
-        "error": "",
-        "blocker": ""
+        "location": ""
       },
-      "host_header_probe": {
+      {
+        "id": "css",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/artist-storefronts.css",
         "status": 200,
         "ok": true,
-        "content_type": "text/html",
-        "elapsed_ms": 69.94,
-        "bytes": 4644,
-        "title": "SkyeNet | Sovereign Deploy Network",
-        "missing_route_header_probe_error": ""
+        "elapsed_ms": 291.83,
+        "content_type": "text/css; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "mcp_js",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/assets/mcp-implementation/mcp-effects.js",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 457.27,
+        "content_type": "text/javascript; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "bridge_js",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/assets/js/0s-command-bridge.js",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 396.56,
+        "content_type": "text/javascript; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "logo",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-apps/shared/SkyeMusicNexus/assets/skye-music-nexus-logo.png",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 582.61,
+        "content_type": "image/png",
+        "location": ""
       }
-    },
-    "sourceDownload": {
+    ],
+    "route": {
+      "status": 200,
       "ok": true,
-      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-apps&project_id=musicnexus-artist-apps&deployment_id=dep_20260530190837",
-      "unauth": {
-        "status": 401,
-        "ok": true,
-        "content_type": "application/json; charset=utf-8",
-        "elapsed_ms": 322.73
-      },
-      "auth": {
-        "status": 200,
-        "ok": true,
-        "content_type": "application/x-tar",
-        "content_length": 0,
-        "bytes_read": 52224,
-        "read_truncated": false,
-        "elapsed_ms": 402.65,
-        "error": ""
-      }
+      "count": 1
+    },
+    "source_download_head": {
+      "status": 404,
+      "ok": false,
+      "elapsed_ms": 274.38,
+      "content_type": "",
+      "location": ""
     }
   }
 }

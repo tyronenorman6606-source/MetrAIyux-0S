@@ -29,7 +29,7 @@
     },
     {
       lane: 'Creation pass',
-      title: 'Create Hub and the DAW turn the idea into a project packet.',
+      title: 'DAW Room and the DAW turn the idea into a project packet.',
       body: 'The DAW room carries transport, arrangement, tracks, mixer, pads, keys, import/preview, mic and MIDI hooks, mixdown, save, and export controls.',
       actions: ['Sketch or import audio.', 'Stage stems and project notes.', 'Export the manifest into release work.'],
       screen: 'daw',
@@ -66,7 +66,7 @@
     {
       lane: 'Business pass',
       title: 'The Store turns approved work into fan-facing products.',
-      body: 'Artist Store handles digital access, merch, tickets, tips, bookings, memberships, order intents, product records, and SkyePay checkout routes.',
+      body: 'Artist Store handles digital access, merch, tickets, tips, bookings, memberships, order intents, product records, and SkyePay request routes.',
       actions: ['Create product copy and price.', 'Attach approved media or drop page.', 'Route checkout through SkyePay.'],
       screen: 'store',
       href: './store.html',
@@ -94,7 +94,7 @@
       lane: 'SupaBoy product pass',
       title: 'SupaBoy product cards stay real before checkout goes live.',
       body: 'The SupaBoy product desk stages SLB / Superboy, 24 Hr In Houston proof, live booking, and first upload without fake audio or fake checkout. The welcome pack links Upload Studio with artist ID 444666666667 already carried in the URL.',
-      actions: ['Inspect the SLB product card.', 'View the Houston proof visual.', 'Upload owned audio before enabling SkyePay checkout.'],
+      actions: ['Inspect the SLB product card.', 'View the Houston proof visual.', 'Upload owned audio before requesting SkyePay checkout.'],
       screen: 'store',
       href: '../artist-storefronts/supaboy/products/',
       focus: [52, 58]

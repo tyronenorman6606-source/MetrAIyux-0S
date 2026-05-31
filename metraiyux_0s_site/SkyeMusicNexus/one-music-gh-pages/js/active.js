@@ -542,7 +542,6 @@ function mountSkyeSolLivingBackground({
   };
 }
 
-
 (function(){
   if(window.__mcpSkyeSolLivingBackgroundMounted) return;
   window.__mcpSkyeSolLivingBackgroundMounted = true;

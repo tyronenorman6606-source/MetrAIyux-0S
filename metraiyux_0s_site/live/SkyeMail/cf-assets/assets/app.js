@@ -54,19 +54,6 @@ function readGateSession(){
     const current = bridge?.current?.();
     if(current?.token) return current;
   }catch(_err){}
-  const keys = ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYGATE_USER_TOKEN","SKYE_GATE_SESSION","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"];
-  for(const key of keys){
-    for(const store of [sessionStorage, localStorage]){
-      try{
-        const raw = store.getItem(key);
-        if(!raw) continue;
-        let parsed = null;
-        try{ parsed = raw.startsWith("{") ? JSON.parse(raw) : null; }catch(_err){}
-        const token = parsed?.token || parsed?.session || parsed?.sessionToken || raw;
-        if(token) return { token, source:key };
-      }catch(_err){}
-    }
-  }
   return null;
 }
 function getToken(){ return readGateSession()?.token || ""; }
@@ -74,19 +61,13 @@ function setToken(t){
   const token = String(t || "").trim();
   if(!token) return "";
   const session = { token, source:"skymail-fs27-session", platform_id:"skymail", usage_lane:"mail", issued_at:new Date().toISOString() };
-  try{
-    sessionStorage.setItem("SMV_SKYEMAIL_SESSION", JSON.stringify(session));
-    localStorage.setItem("SMV_SKYEMAIL_SESSION", JSON.stringify(session));
-    sessionStorage.setItem("SMV_AUTH_TOKEN", token);
-    localStorage.setItem("SMV_AUTH_TOKEN", token);
-  }catch(_err){}
   const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   bridge?.persist?.(session, { silent:true });
   return token;
 }
 function clearToken(){
   try{
-    ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN"].forEach((key) => {
+    ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","SKYGATE_USER_TOKEN","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"].forEach((key) => {
       sessionStorage.removeItem(key);
       localStorage.removeItem(key);
     });

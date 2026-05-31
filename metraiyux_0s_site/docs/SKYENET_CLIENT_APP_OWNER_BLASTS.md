@@ -1,6 +1,6 @@
 # SkyeNet Client App Owner Blasts
 
-Generated: 2026-05-30T07:53:33.082Z
+Generated: 2026-05-30T20:39:33.378Z
 
 This report is generated from `tools/report-skynet-client-apps.mjs` by scanning `client-app-factory/client-apps`. It excludes `skye-app-template` by default and uses only local metadata: `site-data.json`, `manifest.webmanifest`, `APP_PATH_MANIFEST.json`, and `deploy-target.json` when present.
 

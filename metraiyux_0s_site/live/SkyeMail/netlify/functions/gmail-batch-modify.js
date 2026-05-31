@@ -4,7 +4,7 @@ const { getAuthorizedGmail, gmailRequest } = require('./_gmail');
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const ids = Array.isArray(body.ids) ? body.ids.map(String).map((v)=>v.trim()).filter(Boolean) : [];
     const addLabelIds = Array.isArray(body.addLabelIds) ? body.addLabelIds.map(String).filter(Boolean) : [];

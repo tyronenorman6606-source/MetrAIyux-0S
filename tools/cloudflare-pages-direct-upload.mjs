@@ -259,6 +259,7 @@ const contentTypes = new Map([
   [".js", "text/javascript; charset=utf-8"],
   [".json", "application/json; charset=utf-8"],
   [".md", "text/markdown; charset=utf-8"],
+  [".mp3", "audio/mpeg"],
   [".mp4", "video/mp4"],
   [".png", "image/png"],
   [".svg", "image/svg+xml"],
@@ -302,9 +303,59 @@ const skyeMusicApprovedReleaseAssetPrefixes = [
   "artist-storefronts/gray-skyes/drops/everything-movie-twin-engine/",
   "artist-storefronts/gray-skyes/drops/skyline-pact/"
 ];
+let skyeMusicPublicCatalogAssetPaths = null;
 
 function isSkyeMusicNexusUpload() {
   return projectName === "skye-music-nexus" || fs.existsSync(path.join(distDir, "SkyeMusicNexus.html")) || fs.existsSync(path.join(distDir, "artist-storefronts"));
+}
+
+function normalizeSkyeMusicAssetPath(value) {
+  if (typeof value !== "string" || !value) return "";
+  let pathname = value;
+  try {
+    pathname = new URL(value, "https://skye-music-nexus.pages.dev").pathname;
+  } catch {
+    pathname = value.split("?")[0].split("#")[0];
+  }
+  return decodeURIComponent(pathname)
+    .replace(/^\/+/, "")
+    .replace(/^SkyeMusicNexus\//, "")
+    .split("?")[0]
+    .split("#")[0];
+}
+
+function collectSkyeMusicPublicCatalogAssetPaths() {
+  if (skyeMusicPublicCatalogAssetPaths) return skyeMusicPublicCatalogAssetPaths;
+  const allowed = new Set();
+  const publicDataFiles = [
+    path.join(distDir, "public", "data", "playlists.json")
+  ];
+
+  function collect(value) {
+    if (Array.isArray(value)) {
+      value.forEach(collect);
+      return;
+    }
+    if (value && typeof value === "object") {
+      Object.values(value).forEach(collect);
+      return;
+    }
+    const webPath = normalizeSkyeMusicAssetPath(value);
+    if (!webPath.startsWith("artist-storefronts/")) return;
+    if (skyeMusicProtectedExtensions.has(path.extname(webPath).toLowerCase())) allowed.add(webPath);
+  }
+
+  for (const file of publicDataFiles) {
+    if (!fs.existsSync(file)) continue;
+    try {
+      collect(JSON.parse(fs.readFileSync(file, "utf8")));
+    } catch (error) {
+      console.warn(`Could not read Music Nexus public catalog allowlist from ${path.relative(repoRoot, file)}: ${error.message}`);
+    }
+  }
+
+  skyeMusicPublicCatalogAssetPaths = allowed;
+  return allowed;
 }
 
 function isSkyeMusicProtectedAsset(relativePath) {
@@ -313,6 +364,7 @@ function isSkyeMusicProtectedAsset(relativePath) {
   if (webPath.startsWith("song-creation-bin/")) return true;
   if (!webPath.startsWith("artist-storefronts/")) return false;
   if (skyeMusicApprovedReleaseAssetPrefixes.some((prefix) => webPath.startsWith(prefix))) return false;
+  if (collectSkyeMusicPublicCatalogAssetPaths().has(webPath)) return false;
   if (webPath.endsWith("/pics2vid/package.json")) return true;
   return skyeMusicProtectedExtensions.has(path.extname(webPath).toLowerCase());
 }
@@ -320,6 +372,7 @@ function isSkyeMusicProtectedAsset(relativePath) {
 function shouldIgnore(relativePath) {
   const parts = relativePath.split(path.sep);
   if (ignoredNames.has(parts.at(-1))) return true;
+  if (isSkyeMusicNexusUpload() && parts.at(-1) === "MCP_TOOLING_RECEIPT.json") return true;
   if (isSkyeMusicProtectedAsset(relativePath)) return true;
   return parts.includes("node_modules") || parts.includes(".git") || parts.includes(".wrangler") || parts[0] === "functions";
 }

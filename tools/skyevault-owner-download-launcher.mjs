@@ -116,6 +116,17 @@ function safeDownloadSummary() {
   };
 }
 
+function signedDownloadNeedsRefresh(summary, windowMs = 5 * 60 * 1000) {
+  const downloads = Array.isArray(summary?.downloads) ? summary.downloads : [];
+  if (!downloads.length) return true;
+  return downloads.some((item) => {
+    if (!item.ok || !item.hasDownloadUrl) return true;
+    const expiresAt = Date.parse(item.expiresAt || '');
+    if (!Number.isFinite(expiresAt)) return true;
+    return expiresAt <= Date.now() + windowMs;
+  });
+}
+
 function mintLatestDownload(envFile, receiptId) {
   const args = [
     path.join(repoRoot, 'tools', 'skyevault-mint-receipt-downloads.mjs'),
@@ -135,12 +146,33 @@ function mintLatestDownload(envFile, receiptId) {
   return JSON.parse(result.stdout || '{}');
 }
 
-function startDetachedServer(port) {
+function ensureFreshSignedDownload(envFile, options = {}) {
+  const receipt = latestFullReceipt();
+  if (!receipt.receiptId) throw new Error('No latest full-repo receipt was found.');
+  const before = safeDownloadSummary();
+  if (!options.force && !signedDownloadNeedsRefresh(before)) {
+    return { refreshed: false, receipt, signedDownload: before };
+  }
+  const mint = mintLatestDownload(envFile, receipt.receiptId);
+  return {
+    refreshed: true,
+    receipt,
+    signedDownload: safeDownloadSummary(),
+    mint: {
+      ok: Boolean(mint.ok),
+      createdAt: mint.createdAt || '',
+      expiresInSeconds: mint.expiresInSeconds || null,
+      downloads: mint.downloads || []
+    }
+  };
+}
+
+function startDetachedServer(port, envFile) {
   const existing = readPid();
   if (pidAlive(Number(existing?.pid || 0))) return { running: true, pid: Number(existing.pid), reused: true };
   fs.mkdirSync(autosyncDir, { recursive: true });
   const out = fs.openSync(logFile, 'a');
-  const child = spawn(process.execPath, [scriptPath, 'serve', `--port=${port}`], {
+  const child = spawn(process.execPath, [scriptPath, 'serve', `--port=${port}`, `--env-file=${envFile}`], {
     cwd: repoRoot,
     detached: true,
     stdio: ['ignore', out, out]
@@ -150,7 +182,7 @@ function startDetachedServer(port) {
   const record = {
     pid: child.pid,
     startedAt: new Date().toISOString(),
-    command: `node ${path.relative(repoRoot, scriptPath)} serve --port=${port}`,
+    command: `node ${path.relative(repoRoot, scriptPath)} serve --port=${port} --env-file=${envFile}`,
     port,
     url: localUrl(port),
     directory: path.relative(repoRoot, autosyncDir),
@@ -167,9 +199,9 @@ function contentType(file) {
   return 'application/octet-stream';
 }
 
-function serve(port) {
+function serve(port, envFile = '.env') {
   fs.mkdirSync(autosyncDir, { recursive: true });
-  const server = http.createServer((request, response) => {
+  const server = http.createServer(async (request, response) => {
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     let decoded = '/';
     try {
@@ -179,7 +211,46 @@ function serve(port) {
       response.end('Bad request');
       return;
     }
+    if (decoded === '/refresh' || decoded === '/refresh.json') {
+      try {
+        const fresh = ensureFreshSignedDownload(envFile, { force: true });
+        const state = await status(port);
+        const payload = { ok: true, refreshed: true, fresh, state };
+        if (decoded.endsWith('.json') || (request.headers.accept || '').includes('application/json')) {
+          const body = `${JSON.stringify(payload, null, 2)}\n`;
+          response.writeHead(200, {
+            'content-type': 'application/json; charset=utf-8',
+            'content-length': Buffer.byteLength(body),
+            'cache-control': 'no-store'
+          });
+          response.end(body);
+          return;
+        }
+        response.writeHead(303, {
+          location: '/FULL_17GB_REPO_DOWNLOAD.html',
+          'cache-control': 'no-store'
+        });
+        response.end();
+        return;
+      } catch (error) {
+        const body = `${JSON.stringify({ ok: false, error: error.message }, null, 2)}\n`;
+        response.writeHead(500, {
+          'content-type': 'application/json; charset=utf-8',
+          'content-length': Buffer.byteLength(body),
+          'cache-control': 'no-store'
+        });
+        response.end(body);
+        return;
+      }
+    }
     if (decoded === '/') decoded = '/FULL_17GB_REPO_DOWNLOAD.html';
+    if (decoded === '/FULL_17GB_REPO_DOWNLOAD.html') {
+      try {
+        ensureFreshSignedDownload(envFile);
+      } catch (error) {
+        console.error(`[owner-download-launcher] refresh failed: ${error.message}`);
+      }
+    }
     const target = path.resolve(autosyncDir, `.${decoded}`);
     const root = `${path.resolve(autosyncDir)}${path.sep}`;
     if (target !== path.resolve(autosyncDir) && !target.startsWith(root)) {
@@ -243,7 +314,7 @@ async function start() {
   if (!receipt.receiptId) throw new Error('No latest full-repo receipt was found.');
   let mint = null;
   if (!hasFlag('--no-mint')) mint = mintLatestDownload(envFile, receipt.receiptId);
-  const server = startDetachedServer(port);
+  const server = startDetachedServer(port, envFile);
   await new Promise((resolve) => setTimeout(resolve, 250));
   const state = await status(port);
   state.started = server;
@@ -273,7 +344,7 @@ async function stop() {
 }
 
 if (command === 'serve') {
-  serve(Number(argValue('--port', '17687')) || 17687);
+  serve(Number(argValue('--port', '17687')) || 17687, argValue('--env-file', '.env') || '.env');
 } else if (command === 'start') {
   start().then((state) => console.log(JSON.stringify(state, null, 2))).catch((error) => {
     console.error(error.stack || error.message);

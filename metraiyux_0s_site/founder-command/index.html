@@ -631,6 +631,43 @@
       </section>
 
       <section class="view" id="view-clients">
+        <section class="panel valley-showroom-panel">
+          <div class="panel-head">
+            <p class="eyebrow">Valley Verified / SkyeNet showroom</p>
+            <h2>Pull up every client app from Founder Command</h2>
+          </div>
+          <p class="muted">These are Valley Verified client app and marketplace route records from SkyeNet. Routes count as live only after the route index verifies them; fallback rows stay visibly unverified.</p>
+          <div class="status-grid">
+            <div><span>Routes</span><strong id="valleyVerifiedRouteCount">Loading</strong></div>
+            <div><span>Verified URLs</span><strong id="valleyVerifiedLiveCount">Loading</strong></div>
+            <div><span>Source</span><strong id="valleyVerifiedProofState">Loading</strong></div>
+          </div>
+          <div class="tool-row">
+            <button class="button" id="refreshValleyVerifiedRoutesBtn" type="button">Refresh Routes</button>
+            <button class="button secondary" id="copyValleyVerifiedLinksBtn" type="button">Copy All Links</button>
+            <button class="button secondary" id="copyValleyVerifiedBlastBtn" type="button">Copy Current Blast</button>
+            <button class="button secondary" id="openValleyVerifiedRouteBtn" type="button">Open Current</button>
+            <button class="button secondary" id="fullscreenValleyVerifiedPreviewBtn" type="button">Fullscreen Preview</button>
+          </div>
+          <div class="valley-showroom">
+            <aside class="valley-client-list" id="valleyVerifiedClientList"></aside>
+            <section class="valley-preview">
+              <div class="valley-preview-bar">
+                <div>
+                  <span>Selected</span>
+                  <strong id="valleyVerifiedActiveName">Loading</strong>
+                  <small id="valleyVerifiedActiveUrl"></small>
+                </div>
+                <a class="button secondary" id="valleyVerifiedOpenLink" href="#" target="_blank" rel="noopener">Open Live</a>
+              </div>
+              <div class="valley-preview-frame" id="valleyVerifiedPreviewShell">
+                <iframe id="valleyVerifiedFrame" title="Valley Verified SkyeNet client preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+              <pre class="output-box" id="valleyVerifiedOutput">Loading Valley Verified SkyeNet routes.</pre>
+            </section>
+          </div>
+        </section>
+
         <section class="panel">
           <div class="panel-head">
             <p class="eyebrow">Founder-only client vault</p>

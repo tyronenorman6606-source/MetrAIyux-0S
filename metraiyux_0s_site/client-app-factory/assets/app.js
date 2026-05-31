@@ -12,6 +12,16 @@ const API_BASE = String(
   || document.querySelector('meta[name="client-app-factory-api-base"]')?.getAttribute("content")
   || (APP_BASE_PATH === "/" ? "/api" : "/api/client-app-factory")
 ).replace(/\/+$/, "");
+const STATIC_FALLBACK_ALLOWED = Boolean(
+  CONFIG.allowStaticFallback === true
+  || window.CLIENT_APP_FACTORY_ALLOW_STATIC_FALLBACK === true
+  || /^(127\.0\.0\.1|localhost)$/i.test(window.location.hostname)
+);
+const sharedGateKeys = [
+  "METRAIYUX_GATE_SESSION",
+  "SKYGATEFS27_GATE_SESSION",
+  "SKYE_GATE_SESSION"
+];
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -291,7 +301,7 @@ const completionGate = [
   "Deploy target ready"
 ];
 
-let currentRecord = fallbackRecord;
+let currentRecord = markRecordLocal(fallbackRecord, "embedded-static-preview-seed");
 let valleyBusinesses = [];
 let scanReport = null;
 let backendHealth = null;
@@ -441,6 +451,69 @@ async function fetchJson(path, fallback) {
   }
 }
 
+function cleanToken(value) {
+  return String(value || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+}
+
+function readTokenFromStore(store, key) {
+  try {
+    const raw = store.getItem(key);
+    if (!raw) return "";
+    const parsed = raw.startsWith("{") ? JSON.parse(raw) : null;
+    return cleanToken(parsed?.token || raw);
+  } catch {
+    return "";
+  }
+}
+
+function sharedGateToken() {
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  const bridgeToken = bridge?.requireSession?.({ platformId: "client-app-factory", usageLane: "client-app-factory" })?.token
+    || bridge?.current?.()?.token
+    || window.SkygateAuthBridge?.token?.()
+    || "";
+  if (bridgeToken) return cleanToken(bridgeToken);
+  for (const key of sharedGateKeys) {
+    const token = readTokenFromStore(sessionStorage, key) || readTokenFromStore(localStorage, key);
+    if (token) return token;
+  }
+  return "";
+}
+
+function authHeaders(extra = {}) {
+  const token = sharedGateToken();
+  return {
+    ...extra,
+    ...(token ? {
+      authorization: `Bearer ${token}`,
+      "x-free99-gate-session": token,
+      "x-skye-gate-session": token,
+      "x-skygate-session": token
+    } : {})
+  };
+}
+
+function markRecordLocal(record, source = "browser-local") {
+  if (!record) return record;
+  return {
+    ...record,
+    __runtimeConfirmed: false,
+    __factorySource: source,
+    __factoryProof: "not-worker-confirmed",
+    status: record.status && !/live|deployed|verified/i.test(record.status) ? record.status : "browser-or-static-preview"
+  };
+}
+
+function markRecordRuntime(record, source = "worker-runtime") {
+  if (!record) return record;
+  return {
+    ...record,
+    __runtimeConfirmed: true,
+    __factorySource: source,
+    __factoryProof: "worker-confirmed"
+  };
+}
+
 async function fetchFirstJson(paths = [], fallback = null) {
   for (const path of paths) {
     const href = toFactoryHref(path);
@@ -448,20 +521,22 @@ async function fetchFirstJson(paths = [], fallback = null) {
     try {
       const response = await fetch(href, { cache: "no-store" });
       if (!response.ok) continue;
-      return await response.json();
+      return markRecordLocal(await response.json(), "static-record-fallback");
     } catch {
       continue;
     }
   }
-  return fallback;
+  return fallback ? markRecordLocal(fallback, "embedded-static-preview-seed") : fallback;
 }
 
 async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     method: options.method || "GET",
-    headers: {
-      "content-type": "application/json"
-    },
+    credentials: "include",
+    headers: authHeaders({
+      "content-type": "application/json",
+      ...(options.headers || {})
+    }),
     body: options.body ? JSON.stringify(options.body) : undefined
   });
   const payload = await response.json().catch(() => ({}));
@@ -475,7 +550,7 @@ function aiBadge() {
   if (!backendHealth?.ai) return "AI pending";
   const ai = backendHealth.ai;
   if (ai.liveAvailable) return `Auren live · ${ai.model}`;
-  if (ai.configured) return `Auren fallback · ${ai.model}`;
+  if (ai.configured) return `Auren configured · live receipt required · ${ai.model}`;
   return "Auren offline";
 }
 
@@ -586,7 +661,7 @@ function renderHeader() {
         <p class="brand-note">One client. Twelve focused steps. No hidden console maze.</p>
       </div>
       <div class="topbar-actions">
-        <span class="status-chip ${backendReady ? "ok" : "warn"}" data-backend-status>${escapeHtml(pipelineSnapshots.statusMessage || (backendReady ? "Factory API live" : "Factory API offline"))}</span>
+        <span class="status-chip ${backendReady ? "ok" : "warn"}" data-backend-status>${escapeHtml(pipelineSnapshots.statusMessage || (backendReady ? "Factory API live" : "Factory API unavailable · browser/static data only"))}</span>
         <span class="status-chip ${backendHealth?.ai?.liveAvailable ? "ok" : "quiet"}">${escapeHtml(aiBadge())}</span>
         <a class="action-btn accent" href="${escapeHtml(pageHref("clients"))}">Start</a>
       </div>
@@ -606,6 +681,7 @@ function renderHeader() {
       </div>
       <dl class="client-band-meta">
         <div><dt>Status</dt><dd>${escapeHtml(currentRecord.status || "intake-created")}</dd></div>
+        <div><dt>Source</dt><dd>${escapeHtml(currentRecord.__runtimeConfirmed ? "Worker confirmed" : currentRecord.__factorySource || "browser/static")}</dd></div>
         <div><dt>Contact</dt><dd>${escapeHtml(getPrimaryContact(currentRecord).name || "Not set")}</dd></div>
         <div><dt>Live site</dt><dd>${liveUrl ? `<a class="text-link" href="${escapeHtml(liveUrl)}" target="_blank" rel="noreferrer">Open</a>` : "Missing"}</dd></div>
         <div><dt>Preview</dt><dd>${renderHref(`${buildClientAppBase(currentRecord)}/index.html`, "Open")}</dd></div>
@@ -637,6 +713,7 @@ function renderHero() {
 
 function renderStateRail() {
   const completed = new Set(currentRecord.completedStates || []);
+  const confirmed = currentRecord.__runtimeConfirmed === true;
   return `
     <section class="section">
       <div class="section-head">
@@ -649,7 +726,7 @@ function renderStateRail() {
         ${outcomeStates.map((state) => `
           <article class="state-node ${completed.has(state) ? "complete" : ""}">
             <strong>${escapeHtml(state.replaceAll("-", " "))}</strong>
-            <span>${completed.has(state) ? "Recorded" : "Waiting"}</span>
+            <span>${completed.has(state) ? (confirmed ? "Worker recorded" : "Browser/static only") : "Waiting"}</span>
           </article>
         `).join("")}
       </div>
@@ -1308,12 +1385,12 @@ function renderProofGrid() {
   const container = $("[data-proof-grid]");
   if (!container) return;
   const proofItems = [
-    { name: "Factory MCP receipt", status: "Recorded", href: "MCP_TOOLING_RECEIPT.json" },
-    { name: "Path manifest", status: "Generated", href: "APP_PATH_MANIFEST.json" },
-    { name: "Generated app", status: latestGeneratedApp(currentRecord) ? "Linked" : "Waiting", href: `${buildClientAppBase(currentRecord)}/index.html` },
-    { name: "Workflow reel", status: "Browser proof", href: "assets/proof/client-app-factory-workflow.webm" },
-    { name: "Scanner report", status: scanReport?.ok ? "Green" : "Pending", href: getScanReportHref() },
-    ...((currentRecord.proofArtifacts || []).map((href) => ({ name: pathLabel(href), status: "Attached", href })))
+    { name: "Factory MCP receipt", status: backendReady ? "Worker reachable" : "Static artifact", href: "MCP_TOOLING_RECEIPT.json" },
+    { name: "Path manifest", status: backendReady ? "Runtime checked" : "Static artifact", href: "APP_PATH_MANIFEST.json" },
+    { name: "Generated app", status: latestGeneratedApp(currentRecord) && currentRecord.__runtimeConfirmed ? "Worker linked" : latestGeneratedApp(currentRecord) ? "Static link" : "Waiting", href: `${buildClientAppBase(currentRecord)}/index.html` },
+    { name: "Workflow reel", status: "Browser proof artifact", href: "assets/proof/client-app-factory-workflow.webm" },
+    { name: "Scanner report", status: scanReport?.ok && backendReady ? "Worker green" : scanReport?.ok ? "Static report" : "Pending", href: getScanReportHref() },
+    ...((currentRecord.proofArtifacts || []).map((href) => ({ name: pathLabel(href), status: currentRecord.__runtimeConfirmed ? "Worker attached" : "Static attachment", href })))
   ];
   const unique = proofItems.filter((item, index, list) => list.findIndex((other) => other.href === item.href) === index);
   container.innerHTML = unique.map((item) => `
@@ -1572,19 +1649,19 @@ async function loadClientRecord(clientId, options = {}) {
   if (backendReady) {
     try {
       const response = await apiRequest(`/factory/records/${clientId}`);
-      record = response.record;
+      record = markRecordRuntime(response.record);
     } catch {}
   }
   const fallbackPaths = [
     ...(options.fallbackPaths || []),
     ...(recordFallbackPaths[clientId] || [])
   ];
-  if (!record && fallbackPaths.length) {
+  if (!record && fallbackPaths.length && STATIC_FALLBACK_ALLOWED) {
     record = await fetchFirstJson(fallbackPaths, embeddedFallbackRecords[clientId] || null);
   }
-  if (!record) {
+  if (!record && STATIC_FALLBACK_ALLOWED) {
     const localRecord = loadLocalRecord();
-    if (localRecord?.clientId === clientId) record = localRecord;
+    if (localRecord?.clientId === clientId) record = markRecordLocal(localRecord, "browser-local-cache");
   }
   if (!record) return;
   const nextClientId = record.clientId || clientId;
@@ -1619,7 +1696,7 @@ async function importValleyBusiness(businessId, options = {}) {
       method: "POST",
       body: { businessId }
     });
-    currentRecord = response.record;
+    currentRecord = markRecordRuntime(response.record);
     pipelineSnapshots = {};
     pipelineSnapshots.clientId = currentRecord.clientId;
     pipelineSnapshots.statusMessage = options.runFactory ? "Client imported. Opening build runway…" : "Client imported.";
@@ -1645,7 +1722,7 @@ async function loadScanReport({ runBackend = true } = {}) {
         body: { clientId: getCurrentClientId(currentRecord) }
       });
       scanReport = response.report;
-      if (response.record) currentRecord = response.record;
+      if (response.record) currentRecord = markRecordRuntime(response.record);
       renderApp();
       await refreshLedger();
       return;
@@ -1666,7 +1743,7 @@ async function runFactoryStage(stage) {
       method: "POST",
       body: { clientId: getCurrentClientId(currentRecord) }
     });
-    currentRecord = response.record || currentRecord;
+    currentRecord = markRecordRuntime(response.record || currentRecord);
     scanReport = response.scan || response.core?.scan || scanReport;
     pipelineSnapshots.last = {
       stage,
@@ -1770,7 +1847,7 @@ async function submitAssetUpload(form) {
       provenance: form.provenance.value || "operator-uploaded"
     }
   });
-  currentRecord = response.record;
+  currentRecord = markRecordRuntime(response.record);
   pipelineSnapshots.clientId = currentRecord.clientId;
   pipelineSnapshots.statusMessage = "Asset cataloged.";
   savePipelineState();
@@ -1855,7 +1932,7 @@ async function requestAiIdentityImage() {
         sourceUrls: currentRecord.sourceUrls || []
       }
     });
-    if (response.record) currentRecord = response.record;
+    if (response.record) currentRecord = markRecordRuntime(response.record);
     if (!response.dataUrl) throw new Error(response.message || "AI image response did not include an image.");
     localStorage.setItem(MEDIA_HANDOFF_KEY, JSON.stringify({
       sourceApp: "client-app-factory",
@@ -1904,16 +1981,18 @@ async function saveIntakeForm(form) {
           email: data.get("email")
         }
       });
-      currentRecord = response.record;
+      currentRecord = markRecordRuntime(response.record);
       pipelineSnapshots.clientId = currentRecord.clientId;
       pipelineSnapshots.statusMessage = "Client dossier saved.";
       savePipelineState();
       await refreshLedger();
-    } catch {
-      currentRecord = nextRecord;
+    } catch (error) {
+      currentRecord = markRecordLocal(nextRecord, "worker-write-failed-browser-copy");
+      pipelineSnapshots.statusMessage = `Client dossier saved as browser-local copy only: ${error.message}`;
+      savePipelineState();
     }
   } else {
-    currentRecord = nextRecord;
+    currentRecord = markRecordLocal(nextRecord, "factory-api-offline-browser-copy");
   }
   if (!backendReady) {
     pipelineSnapshots.clientId = currentRecord.clientId;

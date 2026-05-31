@@ -3,8 +3,13 @@
   "app": "SkyeWebCreatorMax",
   "slug": "skyewebcreator",
   "version": "3.0.0",
-  "mode": "static-production-platform-contract",
+  "mode": "static-contract-not-live-telemetry",
   "endpoint": "/v1/sessions",
+  "dataSource": "checked-in static route contract",
+  "liveTelemetry": false,
+  "liveCustomerVisibility": false,
+  "workerRuntimeEndpoint": "/api/marketing-made-easy/v1/sessions",
+  "boundary": "This file must not be treated as live auth/session telemetry. Live sessions are returned only by the shared-gated 0S Worker API.",
   "pages": [
     "/dashboard.html",
     "/briefs.html",
@@ -16,9 +21,10 @@
     "/settings.html"
   ],
   "updatedAt": "2026-05-10T00:00:00.000Z",
-  "sessions": [
+  "sessions": [],
+  "staticSessionProofs": [
     {
-      "title": "Static production verification",
+      "title": "Static contract verification",
       "recordedAt": "2026-05-10T00:00:00.000Z"
     }
   ]

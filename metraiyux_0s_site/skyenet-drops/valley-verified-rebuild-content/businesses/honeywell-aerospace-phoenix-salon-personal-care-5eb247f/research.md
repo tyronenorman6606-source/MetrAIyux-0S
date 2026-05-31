@@ -1,26 +1,45 @@
 # Honeywell Aerospace Research
 
-Status: source_backed_category_mismatch
-Researched: 2026-05-28T06:24:12Z
+Status: moderate
+Researched: 2026-05-30T00:00:00.000-07:00
 
-## Confirmed Facts
-- Sourced reality is aerospace technologies, not salon/personal care.
-- Official Honeywell Aerospace pages describe products and services for airlines/cargo, business aviation, general aviation, defense, and space.
-- Official materials list aircraft engines, cockpit and cabin electronics, avionics/flight systems, wireless connectivity, mechanical components, and aerospace services/software.
-- Official Phoenix facility page lists Honeywell Aerospace Trading at 1720 E. Grant Street, Phoenix, AZ 85034 in a 100,000+ square-foot office/warehouse facility near Sky Harbor.
-- Official about page states about 90% of aircraft use Honeywell avionics, about 80% of satellites in orbit have Honeywell on board, and 100K+ APUs and 72K+ engines have been delivered since 1959.
+## Faraday Summary
+Honeywell Aerospace is Valley Verified here as a Phoenix aerospace technology employer and supplier, with the imported beauty-category label corrected by source research.
 
-## Landing Page Use
-- Put a category correction near the top: this is an aerospace/defense/aviation profile.
-- Avoid salon, spa, booking, consumer service, patient, or family-care language.
-- Use official contact/customer portal routes rather than inventing a local phone or appointment CTA.
+Honeywell sources identify aerospace products, services, connected aircraft technologies, avionics, engines, safety systems, and Phoenix-area aerospace operations.
 
-## Sources
-- https://www.honeywellaerospace.com/us/en/about-us/about-honeywell-aerospace
-- https://www.honeywell.com/us/en/industries/aerospace
-- https://www.honeywellaerospace.com/us/en/pages/honeywell-aerospace-trading-expanded-facilities-in-phoenix
-- https://aerospace.honeywell.com/content/dam/aerobt/en/documents/learn/about-us/about-us/hon-aero-about-honeywell-aerospace-business.pdf
+## Customer Fit
+- Aviation, defense, and aerospace customers checking the Phoenix Honeywell identity.
+- Job seekers and suppliers confirming that this record should be read as aerospace, not salon or personal care.
+- Local stakeholders evaluating major-employer presence in the Valley.
 
-## Warnings
-- Local category is clearly mismatched.
-- No public local phone or hours were confirmed.
+## Verification Proof Points
+- Honeywell aerospace sources confirm aerospace industry positioning.
+- Local record carries a Phoenix business identity and Honeywell corporate domain.
+- Research explicitly separates the factual company identity from the imported category mismatch.
+
+## Confirmed Contact Facts
+- Category: Beauty And Wellness
+- Niche: Salon / Personal Care
+- Market: Phoenix, AZ
+- Address: Phoenix, AZ
+- Phone: No public phone confirmed in the local record.
+- Website: https://www.honeywell.com
+- Hours: Not confirmed in the local record.
+
+## Trust Signals
+- Public address present in the local record.
+- Customer-facing web route present in sources.
+
+## Source URLs
+- About Honeywell Aerospace Technologies: https://www.honeywellaerospace.com/us/en/about-us/about-honeywell-aerospace
+  - Official page describes Honeywell Aerospace Technologies, including facts and figures such as aircraft avionics usage, satellites, APUs, engines, leadership, and community involvement in Phoenix.
+- Aerospace Technologies, Solutions and Services | Honeywell: https://www.honeywell.com/us/en/industries/aerospace
+  - Official Honeywell aerospace industry page describes aerospace solutions for airlines and cargo, business jet, general aviation, defense, and space customers.
+- Honeywell Aerospace Trading Expanded Facilities in Phoenix: https://www.honeywellaerospace.com/us/en/pages/honeywell-aerospace-trading-expanded-facilities-in-phoenix
+  - Official page says Honeywell Aerospace Trading's Phoenix team moved into a 100,000+ square-foot office and warehouse facility at 1720 E. Grant Street, Phoenix, AZ 85034, near Sky Harbor and next door to Honeywell Aerospace Technologies headquarters and a Repair and Overhaul site.
+- About Honeywell Aerospace Business PDF: https://aerospace.honeywell.com/content/dam/aerobt/en/documents/learn/about-us/about-us/hon-aero-about-honeywell-aerospace-business.pdf
+  - Official PDF states Honeywell Aerospace products and services are used on virtually every commercial, defense, and space aircraft; it names aircraft engines, cockpit and cabin electronics, wireless connectivity systems, mechanical components, and Phoenix, Arizona headquarters.
+
+## Publication Boundary
+The source category in the local record is misclassified; customer-facing copy should rely on Honeywell aerospace sources.

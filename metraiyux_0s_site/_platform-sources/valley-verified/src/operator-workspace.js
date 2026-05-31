@@ -1,7 +1,23 @@
 (() => {
   'use strict';
 
-  const DATA = '/valley-verified/data/';
+  const DATA = `${valleyMountPath()}/data/`;
+  function valleyMountPath(){
+    const parts = location.pathname.split('/').filter(Boolean);
+    if(parts[0] === 'valley-verified-marketplace') return '/valley-verified-marketplace';
+    if(parts[0] === 'skyenet' && parts[1] === 'valley-verified') return '/skyenet/valley-verified';
+    if(parts[0] === 'valley-verified') return '/valley-verified';
+    return '';
+  }
+  function routeUrl(value){
+    const raw = String(value || '');
+    if(!raw.startsWith('/') || raw.startsWith('//')) return raw;
+    const mount = valleyMountPath();
+    if(!mount || raw === mount || raw.startsWith(`${mount}/`)) return raw;
+    if(raw === '/valley-verified') return `${mount}/`;
+    if(raw.startsWith('/valley-verified/')) return `${mount}${raw.slice('/valley-verified'.length)}`;
+    return `${mount}${raw}`.replace(/\/{2,}/g, '/');
+  }
   const STORE = 'valleyVerified.operatorWorkspace.v1.';
   const src = (label, file) => ({ label, url: `${DATA}${file}` });
 
@@ -64,6 +80,9 @@
 
   function currentRoute() {
     const parts = location.pathname.split('/').filter(Boolean);
+    const marketplaceIndex = parts.indexOf('valley-verified-marketplace');
+    if (marketplaceIndex >= 0) return parts[marketplaceIndex + 1] || 'operator';
+    if (parts[0] === 'skyenet' && parts[1] === 'valley-verified') return parts[2] || 'operator';
     const index = parts.indexOf('valley-verified');
     return index >= 0 ? (parts[index + 1] || 'operator') : parts[0];
   }
@@ -136,7 +155,7 @@
       feedSlug: slug(feedLabel),
       title: text(record.name || record.business_name || record.title || record.action || record.rule_id || record.lead_lane_id || record.stage || record.batch || id),
       status: text(record.status || record.priority || record.stage || record.trust_tier || record.claim_status || record.routing_status || record.next_action || record.recommended_action || 'review'),
-      href: text(record.url || record.claim_packet_url || record.route || record.profile_url || (record.business_id ? `/valley-verified/business/${record.business_id}/` : '')),
+      href: routeUrl(text(record.url || record.claim_packet_url || record.route || record.profile_url || (record.business_id ? `/valley-verified/business/${record.business_id}/` : ''))),
       note: text(record.suggested_next_action || record.next_action || record.suggested_resolution || record.recommended_action || record.reason || record.description || flags || ''),
       meta: [record.city, record.category, record.niche, record.source_group, record.batch, record.score ?? record.verification_score ?? record.priority_score, record.candidate_count ? `${record.candidate_count} candidates` : ''].map(text).filter(Boolean).slice(0, 5)
     };

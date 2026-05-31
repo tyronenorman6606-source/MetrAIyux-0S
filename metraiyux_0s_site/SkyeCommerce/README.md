@@ -13,7 +13,7 @@ Production surfaces:
 - `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/docs/`
 - `https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeCommerce/api/docs/sovereigndocs-kit`
 
-SkyeCommerce now uses the shared FS27/Free99 gate. App-local owner/admin registration remains blocked for mounted owner access. Dynamic checkout builds signed SkyPay cart payloads, dispatches through the `SKYGATEFS27_WORKER` service binding, syncs paid status back into SkyeCommerce payment state, and records merchant receivables in `merchant_payout_ledger`.
+SkyeCommerce now uses the shared FS27/Free99 gate. App-local owner/admin registration remains blocked for mounted owner access. Mounted customer login/register reconciles to the active FS27 gate email and creates or reuses a local compatibility customer record with no usable local password. Mounted headless API bearer tokens must match the gate-owned merchant before data is served. Dynamic checkout builds signed SkyPay cart payloads, dispatches through the `SKYGATEFS27_WORKER` service binding, syncs paid status back into SkyeCommerce payment state, and records merchant receivables in `merchant_payout_ledger`.
 
 The Document Desk points merchants to SovereignDocs self-help commerce templates and SkyeDocxMax drafting context for terms, privacy, refund, shipping, seller, subscription, cookie, accessibility, acceptable-use, license, creator-platform, and community-guideline drafts. It is document automation, not legal advice.
 

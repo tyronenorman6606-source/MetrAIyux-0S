@@ -19,7 +19,7 @@ Launch mailbox status: free.
 
 SkyeMail can be used for FS27 gate-card onboarding and proof-lane mailbox work without charging the user during the launch/proof period.
 
-Billing status: mailbox access is still launch-free. The SkyeMail Brain now has FS27/SkyPay checkout create + claim routes for paid kAIxu response plans.
+Billing status: mailbox access is still launch-free. The SkyeMail Brain now has FS27/SkyPay checkout create + claim routes for paid FS27 Brain response plans.
 
 ## Public Pages
 
@@ -72,7 +72,7 @@ Operator:
 AI Brain Starter / Plus / Managed:
 
 - SkyPay checkout create and claim routes.
-- kAIxu metered model calls.
+- FS27 metered Brain calls.
 - Usage events stored in `skymail.ai_usage_events`.
 - Active entitlements stored in `skymail.ai_entitlements`.
 - Reply monitors stored in `skymail.brain_monitors`.

@@ -27,6 +27,7 @@ import skyepayOffers from '../netlify/functions/skyepay-offers.js';
 import skyepayCheckout from '../netlify/functions/skyepay-checkout.js';
 import skyepayRefund from '../netlify/functions/skyepay-refund.js';
 import skyepayStatus from '../netlify/functions/skyepay-status.js';
+import stripeWebhook from '../netlify/functions/stripe-webhook.js';
 import adminSkyePayLedger from '../netlify/functions/admin-skyepay-ledger.js';
 import skysecureApi from '../netlify/functions/skysecure-api.js';
 import vantacoreCrm from '../netlify/functions/vantacore-crm.js';
@@ -147,6 +148,9 @@ const ROUTES = [
   ['POST', '/.netlify/functions/skyepay-refund', skyepayRefund],
   ['GET', '/skyepay/status', skyepayStatus],
   ['GET', '/.netlify/functions/skyepay-status', skyepayStatus],
+  ['POST', '/stripe-webhook', stripeWebhook],
+  ['POST', '/skyepay/stripe-webhook', stripeWebhook],
+  ['POST', '/.netlify/functions/stripe-webhook', stripeWebhook],
   ['GET', '/admin/skyepay-ledger', adminSkyePayLedger],
   ['PATCH', '/admin/skyepay-ledger', adminSkyePayLedger],
   ['GET', '/.netlify/functions/admin-skyepay-ledger', adminSkyePayLedger],
@@ -221,9 +225,14 @@ const ROUTES = [
   ['OPTIONS', '/deploy/source-upload', handleSkyeNetDeployRequest],
   ['PUT', '/deploy/source-upload', handleSkyeNetDeployRequest],
   ['POST', '/deploy/source-upload', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-index', handleSkyeNetDeployRequest],
+  ['PUT', '/deploy/source-index', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/source-index', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/source-archive', handleSkyeNetDeployRequest],
   ['PUT', '/deploy/source-archive', handleSkyeNetDeployRequest],
   ['POST', '/deploy/source-archive', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/source-archive-link', handleSkyeNetDeployRequest],
+  ['POST', '/deploy/source-archive-link', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/source-complete', handleSkyeNetDeployRequest],
   ['POST', '/deploy/source-complete', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/source-manifest', handleSkyeNetDeployRequest],
@@ -246,6 +255,10 @@ const ROUTES = [
   ['GET', '/deploy/observability', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/cost-model', handleSkyeNetDeployRequest],
   ['GET', '/deploy/cost-model', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/support', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/support', handleSkyeNetDeployRequest],
+  ['OPTIONS', '/deploy/export', handleSkyeNetDeployRequest],
+  ['GET', '/deploy/export', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/init', handleSkyeNetDeployRequest],
   ['POST', '/deploy/init', handleSkyeNetDeployRequest],
   ['OPTIONS', '/deploy/upload', handleSkyeNetDeployRequest],
@@ -267,6 +280,7 @@ const routeMap = new Map(ROUTES.map(([method, path, handler]) => [routeKey(metho
 const ASSET_ALIASES = new Map([
   ['/pay', '/skyepay.html'],
   ['/store', '/skyepay-store.html'],
+  ['/vault-agent', '/skyevault-agent.html'],
   ['/connectlog-relay13', '/connectlog-relay13-gate.html'],
   ['/vantacore-service-crm', '/vantacore-service-crm-gate.html'],
   ['/vantacore-crm', '/vantacore-crm-dashboard.html'],
@@ -311,6 +325,7 @@ const BLOCKED_LOCAL_ASSET_FILENAMES = new Set([
   '.netlifyignore',
   '.node-version',
   '.nvmrc',
+  '_headers',
   '_redirects',
   'deno.lock',
   'env.template',
@@ -454,6 +469,399 @@ function assetCandidates(pathname) {
   return candidates;
 }
 
+function isDeploymentRuleAssetPath(pathname) {
+  const clean = String(pathname || '').replace(/^\/+/, '').toLowerCase();
+  return clean === '_redirects' || clean === '_headers' || clean === 'netlify.toml';
+}
+
+async function deploymentAssetText(bucket, prefix, filename, maxBytes = 128 * 1024) {
+  const object = await bucket?.get?.(`${prefix}${filename}`.replace(/\/+/g, '/')).catch(() => null);
+  if (!object) return '';
+  const size = Number(object.size || 0);
+  if (size > maxBytes) return '';
+  if (typeof object.text === 'function') {
+    const text = await object.text();
+    return text.length > maxBytes ? text.slice(0, maxBytes) : text;
+  }
+  if (object.body) {
+    const text = await new Response(object.body).text();
+    return text.length > maxBytes ? text.slice(0, maxBytes) : text;
+  }
+  return '';
+}
+
+async function firstDeploymentAsset(bucket, prefix, pathname) {
+  for (const candidate of assetCandidates(pathname)) {
+    if (isDeploymentRuleAssetPath(candidate)) continue;
+    const key = `${prefix}${candidate}`.replace(/\/+/g, '/');
+    const object = await bucket.get(key).catch(() => null);
+    if (object) return { candidate, key, object };
+  }
+  return null;
+}
+
+function parseRedirectRules(text = '') {
+  const rules = [];
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const parts = line.split(/\s+/).filter(Boolean);
+    if (parts.length < 2) continue;
+    const [from, to, statusRaw = '301', ...rest] = parts;
+    const force = rest.includes('!') || /!$/.test(statusRaw);
+    const status = Number(String(statusRaw).replace(/!$/, ''));
+    rules.push({
+      from,
+      to,
+      status: Number.isFinite(status) ? status : 301,
+      force,
+      raw: line
+    });
+  }
+  return rules.slice(0, 500);
+}
+
+function parseHeaderRules(text = '') {
+  const rules = [];
+  let current = null;
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    if (!raw.trim() || raw.trim().startsWith('#')) continue;
+    if (!/^\s/.test(raw)) {
+      current = { path: raw.trim(), headers: [] };
+      rules.push(current);
+      continue;
+    }
+    if (!current) continue;
+    const line = raw.trim();
+    const separator = line.indexOf(':');
+    if (separator <= 0) continue;
+    const name = cleanText(line.slice(0, separator), 120);
+    const value = cleanText(line.slice(separator + 1), 500);
+    if (name && value) current.headers.push([name, value]);
+  }
+  return rules.filter((rule) => rule.headers.length).slice(0, 500);
+}
+
+function stripTomlComment(line = '') {
+  let quoted = '';
+  let escaped = false;
+  let out = '';
+  for (const char of String(line || '')) {
+    if (escaped) {
+      out += char;
+      escaped = false;
+      continue;
+    }
+    if (char === '\\' && quoted) {
+      out += char;
+      escaped = true;
+      continue;
+    }
+    if ((char === '"' || char === "'") && (!quoted || quoted === char)) {
+      quoted = quoted ? '' : char;
+      out += char;
+      continue;
+    }
+    if (char === '#' && !quoted) break;
+    out += char;
+  }
+  return out.trim();
+}
+
+function unquoteToml(value = '') {
+  const text = String(value || '').trim();
+  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+    return text.slice(1, -1).replace(/\\(["'\\btnfr])/g, (_match, char) => ({
+      b: '\b',
+      t: '\t',
+      n: '\n',
+      f: '\f',
+      r: '\r',
+      '"': '"',
+      "'": "'",
+      '\\': '\\'
+    }[char] || char));
+  }
+  return text;
+}
+
+function parseTomlScalar(value = '') {
+  const text = String(value || '').trim();
+  if (/^(true|false)$/i.test(text)) return text.toLowerCase() === 'true';
+  if (/^-?\d+$/.test(text)) return Number(text);
+  return unquoteToml(text);
+}
+
+function parseTomlKey(value = '') {
+  return unquoteToml(String(value || '').trim()).trim();
+}
+
+function parseNetlifyTomlRules(text = '') {
+  const redirects = [];
+  const headers = [];
+  let section = '';
+  let current = null;
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = stripTomlComment(raw);
+    if (!line) continue;
+    if (line === '[[redirects]]') {
+      current = {};
+      redirects.push(current);
+      section = 'redirect';
+      continue;
+    }
+    if (line === '[[headers]]') {
+      current = { headers: [] };
+      headers.push(current);
+      section = 'header';
+      continue;
+    }
+    if (line === '[headers.values]' && current && headers.includes(current)) {
+      section = 'header.values';
+      continue;
+    }
+    if (line.startsWith('[')) {
+      section = '';
+      current = null;
+      continue;
+    }
+    const separator = line.indexOf('=');
+    if (separator <= 0 || !current) continue;
+    const key = parseTomlKey(line.slice(0, separator));
+    const value = parseTomlScalar(line.slice(separator + 1));
+    if (section === 'redirect') {
+      current[key] = value;
+    } else if (section === 'header') {
+      if (key === 'for') current.path = cleanText(value, 500);
+    } else if (section === 'header.values') {
+      const name = cleanText(key, 120);
+      const headerValue = cleanText(value, 500);
+      if (name && headerValue) current.headers.push([name, headerValue]);
+    }
+  }
+  return {
+    redirects: redirects
+      .map((rule) => {
+        const statusRaw = String(rule.status ?? '301').trim();
+        const status = Number(statusRaw.replace(/!$/, ''));
+        return {
+          from: cleanText(rule.from || '', 500),
+          to: cleanText(rule.to || '', 1000),
+          status: Number.isFinite(status) ? status : 301,
+          force: rule.force === true || /!$/.test(statusRaw),
+          raw: 'netlify.toml'
+        };
+      })
+      .filter((rule) => rule.from && rule.to)
+      .slice(0, 500),
+    headers: headers
+      .filter((rule) => rule.path && rule.headers.length)
+      .slice(0, 500)
+  };
+}
+
+function escapeRegExp(value) {
+  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function matchNetlifyPattern(pattern = '', pathname = '/') {
+  let source = String(pattern || '').trim();
+  if (!source) return null;
+  if (!source.startsWith('/')) source = `/${source}`;
+  const paramNames = [];
+  let regex = '^';
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '*') {
+      paramNames.push('splat');
+      regex += '(.*)';
+      continue;
+    }
+    if (char === ':') {
+      let name = '';
+      index += 1;
+      while (index < source.length && /[A-Za-z0-9_]/.test(source[index])) {
+        name += source[index];
+        index += 1;
+      }
+      index -= 1;
+      if (name) {
+        paramNames.push(name);
+        regex += '([^/]+)';
+        continue;
+      }
+      regex += ':';
+      continue;
+    }
+    regex += escapeRegExp(char);
+  }
+  regex += '$';
+  const match = String(pathname || '/').match(new RegExp(regex));
+  if (!match) return null;
+  const params = {};
+  paramNames.forEach((name, index) => {
+    params[name] = match[index + 1] || '';
+  });
+  return params;
+}
+
+function interpolateNetlifyTarget(target = '', params = {}) {
+  let out = String(target || '');
+  out = out.replace(/:([A-Za-z0-9_]+)/g, (_match, name) => encodeURI(params[name] || ''));
+  if (params.splat != null) out = out.replace(/\*/g, encodeURI(params.splat));
+  return out;
+}
+
+function publicRedirectLocation(target = '', url, routeRecord) {
+  if (/^https?:\/\//i.test(target)) return target;
+  if (!target.startsWith('/')) return new URL(target, url).toString();
+  const mountPath = cleanText(routeRecord?.mount_path || '', 300).replace(/\/+$/, '');
+  const publicPath = mountPath && routeRecord?.strip_mount_path !== false
+    ? `${mountPath}${target}`.replace(/\/{2,}/g, '/')
+    : target;
+  return new URL(publicPath || '/', url).toString();
+}
+
+function applyNetlifyHeaderRules(headers, rules = [], pathnames = []) {
+  for (const rule of rules) {
+    if (!pathnames.some((pathname) => matchNetlifyPattern(rule.path, pathname))) continue;
+    for (const [name, value] of rule.headers) headers.set(name, value);
+  }
+}
+
+async function deploymentRules(bucket, prefix) {
+  const [redirectText, headerText, netlifyTomlText] = await Promise.all([
+    deploymentAssetText(bucket, prefix, '_redirects'),
+    deploymentAssetText(bucket, prefix, '_headers'),
+    deploymentAssetText(bucket, prefix, 'netlify.toml')
+  ]);
+  const tomlRules = parseNetlifyTomlRules(netlifyTomlText);
+  return {
+    redirects: [...parseRedirectRules(redirectText), ...tomlRules.redirects],
+    headers: [...parseHeaderRules(headerText), ...tomlRules.headers]
+  };
+}
+
+function etagMatches(ifNoneMatch = '', etag = '') {
+  if (!ifNoneMatch || !etag) return false;
+  const normalizedEtag = String(etag).replace(/^W\//i, '');
+  return String(ifNoneMatch).split(',').some((part) => {
+    const candidate = part.trim();
+    return candidate === '*' || candidate === etag || candidate.replace(/^W\//i, '') === normalizedEtag;
+  });
+}
+
+function objectLastModifiedHttpDate(object) {
+  const raw = object?.uploaded || object?.uploaded_at || object?.uploadedAt || object?.httpMetadata?.lastModified;
+  const date = raw instanceof Date ? raw : new Date(raw || 0);
+  return Number.isFinite(date.getTime()) && date.getTime() > 0 ? date.toUTCString() : '';
+}
+
+function modifiedSinceFresh(ifModifiedSince = '', lastModified = '') {
+  if (!ifModifiedSince || !lastModified) return false;
+  const requestTime = Date.parse(ifModifiedSince);
+  const objectTime = Date.parse(lastModified);
+  if (!Number.isFinite(requestTime) || !Number.isFinite(objectTime)) return false;
+  return objectTime <= requestTime;
+}
+
+function parseByteRangeHeader(header = '', size = 0) {
+  const text = String(header || '').trim();
+  if (!text) return null;
+  const match = text.match(/^bytes=(\d*)-(\d*)$/);
+  if (!match || !Number.isFinite(size) || size < 0) return { error: true };
+  if (size === 0) return { error: true };
+  const [, startRaw, endRaw] = match;
+  let start;
+  let end;
+  if (!startRaw) {
+    const suffixLength = Number(endRaw);
+    if (!Number.isFinite(suffixLength) || suffixLength <= 0) return { error: true };
+    start = Math.max(size - suffixLength, 0);
+    end = size - 1;
+  } else {
+    start = Number(startRaw);
+    end = endRaw ? Number(endRaw) : size - 1;
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end < start) return { error: true };
+    if (start >= size) return { error: true };
+    end = Math.min(end, size - 1);
+  }
+  return { start, end, length: end - start + 1 };
+}
+
+async function rangeBody(bucket, key, object, range) {
+  const ranged = await bucket?.get?.(key, {
+    range: { offset: range.start, length: range.length }
+  }).catch(() => null);
+  if (ranged?.body) return ranged.body;
+  const buffer = typeof object?.arrayBuffer === 'function'
+    ? await object.arrayBuffer()
+    : await new Response(object?.body || '').arrayBuffer();
+  return new Uint8Array(buffer).slice(range.start, range.end + 1);
+}
+
+async function deploymentAssetResponse(request, {
+  bucket,
+  key,
+  candidate,
+  object,
+  routeRecord,
+  rules,
+  headerPaths = [],
+  routeName = 'r2-deployment',
+  extraHeaders = {}
+}) {
+  const method = String(request.method || 'GET').toUpperCase();
+  const headers = new Headers();
+  object.writeHttpMetadata?.(headers);
+  if (!headers.has('content-type')) headers.set('content-type', contentTypeForPath(candidate));
+  if (object.httpEtag) headers.set('etag', object.httpEtag);
+  if (!headers.has('last-modified')) {
+    const lastModified = objectLastModifiedHttpDate(object);
+    if (lastModified) headers.set('last-modified', lastModified);
+  }
+  headers.set('cache-control', headers.get('cache-control') || cacheControlForDeploymentAsset(candidate));
+  headers.set('accept-ranges', 'bytes');
+  headers.set('x-skynet-route', routeName);
+  headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+  headers.set('x-skynet-deployment-id', cleanText(routeRecord.active_deployment_id || '', 180));
+  for (const [name, value] of Object.entries(extraHeaders || {})) {
+    if (value != null && value !== '') headers.set(name, String(value));
+  }
+  applyNetlifyHeaderRules(headers, rules.headers, headerPaths);
+
+  const etag = headers.get('etag') || '';
+  if ((method === 'GET' || method === 'HEAD') && etagMatches(request.headers.get('if-none-match') || '', etag)) {
+    return new Response(null, { status: 304, headers });
+  }
+  const lastModified = headers.get('last-modified') || '';
+  if ((method === 'GET' || method === 'HEAD') && modifiedSinceFresh(request.headers.get('if-modified-since') || '', lastModified)) {
+    return new Response(null, { status: 304, headers });
+  }
+
+  const size = Number(object.size);
+  const requestedRange = method === 'GET' || method === 'HEAD'
+    ? parseByteRangeHeader(request.headers.get('range') || '', size)
+    : null;
+  if (requestedRange?.error) {
+    const rangeHeaders = new Headers(headers);
+    if (Number.isFinite(size)) rangeHeaders.set('content-range', `bytes */${size}`);
+    rangeHeaders.set('content-type', 'text/plain; charset=utf-8');
+    return new Response(method === 'HEAD' ? null : 'Range not satisfiable', {
+      status: 416,
+      headers: rangeHeaders
+    });
+  }
+  if (requestedRange) {
+    const body = method === 'HEAD' ? null : await rangeBody(bucket, key, object, requestedRange);
+    headers.set('content-range', `bytes ${requestedRange.start}-${requestedRange.end}/${size}`);
+    headers.set('content-length', String(requestedRange.length));
+    return new Response(body, { status: 206, headers });
+  }
+
+  return new Response(method === 'HEAD' ? null : object.body, { headers });
+}
+
 function mountedAssetPath(pathname, routeRecord) {
   const mountPath = cleanText(routeRecord?.mount_path || '', 300).replace(/\/+$/, '');
   if (!mountPath || routeRecord?.strip_mount_path === false) return pathname;
@@ -515,27 +923,265 @@ async function ensureMappedRouteAccess(request, routeRecord, runtimeMeta) {
   }
 }
 
+function safeKeySegment(value = '', fallback = 'unknown') {
+  return cleanText(value || fallback, 180).replace(/[^A-Za-z0-9._=-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
+}
+
+function compactFormValue(value) {
+  if (value && typeof value === 'object' && 'name' in value && 'size' in value) {
+    return {
+      file: true,
+      name: cleanText(value.name || 'upload', 240),
+      type: cleanText(value.type || 'application/octet-stream', 120),
+      size: Number(value.size || 0)
+    };
+  }
+  return cleanText(value, 4000);
+}
+
+function setFormField(fields, name, value) {
+  const key = cleanText(name, 160);
+  if (!key) return;
+  const cleanValue = compactFormValue(value);
+  if (fields[key] == null) {
+    fields[key] = cleanValue;
+  } else if (Array.isArray(fields[key])) {
+    fields[key].push(cleanValue);
+  } else {
+    fields[key] = [fields[key], cleanValue];
+  }
+}
+
+async function parseNetlifyFormSubmission(request) {
+  const contentType = String(request.headers.get('content-type') || '').toLowerCase();
+  const fields = {};
+  if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+    const form = await request.formData().catch(() => null);
+    if (!form) return null;
+    for (const [name, value] of form.entries()) setFormField(fields, name, value);
+  } else if (contentType.includes('application/json')) {
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
+    for (const [name, value] of Object.entries(body)) setFormField(fields, name, value);
+  } else {
+    return null;
+  }
+  const formName = cleanText(
+    fields['form-name']
+      || fields.form_name
+      || request.headers.get('x-netlify-form-name')
+      || request.headers.get('x-skynet-form-name')
+      || '',
+    120
+  );
+  if (!formName) return null;
+  return { formName, fields };
+}
+
+async function handleNetlifyFormSubmission(request, env, routeRecord, runtimeMeta) {
+  if (String(request.method || 'GET').toUpperCase() !== 'POST') return null;
+  const submission = await parseNetlifyFormSubmission(request);
+  if (!submission) return null;
+  const bucket = env.SKYENET_FORMS_BUCKET || env.REQUEST_LOG_BUCKET;
+  const url = new URL(request.url);
+  const projectId = cleanText(routeRecord.project_id || 'unknown-project', 180);
+  const deploymentId = cleanText(routeRecord.active_deployment_id || 'active', 180);
+  const submissionId = typeof globalThis.crypto?.randomUUID === 'function'
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const key = [
+    'skynet',
+    'forms',
+    `project=${safeKeySegment(projectId)}`,
+    `deployment=${safeKeySegment(deploymentId)}`,
+    `form=${safeKeySegment(submission.formName, 'form')}`,
+    new Date().toISOString().slice(0, 10),
+    `${safeKeySegment(submissionId)}.json`
+  ].join('/');
+  const record = {
+    schema: 'skyenet.netlify-form-submission.v1',
+    received_at: new Date().toISOString(),
+    submission_id: submissionId,
+    form_name: submission.formName,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    hostname: url.hostname,
+    path: url.pathname,
+    mount_path: cleanText(routeRecord.mount_path || '', 300),
+    fields: submission.fields,
+    request: {
+      content_type: cleanText(request.headers.get('content-type') || '', 180),
+      user_agent: cleanText(request.headers.get('user-agent') || '', 240),
+      referer: cleanText(request.headers.get('referer') || '', 500)
+    }
+  };
+  if (!bucket?.put) {
+    runtimeMeta.runtime_type = 'form_capture';
+    runtimeMeta.route_decision = 'netlify.forms.bucket_missing';
+    runtimeMeta.error_code = 'SKYENET_FORMS_BUCKET_MISSING';
+    return httpJson(503, {
+      ok: false,
+      error: 'SkyeNet form capture bucket is not configured.',
+      code: 'SKYENET_FORMS_BUCKET_MISSING'
+    }, {
+      ...buildCors(request),
+      'cache-control': 'no-store',
+      'x-skynet-route': 'netlify-form',
+      'x-skynet-project-id': projectId,
+      'x-skynet-deployment-id': deploymentId,
+      'x-skynet-form-name': submission.formName
+    });
+  }
+  await bucket.put(key, JSON.stringify(record, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' },
+    customMetadata: {
+      project_id: projectId,
+      deployment_id: deploymentId,
+      form_name: submission.formName
+    }
+  });
+  runtimeMeta.runtime_type = 'form_capture';
+  runtimeMeta.route_decision = 'netlify.forms.capture';
+  const baseHeaders = {
+    ...buildCors(request),
+    'cache-control': 'no-store',
+    'x-skynet-route': 'netlify-form',
+    'x-skynet-project-id': projectId,
+    'x-skynet-deployment-id': deploymentId,
+    'x-skynet-form-name': submission.formName,
+    'x-skynet-form-receipt': key
+  };
+  const accept = String(request.headers.get('accept') || '').toLowerCase();
+  if (accept.includes('text/html') && !accept.includes('application/json')) {
+    const successUrl = new URL(url.toString());
+    successUrl.searchParams.set('form', 'success');
+    return new Response(null, {
+      status: 303,
+      headers: { ...baseHeaders, location: successUrl.toString() }
+    });
+  }
+  return httpJson(202, {
+    ok: true,
+    form_name: submission.formName,
+    receipt_key: key,
+    project_id: projectId,
+    deployment_id: deploymentId
+  }, baseHeaders);
+}
+
+function staticRouteOptionsResponse(request, routeRecord, runtimeMeta) {
+  runtimeMeta.runtime_type = 'static';
+  runtimeMeta.route_decision = 'r2.deployment_options';
+  return httpJson(200, { ok: true }, {
+    ...buildCors(request),
+    allow: 'GET, HEAD, OPTIONS, POST',
+    'cache-control': 'no-store',
+    'x-skynet-route': 'r2-deployment-options',
+    'x-skynet-project-id': cleanText(routeRecord.project_id || '', 180),
+    'x-skynet-deployment-id': cleanText(routeRecord.active_deployment_id || '', 180)
+  });
+}
+
+function staticMethodNotAllowedResponse(request, routeRecord, runtimeMeta) {
+  runtimeMeta.runtime_type = 'static';
+  runtimeMeta.route_decision = 'r2.deployment_method_not_allowed';
+  runtimeMeta.error_code = 'SKYENET_STATIC_METHOD_NOT_ALLOWED';
+  return httpJson(405, {
+    ok: false,
+    error: 'SkyeNet static deployments accept GET, HEAD, OPTIONS, and Netlify Forms POST requests.',
+    code: 'SKYENET_STATIC_METHOD_NOT_ALLOWED'
+  }, {
+    ...buildCors(request),
+    allow: 'GET, HEAD, OPTIONS, POST',
+    'cache-control': 'no-store',
+    'x-skynet-route': 'static-method-not-allowed',
+    'x-skynet-project-id': cleanText(routeRecord.project_id || '', 180),
+    'x-skynet-deployment-id': cleanText(routeRecord.active_deployment_id || '', 180)
+  });
+}
+
 async function serveDeploymentAsset(request, env, routeRecord, runtimeMeta) {
   const bucket = deploymentBucket(env);
   if (!bucket?.get || !routeRecord) return null;
   const prefix = assetPrefix(routeRecord);
   const url = new URL(request.url);
   const assetPath = mountedAssetPath(url.pathname, routeRecord);
-  for (const candidate of assetCandidates(assetPath)) {
-    const key = `${prefix}${candidate}`.replace(/\/+/g, '/');
-    const object = await bucket.get(key);
-    if (!object) continue;
-    const headers = new Headers();
-    object.writeHttpMetadata?.(headers);
-    if (!headers.has('content-type')) headers.set('content-type', contentTypeForPath(candidate));
-    if (object.httpEtag) headers.set('etag', object.httpEtag);
-    headers.set('cache-control', headers.get('cache-control') || cacheControlForDeploymentAsset(candidate));
-    headers.set('x-skynet-route', 'r2-deployment');
-    headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
-    headers.set('x-skynet-deployment-id', cleanText(routeRecord.active_deployment_id || '', 180));
+  const normalizedRequestPath = `/${assetPath.replace(/^\/+/, '')}`.replace(/\/+$/, '') || '/';
+  if (isDeploymentRuleAssetPath(assetPath)) {
+    runtimeMeta.runtime_type = 'static';
+    runtimeMeta.route_decision = 'r2.deployment_rule_asset_blocked';
+    runtimeMeta.error_code = 'SKYENET_RULE_ASSET_BLOCKED';
+    return new Response('Not found', {
+      status: 404,
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        'cache-control': 'no-store',
+        'x-skynet-route': 'rule-asset-blocked',
+        'x-skynet-project-id': cleanText(routeRecord.project_id || '', 180),
+        'x-skynet-deployment-id': cleanText(routeRecord.active_deployment_id || '', 180)
+      }
+    });
+  }
+  const rules = await deploymentRules(bucket, prefix);
+  const directAsset = await firstDeploymentAsset(bucket, prefix, assetPath);
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    for (const rule of rules.redirects) {
+      const params = matchNetlifyPattern(rule.from, normalizedRequestPath);
+      if (!params) continue;
+      if (directAsset && !rule.force) {
+        runtimeMeta.route_decision = 'netlify.redirects.shadowed_by_asset';
+        continue;
+      }
+      const target = interpolateNetlifyTarget(rule.to, params);
+      if (rule.status === 200) {
+        if (/^https?:\/\//i.test(target)) continue;
+        const rewritten = target.startsWith('/') ? target : `/${target}`;
+        runtimeMeta.route_decision = 'netlify.redirects.rewrite';
+        const rewriteAsset = await firstDeploymentAsset(bucket, prefix, rewritten);
+        if (rewriteAsset) {
+          runtimeMeta.runtime_type = 'static';
+          return deploymentAssetResponse(request, {
+            bucket,
+            key: rewriteAsset.key,
+            candidate: rewriteAsset.candidate,
+            object: rewriteAsset.object,
+            routeRecord,
+            rules,
+            headerPaths: [normalizedRequestPath, rewritten],
+            routeName: 'netlify-rewrite',
+            extraHeaders: { 'x-skynet-rewrite-target': rewritten }
+          });
+        }
+        continue;
+      }
+      if (rule.status >= 300 && rule.status <= 399) {
+        const location = publicRedirectLocation(target, url, routeRecord);
+        const headers = new Headers({
+          location,
+          'cache-control': 'no-store'
+        });
+        headers.set('x-skynet-route', 'netlify-redirect');
+        headers.set('x-skynet-project-id', cleanText(routeRecord.project_id || '', 180));
+        headers.set('x-skynet-deployment-id', cleanText(routeRecord.active_deployment_id || '', 180));
+        runtimeMeta.runtime_type = 'static';
+        runtimeMeta.route_decision = 'netlify.redirects.redirect';
+        return new Response(null, { status: rule.status, headers });
+      }
+    }
+  }
+  if (directAsset) {
     runtimeMeta.runtime_type = 'static';
     runtimeMeta.route_decision = 'r2.deployment_asset';
-    return new Response(object.body, { headers });
+    return deploymentAssetResponse(request, {
+      bucket,
+      key: directAsset.key,
+      candidate: directAsset.candidate,
+      object: directAsset.object,
+      routeRecord,
+      rules,
+      headerPaths: [normalizedRequestPath, `/${directAsset.candidate}`],
+      routeName: 'r2-deployment'
+    });
   }
   return null;
 }
@@ -615,9 +1261,21 @@ async function serveMappedRoute(request, env, routeRecord, runtimeMeta) {
   const denied = await ensureMappedRouteAccess(request, routeRecord, runtimeMeta);
   if (denied) return denied;
   if (routeRecord.asset_mode === 'r2' || routeRecord.asset_prefix) {
-    const asset = await serveDeploymentAsset(request, env, routeRecord, runtimeMeta);
-    if (asset) return asset;
-    if (!routeRecord.fallback_origin) return missingDeploymentAssetResponse(request, routeRecord, runtimeMeta);
+    const method = String(request.method || 'GET').toUpperCase();
+    if (method === 'OPTIONS') return staticRouteOptionsResponse(request, routeRecord, runtimeMeta);
+    if (method === 'POST') {
+      const formRequest = routeRecord.fallback_origin ? request.clone() : request;
+      const form = await handleNetlifyFormSubmission(formRequest, env, routeRecord, runtimeMeta);
+      if (form) return form;
+      if (!routeRecord.fallback_origin) return staticMethodNotAllowedResponse(request, routeRecord, runtimeMeta);
+    }
+    if (method === 'GET' || method === 'HEAD') {
+      const asset = await serveDeploymentAsset(request, env, routeRecord, runtimeMeta);
+      if (asset) return asset;
+      if (!routeRecord.fallback_origin) return missingDeploymentAssetResponse(request, routeRecord, runtimeMeta);
+    } else if (!routeRecord.fallback_origin) {
+      return staticMethodNotAllowedResponse(request, routeRecord, runtimeMeta);
+    }
   }
   return proxyFallbackOrigin(request, routeRecord, runtimeMeta);
 }

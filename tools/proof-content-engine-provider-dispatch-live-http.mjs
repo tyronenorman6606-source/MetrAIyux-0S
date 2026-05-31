@@ -71,7 +71,7 @@ async function loginWith(candidate) {
     if (response?.ok) return { token: candidate.value, sourceKey: candidate.key, mode: 'bearer' };
     return null;
   }
-  for (const pathname of ['/api/founder-command/login', '/api/owner/admin-login']) {
+  for (const pathname of ['/api/owner/admin-login', '/api/owner/admin-login']) {
     const response = await fetch(`${BASE_URL}${pathname}`, {
       method: 'POST',
       headers: { accept: 'application/json', 'content-type': 'application/json' },

@@ -200,17 +200,22 @@ function gateCredential(req) {
     || cookies.owner_admin_session
     || '';
 }
+function isReadOnlyTourCredential(req, credential) {
+  const usageLane = String(cleanText(headerValue(req, ['x-skye-usage-lane', 'x-free99-usage-lane', 'x-usage-lane']), 120) || '').toLowerCase();
+  return usageLane === 'skyeroutex-tour-readonly'
+    || /^rtx_tour_[a-z0-9_.-]{12,}$/i.test(String(credential || '').trim());
+}
 function gateRole(req) {
-  const role = cleanText(headerValue(req, ['x-routex-role', 'x-skye-role', 'x-gate-role', 'x-free99-role', 'x-operator-role', 'x-user-role']), 80).toLowerCase();
-  if (['owner', 'founder_admin', 'operator'].includes(role)) return 'house_command';
+  const role = String(cleanText(headerValue(req, ['x-routex-role', 'x-0s-role', 'x-skye-role', 'x-gate-role', 'x-free99-role', 'x-operator-role', 'x-user-role']), 80) || '').toLowerCase();
+  if (['owner', 'founder', 'founder_admin', 'operator', 'deployer'].includes(role)) return 'house_command';
   if (['admin', 'house_command', 'ae', 'provider', 'contractor', 'crew'].includes(role)) return role;
-  return 'house_command';
+  return '';
 }
 function gateEmail(req) {
-  return cleanText(headerValue(req, ['x-routex-email', 'x-skye-email', 'x-gate-email', 'x-free99-email', 'x-operator-email', 'x-user-email']), 160).toLowerCase();
+  return String(cleanText(headerValue(req, ['x-routex-email', 'x-0s-email', 'x-skye-email', 'x-gate-email', 'x-free99-email', 'x-operator-email', 'x-user-email']), 160) || '').toLowerCase();
 }
 function gateName(req, email) {
-  return cleanText(headerValue(req, ['x-routex-name', 'x-skye-name', 'x-gate-name', 'x-free99-name', 'x-operator-name', 'x-user-name']), 120)
+  return cleanText(headerValue(req, ['x-routex-name', 'x-0s-actor', 'x-skye-name', 'x-gate-name', 'x-free99-name', 'x-operator-name', 'x-user-name']), 120)
     || (email ? email.split('@')[0] : '0S Gate Operator');
 }
 function redactLocalCredentialFields(row = {}) {
@@ -221,8 +226,22 @@ function redactLocalCredentialFields(row = {}) {
 function auth(req, db) {
   const credential = gateCredential(req);
   if (!credential) return null;
+  if (isReadOnlyTourCredential(req, credential)) {
+    return {
+      id: `tour_${crypto.createHash('sha256').update(String(credential)).digest('hex').slice(0, 18)}`,
+      email: 'skyeroutex-tour-readonly@routex.local',
+      role: 'tour',
+      status: 'active',
+      name: 'SkyeRouteX Read-Only Tour',
+      city: null,
+      state: null,
+      shared_gate_auth: false,
+      readonly_demo: true
+    };
+  }
   const email = gateEmail(req);
   const role = gateRole(req);
+  if (!role) return null;
   const found = email ? db.users.find(u => String(u.email || '').toLowerCase() === email && u.status !== 'disabled') : null;
   const safe = redactLocalCredentialFields(found || {});
   return {
@@ -239,6 +258,10 @@ function auth(req, db) {
 function requireUser(req, res, db, roles) {
   const user = auth(req, db);
   if (!user) { json(res, 401, { error: 'Shared FS27/SkyGate/Free99 Gate authentication required.' }); return null; }
+  if (user.readonly_demo && !['GET', 'HEAD', 'OPTIONS'].includes(String(req.method || '').toUpperCase())) {
+    json(res, 403, { error: 'SkyeRouteX tour/free99 demo tokens are read-only and cannot mutate Workforce Command data.' });
+    return null;
+  }
   if (roles && !roles.includes(user.role)) { json(res, 403, { error: `Requires role: ${roles.join(', ')}` }); return null; }
   return user;
 }

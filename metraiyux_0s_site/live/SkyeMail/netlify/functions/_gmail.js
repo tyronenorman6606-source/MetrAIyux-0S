@@ -46,12 +46,14 @@ function getWatchConfig() {
 }
 
 function createOAuthState(payload) {
-  const secret = requireEnv('JWT_SECRET');
+  const secret = String(process.env.GOOGLE_OAUTH_STATE_SECRET || process.env.SKYEMAIL_OAUTH_STATE_SECRET || '').trim();
+  if (!secret) throw new Error('GOOGLE_OAUTH_STATE_SECRET or SKYEMAIL_OAUTH_STATE_SECRET env var missing.');
   return jwt['si' + 'gn']({ t: 'google-oauth', ...payload }, secret, { expiresIn: '10m' });
 }
 
 function readOAuthState(token) {
-  const secret = requireEnv('JWT_SECRET');
+  const secret = String(process.env.GOOGLE_OAUTH_STATE_SECRET || process.env.SKYEMAIL_OAUTH_STATE_SECRET || '').trim();
+  if (!secret) throw new Error('GOOGLE_OAUTH_STATE_SECRET or SKYEMAIL_OAUTH_STATE_SECRET env var missing.');
   const decoded = jwt['ver' + 'ify'](String(token || ''), secret);
   if (!decoded || decoded.t !== 'google-oauth') throw new Error('Invalid OAuth state.');
   return decoded;

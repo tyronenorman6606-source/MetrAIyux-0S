@@ -28,8 +28,13 @@ export function matchesAdminPassword(password) {
   return Boolean(pass && adminPasswordCandidates().some((expected) => pass === expected));
 }
 
+function adminPasswordHeaderAllowed() {
+  return truthyEnv(process.env.FS27_ALLOW_ADMIN_PASSWORD_HEADER)
+    || truthyEnv(process.env.SKYGATEFS27_ALLOW_ADMIN_PASSWORD_HEADER);
+}
+
 export function requireAdmin(req) {
-  // Preferred: short-lived admin JWT
+  // Preferred compatibility path: short-lived admin JWT minted after FS27 user auth.
   const auth = req.headers.get("authorization") || req.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
   if (token) {
@@ -37,12 +42,11 @@ export function requireAdmin(req) {
     if (payload && payload.role === "admin") return payload;
   }
 
-  // Back-compat for the bundled admin UI: per-request password header
-  // You can disable this entirely by setting DISABLE_ADMIN_PASSWORD_HEADER=true
-  if (!truthyEnv(process.env.DISABLE_ADMIN_PASSWORD_HEADER)) {
+  // Explicit break-glass only. The password header is not a normal auth lane.
+  if (adminPasswordHeaderAllowed()) {
     const pass = (req.headers.get("x-admin-password") || "").toString();
     if (matchesAdminPassword(pass)) {
-      return { role: "admin", via: "fs27-password" };
+      return { role: "admin", via: "explicit-break-glass-password-header", break_glass: true };
     }
   }
 

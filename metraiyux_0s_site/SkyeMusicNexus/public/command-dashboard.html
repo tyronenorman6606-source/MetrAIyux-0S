@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SkyeMusicNexus - Service Health</title>
-  <meta name="description" content="Owner-facing SkyeMusicNexus analytics, service health, activity records, workflow state, and visual health data." />
+  <meta name="description" content="Owner-facing SkyeMusicNexus analytics, service health, activity records, workflow state, and visual health data from Worker-confirmed sources when the shared 0S gate is active." />
   <link rel="stylesheet" href="./neo-nexus.css" />
   <script defer src="../gate-session.js"></script>
   <script defer src="./skygate-auth.js"></script>
-  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = /(^|\.)skye-music-nexus\.pages\.dev$/i.test(location.hostname);</script>
+  <script>window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW = false;</script>
   <script defer src="../../assets/js/visual-data-kit.js"></script>
   <script defer src="./neo-nexus.js"></script>
 </head>
@@ -20,7 +20,7 @@
     <a class="sigil" href="./index.html" aria-label="SkyeMusicNexus workspace"><img src="../assets/skye-music-nexus-logo.png" alt="" /></a>
     <div class="top-title">
       <p class="micro">SkyeMusicNexus // Service Health</p>
-      <h1>Live analytics, service health, workflow state, and activity records from the music platform.</h1>
+      <h1>Worker-confirmed analytics, service health, workflow state, and activity records from the music platform.</h1>
     </div>
     <div class="session-rack">
       <span id="sessionChip" class="chip chip-hot">Client access required</span>
@@ -31,7 +31,7 @@
 
   <nav class="nexus-nav" aria-label="SkyeMusicNexus platform rooms">
     <a href="./index.html">Workspace</a>
-    <a href="./create.html">Create</a>
+
     <a href="./daw.html">DAW</a>
     <a href="./discover.html">Discover</a>
     <a href="./feed.html">Feed</a>
@@ -50,11 +50,12 @@
     <section class="panel-xl visual-dashboard music-command-visuals"
       data-visual-dashboard
       data-workspace="skye-music-nexus"
-      data-api="/api/skymusicnexus/visuals"
+      data-api="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/visuals"
+      data-require-live="true"
       data-source="../data/nexus-visuals-demo.json"
       data-fallback="../data/nexus-visuals-demo.json">
       <div class="visual-board-head" data-visual-workspace></div>
-      <p class="visual-status-line" data-visual-status>Loading live SkyeMusicNexus visual data...</p>
+      <p class="visual-status-line" data-visual-status>Loading Worker-confirmed SkyeMusicNexus visual data...</p>
 
       <div class="visual-kpi-grid" data-visual-kpis></div>
 
@@ -79,7 +80,7 @@
 
       <section class="visual-panel">
         <h2>Service Health</h2>
-        <p class="compact">Every row is a browser-facing room/service lane. Live mode shows retained activity counts from successful platform actions.</p>
+        <p class="compact">Every row is a browser-facing room/service lane. Live mode shows retained activity counts only after the shared Worker API answers.</p>
         <div class="visual-route-grid" data-visual-routes></div>
       </section>
 

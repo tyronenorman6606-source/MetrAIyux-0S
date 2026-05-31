@@ -111,6 +111,28 @@ test('standalone SkyeNet console exposes full package publisher controls', async
   assert.match(html, /name="public_files"/);
   assert.match(html, /name="source_files"/);
   assert.match(html, /Publish full package/);
+  assert.match(html, /Support/);
+  assert.match(html, /id="supportProfile"/);
+  assert.match(html, /Customer export/);
+  assert.match(html, /id="exportForm"/);
+  assert.match(html, /Export customer data/);
+});
+
+test('standalone SkyeNet serves approved public support profile', async () => {
+  const e = env();
+  const response = await worker.fetch(req('/support.json'), e);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('content-type'), 'application/json; charset=utf-8');
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.source, 'https://skyenet.skyesol/leadership/SkyesOverLondon.html');
+  assert.equal(body.public_site, 'https://skyenet.solenterprises/');
+  assert.equal(body.channels.operations_email, 'SkyesOverLondonLC@solenterprises.org');
+  assert.equal(body.channels.founder_email, 'GrayLondonSkyes@solenterprises.org');
+  assert.equal(body.channels.general_email, 'Contact@solenterprises.org');
+  assert.equal(body.channels.b2b_email, 'B2B@solenterprises.org');
+  assert.deepEqual(body.channels.phones, ['480-469-5416', '623-260-7073']);
+  assert.equal(e.calls.length, 0);
 });
 
 test('standalone SkyeNet API maps to FS27 deploy API and preserves shared gate bearer', async () => {
@@ -124,6 +146,25 @@ test('standalone SkyeNet API maps to FS27 deploy API and preserves shared gate b
   assert.equal(e.calls[0].source, 'standalone-skynet');
   assert.equal(e.calls[0].publicHost, 'skyenet.example.test');
   assert.equal(e.calls[0].auth, 'Bearer gate-token');
+});
+
+test('standalone SkyeNet support and export APIs proxy to FS27 deploy parity routes', async () => {
+  const e = env();
+  const supportResponse = await worker.fetch(req('/api/skyenet/support', {
+    headers: { authorization: 'Bearer gate-token' }
+  }), e);
+  assert.equal(supportResponse.status, 200);
+  assert.equal((await supportResponse.json()).path, '/deploy/support');
+  assert.equal(e.calls[0].path, '/deploy/support');
+  assert.equal(e.calls[0].auth, 'Bearer gate-token');
+
+  const exportResponse = await worker.fetch(req('/api/skyenet/export?workspace_id=demo&format=json', {
+    headers: { authorization: 'Bearer gate-token' }
+  }), e);
+  assert.equal(exportResponse.status, 200);
+  assert.equal((await exportResponse.json()).path, '/deploy/export');
+  assert.equal(e.calls[1].path, '/deploy/export');
+  assert.equal(e.calls[1].auth, 'Bearer gate-token');
 });
 
 test('standalone SkyeNet source-download keeps the account bearer and tar response', async () => {
@@ -178,17 +219,35 @@ test('standalone SkyeNet env and private source APIs map to FS27', async () => {
   assert.equal((await uploadResponse.json()).path, '/deploy/source-upload');
   assert.equal(e.calls[1].path, '/deploy/source-upload');
 
+  const indexResponse = await worker.fetch(req('/api/skyenet/source-index?workspaceId=demo&projectId=demo&deploymentId=dep_1', {
+    method: 'PUT',
+    headers: { authorization: 'Bearer gate-token' },
+    body: '{"path":"package.json"}\n'
+  }), e);
+  assert.equal(indexResponse.status, 200);
+  assert.equal((await indexResponse.json()).path, '/deploy/source-index');
+  assert.equal(e.calls[2].path, '/deploy/source-index');
+
   for (const [index, path, expected] of [
-    [2, '/api/skyenet/source-manifest?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-manifest'],
-    [3, '/api/skyenet/source-tree?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-tree'],
-    [4, '/api/skyenet/source-file?workspace_id=demo&project_id=demo&deployment_id=dep_1&path=package.json', '/deploy/source-file'],
-    [5, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search'],
-    [6, '/api/skyenet/source-archive?workspace_id=demo&project_id=demo&deployment_id=dep_1&filename=source.tar.zst', '/deploy/source-archive']
+    [3, '/api/skyenet/source-manifest?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-manifest'],
+    [4, '/api/skyenet/source-tree?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/source-tree'],
+    [5, '/api/skyenet/source-file?workspace_id=demo&project_id=demo&deployment_id=dep_1&path=package.json', '/deploy/source-file'],
+    [6, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search'],
+    [7, '/api/skyenet/source-archive?workspace_id=demo&project_id=demo&deployment_id=dep_1&filename=source.tar.zst', '/deploy/source-archive'],
+    [8, '/api/skyenet/source-archive-link', '/deploy/source-archive-link']
   ]) {
     const response = await worker.fetch(req(path, {
-      method: expected === '/deploy/source-archive' ? 'PUT' : 'GET',
+      method: expected === '/deploy/source-archive'
+        ? 'PUT'
+        : expected === '/deploy/source-archive-link'
+          ? 'POST'
+          : 'GET',
       headers: { authorization: 'Bearer gate-token' },
-      body: expected === '/deploy/source-archive' ? 'archive' : undefined
+      body: expected === '/deploy/source-archive'
+        ? 'archive'
+        : expected === '/deploy/source-archive-link'
+          ? JSON.stringify({ workspace_id: 'demo', project_id: 'demo', deployment_id: 'dep_1', key: 'source.tar.zst' })
+          : undefined
     }), e);
     assert.equal(response.status, 200);
     assert.equal((await response.json()).path, expected);

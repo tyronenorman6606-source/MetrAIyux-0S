@@ -40,7 +40,7 @@
       <div class="panel">
         <p class="eyebrow">Live platform state</p>
         <h2 id="platformTitle">Checking mounted runtime…</h2>
-        <p class="wide" id="platformSummary">Pulling the live mounted status from the 0S worker.</p>
+        <p class="wide" id="platformSummary">Checking the mounted 0S Worker status; static module files are not treated as live telemetry.</p>
         <div class="route-grid" id="platformFacts"></div>
       </div>
       <aside class="panel">
@@ -57,7 +57,7 @@
 
     <section class="section">
       <p class="eyebrow">Mounted modules</p>
-      <h2>Nine rooms now live under one platform shell.</h2>
+      <h2>Nine rooms route under one platform shell.</h2>
       <div class="route-grid">
         <a class="route-card mme-module-link" data-module-id="ae-flowpro" href="AE-FlowPro/index.html"><h3>AE-FlowPro</h3><p>Lead flow, offer queue, follow-up rail, activation packs, and close-path delivery under the shared gate lane.</p></a>
         <a class="route-card mme-module-link" data-module-id="brandid-offline-pwa" href="BrandID-Offline-PWA/index.html"><h3>BrandID Offline PWA</h3><p>Identity builder and offline export room mounted as a module, not a second auth island.</p></a>
@@ -123,11 +123,11 @@
       ]);
 
       if (health.ok) {
-        titleNode.textContent = 'Mounted platform is live';
+        titleNode.textContent = 'Mounted platform Worker responded';
         const routeLabel = workspace ? ' and workspace routing is active.' : '.';
         summaryNode.textContent = 'The 0S worker is serving Marketing Made Easy as a mounted platform with a shared gate lane' + routeLabel;
         const facts = [
-          ['Status', health.data.status || 'LIVE/GATED'],
+          ['Status', health.data.status || 'WORKER/GATED'],
           ['Auth mode', health.data.auth_mode || 'skygate-shared-lane'],
           ['Storage', health.data.storage_mode || 'site_events_kv'],
           ['Workspace route', health.data.workspace_route || '/Marketing-Made-Easy/index.html?workspace=:slug']

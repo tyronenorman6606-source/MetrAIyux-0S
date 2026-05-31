@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { createReadStream, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+
+const SOURCE_INDEX_UPLOAD_THRESHOLD = 20000;
 
 function arg(name, fallback = '') {
   const prefix = `--${name}=`;
@@ -43,6 +46,7 @@ Common:
 	  --source-archive <archive.tar|archive.tar.zst>
 	  --source-index-only
 	  --no-source
+	  --include-public-originals
   --concurrency 6
   --resume
   --public
@@ -53,11 +57,14 @@ function cleanToken(value) {
   return String(value || '').replace(/^Bearer\s+/i, '').trim();
 }
 
-function isSafePublicPath(rel) {
+function isSafePublicPath(rel, options = {}) {
   const normalized = String(rel || '').replace(/\\/g, '/');
   if (!normalized || normalized.includes('../')) return false;
   if (/(^|\/)(\.git|node_modules|\.wrangler|\.skyenet|__pycache__|\.cache)(\/|$)/i.test(normalized)) return false;
-  if (/(^|\/)(tests?|smoke|proof|scripts|server|src|template-library|templates|originals?|coverage)(\/|$)/i.test(normalized)) return false;
+  const excludedPublicDirs = options.includeOriginals
+    ? /(^|\/)(tests?|smoke|proof|scripts|server|src|template-library|templates|coverage)(\/|$)/i
+    : /(^|\/)(tests?|smoke|proof|scripts|server|src|template-library|templates|originals?|coverage)(\/|$)/i;
+  if (excludedPublicDirs.test(normalized)) return false;
   if (/(^|\/)netlify\/functions(\/|$)/i.test(normalized)) return false;
   if (/(^|\/)(MCP_TOOLING_RECEIPT\.json|README(?:\.[a-z0-9]+)?|README_DEPLOY\.txt|deploy-target\.json|package(?:-lock)?\.json)$/i.test(normalized)) return false;
   if (/(^|\/)\.env(\.|$|\/)/i.test(normalized)) return false;
@@ -68,16 +75,17 @@ function isSafePublicPath(rel) {
 
 async function collectFiles(root, options = {}) {
   const out = [];
+  const skipDirs = new Set(options.skipDirs || ['node_modules', '.git', '.skyenet']);
   async function walk(current) {
     const entries = await fs.readdir(current, { withFileTypes: true });
     for (const entry of entries) {
       const full = path.join(current, entry.name);
       if (entry.isDirectory()) {
-        if (['node_modules', '.git', '.skyenet'].includes(entry.name)) continue;
+        if (skipDirs.has(entry.name)) continue;
         await walk(full);
       } else if (entry.isFile()) {
         const rel = path.relative(root, full).replace(/\\/g, '/');
-        if (options.publicBundle && !isSafePublicPath(rel)) continue;
+        if (options.publicBundle && !isSafePublicPath(rel, options)) continue;
         const stat = await fs.stat(full);
         out.push({ full, rel, size: stat.size });
       }
@@ -98,7 +106,7 @@ function isSafeSourcePath(rel) {
 }
 
 async function collectSourceFiles(root) {
-  const files = await collectFiles(root);
+  const files = await collectFiles(root, { skipDirs: ['.git', '.skyenet', '.wrangler'] });
   return files.filter((file) => isSafeSourcePath(file.rel));
 }
 
@@ -131,7 +139,28 @@ function contentTypeForPath(pathname) {
   if (clean.endsWith('.txt') || clean.endsWith('.md')) return 'text/plain; charset=utf-8';
   if (clean.endsWith('.xml')) return 'application/xml; charset=utf-8';
   if (clean.endsWith('.zip')) return 'application/zip';
+  if (clean.endsWith('.tar')) return 'application/x-tar';
+  if (clean.endsWith('.tar.gz') || clean.endsWith('.tgz')) return 'application/gzip';
+  if (clean.endsWith('.tar.zst') || clean.endsWith('.zst')) return 'application/zstd';
   return 'application/octet-stream';
+}
+
+async function sha256File(filePath) {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(filePath)) hash.update(chunk);
+  return hash.digest('hex');
+}
+
+function sourceFileRecord(file) {
+  return {
+    path: file.rel,
+    size: file.size || 0,
+    content_type: contentTypeForPath(file.rel)
+  };
+}
+
+function sourceIndexBody(files) {
+  return `${files.map((file) => JSON.stringify(sourceFileRecord(file))).join('\n')}\n`;
 }
 
 async function apiFetch(api, token, pathname, options = {}) {
@@ -239,6 +268,7 @@ const publicAccess = flag('public') || String(arg('auth', '')).toLowerCase() ===
 const concurrency = intArg('concurrency', 1, 1, 12);
 const resumeUploads = flag('resume') || String(process.env.SKYENET_RESUME || '').toLowerCase() === 'true';
 const uploadSourcePackage = !flag('no-source') && String(process.env.SKYENET_NO_SOURCE || '').toLowerCase() !== 'true';
+const includePublicOriginals = flag('include-public-originals') || /^(1|true|yes)$/i.test(process.env.SKYENET_INCLUDE_PUBLIC_ORIGINALS || '');
 
 if (!token || !projectId || (!dirArg && !zipArg)) {
   console.error(usage());
@@ -247,7 +277,7 @@ if (!token || !projectId || (!dirArg && !zipArg)) {
 
 const sourceRoot = zipArg ? await extractZip(path.resolve(zipArg)) : path.resolve(dirArg);
 if (!existsSync(sourceRoot)) throw new Error(`Source not found: ${sourceRoot}`);
-const files = await collectFiles(sourceRoot, { publicBundle: true });
+const files = await collectFiles(sourceRoot, { publicBundle: true, includeOriginals: includePublicOriginals });
 if (!files.length) throw new Error(`No files found in ${sourceRoot}`);
 const privateSourceRoot = sourceRootArg ? path.resolve(sourceRootArg) : sourceRoot;
 const sourceFiles = uploadSourcePackage && existsSync(privateSourceRoot)
@@ -307,6 +337,7 @@ await apiFetch(api, token, '/deploy/complete', {
 });
 
 let uploadedSourceArchive = null;
+let uploadedSourceIndex = null;
 if (uploadSourcePackage && sourceFiles.length) {
   process.stderr.write(`skyenet-deploy: uploading private full source package ${sourceFiles.length} files from ${privateSourceRoot}\n`);
   if (sourceIndexOnly) {
@@ -329,9 +360,22 @@ if (uploadSourcePackage && sourceFiles.length) {
       }
     });
   }
+  if (sourceIndexOnly || sourceFiles.length > SOURCE_INDEX_UPLOAD_THRESHOLD) {
+    process.stderr.write(`skyenet-deploy: uploading private source JSONL index for ${sourceFiles.length} files\n`);
+    const params = new URLSearchParams({ workspaceId, projectId, deploymentId });
+    const indexResponse = await apiFetch(api, token, `/deploy/source-index?${params.toString()}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/x-ndjson; charset=utf-8' },
+      body: sourceIndexBody(sourceFiles),
+      retries: 5,
+      retryDelayMs: 900
+    });
+    uploadedSourceIndex = indexResponse.source_index || null;
+  }
   if (sourceArchiveArg) {
     const archivePath = path.resolve(sourceArchiveArg);
-    const archiveBody = await fs.readFile(archivePath);
+    const archiveStat = await fs.stat(archivePath);
+    const archiveSha256 = await sha256File(archivePath);
     const params = new URLSearchParams({
       workspaceId,
       projectId,
@@ -340,34 +384,44 @@ if (uploadSourcePackage && sourceFiles.length) {
     });
     const archiveResponse = await apiFetch(api, token, `/deploy/source-archive?${params.toString()}`, {
       method: 'PUT',
-      headers: { 'content-type': contentTypeForPath(archivePath) },
-      body: archiveBody,
+      headers: {
+        'content-type': contentTypeForPath(archivePath),
+        'content-length': String(archiveStat.size),
+        'x-skynet-source-archive-bytes': String(archiveStat.size),
+        'x-skynet-source-archive-sha256': archiveSha256
+      },
+      body: createReadStream(archivePath),
+      duplex: 'half',
       retries: 5,
       retryDelayMs: 900
     });
     uploadedSourceArchive = archiveResponse.source_archive || null;
   }
+  const sourceCompletePayload = {
+    workspace_id: workspaceId,
+    plan_name: planName,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    archive: uploadedSourceArchive,
+    meta: {
+      source_root: privateSourceRoot,
+      public_build_root: sourceRoot,
+      upload_mode: sourceIndexOnly ? 'source-index-with-archive' : (sourceRootArg ? 'explicit-source-root' : 'deploy-dir-source-root'),
+      public_asset_exposure: false
+    }
+  };
+  if (uploadedSourceIndex) {
+    sourceCompletePayload.index_key = uploadedSourceIndex.key;
+    sourceCompletePayload.file_count = uploadedSourceIndex.file_count || sourceFiles.length;
+    sourceCompletePayload.total_bytes = uploadedSourceIndex.total_bytes || sourceFiles.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    sourceCompletePayload.sample_files = sourceFiles.slice(0, 1000).map(sourceFileRecord);
+  } else {
+    sourceCompletePayload.files = sourceFiles.map(sourceFileRecord);
+  }
   await apiFetch(api, token, '/deploy/source-complete', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-	    body: JSON.stringify({
-	      workspace_id: workspaceId,
-	      plan_name: planName,
-	      project_id: projectId,
-	      deployment_id: deploymentId,
-	      files: sourceFiles.map((file) => ({
-	        path: file.rel,
-	        size: file.size || 0,
-	        content_type: contentTypeForPath(file.rel)
-	      })),
-	      archive: uploadedSourceArchive,
-	      meta: {
-	        source_root: privateSourceRoot,
-	        public_build_root: sourceRoot,
-	        upload_mode: sourceIndexOnly ? 'source-index-with-archive' : (sourceRootArg ? 'explicit-source-root' : 'deploy-dir-source-root'),
-	        public_asset_exposure: false
-	      }
-	    }),
+	    body: JSON.stringify(sourceCompletePayload),
     retries: 5,
     retryDelayMs: 900
   });
@@ -402,6 +456,7 @@ console.log(JSON.stringify({
 	    file_count: sourceFiles.length,
 	    uploaded: sourceFiles.length > 0,
 	    source_index_only: sourceIndexOnly,
+	    source_index_uploaded: Boolean(uploadedSourceIndex),
 	    source_archive_uploaded: Boolean(uploadedSourceArchive),
 	    source_manifest_url: `/api/skyenet/source-manifest?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,
 	    source_tree_url: `/api/skyenet/source-tree?workspace_id=${encodeURIComponent(workspaceId)}&project_id=${encodeURIComponent(projectId)}&deployment_id=${encodeURIComponent(deploymentId)}`,

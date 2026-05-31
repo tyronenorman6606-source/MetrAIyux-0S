@@ -886,7 +886,7 @@ Room sections:
 Add links from:
 
 - `public/index.html`
-- `public/create.html`
+- `public/daw.html`
 - `public/upload.html`
 - `public/releases.html`
 - `public/admin.html`

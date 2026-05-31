@@ -1,692 +1,197 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Veridus | Valley Verified</title>
-  <meta name="description" content="Valley Verified fact page for Veridus, a Phoenix public affairs and strategy business listed from public directory research.">
-  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/veridus-phoenix-85004-f41f053/">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <style>
-    :root {
-      --ink: #15171d;
-      --navy: #202c4a;
-      --civic: #f0f3f8;
-      --paper: #fffdf7;
-      --gold: #c9972f;
-      --copper: #b65f3a;
-      --teal: #1d7773;
-      --mist: #dfe7ef;
-      --muted: #656d78;
-      --line: rgba(21, 23, 29, 0.16);
-      --shadow: 0 26px 72px rgba(32, 44, 74, 0.16);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body[data-static-hand-page="true"] {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--ink);
-      background:
-        linear-gradient(115deg, rgba(201, 151, 47, 0.12) 0 20%, transparent 20% 100%),
-        linear-gradient(245deg, rgba(29, 119, 115, 0.12) 0 18%, transparent 18% 100%),
-        repeating-linear-gradient(90deg, rgba(32, 44, 74, 0.05) 0 1px, transparent 1px 88px),
-        var(--civic);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .civic-shell {
-      width: min(1200px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 26px 0 44px;
-    }
-
-    .mast {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 18px;
-      align-items: center;
-      padding: 14px 0 24px;
-      color: var(--navy);
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.78rem;
-    }
-
-    .mast div {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .mast div::before {
-      content: "";
-      width: 36px;
-      height: 10px;
-      background: linear-gradient(90deg, var(--gold), var(--teal));
-      border-radius: 999px;
-    }
-
-    .hero {
-      min-height: 620px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(330px, 430px);
-      gap: 24px;
-      align-items: stretch;
-    }
-
-    .statement {
-      padding: clamp(28px, 6vw, 68px);
-      border-radius: 8px;
-      color: #fffdf7;
-      background:
-        linear-gradient(135deg, rgba(32, 44, 74, 0.92), rgba(21, 23, 29, 0.97)),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 28px);
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .statement::after {
-      content: "";
-      position: absolute;
-      right: clamp(16px, 4vw, 56px);
-      top: clamp(16px, 4vw, 56px);
-      width: min(38vw, 360px);
-      aspect-ratio: 1;
-      border: 1px solid rgba(255, 253, 247, 0.16);
-      background:
-        linear-gradient(90deg, transparent 0 48%, rgba(255, 253, 247, 0.12) 48% 52%, transparent 52% 100%),
-        linear-gradient(0deg, transparent 0 48%, rgba(255, 253, 247, 0.12) 48% 52%, transparent 52% 100%);
-      transform: rotate(45deg);
-      pointer-events: none;
-    }
-
-    .statement > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      width: fit-content;
-      padding: 9px 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(201, 151, 47, 0.7);
-      color: #f9d885;
-      font-size: 0.75rem;
-      font-weight: 950;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 30px 0 18px;
-      max-width: 780px;
-      font-size: clamp(3.4rem, 10vw, 8.2rem);
-      line-height: 0.9;
-      letter-spacing: 0;
-    }
-
-    .lede {
-      max-width: 740px;
-      margin: 0;
-      color: rgba(255, 253, 247, 0.84);
-      font-size: clamp(1rem, 2vw, 1.22rem);
-      line-height: 1.65;
-    }
-
-    .docket {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 40px;
-    }
-
-    .docket div {
-      min-height: 116px;
-      padding: 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 253, 247, 0.16);
-      background: rgba(255, 253, 247, 0.08);
-    }
-
-    .docket b {
-      display: block;
-      color: #f9d885;
-      font-size: 1.55rem;
-      margin-bottom: 8px;
-      line-height: 1;
-    }
-
-    .docket span {
-      color: rgba(255, 253, 247, 0.76);
-      font-size: 0.86rem;
-      font-weight: 760;
-      line-height: 1.35;
-    }
-
-    .brief-card {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 24px;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 20px;
-    }
-
-    .brief-card h2 {
-      margin: 0;
-      color: var(--navy);
-      font-size: 1.35rem;
-      line-height: 1.05;
-      letter-spacing: 0;
-    }
-
-    .brief-card p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-weight: 700;
-      line-height: 1.55;
-    }
-
-    .agenda {
-      display: grid;
-      gap: 12px;
-      align-content: center;
-    }
-
-    .agenda-item {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      gap: 12px;
-      align-items: center;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #ffffff;
-    }
-
-    .number {
-      min-height: 56px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: var(--navy);
-      color: #fffdf7;
-      font-weight: 950;
-      font-size: 1.4rem;
-    }
-
-    .agenda-item b {
-      display: block;
-      color: var(--navy);
-      margin-bottom: 4px;
-    }
-
-    .agenda-item span {
-      display: block;
-      color: var(--muted);
-      font-weight: 720;
-      line-height: 1.35;
-      overflow-wrap: anywhere;
-    }
-
-    .status-strip {
-      padding: 16px;
-      border-radius: 8px;
-      background: #f7efe1;
-      border: 1px solid rgba(201, 151, 47, 0.42);
-    }
-
-    .status-strip b {
-      display: block;
-      color: var(--copper);
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 7px;
-    }
-
-    .status-strip span {
-      color: var(--ink);
-      line-height: 1.45;
-      font-weight: 760;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
-      gap: 24px;
-      margin-top: 24px;
-      align-items: start;
-    }
-
-    .facts,
-    .source,
-    .skyemail,
-    .seats {
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: rgba(255, 253, 247, 0.9);
-      box-shadow: 0 18px 48px rgba(32, 44, 74, 0.08);
-    }
-
-    .facts {
-      padding: 24px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .facts h2,
-    .source h2,
-    .skyemail h2 {
-      margin: 0;
-      color: var(--navy);
-      font-size: clamp(1.35rem, 2.4vw, 2.05rem);
-      line-height: 1.05;
-      letter-spacing: 0;
-    }
-
-    .fact {
-      display: grid;
-      grid-template-columns: 128px 1fr;
-      gap: 14px;
-      padding-top: 15px;
-      border-top: 1px solid var(--line);
-    }
-
-    .fact b {
-      color: var(--teal);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .fact span {
-      color: var(--ink);
-      font-weight: 750;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
-    }
-
-    .right {
-      display: grid;
-      gap: 24px;
-    }
-
-    .source {
-      padding: 24px;
-    }
-
-    .source-list {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .source-list div {
-      min-height: 102px;
-      padding: 15px;
-      border-radius: 8px;
-      background: #ffffff;
-      border: 1px solid var(--line);
-    }
-
-    .source-list b {
-      display: block;
-      color: var(--teal);
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
-    }
-
-    .source-list span,
-    .source-list a {
-      display: block;
-      color: var(--ink);
-      font-weight: 740;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
-    }
-
-    .skyemail {
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(250px, 0.65fr);
-    }
-
-    .mail-panel {
-      padding: 26px;
-      background: var(--paper);
-    }
-
-    .mail-panel p {
-      margin: 14px 0 20px;
-      color: var(--muted);
-      font-weight: 700;
-      line-height: 1.55;
-    }
-
-    .accept {
-      display: inline-flex;
-      min-height: 48px;
-      align-items: center;
-      justify-content: center;
-      padding: 0 18px;
-      border-radius: 999px;
-      background: var(--navy);
-      color: #fffdf7;
-      text-decoration: none;
-      font-weight: 950;
-    }
-
-    .mail-steps {
-      margin: 0;
-      padding: 24px;
-      background: var(--navy);
-      color: #fffdf7;
-      list-style: none;
-      display: grid;
-      gap: 15px;
-    }
-
-    .mail-steps li {
-      display: grid;
-      gap: 5px;
-    }
-
-    .mail-steps b {
-      color: #f9d885;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .mail-steps span {
-      color: rgba(255, 253, 247, 0.82);
-      font-weight: 730;
-      line-height: 1.35;
-    }
-
-    .seats {
-      padding: 18px;
-      display: grid;
-      grid-template-columns: 118px 1fr 174px;
-      gap: 18px;
-      align-items: center;
-      background: #ffffff;
-    }
-
-    .seat-count {
-      min-height: 104px;
-      display: grid;
-      place-items: center;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #f9d885, #ffffff);
-      border: 2px solid var(--navy);
-      color: var(--navy);
-      font-size: 4rem;
-      line-height: 1;
-      font-weight: 950;
-    }
-
-    .seat-copy b {
-      display: block;
-      color: var(--navy);
-      font-size: 1.05rem;
-      margin-bottom: 6px;
-    }
-
-    .seat-copy span,
-    .seat-rule span {
-      color: var(--muted);
-      display: block;
-      font-weight: 740;
-      line-height: 1.4;
-    }
-
-    .seat-rule {
-      border-radius: 8px;
-      padding: 14px;
-      background: #edf8f7;
-      border: 1px solid rgba(29, 119, 115, 0.34);
-    }
-
-    @media (max-width: 920px) {
-      .hero,
-      .grid,
-      .skyemail,
-      .seats {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        min-height: auto;
-      }
-
-      .docket,
-      .source-list {
-        grid-template-columns: 1fr;
-      }
-
-      .statement::after {
-        opacity: 0.42;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .civic-shell {
-        width: min(100% - 20px, 1200px);
-        padding-top: 16px;
-      }
-
-      .mast {
-        grid-template-columns: 1fr;
-      }
-
-      .statement,
-      .brief-card,
-      .facts,
-      .source,
-      .mail-panel,
-      .mail-steps {
-        padding: 18px;
-      }
-
-      h1 {
-        font-size: clamp(2.65rem, 18vw, 4.65rem);
-      }
-
-      .fact,
-      .agenda-item {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veridus | Valley Verified</title>
+<meta name="description" content="Valley Verified fact page for Veridus, a Phoenix public affairs and strategy business listed from public directory research.">
+<link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/veridus-phoenix-85004-f41f053/">
+<link rel="stylesheet" href="/assets/styles.css">
+<style> :root { --ink: #15171d; --navy: #202c4a; --civic: #f0f3f8; --paper: #fffdf7; --gold: #c9972f; --copper: #b65f3a; --teal: #1d7773; --mist: #dfe7ef; --muted: #656d78; --line: rgba(21, 23, 29, 0.16); --shadow: 0 26px 72px rgba(32, 44, 74, 0.16); } * { box-sizing: border-box; } body[data-static-hand-page="true"] { margin: 0; min-height: 100vh; color: var(--ink); background: linear-gradient(115deg, rgba(201, 151, 47, 0.12) 0 20%, transparent 20% 100%), linear-gradient(245deg, rgba(29, 119, 115, 0.12) 0 18%, transparent 18% 100%), repeating-linear-gradient(90deg, rgba(32, 44, 74, 0.05) 0 1px, transparent 1px 88px), var(--civic); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: 0; } a { color: inherit; } .civic-shell { width: min(1200px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 44px; } .mast { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; padding: 14px 0 24px; color: var(--navy); font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; } .mast div { display: flex; align-items: center; gap: 10px; } .mast div::before { content: ""; width: 36px; height: 10px; background: linear-gradient(90deg, var(--gold), var(--teal)); border-radius: 999px; } .hero { min-height: 620px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(330px, 430px); gap: 24px; align-items: stretch; } .statement { padding: clamp(28px, 6vw, 68px); border-radius: 8px; color: #fffdf7; background: linear-gradient(135deg, rgba(32, 44, 74, 0.92), rgba(21, 23, 29, 0.97)), repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 28px); box-shadow: var(--shadow); border: 1px solid rgba(255, 255, 255, 0.12); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; } .statement::after { content: ""; position: absolute; right: clamp(16px, 4vw, 56px); top: clamp(16px, 4vw, 56px); width: min(38vw, 360px); aspect-ratio: 1; border: 1px solid rgba(255, 253, 247, 0.16); background: linear-gradient(90deg, transparent 0 48%, rgba(255, 253, 247, 0.12) 48% 52%, transparent 52% 100%), linear-gradient(0deg, transparent 0 48%, rgba(255, 253, 247, 0.12) 48% 52%, transparent 52% 100%); transform: rotate(45deg); pointer-events: none; } .statement > * { position: relative; z-index: 1; } .eyebrow { display: inline-flex; width: fit-content; padding: 9px 13px; border-radius: 999px; border: 1px solid rgba(201, 151, 47, 0.7); color: #f9d885; font-size: 0.75rem; font-weight: 950; letter-spacing: 0.12em; text-transform: uppercase; } h1 { margin: 30px 0 18px; max-width: 780px; font-size: clamp(3.4rem, 10vw, 8.2rem); line-height: 0.9; letter-spacing: 0; } .lede { max-width: 740px; margin: 0; color: rgba(255, 253, 247, 0.84); font-size: clamp(1rem, 2vw, 1.22rem); line-height: 1.65; } .docket { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 40px; } .docket div { min-height: 116px; padding: 16px; border-radius: 8px; border: 1px solid rgba(255, 253, 247, 0.16); background: rgba(255, 253, 247, 0.08); } .docket b { display: block; color: #f9d885; font-size: 1.55rem; margin-bottom: 8px; line-height: 1; } .docket span { color: rgba(255, 253, 247, 0.76); font-size: 0.86rem; font-weight: 760; line-height: 1.35; } .brief-card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 24px; display: grid; grid-template-rows: auto 1fr auto; gap: 20px; } .brief-card h2 { margin: 0; color: var(--navy); font-size: 1.35rem; line-height: 1.05; letter-spacing: 0; } .brief-card p { margin: 8px 0 0; color: var(--muted); font-weight: 700; line-height: 1.55; } .agenda { display: grid; gap: 12px; align-content: center; } .agenda-item { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #ffffff; } .number { min-height: 56px; border-radius: 8px; display: grid; place-items: center; background: var(--navy); color: #fffdf7; font-weight: 950; font-size: 1.4rem; } .agenda-item b { display: block; color: var(--navy); margin-bottom: 4px; } .agenda-item span { display: block; color: var(--muted); font-weight: 720; line-height: 1.35; overflow-wrap: anywhere; } .status-strip { padding: 16px; border-radius: 8px; background: #f7efe1; border: 1px solid rgba(201, 151, 47, 0.42); } .status-strip b { display: block; color: var(--copper); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; } .status-strip span { color: var(--ink); line-height: 1.45; font-weight: 760; } .grid { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr); gap: 24px; margin-top: 24px; align-items: start; } .facts, .source, .skyemail, .seats { border-radius: 8px; border: 1px solid var(--line); background: rgba(255, 253, 247, 0.9); box-shadow: 0 18px 48px rgba(32, 44, 74, 0.08); } .facts { padding: 24px; display: grid; gap: 14px; } .facts h2, .source h2, .skyemail h2 { margin: 0; color: var(--navy); font-size: clamp(1.35rem, 2.4vw, 2.05rem); line-height: 1.05; letter-spacing: 0; } .fact { display: grid; grid-template-columns: 128px 1fr; gap: 14px; padding-top: 15px; border-top: 1px solid var(--line); } .fact b { color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; } .fact span { color: var(--ink); font-weight: 750; line-height: 1.45; overflow-wrap: anywhere; } .right { display: grid; gap: 24px; } .source { padding: 24px; } .source-list { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } .source-list div { min-height: 102px; padding: 15px; border-radius: 8px; background: #ffffff; border: 1px solid var(--line); } .source-list b { display: block; color: var(--teal); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; } .source-list span, .source-list a { display: block; color: var(--ink); font-weight: 740; line-height: 1.45; overflow-wrap: anywhere; } .skyemail { overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 0.65fr); } .mail-panel { padding: 26px; background: var(--paper); } .mail-panel p { margin: 14px 0 20px; color: var(--muted); font-weight: 700; line-height: 1.55; } .accept { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 0 18px; border-radius: 999px; background: var(--navy); color: #fffdf7; text-decoration: none; font-weight: 950; } .mail-steps { margin: 0; padding: 24px; background: var(--navy); color: #fffdf7; list-style: none; display: grid; gap: 15px; } .mail-steps li { display: grid; gap: 5px; } .mail-steps b { color: #f9d885; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; } .mail-steps span { color: rgba(255, 253, 247, 0.82); font-weight: 730; line-height: 1.35; } .seats { padding: 18px; display: grid; grid-template-columns: 118px 1fr 174px; gap: 18px; align-items: center; background: #ffffff; } .seat-count { min-height: 104px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(135deg, #f9d885, #ffffff); border: 2px solid var(--navy); color: var(--navy); font-size: 4rem; line-height: 1; font-weight: 950; } .seat-copy b { display: block; color: var(--navy); font-size: 1.05rem; margin-bottom: 6px; } .seat-copy span, .seat-rule span { color: var(--muted); display: block; font-weight: 740; line-height: 1.4; } .seat-rule { border-radius: 8px; padding: 14px; background: #edf8f7; border: 1px solid rgba(29, 119, 115, 0.34); } @media (max-width: 920px) { .hero, .grid, .skyemail, .seats { grid-template-columns: 1fr; } .hero { min-height: auto; } .docket, .source-list { grid-template-columns: 1fr; } .statement::after { opacity: 0.42; } } @media (max-width: 560px) { .civic-shell { width: min(100% - 20px, 1200px); padding-top: 16px; } .mast { grid-template-columns: 1fr; } .statement, .brief-card, .facts, .source, .mail-panel, .mail-steps { padding: 18px; } h1 { font-size: clamp(2.65rem, 18vw, 4.65rem); } .fact, .agenda-item { grid-template-columns: 1fr; } } </style>
+<style> .sol-verdict { width: min(1120px, calc(100% - 32px)); margin: 24px auto; padding: clamp(22px, 4vw, 34px); border: 1px solid rgba(28, 36, 45, 0.16); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(243, 248, 246, 0.9)); box-shadow: 0 18px 46px rgba(28, 36, 45, 0.08); color: #18212a; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.55; } .sol-verdict a { color: #0f5f59; overflow-wrap: anywhere; } .sol-verdict__kicker, .sol-verdict__grid span { color: #8a3f20; font-size: 0.75rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; } .sol-verdict h2 { margin: 8px 0 12px; color: #18212a; font-size: clamp(1.55rem, 3vw, 2.45rem); line-height: 1.05; letter-spacing: 0; } .sol-verdict h3 { margin: 0 0 10px; color: #18212a; font-size: 1.05rem; letter-spacing: 0; } .sol-verdict p { margin: 0; color: #4c5965; } .sol-verdict ul { margin: 14px 0 0; padding-left: 1.1rem; color: #31404c; } .sol-verdict li + li { margin-top: 8px; } .sol-verdict__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 20px 0; } .sol-verdict__grid article { min-height: 106px; padding: 14px; border: 1px solid rgba(28, 36, 45, 0.14); border-radius: 8px; background: rgba(255, 255, 255, 0.72); } .sol-verdict__grid strong { display: block; margin-top: 8px; overflow-wrap: anywhere; color: #18212a; font-size: 0.95rem; } .sol-verdict__split { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr); gap: 18px; align-items: start; } .sol-verdict__split > div { height: 100%; padding: 18px; border: 1px solid rgba(28, 36, 45, 0.12); border-radius: 8px; background: rgba(255, 255, 255, 0.64); } .sol-verdict__source { margin-top: 12px; font-size: 0.93rem; } @media (max-width: 840px) { .sol-verdict__grid, .sol-verdict__split { grid-template-columns: 1fr; } } </style>
 </head>
 <body data-static-hand-page="true">
-  <main class="civic-shell">
-    <div class="mast">
-      <div>Valley Verified record</div>
-      <span>Public affairs / strategy</span>
-    </div>
-
-    <section class="hero" aria-label="Veridus overview">
-      <div class="statement">
-        <div>
-          <span class="eyebrow">Creative Services</span>
-          <h1>Veridus</h1>
-          <p class="lede">Veridus is listed in the Valley Verified Network for public affairs and strategy in Phoenix. The record below keeps the public directory facts, owner-researched verified status, contact details, source trail, and SkyEmail acceptance path clear.</p>
-        </div>
-        <div class="docket" aria-label="Veridus record markers">
-          <div>
-            <b>990</b>
-            <span>Suite number listed on the public Phoenix address.</span>
-          </div>
-          <div>
-            <b>85004</b>
-            <span>Downtown Phoenix ZIP on the directory record.</span>
-          </div>
-          <div>
-            <b>2026</b>
-            <span>Research record last checked on May 19.</span>
-          </div>
-        </div>
-      </div>
-
-      <aside class="brief-card" aria-label="Veridus status brief">
-        <div>
-          <h2>Owner-researched verified status</h2>
-          <p>Public directory verified for Advertising &amp; Media / Public Affairs / Strategy. The business is unclaimed inside Valley Verified, with public phone, address, and Phoenix Chamber source signals retained.</p>
-        </div>
-
-        <div class="agenda">
-          <div class="agenda-item">
-            <div class="number">1</div>
-            <div>
-              <b>Business identity</b>
-              <span>Veridus, Phoenix, Arizona</span>
-            </div>
-          </div>
-          <div class="agenda-item">
-            <div class="number">2</div>
-            <div>
-              <b>Primary key</b>
-              <span>phone:6022291129</span>
-            </div>
-          </div>
-          <div class="agenda-item">
-            <div class="number">3</div>
-            <div>
-              <b>Source hash</b>
-              <span>f41f05312ec7</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="status-strip">
-          <b>Claim status</b>
-          <span>Unclaimed profile; direct contact is listed by public phone only.</span>
-        </div>
-      </aside>
-    </section>
-
-    <section class="grid" aria-label="Veridus facts and SkyEmail">
-      <section class="facts" aria-label="Business facts">
-        <h2>Business facts</h2>
-        <div class="fact">
-          <b>Name</b>
-          <span>Veridus</span>
-        </div>
-        <div class="fact">
-          <b>Category</b>
-          <span>Creative Services</span>
-        </div>
-        <div class="fact">
-          <b>Specialty</b>
-          <span>Public Affairs / Strategy</span>
-        </div>
-        <div class="fact">
-          <b>Address</b>
-          <span>101 E Washington Street Suite 990, Phoenix, AZ 85004</span>
-        </div>
-        <div class="fact">
-          <b>Phone</b>
-          <span><a href="tel:+16022291129">(602) 229-1129</a></span>
-        </div>
-        <div class="fact">
-          <b>Email</b>
-          <span>No public email listed in the source record.</span>
-        </div>
-        <div class="fact">
-          <b>Pricing</b>
-          <span>Contact the provider directly for scope, availability, and pricing.</span>
-        </div>
-      </section>
-
-      <div class="right">
-        <section class="source" aria-label="Source record">
-          <h2>Source record</h2>
-          <div class="source-list">
-            <div>
-              <b>Last verified</b>
-              <span>2026-05-19</span>
-            </div>
-            <div>
-              <b>Source file</b>
-              <span>public business profile review</span>
-            </div>
-            <div>
-              <b>Source lines</b>
-              <span>L483-L487</span>
-            </div>
-            <div>
-              <b>Source policy</b>
-              <span>Public directory/company listing only; no synthetic contacts or guessed emails.</span>
-            </div>
-            <div>
-              <b>Identity signals</b>
-              <span>phone:6022291129; name_city_zip:veridus-phoenix-85004</span>
-            </div>
-            <div>
-              <b>Source URL</b>
-              <a href="https://business.phoenixchamber.com/list/ql/advertising-media-1">Phoenix Chamber advertising and media listing</a>
-            </div>
-          </div>
-        </section>
-
-        <section class="skyemail" aria-label="SkyEmail acceptance">
-          <div class="mail-panel">
-            <h2>Accept the free SkyEmail account.</h2>
-            <p>Veridus signs in through the shared 0S/SkyGate lane. The team activates the SkyEmail workspace after provisioning, and activation may take up to 24 hours.</p>
-            <a class="accept" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=veridus-phoenix-85004-f41f053&amp;mailbox=veridus%40skyemail.solenterprises.org">Accept SkyEmail</a>
-          </div>
-          <ul class="mail-steps">
-            <li>
-              <b>Sign in</b>
-              <span>Use the shared 0S/SkyGate sign-in screen for the assigned SkyEmail account.</span>
-            </li>
-            <li>
-              <b>Provision</b>
-              <span>Notify owner: provision the Veridus SkyEmail workspace.</span>
-            </li>
-            <li>
-              <b>Escalate</b>
-              <span>If activation is not complete after 24 hours, K4i sends the workspace escalation notice.</span>
-            </li>
-          </ul>
-        </section>
-
-        <section class="seats" aria-label="SkyEmail seats">
-          <div class="seat-count">9</div>
-          <div class="seat-copy">
-            <b>SkyEmail seats left after this lane</b>
-            <span>Track remaining seats from 9. When 2 seats remain, send the owner a purchase notice.</span>
-          </div>
-          <div class="seat-rule">
-            <span>Additional seats must be purchased only in groups of 5.</span>
-          </div>
-        </section>
-      </div>
-    </section>
-  </main>
+<section class="sol-verdict" aria-labelledby="sol-verdict-title">
+<div class="sol-verdict__kicker">Valley Verified business review</div>
+<h2 id="sol-verdict-title">Why Skyes Over London says Veridus is Valley Verified</h2>
+<p>Skyes Over London marks this page Valley Verified because the record ties a public source trail to Veridus's customer-facing identity: category, service lane, phone, address, last-reviewed date, and source-policy notes are visible instead of hidden behind guessed contacts.</p>
+<div class="sol-verdict__grid" aria-label="Verification facts">
+<article><span>Identity</span><strong>Veridus | 101 E Washington Street Suite 990, Phoenix, AZ 85004</strong></article>
+<article><span>Customer lane</span><strong>Public Affairs / Strategy in Phoenix, AZ</strong></article>
+<article><span>Contact</span><strong>Call (602) 229-1129</strong></article>
+</div>
+<div class="sol-verdict__split">
+<div>
+<h3>What customers can use here</h3>
+<p>Best fit for organizations facing Arizona policy, procurement, public affairs, or government-relations decisions that need senior local counsel.</p>
+<ul>
+<li>Veridus calls itself Arizona's largest and most experienced public affairs firm.</li>
+<li>The official services page describes a bipartisan government-relations team, procurement support, and long-term relationships across government levels.</li>
+</ul>
+</div>
+<div>
+<h3>Proof boundary</h3>
+<p>The page is a customer-facing proof profile, not legal or lobbying advice.</p>
+<p class="sol-verdict__source">Checked source: <a href="https://www.veridus.com/">Veridus</a>. Local record last verified 2026-05-19 with score 13.</p>
+</div>
+</div>
+</section>
+<main class="civic-shell">
+<div class="mast">
+<div>Valley Verified record</div>
+<span>Public affairs / strategy</span>
+</div>
+<section class="hero" aria-label="Veridus overview">
+<div class="statement">
+<div>
+<span class="eyebrow">Creative Services</span>
+<h1>Veridus</h1>
+<p class="lede">Veridus is listed in the Valley Verified Network for public affairs and strategy in Phoenix. The record below keeps the public directory facts, owner-researched verified status, contact details, source trail, and SkyEmail acceptance path clear.</p>
+</div>
+<div class="docket" aria-label="Veridus record markers">
+<div>
+<b>990</b>
+<span>Suite number listed on the public Phoenix address.</span>
+</div>
+<div>
+<b>85004</b>
+<span>Downtown Phoenix ZIP on the directory record.</span>
+</div>
+<div>
+<b>2026</b>
+<span>Research record last checked on May 19.</span>
+</div>
+</div>
+</div>
+<aside class="brief-card" aria-label="Veridus status brief">
+<div>
+<h2>Owner-researched verified status</h2>
+<p>Public directory verified for Advertising &amp; Media / Public Affairs / Strategy. The business is unclaimed inside Valley Verified, with public phone, address, and Phoenix Chamber source signals retained.</p>
+</div>
+<div class="agenda">
+<div class="agenda-item">
+<div class="number">1</div>
+<div>
+<b>Business identity</b>
+<span>Veridus, Phoenix, Arizona</span>
+</div>
+</div>
+<div class="agenda-item">
+<div class="number">2</div>
+<div>
+<b>Primary key</b>
+<span>phone:6022291129</span>
+</div>
+</div>
+<div class="agenda-item">
+<div class="number">3</div>
+<div>
+<b>Source hash</b>
+<span>f41f05312ec7</span>
+</div>
+</div>
+</div>
+<div class="status-strip">
+<b>Claim status</b>
+<span>Unclaimed profile; direct contact is listed by public phone only.</span>
+</div>
+</aside>
+</section>
+<section class="grid" aria-label="Veridus facts and SkyEmail">
+<section class="facts" aria-label="Business facts">
+<h2>Business facts</h2>
+<div class="fact">
+<b>Name</b>
+<span>Veridus</span>
+</div>
+<div class="fact">
+<b>Category</b>
+<span>Creative Services</span>
+</div>
+<div class="fact">
+<b>Specialty</b>
+<span>Public Affairs / Strategy</span>
+</div>
+<div class="fact">
+<b>Address</b>
+<span>101 E Washington Street Suite 990, Phoenix, AZ 85004</span>
+</div>
+<div class="fact">
+<b>Phone</b>
+<span><a href="tel:+16022291129">(602) 229-1129</a></span>
+</div>
+<div class="fact">
+<b>Email</b>
+<span>No public email listed in the source record.</span>
+</div>
+<div class="fact">
+<b>Pricing</b>
+<span>Contact the provider directly for scope, availability, and pricing.</span>
+</div>
+</section>
+<div class="right">
+<section class="source" aria-label="Source record">
+<h2>Source record</h2>
+<div class="source-list">
+<div>
+<b>Last verified</b>
+<span>2026-05-19</span>
+</div>
+<div>
+<b>Source file</b>
+<span>public business profile review</span>
+</div>
+<div>
+<b>Source lines</b>
+<span>L483-L487</span>
+</div>
+<div>
+<b>Source policy</b>
+<span>Public directory/company listing only; no synthetic contacts or guessed emails.</span>
+</div>
+<div>
+<b>Identity signals</b>
+<span>phone:6022291129; name_city_zip:veridus-phoenix-85004</span>
+</div>
+<div>
+<b>Source URL</b>
+<a href="https://business.phoenixchamber.com/list/ql/advertising-media-1">Phoenix Chamber advertising and media listing</a>
+</div>
+</div>
+</section>
+<section class="skyemail" aria-label="SkyEmail acceptance">
+<div class="mail-panel">
+<h2>Accept the free SkyEmail account.</h2>
+<p>Veridus signs in through the shared 0S/SkyGate lane. The team activates the SkyEmail workspace after provisioning, and activation may take up to 24 hours.</p>
+<a class="accept" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=veridus-phoenix-85004-f41f053&amp;mailbox=veridus%40skyemail.solenterprises.org">Accept SkyEmail</a>
+</div>
+<ul class="mail-steps">
+<li>
+<b>Sign in</b>
+<span>Use the shared 0S/SkyGate sign-in screen for the assigned SkyEmail account.</span>
+</li>
+<li>
+<b>Provision</b>
+<span>Notify owner: provision the Veridus SkyEmail workspace.</span>
+</li>
+<li>
+<b>Escalate</b>
+<span>If activation is not complete after 24 hours, K4i sends the workspace escalation notice.</span>
+</li>
+</ul>
+</section>
+<section class="seats" aria-label="SkyEmail seats">
+<div class="seat-count">9</div>
+<div class="seat-copy">
+<b>SkyEmail seats left after this lane</b>
+<span>Track remaining seats from 9. When 2 seats remain, send the owner a purchase notice.</span>
+</div>
+<div class="seat-rule">
+<span>Additional seats must be purchased only in groups of 5.</span>
+</div>
+</section>
+</div>
+</section>
+</main>
 </body>
 </html>

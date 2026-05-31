@@ -4,14 +4,9 @@
   const API_BASE = '/api/northstar';
   const SESSION_STORAGE_KEY = 'signinpro_last_workspace_session_v2';
   const SHARED_GATE_KEYS = [
-    'FREE99_PLATFORM_GATE_SESSION',
     'METRAIYUX_GATE_SESSION',
     'SKYGATEFS27_GATE_SESSION',
-    'SKYGATE_USER_TOKEN',
-    'SKYE_GATE_SESSION',
-    'quantumskyes_mcp_owner_token',
-    'metraiyux.founderCommand.token',
-    'adminBrainToken'
+    'SKYE_GATE_SESSION'
   ];
   const BUILTIN_WORKSPACE_PROFILES = {
     'bobs-smoke-shop': { name: "Bob's Smoke Shop" },
@@ -40,11 +35,13 @@
   }
 
   function readSharedGateToken() {
+    const bridgeToken = cleanToken(window.MetrAIyuxGateBridge?.current?.()?.token || window.Free99PlatformGate?.requireSession?.()?.token || '');
+    if (bridgeToken) return bridgeToken;
     for (const key of SHARED_GATE_KEYS) {
       const token = readTokenFromStorage(sessionStorage, key) || readTokenFromStorage(localStorage, key);
       if (token) return token;
     }
-    return cleanToken(window.MetrAIyuxGateBridge?.current?.()?.token || window.Free99PlatformGate?.requireSession?.()?.token || '');
+    return '';
   }
 
   function ownerAdminCredential(input) {
@@ -74,9 +71,8 @@
       issued_at: new Date().toISOString()
     };
     try {
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-      sessionStorage.setItem('quantumskyes_mcp_owner_token', clean);
-      localStorage.setItem('quantumskyes_mcp_owner_token', clean);
+      sessionStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
+      sessionStorage.setItem('SKYGATEFS27_GATE_SESSION', JSON.stringify(shared));
     } catch (error) {}
     window.MetrAIyuxGateBridge?.persist?.(shared, { silent: true });
   }
@@ -213,7 +209,6 @@
     csrfToken = '';
     try {
       localStorage.removeItem(SESSION_STORAGE_KEY);
-      localStorage.removeItem('quantumskyes_mcp_owner_token');
     } catch (error) {}
   }
 

@@ -100,15 +100,16 @@ npm run vault:git:restore -- --restore=/path/to/pack.zip --to=/workspace/repo --
 For true Git push/fetch behavior, run the smart HTTP remote service:
 
 ```bash
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
+SKYEVAULT_GATE_INTROSPECT_URL="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skygate/auth-introspect" npm run vault:git:remote
 ```
 
 Then developers can use:
 
 ```bash
-git remote add vault http://x-token:${SKYEVAULT_GIT_REMOTE_TOKEN}@127.0.0.1:8787/acme/repo.git
-git push vault main
-git fetch vault
+git remote add vault http://127.0.0.1:8787/acme/repo.git
+export SKYEVAULT_GATE_BEARER="<shared 0S/FS27/SkyGate bearer>"
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" push vault main
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" fetch vault
 ```
 
 The remote service stores bare repos, writes ref-update ledgers, and emits neural-map JSON from `post-receive` hooks. See `docs/SKYEVAULT_GIT_REMOTE_SERVICE.md`.

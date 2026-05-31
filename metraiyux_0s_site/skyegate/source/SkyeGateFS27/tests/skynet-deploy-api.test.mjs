@@ -146,6 +146,10 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
     })
   }), context);
   assert.equal(complete.status, 200);
+  const completeBody = await complete.json();
+  assert.equal(completeBody.asset_audit.ok, true);
+  assert.equal(completeBody.asset_audit.checked_count, 2);
+  assert.equal(completeBody.deployment.status, 'complete');
   assert.ok(env.objects.has('deployments/sovereign-docs/dep_test_001/.fs27/deployment-complete.json'));
 
   const sourceUpload = await handleSkyeNetDeployRequest(new Request(
@@ -186,6 +190,8 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
   assert.equal(sourceCompleteBody.source_package.file_count, 2);
   assert.equal(sourceCompleteBody.source_package.index_file_count, 2);
   assert.equal(sourceCompleteBody.source_package.files_truncated, false);
+  assert.equal(sourceCompleteBody.source_package.storage_verified, true);
+  assert.equal(sourceCompleteBody.source_package.storage_checked_count, 2);
   assert.match(sourceCompleteBody.source_package.manifest_key, /\.skyenet\/source-package\.json$/);
   assert.match(sourceCompleteBody.source_package.index_key, /\.skyenet\/source-index\.jsonl$/);
   assert.ok(env.objects.has('source-packages/customer-31/workspace-customer-31/project-sovereign-docs/deployment-dep_test_001/.skyenet/source-package.json'));
@@ -414,6 +420,78 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
   }
 });
 
+test('SkyeNet deploy API refuses unverified complete and route records', async () => {
+  const env = mockEnv();
+  const context = { env };
+
+  assert.equal((await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/init', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ project_id: 'missing-asset-demo', deployment_id: 'dep_missing_assets' })
+  }), context)).status, 200);
+
+  assert.equal((await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/upload?projectId=missing-asset-demo&deploymentId=dep_missing_assets&path=index.html',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/html; charset=utf-8' }),
+      body: '<h1>Only Root</h1>'
+    }
+  ), context)).status, 200);
+
+  const earlyRoute = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/route', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      hostname: 'skynet.example.com',
+      mount_path: '/missing-asset-demo',
+      project_id: 'missing-asset-demo',
+      deployment_id: 'dep_missing_assets',
+      public_access: true
+    })
+  }), context);
+  assert.equal(earlyRoute.status, 409);
+  assert.equal((await earlyRoute.json()).code, 'DEPLOYMENT_NOT_COMPLETE');
+
+  const badComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      project_id: 'missing-asset-demo',
+      deployment_id: 'dep_missing_assets',
+      files: ['index.html', 'assets/missing.css']
+    })
+  }), context);
+  assert.equal(badComplete.status, 409);
+  const badCompleteBody = await badComplete.json();
+  assert.equal(badCompleteBody.code, 'DEPLOYMENT_ASSET_MISSING');
+  assert.deepEqual(badCompleteBody.missing_files, ['assets/missing.css']);
+
+  const goodComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      project_id: 'missing-asset-demo',
+      deployment_id: 'dep_missing_assets',
+      files: ['index.html']
+    })
+  }), context);
+  assert.equal(goodComplete.status, 200);
+
+  const readyRoute = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/route', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      hostname: 'skynet.example.com',
+      mount_path: '/missing-asset-demo',
+      project_id: 'missing-asset-demo',
+      deployment_id: 'dep_missing_assets',
+      public_access: true
+    })
+  }), context);
+  assert.equal(readyRoute.status, 200);
+});
+
 test('SkyeNet deploy API rejects source/runtime asset paths', async () => {
   const env = mockEnv();
   const response = await handleSkyeNetDeployRequest(new Request(
@@ -429,6 +507,29 @@ test('SkyeNet deploy API rejects source/runtime asset paths', async () => {
   assert.equal(body.code, 'SOURCE_PATH_BLOCKED');
 });
 
+test('SkyeNet private source custody preserves owner-gated package paths that public assets reject', async () => {
+  const env = mockEnv();
+  const context = { env };
+  const files = [
+    { path: 'runtime/standalone-apps/appointmentsetter/data/appointments.db', size: 2048, content_type: 'application/octet-stream' },
+    { path: 'proof-pack/direct-workspaces/testnode/artifacts/public-trust-pack/leaf.key', size: 4096, content_type: 'application/octet-stream' }
+  ];
+
+  const privateIndex = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-index?project_id=private-paths&deployment_id=dep_private_paths',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/x-ndjson; charset=utf-8' }),
+      body: `${files.map((file) => JSON.stringify(file)).join('\n')}\n`
+    }
+  ), context);
+  assert.equal(privateIndex.status, 200);
+  const body = await privateIndex.json();
+  assert.equal(body.source_package.file_count, 2);
+  assert.equal(body.source_package.files[0].path, files[0].path);
+  assert.ok(env.objects.has('source-packages/customer-31/workspace-customer-31/project-private-paths/deployment-dep_private_paths/.skyenet/source-index-pages/page-000000.json'));
+});
+
 test('SkyeNet source-complete stores large source indexes outside the inline deployment file cap', async () => {
   const env = mockEnv();
   const context = { env };
@@ -438,13 +539,28 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
     content_type: 'text/javascript; charset=utf-8'
   }));
 
+  const indexUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-index?project_id=large-source&deployment_id=dep_large_index',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/x-ndjson; charset=utf-8' }),
+      body: `${files.map((file) => JSON.stringify(file)).join('\n')}\n`
+    }
+  ), context);
+  assert.equal(indexUpload.status, 200);
+  const indexBody = await indexUpload.json();
+  assert.equal(indexBody.source_index.file_count, 20001);
+  assert.equal(indexBody.source_index.files_truncated, true);
+
   const complete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/source-complete', {
     method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify({
       project_id: 'large-source',
       deployment_id: 'dep_large_index',
-      files
+      index_key: indexBody.source_index.key,
+      file_count: indexBody.source_index.file_count,
+      sample_files: files.slice(0, 1000)
     })
   }), context);
   assert.equal(complete.status, 200);
@@ -465,6 +581,7 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   assert.equal(manifestBody.files.length, 3);
   assert.equal(manifestBody.next_cursor, '3');
   assert.equal(manifestBody.files[0].path, 'src/generated/file-00000.js');
+  assert.equal(manifestBody.index_paged, true);
 
   const tree = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-tree?project_id=large-source&deployment_id=dep_large_index&prefix=src/generated&limit=2',
@@ -474,6 +591,7 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   const treeBody = await tree.json();
   assert.equal(treeBody.entries.length, 2);
   assert.equal(treeBody.next_cursor, '2');
+  assert.equal(treeBody.tree_paged, true);
 
   const archive = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-archive?project_id=large-source&deployment_id=dep_large_index&filename=large-source.tar.zst',
@@ -488,6 +606,28 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   assert.equal(archiveBody.source_archive.filename, 'large-source.tar.zst');
   assert.match(archiveBody.source_archive.key, /\.skyenet\/archive\/large-source\.tar\.zst$/);
 
+  const archiveLink = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-archive-link',
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        project_id: 'large-source',
+        deployment_id: 'dep_large_index',
+        key: archiveBody.source_archive.key,
+        filename: archiveBody.source_archive.filename,
+        bytes: archiveBody.source_archive.bytes,
+        sha256: archiveBody.source_archive.sha256,
+        content_type: archiveBody.source_archive.content_type,
+        recovery_receipt: 'test-artifacts/netlify-quantumskyes-drive-handoff/handoff-summary.json'
+      })
+    }
+  ), context);
+  assert.equal(archiveLink.status, 200);
+  const archiveLinkBody = await archiveLink.json();
+  assert.equal(archiveLinkBody.source_archive.key, archiveBody.source_archive.key);
+  assert.equal(archiveLinkBody.source_archive.bytes, 20);
+
   const download = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-download?project_id=large-source&deployment_id=dep_large_index',
     { method: 'GET', headers: authHeaders() }
@@ -496,4 +636,70 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   assert.equal(download.headers.get('x-skynet-source-download'), 'stored-archive');
   assert.equal(download.headers.get('content-disposition'), 'attachment; filename="large-source.tar.zst"');
   assert.equal(await download.text(), 'stored-archive-bytes');
+
+  const rangeDownload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-download?project_id=large-source&deployment_id=dep_large_index',
+    { method: 'GET', headers: authHeaders({ range: 'bytes=7-13' }) }
+  ), context);
+  assert.equal(rangeDownload.status, 206);
+  assert.equal(rangeDownload.headers.get('content-range'), 'bytes 7-13/20');
+  assert.equal(rangeDownload.headers.get('accept-ranges'), 'bytes');
+  assert.equal(await rangeDownload.text(), 'archive');
+
+  const transfer = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-transfer',
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        project_id: 'large-source',
+        deployment_id: 'dep_large_index',
+        method: 'skyevault',
+        vault_id: 'large-source-proof-vault'
+      })
+    }
+  ), context);
+  assert.equal(transfer.status, 200);
+  const transferBody = await transfer.json();
+  assert.equal(transferBody.status, 'completed');
+  assert.equal(transferBody.archive.file_count, 20001);
+  assert.equal(transferBody.archive.stored_archive_reused, true);
+  assert.equal(transferBody.storage.stored, true);
+  assert.equal(transferBody.storage.stored_archive_reused, true);
+  assert.equal(transferBody.storage.filename, 'large-source.tar.zst');
+  assert.ok(env.objects.has(transferBody.storage.key));
+});
+
+test('SkyeNet private source uploads accept dependency trees and do not stop at the inline file cap', async () => {
+  const env = mockEnv();
+  const context = { env };
+  const files = Array.from({ length: 20001 }, (_item, index) => ({
+    path: `node_modules/demo-pkg/file-${String(index).padStart(5, '0')}.js`,
+    size: 10,
+    content_type: 'text/javascript; charset=utf-8'
+  }));
+
+  const indexUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-index?project_id=dependency-tree&deployment_id=dep_dependency_tree',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/x-ndjson; charset=utf-8' }),
+      body: `${files.map((file) => JSON.stringify(file)).join('\n')}\n`
+    }
+  ), context);
+  assert.equal(indexUpload.status, 200);
+
+  const upload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-upload?project_id=dependency-tree&deployment_id=dep_dependency_tree&path=node_modules/demo-pkg/live.js',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/javascript; charset=utf-8' }),
+      body: 'export const live = true;'
+    }
+  ), context);
+  assert.equal(upload.status, 200);
+  const body = await upload.json();
+  assert.equal(body.source_package.file_count, 20002);
+  assert.equal(body.source_package.files_truncated, true);
+  assert.ok(env.objects.has('source-packages/customer-31/workspace-customer-31/project-dependency-tree/deployment-dep_dependency_tree/node_modules/demo-pkg/live.js'));
 });

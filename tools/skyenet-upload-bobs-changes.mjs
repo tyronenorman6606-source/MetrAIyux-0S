@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const zeroOsBase = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -21,53 +22,8 @@ const changedFiles = [
   'workspace-preview.html',
   'workspace-preview/index.html'
 ];
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
 function rel(file) {
   return path.relative(repoRoot, file).replace(/\\/g, '/');
-}
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
 }
 
 function contentTypeForPath(pathname) {
@@ -96,15 +52,7 @@ async function fetchWithTimeout(url, init = {}, timeoutMs = Number(process.env.S
 }
 
 async function login() {
-  const credential = await ownerCredential();
-  if (!credential.value) return { credential, token: '', response: null };
-  const response = await fetchWithTimeout(`${zeroOsBase}/api/founder-command/login`, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = response.body?.gateBearerToken || response.body?.gateToken || response.body?.token || '';
-  return { credential, token, response };
+  return resolveZeroOsGateAuth({ zeroOsBase });
 }
 
 async function uploadFile(token, relPath) {

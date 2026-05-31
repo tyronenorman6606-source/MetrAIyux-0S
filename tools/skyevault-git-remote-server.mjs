@@ -708,6 +708,26 @@ function browserRepoLanding(req, url, repo) {
   const cloneUrl = `${url.protocol}//${url.host}${url.pathname}`;
   const safeCloneUrl = escapeHtml(cloneUrl);
   const safeRepo = escapeHtml(`${repo.workspaceId}/${repo.repoId}`);
+  const gateMode = Boolean(gateIntrospectUrl);
+  const authBlock = gateMode ? `
+  <div class="box">
+    <p><strong>Normal access:</strong> use the shared 0S/FS27/SkyGate bearer session. This Git endpoint does not own a separate founder/admin password.</p>
+    <p>Clone command:</p>
+    <pre>export SKYEVAULT_GATE_BEARER='&lt;shared gate bearer&gt;'
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" clone ${safeCloneUrl}</pre>
+    <p>Owner login: <code>/admin/login.html</code> on the 0S Worker issues the same shared gate session.</p>
+  </div>` : `
+  <div class="box">
+    <p><strong>Emergency local mode:</strong> this origin is using a local service token. Do not present it as a founder/admin account.</p>
+    <p><strong>Username:</strong> <code>x-token</code></p>
+    <p><strong>Password:</strong> stored locally in <code>.skyevault-out/git-remote/owner-git-origin.env</code> as <code>SKYEVAULT_GIT_REMOTE_TOKEN</code>.</p>
+  </div>
+  <p>Clone command:</p>
+  <pre>git clone ${safeCloneUrl}</pre>
+  <p>Access helper:</p>
+  <pre>npm run vault:origin:access</pre>
+  <p>Reset emergency token helper:</p>
+  <pre>npm run vault:origin:reset-token -- --static-token</pre>`;
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -729,17 +749,8 @@ function browserRepoLanding(req, url, repo) {
 <main>
   <h1>SkyeVault Git Origin</h1>
   <p>This is the private Git address for <strong>${safeRepo}</strong>. It is not a file-browsing webpage.</p>
-  <div class="box">
-    <p><strong>What it does:</strong> lets a terminal or IDE clone, pull, fetch, and push this repo.</p>
-    <p><strong>Username:</strong> <code>x-token</code></p>
-    <p><strong>Password:</strong> stored locally in <code>.skyevault-out/git-remote/owner-git-origin.env</code> as <code>SKYEVAULT_GIT_REMOTE_TOKEN</code>.</p>
-  </div>
-  <p>Clone command:</p>
-  <pre>git clone ${safeCloneUrl}</pre>
-  <p>Access helper:</p>
-  <pre>npm run vault:origin:access</pre>
-  <p>Reset password helper:</p>
-  <pre>npm run vault:origin:reset-token</pre>
+  <p><strong>What it does:</strong> lets a terminal or IDE clone, pull, fetch, and push this repo.</p>
+  ${authBlock}
   <p>Repo console: <a href="/__skyevault/ui">/__skyevault/ui</a></p>
 </main>
 </body>

@@ -1,56 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const BASE_URL = process.env.ADMIN_BRAIN_LIVE_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 const OUT_DIR = path.resolve('test-artifacts/admin-brain-native');
 const LATEST = path.join(OUT_DIR, 'admin-brain-native-live-http-latest.json');
 const ALLOW_LIVE_PROVIDER_CALLS = ['1', 'true', 'yes', 'on'].includes(String(process.env.ADMIN_BRAIN_ALLOW_LIVE_PROVIDER_CALLS || '').trim().toLowerCase());
-const CREDENTIAL_KEYS = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of CREDENTIAL_KEYS) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
-
 async function fetchAny(label, url, init = {}) {
   const started = performance.now();
   const response = await fetch(url, init);
@@ -69,12 +25,9 @@ async function fetchAny(label, url, init = {}) {
   };
 }
 
-function redactCredentialSource(source) {
-  return source || 'missing';
-}
-
 async function main() {
-  const credential = await liveCredential();
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: BASE_URL });
+  const token = auth.token || '';
   const receipt = {
     ok: false,
     generatedAt: new Date().toISOString(),
@@ -83,39 +36,32 @@ async function main() {
     noBrowserProofRun: true,
     ownerManualLiveCheck: true,
     liveProviderCallsAllowed: ALLOW_LIVE_PROVIDER_CALLS,
-    credentialSource: redactCredentialSource(credential.key),
+    credentialSource: auth.credential?.key || auth.credential?.source || 'missing',
     deploymentRequirement: '0S Worker with native /api/admin brain persistence endpoints',
     checks: [],
     stress: null,
     failures: []
   };
 
-  if (!credential.value) {
-    receipt.failures.push('No owner credential found in process env, .env, or env.txt.');
+  receipt.checks.push({
+    label: 'Shared FS27/SkyGate auth helper resolves owner bearer',
+    status: Number(auth.response?.status || 0) || 0,
+    ok: Boolean(auth.ok && token),
+    tokenReceived: Boolean(token),
+    via: auth.response?.via || auth.credential?.source || ''
+  });
+
+  if (!token) {
+    receipt.failures.push(auth.response?.body?.error || auth.response?.error || 'No shared FS27/SkyGate bearer or owner gate exchange credential found.');
     await fs.mkdir(OUT_DIR, { recursive: true });
     await fs.writeFile(LATEST, `${JSON.stringify(receipt, null, 2)}\n`);
     console.log(JSON.stringify({ ok: false, receipt: LATEST, failures: receipt.failures }, null, 2));
     process.exit(1);
   }
 
-  const login = await fetchAny('Founder Command login issues shared gate token', `${BASE_URL}/api/founder-command/login`, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-  receipt.checks.push({
-    label: login.label,
-    status: login.status,
-    ok: Boolean(login.ok && token),
-    tokenReceived: Boolean(token),
-    elapsedMs: login.elapsedMs
-  });
-
   const headers = {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };

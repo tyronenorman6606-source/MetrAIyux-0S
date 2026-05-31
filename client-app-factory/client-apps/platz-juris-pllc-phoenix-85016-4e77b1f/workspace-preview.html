@@ -1,1 +1,555 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLATZ JURIS, PLLC Workspace Preview</title><style>body{font-family:Arial,sans-serif;max-width:860px;margin:40px auto;line-height:1.5;background:#080b0c;color:#f8fbf6}a{color:#7ae7ff}.box{border:1px solid #334;border-radius:8px;padding:18px;background:#111818;margin:12px 0}</style></head><body><h1>PLATZ JURIS, PLLC candidate workspace</h1><div class="box"><p>Status: candidate only, pending verification and signed terms.</p><p>Workspace slug: <code>platz-juris-pllc-legal-review</code></p><p><a href="/northstar/?workspace=platz-juris-pllc-legal-review">Open SignIn Pro by NorthStar</a></p><p><a href="/Free99/apps/sovereigndocs/partner-workbench/?workspace=platz-juris-pllc-legal-review&amp;partner=platz-juris-pllc">Open SovereignDocs partner workbench</a></p><p><a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=sovereigndocs-legal-review-lane">Open SkyePay legal review checkout</a></p></div></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLATZ JURIS, PLLC | Workspace Preview</title>
+<meta name="description" content="Candidate-only Valley Verified legal preview workspace for PLATZ JURIS, PLLC. No firm partnership claim, no legal advice, and no attorney-client relationship.">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #07090b;
+  --surface: #101619;
+  --surface-strong: #151e22;
+  --ink: #f7fbf8;
+  --muted: #a9b8b4;
+  --line: rgba(247, 251, 248, .14);
+  --accent: #8affd2;
+  --gold: #f5d36a;
+  --cyan: #7ae7ff;
+  --green: #8af0b2;
+  --danger: #ff8b8b;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(135deg, #07090b 0%, #111719 48%, #090d12 100%);
+  line-height: 1.5;
+}
+a { color: inherit; }
+.shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 9, 11, .9);
+  backdrop-filter: blur(16px);
+}
+.nav {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+.brand { display: grid; gap: 2px; text-decoration: none; min-width: 220px; }
+.brand strong { font-size: 17px; line-height: 1.15; }
+.brand span, .muted { color: var(--muted); }
+.navlinks { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; }
+.button, button, .download-link {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 13px;
+  color: var(--ink);
+  background: var(--surface-strong);
+  text-decoration: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 760;
+  cursor: pointer;
+}
+.button.primary, button.primary { border-color: transparent; color: #05100d; background: linear-gradient(135deg, var(--accent), var(--gold)); }
+.button.ghost, button.ghost { background: transparent; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(245, 211, 106, .35);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #fff6c9;
+  background: rgba(245, 211, 106, .08);
+  font-size: 12px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.badge i { width: 10px; height: 10px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 18px rgba(245, 211, 106, .55); }
+.hero { padding: 54px 0 28px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: 24px; align-items: end; }
+.hero-copy h1 { margin: 10px 0 14px; font-size: clamp(40px, 7vw, 82px); line-height: .95; letter-spacing: 0; }
+.eyebrow { margin: 0; color: var(--accent); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.lede { max-width: 760px; color: var(--muted); font-size: 18px; }
+.notice {
+  margin-top: 20px;
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: rgba(245, 211, 106, .09);
+}
+.packet {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(16, 22, 25, .86);
+  padding: 20px;
+}
+.packet dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 12px; margin: 0; }
+.packet dt { color: var(--muted); }
+.packet dd { margin: 0; overflow-wrap: anywhere; }
+.action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.status-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 12px 0 26px; background: var(--line); }
+.status-strip div { min-height: 90px; padding: 14px; background: rgba(16, 22, 25, .94); }
+.status-strip strong { display: block; font-size: 20px; }
+.status-strip span { color: var(--muted); font-size: 13px; }
+.workspace-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 18px; align-items: start; margin: 24px 0 48px; }
+.module { border: 1px solid var(--line); border-radius: 8px; background: rgba(16, 22, 25, .86); padding: 20px; }
+.module + .module { margin-top: 18px; }
+h2 { margin: 4px 0 14px; font-size: 26px; letter-spacing: 0; }
+h3 { margin: 0 0 8px; letter-spacing: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+label { display: grid; gap: 6px; color: var(--muted); font-weight: 740; }
+.full { grid-column: 1 / -1; }
+input, select, textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: var(--ink);
+  background: #070c0f;
+  font: inherit;
+}
+textarea { min-height: 118px; resize: vertical; }
+.form-actions, .queue-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.queue-tools input, .queue-tools select { max-width: 260px; }
+.queue-list { display: grid; gap: 10px; margin-top: 14px; }
+.queue-item { border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: #0b1114; }
+.queue-head { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.queue-title { display: grid; gap: 3px; }
+.queue-title strong { overflow-wrap: anywhere; }
+.queue-meta { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.queue-body { margin: 12px 0; color: var(--muted); }
+.queue-actions { display: grid; grid-template-columns: minmax(180px, 230px) minmax(0, 1fr) auto auto; gap: 8px; align-items: start; }
+.queue-actions textarea { min-height: 70px; }
+.pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px; color: var(--muted); font-size: 12px; font-weight: 850; }
+.checklist { display: grid; gap: 8px; }
+.checkrow { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.checkrow input { width: 18px; min-height: 18px; margin-top: 2px; }
+.scope-list, .activation-list { margin: 0; padding-left: 20px; color: var(--muted); }
+.scope-list li, .activation-list li { margin: 7px 0; }
+.output { margin: 12px 0 0; white-space: pre-wrap; overflow: auto; max-height: 360px; border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: #06090b; color: #dce9e4; font-size: 13px; }
+.empty { border: 1px dashed var(--line); border-radius: 8px; padding: 14px; color: var(--muted); background: rgba(255, 255, 255, .03); }
+.footer { border-top: 1px solid var(--line); padding: 24px 0 34px; color: var(--muted); }
+.footer .shell { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 900px) {
+  .nav, .footer .shell { align-items: flex-start; }
+  .hero, .workspace-grid, .status-strip { grid-template-columns: 1fr; }
+  .nav { flex-direction: column; padding: 14px 0; }
+  .navlinks { justify-content: flex-start; }
+  .form-grid, .queue-actions { grid-template-columns: 1fr; }
+  .queue-tools input, .queue-tools select { max-width: none; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell nav">
+    <a class="brand" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/platz-juris-pllc-phoenix-85016-4e77b1f/">
+      <strong>PLATZ JURIS, PLLC</strong>
+      <span>candidate legal preview workspace</span>
+    </a>
+    <nav class="navlinks" aria-label="Workspace links">
+      <span class="badge" aria-label="Powered by SkyeKnowlogy"><i></i>Powered by SkyeKnowlogy</span>
+      <a class="button ghost" href="#intake">Intake</a>
+      <a class="button ghost" href="#queue">Queue</a>
+      <a class="button" href="https://platzjuris.com/" target="_blank" rel="noopener">Official Site</a>
+      <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/?workspace=platz-juris-pllc-legal-review" target="_blank" rel="noopener">NorthStar 0S</a>
+      <a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/partner-workbench/?workspace=platz-juris-pllc-legal-review&amp;partner=platz-juris-pllc" target="_blank" rel="noopener">SovereignDocs</a>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Valley Verified legal lane</p>
+      <h1 id="page-title">PLATZ JURIS, PLLC</h1>
+      <p class="lede">IP, business, civil litigation, corporate governance, music/entertainment, trademark, trade secret, and cannabis law candidate lane.</p>
+      <p class="notice"><strong>Boundary:</strong> Candidate preview only. This workspace does not claim firm partnership, does not provide legal advice, and does not create an attorney-client relationship. Contact the firm through its official website for legal services.</p>
+      <div class="action-bar">
+        <a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/partner-workbench/?workspace=platz-juris-pllc-legal-review&amp;partner=platz-juris-pllc" target="_blank" rel="noopener">Open SovereignDocs candidate workspace</a>
+        <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/?workspace=platz-juris-pllc-legal-review" target="_blank" rel="noopener">Open NorthStar 0S gate</a>
+        <a class="button" href="https://platzjuris.com/" target="_blank" rel="noopener">Open official firm site</a>
+        <a class="button ghost" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=sovereigndocs-legal-review-lane" target="_blank" rel="noopener">Review checkout lane</a>
+      </div>
+    </div>
+    <aside class="packet" aria-label="Candidate packet">
+      <p class="eyebrow">Candidate packet</p>
+      <dl>
+        <dt>Market</dt><dd>Phoenix, AZ 85016</dd>
+        <dt>Phone</dt><dd>(480) 570-8558</dd>
+        <dt>Address</dt><dd>2325 E. Camelback Road, Suite 400, Phoenix, AZ 85016</dd>
+        <dt>Workspace</dt><dd>platz-juris-pllc-legal-review</dd>
+        <dt>Status</dt><dd>candidate preview only</dd>
+        <dt>Official</dt><dd><a href="https://platzjuris.com/" target="_blank" rel="noopener">https://platzjuris.com/</a></dd>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="status-strip" aria-label="Workspace status">
+    <div><strong>Local</strong><span>intake records stay in browser storage for this preview.</span></div>
+    <div><strong>Candidate</strong><span>no partnership, approval, endorsement, or engagement is represented.</span></div>
+    <div><strong>0S Links</strong><span>NorthStar and SovereignDocs links are absolute to the 0S Worker.</span></div>
+    <div><strong>Owner Check</strong><span>activation requires outreach, licensing, conflicts, terms, fees, and payout setup.</span></div>
+  </section>
+
+  <section class="workspace-grid">
+    <div>
+      <form class="module" id="intake" autocomplete="off">
+        <p class="eyebrow">Local intake tracker</p>
+        <h2>Record a review packet</h2>
+        <div class="form-grid">
+          <label>Client or business name<input name="clientName" required placeholder="Client / business"></label>
+          <label>Contact<input name="contact" placeholder="Email or phone"></label>
+          <label>Matter / packet ID<input name="packetId" required placeholder="sd_review_..."></label>
+          <label>Review lane<select name="matterType"><option value="IP prep packets">IP prep packets</option>
+<option value="trademark and copyright documents">trademark and copyright documents</option>
+<option value="business and governance documents">business and governance documents</option>
+<option value="civil litigation triage">civil litigation triage</option>
+<option value="music and entertainment documents">music and entertainment documents</option></select></label>
+          <label>Urgency<select name="urgency"><option>standard</option><option>time_sensitive</option><option>blocked_until_conflicts_clear</option></select></label>
+          <label>Status<select name="status"><option value="new_intake">New Intake</option>
+<option value="conflict_screen_needed">Conflict Screen Needed</option>
+<option value="client_packet_incomplete">Client Packet Incomplete</option>
+<option value="ready_for_owner_review">Ready For Owner Review</option>
+<option value="sovereign_docs_checkout_sent">Sovereign Docs Checkout Sent</option>
+<option value="candidate_firm_outreach_sent">Candidate Firm Outreach Sent</option>
+<option value="firm_response_recorded">Firm Response Recorded</option>
+<option value="closed_no_engagement">Closed No Engagement</option></select></label>
+          <label class="full">Conflict screen notes<textarea name="conflictNotes" placeholder="Names, counterparties, jurisdictions, or blocked terms to screen before outreach."></textarea></label>
+          <label class="full">Packet summary<textarea name="summary" required placeholder="Plain-language packet summary for owner review. Do not enter privileged legal advice here."></textarea></label>
+        </div>
+        <div class="form-actions">
+          <button class="primary" type="submit">Save local intake</button>
+          <button class="ghost" type="reset">Reset form</button>
+        </div>
+      </form>
+
+      <section class="module" aria-labelledby="preflight-heading">
+        <p class="eyebrow">Activation preflight</p>
+        <h2 id="preflight-heading">Verification checklist</h2>
+        <div class="checklist" id="preflightChecklist"></div>
+      </section>
+
+      <section class="module" aria-labelledby="scope-heading">
+        <p class="eyebrow">Useful review modules</p>
+        <h2 id="scope-heading">Candidate lanes</h2>
+        <ul class="scope-list"><li>IP prep packets</li>
+<li>trademark and copyright documents</li>
+<li>business and governance documents</li>
+<li>civil litigation triage</li>
+<li>music and entertainment documents</li></ul>
+      </section>
+    </div>
+
+    <div>
+      <section class="module" id="queue" aria-labelledby="queue-heading">
+        <p class="eyebrow">Review board</p>
+        <h2 id="queue-heading">Local queue</h2>
+        <div class="status-strip" aria-label="Local queue counts">
+          <div><strong id="totalCount">0</strong><span>total</span></div>
+          <div><strong id="openCount">0</strong><span>open</span></div>
+          <div><strong id="conflictCount">0</strong><span>conflict checks</span></div>
+          <div><strong id="lastSaved">none</strong><span>last saved</span></div>
+        </div>
+        <div class="queue-tools">
+          <input id="queueSearch" type="search" placeholder="Filter by client, packet, or note" aria-label="Filter local queue">
+          <select id="statusFilter" aria-label="Filter by status"><option value="all">All statuses</option><option value="new_intake">New Intake</option>
+<option value="conflict_screen_needed">Conflict Screen Needed</option>
+<option value="client_packet_incomplete">Client Packet Incomplete</option>
+<option value="ready_for_owner_review">Ready For Owner Review</option>
+<option value="sovereign_docs_checkout_sent">Sovereign Docs Checkout Sent</option>
+<option value="candidate_firm_outreach_sent">Candidate Firm Outreach Sent</option>
+<option value="firm_response_recorded">Firm Response Recorded</option>
+<option value="closed_no_engagement">Closed No Engagement</option></select>
+          <button type="button" id="exportJson">Prepare JSON export</button>
+          <a class="download-link" id="downloadJson" hidden>Download JSON</a>
+          <button class="ghost" type="button" id="clearClosed">Remove closed</button>
+        </div>
+        <div class="queue-list" id="queueList"></div>
+      </section>
+
+      <section class="module" aria-labelledby="handoff-heading">
+        <p class="eyebrow">0S handoffs</p>
+        <h2 id="handoff-heading">Absolute workspace links</h2>
+        <p class="muted">These links point at the shared 0S origin and shared FS27/SkyGate auth lane.</p>
+        <div class="action-bar">
+          <a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/partner-workbench/?workspace=platz-juris-pllc-legal-review&amp;partner=platz-juris-pllc" target="_blank" rel="noopener">SovereignDocs</a>
+          <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/?workspace=platz-juris-pllc-legal-review" target="_blank" rel="noopener">NorthStar 0S</a>
+          <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/legal-review-lane/platz-juris-pllc/" target="_blank" rel="noopener">Valley Verified lane</a>
+          <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/platz-juris-pllc-phoenix-85016-4e77b1f/" target="_blank" rel="noopener">Business record</a>
+        </div>
+      </section>
+
+      <section class="module" aria-labelledby="audit-heading">
+        <p class="eyebrow">Local audit</p>
+        <h2 id="audit-heading">Workspace JSON</h2>
+        <pre class="output" id="workspaceOutput">No local records yet.</pre>
+      </section>
+    </div>
+  </section>
+
+  <section class="module" aria-labelledby="activation-heading">
+    <p class="eyebrow">Activation boundary</p>
+    <h2 id="activation-heading">Required before live legal routing</h2>
+    <ul class="activation-list"><li>firm outreach accepted</li>
+<li>State Bar / licensing verification</li>
+<li>conflict intake rules</li>
+<li>fee schedule</li>
+<li>MSA / NDA / data terms</li>
+<li>SkyePay payout destination</li>
+<li>client understands this preview is not legal advice</li>
+<li>no attorney-client relationship represented by this app</li>
+<li>official firm website checked before outreach</li>
+<li>owner approval recorded before any public partnership language</li></ul>
+  </section>
+</main>
+<footer class="footer">
+  <div class="shell">
+    <span class="badge"><i></i>Powered by SkyeKnowlogy</span>
+    <span>Candidate preview only. Official firm source: <a href="https://platzjuris.com/" target="_blank" rel="noopener">https://platzjuris.com/</a></span>
+  </div>
+</footer>
+<script type="application/json" id="site-data">{
+  "id": "platz-juris-pllc-phoenix-85016-4e77b1f",
+  "slug": "platz-juris-pllc",
+  "name": "PLATZ JURIS, PLLC",
+  "city": "Phoenix",
+  "state": "AZ",
+  "zip": "85016",
+  "phone": "(480) 570-8558",
+  "officialWebsite": "https://platzjuris.com/",
+  "officialSource": "https://platzjuris.com/",
+  "address": "2325 E. Camelback Road, Suite 400, Phoenix, AZ 85016",
+  "practiceSummary": "IP, business, civil litigation, corporate governance, music/entertainment, trademark, trade secret, and cannabis law candidate lane.",
+  "reviewScopes": [
+    "IP prep packets",
+    "trademark and copyright documents",
+    "business and governance documents",
+    "civil litigation triage",
+    "music and entertainment documents"
+  ],
+  "accent": "#8affd2",
+  "partnerId": "legal_partner_candidate_platz_juris_pllc",
+  "workspaceSlug": "platz-juris-pllc-legal-review",
+  "appUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/platz-juris-pllc-phoenix-85016-4e77b1f/",
+  "signinProUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/northstar/?workspace=platz-juris-pllc-legal-review",
+  "sovereignDocsWorkspaceUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/Free99/apps/sovereigndocs/partner-workbench/?workspace=platz-juris-pllc-legal-review&partner=platz-juris-pllc",
+  "legalLandingUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/legal-review-lane/platz-juris-pllc/",
+  "valleyVerifiedUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/platz-juris-pllc-phoenix-85016-4e77b1f/",
+  "skyePayReviewUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&offer=sovereigndocs-legal-review-lane",
+  "publicStatus": "candidate_preview_only_no_partnership_no_legal_advice",
+  "activationRequired": [
+    "firm outreach accepted",
+    "State Bar / licensing verification",
+    "conflict intake rules",
+    "fee schedule",
+    "MSA / NDA / data terms",
+    "SkyePay payout destination"
+  ],
+  "zeroOsBaseUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev",
+  "previewUrl": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/platz-juris-pllc-phoenix-85016-4e77b1f/workspace-preview.html",
+  "poweredBy": "SkyeKnowlogy",
+  "poweredByBadge": "Powered by SkyeKnowlogy",
+  "workspaceUse": "Local preview intake, review routing, and owner verification tracking only.",
+  "legalBoundary": "Candidate preview only. This workspace does not claim firm partnership, does not provide legal advice, and does not create an attorney-client relationship.",
+  "reviewStatuses": [
+    "new_intake",
+    "conflict_screen_needed",
+    "client_packet_incomplete",
+    "ready_for_owner_review",
+    "sovereign_docs_checkout_sent",
+    "candidate_firm_outreach_sent",
+    "firm_response_recorded",
+    "closed_no_engagement"
+  ],
+  "workspaceModules": [
+    "local intake tracker",
+    "review status board",
+    "conflict and verification checklist",
+    "official firm link launcher",
+    "SovereignDocs and NorthStar 0S handoff links",
+    "local JSON export"
+  ],
+  "storageKeys": {
+    "intakeQueue": "valley-verified-legal:platz-juris-pllc-legal-review:intake-queue",
+    "checklist": "valley-verified-legal:platz-juris-pllc-legal-review:preflight-checklist"
+  },
+  "repairedAt": "2026-05-30T23:33:57.776Z"
+}</script>
+<script>
+(function () {
+  const data = JSON.parse(document.getElementById('site-data').textContent);
+  const queueKey = data.storageKeys.intakeQueue;
+  const checklistKey = data.storageKeys.checklist;
+  const statuses = data.reviewStatuses;
+  const checklistItems = data.activationRequired.concat([
+    'client understands this preview is not legal advice',
+    'no attorney-client relationship represented by this app',
+    'official firm website checked before outreach',
+    'owner approval recorded before any public partnership language'
+  ]);
+  const queueList = document.getElementById('queueList');
+  const output = document.getElementById('workspaceOutput');
+  const searchInput = document.getElementById('queueSearch');
+  const statusFilter = document.getElementById('statusFilter');
+  const downloadJson = document.getElementById('downloadJson');
+  const safe = function (value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (character) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character];
+    });
+  };
+  const format = function (status) {
+    return String(status || '').replace(/_/g, ' ').replace(/w/g, function (letter) { return letter.toUpperCase(); });
+  };
+  const read = function (key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch (error) { return fallback; }
+  };
+  const write = function (key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+  const readQueue = function () { return read(queueKey, []); };
+  const writeQueue = function (rows) { write(queueKey, rows.slice(0, 100)); };
+  const readChecklist = function () { return read(checklistKey, {}); };
+  const writeChecklist = function (state) { write(checklistKey, state); };
+  const statusOptions = function (selected) {
+    return statuses.map(function (status) {
+      return '<option value="' + safe(status) + '"' + (status === selected ? ' selected' : '') + '>' + safe(format(status)) + '</option>';
+    }).join('');
+  };
+  const matchesFilters = function (row) {
+    const needle = (searchInput.value || '').trim().toLowerCase();
+    const selectedStatus = statusFilter.value;
+    const haystack = [row.clientName, row.contact, row.packetId, row.matterType, row.summary, row.conflictNotes, row.operatorNote].join(' ').toLowerCase();
+    return (!needle || haystack.includes(needle)) && (selectedStatus === 'all' || row.status === selectedStatus);
+  };
+  function renderChecklist() {
+    const state = readChecklist();
+    document.getElementById('preflightChecklist').innerHTML = checklistItems.map(function (item, index) {
+      return '<label class="checkrow"><input type="checkbox" data-check-index="' + index + '"' + (state[index] ? ' checked' : '') + '><span>' + safe(item) + '</span></label>';
+    }).join('');
+  }
+  function renderQueue() {
+    const rows = readQueue();
+    const visible = rows.filter(matchesFilters);
+    const openRows = rows.filter(function (row) { return row.status !== 'closed_no_engagement'; });
+    const conflictRows = rows.filter(function (row) { return row.status === 'conflict_screen_needed'; });
+    document.getElementById('totalCount').textContent = rows.length;
+    document.getElementById('openCount').textContent = openRows.length;
+    document.getElementById('conflictCount').textContent = conflictRows.length;
+    document.getElementById('lastSaved').textContent = rows[0] ? new Date(rows[0].updatedAt || rows[0].createdAt).toLocaleDateString() : 'none';
+    queueList.innerHTML = visible.length ? visible.map(function (row) {
+      return '<article class="queue-item">' +
+        '<div class="queue-head"><div class="queue-title"><strong>' + safe(row.clientName || 'Unnamed client') + '</strong><span class="queue-meta">' + safe(row.packetId) + ' | ' + safe(row.matterType) + ' | ' + safe(row.urgency) + '</span></div><span class="pill">' + safe(format(row.status)) + '</span></div>' +
+        '<p class="queue-body">' + safe(row.summary || 'No summary recorded.') + '</p>' +
+        '<p class="queue-meta">Conflict screen: ' + safe(row.conflictNotes || 'none recorded') + '</p>' +
+        '<div class="queue-actions"><select data-status-id="' + safe(row.id) + '">' + statusOptions(row.status) + '</select><textarea data-note-id="' + safe(row.id) + '" placeholder="Operator note">' + safe(row.operatorNote || '') + '</textarea><button type="button" data-save-note="' + safe(row.id) + '">Save note</button><button class="ghost" type="button" data-remove-id="' + safe(row.id) + '">Remove</button></div>' +
+      '</article>';
+    }).join('') : '<p class="empty">No matching local intake records.</p>';
+    output.textContent = rows.length ? JSON.stringify({ workspace: data.workspaceSlug, records: rows, checklist: readChecklist() }, null, 2) : 'No local records yet.';
+  }
+  document.getElementById('intake').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const now = new Date().toISOString();
+    const row = {
+      id: 'vv-' + Date.now().toString(36) + '-' + Math.random().toString(16).slice(2),
+      workspace: data.workspaceSlug,
+      firmCandidate: data.name,
+      clientName: form.get('clientName'),
+      contact: form.get('contact'),
+      packetId: form.get('packetId'),
+      matterType: form.get('matterType'),
+      urgency: form.get('urgency'),
+      status: form.get('status'),
+      conflictNotes: form.get('conflictNotes'),
+      summary: form.get('summary'),
+      operatorNote: '',
+      createdAt: now,
+      updatedAt: now
+    };
+    const rows = readQueue();
+    rows.unshift(row);
+    writeQueue(rows);
+    event.currentTarget.reset();
+    renderQueue();
+  });
+  document.addEventListener('change', function (event) {
+    const statusId = event.target.getAttribute('data-status-id');
+    const checkIndex = event.target.getAttribute('data-check-index');
+    if (statusId) {
+      const rows = readQueue().map(function (row) {
+        if (row.id === statusId) return Object.assign({}, row, { status: event.target.value, updatedAt: new Date().toISOString() });
+        return row;
+      });
+      writeQueue(rows);
+      renderQueue();
+    }
+    if (checkIndex !== null) {
+      const state = readChecklist();
+      state[checkIndex] = event.target.checked;
+      writeChecklist(state);
+      renderQueue();
+    }
+  });
+  document.addEventListener('click', function (event) {
+    const removeId = event.target.getAttribute('data-remove-id');
+    const saveNoteId = event.target.getAttribute('data-save-note');
+    if (removeId) {
+      writeQueue(readQueue().filter(function (row) { return row.id !== removeId; }));
+      renderQueue();
+    }
+    if (saveNoteId) {
+      const noteField = Array.from(document.querySelectorAll('[data-note-id]')).find(function (field) { return field.getAttribute('data-note-id') === saveNoteId; });
+      const note = noteField ? noteField.value : '';
+      const rows = readQueue().map(function (row) {
+        if (row.id === saveNoteId) return Object.assign({}, row, { operatorNote: note, updatedAt: new Date().toISOString() });
+        return row;
+      });
+      writeQueue(rows);
+      renderQueue();
+    }
+  });
+  searchInput.addEventListener('input', renderQueue);
+  statusFilter.addEventListener('change', renderQueue);
+  document.getElementById('clearClosed').addEventListener('click', function () {
+    writeQueue(readQueue().filter(function (row) { return row.status !== 'closed_no_engagement'; }));
+    renderQueue();
+  });
+  document.getElementById('exportJson').addEventListener('click', function () {
+    const payload = { workspace: data.workspaceSlug, firmCandidate: data.name, exportedAt: new Date().toISOString(), records: readQueue(), checklist: readChecklist() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    if (downloadJson.dataset.url) URL.revokeObjectURL(downloadJson.dataset.url);
+    const url = URL.createObjectURL(blob);
+    downloadJson.dataset.url = url;
+    downloadJson.href = url;
+    downloadJson.download = data.workspaceSlug + '-local-review-export.json';
+    downloadJson.hidden = false;
+    downloadJson.textContent = 'Download local workspace JSON';
+  });
+  renderChecklist();
+  renderQueue();
+})();
+</script>
+</body>
+</html>

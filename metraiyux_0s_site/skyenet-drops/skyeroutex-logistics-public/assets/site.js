@@ -21,20 +21,8 @@
     try {
       sessionStorage.setItem(TOKEN_KEY, token);
       sessionStorage.setItem(EXPIRES_KEY, expiresAt || '');
-      if (/^rtx_tour_/i.test(token || '')) {
-        const sharedSession = {
-          token,
-          source: 'skyeroutex-tour-token',
-          platform_id: 'skyeroutex',
-          usage_lane: 'skyeroutex-tour-readonly',
-          billing_mode: 'free99-demo',
-          readonly: true,
-          issued_at: new Date().toISOString(),
-          expires_at: expiresAt || ''
-        };
-        sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX', JSON.stringify(sharedSession));
-        sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(sharedSession));
-      }
+      sessionStorage.removeItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX');
+      sessionStorage.removeItem('FREE99_PLATFORM_GATE_SESSION');
     } catch {}
   }
 

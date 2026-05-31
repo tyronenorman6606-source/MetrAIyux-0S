@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { constantTimeEqual, getHeader, cleanText, safeId } from './_lib/security.js';
+import { introspectSkygateBearer, cleanText, safeId } from './_lib/security.js';
 import { applyRateLimit } from './_lib/rate-limit.js';
 import { setProvisionedWorkspaceStatus, upsertProvisionedWorkspace } from './_lib/workspace-registry.js';
 import { writeAuditEventSafe } from './_lib/config.js';
@@ -10,13 +10,34 @@ function fail(message, statusCode = 400) {
   throw error;
 }
 
-function requireProvisioningSecret(event, body = {}) {
-  const expected = process.env.SKYEVAULT_PROVISIONING_SECRET || process.env.PROVISIONING_SHARED_SECRET || '';
-  if (!expected) fail('SKYEVAULT_PROVISIONING_SECRET is not configured.', 500);
-  const auth = getHeader(event, 'authorization');
-  const bearer = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  const provided = getHeader(event, 'x-skyevault-provisioning-secret') || bearer || body.provisioningSecret || '';
-  if (!constantTimeEqual(provided, expected)) fail('Provisioning secret is invalid or missing.', 401);
+function scopeList(scope) {
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope || '').split(/\s+/).filter(Boolean);
+}
+
+function allowsProvisioning(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = String(claims.role || claims.user?.role || '').toLowerCase();
+  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
+  return ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)
+    || scopes.has('admin.write')
+    || scopes.has('keys.write')
+    || scopes.has('gateway.invoke')
+    || scopes.has('skyevault.admin')
+    || scopes.has('vault.admin')
+    || scopes.has('vault.provision');
+}
+
+async function requireProvisioningGate(event) {
+  const gate = await introspectSkygateBearer(event);
+  if (!gate.ok) fail(gate.error || 'FS27/SkyGate owner-admin bearer is required for SkyeVault workspace provisioning.', gate.statusCode || 401);
+  if (!allowsProvisioning(gate.claims)) fail('FS27/SkyGate bearer is active, but it is not scoped for SkyeVault workspace provisioning.', 403);
+  return gate.claims;
+}
+
+function positiveNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
 }
 
 function planLimits(body = {}) {
@@ -30,13 +51,26 @@ function planLimits(body = {}) {
     rateLimitWindowMs: Number(process.env.SKYEVAULT_DEFAULT_RATE_WINDOW_MS || 60 * 60 * 1000)
   };
   const configuredPlans = String(process.env.SKYEVAULT_PLAN_LIMITS_JSON || '').trim();
-  if (!configuredPlans) return defaults;
+  let configured = {};
   try {
-    const parsed = JSON.parse(configuredPlans);
-    return { ...defaults, ...(parsed[planName] || parsed.default || {}) };
+    if (configuredPlans) {
+      const parsed = JSON.parse(configuredPlans);
+      configured = parsed[planName] || parsed.default || {};
+    }
   } catch {
     fail('SKYEVAULT_PLAN_LIMITS_JSON contains invalid JSON.', 500);
   }
+  const incoming = {
+    maxFilesPerSubmission: positiveNumber(body.maxFilesPerSubmission ?? body.max_files_per_submission),
+    maxTotalSubmissionGb: positiveNumber(body.maxTotalSubmissionGb ?? body.max_total_submission_gb),
+    maxFileSizeGb: positiveNumber(body.maxFileSizeGb ?? body.max_file_size_gb),
+    rateLimitUploadSessionsPerWindow: positiveNumber(body.rateLimitUploadSessionsPerWindow ?? body.rate_limit_upload_sessions_per_window),
+    rateLimitStatusPerWindow: positiveNumber(body.rateLimitStatusPerWindow ?? body.rate_limit_status_per_window),
+    rateLimitWindowMs: positiveNumber(body.rateLimitWindowMs ?? body.rate_limit_window_ms)
+  };
+  return Object.fromEntries(
+    Object.entries({ ...defaults, ...configured, ...incoming }).filter(([, value]) => value != null)
+  );
 }
 
 function workspacePayload(body = {}) {
@@ -76,7 +110,7 @@ export async function handler(event) {
       windowMs: Number(process.env.PROVISION_WORKSPACE_RATE_WINDOW_MS || 10 * 60 * 1000),
       message: 'Too many vault provisioning requests from this requester. Wait and try again.'
     });
-    requireProvisioningSecret(event, body);
+    const gateClaims = await requireProvisioningGate(event);
 
     const action = cleanText(body.action || 'provision', 40).toLowerCase();
     if (['suspend', 'cancel', 'cancelled', 'deactivate'].includes(action)) {
@@ -91,7 +125,9 @@ export async function handler(event) {
         workspaceId,
         action,
         stripeSubscriptionId: body.stripeSubscriptionId || body.stripe_subscription_id || null,
-        skyepayOrderId: body.skyepayOrderId || body.skyepay_order_id || body.orderId || body.order_id || null
+        skyepayOrderId: body.skyepayOrderId || body.skyepay_order_id || body.orderId || body.order_id || null,
+        gateSubject: gateClaims.sub || gateClaims.user_id || gateClaims.user?.id || null,
+        gateEmail: gateClaims.email || gateClaims.user?.email || null
       });
       return json(200, { ok: true, action, workspace: result.workspace, audit }, noStoreCors(event));
     }
@@ -110,6 +146,8 @@ export async function handler(event) {
       offerId: result.workspace.offerId || null,
       stripeSubscriptionId: result.workspace.stripeSubscriptionId || null,
       skyepayOrderId: result.workspace.skyepayOrderId || null,
+      gateSubject: gateClaims.sub || gateClaims.user_id || gateClaims.user?.id || null,
+      gateEmail: gateClaims.email || gateClaims.user?.email || null,
       keyCreated: result.keyCreated
     });
     return json(200, {
@@ -132,4 +170,3 @@ export async function handler(event) {
     return json(error.statusCode || 500, { ok: false, error: error.message }, noStoreCors(event));
   }
 }
-

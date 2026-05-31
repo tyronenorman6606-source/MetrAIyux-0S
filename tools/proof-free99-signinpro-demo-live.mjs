@@ -410,7 +410,7 @@ async function liveProof() {
   const login = credential.kind === 'bearer'
     ? { status: 0, ok: true, body: null, bearer_reused: true }
     : credential.value
-    ? await fetchAny(`${origin}/api/founder-command/login`, {
+    ? await fetchAny(`${origin}/api/owner/admin-login`, {
       method: 'POST',
       headers: { accept: 'application/json', 'content-type': 'application/json' },
       body: JSON.stringify({ code: credential.value })

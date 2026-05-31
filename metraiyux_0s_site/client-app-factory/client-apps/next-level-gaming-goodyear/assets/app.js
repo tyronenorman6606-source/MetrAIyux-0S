@@ -14,6 +14,8 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const requestKey = "nextLevelGaming.eventRequests";
 const noteKey = "nextLevelGaming.workspaceNotes";
 const previewCode = "NLG-7DAY";
+const LOCAL_TELEMETRY_STATUS = "browser-local pending/static artifact";
+const LOCAL_TELEMETRY_SOURCE = "localStorage";
 
 const events = [
   {
@@ -459,7 +461,14 @@ function mountRequestForm() {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
-    const item = { ...data, createdAt: new Date().toISOString(), source: location.href };
+    const item = {
+      ...data,
+      createdAt: new Date().toISOString(),
+      source: location.href,
+      telemetryStatus: LOCAL_TELEMETRY_STATUS,
+      telemetrySource: LOCAL_TELEMETRY_SOURCE,
+      telemetryReceipt: "none"
+    };
     const list = [item, ...readList(requestKey)];
     writeList(requestKey, list);
     const body = [
@@ -478,7 +487,7 @@ function mountRequestForm() {
       mail.href = `mailto:nlgaming2023@gmail.com?subject=${encodeURIComponent(`Event request: ${data.game}`)}&body=${encodeURIComponent(body)}`;
       mail.classList.remove("is-hidden");
     }
-    if (result) result.textContent = "Request saved locally. Open the email button to send it to the shop.";
+    if (result) result.textContent = "Request saved as browser-local pending/static artifact. Open the email button to send it to the shop; this static bundle has no Worker, Relay, or Command Bridge receipt.";
     renderLedger();
     form.reset();
   });
@@ -489,13 +498,14 @@ function renderLedger() {
   if (!list) return;
   const requests = readList(requestKey);
   if (!requests.length) {
-    list.innerHTML = "<p>No local requests yet.</p>";
+    list.innerHTML = "<p>No local requests yet. New rows are browser-local pending/static artifacts until a Worker, Relay, or Command Bridge receipt exists.</p>";
     return;
   }
   list.innerHTML = requests.slice(0, 5).map((item) => `
     <div class="table-row">
       <span>${new Date(item.createdAt).toLocaleDateString()}</span>
       <strong>${item.game} - ${item.requestType}</strong>
+      <span>${item.telemetryStatus || LOCAL_TELEMETRY_STATUS}</span>
     </div>
   `).join("");
 }
@@ -527,8 +537,14 @@ function mountWorkspaceNotes() {
     event.preventDefault();
     const note = String(new FormData(form).get("note") || "").trim();
     if (!note) return;
-    writeList(noteKey, [{ note, createdAt: new Date().toISOString() }, ...readList(noteKey)]);
-    if (result) result.textContent = "Workspace note saved locally.";
+    writeList(noteKey, [{
+      note,
+      createdAt: new Date().toISOString(),
+      telemetryStatus: LOCAL_TELEMETRY_STATUS,
+      telemetrySource: LOCAL_TELEMETRY_SOURCE,
+      telemetryReceipt: "none"
+    }, ...readList(noteKey)]);
+    if (result) result.textContent = "Workspace note saved as browser-local pending/static artifact. No Worker, Relay, or Command Bridge receipt was returned.";
     form.reset();
   });
 }

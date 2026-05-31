@@ -1,0 +1,532 @@
+{
+  "ok": true,
+  "app": "SkyeMusicNexus",
+  "mode": "mounted Worker controlled stress",
+  "checkedAt": "2026-05-31T00:05:01.161Z",
+  "iterations": 12,
+  "mutationConcurrency": 1,
+  "readStressRequests": 72,
+  "setupActions": [
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/routes/manifest",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "method": "GET",
+      "route": "/api/skymusicnexus/hub",
+      "status": 401,
+      "ok": false
+    },
+    {
+      "method": "POST",
+      "route": "/api/skymusicnexus/music-artists",
+      "status": 401,
+      "ok": false
+    }
+  ],
+  "totalWorkflowActions": 216,
+  "readStress": {
+    "requests": 72,
+    "failures": 0,
+    "routes": [
+      "/api/skymusicnexus/hub",
+      "/api/skymusicnexus/music-assets?action=list",
+      "/api/skymusicnexus/music-releases?action=list",
+      "/api/skymusicnexus/music-releases?action=rights-audit",
+      "/api/skymusicnexus/music-exchange?action=hub",
+      "/api/skymusicnexus/music-social?action=hub",
+      "/api/skymusicnexus/music-analytics",
+      "/api/skymusicnexus/observability",
+      "/api/skymusicnexus/visuals"
+    ]
+  },
+  "retained": {
+    "artists": 14,
+    "releases": 12,
+    "assets": 12,
+    "drops": 12,
+    "feedItems": 12,
+    "streams": 0,
+    "auditEvents": 192
+  },
+  "observability": {
+    "storage": {
+      "mode": "kv",
+      "durable": true,
+      "stateKey": "skymusicnexus:v1:state"
+    },
+    "retained": {
+      "artists": 14,
+      "assets": 12,
+      "releases": 12,
+      "drops": 12,
+      "payouts": 0,
+      "exchangeRequests": 12,
+      "feedItems": 12,
+      "storeProducts": 0,
+      "storeOrders": 0,
+      "adCampaigns": 0,
+      "activeAdPlacements": 0,
+      "adEvents": 0,
+      "workforceLinks": 0,
+      "workforceAccessLinks": 6,
+      "workforceEvents": 0,
+      "artistBrains": 0,
+      "brainActions": 0,
+      "brainToolRuns": 0,
+      "brainSystemListens": 0,
+      "brainSongDrafts": 0,
+      "skyeMeters": 12,
+      "skyeMerits": 0,
+      "gamifyEvents": 36,
+      "artistAchievements": 0,
+      "giveaways": 0,
+      "giveawayEntries": 0,
+      "auditEvents": 192
+    },
+    "latestEvents": [
+      {
+        "id": "audit_1780185904186_b24df2cd98361",
+        "eventId": "audit_evt_1780185904186_ea1e97cb781bf",
+        "createdAt": "2026-05-31T00:05:04.186Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-social",
+        "functionName": "music-social",
+        "action": "queue-post",
+        "method": "POST",
+        "status": 201,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "post",
+        "ids": {
+          "id": "social_post_1780185904182_bdef6f019949b",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "connectorId": "musicnexus-local-feed"
+        }
+      },
+      {
+        "id": "audit_1780185904166_544d39fd7bda9",
+        "eventId": "audit_evt_1780185904166_696eeca9cd478",
+        "createdAt": "2026-05-31T00:05:04.166Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-social",
+        "functionName": "music-social",
+        "action": "feed-action",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "post",
+        "ids": {
+          "id": "feed_1780185904139_acfa271f0f3ad",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "postId": "feed_1780185904139_acfa271f0f3ad"
+        }
+      },
+      {
+        "id": "audit_1780185904141_83ae25e8e9eb6",
+        "eventId": "audit_evt_1780185904141_892797a352a56",
+        "createdAt": "2026-05-31T00:05:04.141Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-social",
+        "functionName": "music-social",
+        "action": "create-feed-post",
+        "method": "POST",
+        "status": 201,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "post",
+        "ids": {
+          "id": "feed_1780185904139_acfa271f0f3ad",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "postId": "feed_1780185904139_acfa271f0f3ad"
+        }
+      },
+      {
+        "id": "audit_1780185904121_1acfed9ffc894",
+        "eventId": "audit_evt_1780185904121_39b2465dd51b4",
+        "createdAt": "2026-05-31T00:05:04.121Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-exchange",
+        "functionName": "music-exchange",
+        "action": "build-release-campaign",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "campaign",
+        "ids": {
+          "id": "campaign_1780185904118_0d972dcbfa16",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11"
+        }
+      },
+      {
+        "id": "audit_1780185904104_30ccbca3ab81c",
+        "eventId": "audit_evt_1780185904104_d8a6ee6c914a5",
+        "createdAt": "2026-05-31T00:05:04.104Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-exchange",
+        "functionName": "music-exchange",
+        "action": "publish-community",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "post",
+        "ids": {
+          "id": "community_1780185904102_de22809f0dc76",
+          "artistId": "artist_stress_11"
+        }
+      },
+      {
+        "id": "audit_1780185904087_2e9fe7b604651",
+        "eventId": "audit_evt_1780185904087_bf3bcc66dcc7f",
+        "createdAt": "2026-05-31T00:05:04.087Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-exchange",
+        "functionName": "music-exchange",
+        "action": "send-message",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "thread",
+        "ids": {
+          "id": "thread_1780185904073_4dd7fe36ca25c",
+          "artistId": "artist_stress_11"
+        }
+      },
+      {
+        "id": "audit_1780185904074_f1fa76f23d213",
+        "eventId": "audit_evt_1780185904074_5757a1d6f4ee7",
+        "createdAt": "2026-05-31T00:05:04.074Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-exchange",
+        "functionName": "music-exchange",
+        "action": "request-content",
+        "method": "POST",
+        "status": 201,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "request",
+        "ids": {
+          "id": "content_req_1780185904073_c5335c3f2d4f",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "threadId": "thread_1780185904073_4dd7fe36ca25c"
+        }
+      },
+      {
+        "id": "audit_1780185904059_49240d4c80a2e",
+        "eventId": "audit_evt_1780185904059_93819b856b54f",
+        "createdAt": "2026-05-31T00:05:04.059Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-drops",
+        "functionName": "music-drops",
+        "action": "submit-drop",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "drop",
+        "ids": {
+          "id": "drop_1780185904041_3b0323145fbfc",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "dropId": "drop_1780185904041_3b0323145fbfc"
+        }
+      },
+      {
+        "id": "audit_1780185904046_f7743fb4f530a",
+        "eventId": "audit_evt_1780185904046_1810143d1b09a",
+        "createdAt": "2026-05-31T00:05:04.046Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-drops",
+        "functionName": "music-drops",
+        "action": "create-drop",
+        "method": "POST",
+        "status": 201,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "drop",
+        "ids": {
+          "id": "drop_1780185904041_3b0323145fbfc",
+          "artistId": "artist_stress_11",
+          "releaseId": "rel_stress_11",
+          "dropId": "drop_1780185904041_3b0323145fbfc"
+        }
+      },
+      {
+        "id": "audit_1780185904028_efacddffb86e4",
+        "eventId": "audit_evt_1780185904028_5e80798c50b6f",
+        "createdAt": "2026-05-31T00:05:04.028Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-releases",
+        "functionName": "music-releases",
+        "action": "update-rights",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "release",
+        "ids": {
+          "id": "rel_stress_11",
+          "artistId": "artist_stress_11"
+        }
+      },
+      {
+        "id": "audit_1780185904012_6774519c52398",
+        "eventId": "audit_evt_1780185904012_7704b363b9963",
+        "createdAt": "2026-05-31T00:05:04.012Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-releases",
+        "functionName": "music-releases",
+        "action": "playback-stream",
+        "method": "POST",
+        "status": 200,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "release",
+        "ids": {
+          "id": "rel_stress_11",
+          "artistId": "artist_stress_11"
+        }
+      },
+      {
+        "id": "audit_1780185903993_08f1534efe003",
+        "eventId": "audit_evt_1780185903993_a1ac4a915c87a",
+        "createdAt": "2026-05-31T00:05:03.993Z",
+        "system": "SkyeMusicNexus",
+        "route": "/api/skymusicnexus/music-releases",
+        "functionName": "music-releases",
+        "action": "submit",
+        "method": "POST",
+        "status": 201,
+        "ok": true,
+        "actor": "music-stress-11@example.com",
+        "role": "artist",
+        "operator": false,
+        "via": "skygate",
+        "result": "release",
+        "ids": {
+          "id": "rel_stress_11",
+          "artistId": "artist_stress_11"
+        }
+      }
+    ]
+  },
+  "visuals": {
+    "schema": "skye.music.nexus.visuals.v1",
+    "source": {
+      "preferred_endpoint": "/api/skymusicnexus/visuals",
+      "fallback": "/SkyeMusicNexus/data/nexus-visuals-demo.json"
+    },
+    "kpis": [
+      {
+        "label": "Artists",
+        "value": "14",
+        "detail": "2 active",
+        "tone": "cyan"
+      },
+      {
+        "label": "Releases",
+        "value": "12",
+        "detail": "0 live",
+        "tone": "gold"
+      },
+      {
+        "label": "Uploads",
+        "value": "12",
+        "detail": "gated music-assets records",
+        "tone": "mint"
+      },
+      {
+        "label": "Stores",
+        "value": "0",
+        "detail": "0 order intents",
+        "tone": "pink"
+      },
+      {
+        "label": "Ads",
+        "value": "0",
+        "detail": "0 live slots",
+        "tone": "gold"
+      },
+      {
+        "label": "Workforce",
+        "value": "0",
+        "detail": "0 assigned",
+        "tone": "mint"
+      },
+      {
+        "label": "Brains",
+        "value": "0",
+        "detail": "0 local actions",
+        "tone": "violet"
+      },
+      {
+        "label": "SkyeMerits",
+        "value": "0",
+        "detail": "36 meter events",
+        "tone": "gold"
+      },
+      {
+        "label": "Audit events",
+        "value": "192",
+        "detail": "latest 50 visible",
+        "tone": "violet"
+      }
+    ],
+    "routeHealthCount": 20,
+    "flowCount": 14,
+    "auditEventCount": 50
+  },
+  "assertions": [
+    "routes manifest stays gate-owned and accurate",
+    "hub rejects unauthenticated access",
+    "writes reject unauthenticated access",
+    "shared FS27/SkyGate token path unlocks music API routes",
+    "artist registration, upload, stream, studio save, export queue, release submit, rights update, drop submit, exchange, feed, and social queue survive repeated serialized mutation stress",
+    "hub, assets, releases, rights, exchange, social, analytics, observability, and visuals routes survive concurrent authenticated read stress",
+    "successful music mutations append audit events that are visible through the gated observability API",
+    "the SkyeMusicNexus visual dashboard endpoint is live-data-backed with KPI, route-health, workflow, and audit-event sections",
+    "Worker stores stress state in shared KV lane without app-specific passwords"
+  ],
+  "results": [
+    {
+      "index": 0,
+      "artistId": "artist_stress_00",
+      "releaseId": "rel_stress_00",
+      "assetId": "aud_1780185901353_1275cf663f114",
+      "dropId": "drop_1780185901437_3585e187c973e",
+      "actions": 18
+    },
+    {
+      "index": 1,
+      "artistId": "artist_stress_01",
+      "releaseId": "rel_stress_01",
+      "assetId": "aud_1780185901523_34de4a426e6c4",
+      "dropId": "drop_1780185901569_f692a0f7646ee",
+      "actions": 18
+    },
+    {
+      "index": 2,
+      "artistId": "artist_stress_02",
+      "releaseId": "rel_stress_02",
+      "assetId": "aud_1780185901648_ab5fdedc2f3c6",
+      "dropId": "drop_1780185901718_d241383b32bfe",
+      "actions": 18
+    },
+    {
+      "index": 3,
+      "artistId": "artist_stress_03",
+      "releaseId": "rel_stress_03",
+      "assetId": "aud_1780185901812_1032ae9caf741",
+      "dropId": "drop_1780185901864_2bb6280c4799e",
+      "actions": 18
+    },
+    {
+      "index": 4,
+      "artistId": "artist_stress_04",
+      "releaseId": "rel_stress_04",
+      "assetId": "aud_1780185901958_23d86545eb23f",
+      "dropId": "drop_1780185902017_667a3a0b1280e",
+      "actions": 18
+    },
+    {
+      "index": 5,
+      "artistId": "artist_stress_05",
+      "releaseId": "rel_stress_05",
+      "assetId": "aud_1780185902113_99e265d1cbe8d",
+      "dropId": "drop_1780185902193_53954b537ee5a",
+      "actions": 18
+    },
+    {
+      "index": 6,
+      "artistId": "artist_stress_06",
+      "releaseId": "rel_stress_06",
+      "assetId": "aud_1780185902329_45f28a5d79dd8",
+      "dropId": "drop_1780185902404_0bd8e8666a105",
+      "actions": 18
+    },
+    {
+      "index": 7,
+      "artistId": "artist_stress_07",
+      "releaseId": "rel_stress_07",
+      "assetId": "aud_1780185902560_9aa02b87cdfdd",
+      "dropId": "drop_1780185902684_f617b5d2497ed",
+      "actions": 18
+    },
+    {
+      "index": 8,
+      "artistId": "artist_stress_08",
+      "releaseId": "rel_stress_08",
+      "assetId": "aud_1780185902891_ff89ae2120f8a",
+      "dropId": "drop_1780185903001_9c5d398d45ded",
+      "actions": 18
+    },
+    {
+      "index": 9,
+      "artistId": "artist_stress_09",
+      "releaseId": "rel_stress_09",
+      "assetId": "aud_1780185903207_0a748a0c9f61e",
+      "dropId": "drop_1780185903346_33ff1d6b8dfbb",
+      "actions": 18
+    },
+    {
+      "index": 10,
+      "artistId": "artist_stress_10",
+      "releaseId": "rel_stress_10",
+      "assetId": "aud_1780185903584_40450a1fd50b9",
+      "dropId": "drop_1780185903726_a567c7a010456",
+      "actions": 18
+    },
+    {
+      "index": 11,
+      "artistId": "artist_stress_11",
+      "releaseId": "rel_stress_11",
+      "assetId": "aud_1780185903934_88b990af3b876",
+      "dropId": "drop_1780185904041_3b0323145fbfc",
+      "actions": 18
+    }
+  ]
+}

@@ -77,6 +77,7 @@ fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 
 copyHtmlPage(path.join(root, "index.html"), path.join(out, "index.html"));
+copyHtmlPage(path.join(root, "index.html"), path.join(out, "home.html"));
 for (const page of pages) {
   const source = path.join(root, `${page}.html`);
   if (!fs.existsSync(source)) continue;

@@ -1,10 +1,11 @@
 (function () {
+  const ZERO_OS_ORIGIN = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev";
+
   const adminToken = () => {
-    try {
-      return (globalThis.sessionStorage?.getItem("KAIXU_ADMIN_TOKEN") || "").trim();
-    } catch {
-      return "";
-    }
+    const session = globalThis.SkyeStandaloneSession?.getSession?.()
+      || globalThis.MetrAIyuxGateBridge?.current?.()
+      || null;
+    return String(session?.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
   };
 
   const founderLinks = () => Array.from(document.querySelectorAll("[data-founder-admin-link]"));
@@ -115,10 +116,17 @@
     if (!token) return false;
 
     try {
-      const response = await fetch("/.netlify/functions/admin-session-check", {
-        headers: { authorization: `Bearer ${token}` }
+      const response = await fetch(`${ZERO_OS_ORIGIN}/api/owner/admin-session`, {
+        credentials: "include",
+        headers: {
+          accept: "application/json",
+          authorization: `Bearer ${token}`,
+          "x-skye-gate-session": token,
+          "x-free99-gate-session": token
+        }
       });
-      return response.ok;
+      const data = await response.json().catch(() => ({}));
+      return response.ok && (data.ok === true || data.authenticated === true);
     } catch {
       return false;
     }

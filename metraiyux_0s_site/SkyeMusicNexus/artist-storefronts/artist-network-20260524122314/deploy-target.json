@@ -1,96 +1,84 @@
 {
   "schema": "skyenet.client-app.deploy-target.v1",
-  "updatedAt": "2026-05-30T19:09:46.430Z",
+  "updatedAt": "2026-05-30T23:04:23.978Z",
   "deployHost": "SkyeNet shared origin path route",
   "projectId": "musicnexus-artist-network-20260524122314",
   "workspaceId": "artist-network-20260524122314",
   "planName": "skyenet-edge-starter",
-  "deploymentId": "dep_20260530190912",
+  "deploymentId": "dep_20260530230212",
   "publicUrl": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/",
   "host": "skyenet.graylondonskyes.workers.dev",
   "mountPath": "/musicnexus-artist-network-20260524122314",
   "urlMode": "path",
   "publicAccess": true,
-  "sourceRoot": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-network-20260524122314",
-  "publicBuildDir": "metraiyux_0s_site/SkyeMusicNexus/artist-storefronts/artist-network-20260524122314",
+  "sourceRoot": ".tmp/skyenet-musicnexus-public-bundles/musicnexus-artist-network-20260524122314",
+  "publicBuildDir": ".tmp/skyenet-musicnexus-public-bundles/musicnexus-artist-network-20260524122314",
   "sourceCustody": {
     "privateSourcePackage": true,
-    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-network-20260524122314&project_id=musicnexus-artist-network-20260524122314&deployment_id=dep_20260530190912",
+    "sourceDownloadApi": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-network-20260524122314&project_id=musicnexus-artist-network-20260524122314&deployment_id=dep_20260530230212",
     "auth": "Shared FS27/SkyGate/Free99 bearer session required"
   },
-  "legacyRoutes": [
-    "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/SkyeMusicNexus/artist-storefronts/artist-network-20260524122314/",
-    "https://skyenet.graylondonskyes.workers.dev/musicnexus/artist-network-20260524122314/"
-  ],
   "proofRequired": "Non-browser HTTP/API smoke plus owner manual browser check",
   "lastSmoke": {
-    "hostHeader": {
-      "ok": true,
-      "route_record": {
+    "ok": true,
+    "assets": [
+      {
+        "id": "root",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/",
         "status": 200,
         "ok": true,
-        "count": 1,
-        "key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-artist-network-20260524122314",
-        "route": {
-          "hostname": "skyenet.graylondonskyes.workers.dev",
-          "mount_path": "/musicnexus-artist-network-20260524122314",
-          "url_mode": "path",
-          "workspace_id": "artist-network-20260524122314",
-          "project_id": "musicnexus-artist-network-20260524122314",
-          "active_deployment_id": "dep_20260530190912",
-          "public_access": true,
-          "default_auth": "public",
-          "asset_prefix": "deployments/musicnexus-artist-network-20260524122314/dep_20260530190912",
-          "updated_at": "2026-05-30T19:09:33.560Z"
-        },
-        "elapsed_ms": 398.91
-      },
-      "dashboard": {
-        "status": 200,
-        "ok": true,
-        "deployment_found": true,
-        "live_url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/",
-        "route_key": "route:v1:host:skyenet.graylondonskyes.workers.dev:path:/musicnexus-artist-network-20260524122314",
-        "elapsed_ms": 845.02
-      },
-      "public_http": {
-        "status": 200,
-        "ok": true,
+        "elapsed_ms": 244.37,
         "content_type": "text/html; charset=utf-8",
-        "location": "",
-        "elapsed_ms": 177.11,
-        "error": "",
-        "blocker": ""
+        "location": ""
       },
-      "host_header_probe": {
+      {
+        "id": "css",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/artist-storefronts.css",
         "status": 200,
         "ok": true,
-        "content_type": "text/html",
-        "elapsed_ms": 52.91,
-        "bytes": 4644,
-        "title": "SkyeNet | Sovereign Deploy Network",
-        "missing_route_header_probe_error": ""
+        "elapsed_ms": 279.54,
+        "content_type": "text/css; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "mcp_js",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/assets/mcp-implementation/mcp-effects.js",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 496.74,
+        "content_type": "text/javascript; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "bridge_js",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/assets/js/0s-command-bridge.js",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 381.42,
+        "content_type": "text/javascript; charset=utf-8",
+        "location": ""
+      },
+      {
+        "id": "logo",
+        "url": "https://skyenet.graylondonskyes.workers.dev/musicnexus-artist-network-20260524122314/shared/SkyeMusicNexus/assets/skye-music-nexus-logo.png",
+        "status": 200,
+        "ok": true,
+        "elapsed_ms": 594.75,
+        "content_type": "image/png",
+        "location": ""
       }
-    },
-    "sourceDownload": {
+    ],
+    "route": {
+      "status": 200,
       "ok": true,
-      "url": "https://skyenet.graylondonskyes.workers.dev/api/skyenet/source-download?workspace_id=artist-network-20260524122314&project_id=musicnexus-artist-network-20260524122314&deployment_id=dep_20260530190912",
-      "unauth": {
-        "status": 401,
-        "ok": true,
-        "content_type": "application/json; charset=utf-8",
-        "elapsed_ms": 131.31
-      },
-      "auth": {
-        "status": 200,
-        "ok": true,
-        "content_type": "application/x-tar",
-        "content_length": 0,
-        "bytes_read": 134964,
-        "read_truncated": true,
-        "elapsed_ms": 1324.95,
-        "error": ""
-      }
+      "count": 1
+    },
+    "source_download_head": {
+      "status": 404,
+      "ok": false,
+      "elapsed_ms": 306.28,
+      "content_type": "",
+      "location": ""
     }
   }
 }

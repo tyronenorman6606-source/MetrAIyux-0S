@@ -559,14 +559,14 @@
           }
         };
         const serialized = JSON.stringify(session);
-        ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYE_GATE_SESSION", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+        ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYE_GATE_SESSION"].forEach((key) => {
           localStorage.setItem(key, serialized);
           sessionStorage.setItem(key, serialized);
         });
-        localStorage.setItem("SKYGATE_USER_TOKEN", token);
-        sessionStorage.setItem("SKYGATE_USER_TOKEN", token);
-        sessionStorage.setItem("SKYGATE_SESSION_TOKEN", token);
-        localStorage.setItem("SKYGATE_SESSION_TOKEN", token);
+        ["FREE99_PLATFORM_GATE_SESSION", "SKYGATE_USER_TOKEN", "SKYGATE_SESSION_TOKEN"].forEach((key) => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
         writeJson(keys.profile, data.profile || {});
         writeJson(keys.profileV1, data.profile || {});
         writeJson(keys.gateIdentity, data.identity || {});

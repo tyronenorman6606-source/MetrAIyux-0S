@@ -2,6 +2,22 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const state = { tag:'', pos:null };
 
+function mountPath(){
+  const parts = location.pathname.split('/').filter(Boolean);
+  if(parts[0] === 'valley-verified-marketplace') return '/valley-verified-marketplace';
+  if(parts[0] === 'skyenet' && parts[1] === 'valley-verified') return '/skyenet/valley-verified';
+  if(parts[0] === 'valley-verified') return '/valley-verified';
+  return '';
+}
+function routeUrl(value){
+  const raw = String(value || '/');
+  if(!raw.startsWith('/') || raw.startsWith('//')) return raw;
+  const mount = mountPath();
+  if(!mount || raw === mount || raw.startsWith(`${mount}/`)) return raw;
+  if(raw === '/valley-verified') return `${mount}/`;
+  if(raw.startsWith('/valley-verified/')) return `${mount}${raw.slice('/valley-verified'.length)}`;
+  return `${mount}${raw}`.replace(/\/{2,}/g, '/');
+}
 function toast(title, detail=''){
   const el = $('#toast');
   if(!el) return;
@@ -38,7 +54,7 @@ function bindShortlistButtons(){
     const item = {
       id: btn.dataset.businessId || card?.dataset.businessId || '',
       name: btn.dataset.businessName || card?.dataset.businessName || text($('h3', card)?.innerText),
-      url: btn.dataset.url || card?.dataset.url || $('a[href^="/business/"]', card)?.getAttribute('href') || location.pathname,
+      url: routeUrl(btn.dataset.url || card?.dataset.url || $('a[href*="/business/"]', card)?.getAttribute('href') || location.pathname),
       category: card?.dataset.category || '',
       city: card?.dataset.city || '',
       score: card?.dataset.score || ''
@@ -81,7 +97,7 @@ function compareCard(b){
   const badges = Object.entries(b.badges || {}).filter(([,v])=>v).map(([k])=>k.replaceAll('_',' ')).join(', ') || 'Provider supplied';
   const gaps = [];
   if(!b.phone) gaps.push('phone'); if(!b.email) gaps.push('email'); if(!b.website && !b.booking_url) gaps.push('website/booking'); if(!b.location) gaps.push('coordinates'); if(b.starting_price === null && !b.price_note) gaps.push('pricing');
-  return `<article class="compare-card"><div class="card-top"><div><p class="eyebrow">${escapeHtml(b.city)} • ${escapeHtml(b.category)}</p><h3>${escapeHtml(b.name)}</h3></div><div class="score"><strong>${escapeHtml(b.verification_score)}</strong><small>score</small></div></div><div class="compare-list"><div><strong>Price</strong><span>${escapeHtml(b.starting_price ? '$'+b.starting_price : b.price_note || 'Quote required')}</span></div><div><strong>Contact</strong><span>${escapeHtml([b.phone,b.email].filter(Boolean).join(' / ') || 'Not listed')}</span></div><div><strong>Badges</strong><span>${escapeHtml(badges)}</span></div><div><strong>Data gaps</strong><span>${escapeHtml(gaps.join(', ') || 'No major gaps')}</span></div></div><div class="button-row"><a class="btn small primary" href="/business/${escapeHtml(b.id)}/">Open</a><a class="btn small" href="/request/?business=${escapeHtml(b.id)}">Request</a></div></article>`;
+  return `<article class="compare-card"><div class="card-top"><div><p class="eyebrow">${escapeHtml(b.city)} • ${escapeHtml(b.category)}</p><h3>${escapeHtml(b.name)}</h3></div><div class="score"><strong>${escapeHtml(b.verification_score)}</strong><small>score</small></div></div><div class="compare-list"><div><strong>Price</strong><span>${escapeHtml(b.starting_price ? '$'+b.starting_price : b.price_note || 'Quote required')}</span></div><div><strong>Contact</strong><span>${escapeHtml([b.phone,b.email].filter(Boolean).join(' / ') || 'Not listed')}</span></div><div><strong>Badges</strong><span>${escapeHtml(badges)}</span></div><div><strong>Data gaps</strong><span>${escapeHtml(gaps.join(', ') || 'No major gaps')}</span></div></div><div class="button-row"><a class="btn small primary" href="${routeUrl(`/business/${escapeHtml(b.id)}/`)}">Open</a><a class="btn small" href="${routeUrl(`/request/?business=${escapeHtml(b.id)}`)}">Request</a></div></article>`;
 }
 function bindComparePage(){
   const shell = $('[data-compare-page]');
@@ -98,10 +114,10 @@ function bindComparePage(){
     history.replaceState(null, '', `${location.pathname}?ids=${ids.join(',')}`);
   }
   async function boot(){
-    if(!data.length){ grid.innerHTML = '<p class="muted">Loading comparison index…</p>'; data = await loadRecords('/data/search-index.json', 'records'); }
+    if(!data.length){ grid.innerHTML = '<p class="muted">Loading comparison index…</p>'; data = await loadRecords(routeUrl('/data/search-index.json'), 'records'); }
     render();
   }
-  $('[data-add-compare]')?.addEventListener('click', async () => { if(!data.length) data = await loadRecords('/data/search-index.json', 'records'); const id = select?.value; if(id && !ids.includes(id)){ ids = [...ids, id].slice(0,4); render(); toast('Added to comparison'); } });
+  $('[data-add-compare]')?.addEventListener('click', async () => { if(!data.length) data = await loadRecords(routeUrl('/data/search-index.json'), 'records'); const id = select?.value; if(id && !ids.includes(id)){ ids = [...ids, id].slice(0,4); render(); toast('Added to comparison'); } });
   $('[data-load-shortlist-compare]')?.addEventListener('click', () => { ids = getShortlist().map(x=>x.id).filter(Boolean).slice(0,4); render(); toast('Loaded shortlist', `${ids.length} provider(s).`); });
   $('[data-clear-compare]')?.addEventListener('click', () => { ids = []; render(); toast('Comparison cleared'); });
   boot();
@@ -163,7 +179,7 @@ function bindDirectory(){
   });
   $('[data-copy-link]')?.addEventListener('click', async () => { await navigator.clipboard?.writeText(location.href); toast('Link copied'); });
   $('[data-export-visible]')?.addEventListener('click', () => {
-    const rows = allCards().filter(c => !c.classList.contains('hidden')).map(c => ({ name:text($('h3',c)?.innerText), category:c.dataset.category, city:c.dataset.city, url:$('a[href^="/business/"]',c)?.href || '' }));
+    const rows = allCards().filter(c => !c.classList.contains('hidden')).map(c => ({ name:text($('h3',c)?.innerText), category:c.dataset.category, city:c.dataset.city, url:$('a[href*="/business/"]',c)?.href || '' }));
     const csv = ['name,category,city,url', ...rows.map(r => [r.name,r.category,r.city,r.url].map(v => `"${String(v).replaceAll('"','""')}"`).join(','))].join('\n');
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'phx-verified-visible-businesses.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); toast('CSV exported', `${rows.length} visible listing(s).`);
@@ -480,7 +496,7 @@ function bindMatchPage(){
     if(b.accepts_requests){ s += 5; reasons.push('accepts requests'); }
     return { ...b, match_score:Math.min(s, 160), reasons:[...new Set(reasons)].slice(0,8) };
   }
-  async function ensureData(){ if(data.length) return data; results.innerHTML = '<p class="muted">Loading match index…</p>'; data = await loadRecords('/data/match-index.json', 'records'); return data; }
+  async function ensureData(){ if(data.length) return data; results.innerHTML = '<p class="muted">Loading match index…</p>'; data = await loadRecords(routeUrl('/data/match-index.json'), 'records'); return data; }
   async function render(){
     await ensureData();
     const req = { city:$('#matchCity')?.value || '', category:$('#matchCategory')?.value || '', budget:$('#matchBudget')?.value || '', terms:$('#matchTerms')?.value || '', verified:!!$('#matchVerified')?.checked, transparent:!!$('#matchTransparent')?.checked, mobile:!!$('#matchMobile')?.checked };
@@ -488,7 +504,7 @@ function bindMatchPage(){
     packet = { id:`match-${Date.now()}`, created_at:new Date().toISOString(), request:req, matches };
     if(count) count.textContent = `${matches.length} matches`;
     if(exportBtn) exportBtn.disabled = !matches.length;
-    results.innerHTML = matches.length ? matches.map(b => `<article class="business-card"><div class="card-top"><div><p class="eyebrow">${escapeHtml(b.city)} • ${escapeHtml(b.category)}</p><h3><a href="${escapeHtml(b.url)}">${escapeHtml(b.name)}</a></h3></div><div class="score"><strong>${escapeHtml(b.match_score)}</strong><small>match</small></div></div><p class="card-desc">${escapeHtml((b.reasons || []).join(' • ') || 'Ranked by seeded profile strength.')}</p><div class="mini-grid"><span>Profile score ${escapeHtml(b.score)}</span><span>${b.accepts_requests ? 'Accepts requests' : 'Review first'}</span><span>${b.price ? '$'+escapeHtml(b.price) : 'Quote required'}</span><span>${b.mobile ? 'Mobile' : 'Location-based'}</span></div><div class="card-actions"><a class="btn small primary" href="${escapeHtml(b.url)}">Open profile</a><button class="btn small" data-save-business data-business-id="${escapeHtml(b.id)}" data-business-name="${escapeHtml(b.name)}" data-url="${escapeHtml(b.url)}">Save</button><a class="btn small" href="/request/?business=${escapeHtml(b.id)}">Request</a></div></article>`).join('') : '<p class="muted">No matches. Loosen city/category filters or seed more businesses in this lane.</p>';
+    results.innerHTML = matches.length ? matches.map(b => `<article class="business-card"><div class="card-top"><div><p class="eyebrow">${escapeHtml(b.city)} • ${escapeHtml(b.category)}</p><h3><a href="${escapeHtml(routeUrl(b.url))}">${escapeHtml(b.name)}</a></h3></div><div class="score"><strong>${escapeHtml(b.match_score)}</strong><small>match</small></div></div><p class="card-desc">${escapeHtml((b.reasons || []).join(' • ') || 'Ranked by seeded profile strength.')}</p><div class="mini-grid"><span>Profile score ${escapeHtml(b.score)}</span><span>${b.accepts_requests ? 'Accepts requests' : 'Review first'}</span><span>${b.price ? '$'+escapeHtml(b.price) : 'Quote required'}</span><span>${b.mobile ? 'Mobile' : 'Location-based'}</span></div><div class="card-actions"><a class="btn small primary" href="${escapeHtml(routeUrl(b.url))}">Open profile</a><button class="btn small" data-save-business data-business-id="${escapeHtml(b.id)}" data-business-name="${escapeHtml(b.name)}" data-url="${escapeHtml(routeUrl(b.url))}">Save</button><a class="btn small" href="${routeUrl(`/request/?business=${escapeHtml(b.id)}`)}">Request</a></div></article>`).join('') : '<p class="muted">No matches. Loosen city/category filters or seed more businesses in this lane.</p>';
     bindShortlistButtons();
   }
   $('[data-run-match]')?.addEventListener('click', () => { render(); toast('Match run complete'); });

@@ -1,408 +1,122 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Firestone Complete Auto Care | Valley Verified Phoenix Auto Repair</title>
-    <meta name="description" content="Owner-researched Valley Verified landing page for Firestone Complete Auto Care, a Phoenix auto repair and maintenance listing from a public directory record.">
-    <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/firestone-complete-auto-care-phoenix-85027-99b80e9/">
-    <link rel="stylesheet" href="/assets/styles.css">
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #1f2528;
-        --muted: #647076;
-        --paper: #f8f6f0;
-        --panel: #ffffff;
-        --line: #dfe3df;
-        --steel: #34515c;
-        --signal: #b7352a;
-        --gold: #e7b44c;
-        --foam: #edf3f2;
-        --shadow: 0 24px 70px rgba(31, 37, 40, 0.12);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        background: var(--paper);
-        color: var(--ink);
-      }
-
-      a {
-        color: inherit;
-      }
-
-      .page {
-        min-height: 100vh;
-        background:
-          linear-gradient(120deg, rgba(183, 53, 42, 0.14) 0%, transparent 34%),
-          linear-gradient(145deg, #f8f6f0 0%, #eef3f2 52%, #fff5db 100%);
-      }
-
-      .shell {
-        width: min(1120px, calc(100% - 32px));
-        margin: 0 auto;
-      }
-
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 22px 0;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 800;
-        letter-spacing: 0;
-      }
-
-      .brand-mark {
-        display: grid;
-        width: 38px;
-        height: 38px;
-        place-items: center;
-        border: 1px solid rgba(52, 81, 92, 0.24);
-        border-radius: 8px;
-        background: #fff;
-        color: var(--steel);
-        font-weight: 900;
-      }
-
-      .status-chip {
-        display: inline-flex;
-        align-items: center;
-        min-height: 34px;
-        padding: 7px 12px;
-        border: 1px solid rgba(52, 81, 92, 0.22);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.72);
-        color: var(--steel);
-        font-size: 0.86rem;
-        font-weight: 800;
-      }
-
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-        gap: 28px;
-        align-items: stretch;
-        padding: 38px 0 30px;
-      }
-
-      .hero-copy,
-      .fact-card,
-      .source-panel,
-      .skyemail-panel {
-        border: 1px solid rgba(31, 37, 40, 0.11);
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: var(--shadow);
-      }
-
-      .hero-copy {
-        display: flex;
-        min-height: 480px;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: clamp(28px, 5vw, 56px);
-        border-radius: 8px;
-      }
-
-      .eyebrow {
-        margin: 0 0 14px;
-        color: var(--signal);
-        font-size: 0.78rem;
-        font-weight: 900;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
-      h1 {
-        max-width: 780px;
-        margin: 0;
-        color: var(--ink);
-        font-size: clamp(2.8rem, 7vw, 6rem);
-        line-height: 0.95;
-        letter-spacing: 0;
-      }
-
-      .lede {
-        max-width: 720px;
-        margin: 24px 0 0;
-        color: var(--muted);
-        font-size: clamp(1.02rem, 2vw, 1.25rem);
-        line-height: 1.65;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 32px;
-      }
-
-      .button {
-        display: inline-flex;
-        min-height: 44px;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 11px 16px;
-        border: 1px solid transparent;
-        border-radius: 8px;
-        font-weight: 850;
-        text-decoration: none;
-      }
-
-      .button.primary {
-        background: var(--signal);
-        color: #fff;
-      }
-
-      .button.secondary {
-        border-color: rgba(52, 81, 92, 0.25);
-        background: #fff;
-        color: var(--steel);
-      }
-
-      .hero-aside {
-        display: grid;
-        gap: 14px;
-      }
-
-      .fact-card {
-        border-radius: 8px;
-        padding: 22px;
-      }
-
-      .fact-card h2,
-      .source-panel h2,
-      .skyemail-panel h2 {
-        margin: 0 0 14px;
-        font-size: 1rem;
-        letter-spacing: 0;
-      }
-
-      .metric {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 14px;
-        padding: 12px 0;
-        border-top: 1px solid var(--line);
-      }
-
-      .metric:first-of-type {
-        border-top: 0;
-        padding-top: 0;
-      }
-
-      .metric span {
-        color: var(--muted);
-      }
-
-      .metric strong {
-        text-align: right;
-      }
-
-      .section-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-        gap: 18px;
-        padding: 10px 0 46px;
-      }
-
-      .source-panel,
-      .skyemail-panel {
-        border-radius: 8px;
-        padding: clamp(22px, 4vw, 32px);
-      }
-
-      .source-panel p,
-      .skyemail-panel p {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.65;
-      }
-
-      .source-list,
-      .skyemail-list {
-        display: grid;
-        gap: 10px;
-        margin: 18px 0 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .source-list li,
-      .skyemail-list li {
-        padding: 12px 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(248, 246, 240, 0.78);
-        color: var(--ink);
-      }
-
-      .skyemail-panel {
-        background: linear-gradient(145deg, #ffffff 0%, #fff0d5 100%);
-      }
-
-      .seat-banner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 18px;
-        padding: 14px 16px;
-        border: 1px solid rgba(183, 53, 42, 0.25);
-        border-radius: 8px;
-        background: #fff8ed;
-      }
-
-      .seat-banner strong {
-        color: var(--signal);
-        font-size: 1.5rem;
-      }
-
-      .footer-note {
-        padding: 24px 0 36px;
-        color: var(--muted);
-        font-size: 0.92rem;
-      }
-
-      @media (max-width: 820px) {
-        .topbar,
-        .seat-banner {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .hero,
-        .section-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .hero-copy {
-          min-height: auto;
-        }
-
-        .metric {
-          grid-template-columns: 1fr;
-          gap: 4px;
-        }
-
-        .metric strong {
-          text-align: left;
-        }
-      }
-    </style>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "AutoRepair",
-        "name": "Firestone Complete Auto Care",
-        "telephone": "+16235825626",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "3440 W. Union Hills Rd.",
-          "addressLocality": "Phoenix",
-          "addressRegion": "AZ",
-          "postalCode": "85027",
-          "addressCountry": "US"
-        },
-        "areaServed": "Phoenix, AZ",
-        "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/firestone-complete-auto-care-phoenix-85027-99b80e9/"
-      }
-    </script>
-  </head>
-  <body data-static-hand-page="true">
-    <main class="page">
-      <div class="shell">
-        <header class="topbar" aria-label="Valley Verified header">
-          <a class="brand" href="/valley-verified/">
-            <span class="brand-mark">VV</span>
-            <span>Valley Verified</span>
-          </a>
-          <span class="status-chip">Owner-researched verified status</span>
-        </header>
-
-        <section class="hero" aria-labelledby="business-name">
-          <div class="hero-copy">
-            <div>
-              <p class="eyebrow">Phoenix automotive services</p>
-              <h1 id="business-name">Firestone Complete Auto Care</h1>
-              <p class="lede">Firestone Complete Auto Care is listed in Valley Verified Network as a Phoenix auto repair and maintenance location. The source record is a public directory listing, so call the location directly to confirm availability, services, timing, and pricing.</p>
-            </div>
-            <div class="hero-actions" aria-label="Primary contact actions">
-              <a class="button primary" href="tel:+16235825626">Call (623) 582-5626</a>
-              <a class="button secondary" href="https://business.phoenixchamber.com/list/ql/automotive-marine-4" rel="noopener">View source listing</a>
-            </div>
-          </div>
-
-          <aside class="hero-aside" aria-label="Firestone Complete Auto Care facts">
-            <article class="fact-card">
-              <h2>Business Facts</h2>
-              <div class="metric"><span>Category</span><strong>Auto Services</strong></div>
-              <div class="metric"><span>Niche</span><strong>Auto Repair/maintenance</strong></div>
-              <div class="metric"><span>License type</span><strong>Automotive / Auto Repair/maintenance</strong></div>
-              <div class="metric"><span>Price mode</span><strong>Contact for quote</strong></div>
-              <div class="metric"><span>Languages</span><strong>English</strong></div>
-              <div class="metric"><span>Requests</span><strong>Accepted</strong></div>
-            </article>
-
-            <article class="fact-card">
-              <h2>Contact</h2>
-              <div class="metric"><span>Phone</span><strong>(623) 582-5626</strong></div>
-              <div class="metric"><span>Address</span><strong>3440 W. Union Hills Rd., Phoenix, AZ 85027</strong></div>
-              <div class="metric"><span>Website</span><strong>Not listed in source record</strong></div>
-              <div class="metric"><span>Email</span><strong>Not listed in source record</strong></div>
-            </article>
-          </aside>
-        </section>
-
-        <section class="section-grid" aria-label="Verification and SkyEmail">
-          <article class="source-panel">
-            <h2>Owner Research Ledger</h2>
-            <p>Owner-researched verified status: public directory verified source, unclaimed Valley Verified record, and no owner-submitted contact expansion in the imported data.</p>
-            <ul class="source-list">
-              <li>Last verified: 2026-05-19</li>
-              <li>Source file: seed/businesses/inbox/valley_verified_public_lead_build_2026-05-19_v4.csv</li>
-              <li>Source lines: L231-L236</li>
-              <li>Source hash: 99b80e9d482b</li>
-              <li>Source policy: public directory/company listing only; no synthetic contacts or guessed emails.</li>
-              <li>Moderation note: no website or booking URL in the source record.</li>
-            </ul>
-          </article>
-
-          <article class="skyemail-panel">
-            <div class="seat-banner">
-              <span>SkyEmail acceptance panel</span>
-              <strong>9 seats left</strong>
-            </div>
-            <h2>SkyEmail Workspace</h2>
-            <p>Use the shared 0S lane to accept free SkyEmail account access for the team. There is no separate business password on this page.</p>
-            <ul class="skyemail-list">
-              <li>sign in through shared 0S/SkyGate using the owner-approved session.</li>
-              <li>notify owner to provision workspace after the team accepts the free SkyEmail account.</li>
-              <li>team activation within 24 hours after provisioning.</li>
-              <li>K4i escalation after 24 hours if the workspace is not active.</li>
-              <li>warn at 2 remaining seats and buy in groups of 5 for additional team capacity.</li>
-            </ul>
-            <div class="hero-actions">
-              <a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&business=firestone-complete-auto-care-phoenix-85027-99b80e9">Accept SkyEmail</a>
-            </div>
-          </article>
-        </section>
-
-        <p class="footer-note">Valley Verified presents this record from owner research and public directory source material. Contact Firestone Complete Auto Care directly before making automotive service, scheduling, or pricing decisions.</p>
-      </div>
-    </main>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firestone Complete Auto Care | Valley Verified Phoenix</title>
+<meta name="description" content="Firestone Complete Auto Care Valley Verified page: source-backed Tire sales and tire pricing requests, Oil and filter changes, and Wheel alignment details, cust">
+<link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/firestone-complete-auto-care-phoenix-85027-99b80e9/">
+<style> :root { color-scheme: light; --ink:#162127; --muted:#5b6870; --paper:#f7f4ec; --panel:#fffaf0; --panel2:#ffffff; --line:#d8ddda; --green:#1f6a5b; --brick:#a83f32; --gold:#cf9a2d; --blue:#254d66; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; } * { box-sizing: border-box; } body { margin:0; background:var(--paper); color:var(--ink); } a { color:inherit; } .page { min-height:100vh; background:linear-gradient(135deg, rgba(31,106,91,.12), transparent 30%), linear-gradient(160deg, #f7f4ec 0%, #eef4f1 52%, #fff8df 100%); } .shell { width:min(1160px, calc(100% - 32px)); margin:0 auto; } .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 0; } .brand { display:inline-flex; align-items:center; gap:10px; font-weight:900; text-decoration:none; } .mark { display:grid; place-items:center; width:38px; height:38px; border:1px solid rgba(22,33,39,.18); border-radius:8px; background:#fff; color:var(--green); } .chip { display:inline-flex; align-items:center; min-height:34px; padding:7px 12px; border:1px solid rgba(22,33,39,.16); border-radius:999px; background:rgba(255,255,255,.74); color:var(--blue); font-size:.86rem; font-weight:850; } .hero { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(310px,.9fr); gap:22px; align-items:stretch; padding:34px 0 22px; } .hero-main, .snapshot, .panel, .skyemail { border:1px solid rgba(22,33,39,.12); border-radius:8px; background:rgba(255,255,255,.9); box-shadow:0 22px 60px rgba(22,33,39,.11); } .hero-main { display:flex; min-height:450px; flex-direction:column; justify-content:space-between; padding:clamp(26px,5vw,54px); } .eyebrow { margin:0 0 12px; color:var(--brick); font-size:.78rem; font-weight:950; letter-spacing:.08em; text-transform:uppercase; } h1 { max-width:820px; margin:0; font-size:clamp(2.4rem,6vw,5.7rem); line-height:.96; letter-spacing:0; } .lede { max-width:780px; margin:22px 0 0; color:var(--muted); font-size:clamp(1.02rem,2vw,1.2rem); line-height:1.68; } .verify { margin-top:20px; padding:16px 18px; border-left:4px solid var(--green); background:#f3faf6; color:#27423a; line-height:1.65; } .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; } .button { display:inline-flex; min-height:44px; align-items:center; justify-content:center; padding:11px 15px; border:1px solid rgba(37,77,102,.24); border-radius:8px; background:#fff; color:var(--blue); font-weight:900; text-decoration:none; } .button.primary { border-color:transparent; background:var(--green); color:#fff; } .button.ghost { background:transparent; } .hero-aside { display:grid; gap:14px; } .snapshot, .panel, .skyemail { padding:clamp(20px,3vw,30px); } h2 { margin:0 0 14px; font-size:1.15rem; letter-spacing:0; } .metric { display:grid; grid-template-columns:1fr auto; gap:14px; padding:12px 0; border-top:1px solid var(--line); } .metric:first-of-type { border-top:0; padding-top:0; } .metric span { color:var(--muted); } .metric strong { text-align:right; } .grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; padding:18px 0; } .wide { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.72fr); gap:16px; padding:0 0 36px; } ul { margin:0; padding-left:20px; } li { margin:8px 0; line-height:1.58; } .source-list { display:grid; gap:10px; padding:0; list-style:none; } .source-list li { margin:0; padding:13px 14px; border:1px solid var(--line); border-radius:8px; background:#fffdf8; } .source-list a { display:block; color:var(--blue); font-weight:900; text-decoration:none; } .source-list span { display:block; margin-top:5px; color:var(--muted); font-size:.93rem; line-height:1.52; } .skyemail { background:linear-gradient(145deg,#ffffff 0%,#fff3d4 100%); } .skyemail p, .panel p { color:var(--muted); line-height:1.65; } .footer-note { padding:0 0 34px; color:var(--muted); font-size:.92rem; line-height:1.6; } @media (max-width:900px){ .hero,.grid,.wide{grid-template-columns:1fr;} .hero-main{min-height:auto;} .metric{grid-template-columns:1fr;gap:4px;} .metric strong{text-align:left;} .topbar{align-items:flex-start;flex-direction:column;} } </style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"AutoRepair","name":"Firestone Complete Auto Care","telephone":"(623) 432-9616","address":"3440 W Union Hills Dr, Phoenix, AZ 85027","areaServed":"Phoenix, AZ 85027, centered on the 3440 W Union Hills Dr store","url":"https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/firestone-complete-auto-care-phoenix-85027-99b80e9/","sameAs":["https://www.firestonecompleteautocare.com/arizona/phoenix/3440-w-union-hills-dr/","https://business.phoenixchamber.com/list/member/firestone-complete-auto-care-91204.htm"]}</script>
+</head>
+<body data-static-hand-page="true">
+<main class="page">
+<div class="shell">
+<header class="topbar" aria-label="Valley Verified header">
+<a class="brand" href="/valley-verified/"><span class="mark">VV</span><span>Valley Verified</span></a>
+<span class="chip">Skyes Over London verified read</span>
+</header>
+<section class="hero" aria-labelledby="business-name">
+<div class="hero-main">
+<div>
+<p class="eyebrow">Phoenix / Auto Repair/maintenance</p>
+<h1 id="business-name">Firestone Complete Auto Care</h1>
+<p class="lede">Tires, maintenance, and repair at Firestone Complete Auto Care on W Union Hills Dr</p>
+<p class="verify"><strong>Why Valley Verified:</strong> Skyes Over London says this page is Valley Verified because Tires &amp; Auto Services at 3440 W Union Hills Dr in Phoenix, AZ | Firestone Complete Auto Care and the local Valley Verified source record support the business identity, service category, and customer contact path for Tire sales and tire pricing requests, Oil and filter changes, and Wheel alignment. The page stays conservative where a source is thin, stale, or needs a direct customer confirmation.</p>
+</div>
+<nav class="actions" aria-label="Primary customer actions">
+<a class="button primary" href="tel:+16234329616">Call (623) 432-9616</a>
+<a class="button" href="https://www.firestonecompleteautocare.com/arizona/phoenix/3440-w-union-hills-dr/" rel="noopener">Open Official Source</a>
+<a class="button ghost" href="https://www.firestonecompleteautocare.com/arizona/phoenix/3440-w-union-hills-dr/" rel="noopener">View Source</a>
+</nav>
+</div>
+<aside class="hero-aside" aria-label="Verification snapshot">
+<article class="snapshot">
+<h2>Customer Snapshot</h2>
+<div class="metric"><span>Primary work</span><strong>Tire sales and tire pricing requests, Oil and filter changes, Wheel alignment, and Tire rotation, replacement, and flat repair</strong></div>
+<div class="metric"><span>Source confidence</span><strong>Source-backed</strong></div>
+<div class="metric"><span>Source count</span><strong>2</strong></div>
+<div class="metric"><span>Service area</span><strong>Phoenix, AZ 85027, centered on the 3440 W Union Hills Dr store</strong></div>
+<div class="metric"><span>Best contact</span><strong>(623) 432-9616</strong></div>
+</article>
+<article class="snapshot">
+<h2>Contact Facts</h2>
+<div class="metric"><span>Address</span><strong>3440 W Union Hills Dr, Phoenix, AZ 85027</strong></div>
+<div class="metric"><span>Phone</span><strong>(623) 432-9616</strong></div>
+<div class="metric"><span>Local category</span><strong>Auto Services</strong></div>
+<div class="metric"><span>Subcategory</span><strong>Auto Repair/maintenance</strong></div>
+</article>
+</aside>
+</section>
+<section class="grid" aria-label="Customer verification details">
+<article class="panel">
+<p class="eyebrow">What Customers Can Use</p>
+<h2>Specific services found in sources</h2>
+<ul><li>Tire sales and tire pricing requests</li>
+<li>Oil and filter changes</li>
+<li>Wheel alignment</li>
+<li>Tire rotation, replacement, and flat repair</li>
+<li>Complete vehicle inspections</li>
+<li>A/C service</li>
+<li>Brake inspection and brake service</li></ul>
+</article>
+<article class="panel">
+<p class="eyebrow">Best Fit</p>
+<h2>Who this page is for</h2>
+<ul><li>Phoenix drivers near Union Hills</li>
+<li>Commuters needing tire or repair appointments</li>
+<li>Vehicle owners comparing maintenance, inspection, and repair options</li>
+<li>Drivers seeking online scheduling before visiting the store</li></ul>
+</article>
+<article class="panel">
+<p class="eyebrow">Proof Points</p>
+<h2>Why the record is credible</h2>
+<ul><li>Official Firestone page confirms store #784286 at 3440 W Union Hills Dr.</li>
+<li>Official page lists online appointment and tire-pricing actions.</li>
+<li>Greater Phoenix Chamber lists the store under auto repair/maintenance and auto services.</li>
+<li>Official Firestone location page confirms the store address and official current phone.</li>
+<li>Greater Phoenix Chamber listing confirms this location and its auto repair/maintenance category.</li>
+<li>Official page identifies the location as store #784286.</li>
+<li>Local Valley Verified record last verified 2026-05-19.</li></ul>
+</article>
+</section>
+<section class="wide" id="sources" aria-label="Sources and customer checks">
+<article class="panel">
+<p class="eyebrow">Research Ledger</p>
+<h2>Source-backed details</h2>
+<p>Valley Verified keeps the customer-facing claim tied to public evidence. These are the sources used for this page, with official sources preferred when they could be matched confidently.</p>
+<ul class="source-list"><li><a href="https://www.firestonecompleteautocare.com/arizona/phoenix/3440-w-union-hills-dr/" rel="noopener">Tires &amp; Auto Services at 3440 W Union Hills Dr in Phoenix, AZ | Firestone Complete Auto Care</a><span>official_location_page - Official location page confirms store #784286 at 3440 W Union Hills Dr, Phoenix, AZ 85027, current official phone (623) 432-9616, online appointment paths, tire pricing path, and services including oil changes, wheel alignment, tire rotation, tire replacement, flat repair, inspections, A/C service, brakes, and EV/hybrid services.</span></li>
+<li><a href="https://business.phoenixchamber.com/list/member/firestone-complete-auto-care-91204.htm" rel="noopener">Firestone Complete Auto Care | Greater Phoenix Chamber</a><span>directory - Chamber listing confirms the 3440 W Union Hills Rd Phoenix location, auto repair/maintenance and auto services categories, website link, and directory phone (623) 582-5626. It describes Firestone as a full auto repair package covering tires, oil changes, alignments, and brakes.</span></li></ul>
+</article>
+<aside class="panel">
+<p class="eyebrow">Before You Decide</p>
+<h2>Confirm these details directly</h2>
+<ul><li>Are the desired tires in stock at this store today?</li>
+<li>What are the current store hours and holiday hours?</li>
+<li>Which coupons, financing, or warranty options apply?</li>
+<li>Is an appointment required for the requested repair or inspection?</li>
+<li>Official page offers a tire-pricing path and quote/scheduling actions, but static service prices were not confirmed.</li>
+<li>Pricing should be confirmed directly before purchase, booking, or engagement.</li></ul>
+<h2 style="margin-top:22px;">Source Cautions</h2><ul><li>Phone mismatch: the official Firestone location page lists (623) 432-9616, while the local Valley Verified/Chamber record lists (623) 582-5626. Landing copy should prefer the official location page phone and note the directory number only if needed.</li>
+<li>Store-specific hours were not reliably visible in the static official page render; confirm hours on the live Firestone page before publishing time-sensitive copy.</li>
+<li>Static service pricing was not confirmed; use the official tire-pricing, quote, and scheduling paths rather than fixed prices.</li></ul>
+</aside>
+</section>
+<section class="wide" aria-label="Valley Verified handoff">
+<article class="panel">
+<p class="eyebrow">Valley Verified Read</p>
+<h2>What Skyes Over London is actually saying</h2>
+<p>This is a customer proof page, not an owner claim page. The useful claim is narrow: Firestone Complete Auto Care has a Valley Verified public record, source-backed contact facts, and enough public context for a customer to know what to ask next. Where sources disagree, the page tells customers to confirm before relying on the detail.</p>
+</article>
+<aside class="skyemail">
+<p class="eyebrow">Owner Handoff</p>
+<h2>Accept SkyEmail</h2>
+<p>Business owners can use the shared 0S/SkyGate lane to accept the reserved SkyEmail workspace. Customers do not need SkyEmail to evaluate this listing.</p>
+<div class="actions"><a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=firestone-complete-auto-care-phoenix-85027-99b80e9">Accept SkyEmail</a></div>
+</aside>
+</section>
+<p class="footer-note">Research reviewed 2026-05-30. Valley Verified pages are source-grounded customer guides; contact Firestone Complete Auto Care directly before making service, medical, legal, financial, travel, or purchase decisions.</p>
+</div>
+</main>
+</body>
 </html>

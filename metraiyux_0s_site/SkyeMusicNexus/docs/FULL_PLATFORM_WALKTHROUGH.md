@@ -16,7 +16,7 @@ Open `public/signup.html` to begin artist intake. The launch record should colle
 
 ## 3. Creation Pass
 
-Open `public/create.html` to choose the creation move. From there, open `public/daw.html` for the native creation room. The DAW supports transport, arrangement, tracks, mixer, pads, keys, audio import/decode/preview, mic and MIDI hooks, browser mixdown, project save, and manifest export.
+Open `public/daw.html` to choose the creation move. From there, open `public/daw.html` for the native creation room. The DAW supports transport, arrangement, tracks, mixer, pads, keys, audio import/decode/preview, mic and MIDI hooks, browser mixdown, project save, and manifest export.
 
 Use `public/stems.html` to stage stems, references, arrangement notes, and gated project save handoff. Use `public/exports.html` to build a portable project packet for Release Forge.
 

@@ -1,5 +1,10 @@
-const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const {
+  getBearer: getGateBearer,
+  requireFs27,
+  ensureSkyeMailUser,
+  sessionFromGateUser
+} = require("./_skygate");
 
 function json(statusCode, body){
   return {
@@ -19,24 +24,23 @@ function requireEnv(name){
 }
 
 function getBearer(event){
-  const h = event.headers && (event.headers.authorization || event.headers.Authorization);
-  if(!h) return "";
-  const m = String(h).match(/^Bearer\s+(.+)$/i);
-  return m ? m[1] : "";
+  return getGateBearer(event);
 }
 
-function verifyAuth(event){
+async function verifyAuth(event, options = {}){
   const token = getBearer(event);
   if(!token) {
     const err = new Error("Unauthorized");
     err.statusCode = 401;
     throw err;
   }
-  const secret = requireEnv("JWT_SECRET");
   try{
-    return jwt.verify(token, secret);
+    const claims = await requireFs27(event, options);
+    const user = await ensureSkyeMailUser(claims);
+    return sessionFromGateUser(user, claims, token);
   }catch(e){
-    const err = new Error("Unauthorized");
+    if(e && e.statusCode) throw e;
+    const err = new Error(e?.message || "Unauthorized");
     err.statusCode = 401;
     throw err;
   }
@@ -124,7 +128,8 @@ function hybridEncryptBytesNode(publicKeyPem, bytesBuffer){
 
 
 function getTokenCipherKey(){
-  const seed = String(process.env.GOOGLE_TOKEN_ENCRYPTION_KEY || requireEnv("JWT_SECRET"));
+  const seed = String(process.env.GOOGLE_TOKEN_ENCRYPTION_KEY || process.env.SKYEMAIL_TOKEN_ENCRYPTION_KEY || "");
+  if(!seed) throw new Error("GOOGLE_TOKEN_ENCRYPTION_KEY or SKYEMAIL_TOKEN_ENCRYPTION_KEY env var missing.");
   return crypto.createHash("sha256").update(seed).digest();
 }
 

@@ -117,19 +117,106 @@ function vaultBaseUrl() {
   return clean(process.env.SKYEVAULT_DROP_URL || process.env.SKYEVAULT_PROVISIONING_URL || "", 400).replace(/\/$/, "");
 }
 
-function provisioningSecret() {
-  return clean(process.env.SKYEVAULT_PROVISIONING_SECRET || process.env.PROVISIONING_SHARED_SECRET || "", 400);
+function normalizeBearer(value) {
+  return clean(value, 4096).replace(/^Bearer\s+/i, "");
 }
 
-async function maybeProvisionVaultWorkspace(body, { customer, user }) {
+function requestBearer(req) {
+  const auth = clean(req.headers.get("authorization") || req.headers.get("Authorization") || "", 4096);
+  const bearer = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  return normalizeBearer(
+    bearer
+      || req.headers.get("x-skye-gate-session")
+      || req.headers.get("x-skygate-session")
+      || req.headers.get("x-free99-gate-session")
+      || req.headers.get("x-fs27-session")
+  );
+}
+
+function firstEnv(names = []) {
+  for (const name of names) {
+    const value = normalizeBearer(process.env[name]);
+    if (value) return { name, value };
+  }
+  return { name: "", value: "" };
+}
+
+function fs27Origin() {
+  return clean(
+    process.env.SKYGATEFS27_ORIGIN
+      || process.env.SKYGATEFS27_WORKER_ORIGIN
+      || process.env.FS27_LIVE_BASE
+      || process.env.URL
+      || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+    400
+  ).replace(/\/$/, "");
+}
+
+function adminEmail() {
+  return clean(
+    process.env.FS27_ADMIN_EMAIL
+      || process.env.SKYGATEFS27_ADMIN_EMAIL
+      || process.env.SKYGATE_ADMIN_EMAIL
+      || process.env.METRAIYUX_OWNER_EMAIL
+      || process.env.METRAIYUX_ADMIN_EMAIL,
+    254
+  ).toLowerCase();
+}
+
+function adminPassword() {
+  return clean(
+    process.env.FS27_ADMIN_PASSWORD
+      || process.env.SKYGATEFS27_ADMIN_PASSWORD
+      || process.env.SKYGATE_ADMIN_PASSWORD
+      || process.env.SKYGATEFS13_ADMIN_PASSWORD
+      || process.env.ADMIN_PASSWORD,
+    400
+  );
+}
+
+async function loginProvisioningBearer() {
+  const email = adminEmail();
+  const password = adminPassword();
+  if (!email || !password) return { token: "", source: "" };
+  const response = await fetch(`${fs27Origin()}/admin/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await response.json().catch(() => ({}));
+  const token = normalizeBearer(data.gateToken || data.gateBearerToken || data.session?.token || data.token || "");
+  if (!response.ok || !token) {
+    const error = new Error(data.error || `FS27 admin login failed with ${response.status}.`);
+    error.status = response.status;
+    throw error;
+  }
+  return { token, source: "fs27-admin-login" };
+}
+
+async function provisioningBearer(req) {
+  const fromRequest = requestBearer(req);
+  if (fromRequest) return { token: fromRequest, source: "request-shared-gate" };
+  const direct = firstEnv([
+    "SKYEVAULT_PROVISIONING_GATE_BEARER",
+    "SKYEVAULT_GATE_BEARER",
+    "ZERO_OS_GATE_SESSION",
+    "FREE99_GATE_SESSION",
+    "MCP_GATE_SESSION"
+  ]);
+  if (direct.value) return { token: direct.value, source: direct.name };
+  return loginProvisioningBearer();
+}
+
+async function maybeProvisionVaultWorkspace(body, { customer, user, req }) {
   if (body.provision_vault_workspace !== true && body.provisionVaultWorkspace !== true) {
     return { requested: false };
   }
   const baseUrl = vaultBaseUrl();
-  const secret = provisioningSecret();
-  if (!baseUrl || !secret) {
-    return { requested: true, ok: false, error: "SkyeVault provisioning env is not configured." };
+  const bearer = await provisioningBearer(req);
+  if (!baseUrl || !bearer.token) {
+    return { requested: true, ok: false, error: "SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared FS27/SkyGate bearer or admin login env." };
   }
+  const gateBearer = bearer.token.replace(/^Bearer\s+/i, "");
   const companyName = clean(body.company_name || body.companyName || body.client_name || body.clientName || customer.email, 180);
   const workspaceId = safeSlug(body.workspace_id || body.workspaceId || body.workspace_slug || body.workspaceSlug || companyName || customer.email);
   const payload = {
@@ -150,7 +237,10 @@ async function maybeProvisionVaultWorkspace(body, { customer, user }) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-skyevault-provisioning-secret": secret
+      authorization: `Bearer ${gateBearer}`,
+      "x-skye-gate-session": gateBearer,
+      "x-free99-gate-session": gateBearer,
+      "x-skyepay-lane": "admin-client-provisioning"
     },
     body: JSON.stringify(payload)
   });
@@ -158,7 +248,7 @@ async function maybeProvisionVaultWorkspace(body, { customer, user }) {
   if (!response.ok || data.ok === false) {
     return { requested: true, ok: false, status: response.status, error: data.error || `SkyeVault provisioning failed with ${response.status}.` };
   }
-  return { requested: true, ok: true, ...data };
+  return { requested: true, ok: true, gate_source: bearer.source || "shared-gate", ...data };
 }
 
 function publicUser(user) {
@@ -260,7 +350,7 @@ export default wrap(async (req) => {
     });
   }
 
-  const vault = await maybeProvisionVaultWorkspace(body, { customer: customerResult.customer, user });
+  const vault = await maybeProvisionVaultWorkspace(body, { customer: customerResult.customer, user, req });
   const origin = clean(body.origin || req.headers.get("origin") || new URL(req.url).origin, 400).replace(/\/$/, "");
   const notification = await sendProvisioningEmail(user, {
     temporaryPassword,

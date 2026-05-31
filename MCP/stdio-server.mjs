@@ -410,6 +410,67 @@ function readText(filePath, maxBytes = 250_000) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+function cleanBearer(value = '') {
+  return String(value || '').replace(/^Bearer\s+/i, '').trim();
+}
+
+function skynetApiBase() {
+  return String(runtimeProcess.env.SKYENET_API || 'https://skyenet.graylondonskyes.workers.dev/api/skyenet').replace(/\/+$/, '');
+}
+
+function skynetGateToken() {
+  return cleanBearer(
+    runtimeProcess.env.SKYENET_AUTH
+    || runtimeProcess.env.ZERO_OS_GATE_SESSION
+    || runtimeProcess.env.MCP_GATE_SESSION
+    || runtimeProcess.env.QUANTUMSKYES_MCP_TOKEN
+    || runtimeProcess.env.MCP_HTTP_BEARER_TOKEN
+    || runtimeProcess.env.NORTHSTAR_SESSION_TOKEN
+    || ''
+  );
+}
+
+function skynetSourceParams(args = {}) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(args || {})) {
+    if (value === undefined || value === null || value === '') continue;
+    params.set(key, String(value));
+  }
+  return params;
+}
+
+async function skynetApiFetch(pathname, args = {}) {
+  const token = skynetGateToken();
+  if (!token) {
+    throw new Error('SkyeNet MCP source tools require SKYENET_AUTH, ZERO_OS_GATE_SESSION, MCP_GATE_SESSION, QUANTUMSKYES_MCP_TOKEN, MCP_HTTP_BEARER_TOKEN, or NORTHSTAR_SESSION_TOKEN.');
+  }
+  const url = new URL(`${skynetApiBase()}${pathname.startsWith('/') ? pathname : `/${pathname}`}`);
+  const params = skynetSourceParams(args);
+  for (const [key, value] of params.entries()) url.searchParams.set(key, value);
+  const response = await fetch(url, {
+    headers: {
+      accept: 'application/json',
+      authorization: `Bearer ${token}`,
+      'x-skye-gate-session': token,
+      'x-free99-gate-session': token
+    }
+  });
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+  const data = contentType.includes('application/json') && text
+    ? JSON.parse(text)
+    : { ok: response.ok, text };
+  const payload = data.skynet || data;
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(`SkyeNet source API ${response.status}: ${payload?.error || payload?.code || 'request failed'}`);
+  }
+  return payload;
+}
+
+function skynetToolText(value) {
+  return { content: [{ type: 'text', text: JSON.stringify(value, null, 2) }] };
+}
+
 function textResource(uri, text, mimeType = 'text/markdown') {
   return {
     contents: [
@@ -2358,6 +2419,111 @@ server.registerTool('repo_read', {
   const filePath = safeJoin(repoRoot, requestedPath);
   return { content: [{ type: 'text', text: readText(filePath) }] };
 });
+
+server.registerTool('skyenet_source_status', {
+  title: 'SkyeNet Source MCP Status',
+  description: 'Show whether the read-only SkyeNet source custody MCP tools have shared gate auth configured. Does not echo bearer tokens.',
+  inputSchema: {}
+}, async () => skynetToolText({
+  ok: true,
+  api_base: skynetApiBase(),
+  shared_gate_token_configured: Boolean(skynetGateToken()),
+  auth_env_names: [
+    'SKYENET_AUTH',
+    'ZERO_OS_GATE_SESSION',
+    'MCP_GATE_SESSION',
+    'QUANTUMSKYES_MCP_TOKEN',
+    'MCP_HTTP_BEARER_TOKEN',
+    'NORTHSTAR_SESSION_TOKEN'
+  ],
+  read_only_tools: [
+    'skyenet_list_codebases',
+    'skyenet_source_manifest',
+    'skyenet_source_tree',
+    'skyenet_source_file',
+    'skyenet_source_search'
+  ],
+  custody_rule: 'Uses the shared FS27/SkyGate/Free99 bearer lane only; no SkyeNet-specific password is accepted.'
+}));
+
+server.registerTool('skyenet_list_codebases', {
+  title: 'List SkyeNet Codebases',
+  description: 'List account-scoped SkyeNet deployments with private source custody metadata from the gated dashboard API.',
+  inputSchema: {
+    workspace_id: z.string().optional().describe('Optional SkyeNet workspace id'),
+    project_id: z.string().optional().describe('Optional project id to filter client-side')
+  }
+}, async ({ workspace_id, project_id } = {}) => {
+  const dashboard = await skynetApiFetch('/dashboard', { workspace_id });
+  const deployments = Array.isArray(dashboard.deployments) ? dashboard.deployments : [];
+  const filtered = project_id ? deployments.filter((item) => item?.project_id === project_id) : deployments;
+  return skynetToolText({
+    ok: true,
+    workspace_id: dashboard.workspace?.workspace_id || workspace_id || '',
+    count: filtered.length,
+    codebases: filtered.map((deployment) => ({
+      project_id: deployment.project_id || '',
+      deployment_id: deployment.deployment_id || '',
+      status: deployment.status || '',
+      live_url: deployment.live_url || '',
+      source_manifest_url: deployment.source_manifest_url || '',
+      source_tree_url: deployment.source_tree_url || '',
+      source_search_url: deployment.source_search_url || '',
+      source_custody: deployment.source_custody || null
+    }))
+  });
+});
+
+server.registerTool('skyenet_source_manifest', {
+  title: 'Read SkyeNet Source Manifest',
+  description: 'Read a paged file manifest for a gated SkyeNet source codebase.',
+  inputSchema: {
+    workspace_id: z.string().optional(),
+    project_id: z.string(),
+    deployment_id: z.string(),
+    prefix: z.string().optional().describe('Optional source path prefix'),
+    limit: z.number().int().positive().max(5000).optional(),
+    cursor: z.string().optional()
+  }
+}, async (args) => skynetToolText(await skynetApiFetch('/source-manifest', args)));
+
+server.registerTool('skyenet_source_tree', {
+  title: 'Read SkyeNet Source Tree',
+  description: 'Read a directory-like tree page for a gated SkyeNet source codebase.',
+  inputSchema: {
+    workspace_id: z.string().optional(),
+    project_id: z.string(),
+    deployment_id: z.string(),
+    prefix: z.string().optional().describe('Optional source tree prefix'),
+    limit: z.number().int().positive().max(5000).optional(),
+    cursor: z.string().optional()
+  }
+}, async (args) => skynetToolText(await skynetApiFetch('/source-tree', args)));
+
+server.registerTool('skyenet_source_file', {
+  title: 'Read SkyeNet Source File',
+  description: 'Read one bounded file from a gated SkyeNet source codebase using the JSON source-file API.',
+  inputSchema: {
+    workspace_id: z.string().optional(),
+    project_id: z.string(),
+    deployment_id: z.string(),
+    path: z.string().describe('Source file path inside the private source package')
+  }
+}, async (args) => skynetToolText(await skynetApiFetch('/source-file', args)));
+
+server.registerTool('skyenet_source_search', {
+  title: 'Search SkyeNet Source',
+  description: 'Search file paths and small text files in a gated SkyeNet source codebase.',
+  inputSchema: {
+    workspace_id: z.string().optional(),
+    project_id: z.string(),
+    deployment_id: z.string(),
+    q: z.string().min(1),
+    prefix: z.string().optional(),
+    content: z.boolean().optional().describe('When false, search paths only'),
+    limit: z.number().int().positive().max(250).optional()
+  }
+}, async (args) => skynetToolText(await skynetApiFetch('/source-search', args)));
 
 server.registerTool('design_apply_mcp_parts', {
   title: 'Apply MCP Parts To Target',

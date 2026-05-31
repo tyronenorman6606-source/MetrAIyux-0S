@@ -5,7 +5,9 @@ SkyeWebCreatorMax is the SkyeDocxMax-style standalone platform for website, UI, 
 It is designed to work in two modes:
 
 1. **Standalone mode** - runs as a local/offline-first PWA with browser persistence.
-2. **SkyeHands connected mode** - sends project requests, generated artifacts, and client delivery handoffs through the SkyeHands platform bus.
+2. **Shared-gated connected mode** - sends project requests, generated artifacts, and client delivery handoffs through the 0S Worker at `/api/marketing-made-easy/webcreator-runtime/*`.
+
+The extensionless files such as `health`, `status`, `queue`, `review-board`, `execution-board`, `dispatch-board`, `handoff-packs`, `v1/runtime-summary`, and `v1/sessions` are static route contracts. They are not live telemetry, customer visibility, live sessions, or downstream delivery proof. Live/current state must come from the shared FS27/SkyGate/Free99-gated Worker APIs.
 
 ## System Role
 
@@ -28,7 +30,13 @@ It uses SkyDexia and the Design Vault as the design intelligence layer:
 
 ## Connected Runtime
 
-The code-backed bridge is:
+The production Worker runtime is:
+
+```txt
+/api/marketing-made-easy/webcreator-runtime/*
+```
+
+The older code-backed bridge for local/bus proof is:
 
 ```txt
 skyehands_runtime_control/core/webcreator/skyewebcreator-bridge.mjs
@@ -63,4 +71,3 @@ Run the standalone package smoke:
 ```bash
 node AbovetheSkye-Platforms/SkyeWebCreatorMax/smoke/smoke-release-checks.mjs
 ```
-

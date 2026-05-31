@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { PlatformEngine } from './platform-engine.mjs';
-import { claimsFromHeaders, signClaims } from './lib/claims.mjs';
+import { claimsFromRequest } from './lib/claims.mjs';
 import { verifyWebhookRequest } from './lib/webhooks.mjs';
 import { openApiDocument, validateBodyForRoute } from './lib/openapi.mjs';
 
@@ -30,15 +30,23 @@ async function route(req, res, engine){
   const pathname = url.pathname;
 
   if (req.method === 'GET' && pathname === '/api/health') return json(res, 200, engine.health());
-  if (req.method === 'GET' && pathname === '/api/platform/manifest') return json(res, 200, {ok:true, manifest:engine.manifest});
   if (req.method === 'GET' && pathname === '/api/platform/openapi.json') return json(res, 200, openApiDocument());
+  if (pathname.startsWith('/api/platform/') && process.env.CODESTUDIO_ALLOW_UNSIGNED_DEV_CLAIMS !== '1') {
+    const claims = await claimsFrom(req, {});
+    if (!claims) {
+      const err = new Error('FS27/SkyGate bearer or signed upstream claims are required.');
+      err.status = 401;
+      throw err;
+    }
+  }
+  if (req.method === 'GET' && pathname === '/api/platform/manifest') return json(res, 200, {ok:true, manifest:engine.manifest});
   if (req.method === 'GET' && pathname === '/api/platform/receipts') return json(res, 200, {ok:true, receipts:engine.receiptsList(Number(url.searchParams.get('limit') || 100))});
   if (req.method === 'GET' && pathname === '/api/platform/providers/probe') return json(res, 200, {ok:true, providers:engine.registry.probeAll(), mode:engine.mode()});
   if (req.method === 'GET' && pathname === '/api/platform/provider-packs') return json(res, 200, {ok:true, packs:await engine.listProviderPacks()});
   if (req.method === 'GET' && pathname === '/api/platform/storage') return json(res, 200, {ok:true, active:engine.data.adapter || {id:'json'}, available:engine.health().storage.available, stats:engine.data.stats()});
   if (req.method === 'POST' && pathname === '/api/platform/storage/verify'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.verifyStorageAdapter(claimsFrom(req, body));
+    const result = await engine.verifyStorageAdapter(await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
   if (req.method === 'GET' && pathname === '/api/platform/webhooks/dispatch-rules') return json(res, 200, {ok:true, rules:engine.listWebhookDispatchRules()});
@@ -46,24 +54,24 @@ async function route(req, res, engine){
   const providerActionRun = pathname.match(/^\/api\/platform\/provider-packs\/([^/]+)\/actions\/(.+)\/run$/);
   if (req.method === 'POST' && providerActionRun){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.runProviderPackAction(body.projectId || body.input?.projectId || 'default', decodeURIComponent(providerActionRun[1]), decodeURIComponent(providerActionRun[2]), body, claimsFrom(req, body));
+    const result = await engine.runProviderPackAction(body.projectId || body.input?.projectId || 'default', decodeURIComponent(providerActionRun[1]), decodeURIComponent(providerActionRun[2]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'GET' && pathname === '/api/platform/projects'){
-    return json(res, 200, {ok:true, projects:engine.listProjects(claimsFrom(req, {})), store:engine.data.stats()});
+    return json(res, 200, {ok:true, projects:engine.listProjects(await claimsFrom(req, {})), store:engine.data.stats()});
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/projects'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.upsertProject(body.project || body, claimsFrom(req, body));
+    const result = await engine.upsertProject(body.project || body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const projectProviderList = pathname.match(/^\/api\/platform\/projects\/([^/]+)\/providers$/);
   if (req.method === 'GET' && projectProviderList){
     const projectId = decodeURIComponent(projectProviderList[1]);
-    const installs = engine.listProviderInstalls(projectId, claimsFrom(req, {}));
+    const installs = engine.listProviderInstalls(projectId, await claimsFrom(req, {}));
     return json(res, 200, {ok:true, projectId, installs});
   }
 
@@ -72,21 +80,21 @@ async function route(req, res, engine){
     const body = await readValidatedJson(req, pathname);
     const projectId = decodeURIComponent(projectProviderInstall[1]);
     const providerId = decodeURIComponent(projectProviderInstall[2]);
-    const result = await engine.installProvider(projectId, {...body, providerId}, claimsFrom(req, body));
+    const result = await engine.installProvider(projectId, {...body, providerId}, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const projectPackInstall = pathname.match(/^\/api\/platform\/projects\/([^/]+)\/provider-packs\/([^/]+)\/install$/);
   if (req.method === 'POST' && projectPackInstall){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.installProviderPack(decodeURIComponent(projectPackInstall[1]), decodeURIComponent(projectPackInstall[2]), body, claimsFrom(req, body));
+    const result = await engine.installProviderPack(decodeURIComponent(projectPackInstall[1]), decodeURIComponent(projectPackInstall[2]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const projectProviderRotate = pathname.match(/^\/api\/platform\/projects\/([^/]+)\/providers\/([^/]+)\/rotate$/);
   if (req.method === 'POST' && projectProviderRotate){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.rotateProvider(decodeURIComponent(projectProviderRotate[1]), decodeURIComponent(projectProviderRotate[2]), claimsFrom(req, body));
+    const result = await engine.rotateProvider(decodeURIComponent(projectProviderRotate[1]), decodeURIComponent(projectProviderRotate[2]), await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -105,7 +113,7 @@ async function route(req, res, engine){
   const approvalResolve = pathname.match(/^\/api\/platform\/approvals\/([^/]+)\/resolve$/);
   if (req.method === 'POST' && approvalResolve){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.resolveApproval(decodeURIComponent(approvalResolve[1]), body, claimsFrom(req, body));
+    const result = await engine.resolveApproval(decodeURIComponent(approvalResolve[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 404, result);
   }
 
@@ -115,34 +123,34 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/jobs'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.enqueueJob(body, claimsFrom(req, body));
+    const result = await engine.enqueueJob(body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const jobRun = pathname.match(/^\/api\/platform\/jobs\/([^/]+)\/run$/);
   if (req.method === 'POST' && jobRun){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.runJob(decodeURIComponent(jobRun[1]), {claims:claimsFrom(req, body)});
+    const result = await engine.runJob(decodeURIComponent(jobRun[1]), {claims:await claimsFrom(req, body)});
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const jobExtend = pathname.match(/^\/api\/platform\/jobs\/([^/]+)\/extend-lock$/);
   if (req.method === 'POST' && jobExtend){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.extendJobLock(decodeURIComponent(jobExtend[1]), body, claimsFrom(req, body));
+    const result = await engine.extendJobLock(decodeURIComponent(jobExtend[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const jobCancel = pathname.match(/^\/api\/platform\/jobs\/([^/]+)\/cancel$/);
   if (req.method === 'POST' && jobCancel){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.cancelJob(decodeURIComponent(jobCancel[1]), body, claimsFrom(req, body));
+    const result = await engine.cancelJob(decodeURIComponent(jobCancel[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/jobs/recover'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.recoverStaleJobs(claimsFrom(req, body));
+    const result = await engine.recoverStaleJobs(await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -153,13 +161,13 @@ async function route(req, res, engine){
   const deadRetry = pathname.match(/^\/api\/platform\/dead-letters\/([^/]+)\/retry$/);
   if (req.method === 'POST' && deadRetry){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.retryDeadLetter(decodeURIComponent(deadRetry[1]), body, claimsFrom(req, body));
+    const result = await engine.retryDeadLetter(decodeURIComponent(deadRetry[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/jobs/drain'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.drainJobs({limit:Number(body.limit || 10), claims:claimsFrom(req, body)});
+    const result = await engine.drainJobs({limit:Number(body.limit || 10), claims:await claimsFrom(req, body)});
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -169,13 +177,13 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/schedules'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.upsertSchedule(body, claimsFrom(req, body));
+    const result = await engine.upsertSchedule(body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/schedules/tick'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.runDueSchedules({limit:Number(body.limit || 20), claims:claimsFrom(req, body)});
+    const result = await engine.runDueSchedules({limit:Number(body.limit || 20), claims:await claimsFrom(req, body)});
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -191,7 +199,7 @@ async function route(req, res, engine){
   if (req.method === 'POST' && pathname === '/api/platform/provider-router/optimize'){
     const body = await readValidatedJson(req, pathname);
     const projectId = body.projectId || body.input?.projectId || 'default';
-    const result = await engine.optimizeProviderRoute(projectId, body, claimsFrom(req, body));
+    const result = await engine.optimizeProviderRoute(projectId, body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -202,7 +210,7 @@ async function route(req, res, engine){
   const invoiceGenerate = pathname.match(/^\/api\/platform\/projects\/([^/]+)\/invoices\/generate$/);
   if (req.method === 'POST' && invoiceGenerate){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.generateUsageInvoice(decodeURIComponent(invoiceGenerate[1]), body, claimsFrom(req, body));
+    const result = await engine.generateUsageInvoice(decodeURIComponent(invoiceGenerate[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -213,20 +221,20 @@ async function route(req, res, engine){
   if (req.method === 'POST' && pathname === '/api/platform/workflow-builder/graphs'){
     const body = await readValidatedJson(req, pathname);
     const projectId = body.projectId || body.input?.projectId || 'default';
-    const result = await engine.saveWorkflowGraph(projectId, body.graph || body, claimsFrom(req, body));
+    const result = await engine.saveWorkflowGraph(projectId, body.graph || body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const projectExport = pathname.match(/^\/api\/platform\/projects\/([^/]+)\/export$/);
   if (req.method === 'POST' && projectExport){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.exportProjectBundle(decodeURIComponent(projectExport[1]), claimsFrom(req, body));
+    const result = await engine.exportProjectBundle(decodeURIComponent(projectExport[1]), await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/import'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.importProjectBundle(body.bundle || body, claimsFrom(req, body));
+    const result = await engine.importProjectBundle(body.bundle || body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -236,14 +244,14 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/preflight'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.preflight(body.templateId || body.workflowId, {input:body.input || {}, claims:claimsFrom(req, body), approvals:body.approvals || {}});
+    const result = await engine.preflight(body.templateId || body.workflowId, {input:body.input || {}, claims:await claimsFrom(req, body), approvals:body.approvals || {}});
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const runMatch = pathname.match(/^\/api\/platform\/workflows\/([^/]+)\/run$/);
   if (req.method === 'POST' && runMatch){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.runWorkflow(decodeURIComponent(runMatch[1]), {input:body.input || body || {}, claims:claimsFrom(req, body), approvals:body.approvals || {}});
+    const result = await engine.runWorkflow(decodeURIComponent(runMatch[1]), {input:body.input || body || {}, claims:await claimsFrom(req, body), approvals:body.approvals || {}});
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -251,14 +259,14 @@ async function route(req, res, engine){
     const body = await readValidatedJson(req, pathname);
     const payload = body.payload || body;
     const verification = verifyWebhookRequest({headers:req.headers, rawBody:body.__rawBody || JSON.stringify(payload), payload});
-    const result = await engine.ingestWebhook(payload, {claims:claimsFrom(req, body), verification, rawBody:body.__rawBody || JSON.stringify(payload)});
+    const result = await engine.ingestWebhook(payload, {claims:await claimsFrom(req, body), verification, rawBody:body.__rawBody || JSON.stringify(payload)});
     return json(res, 200, result);
   }
 
   const replayMatch = pathname.match(/^\/api\/platform\/webhooks\/([^/]+)\/replay$/);
   if (req.method === 'POST' && replayMatch){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.replayWebhook(decodeURIComponent(replayMatch[1]), {claims:claimsFrom(req, body), approvals:body.approvals || {}});
+    const result = await engine.replayWebhook(decodeURIComponent(replayMatch[1]), {claims:await claimsFrom(req, body), approvals:body.approvals || {}});
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -270,7 +278,7 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/audit'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.recordAuditEvent(body.projectId || body.input?.projectId || 'default', body, claimsFrom(req, body));
+    const result = await engine.recordAuditEvent(body.projectId || body.input?.projectId || 'default', body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -280,14 +288,14 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/incidents'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.openIncident(body.projectId || body.input?.projectId || 'default', body, claimsFrom(req, body));
+    const result = await engine.openIncident(body.projectId || body.input?.projectId || 'default', body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const incidentResolve = pathname.match(/^\/api\/platform\/incidents\/([^/]+)\/resolve$/);
   if (req.method === 'POST' && incidentResolve){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.resolveIncident(decodeURIComponent(incidentResolve[1]), body, claimsFrom(req, body));
+    const result = await engine.resolveIncident(decodeURIComponent(incidentResolve[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 404, result);
   }
 
@@ -299,13 +307,13 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/entitlements'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.upsertEntitlement(body.projectId || body.input?.projectId || 'default', body, claimsFrom(req, body));
+    const result = await engine.upsertEntitlement(body.projectId || body.input?.projectId || 'default', body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   if (req.method === 'POST' && pathname === '/api/platform/entitlements/check'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.checkEntitlement(body.projectId || body.input?.projectId || 'default', body, claimsFrom(req, body));
+    const result = await engine.checkEntitlement(body.projectId || body.input?.projectId || 'default', body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -316,7 +324,7 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && recordsMatch){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.saveRecord(decodeURIComponent(recordsMatch[1]), body, claimsFrom(req, body));
+    const result = await engine.saveRecord(decodeURIComponent(recordsMatch[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -326,21 +334,21 @@ async function route(req, res, engine){
 
   if (req.method === 'POST' && pathname === '/api/platform/forms'){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.saveForm(body.projectId || body.input?.projectId || 'default', body, claimsFrom(req, body));
+    const result = await engine.saveForm(body.projectId || body.input?.projectId || 'default', body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const formSubmit = pathname.match(/^\/api\/platform\/forms\/([^/]+)\/submit$/);
   if (req.method === 'POST' && formSubmit){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.submitForm(decodeURIComponent(formSubmit[1]), body, claimsFrom(req, body));
+    const result = await engine.submitForm(decodeURIComponent(formSubmit[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
   const graphRun = pathname.match(/^\/api\/platform\/workflow-builder\/graphs\/([^/]+)\/run$/);
   if (req.method === 'POST' && graphRun){
     const body = await readValidatedJson(req, pathname);
-    const result = await engine.runWorkflowGraph(decodeURIComponent(graphRun[1]), body, claimsFrom(req, body));
+    const result = await engine.runWorkflowGraph(decodeURIComponent(graphRun[1]), body, await claimsFrom(req, body));
     return json(res, result.ok ? 200 : 409, result);
   }
 
@@ -397,8 +405,11 @@ async function staticFile(res, pathname){
   res.end(await readFile(file));
 }
 
-function claimsFrom(req, body){
-  return claimsFromHeaders(req.headers || {}, body || {});
+async function claimsFrom(req, body){
+  if (req.__codestudioClaims) return req.__codestudioClaims;
+  const claims = await claimsFromRequest(req, body || {});
+  if (claims) req.__codestudioClaims = claims;
+  return claims;
 }
 
 async function readValidatedJson(req, pathname){

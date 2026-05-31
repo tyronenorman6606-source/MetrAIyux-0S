@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const qs = event.queryStringParameters || {};
     const max = Math.max(1, Math.min(25, Number(qs.max || 20)));
     const pageToken = String(qs.pageToken || '').trim();

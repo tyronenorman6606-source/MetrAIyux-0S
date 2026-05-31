@@ -18,3 +18,8 @@ Researched: 2026-05-28T06:23:33Z
 - Use a correction warning: local ZIP and phone are mismatched.
 - Mention both naming realities only if useful: local/CARFAX "North Peoria" vs official "German Auto in Peoria."
 - Do not publish repair prices or warranty guarantees without checking current terms.
+
+## Page Copy Decision
+- Valley Verified page should use the official location phone `(623) 246-4477` and ZIP `85382` for customer action.
+- Keep the imported Chamber record visible as the reason the business entered the Valley Verified index, but do not let stale imported contact data override stronger official/CARFAX sources.
+- The public claim should be: Skyes Over London says this business is Valley Verified because the imported record reconciles to a current, customer-usable official shop page with matching address, service scope, hours, and North Peoria/German Auto naming trail.

@@ -227,17 +227,17 @@
   // Identity helpers (optional)
   // ─────────────────────────────────────────────
   function initIdentity(){
-    if (!window.netlifyIdentity) return;
+    if (!window.SkyeSolIdentity) return;
     state.identityReady = true;
     try {
-      state.user = window.netlifyIdentity.currentUser();
+      state.user = window.SkyeSolIdentity.currentUser();
     } catch {}
 
-    window.netlifyIdentity.on('login', user => {
+    window.SkyeSolIdentity.on('login', user => {
       state.user = user;
       refreshAuthUI();
     });
-    window.netlifyIdentity.on('logout', () => {
+    window.SkyeSolIdentity.on('logout', () => {
       state.user = null;
       refreshAuthUI();
     });
@@ -246,6 +246,9 @@
 
   async function getToken(){
     if (!state.user) return null;
+    if (state.user.token) return state.user.token;
+    if (state.user.sessionToken) return state.user.sessionToken;
+    if (typeof state.user.jwt !== 'function') return null;
     const token = await state.user.jwt(true);
     return token;
   }
@@ -260,13 +263,13 @@
     if (!state.user){
       el.innerHTML = '<button class="btn-outline btn-sm" id="btnLogin">Login</button>';
       const b = $('#btnLogin');
-      if (b) b.addEventListener('click', () => window.netlifyIdentity.open('login'));
+      if (b) b.addEventListener('click', () => window.SkyeSolIdentity.open('login'));
       return;
     }
     const email = (state.user.email || '').trim();
     el.innerHTML = `<span class="auth-pill">${esc(email || 'Signed in')}</span><button class="btn-outline btn-sm" id="btnLogout">Logout</button>`;
     const b = $('#btnLogout');
-    if (b) b.addEventListener('click', () => window.netlifyIdentity.logout());
+    if (b) b.addEventListener('click', () => window.SkyeSolIdentity.logout());
   }
 
   // ─────────────────────────────────────────────
@@ -560,11 +563,11 @@
       if (!state.identityReady) {
         gate.style.display = 'block';
         app.style.display = 'none';
-        msg.innerHTML = 'Netlify Identity is not enabled yet. Enable it in your Netlify site settings to use Admin.';
+        msg.innerHTML = 'The shared 0S/FS27 gate bridge is not available yet. Open the 0S login to use Admin.';
         return;
       }
 
-      const u = window.netlifyIdentity.currentUser();
+      const u = window.SkyeSolIdentity.currentUser();
       if (!u){
         gate.style.display = 'block';
         app.style.display = 'none';
@@ -590,10 +593,10 @@
       }
     }
 
-    $('#adminLogin')?.addEventListener('click', () => window.netlifyIdentity.open('login'));
-    $('#adminLogout')?.addEventListener('click', () => window.netlifyIdentity.logout());
-    window.netlifyIdentity.on('login', ensure);
-    window.netlifyIdentity.on('logout', ensure);
+    $('#adminLogin')?.addEventListener('click', () => window.SkyeSolIdentity.open('login'));
+    $('#adminLogout')?.addEventListener('click', () => window.SkyeSolIdentity.logout());
+    window.SkyeSolIdentity.on('login', ensure);
+    window.SkyeSolIdentity.on('logout', ensure);
 
     // Tabs
     $$('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
@@ -877,11 +880,11 @@
       if (!state.identityReady) {
         gate.style.display = 'block';
         mount.style.display = 'none';
-        msg.innerHTML = 'Netlify Identity is not enabled yet. Enable it to use the Client Vault.';
+        msg.innerHTML = 'The shared 0S/FS27 gate bridge is not available yet. Open the 0S login to use the Client Vault.';
         return;
       }
 
-      const u = window.netlifyIdentity.currentUser();
+      const u = window.SkyeSolIdentity.currentUser();
       if (!u){
         gate.style.display = 'block';
         mount.style.display = 'none';
@@ -913,10 +916,10 @@
       }
     }
 
-    $('#vaultLogin')?.addEventListener('click', () => window.netlifyIdentity.open('login'));
-    $('#vaultLogout')?.addEventListener('click', () => window.netlifyIdentity.logout());
-    window.netlifyIdentity.on('login', ensure);
-    window.netlifyIdentity.on('logout', ensure);
+    $('#vaultLogin')?.addEventListener('click', () => window.SkyeSolIdentity.open('login'));
+    $('#vaultLogout')?.addEventListener('click', () => window.SkyeSolIdentity.logout());
+    window.SkyeSolIdentity.on('login', ensure);
+    window.SkyeSolIdentity.on('logout', ensure);
     await ensure();
   }
 
@@ -929,7 +932,7 @@
     let n = 0;
     const t = setInterval(() => {
       n++;
-      if (window.netlifyIdentity){
+      if (window.SkyeSolIdentity){
         clearInterval(t);
         initIdentity();
       }

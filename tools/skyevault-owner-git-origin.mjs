@@ -10,6 +10,51 @@ const repoRoot = path.resolve(new URL('..', import.meta.url).pathname);
 const rawArgs = process.argv.slice(2);
 const command = rawArgs.find((arg) => !arg.startsWith('--')) || 'status';
 
+function rawArgValues(name) {
+  const prefix = `${name}=`;
+  const out = [];
+  for (let i = 0; i < rawArgs.length; i += 1) {
+    const arg = rawArgs[i];
+    if (arg.startsWith(prefix)) out.push(arg.slice(prefix.length));
+    else if (arg === name && rawArgs[i + 1] && !rawArgs[i + 1].startsWith('--')) out.push(rawArgs[i + 1]);
+  }
+  return out.filter(Boolean);
+}
+
+function parseEnvFile(file) {
+  const values = {};
+  try {
+    for (const raw of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const match = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+      if (!match) continue;
+      let value = match[2].trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
+      values[match[1]] = value;
+    }
+  } catch {}
+  return values;
+}
+
+function loadEnvFiles() {
+  const files = [
+    ...rawArgValues('--env-file'),
+    path.join(repoRoot, '.env'),
+    path.join(repoRoot, 'env.txt'),
+    path.join(repoRoot, 'SkyeVault-Drop', '.env')
+  ];
+  for (const file of files) {
+    const full = path.isAbsolute(file) ? file : path.resolve(repoRoot, file);
+    const values = parseEnvFile(full);
+    for (const [key, value] of Object.entries(values)) {
+      if (process.env[key] === undefined || process.env[key] === '') process.env[key] = value;
+    }
+  }
+}
+
+loadEnvFiles();
+
 const stateDir = path.join(repoRoot, '.skyevault-out', 'git-remote');
 const storageRoot = resolvePath(argValue('--storage-root') || process.env.SKYEVAULT_OWNER_GIT_REMOTE_ROOT, path.join(stateDir, 'storage'));
 const envFile = path.join(stateDir, 'owner-git-origin.env');
@@ -24,6 +69,56 @@ const repoId = sanitizePart(argValue('--repo') || process.env.SKYEVAULT_OWNER_GI
 const host = argValue('--host') || process.env.SKYEVAULT_GIT_REMOTE_HOST || '127.0.0.1';
 const requestedPort = Number(argValue('--port') || process.env.SKYEVAULT_GIT_REMOTE_PORT || '8787');
 const maxBuffer = Math.max(64, Number(process.env.SKYEVAULT_OWNER_GIT_MAX_BUFFER_MB || '256')) * 1024 * 1024;
+const ownerWorkspaceSlug = String(process.env.SKYEVAULT_OWNER_WORKSPACE_SLUG || 'metraiyux-0s').trim();
+const defaultZeroOsBase = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+
+const GATE_BEARER_ENV_NAMES = [
+  'SKYEVAULT_GATE_BEARER',
+  'SKYEVAULT_ONE_AUTH_BEARER',
+  'ZERO_OS_GATE_SESSION',
+  'ZERO_OS_OWNER_SESSION',
+  'METRAIYUX_OWNER_GATE_SESSION',
+  'FREE99_GATE_SESSION',
+  'SKYGATE_SESSION_TOKEN',
+  'SKYE_GATE_SESSION',
+  'FS27_ADMIN_BEARER',
+  'SKYENET_AUTH',
+  'MCP_GATE_SESSION',
+  'QUANTUMSKYES_MCP_TOKEN',
+  'QUANTUMSKYES_MCP_TOKEN_OR_GATE_SESSION'
+];
+
+const OWNER_CODE_ENV_NAMES = [
+  'ZERO_OS_GATE_CODE',
+  'ZERO_OS_ADMIN_CODE',
+  'ZERO_OS_OWNER_CODE',
+  'METRAIYUX_OWNER_ADMIN_CODE',
+  'METRAIYUX_ADMIN_CODE',
+  'OWNER_ADMIN_CODE',
+  'OWNER_ADMIN_PASSWORD',
+  'FREE99_ADMIN_CODE',
+  'FREE99_ADMIN_PASSWORD',
+  'FREE99_GATE_CODE',
+  'FREE99_GATE_PASSWORD',
+  'FREE99_OWNER_CODE',
+  'FREE99_OWNER_PASSWORD',
+  'FS27_ADMIN_CODE',
+  'FS27_ADMIN_PASSWORD',
+  'FS27_OWNER_CODE',
+  'FS27_OWNER_PASSWORD',
+  'SKYGATE_ADMIN_CODE',
+  'SKYGATE_ADMIN_PASSWORD',
+  'SKYGATE_OWNER_CODE',
+  'SKYGATE_OWNER_PASSWORD',
+  'SKYGATEFS27_ADMIN_CODE',
+  'SKYGATEFS27_ADMIN_PASSWORD',
+  'SKYGATEFS27_OWNER_CODE',
+  'SKYGATEFS27_OWNER_PASSWORD',
+  'SKYE_GATE_ADMIN_CODE',
+  'SKYE_GATE_ADMIN_PASSWORD',
+  'SKYE_GATE_OWNER_CODE',
+  'SKYE_GATE_OWNER_PASSWORD'
+];
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -89,9 +184,11 @@ function readEnvFile(file) {
   return out;
 }
 
-function writeEnv(values) {
+function writeEnv(values, removeKeys = []) {
   const existing = readEnvFile(envFile);
-  const merged = { ...existing, ...values };
+  const merged = { ...existing };
+  for (const key of removeKeys) delete merged[key];
+  Object.assign(merged, values);
   fs.mkdirSync(path.dirname(envFile), { recursive: true });
   const lines = Object.entries(merged)
     .filter(([, value]) => value !== undefined && value !== null && value !== '')
@@ -112,6 +209,99 @@ function mintOwnerToken() {
   return `skyevault-owner-${crypto.randomBytes(32).toString('hex')}`;
 }
 
+function cleanBearer(value) {
+  return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+}
+
+function firstEnv(names) {
+  for (const name of names) {
+    const value = cleanBearer(process.env[name]);
+    if (value) return { name, value };
+  }
+  return { name: '', value: '' };
+}
+
+function zeroOsBase() {
+  return String(
+    argValue('--0s-origin')
+    || argValue('--zero-os-origin')
+    || process.env.METRAIYUX_0S_LIVE_BASE
+    || process.env.METRAIYUX_0S_FULL_SYSTEM_URL
+    || process.env.METRAIYUX_0S_WORKER_URL
+    || defaultZeroOsBase
+  ).replace(/\/+$/, '');
+}
+
+function gateIntrospectUrl() {
+  return String(
+    argValue('--gate-introspect-url')
+    || process.env.SKYEVAULT_GATE_INTROSPECT_URL
+    || process.env.SKYEVAULT_FS27_INTROSPECT_API
+    || process.env.METRAIYUX_0S_SKYGATE_FS27_INTROSPECT_ENDPOINT
+    || `${zeroOsBase()}/api/skygate/auth-introspect`
+  ).replace(/\/+$/, '');
+}
+
+function useStaticTokenMode() {
+  const mode = String(argValue('--auth-mode') || process.env.SKYEVAULT_OWNER_GIT_AUTH_MODE || process.env.SKYEVAULT_GIT_REMOTE_AUTH_MODE || '').toLowerCase();
+  return rawArgs.includes('--static-token')
+    || mode === 'static-token'
+    || mode === 'local-static-token'
+    || process.env.SKYEVAULT_OWNER_GIT_ALLOW_STATIC_TOKEN === '1';
+}
+
+async function postJson(url, body, headers = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...headers },
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  let data = {};
+  try { data = JSON.parse(text || '{}'); } catch { data = { ok: false, error: text.slice(0, 240) }; }
+  return { response, data, text };
+}
+
+async function obtainGateBearer() {
+  const direct = firstEnv(GATE_BEARER_ENV_NAMES);
+  if (direct.value) return { token: direct.value, source: direct.name, login: null };
+  const code = firstEnv(OWNER_CODE_ENV_NAMES);
+  if (!code.value) {
+    throw new Error('Shared 0S/FS27 gate credential is required. Set ZERO_OS_GATE_SESSION/SKYEVAULT_GATE_BEARER, or set the shared owner code in .env for /api/owner/admin-login.');
+  }
+  const login = await postJson(`${zeroOsBase()}/api/owner/admin-login`, { code: code.value });
+  const token = cleanBearer(login.data.gateToken || login.data.gateBearerToken || login.data.token || '');
+  if (!login.response.ok || !token) {
+    throw new Error(`Shared owner login failed through /api/owner/admin-login (${login.response.status}).`);
+  }
+  return {
+    token,
+    source: `owner-admin-login:${code.name}`,
+    login: { ok: true, status: login.response.status, via: login.data.via || 'owner-admin-login' }
+  };
+}
+
+async function ownerAuth() {
+  if (useStaticTokenMode()) {
+    return {
+      mode: 'static-token',
+      serverAuth: 'static-token',
+      token: ownerToken(),
+      source: 'explicit-emergency-static-token',
+      gateIntrospectUrl: ''
+    };
+  }
+  const bearer = await obtainGateBearer();
+  return {
+    mode: 'gate',
+    serverAuth: 'gate-introspection',
+    token: bearer.token,
+    source: bearer.source,
+    login: bearer.login,
+    gateIntrospectUrl: gateIntrospectUrl()
+  };
+}
+
 function baseUrlFor(port = requestedPort) {
   return `http://${host}:${port}`;
 }
@@ -124,24 +314,26 @@ function repoPath() {
   return path.join(storageRoot, 'repos', workspaceId, `${repoId}.git`);
 }
 
-function authHeader(token) {
-  return `Authorization: Basic ${Buffer.from(`x-token:${token}`).toString('base64')}`;
+function authHeader(auth) {
+  if (auth?.mode === 'gate') return `Authorization: Bearer ${auth.token}`;
+  return `Authorization: Basic ${Buffer.from(`x-token:${auth?.token || ''}`).toString('base64')}`;
 }
 
-function gitAuthEnv(token) {
+function gitAuthEnv(auth) {
   return {
     ...process.env,
     GIT_TERMINAL_PROMPT: '0',
     GIT_CONFIG_COUNT: '1',
     GIT_CONFIG_KEY_0: 'http.extraHeader',
-    GIT_CONFIG_VALUE_0: authHeader(token)
+    GIT_CONFIG_VALUE_0: authHeader(auth)
   };
 }
 
-function redact(text, token = ownerToken()) {
+function redact(text, token = '') {
   let clean = String(text || '');
   if (token) clean = clean.split(token).join('***');
   clean = clean.replace(/Authorization: Basic\s+[A-Za-z0-9+/=]+/g, 'Authorization: Basic ***');
+  clean = clean.replace(/Authorization: Bearer\s+[A-Za-z0-9._~+/=-]+/g, 'Authorization: Bearer ***');
   clean = clean.replace(/x-token:[^@\s]+@/g, 'x-token:***@');
   return clean;
 }
@@ -323,22 +515,49 @@ function storageLimits() {
   };
 }
 
-function writeRuntimeEnv(baseUrl, token) {
+function writeRuntimeEnv(baseUrl, auth) {
+  const removeKeys = auth.mode === 'gate' ? ['SKYEVAULT_GIT_REMOTE_TOKEN'] : [];
   return writeEnv({
-    SKYEVAULT_GIT_REMOTE_TOKEN: token,
+    SKYEVAULT_OWNER_GIT_AUTH_MODE: auth.mode === 'gate' ? 'gate-introspection' : 'static-token',
+    SKYEVAULT_GATE_INTROSPECT_URL: auth.gateIntrospectUrl || '',
     SKYEVAULT_GIT_REMOTE_BASE_URL: baseUrl,
     SKYEVAULT_GIT_REMOTE_URL: cloneUrlFor(baseUrl),
     SKYEVAULT_GIT_REMOTE_WORKSPACE: workspaceId,
     SKYEVAULT_GIT_REMOTE_REPO: repoId,
     SKYEVAULT_OWNER_GIT_REMOTE_NAME: remoteName,
     SKYEVAULT_OWNER_GIT_REMOTE_ROOT: storageRoot
-  });
+  }, removeKeys);
 }
 
 async function accessPayload() {
   const status = await startServer();
+  const auth = await ownerAuth();
   const baseUrl = status.baseUrl;
   const cloneUrl = cloneUrlFor(baseUrl);
+  const gateSessionVar = GATE_BEARER_ENV_NAMES[0];
+  if (auth.mode === 'gate') {
+    return {
+      ok: true,
+      schema: 'skyevault.owner-git-origin-access.v1',
+      checkedAt: new Date().toISOString(),
+      whatThisIs: 'A local Git smart HTTP origin. Use it with git clone/fetch/pull/push; it is not a normal browser page.',
+      auth: {
+        mode: 'shared-gate',
+        login: '/api/owner/admin-login or any active FS27/SkyGate bearer',
+        gateIntrospectUrl: auth.gateIntrospectUrl ? 'configured' : null,
+        source: auth.source
+      },
+      cloneUrl,
+      commands: {
+        ownerLogin: `${zeroOsBase()}/admin/login.html`,
+        exportGateBearer: `export ${gateSessionVar}='<shared 0S/FS27/SkyGate bearer>'`,
+        cloneWithoutPrompt: `git -c "http.extraHeader=Authorization: Bearer $${gateSessionVar}" clone ${cloneUrl} ${repoId}`,
+        status: 'npm run vault:origin:status',
+        proof: 'npm run vault:origin:proof'
+      },
+      note: 'No SkyeVault-specific founder/admin password is used in normal mode. Git receives the same shared gate bearer used by the 0S owner session.'
+    };
+  }
   return {
     ok: true,
     schema: 'skyevault.owner-git-origin-access.v1',
@@ -356,15 +575,32 @@ async function accessPayload() {
       cloneWithoutPrompt: `set -a; . ${rel(envFile)}; set +a; git -c "http.extraHeader=Authorization: Basic $(printf 'x-token:%s' \\"$SKYEVAULT_GIT_REMOTE_TOKEN\\" | base64 -w0)" clone ${cloneUrl} ${repoId}`,
       resetPassword: 'npm run vault:origin:reset-token'
     },
+    warning: 'Emergency-local static token mode is active. This is not the normal 0S owner account lane.',
     note: 'The password is not printed by this command so it does not leak into chat, logs, or receipts.'
   };
 }
 
 async function resetToken() {
+  if (!useStaticTokenMode()) {
+    const started = await startServer();
+    return {
+      ok: Boolean(started.ok),
+      schema: 'skyevault.owner-git-origin-reset-token.v1',
+      resetAt: new Date().toISOString(),
+      action: 'gate-managed-no-static-token',
+      auth: {
+        mode: 'shared-gate',
+        ownerLogin: `${zeroOsBase()}/admin/login.html`,
+        gateIntrospectUrl: gateIntrospectUrl() ? 'configured' : null
+      },
+      cloneUrl: cloneUrlFor(started.baseUrl || await activeBaseUrl()),
+      note: 'Normal mode has no SkyeVault Git password to reset. Refresh or revoke the shared 0S/FS27/SkyGate owner session instead.'
+    };
+  }
   const oldBaseUrl = await activeBaseUrl();
   const baseUrl = oldBaseUrl || baseUrlFor(requestedPort);
   const token = mintOwnerToken();
-  writeRuntimeEnv(baseUrl, token);
+  writeRuntimeEnv(baseUrl, { mode: 'static-token', token, gateIntrospectUrl: '' });
   stopServer();
   const started = await startServer();
   const synced = await syncOrigin();
@@ -419,12 +655,29 @@ async function waitForReady(baseUrl, ms = 15000) {
 async function startServer() {
   fs.mkdirSync(stateDir, { recursive: true });
   fs.mkdirSync(storageRoot, { recursive: true });
-  const token = ownerToken();
+  const auth = await ownerAuth();
   let baseUrl = await activeBaseUrl();
   const runningHealth = await health(baseUrl);
   const record = readPidRecord();
   if (runningHealth) {
-    writeRuntimeEnv(baseUrl, token);
+    if (runningHealth.auth !== auth.serverAuth) {
+      stopServer();
+    } else {
+      writeRuntimeEnv(baseUrl, auth);
+      const payload = await statusPayload({ skipApiErrors: true });
+      payload.action = 'already-running';
+      payload.pid = pidAlive(Number(record?.pid)) ? Number(record.pid) : payload.pid;
+      writeJson(statusFile, payload);
+      return payload;
+    }
+  }
+
+  if (!runningHealth || runningHealth.auth !== auth.serverAuth) {
+    baseUrl = await activeBaseUrl();
+  }
+
+  if (await health(baseUrl)) {
+    writeRuntimeEnv(baseUrl, auth);
     const payload = await statusPayload({ skipApiErrors: true });
     payload.action = 'already-running';
     payload.pid = pidAlive(Number(record?.pid)) ? Number(record.pid) : payload.pid;
@@ -443,9 +696,19 @@ async function startServer() {
     }
   }
   baseUrl = baseUrlFor(port);
-  writeRuntimeEnv(baseUrl, token);
+  writeRuntimeEnv(baseUrl, auth);
   const log = fs.openSync(logFile, 'a', 0o600);
-  fs.writeSync(log, `\n[owner-git-origin] ${new Date().toISOString()} starting ${baseUrl} storage=${storageRoot}\n`);
+  fs.writeSync(log, `\n[owner-git-origin] ${new Date().toISOString()} starting ${baseUrl} storage=${storageRoot} auth=${auth.serverAuth}\n`);
+  const authEnv = auth.mode === 'gate'
+    ? {
+      SKYEVAULT_GATE_INTROSPECT_URL: auth.gateIntrospectUrl,
+      SKYEVAULT_GATE_ADMIN_ALL_WORKSPACES: process.env.SKYEVAULT_GATE_ADMIN_ALL_WORKSPACES || '1',
+      SKYEVAULT_GATE_ENFORCE_WORKSPACE: process.env.SKYEVAULT_GATE_ENFORCE_WORKSPACE || '1',
+      SKYEVAULT_GATE_REQUIRED_VIEW_ROLE: process.env.SKYEVAULT_GATE_REQUIRED_VIEW_ROLE || 'viewer',
+      SKYEVAULT_GATE_REQUIRED_PUSH_ROLE: process.env.SKYEVAULT_GATE_REQUIRED_PUSH_ROLE || 'deployer',
+      SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE: process.env.SKYEVAULT_GATE_REQUIRED_ADMIN_ROLE || 'admin'
+    }
+    : { SKYEVAULT_GIT_REMOTE_TOKEN: auth.token };
   const child = spawn(process.execPath, [
     path.join(repoRoot, 'tools', 'skyevault-git-remote-server.mjs'),
     `--host=${host}`,
@@ -457,7 +720,7 @@ async function startServer() {
     stdio: ['ignore', log, log],
     env: {
       ...process.env,
-      SKYEVAULT_GIT_REMOTE_TOKEN: token,
+      ...authEnv,
       SKYEVAULT_GIT_REMOTE_ROOT: storageRoot,
       SKYEVAULT_VAULT_STORAGE_MB: process.env.SKYEVAULT_VAULT_STORAGE_MB || '',
       SKYEVAULT_VAULT_FILE_LIMIT: process.env.SKYEVAULT_VAULT_FILE_LIMIT || '',
@@ -473,7 +736,8 @@ async function startServer() {
     startedAt: new Date().toISOString(),
     baseUrl,
     storageRoot,
-    logFile: rel(logFile)
+    logFile: rel(logFile),
+    authMode: auth.serverAuth
   });
   const payload = await statusPayload({ skipApiErrors: true });
   payload.action = 'started';
@@ -557,9 +821,9 @@ function ensureBareRepoFromLocal(forceDirect = false) {
   };
 }
 
-function pushRefs(baseUrl, token) {
+function pushRefs(baseUrl, auth) {
   configureRemote(baseUrl);
-  const env = gitAuthEnv(token);
+  const env = gitAuthEnv(auth);
   const heads = spawnCaptured('git', ['push', remoteName, 'refs/heads/*:refs/heads/*'], { env });
   const tagNames = gitMaybe(['tag', '--list'], {}, '').split(/\r?\n/).filter(Boolean);
   const tags = tagNames.length
@@ -568,18 +832,18 @@ function pushRefs(baseUrl, token) {
   return { heads, tags, tagCount: tagNames.length };
 }
 
-async function remoteRepoDetail(baseUrl, token) {
+async function remoteRepoDetail(baseUrl, auth) {
   try {
-    const detail = await apiJson(baseUrl, token, `/__skyevault/repos/${encodeURIComponent(workspaceId)}/${encodeURIComponent(repoId)}`);
+    const detail = await apiJson(baseUrl, auth.token, `/__skyevault/repos/${encodeURIComponent(workspaceId)}/${encodeURIComponent(repoId)}`);
     return detail.repo || null;
   } catch {
     return null;
   }
 }
 
-function lsRemote(baseUrl, token) {
+function lsRemote(baseUrl, auth) {
   const url = cloneUrlFor(baseUrl);
-  const output = gitMaybe(['ls-remote', url, 'HEAD', 'refs/heads/*', 'refs/tags/*'], { env: gitAuthEnv(token) }, '');
+  const output = gitMaybe(['ls-remote', url, 'HEAD', 'refs/heads/*', 'refs/tags/*'], { env: gitAuthEnv(auth) }, '');
   return output.split(/\r?\n/).filter(Boolean).map((line) => {
     const [object, ref] = line.split(/\s+/);
     return { ref, object };
@@ -590,13 +854,13 @@ async function syncOrigin(options = {}) {
   const startedAt = new Date().toISOString();
   const started = Date.now();
   const status = await startServer();
-  const token = ownerToken();
+  const auth = await ownerAuth();
   const baseUrl = status.baseUrl;
-  writeRuntimeEnv(baseUrl, token);
+  writeRuntimeEnv(baseUrl, auth);
   const seeded = ensureBareRepoFromLocal(Boolean(options.forceDirect || flag('--direct-seed') || flag('--repair')));
-  const pushed = flag('--no-push') ? { skipped: true, reason: 'no-push' } : pushRefs(baseUrl, token);
-  const refs = lsRemote(baseUrl, token);
-  const detail = await remoteRepoDetail(baseUrl, token);
+  const pushed = flag('--no-push') ? { skipped: true, reason: 'no-push' } : pushRefs(baseUrl, auth);
+  const refs = lsRemote(baseUrl, auth);
+  const detail = await remoteRepoDetail(baseUrl, auth);
   const head = localHead();
   const remoteMain = refs.find((item) => item.ref === `refs/heads/${currentBranch()}`) || refs.find((item) => item.ref === 'refs/heads/main') || refs[0] || null;
   const ok = Boolean(seeded.ok)
@@ -610,11 +874,17 @@ async function syncOrigin(options = {}) {
     completedAt: new Date().toISOString(),
     durationMs: Date.now() - started,
     workspaceId,
+    ownerWorkspaceSlug,
     repoId,
     baseUrl,
     cloneUrl: cloneUrlFor(baseUrl),
     remoteName,
-    tokenStoredAt: rel(envFile),
+    auth: {
+      mode: auth.mode === 'gate' ? 'shared-gate' : 'emergency-static-token',
+      source: auth.source,
+      gateIntrospectUrl: auth.gateIntrospectUrl ? 'configured' : null,
+      runtimeEnv: rel(envFile)
+    },
     localHead: head,
     localBranch: currentBranch(),
     remoteHead: remoteMain,
@@ -645,13 +915,13 @@ async function syncOrigin(options = {}) {
 
 async function cloneProof() {
   const sync = flag('--no-sync') ? null : await syncOrigin();
-  const token = ownerToken();
+  const auth = await ownerAuth();
   const baseUrl = (sync?.baseUrl) || await activeBaseUrl();
   const proofRoot = resolvePath(argValue('--proof-root'), path.join(os.tmpdir(), `skyevault-owner-git-origin-proof-${stamp()}`));
   const cloneDir = path.join(proofRoot, repoId);
   fs.rmSync(proofRoot, { recursive: true, force: true });
   fs.mkdirSync(proofRoot, { recursive: true });
-  const clone = spawnCaptured('git', ['clone', cloneUrlFor(baseUrl), cloneDir], { cwd: proofRoot, env: gitAuthEnv(token) });
+  const clone = spawnCaptured('git', ['clone', cloneUrlFor(baseUrl), cloneDir], { cwd: proofRoot, env: gitAuthEnv(auth) });
   if (!clone.ok) {
     const receipt = {
       ok: false,
@@ -674,10 +944,16 @@ async function cloneProof() {
     schema: 'skyevault.owner-git-origin-proof.v1',
     provedAt: new Date().toISOString(),
     workspaceId,
+    ownerWorkspaceSlug,
     repoId,
     baseUrl,
     cloneUrl: cloneUrlFor(baseUrl),
-    tokenStoredAt: rel(envFile),
+    auth: {
+      mode: auth.mode === 'gate' ? 'shared-gate' : 'emergency-static-token',
+      source: auth.source,
+      gateIntrospectUrl: auth.gateIntrospectUrl ? 'configured' : null,
+      runtimeEnv: rel(envFile)
+    },
     cloneDir,
     localHead: localHead(),
     clonedHead,
@@ -723,7 +999,6 @@ async function snapshotRemote() {
 }
 
 async function statusPayload(options = {}) {
-  const token = ownerToken();
   const baseUrl = await activeBaseUrl();
   const record = readPidRecord();
   const alive = pidAlive(Number(record?.pid));
@@ -731,14 +1006,22 @@ async function statusPayload(options = {}) {
   let repos = null;
   let remoteDetail = null;
   let refs = [];
+  let auth = null;
+  let authError = '';
   if (h && !options.skipApiErrors) {
-    repos = await apiJson(baseUrl, token, '/__skyevault/repos');
-    remoteDetail = await remoteRepoDetail(baseUrl, token);
-    refs = lsRemote(baseUrl, token);
+    auth = await ownerAuth();
+    repos = await apiJson(baseUrl, auth.token, '/__skyevault/repos');
+    remoteDetail = await remoteRepoDetail(baseUrl, auth);
+    refs = lsRemote(baseUrl, auth);
   } else if (h && options.skipApiErrors) {
-    try { repos = await apiJson(baseUrl, token, '/__skyevault/repos'); } catch {}
-    try { remoteDetail = await remoteRepoDetail(baseUrl, token); } catch {}
-    try { refs = lsRemote(baseUrl, token); } catch {}
+    try {
+      auth = await ownerAuth();
+      repos = await apiJson(baseUrl, auth.token, '/__skyevault/repos');
+      remoteDetail = await remoteRepoDetail(baseUrl, auth);
+      refs = lsRemote(baseUrl, auth);
+    } catch (error) {
+      authError = error.message;
+    }
   }
   const head = localHead();
   const remoteBranch = refs.find((item) => item.ref === `refs/heads/${currentBranch()}`) || refs.find((item) => item.ref === 'refs/heads/main') || null;
@@ -751,9 +1034,15 @@ async function statusPayload(options = {}) {
     baseUrl,
     cloneUrl: cloneUrlFor(baseUrl),
     workspaceId,
+    ownerWorkspaceSlug,
     repoId,
     remoteName,
-    tokenStoredAt: rel(envFile),
+    auth: {
+      mode: h?.auth === 'gate-introspection' ? 'shared-gate' : (h?.auth === 'static-token' ? 'emergency-static-token' : h?.auth || 'unknown'),
+      gateIntrospectUrl: h?.auth === 'gate-introspection' ? 'configured' : null,
+      runtimeEnv: rel(envFile),
+      authError: authError || null
+    },
     storageRoot: rel(storageRoot),
     repoPath: rel(repoPath()),
     logFile: rel(logFile),

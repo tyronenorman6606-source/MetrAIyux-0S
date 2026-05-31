@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     if (!['POST', 'GET'].includes(String(event.httpMethod || 'GET').toUpperCase())) {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const data = await syncGoogleContacts(auth.sub);
     return json(200, { ok: true, ...data });
   } catch (err) {

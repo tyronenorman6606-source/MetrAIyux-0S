@@ -1,6 +1,13 @@
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-const VALLEY_DECISION_URL = '/valley-verified/VALLEY_RUNTIME_DECISION.json';
+const VALLEY_DECISION_URL = `${valleyMountPath()}/VALLEY_RUNTIME_DECISION.json`;
+function valleyMountPath(){
+  const parts = location.pathname.split('/').filter(Boolean);
+  if(parts[0] === 'valley-verified-marketplace') return '/valley-verified-marketplace';
+  if(parts[0] === 'skyenet' && parts[1] === 'valley-verified') return '/skyenet/valley-verified';
+  if(parts[0] === 'valley-verified') return '/valley-verified';
+  return '';
+}
 async function api(operation, payload = {}){
   const decision = await fetch(VALLEY_DECISION_URL, { cache:'no-store', credentials:'include' }).then((res)=>res.json()).catch(()=>({ decision:'public_directory_static_admin_external_proof_only' }));
   return {

@@ -6,22 +6,13 @@
   const AUTH_OWNER = "main-worker-enforceZeroOsGate";
   const ACCEPTED_GATE_HEADERS = [
     "Authorization",
-    "x-admin-token",
-    "x-free99-admin-code",
     "x-free99-gate-session",
     "x-skye-gate-session"
   ];
   const SHARED_SESSION_KEYS = [
-    "FREE99_PLATFORM_GATE_SESSION_BRANDID_OFFLINE_PWA",
-    "FREE99_PLATFORM_GATE_SESSION",
-    "FREE99_GATE_SESSION",
     "METRAIYUX_GATE_SESSION",
     "SKYGATEFS27_GATE_SESSION",
-    "SKYGATE_USER_TOKEN",
-    "SKYE_GATE_SESSION",
-    "ZERO_OS_GATE_SESSION",
-    "OWNER_ADMIN_SESSION",
-    "saas_client_session"
+    "SKYE_GATE_SESSION"
   ];
 
   const nativeFetch = window.fetch.bind(window);
@@ -141,7 +132,7 @@
       };
     }
 
-    const stored = readKnownStoredSession() || readDiscoveredStoredSession();
+    const stored = readKnownStoredSession();
     if (!stored) return null;
     return {
       ...stored,

@@ -359,6 +359,10 @@ button.small {
 }
 
 .statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
   margin-top: 14px;
   border: 1px solid var(--stroke);
   border-radius: 8px;
@@ -366,6 +370,8 @@ button.small {
   background: rgba(0,0,0,.24);
   color: var(--muted);
 }
+
+.statusbar strong { color: var(--text); }
 
 .list {
   display: grid;

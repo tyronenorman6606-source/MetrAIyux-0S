@@ -4,12 +4,14 @@
 
 `local-runtime-proven / external-provider-boundaries-open`
 
+Live telemetry and customer visibility are counted only when a shared 0S-gated Worker/API endpoint confirms the record. Browser-local queues, static preview sessions, generated dashboard samples, and `serverConfirmed=false` playback or command-bridge events are local proof artifacts, not production-live telemetry.
+
 ## What Changed
 
 The deployed app in `public/` is split into a roomed music platform:
 
 - `public/index.html` — Artist Workspace with room map, rates posture, Live Constellation, and Proof Chain.
-- `public/create.html` — Create Hub with BandLab plus Spotify plus Instagram launch cards and room navigation.
+- `public/daw.html` — DAW Room with first-party music editing, stems, export, and release handoff navigation.
 - `public/daw.html` — first-party fullscreen SkyeMusicNexus DAW.
 - `public/nexus-daw.js` / `public/nexus-daw.css` — native DAW transport, timeline, tracks, mixer, pads, keys, physical keyboard, region editing, loop/metronome, sound packs, mic/Web MIDI hooks, browser WAV mixdown, save, and export UI.
 - `public/stems.html` — Stem Vault with local stem staging, sample pack rail, notes, and gated project save handoff.
@@ -42,7 +44,7 @@ npm run smoke
 ## What The Proof Verifies
 
 - the artist workspace exposes the split platform room map
-- the Create Hub routes to DAW, stems, export, discover, feed, upload, release, rights, and exchange rooms
+- the DAW Room routes to DAW, stems, export, discover, feed, upload, release, rights, and exchange rooms
 - the DAW is native Nexus code and contains no iframe
 - the DAW exposes transport, BPM/key controls, arrangement, tracks, mixer, pads, keys, physical keyboard notes, audio import/decode/preview, region edit tools, undo/redo, loop/metronome, sound-pack insertion, browser WAV mixdown, project save, and export manifest controls
 - third-party DAW vendor source is absent from the Nexus folder
@@ -52,11 +54,12 @@ npm run smoke
 - linked preview playback remains blocked until ownership and preview-use rights are attested
 - release publishing, stream reporting, and operations queueing remain blocked until the distribution rights gate is ready
 - takedown hold requests block later playback while retaining the rights audit trail
-- content request work packets, inbox threads, community posts, release campaign packs, achievement progression, payment ledger, payout queue, and analytics proof still work
+- content request work packets, inbox threads, community posts, release campaign packs, achievement progression, payment ledger, payout queue, and analytics proof still work when the gated Worker/API route confirms them; otherwise the browser keeps pending local proof only
 
 ## What Is Still Not Proven Here
 
 - real identity-provider handoff into production SkyGate tokens beyond the local shared Skye-ID browser bridge
+- owner-handled browser verification; Codex proof in this repo stops at non-browser checks and retained receipts
 - full Spotify-style licensed catalog, recommendation engine, subscription playback stack, and royalty-bearing playlist graph beyond the local Discover proof surface
 - live production R2 credentials, R2 bucket CORS, multipart upload scaling beyond presigned PUT, transcoding, waveform generation, and CDN delivery
 - server-side audio render/transcode workers beyond the current browser WAV mixdown and manifest export

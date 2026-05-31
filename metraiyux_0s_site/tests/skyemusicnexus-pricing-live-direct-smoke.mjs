@@ -146,7 +146,7 @@ async function main() {
   };
 
   const pagesChecks = [
-    ['/public/pricing.html', ['Song Creation pays for provider-backed drafting', 'Drop Packaging', 'DAW Beta']],
+    ['/public/pricing.html', ['Song Creation pays for kAIxU drafting', 'Drop Packaging', 'DAW Beta']],
     ['/public/pricing-song-creation.html', ['Everything Movie', '$23', 'Cinematic Suite']],
     ['/public/pricing-drops.html', ['No AI generation in this lane.', '$15', '$99']],
     ['/public/pricing-artist-apps.html', ['$239', '$1,197+', 'Custom Artist Universe']],
@@ -172,7 +172,7 @@ async function main() {
 
   const owner = await resolveOwnerGate(receipt);
   for (const [route, snippets] of [
-    ['/SkyeMusicNexus/public/pricing.html', ['Song Creation pays for provider-backed drafting', 'Drop Packaging', 'DAW Beta']],
+    ['/SkyeMusicNexus/public/pricing.html', ['Song Creation pays for kAIxU drafting', 'Drop Packaging', 'DAW Beta']],
     ['/SkyeMusicNexus/public/pricing-song-creation.html', ['Everything Movie', '$23', 'Cinematic Suite']],
   ]) {
     const record = await fetchText(`${workerBase}${route}`, { headers: gateHeaders(owner.token) });

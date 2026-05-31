@@ -1,4 +1,4 @@
-const CACHE_NAME = "next-level-gaming-az-v1";
+const CACHE_NAME = "next-level-gaming-az-v2";
 const APP_SHELL = [
   "/",
   "index.html",
@@ -12,6 +12,8 @@ const APP_SHELL = [
   "assets/app.js",
   "assets/icons/icon.svg",
   "assets/media/next-level-logo.png",
+  "assets/media/next-level-hero.mp4",
+  "assets/media/next-level-hero-poster.jpg",
   "assets/media/cyber-city-hero.jpg",
   "assets/media/shop-photo-1.jpg",
   "assets/media/shop-photo-2.jpg",

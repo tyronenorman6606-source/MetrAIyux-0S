@@ -803,7 +803,7 @@ async function ownerBearer(env) {
   if (direct) return { token: direct, source: 'shared_gate_bearer_env' };
   const code = env.FREE99_ADMIN_CODE || env.OWNER_ADMIN_CODE || env.SKYGATE_ADMIN_PASSWORD || env.FS27_ADMIN_PASSWORD || '';
   if (!code) return { token: '', source: 'missing' };
-  const response = await fetch(`${baseUrl}/api/founder-command/login`, {
+  const response = await fetch(`${baseUrl}/api/owner/admin-login`, {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/json' },
     body: JSON.stringify({ code })

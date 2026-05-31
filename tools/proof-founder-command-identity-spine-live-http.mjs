@@ -2,57 +2,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const BASE_URL = process.env.FOUNDER_COMMAND_LIVE_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 const OUT_DIR = path.resolve('test-artifacts/founder-command-identity-spine');
 const LATEST = path.join(OUT_DIR, 'founder-command-identity-spine-live-http-latest.json');
 const FETCH_TIMEOUT_MS = Number(process.env.FOUNDER_COMMAND_PROOF_FETCH_TIMEOUT_MS || 20000);
 const STRESS_REQUESTS = Number(process.env.FOUNDER_COMMAND_IDENTITY_SPINE_STRESS_REQUESTS || 18);
-const CREDENTIAL_KEYS = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of CREDENTIAL_KEYS) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
-
 async function fetchJson(url, init = {}) {
   const started = performance.now();
   const controller = new AbortController();
@@ -97,7 +53,8 @@ async function writeReceipt(receipt) {
 }
 
 async function main() {
-  const credential = await liveCredential();
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: BASE_URL });
+  const token = auth.token || '';
   const generatedAt = new Date().toISOString();
   const proofSlug = `identity-spine-${safeId(generatedAt)}-${Math.random().toString(36).slice(2, 8)}`;
   const clientAccountId = `founder-client:${proofSlug}`;
@@ -121,7 +78,7 @@ async function main() {
     baseUrl: BASE_URL,
     noBrowserProofRun: true,
     ownerManualLiveCheck: true,
-    credentialSource: credential.key || 'missing',
+    credentialSource: auth.credential?.key || auth.credential?.source || 'missing',
     proofClientAccountId: clientAccountId,
     login: null,
     unauth: null,
@@ -131,33 +88,24 @@ async function main() {
     stress: null,
     failures: []
   };
-  if (!credential.value) {
-    receipt.failures.push('No owner credential found in process env, .env, or env.txt.');
+  receipt.login = {
+    status: Number(auth.response?.status || 0) || 0,
+    ok: Boolean(auth.ok && token),
+    tokenReceived: Boolean(token),
+    via: auth.response?.via || auth.credential?.source || ''
+  };
+  if (!token) {
+    receipt.failures.push(auth.response?.body?.error || auth.response?.error || 'No shared FS27/SkyGate bearer or owner gate exchange credential found.');
     const paths = await writeReceipt(receipt);
     console.log(JSON.stringify({ ok: false, receipt: path.relative(process.cwd(), paths.latest), failures: receipt.failures }, null, 2));
     process.exitCode = 1;
     return;
   }
 
-  const login = await fetchJson(`${BASE_URL}/api/founder-command/login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-  receipt.login = {
-    status: login.status,
-    ok: Boolean(login.ok && token),
-    tokenReceived: Boolean(token),
-    elapsedMs: Number(login.elapsedMs.toFixed(2))
-  };
-  if (!token) receipt.failures.push(login.body?.error || 'Live owner login did not return a bearer.');
-
   if (token) {
     const headers = {
       accept: 'application/json',
       authorization: `Bearer ${token}`,
-      'x-admin-token': token,
       'x-free99-gate-session': token,
       'x-skye-gate-session': token
     };

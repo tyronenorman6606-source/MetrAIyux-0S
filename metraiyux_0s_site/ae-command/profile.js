@@ -1,16 +1,10 @@
 const $ = (id) => document.getElementById(id);
 
-function safeJson(value, fallback = null) {
-  try { return JSON.parse(value || 'null') || fallback; } catch { return fallback; }
-}
-
 function gateSession() {
-  return safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_ROUTEX_AE_COMMAND'))
-    || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_ROUTEX_AE_COMMAND'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION'));
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  return bridge?.requireSession?.({ platformId: 'routex-ae-command', usageLane: 'ae-profile' })
+    || bridge?.current?.()
+    || null;
 }
 
 function gateHeaders() {

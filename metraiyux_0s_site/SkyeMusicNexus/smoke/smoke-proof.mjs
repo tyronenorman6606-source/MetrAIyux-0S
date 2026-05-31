@@ -180,7 +180,7 @@ assert(!authHelper.includes(legacyLoginSymbol), "skygate-auth.js still exposes l
 assert(!artistPages.includes(legacyLoginCopy), "public platform pages still expose legacy local login copy");
 assert(authHelper.includes("logoutSession"), "skygate-auth.js is missing local session logout wiring");
 assert(gateSession.includes("MetrAIyuxGateBridge"), "gate-session.js is missing the shared 0S Gate bridge");
-assert(gateSession.includes("/gate/signup/?return="), "gate-session.js is missing the shared 0S signup handoff");
+assert(gateSession.includes("/admin/login.html?return="), "gate-session.js is missing the shared 0S login handoff");
 const retiredMusicSessionKey = "SKYE_MUSIC_NEXUS" + "_GATE_SESSION";
 assert(!gateSession.includes(retiredMusicSessionKey), "gate-session.js still uses the retired app-specific Music Nexus session key");
 assert(!gateSession.includes("localStorage.setItem") && !gateSession.includes("sessionStorage.setItem"), "gate-session.js still writes app-local session storage");

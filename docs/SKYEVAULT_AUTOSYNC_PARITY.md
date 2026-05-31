@@ -82,7 +82,7 @@ Current owner clone URL:
 http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git
 ```
 
-The local Git Basic-auth service token is stored privately in `.skyevault-out/git-remote/owner-git-origin.env` and is not printed or embedded in the clone URL. It is a local service credential, not another founder/admin account. The founder account remains the shared 0S/FS27/SkyGate/Free99 owner session.
+The owner Git origin now starts in shared-gate mode by default. It uses `SKYEVAULT_GATE_INTROSPECT_URL` plus the same 0S/FS27/SkyGate/Free99 owner bearer used by the rest of the 0S. `.skyevault-out/git-remote/owner-git-origin.env` stores ignored runtime metadata, not a normal founder/admin password.
 
 May 30 owner proof:
 
@@ -190,9 +190,11 @@ May 30 source-of-truth closure: the corrected dirty-state full baseline landed a
 
 May 30 owner download handoff correction: the owner-facing default is the HTTP launcher, not a local workspace file link. Run `npm run vault:source:download -- --env-file=.env` to mint the latest owner-private full-repo signed ticket and serve `http://127.0.0.1:17687/FULL_17GB_REPO_DOWNLOAD.html`. `vault:source:status` reports this under `ownerDownloadLauncher`; signed R2 URLs remain private inside `.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.json`.
 
+May 31 owner download and delta correction: the launcher now refreshes expired signed full-repo links when `FULL_17GB_REPO_DOWNLOAD.html` is opened and exposes `/refresh` plus `/refresh.json` for explicit reminting. The delta journal no longer excludes production media extensions and defaults to a 5000 MB per-file ceiling so changed PNG/JPG/MP4 and similar repo assets are carried in encrypted additive packs instead of silently skipped. The corrected real upload wrote receipt `cdv_969c28eebe708b59a649c7c8` with `skippedCount:0`, followed by daemon receipt `cdv_dd6c4a0e11ea53c53659ec8a`, also with `skippedCount:0`.
+
 May 30 additive-baseline correction: after the 17GB encrypted full-repo artifact exists, the daemon treats that artifact as the baseline and advances custody through encrypted additive delta journals. A normal `git+full` daemon tick must not launch a new 17GB full stream or 5GB Git pack just because the repo digest moved; it should cover the baseline modes and run only the delta journal unless the owner explicitly asks for `--force`, `--full-checkpoint`, or disables additive baseline mode. The baseline delta head was seeded from the completed full export timestamp and the first additive catch-up uploaded `skyevault-delta-20260530T071247Z.skyesecrets`, `19,904,673` bytes, receipt `cdv_ebe84f35641c71e201ffff51`, covering 166 changed files and 757 tombstones after baseline.
 
-May 30 owner Git origin closure: `tools/skyevault-owner-git-origin.mjs` now manages the local owner-private smart-HTTP Git origin. The owner origin was seeded into `.skyevault-out/git-remote/storage`, pushed through the token-protected remote, and clone-proved from `http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git`. Proof receipt `.skyevault-out/git-remote/owner-git-origin-proof.json` shows cloned `HEAD` equals local `HEAD` (`6336a975e8702e50e06ed26da1cb026ba06290d6`) with `git fsck --connectivity-only` green. `vault:source:status` now reports this lane as `ownerGitOrigin`.
+May 30 owner Git origin closure: `tools/skyevault-owner-git-origin.mjs` now manages the local owner-private smart-HTTP Git origin. The owner origin was seeded into `.skyevault-out/git-remote/storage`, pushed through the shared-gate remote, and clone-proved from `http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git`. Proof receipt `.skyevault-out/git-remote/owner-git-origin-proof.json` shows cloned `HEAD` equals local `HEAD` (`6336a975e8702e50e06ed26da1cb026ba06290d6`) with `git fsck --connectivity-only` green. `vault:source:status` now reports this lane as `ownerGitOrigin`.
 
 The same hardening pass raised the Git command output buffer for autosync and delta-journal scans. This repo can produce far more than Node's default command buffer in `git status`, and overflowing that buffer made the daemon report a false-clean workspace. The corrected scan now sees the large dirty/untracked surface and includes it in the repo/vault digest before deciding whether to delta-pack or full-stream.
 

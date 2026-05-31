@@ -9,7 +9,6 @@ const requiredFiles = [
   'public/walkthrough.html',
   'public/walkthrough.css',
   'public/walkthrough.js',
-  'public/create.html',
   'public/daw.html',
   'public/stems.html',
   'public/exports.html',
@@ -48,7 +47,6 @@ const index = await text('public/index.html');
 const walkthrough = await text('public/walkthrough.html');
 const walkthroughCss = await text('public/walkthrough.css');
 const walkthroughJs = await text('public/walkthrough.js');
-const create = await text('public/create.html');
 const daw = await text('public/daw.html');
 const stems = await text('public/stems.html');
 const exportsPage = await text('public/exports.html');
@@ -69,8 +67,8 @@ const js = await text('public/neo-nexus.js');
 const supaboyWelcome = await text('artist-storefronts/supaboy/welcome.html');
 const supaboyHandoff = await text('../founder-command/client-credentials/supaboy.json');
 
-const allArtistPages = [index, create, daw, stems, exportsPage, discover, feed, store, brain, drops, upload, player, releases, rights, exchange].join('\n');
-const indexMust = ['Artist Workspace','Create','DAW','Discover','Feed','Upload Studio','Music Player','Releases','Rights','Exchange','Artist Store','Artist Brain','Client Launch Path','Claim Audit','pulse-field'];
+const allArtistPages = [index, daw, stems, exportsPage, discover, feed, store, brain, drops, upload, player, releases, rights, exchange].join('\n');
+const indexMust = ['Artist Workspace','DAW','Discover','Feed','Upload Studio','Music Player','Releases','Rights','Exchange','Artist Store','Artist Brain','Client Launch Path','Claim Audit','pulse-field'];
 for (const marker of indexMust) if (!index.includes(marker)) failures.push(`public/index.html missing ${marker}`);
 const walkthroughMust = ['Full Platform Walkthroughs','data-walkthrough-root','Play Walkthrough','SupaBoy','FULL_PLATFORM_WALKTHROUGH.md'];
 for (const marker of walkthroughMust) if (!walkthrough.includes(marker)) failures.push(`public/walkthrough.html missing ${marker}`);
@@ -88,8 +86,6 @@ try {
 } catch {
   failures.push('founder-command/client-credentials/supaboy.json is not valid JSON');
 }
-const createMust = ['BandLab / Spotify / Instagram command layer','DAW','Stems','Exports','Discover','Feed','Save Studio Project'];
-for (const marker of createMust) if (!create.includes(marker)) failures.push(`public/create.html missing ${marker}`);
 const dawMust = ['Native DAW','SkyeMusicNexus DAW','dawTrackGrid','dawMixerChannels','dawPads','dawKeys','audioEngineButton','dawAudioStatus','dawWorkbenchBody','dawStatusProject','undoDawButton','splitRegionButton','dawSoundLibrary','mixdownDawButton','micRecordButton','midiDawButton','nexus-daw.js'];
 for (const marker of dawMust) if (!daw.includes(marker)) failures.push(`public/daw.html missing ${marker}`);
 if (daw.includes('<iframe')) failures.push('public/daw.html must not contain an iframe');
@@ -112,7 +108,7 @@ const legacyLoginSymbol = 'loginLocal' + 'Operator';
 if (allArtistPages.includes(legacyLoginCopy)) failures.push('public platform pages still expose legacy local login copy');
 if (js.includes(legacyLoginSymbol)) failures.push('neo-nexus.js still exposes legacy local password login wiring');
 
-for (const marker of ['MetrAIyuxGateBridge','/gate/signup/?return=','SkyeMusicGate']) {
+for (const marker of ['MetrAIyuxGateBridge','/admin/login.html?return=','SkyeMusicGate']) {
   if (!gate.includes(marker)) failures.push(`gate-session.js missing ${marker}`);
 }
 const retiredMusicSessionKey = 'SKYE_MUSIC_NEXUS' + '_GATE_SESSION';
@@ -127,4 +123,4 @@ if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
-console.log(JSON.stringify({ ok: true, app: 'SkyeMusicNexus NeoFront', verified: ['artist workspace', 'create hub', 'native DAW', 'stem vault', 'export forge', 'discover surface', 'open social feed surface', 'artist store room', 'local artist brain room', 'SkyeMeter and giveaways', 'Pixelfed/Fediverse connector controls', 'upload studio', 'protected audio upload', 'artist stage', 'protected review stage', 'artist exchange', 'content request exchange', 'community relay', 'achievement orbit', 'release campaign forge', 'stream deck playback', 'rights vault', 'takedown hold', 'vinyl signal system', 'release forge', 'royalty river', 'operations sequencer', 'shared client access wiring'] }, null, 2));
+console.log(JSON.stringify({ ok: true, app: 'SkyeMusicNexus NeoFront', verified: ['artist workspace', 'native DAW', 'stem vault', 'export forge', 'discover surface', 'open social feed surface', 'artist store room', 'local artist brain room', 'SkyeMeter and giveaways', 'Pixelfed/Fediverse connector controls', 'upload studio', 'protected audio upload', 'artist stage', 'protected review stage', 'artist exchange', 'content request exchange', 'community relay', 'achievement orbit', 'release campaign forge', 'stream deck playback', 'rights vault', 'takedown hold', 'vinyl signal system', 'release forge', 'royalty river', 'operations sequencer', 'shared client access wiring'] }, null, 2));

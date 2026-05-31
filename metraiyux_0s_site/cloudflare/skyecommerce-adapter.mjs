@@ -75,8 +75,7 @@ function gateHandoffSecret(env) {
   return String(
     env.SKYECOMMERCE_GATE_HANDOFF_SECRET
     || env.OWNER_ADMIN_SESSION_SECRET
-    || env.FREE99_ADMIN_CODE
-    || env.SITE_OPERATOR_ADMIN_TOKEN
+    || 'skyecommerce-mounted-shared-0s-gate'
     || ''
   ).trim();
 }
@@ -116,6 +115,38 @@ function actorName(auth, env) {
   ).trim();
 }
 
+function actorSub(auth) {
+  return String(
+    auth?.identity?.sub
+    || auth?.identity?.id
+    || auth?.gate?.data?.sub
+    || auth?.gate?.data?.id
+    || auth?.gate?.data?.user?.id
+    || ''
+  ).trim();
+}
+
+function actorCustomerId(auth) {
+  return String(
+    auth?.identity?.customer_id
+    || auth?.identity?.customerId
+    || auth?.gate?.data?.customer_id
+    || auth?.gate?.data?.customerId
+    || auth?.gate?.data?.user?.primary_customer_id
+    || ''
+  ).trim();
+}
+
+function actorWorkspaceId(auth) {
+  return String(
+    auth?.identity?.workspace_id
+    || auth?.identity?.workspaceId
+    || auth?.gate?.data?.workspace_id
+    || auth?.gate?.data?.workspaceId
+    || ''
+  ).trim();
+}
+
 function appRequest(request, url, env, auth) {
   const target = new URL(request.url);
   target.pathname = mountedSuffix(url.pathname);
@@ -124,6 +155,9 @@ function appRequest(request, url, env, auth) {
   if (secret) headers.set('x-skyecommerce-gate-handoff', secret);
   headers.set('x-skyecommerce-gate-email', actorEmail(auth, env));
   headers.set('x-skyecommerce-gate-name', actorName(auth, env));
+  headers.set('x-skyecommerce-gate-sub', actorSub(auth));
+  headers.set('x-skyecommerce-gate-customer-id', actorCustomerId(auth));
+  headers.set('x-skyecommerce-gate-workspace-id', actorWorkspaceId(auth));
   headers.set('x-skyecommerce-mounted-base', SKYECOMMERCE_MOUNT);
   return new Request(target.toString(), {
     method: request.method,
@@ -155,7 +189,9 @@ function rewriteMountedLocation(response, requestUrl) {
 
 export async function handleSkyeCommerceRoute(request, env, ctx, url, helpers = {}) {
   if (url.pathname !== SKYECOMMERCE_MOUNT && !url.pathname.startsWith(`${SKYECOMMERCE_MOUNT}/`)) return null;
-  const auth = helpers.requireGateAuth ? await helpers.requireGateAuth(request, env, 'SkyeCommerce shared 0S gate') : { ok: true };
+  const auth = helpers.requireGateAuth
+    ? await helpers.requireGateAuth(request, env, 'SkyeCommerce shared 0S gate')
+    : { ok: false, response: new Response(JSON.stringify({ ok: false, error: 'SkyeCommerce requires the canonical FS27/SkyGate auth helper.', code: 'fs27_helper_required' }), { status: 503, headers: { 'content-type': 'application/json; charset=utf-8' } }) };
   if (!auth.ok) return auth.response;
   if (isRetiredAeSurface(url.pathname)) return retiredAeRedirect(url);
   if (!skyeCommerceApp?.fetch) return new Response('SkyeCommerce runtime is not available.', { status: 503 });

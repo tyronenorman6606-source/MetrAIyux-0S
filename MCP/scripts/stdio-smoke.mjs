@@ -99,6 +99,12 @@ try {
   const tools = await client.listTools();
   const toolNames = tools.tools.map((tool) => tool.name);
   assert(toolNames.includes('repo_read'), 'repo_read tool missing');
+  assert(toolNames.includes('skyenet_source_status'), 'skyenet_source_status tool missing');
+  assert(toolNames.includes('skyenet_list_codebases'), 'skyenet_list_codebases tool missing');
+  assert(toolNames.includes('skyenet_source_manifest'), 'skyenet_source_manifest tool missing');
+  assert(toolNames.includes('skyenet_source_tree'), 'skyenet_source_tree tool missing');
+  assert(toolNames.includes('skyenet_source_file'), 'skyenet_source_file tool missing');
+  assert(toolNames.includes('skyenet_source_search'), 'skyenet_source_search tool missing');
   assert(toolNames.includes('design_find'), 'design_find tool missing');
   assert(toolNames.includes('design_validate'), 'design_validate tool missing');
   assert(toolNames.includes('design_content_audit'), 'design_content_audit tool missing');
@@ -120,6 +126,14 @@ try {
   assert(toolNames.includes('design_stack_catalog'), 'design_stack_catalog tool missing');
   assert(toolNames.includes('design_recipe_plan'), 'design_recipe_plan tool missing');
   assert(toolNames.includes('design_apply_mcp_parts'), 'design_apply_mcp_parts tool missing');
+
+  const skynetStatus = await client.callTool({
+    name: 'skyenet_source_status',
+    arguments: {}
+  });
+  const skynetStatusText = skynetStatus.content.map((item) => item.text || '').join('\n');
+  assert(skynetStatusText.includes('shared_gate_token_configured'), 'SkyeNet source status should expose redacted auth readiness');
+  assert(skynetStatusText.includes('skyenet_source_manifest'), 'SkyeNet source status should list source manifest tool');
 
   const elements = await client.callTool({
     name: 'design_elements',

@@ -59,7 +59,7 @@ for (const drop of simplePricing.dropPricing.filter((item) => item.id.includes('
 }
 
 const pages = {
-  'public/pricing.html': ['Drop Packaging', 'Artist Apps', 'Song Creation', 'DAW Beta', 'Song Creation pays for kAIxU drafting', 'Open Song Creator'],
+  'public/pricing.html': ['Drop Packaging', 'Artist Apps', 'Song Creation', 'DAW Beta', 'Song Creation pays for kAIxU drafting'],
   'public/pricing-drops.html': ['No AI generation in this lane.', '$15', '$29', '$49', '$99'],
   'public/pricing-artist-apps.html': ['$239', '$444', '$796', '$996', '$1,197+'],
   'public/pricing-song-creation.html': ['$23', '$49', '$99', '$249', '$497+', 'Everything Movie', '12 total generated minutes', 'Prompt-led, not hardcoded'],

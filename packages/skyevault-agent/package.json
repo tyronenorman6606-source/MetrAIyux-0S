@@ -1,0 +1,22 @@
+{
+  "name": "@metraiyux/skyevault-agent",
+  "version": "0.2.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "skyevault-agent": "bin/skyevault-agent.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "package.json"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "doctor": "node bin/skyevault-agent.mjs doctor --json",
+    "snapshot:dry": "node bin/skyevault-agent.mjs snapshot --repo=. --dry-run --json",
+    "sync:dry": "node bin/skyevault-agent.mjs sync --repo=. --dry-run --json"
+  }
+}

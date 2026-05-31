@@ -12,7 +12,7 @@ const { mirrorPlatformEvent } = require("./_skygate");
 exports.handler = async (event) => {
   try {
     const method = String(event.httpMethod || "GET").toUpperCase();
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const userRes = await query(
       `select id, handle, email, skymail_id, workspace_id, fs27_customer_id, fs27_gate_card_id
          from users

@@ -530,6 +530,7 @@
   }
 
   function mountPath() {
+    if (location.pathname.startsWith('/valley-verified-marketplace')) return '/valley-verified-marketplace';
     if (location.pathname.startsWith('/skyenet/valley-verified')) return '/skyenet/valley-verified';
     if (location.pathname.startsWith('/valley-verified')) return '/valley-verified';
     return '';
@@ -540,8 +541,9 @@
     const mount = mountPath();
     if (!value) return mount || '/';
     if (/^https?:\/\//i.test(value) || value.startsWith('mailto:') || value.startsWith('tel:')) return value;
-    if (value.startsWith('/skyenet/valley-verified/')) return value;
-    if (value.startsWith('/valley-verified/')) return mount === '/skyenet/valley-verified' ? `${mount}${value.slice('/valley-verified'.length)}` : value;
+    if (value.startsWith(`${mount}/`)) return value;
+    if (value.startsWith('/skyenet/valley-verified/')) return mount ? `${mount}${value.slice('/skyenet/valley-verified'.length)}` : value;
+    if (value.startsWith('/valley-verified/')) return mount ? `${mount}${value.slice('/valley-verified'.length)}` : value;
     return `${mount}${value.startsWith('/') ? value : `/${value}`}`.replace(/\/{2,}/g, '/');
   }
 

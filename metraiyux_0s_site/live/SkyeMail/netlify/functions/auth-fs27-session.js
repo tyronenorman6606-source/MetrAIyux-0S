@@ -1,8 +1,9 @@
 const { json } = require("./_utils");
 const {
+  getBearer,
   requireFs27,
   ensureSkyeMailUser,
-  mintSkyeMailSession,
+  sessionFromGateUser,
   mirrorPlatformEvent
 } = require("./_skygate");
 
@@ -14,7 +15,8 @@ exports.handler = async (event) => {
 
     const claims = await requireFs27(event);
     const user = await ensureSkyeMailUser(claims);
-    const token = mintSkyeMailSession(user, claims);
+    const token = getBearer(event);
+    const session = sessionFromGateUser(user, claims, token);
 
     await mirrorPlatformEvent({
       actor: user.email,
@@ -36,11 +38,24 @@ exports.handler = async (event) => {
     return json(200, {
       ok: true,
       token,
+      session_kind: "fs27_gate_bearer",
       handle: user.handle,
       email: user.email,
       skymail_id: user.skymail_id || null,
       workspace_id: user.workspace_id || null,
       auth_provider: "skygatefs27",
+      session: {
+        sub: session.sub,
+        handle: session.handle,
+        email: session.email,
+        skymail_id: session.skymail_id,
+        workspace_id: session.workspace_id,
+        auth_provider: session.auth_provider,
+        fs27_sub: session.fs27_sub,
+        fs27_customer_id: session.fs27_customer_id,
+        fs27_gate_card_id: session.fs27_gate_card_id,
+        fs27_role: session.fs27_role
+      },
       fs27: {
         active: true,
         sub: claims.sub || null,

@@ -34,7 +34,10 @@ requireTokens("visual-data-kit.js", visualKit, [
   "data-visual-donut",
   "data-visual-timeline",
   "data-visual-stack",
-  "data-visual-event-mix"
+  "data-visual-event-mix",
+  "workspace_id_required_for_live_visuals",
+  "customer_visuals.loaded",
+  "/api/saas/action-event"
 ]);
 
 const customerData = await read(path.join(siteDir, "saas", "customer-data.html"));
@@ -42,17 +45,26 @@ requireTokens("saas/customer-data.html", customerData, [
   "visual-data-kit.js",
   "data-visual-dashboard",
   "/api/saas/customer-visuals?workspace_id={workspace_id}",
-  "../data/customer-visuals-demo.json",
-  "Sovereign stack state"
+  "data-require-live=\"true\"",
+  "Sovereign stack state",
+  "Worker audit trace"
 ]);
+if (/customer-visuals-demo\.json/.test(customerData)) {
+  fail("saas/customer-data.html must not reference customer-visuals-demo.json");
+}
 
 const customerDashboard = await read(path.join(siteDir, "saas", "customer-dashboard.html"));
 requireTokens("saas/customer-dashboard.html", customerDashboard, [
   "customer-data.html",
   "visual-data-kit.js",
   "Workspace visual snapshot",
-  "data-visual-dashboard"
+  "data-visual-dashboard",
+  "data-visual-audit",
+  "Worker-backed command boundary"
 ]);
+if (/customer-visuals-demo\.json/.test(customerDashboard)) {
+  fail("saas/customer-dashboard.html must not reference customer-visuals-demo.json");
+}
 
 const saasHub = await read(path.join(siteDir, "saas", "index.html"));
 requireTokens("saas/index.html", saasHub, [
@@ -71,21 +83,12 @@ for (const field of ["workspace", "kpis", "progress", "bars", "donut", "timeline
 for (const [label, source] of [
   ["visual-data-kit.js", visualKit],
   ["saas/customer-data.html", customerData],
-  ["visualization-stack.json", JSON.stringify(stack)],
-  ["customer-visuals-demo.json", JSON.stringify(await readJson(path.join(siteDir, "data", "customer-visuals-demo.json")))]
+  ["saas/customer-dashboard.html", customerDashboard],
+  ["visualization-stack.json", JSON.stringify(stack)]
 ]) {
   if (/Chart\.js|chartjs|open_source|Open-source visualization path/i.test(source)) {
     fail(`${label} should not expose an open-source charting path on customer visual surfaces`);
   }
-}
-
-const demo = await readJson(path.join(siteDir, "data", "customer-visuals-demo.json"));
-if (demo.schema_version !== "0s.customer_visuals.v1") fail("customer-visuals-demo.json has the wrong schema_version");
-for (const field of ["workspace", "kpis", "progress", "bars", "donut", "timeline", "sovereign_stack", "event_mix"]) {
-  if (!demo[field]) fail(`customer-visuals-demo.json missing ${field}`);
-}
-if (!demo.source?.preferred_endpoint?.includes("/api/saas/customer-visuals")) {
-  fail("customer-visuals-demo.json must point at the customer visuals endpoint");
 }
 
 const worker = await read(path.join(siteDir, "cloudflare-saas-provisioning-worker", "src", "index.js"));
@@ -98,7 +101,8 @@ requireTokens("worker index.js", worker, [
   "customer_visuals_view"
 ]);
 
-const fs27Index = await read(path.join(root, "SkyeGateFS27", "index.html"));
+const fs27Root = path.join(siteDir, "skyegate", "source", "SkyeGateFS27");
+const fs27Index = await read(path.join(fs27Root, "index.html"));
 requireTokens("SkyeGateFS27/index.html", fs27Index, [
   "0S Visual Mirror",
   "pcVisualBars",
@@ -106,7 +110,7 @@ requireTokens("SkyeGateFS27/index.html", fs27Index, [
   "FS27 turns mirrored 0S events into visible operating state"
 ]);
 
-const fs27App = await read(path.join(root, "SkyeGateFS27", "assets", "app.js"));
+const fs27App = await read(path.join(fs27Root, "assets", "app.js"));
 requireTokens("SkyeGateFS27/assets/app.js", fs27App, [
   "renderFs27VisualBars",
   "pcVisualBars",

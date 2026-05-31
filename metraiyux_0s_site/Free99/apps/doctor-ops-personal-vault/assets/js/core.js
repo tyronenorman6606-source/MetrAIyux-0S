@@ -121,6 +121,20 @@
     if(/approved|completed|closed|stable|ready|final|normal|good|yes|resolved|scheduled/.test(v)) return 'ok';
     return 'info';
   }
+  function localBoundary(source){
+    const s = String(source || 'browser-local');
+    const localApi = /api|file/.test(s);
+    return {
+      source: localApi ? 'local-file-api' : 'browser-local',
+      label: localApi ? 'local file API (local/offline)' : 'local/offline browser',
+      liveBridgeReceipt:null
+    };
+  }
+  function recordBoundary(rec){
+    if(rec?.boundary?.liveBridgeReceipt || rec?.bridge_receipt || rec?.liveBridgeReceipt) return 'live bridge receipt';
+    return rec?.boundary?.label || 'local/offline browser';
+  }
+  function boundaryBadge(rec){ return `<span class="badge info">${esc(recordBoundary(rec))}</span>`; }
   function storageKey(appId){ return `${SUITE}:${appId}:state`; }
   function workspaceKey(){ return `${PLATFORM}:workspace`; }
   function defaultWorkspace(){
@@ -155,7 +169,7 @@
     return [config.id, rec.patientName || rec.name || recordTitleFallback(config, rec), rec[dateKey] || '', rec[config.statusField || 'status'] || ''].map(v => String(v || '').trim().toLowerCase()).join('|');
   }
   function createReceipt(state, config, action, detail, payload){
-    const receipt = {id:uid('rcpt'), at:isoNow(), appId:config.id, appTitle:config.title, action, detail, payload:payload || null};
+    const receipt = {id:uid('rcpt'), at:isoNow(), appId:config.id, appTitle:config.title, action, detail, payload:payload || null, boundary:localBoundary('browser-local')};
     state.receipts.unshift(receipt);
     state.receipts = state.receipts.slice(0,160);
     return receipt;
@@ -186,7 +200,7 @@
   function createApp(config){
     const key = storageKey(config.id);
     const compute = typeof config.compute === 'function' ? config.compute : (r => r);
-    const seedRecords = clone(config.sampleRecords || []).map(r => compute({...r, id:r.id || uid(config.id), createdAt:r.createdAt || isoNow(), updatedAt:r.updatedAt || isoNow()}, {daysBetween, formatDate, formatDateTime}));
+    const seedRecords = clone(config.sampleRecords || []).map(r => compute({...r, id:r.id || uid(config.id), createdAt:r.createdAt || isoNow(), updatedAt:r.updatedAt || isoNow(), boundary:r.boundary || localBoundary('browser-local')}, {daysBetween, formatDate, formatDateTime}));
     const seed = {
       records: seedRecords,
       audit: [{id:uid('audit'), at:isoNow(), message:'Initialized app with synthetic demo records.'}],
@@ -259,7 +273,7 @@
 
     const syncPanel = document.createElement('section');
     syncPanel.className = 'panel';
-    syncPanel.innerHTML = `<div class="section-title"><div><h2>Runtime sync bridge</h2><p>Optional local API persistence. Browser-only mode still works when the runtime is not started.</p></div></div><div id="runtime-sync" class="sync-panel"><strong>Checking local API...</strong><span>Run npm run server to enable file-backed API sync.</span></div>`;
+    syncPanel.innerHTML = `<div class="section-title"><div><h2>Local file sync bridge</h2><p>Optional local file API persistence. Browser-only mode still works when the local runtime is not started.</p></div></div><div id="runtime-sync" class="sync-panel"><strong>Checking local file API...</strong><span>Run npm run server to enable file-backed local sync.</span></div>`;
     sideStack.insertBefore(syncPanel, sideStack.children[3]);
 
     const workspaceStrip = document.createElement('div');
@@ -279,6 +293,7 @@
       rec.id = raw.id || uid(config.id);
       rec.createdAt = isUpdate ? (raw.createdAt || isoNow()) : (raw.createdAt || isoNow());
       rec.updatedAt = isoNow();
+      rec.boundary = raw.boundary || localBoundary(raw._boundarySource || 'browser-local');
       rec._fingerprint = fingerprint(config, rec);
       rec = compute(rec, {daysBetween, formatDate, formatDateTime});
       rec._quality = qualityFor(config, rec);
@@ -316,9 +331,9 @@
       const api = window.DOCTOR_OPS_API;
       const activeRecord = current();
       const selectedText = activeRecord ? `Selected: ${recordTitleFallback(config, activeRecord)}` : 'No record selected';
-      el.innerHTML = `<div class="sync-grid"><div class="sync-card"><strong id="sync-health">Runtime status</strong><span>${esc(message || 'Checking optional API bridge...')}</span><small>${esc(selectedText)}</small></div><div class="sync-card"><strong>${esc(state.records.length)}</strong><span>Browser records in this app</span><small>Push keeps the local file vault aligned with browser data.</small></div><div class="sync-card"><strong>${esc(state.receipts.length)}</strong><span>Local receipts</span><small>Runtime actions add receipts to the local ledger.</small></div></div><div class="action-panel"><strong>Sync and queue controls</strong><span>Uses same-origin /api endpoints when npm run server is active. Data stays in the local file vault; no login is implemented here.</span><div class="toolbar compact"><button class="btn ghost" id="sync-pull-app" type="button">Pull app from API</button><button class="btn ghost" id="sync-push-app" type="button">Push app to API</button><button class="btn ghost" id="sync-queue-record" type="button" ${activeRecord ? '' : 'disabled'}>Queue selected review</button><button class="btn ghost" id="sync-action-record" type="button" ${activeRecord ? '' : 'disabled'}>Receipt selected action</button></div></div>`;
+      el.innerHTML = `<div class="sync-grid"><div class="sync-card"><strong id="sync-health">Local runtime status</strong><span>${esc(message || 'Checking optional local file API bridge...')}</span><small>${esc(selectedText)}</small></div><div class="sync-card"><strong>${esc(state.records.length)}</strong><span>Local/offline records</span><small>Push mirrors browser data to the local file store only.</small></div><div class="sync-card"><strong>${esc(state.receipts.length)}</strong><span>Local/offline receipts</span><small>No live bridge receipt is created here.</small></div></div><div class="action-panel"><strong>Local file sync controls</strong><span>Uses same-origin /api endpoints when npm run server is active. Data stays in the local file vault; no backend telemetry bridge or login is implemented here.</span><div class="toolbar compact"><button class="btn ghost" id="sync-pull-app" type="button">Pull app from local API</button><button class="btn ghost" id="sync-push-app" type="button">Push app to local API</button><button class="btn ghost" id="sync-queue-record" type="button" ${activeRecord ? '' : 'disabled'}>Queue selected review</button><button class="btn ghost" id="sync-action-record" type="button" ${activeRecord ? '' : 'disabled'}>Receipt selected action</button></div></div>`;
       if(!api){ el.querySelector('#sync-health').textContent = 'Browser-only'; return; }
-      api.health().then(h => { const s = el.querySelector('#sync-health'); if(s) s.textContent = `Connected · ${h.version}`; }).catch(err => { const s = el.querySelector('#sync-health'); if(s) s.textContent = `Browser-only · ${err.message}`; });
+      api.health().then(h => { const s = el.querySelector('#sync-health'); if(s) s.textContent = `Local file API · ${h.version}`; }).catch(err => { const s = el.querySelector('#sync-health'); if(s) s.textContent = `Browser-only · ${err.message}`; });
       el.querySelector('#sync-pull-app').addEventListener('click', async () => {
         try{
           const remote = await api.pullApp(config.id);
@@ -327,27 +342,27 @@
           const byId = new Map(state.records.map((r, idx) => [r.id, idx]));
           let created = 0, updated = 0;
           rows.forEach(row => {
-            const normalized = normalize(row, !!row.id);
+            const normalized = normalize({...row, boundary:row.boundary || localBoundary('local-file-api'), _boundarySource:'local-file-api'}, !!row.id);
             if(normalized.id && byId.has(normalized.id)){ state.records[byId.get(normalized.id)] = {...state.records[byId.get(normalized.id)], ...normalized, updatedAt:isoNow()}; updated++; }
             else { state.records.unshift(normalized); created++; }
           });
           snapshot(state, config, 'api-pull-app', before, clone(state.records));
-          log(`Pulled ${rows.length} API records into ${config.title}: ${created} created, ${updated} updated.`, 'api-pull-app', {rows:rows.length, created, updated});
+          log(`Pulled ${rows.length} local file API records into ${config.title}: ${created} created, ${updated} updated.`, 'api-pull-app', {rows:rows.length, created, updated, boundary:localBoundary('local-file-api')});
           persist(); renderAll();
         }catch(err){ renderSyncPanel(`Pull failed: ${err.message}`); }
       });
       el.querySelector('#sync-push-app').addEventListener('click', async () => {
-        try{ const result = await api.pushApp(config.id, state.records); log(`Pushed ${state.records.length} records to local API: ${result.created || 0} created, ${result.updated || 0} updated.`, 'api-push-app', result); renderSyncPanel('Push completed.'); }
+        try{ const result = await api.pushApp(config.id, state.records); log(`Pushed ${state.records.length} records to local file API: ${result.created || 0} created, ${result.updated || 0} updated.`, 'api-push-app', {...result, boundary:localBoundary('local-file-api')}); renderSyncPanel('Local file API push completed.'); }
         catch(err){ renderSyncPanel(`Push failed: ${err.message}`); }
       });
       el.querySelector('#sync-queue-record')?.addEventListener('click', async () => {
         const rec = current(); if(!rec) return;
-        try{ const result = await api.enqueue({slug:config.id, recordId:rec.id, action:'operator-review', priority:badgeTone(rec[config.statusField || 'status']) === 'danger' ? 'high' : 'normal', notes:`Review ${recordTitleFallback(config, rec)}`}); log(`Queued runtime review task for ${recordTitleFallback(config, rec)}.`, 'api-queue-record', result.task || result); renderSyncPanel('Review queued in local API.'); }
+        try{ const result = await api.enqueue({slug:config.id, recordId:rec.id, action:'operator-review', priority:badgeTone(rec[config.statusField || 'status']) === 'danger' ? 'high' : 'normal', notes:`Review ${recordTitleFallback(config, rec)}`}); log(`Queued local file API review task for ${recordTitleFallback(config, rec)}.`, 'api-queue-record', result.task || result); renderSyncPanel('Review queued in local file API.'); }
         catch(err){ renderSyncPanel(`Queue failed: ${err.message}`); }
       });
       el.querySelector('#sync-action-record')?.addEventListener('click', async () => {
         const rec = current(); if(!rec) return;
-        try{ const result = await api.executeAction({slug:config.id, recordId:rec.id, action:'operator-reviewed', notes:`Operator reviewed ${recordTitleFallback(config, rec)}`}); log(`Recorded runtime action for ${recordTitleFallback(config, rec)}.`, 'api-action-record', result.action || result); renderSyncPanel('Action receipt written to local API.'); }
+        try{ const result = await api.executeAction({slug:config.id, recordId:rec.id, action:'operator-reviewed', notes:`Operator reviewed ${recordTitleFallback(config, rec)}`}); log(`Recorded local file API action for ${recordTitleFallback(config, rec)}.`, 'api-action-record', result.action || result); renderSyncPanel('Local/offline action receipt written to local API.'); }
         catch(err){ renderSyncPanel(`Action failed: ${err.message}`); }
       });
     }
@@ -397,7 +412,7 @@
           tr.appendChild(td);
         });
         const a = document.createElement('td');
-        a.innerHTML = `<div class="toolbar compact"><button class="btn ghost" data-a="edit">Edit</button><button class="btn ghost" data-a="clone">Clone</button><button class="btn ghost" data-a="delete">Delete</button></div>`;
+        a.innerHTML = `<div class="toolbar compact">${boundaryBadge(rec)}<button class="btn ghost" data-a="edit">Edit</button><button class="btn ghost" data-a="clone">Clone</button><button class="btn ghost" data-a="delete">Delete</button></div>`;
         a.querySelector('[data-a="edit"]').addEventListener('click', () => { editingId = rec.id; document.getElementById('form-mode').textContent = 'Update'; fill(rec); window.scrollTo({top:0, behavior:'smooth'}); });
         a.querySelector('[data-a="clone"]').addEventListener('click', () => {
           const c = normalize({...rec, id:null, createdAt:null, updatedAt:null}, false);
@@ -424,7 +439,7 @@
         const field = config.fields.find(f => f.name === k); const label = field ? field.label : labelize(k); let val = rec[k];
         if(field && field.type === 'date') val = formatDate(val);
         return `<strong>${esc(label)}</strong><span>${esc(val || '—')}</span>`;
-      }).join('')}<strong>Record ID</strong><span>${esc(rec.id)}</span><strong>Updated</strong><span>${esc(formatDateTime(rec.updatedAt))}</span></div>`;
+      }).join('')}<strong>Source boundary</strong><span>${esc(recordBoundary(rec))}</span><strong>Record ID</strong><span>${esc(rec.id)}</span><strong>Updated</strong><span>${esc(formatDateTime(rec.updatedAt))}</span></div>`;
       preview.textContent = config.preview(rec, {formatDate, formatDateTime, daysBetween});
     }
     function renderOps(){
@@ -433,7 +448,7 @@
       if(!rec){ el.innerHTML = `<div class="empty">Select a record to see quality and action signals.</div>`; return; }
       const quality = qualityFor(config, rec);
       const signals = inferOpsSignals(rec);
-      el.innerHTML = `<div class="ops-grid"><div class="ops-card"><strong>${quality.score}%</strong><span>Field completion</span><small>${quality.completed}/${quality.total} configured fields filled</small></div><div class="ops-card"><strong>${quality.missing.length}</strong><span>Core missing fields</span><small>${quality.missing.length ? quality.missing.map(labelize).join(', ') : 'Core data present'}</small></div><div class="ops-card"><strong>${esc(state.versions.filter(v => v.after?.id === rec.id || v.before?.id === rec.id).length)}</strong><span>Restore points</span><small>Saved for this record</small></div></div><div class="signal-row">${signals.map(s => `<span class="badge ${esc(s.tone)}">${esc(s.label)}</span>`).join('')}</div><div class="toolbar"><button class="btn ghost" id="copy-summary" type="button">Copy summary</button><button class="btn ghost" id="copy-json" type="button">Copy record JSON</button></div>`;
+      el.innerHTML = `<div class="ops-grid"><div class="ops-card"><strong>${quality.score}%</strong><span>Field completion</span><small>${quality.completed}/${quality.total} configured fields filled</small></div><div class="ops-card"><strong>${quality.missing.length}</strong><span>Core missing fields</span><small>${quality.missing.length ? quality.missing.map(labelize).join(', ') : 'Core data present'}</small></div><div class="ops-card"><strong>${esc(state.versions.filter(v => v.after?.id === rec.id || v.before?.id === rec.id).length)}</strong><span>Restore points</span><small>Saved for this record</small></div></div><div class="signal-row">${boundaryBadge(rec)}${signals.map(s => `<span class="badge ${esc(s.tone)}">${esc(s.label)}</span>`).join('')}</div><div class="toolbar"><button class="btn ghost" id="copy-summary" type="button">Copy summary</button><button class="btn ghost" id="copy-json" type="button">Copy record JSON</button></div>`;
       el.querySelector('#copy-summary').addEventListener('click', async () => { await navigator.clipboard.writeText(config.preview(rec, {formatDate, formatDateTime, daysBetween})); log(`Copied generated summary for ${recordTitleFallback(config, rec)}.`, 'copy-summary', {id:rec.id}); });
       el.querySelector('#copy-json').addEventListener('click', async () => { await navigator.clipboard.writeText(JSON.stringify(rec, null, 2)); log(`Copied JSON for ${recordTitleFallback(config, rec)}.`, 'copy-record-json', {id:rec.id}); });
     }
@@ -461,7 +476,7 @@
     }
     function renderAudit(){
       audit.innerHTML = '';
-      state.audit.slice(0,24).forEach(item => { const d = document.createElement('div'); d.className = 'audit-item'; d.innerHTML = `<strong>${esc(item.message)}</strong><span>${esc(formatDateTime(item.at))}</span>`; audit.appendChild(d); });
+      state.audit.slice(0,24).forEach(item => { const d = document.createElement('div'); d.className = 'audit-item'; d.innerHTML = `<strong>${esc(item.message)}</strong><span>${esc(formatDateTime(item.at))} · local/offline ledger</span>`; audit.appendChild(d); });
     }
     function renderAll(){ renderWorkspace(); renderMetrics(); renderTable(); renderDetail(); renderOps(); renderVersions(); renderAudit(); renderSyncPanel(); }
 

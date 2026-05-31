@@ -10,6 +10,16 @@ window.SkyePersonalVault = (() => {
   const splitPath = (path = '') => normalizePath(path).split('/').filter(Boolean);
   const joinPath = (...parts) => normalizePath(parts.filter(Boolean).join('/'));
 
+  function localCustody(existing = null, overrides = {}) {
+    const hasReceiptOverride = Object.prototype.hasOwnProperty.call(overrides, 'liveBridgeReceipt');
+    return {
+      mode: overrides.mode || existing?.custody?.mode || 'local_offline_indexeddb',
+      label: overrides.label || existing?.custody?.label || 'Local/offline IndexedDB',
+      liveBridgeReceipt: hasReceiptOverride ? overrides.liveBridgeReceipt : (existing?.custody?.liveBridgeReceipt || null),
+      updatedAt: overrides.updatedAt || now()
+    };
+  }
+
   function extensionFor(name = '') {
     const match = String(name).match(/(\.[^.]+)$/);
     return match ? match[1].toLowerCase() : '';
@@ -95,8 +105,8 @@ window.SkyePersonalVault = (() => {
   async function ensureSeed() {
     const items = await listAllItems();
     if (items.length) return;
-    const docsFolder = { id: uid('fld'), kind: 'folder', name: 'Documents', folderPath: '', path: 'Documents', updatedAt: now() };
-    const mediaFolder = { id: uid('fld'), kind: 'folder', name: 'Media', folderPath: '', path: 'Media', updatedAt: now() };
+    const docsFolder = { id: uid('fld'), kind: 'folder', name: 'Documents', folderPath: '', path: 'Documents', updatedAt: now(), custody: localCustody() };
+    const mediaFolder = { id: uid('fld'), kind: 'folder', name: 'Media', folderPath: '', path: 'Media', updatedAt: now(), custody: localCustody() };
     await put(STORES.items, docsFolder);
     await put(STORES.items, mediaFolder);
     await createBlankDoc({ title: 'Welcome to SkyeVault Pro', folderPath: 'Documents', htmlContent: `<h1>Welcome to SkyeVault Pro</h1><p>This vault keeps your files close, your folder logic clean, and your SkyeDocx edits in the family.</p><ul><li>Create <strong>.skye</strong> docs</li><li>Drop files, folders, and zip stacks</li><li>Choose a vault folder on disk</li><li>Sync copies out whenever you want</li></ul>` });
@@ -105,7 +115,7 @@ window.SkyePersonalVault = (() => {
 
   async function listAllItems() {
     const items = await getAll(STORES.items);
-    return items.sort((a, b) => {
+    return items.map((item) => ({ ...item, custody: localCustody(item) })).sort((a, b) => {
       if (a.kind === 'folder' && b.kind !== 'folder') return -1;
       if (a.kind !== 'folder' && b.kind === 'folder') return 1;
       return String(a.name || '').localeCompare(String(b.name || ''));
@@ -130,7 +140,10 @@ window.SkyePersonalVault = (() => {
       });
   }
 
-  async function getItem(id) { return get(STORES.items, id); }
+  async function getItem(id) {
+    const item = await get(STORES.items, id);
+    return item ? { ...item, custody: localCustody(item) } : item;
+  }
   async function getBlob(id) { const row = await get(STORES.blobs, id); return row?.blob || null; }
 
   async function setSetting(key, value) { return put(STORES.settings, { key, value, updatedAt: now() }); }
@@ -142,7 +155,7 @@ window.SkyePersonalVault = (() => {
     const path = joinPath(folderPath, clean);
     const existing = (await listAllItems()).find((item) => item.kind === 'folder' && normalizePath(item.path) === path);
     if (existing) return existing;
-    const folder = { id: uid('fld'), kind: 'folder', name: clean, folderPath: normalizePath(folderPath), path, updatedAt: now() };
+    const folder = { id: uid('fld'), kind: 'folder', name: clean, folderPath: normalizePath(folderPath), path, updatedAt: now(), custody: localCustody() };
     await put(STORES.items, folder);
     await logEvent('folder_created', { path });
     return folder;
@@ -185,6 +198,7 @@ window.SkyePersonalVault = (() => {
       plainText: options.plainText ?? existing?.plainText ?? previewText,
       sourceFormat: options.sourceFormat || existing?.sourceFormat || (extensionFor(name) === '.skye' ? 'skye' : mimeType),
       diskSyncedAt: existing?.diskSyncedAt || null,
+      custody: localCustody(existing, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null }),
     };
     await put(STORES.items, item);
     await put(STORES.blobs, { id, blob, updatedAt: now() });
@@ -210,6 +224,7 @@ window.SkyePersonalVault = (() => {
       plainText: htmlContent.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
       sourceFormat: 'skye-draft',
       diskSyncedAt: null,
+      custody: localCustody(),
     };
     await put(STORES.items, item);
     await logEvent('doc_created', { id: item.id, path: item.path });
@@ -250,6 +265,7 @@ window.SkyePersonalVault = (() => {
         if (child.id !== id && (childFolder === oldPath || childFolder.startsWith(`${oldPath}/`))) {
           child.folderPath = childFolder.replace(oldPath, item.path);
           child.path = child.path.replace(oldPath, item.path);
+          child.custody = localCustody(child, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
           await put(STORES.items, child);
         }
       }
@@ -259,6 +275,7 @@ window.SkyePersonalVault = (() => {
       item.mimeType = guessMime(clean, item.mimeType);
     }
     item.updatedAt = now();
+    item.custody = localCustody(item, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
     await put(STORES.items, item);
     await logEvent('item_renamed', { id, path: item.path });
     return item;
@@ -286,6 +303,7 @@ window.SkyePersonalVault = (() => {
     item.folderPath = folderPath;
     item.path = candidatePath;
     item.updatedAt = now();
+    item.custody = localCustody(item, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
     await put(STORES.items, item);
     if (item.kind === 'folder') {
       for (const child of items) {
@@ -293,6 +311,7 @@ window.SkyePersonalVault = (() => {
         if (child.id !== id && (childFolder === oldPath || childFolder.startsWith(`${oldPath}/`))) {
           child.folderPath = childFolder.replace(oldPath, item.path);
           child.path = child.path.replace(oldPath, item.path);
+          child.custody = localCustody(child, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
           await put(STORES.items, child);
         }
       }
@@ -305,6 +324,7 @@ window.SkyePersonalVault = (() => {
     const item = await getItem(id);
     if (!item) throw new Error('Document not found.');
     Object.assign(item, patch, { updatedAt: now() });
+    item.custody = localCustody(item, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
     if (patch.name) {
       item.extension = extensionFor(patch.name);
       item.mimeType = guessMime(patch.name, item.mimeType);
@@ -327,6 +347,7 @@ window.SkyePersonalVault = (() => {
     item.sizeBytes = blob?.size || item.sizeBytes || 0;
     item.updatedAt = now();
     item.sourceFormat = item.extension === '.skye' ? 'skye' : item.mimeType;
+    item.custody = localCustody(item, { mode: 'local_offline_indexeddb', label: 'Local/offline IndexedDB', liveBridgeReceipt: null });
     await put(STORES.items, item);
     if (blob) await put(STORES.blobs, { id, blob, updatedAt: now() });
     await logEvent('doc_committed', { id, path: item.path });
@@ -387,6 +408,8 @@ window.SkyePersonalVault = (() => {
     for (const item of items) {
       if (item.kind === 'folder') {
         await ensureDir(root, item.path);
+        item.custody = localCustody(item, { mode: 'local_disk_copy', label: 'Local/offline + disk copy', liveBridgeReceipt: null });
+        await put(STORES.items, item);
         manifest.push({ id: item.id, kind: item.kind, path: item.path, updatedAt: item.updatedAt });
         continue;
       }
@@ -399,6 +422,7 @@ window.SkyePersonalVault = (() => {
       await writer.write(blob);
       await writer.close();
       item.diskSyncedAt = now();
+      item.custody = localCustody(item, { mode: 'local_disk_copy', label: 'Local/offline + disk copy', liveBridgeReceipt: null, updatedAt: item.diskSyncedAt });
       await put(STORES.items, item);
       manifest.push({ id: item.id, kind: item.kind, path: item.path, updatedAt: item.updatedAt, sizeBytes: item.sizeBytes, mimeType: item.mimeType });
     }

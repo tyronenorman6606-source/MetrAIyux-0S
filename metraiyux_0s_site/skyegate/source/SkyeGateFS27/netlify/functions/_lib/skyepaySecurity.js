@@ -96,7 +96,57 @@ export function maskEmail(value) {
   return `${visible}@${domain}`;
 }
 
-export function publicSkyePayOrder(row) {
+function skyeVaultAgentStatusActive(status = "") {
+  return ["paid", "complete", "no_payment_required", "active", "trialing"].includes(String(status || "").toLowerCase());
+}
+
+function skyeVaultAgentProvisioningActive(status = "") {
+  return ["workspace_unlocked", "auto_unlock_pending", "ready_to_unlock"].includes(String(status || "").toLowerCase());
+}
+
+function safeRepoEnv(repoEnv = {}) {
+  const allowed = [
+    "SKYEVAULT_DROP_URL",
+    "SKYEVAULT_PORTAL_KEY",
+    "SKYEVAULT_WORKSPACE_ID",
+    "SKYEVAULT_DEVELOPER_ID",
+    "SKYEVAULT_DEVELOPER_NAME",
+    "SKYEVAULT_DESTINATION_ID"
+  ];
+  const out = {};
+  for (const key of allowed) {
+    const value = String(repoEnv?.[key] || "").trim();
+    if (value) out[key] = value;
+  }
+  return out;
+}
+
+export function skyeVaultAgentDeliveryForOrder(row, { includeSecrets = false } = {}) {
+  if (!row) return null;
+  const offer = row.offer_snapshot && typeof row.offer_snapshot === "object" ? row.offer_snapshot : {};
+  const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+  const vault = metadata.vault_provisioning && typeof metadata.vault_provisioning === "object"
+    ? metadata.vault_provisioning
+    : {};
+  const isVault = offer.family === "skyevault" || String(row.offer_id || "").startsWith("skyevault-");
+  if (!isVault) return null;
+  const paymentActive = skyeVaultAgentStatusActive(row.payment_status);
+  const provisioningActive = skyeVaultAgentProvisioningActive(row.provisioning_status);
+  const repoEnv = safeRepoEnv(vault.repoEnv || vault.repo_env || {});
+  return {
+    type: "skyevault-agent",
+    unlocked: paymentActive && provisioningActive,
+    workspace_id: vault.workspaceId || vault.workspace_id || row.workspace_slug || null,
+    key_created: vault.keyCreated === true || vault.key_created === true,
+    portal_key_available: Boolean(repoEnv.SKYEVAULT_PORTAL_KEY),
+    install_center: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/",
+    package_manifest: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/latest.json",
+    agent_package: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz",
+    ...(includeSecrets && paymentActive && provisioningActive && repoEnv.SKYEVAULT_PORTAL_KEY ? { repo_env: repoEnv } : {})
+  };
+}
+
+export function publicSkyePayOrder(row, options = {}) {
   if (!row) return null;
   const offer = row.offer_snapshot && typeof row.offer_snapshot === "object" ? row.offer_snapshot : {};
   const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
@@ -134,6 +184,7 @@ export function publicSkyePayOrder(row) {
     paid_at: row.paid_at,
     approved_at: row.approved_at,
     provisioned_at: row.provisioned_at,
+    agent_delivery: skyeVaultAgentDeliveryForOrder(row, { includeSecrets: options.includeVaultAgentSecrets === true }),
     created_at: row.created_at,
     updated_at: row.updated_at
   };

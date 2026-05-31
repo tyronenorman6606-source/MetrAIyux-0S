@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const BASE_URL = (process.env.SKYEROUTEX_OPERATOR_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const OUT_DIR = path.resolve('test-artifacts');
@@ -14,30 +15,15 @@ function nowStamp() {
   return new Date().toISOString().replace(/[:.]/g, '-');
 }
 
-function cleanToken(value) {
-  return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
-}
-
-function authCredential() {
-  return cleanToken(
-    process.env.ZERO_OS_GATE_SESSION
-    || process.env.SKYENET_AUTH
-    || process.env.SKYENET_GATE_SESSION
-    || process.env.FREE99_ADMIN_CODE
-    || process.env.METRAIYUX_ADMIN_TOKEN
-    || process.env.ADMIN_TOKEN
-  );
-}
-
-function gateHeaders() {
-  const token = authCredential();
+async function gateHeaders() {
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: BASE_URL });
+  const token = auth.token;
   if (!token) return null;
   return {
     accept: 'text/html,*/*',
     authorization: `Bearer ${token}`,
     'x-free99-gate-session': token,
-    'x-skye-gate-session': token,
-    'x-free99-admin-code': token
+    'x-skye-gate-session': token
   };
 }
 
@@ -110,7 +96,7 @@ async function main() {
   const generatedAt = new Date().toISOString();
   const receiptPath = path.join(OUT_DIR, `skyeroutex-operator-entry-live-http-${nowStamp()}.json`);
   const latestPath = path.join(OUT_DIR, 'skyeroutex-operator-entry-live-http-latest.json');
-  const auth = gateHeaders();
+  const auth = await gateHeaders();
 
   const anonymous = [];
   for (let i = 0; i < ANON_ITERATIONS; i += 1) {

@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const to = String(body.to || '').trim();
     const cc = String(body.cc || '').trim();

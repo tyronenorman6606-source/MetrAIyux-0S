@@ -68,6 +68,14 @@ const MIME = {
 
 function createDefaultStore() {
   return {
+    runtimeBoundary: {
+      source: 'local-runtime',
+      liveTelemetry: false,
+      liveCustomerVisibility: false,
+      workerConfirmed: false,
+      workerRuntimeEndpoint: '/api/marketing-made-easy/webcreator-runtime',
+      note: 'Local runtime state only; shared-gated 0S Worker confirmation is required before customer-visible delivery claims.',
+    },
     deliveryPacks: [],
     audit: [],
   };
@@ -80,6 +88,8 @@ function normalizeDispatch(dispatch = {}, pack = {}) {
     owner: dispatch.owner || '',
     checkpoint: dispatch.checkpoint || '',
     notes: dispatch.notes || '',
+    workerConfirmed: dispatch.workerConfirmed === true,
+    customerVisible: dispatch.customerVisible === true,
     targets: Array.isArray(dispatch.targets) && dispatch.targets.length ? dispatch.targets : inferTargets(pack),
     updatedAt: dispatch.updatedAt || new Date().toISOString(),
   };
@@ -92,6 +102,8 @@ function normalizeExecution(execution = {}, pack = {}) {
     owner: execution.owner || '',
     checkpoint: execution.checkpoint || '',
     notes: execution.notes || '',
+    workerConfirmed: execution.workerConfirmed === true,
+    customerVisible: execution.customerVisible === true,
     targets: Array.isArray(execution.targets) && execution.targets.length ? execution.targets : inferTargets(pack),
     updatedAt: execution.updatedAt || new Date().toISOString(),
   };
@@ -160,6 +172,8 @@ function normalizeReview(review = {}) {
     owner: review.owner || '',
     checkpoint: review.checkpoint || '',
     notes: review.notes || '',
+    workerConfirmed: review.workerConfirmed === true,
+    customerVisible: review.customerVisible === true,
     updatedAt: new Date().toISOString(),
   };
 }
@@ -203,6 +217,8 @@ function workflowTimeline(audit = []) {
       status: entry.status || '',
       checkpoint: entry.checkpoint || '',
       notes: entry.notes || '',
+      workerConfirmed: entry.workerConfirmed === true,
+      customerVisible: entry.customerVisible === true,
       targets: Array.isArray(entry.targets) ? entry.targets : [],
     };
   });
@@ -328,6 +344,10 @@ async function handleApi(req, res, url) {
     const body = await readBody(req);
     const pack = {
       id: `delivery-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      source: 'local-runtime',
+      workerConfirmed: false,
+      customerVisible: false,
+      liveTelemetry: false,
       projectId: body.projectId || '',
       projectName: body.projectName || 'Unnamed Project',
       label: body.label || body.projectName || 'Website delivery pack',
@@ -351,6 +371,8 @@ async function handleApi(req, res, url) {
       status: pack.review?.status || '',
       checkpoint: pack.review?.checkpoint || '',
       notes: pack.notes || '',
+      workerConfirmed: false,
+      customerVisible: false,
       targets: pack.targets || [],
     });
     await writeStore(store);
@@ -375,6 +397,8 @@ async function handleApi(req, res, url) {
       status: pack.review.status || '',
       checkpoint: pack.review.checkpoint || '',
       notes: pack.review.notes || '',
+      workerConfirmed: pack.review.workerConfirmed === true,
+      customerVisible: pack.review.customerVisible === true,
       targets: pack.targets || [],
     });
     await writeStore(store);
@@ -398,6 +422,8 @@ async function handleApi(req, res, url) {
       status: pack.execution.status || '',
       checkpoint: pack.execution.checkpoint || '',
       notes: pack.execution.notes || '',
+      workerConfirmed: pack.execution.workerConfirmed === true,
+      customerVisible: pack.execution.customerVisible === true,
       targets: pack.execution.targets || [],
     });
     await writeStore(store);
@@ -431,6 +457,8 @@ async function handleApi(req, res, url) {
       status: pack.dispatch.status || '',
       checkpoint: pack.dispatch.checkpoint || '',
       notes: pack.dispatch.notes || '',
+      workerConfirmed: pack.dispatch.workerConfirmed === true,
+      customerVisible: pack.dispatch.customerVisible === true,
       targets: pack.dispatch.targets || [],
     });
     await writeStore(store);

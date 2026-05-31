@@ -4,6 +4,7 @@ import { audit } from "./audit.js";
 import { createUser, ensureCustomerForUser, getUserByEmail, sanitizeContactValue, sanitizeDisplayName, setUserProvisioningState, updateUserPassword } from "./identity.js";
 import { getClientIp, getUserAgent } from "./http.js";
 import { hashPassword } from "./passwords.js";
+import { verifySessionToken } from "./sessions.js";
 
 const COOKIE_NAME = "sip_session";
 const SESSION_HOURS = Number.parseInt(process.env.SIGNINPRO_SESSION_HOURS || "12", 10) || 12;
@@ -42,6 +43,10 @@ export function slugify(value) {
 
 export function permissionsForRole(role) {
   return ROLE_PERMISSIONS[role] || [];
+}
+
+function boolEnv(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || "").trim());
 }
 
 export function requirePermission(session, permission) {
@@ -92,6 +97,29 @@ function readCookie(req, name) {
   const parts = raw.split(";").map((part) => part.trim()).filter(Boolean);
   const found = parts.find((part) => part.startsWith(`${name}=`));
   return found ? found.slice(name.length + 1) : "";
+}
+
+function bearerToken(req) {
+  return String(req.headers.get("authorization") || req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
+}
+
+function gateSessionToken(req) {
+  return (
+    bearerToken(req) ||
+    String(req.headers.get("x-0s-gate-session") || "").trim() ||
+    String(req.headers.get("x-skye-gate-session") || "").trim() ||
+    String(req.headers.get("x-skygate-session") || "").trim() ||
+    String(req.headers.get("x-fs27-session") || "").trim()
+  );
+}
+
+function workspaceHint(req) {
+  try {
+    const url = new URL(req.url);
+    return slugify(url.searchParams.get("workspace") || url.searchParams.get("workspaceSlug") || url.searchParams.get("client") || "");
+  } catch {
+    return "";
+  }
 }
 
 function verifyCookiePayload(token) {
@@ -309,6 +337,11 @@ export async function revokeWorkspaceSession(sessionId, reason = "logout") {
 }
 
 export async function resolveWorkspaceSession(req) {
+  const gateSession = await resolveWorkspaceSessionFromGate(req);
+  if (gateSession) return gateSession;
+
+  if (!boolEnv(process.env.SIGNINPRO_ALLOW_LOCAL_WORKSPACE_COOKIE)) return null;
+
   const token = readCookie(req, COOKIE_NAME);
   const payload = verifyCookiePayload(token);
   if (!payload?.sid) return null;
@@ -365,6 +398,84 @@ export async function resolveWorkspaceSession(req) {
   return session;
 }
 
+export async function resolveWorkspaceSessionFromGate(req) {
+  const token = gateSessionToken(req);
+  if (!token) return null;
+  const verified = await verifySessionToken(token).catch(() => null);
+  if (!verified?.user?.id) return null;
+  const hint = workspaceHint(req);
+  const params = [verified.session.id, verified.user.id, verified.user.email || ""];
+  let workspaceFilter = "";
+  if (hint) {
+    params.push(hint);
+    workspaceFilter = `and w.slug = $4`;
+  }
+  const result = await q(
+    `select
+        s.id as session_id,
+        s.customer_id,
+        s.api_key_id,
+        s.meta,
+        s.expires_at,
+        wu.id as workspace_user_id,
+        wu.email as workspace_user_email,
+        wu.role as workspace_user_role,
+        wu.status as workspace_user_status,
+        wu.linked_user_id,
+        wu.communication_email as workspace_user_communication_email,
+        wu.skyemail as workspace_user_skyemail,
+        w.id as workspace_id,
+        w.slug,
+        w.name,
+        w.status as workspace_status,
+        w.plan,
+        w.metadata,
+        w.primary_customer_id,
+        w.communication_email as workspace_communication_email,
+        w.skyemail as workspace_skyemail,
+        ws.branding,
+        ws.app_settings,
+        ws.security_settings,
+        u.email as gate_user_email
+      from user_sessions s
+      join workspace_users wu
+        on (wu.linked_user_id = $2 or lower(wu.email) = lower($3))
+      join workspaces w on w.id = wu.workspace_id
+      left join workspace_settings ws on ws.workspace_id = w.id
+      left join users u on u.id = wu.linked_user_id
+      where s.id = $1
+        and s.revoked_at is null
+        and s.expires_at > now()
+        and w.status = 'active'
+        and wu.status = 'active'
+        ${workspaceFilter}
+      order by case wu.role when 'owner' then 1 when 'admin' then 2 when 'operator' then 3 else 4 end, w.updated_at desc
+      limit 1`,
+    params
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  row.session_id = verified.session.id;
+  row.customer_id = verified.session.customer_id || row.customer_id || row.primary_customer_id || null;
+  row.api_key_id = verified.session.api_key_id || row.api_key_id || null;
+  row.expires_at = verified.session.expires_at;
+  row.meta = {
+    ...(normalizeJsonObject(row.meta)),
+    source_app: "northstar-signinpro",
+    source_session_kind: "fs27_user_session",
+    gate_owned: true,
+    fs27_session_id: verified.session.id,
+    fs27_user_id: verified.user.id
+  };
+  const session = mapWorkspaceSessionRow(row, "fs27-gate-bearer");
+  session.sessionId = row.session_id;
+  session.customerId = row.customer_id || row.primary_customer_id || null;
+  session.apiKeyId = row.api_key_id || null;
+  session.expiresAt = row.expires_at;
+  session.meta = normalizeJsonObject(row.meta);
+  return session;
+}
+
 export async function touchWorkspaceSession(sessionId, req) {
   if (!sessionId) return;
   await q(
@@ -379,6 +490,7 @@ export async function touchWorkspaceSession(sessionId, req) {
 
 export function requireCsrf(req, session) {
   if (!["POST", "PUT", "PATCH", "DELETE"].includes(String(req.method || "GET").toUpperCase())) return;
+  if (session?.meta?.source_session_kind === "fs27_user_session" && gateSessionToken(req)) return;
   const actual = String(req.headers.get("x-csrf-token") || req.headers.get("X-CSRF-Token") || "");
   if (!session?.csrfToken || !actual || actual !== session.csrfToken) {
     const error = new Error("CSRF token missing or invalid. Refresh the session and try again.");
@@ -458,9 +570,27 @@ function operatorTokens() {
   ].map((value) => String(value || "").trim()).filter(Boolean);
 }
 
-export function requireOperatorBearer(req) {
+export async function requireOperatorBearer(req) {
   const header = String(req.headers.get("authorization") || req.headers.get("Authorization") || "");
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : String(req.headers.get("x-operator-token") || req.headers.get("X-Operator-Token") || "").trim();
+  if (token) {
+    const verified = await verifySessionToken(token).catch(() => null);
+    const role = String(verified?.user?.role || verified?.payload?.role || "").toLowerCase();
+    const scopes = new Set(
+      (Array.isArray(verified?.session?.scope) ? verified.session.scope : String(verified?.payload?.scope || "").split(/\s+/))
+        .map((item) => String(item || "").toLowerCase())
+        .filter(Boolean)
+    );
+    if (["founder", "owner", "admin"].includes(role) || scopes.has("admin.write") || scopes.has("gateway.invoke")) {
+      return { via: "fs27-session", user_id: verified.user?.id || null, role };
+    }
+  }
+  if (!boolEnv(process.env.SIGNINPRO_ALLOW_LEGACY_OPERATOR_TOKEN)) {
+    const error = new Error("FS27/SkyGate operator session is required for NorthStar provisioning.");
+    error.status = token ? 403 : 401;
+    error.code = "SIGNINPRO_FS27_OPERATOR_REQUIRED";
+    throw error;
+  }
   const allowed = operatorTokens();
   if (!token || !allowed.includes(token)) {
     const error = new Error("Operator provisioning token is missing or invalid.");

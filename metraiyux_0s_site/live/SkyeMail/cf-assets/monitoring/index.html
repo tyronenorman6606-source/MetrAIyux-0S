@@ -18,7 +18,7 @@
         <section class="card">
           <div class="badge" id="monitoringBadge">Checking Citadel mail lane health...</div>
           <h1 class="h1">Monitoring</h1>
-          <p class="sub">Citadel lifecycle events, inbound webhook processing, and delivery health for the connected mailbox.</p>
+          <p class="sub">Real Citadel lifecycle events, provider webhook processing, and delivery health for the connected mailbox.</p>
           <div class="btnrow">
             <button class="btn gold" id="refreshMonitoringBtn" type="button">Refresh</button>
             <a class="btn" href="dashboard.html">Inbox</a>
@@ -48,7 +48,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Delivery Events</h2>
-            <div class="mini">Message lifecycle events matched back to SkyeMail messages.</div>
+            <div class="mini">Database-backed message lifecycle rows matched back to SkyeMail messages.</div>
           </div>
         </div>
         <div class="mailtable" id="deliveryEvents"><div class="empty">Loading delivery events…</div></div>
@@ -58,7 +58,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Webhook Processing</h2>
-            <div class="mini">Signed Citadel webhook attempts processed by the backend.</div>
+            <div class="mini">Provider webhook audit rows processed by the backend. Local suite handoffs are not counted here.</div>
           </div>
         </div>
         <div class="mailtable" id="webhookEvents"><div class="empty">Loading webhook events…</div></div>

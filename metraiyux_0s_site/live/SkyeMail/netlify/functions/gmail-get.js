@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const qs = event.queryStringParameters || {};
     const id = String(qs.id || '').trim();
     if (!id) return json(400, { error: 'id required.' });

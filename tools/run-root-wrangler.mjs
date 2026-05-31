@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const wranglerVersion = process.env.WRANGLER_VERSION || '4.14.0';
 const requestedEnvFile = process.env.ROOT_ENV_FILE || process.env.METRAIYUX_ROOT_ENV || '.env';
@@ -153,12 +154,16 @@ const accountFromRows = rows.find((row) => /^(METRAIYUX_0S_)?CLOUDFLARE_ACCOUNT_
 const accountId = rootEnv.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID || rootEnv.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || accountFromRows;
 const wranglerArgs = process.argv.slice(2);
 const selected = await chooseCloudflareToken(accountId, wranglerArgs);
+const gateAuth = await resolveZeroOsGateAuth({ env: { ...rootEnv, ...process.env } });
+const gateBearer = gateAuth.token || '';
 const childEnv = {
   ...process.env,
   ...rootEnv,
   CLOUDFLARE_ACCOUNT_ID: accountId,
   CLOUDFLARE_API_TOKEN: selected.value,
-  PLATFORM_ADMIN_TOKEN: rootEnv.PLATFORM_ADMIN_TOKEN || rootEnv.SKYGATEFS13_WORKER_ADMIN_TOKEN || process.env.PLATFORM_ADMIN_TOKEN || '',
+  ZERO_OS_GATE_SESSION: gateBearer || rootEnv.ZERO_OS_GATE_SESSION || process.env.ZERO_OS_GATE_SESSION || '',
+  SKYENET_AUTH: gateBearer || rootEnv.SKYENET_AUTH || process.env.SKYENET_AUTH || '',
+  PLATFORM_ADMIN_TOKEN: '',
   NO_COLOR: process.env.NO_COLOR || '1',
   WRANGLER_SEND_METRICS: process.env.WRANGLER_SEND_METRICS || 'false',
   CI: process.env.CI || '1'

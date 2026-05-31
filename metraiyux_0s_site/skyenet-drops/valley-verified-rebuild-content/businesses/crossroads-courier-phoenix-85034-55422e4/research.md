@@ -1,26 +1,55 @@
 # Crossroads Courier Research
 
-Status: source_backed
-Researched: 2026-05-28T06:24:12Z
+Status: moderate
+Researched: 2026-05-30
 
-## Confirmed Facts
-- Official Phoenix division: 1250 E Hadley St, Phoenix, AZ 85034; phone 480-927-1818.
-- Chamber listing refines the address to 1250 E. Hadley Street #3 and categorizes the business as Couriers and Delivery Services / Business Support Services.
-- Official services include on-demand delivery, routed delivery, distribution, warehousing, fleet replacement, and special projects/custom logistics.
-- Official industry page names healthcare/life sciences, environmental services, manufacturing, professional services, and ecommerce/consumer goods.
-- Official services page mentions live GPS tracking and 24/7 logistics support for time-sensitive shipments.
+## Why Valley Verified
 
-## Landing Page Use
-- Position as Phoenix courier/logistics support for businesses, not as a food/event provider.
-- Lead with same-day, next-day, scheduled route, final-mile distribution, warehousing, and custom logistics.
-- Use quote/request language; no public pricing was found.
+Skyes Over London says this page is Valley Verified because Crossroads Courier - Contact and the local Valley Verified source record support the business identity, service category, and customer contact path for Courier and delivery services, Same-day delivery, and Next-day delivery..
+
+## Customer-Facing Facts
+
+- Address: 1250 E Hadley St #3, Phoenix, AZ 85034
+- Phone: 480-927-1818
+- Service area: Phoenix division at 1250 E Hadley St, with a broader multi-market U.S. courier network listed by the official site.
+- Service/source category: Courier and delivery services
+- Service/source category: Same-day delivery
+- Service/source category: Next-day delivery
+- Service/source category: Scheduled and routed delivery
+- Service/source category: Final-mile distribution
+- Service/source category: Warehousing
+- Service/source category: Fleet replacement
+- Service/source category: Special projects and custom logistics
+
+## Proof Points
+
+- Official Phoenix division phone: 480-927-1818.
+- Greater Phoenix Chamber lists Crossroads under Couriers and Delivery Services / Business Support Services.
+- Official services page lists GPS tracking, 24/7 logistics support, and route optimization.
+- Official website confirms Phoenix division contact information.
+- Greater Phoenix Chamber member page confirms business category, address, phone, and service summary.
+- Official industry page identifies business-critical sectors rather than consumer food/event services.
+- Local Valley Verified record last verified 2026-05-19.
+
+## Customer Checks
+
+- What shipment size, urgency, and delivery window does the customer need?
+- Is the request one-time, routed, recurring, or a warehousing/distribution need?
+- Does the delivery require special handling or industry compliance?
+- Pricing is not published in the reviewed sources; use quote/request language.
+- Pricing should be confirmed directly before purchase, booking, or engagement.
+- Confirm current hours before visiting.
+
+## Cautions
+
+- Local category 'Food And Events' is mismatched; sourced reality is courier/logistics/business support.
+- Public office hours were not confirmed in reviewed sources.
+- Pricing was not confirmed; landing copy should direct visitors to request a quote.
+- Research status normalized from source_backed to moderate for Valley Verified schema compatibility.
 
 ## Sources
-- https://crossroadscourier.com/contact/
-- https://crossroadscourier.com/solutions/
-- https://crossroadscourier.com/industries-served/
-- https://business.phoenixchamber.com/list/member/crossroads-courier-68774
 
-## Warnings
-- Local category is wrong: use courier/logistics/business support.
-- Public office hours were not confirmed.
+- https://crossroadscourier.com/contact/ - Crossroads Courier - Contact
+- https://crossroadscourier.com/solutions/ - Crossroads Courier - Solutions
+- https://crossroadscourier.com/industries-served/ - Crossroads Courier - Industries Served
+- https://business.phoenixchamber.com/list/member/crossroads-courier-68774 - Crossroads Courier | Greater Phoenix Chamber

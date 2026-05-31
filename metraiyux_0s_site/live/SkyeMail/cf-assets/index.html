@@ -375,11 +375,157 @@ body.motion-chrome{
 @media (max-width:700px){.mcp-neon-scroll-rail-x,.mcp-neon-scroll-corner{display:none!important}}
   </style>
   <link rel="stylesheet" href="assets/mail-ui.css" />
+  <style>
+body.skymail-homepage .topbar{
+  position:sticky;
+  top:0;
+  z-index:40;
+}
+body.skymail-homepage .nav,
+body.skymail-homepage .container{
+  width:min(100% - 32px, 1220px);
+  max-width:none;
+  margin-inline:auto;
+}
+body.skymail-homepage .nav{
+  display:grid;
+  grid-template-columns:minmax(260px, max-content) minmax(0, 1fr);
+  align-items:center;
+  gap:12px 22px;
+  padding:14px 0;
+}
+body.skymail-homepage .brand{
+  min-width:0;
+}
+body.skymail-homepage .brand .name{
+  min-width:0;
+}
+body.skymail-homepage .brand .name > span{
+  color:var(--neon-muted) !important;
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  -webkit-text-fill-color:currentColor;
+  text-shadow:none;
+  animation:none;
+}
+body.skymail-homepage .navlinks{
+  width:100%;
+  min-width:0;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+}
+body.skymail-homepage .pill,
+body.skymail-homepage .btn{
+  border-radius:8px;
+  min-height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1.15;
+  text-align:center;
+  white-space:nowrap;
+}
+body.skymail-homepage .container{
+  flex:1 0 auto;
+  padding:clamp(24px, 4vw, 50px) 0 36px;
+}
+body.skymail-homepage .hero{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0, 1.05fr) minmax(300px, .72fr);
+  align-items:start;
+  gap:20px;
+  min-height:auto;
+  padding:0;
+}
+body.skymail-homepage .card{
+  border-radius:12px;
+  padding:clamp(18px, 2.4vw, 28px);
+}
+body.skymail-homepage .h1.glow-text{
+  font-size:clamp(2.7rem, 5.2vw, 5.9rem);
+  line-height:1;
+  margin-bottom:14px;
+  letter-spacing:0;
+}
+body.skymail-homepage .sub{
+  max-width:72ch;
+}
+body.skymail-homepage .righthero{
+  min-width:0;
+}
+body.skymail-homepage .mail-command-row{
+  align-items:flex-start;
+}
+body.skymail-homepage .footer{
+  flex:0 0 auto;
+}
+body.skymail-homepage .footer .container{
+  flex:initial;
+  padding:18px 0 20px;
+  text-align:center;
+}
+body.skymail-homepage .footer p{
+  max-width:96ch;
+  margin-inline:auto;
+}
+body.skymail-homepage .linksbox{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px 14px;
+  margin-top:8px;
+}
+body.skymail-homepage .linksbox a{
+  margin:0;
+  overflow-wrap:anywhere;
+}
+@media (max-width:980px){
+  body.skymail-homepage .nav{
+    grid-template-columns:1fr;
+    justify-items:center;
+  }
+  body.skymail-homepage .brand{
+    justify-content:center;
+    text-align:center;
+  }
+  body.skymail-homepage .navlinks{
+    justify-content:center;
+  }
+  body.skymail-homepage .hero{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width:620px){
+  body.skymail-homepage .nav,
+  body.skymail-homepage .container{
+    width:min(100% - 24px, 1220px);
+  }
+  body.skymail-homepage .navlinks{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+  body.skymail-homepage .pill{
+    width:100%;
+    white-space:normal;
+  }
+  body.skymail-homepage .btnrow{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  body.skymail-homepage .btnrow .btn,
+  body.skymail-homepage .btnrow .pill{
+    width:100%;
+  }
+}
+  </style>
 <script src="assets/app.js"></script>
 <script src="assets/skye0s-onboard-bridge.js"></script>
 <script type="module" src="assets/spectacle-motion.js"></script>
 </head>
-<body class="motion-chrome skyesol-living-page">
+<body class="skymail-homepage motion-chrome skyesol-living-page">
 <div class="neon-motion-chrome" data-motion-chrome aria-hidden="true"></div>
 <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas><div class="skyesol-grain" aria-hidden="true"></div><div class="skyesol-scanline" aria-hidden="true"></div>
 <div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
@@ -427,7 +573,7 @@ body.motion-chrome{
       <div class="kpi"><b>End‑to‑end encrypted</b><div>Sender encrypts subject + body in their browser using your public key. Server stores ciphertext only.</div></div>
       <div class="kpi"><b>Inbox + notification</b><div>Citadel stores encrypted sovereign mail data while SkyeNet serves the hosted inbox, send lane, and delivery receipts.</div></div>
       <div class="kpi"><b>Recovery is opt‑in</b><div>At signup you can allow admin recovery. If you don’t, nobody can recover the sovereign mail core.</div></div>
-      <div class="kpi"><b>kAIxuGateway13 ready</b><div>Optional AI assistant panel uses only kAIxuGateway13 endpoints and fetch+ReadableStream SSE parsing.</div></div>
+      <div class="kpi"><b>SkyEmail Brain ready</b><div>Mailbox AI runs through the shared FS27/SkyGate Brain lane with SkyPay entitlements and no direct provider UI.</div></div>
     </div>
 
     <div class="skyemerit-card" id="launchSpark">
@@ -449,7 +595,7 @@ body.motion-chrome{
       <a class="btn" href="suite/index.html">Open Platform</a>
       <a class="btn" href="login.html">Login</a>
       <a class="btn" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
-      <a class="btn" href="ai.html">AI Assistant</a>
+      <a class="btn" href="brain.html">SkyEmail Brain</a>
     </div>
 
     <div class="hr"></div>
@@ -502,7 +648,7 @@ body.motion-chrome{
       <p class="linksbox">
         <a href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
         <a href="https://solenterprises.org/pages/leadership-hub" target="_blank" rel="noopener">Leadership Hub</a>
-        <a href="https://kaixugateway13ee.netlify.app/" target="_blank" rel="noopener">kAIxuGateway13EE</a>
+        <a href="brain.html">SkyEmail Brain</a>
         <a href="https://solenterprisesnexusconnect.netlify.app/" target="_blank" rel="noopener">NexusConnect</a>
         <a href="https://familycommand.netlify.app/" target="_blank" rel="noopener">FamilyCommand</a>
         <a href="https://skyecode-nexus.netlify.app/" target="_blank" rel="noopener">SkyeCode Nexus</a>

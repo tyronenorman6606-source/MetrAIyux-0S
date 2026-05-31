@@ -5,7 +5,8 @@
   const win = window;
   const CONFIG_KEY = "MetrAIyuxWorkspaceChatConfig";
   const API_KEY = "MetrAIyuxWorkspaceChat";
-  const DEFAULT_DISCLAIMER = "Messages are tied to this workspace account and may be used for support, proof receipts, QA, and follow-up inside the client build lane.";
+  const DEFAULT_DISCLAIMER = "Messages are tied to this workspace account after Relay13 or Command Bridge confirms them; otherwise they remain browser-local pending cache.";
+  const COMMAND_BRIDGE_ENDPOINT = "/api/0s-command-bridge/events";
 
   if (win[API_KEY] && win[API_KEY].__mounted) return;
 
@@ -16,7 +17,7 @@
     appName: "Workspace App",
     launcherText: "Workspace chat",
     operatorName: "MetrAIyux Operator",
-    welcomeText: "Send a note here. This thread is logged to the workspace lane.",
+    welcomeText: "Send a note here. Chat rows are browser-local pending until Relay13 or Command Bridge confirms a live write.",
     accountDisclaimer: DEFAULT_DISCLAIMER,
     accent: "",
     apiBase: "",
@@ -97,6 +98,69 @@
     return String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
   }
 
+  function gateHeaders() {
+    const headers = { "Content-Type": "application/json" };
+    try {
+      const bridgeHeaders = win.MetrAIyuxGateBridge?.headers?.() || win.Free99PlatformGate?.headers?.() || {};
+      Object.entries(bridgeHeaders).forEach(([key, value]) => {
+        if (value) headers[key] = value;
+      });
+    } catch {}
+    return headers;
+  }
+
+  function commandBridgePayload(event) {
+    return {
+      source_app: "client-app-factory-workspace-chat",
+      source_surface: config.appName || config.clientName || "Workspace chat",
+      event_type: `workspace_chat.${event.eventType || "event"}`,
+      summary: `${config.clientName || config.appName || "Workspace"} ${event.eventType || "event"}`,
+      entity: {
+        kind: "workspace",
+        id: config.workspaceId || config.workspaceSlug || "workspace",
+        label: config.clientName || config.appName || config.workspaceSlug || "Workspace"
+      },
+      ids: {
+        workspace_id: config.workspaceId || "",
+        workspace_slug: config.workspaceSlug || "",
+        chat_event_id: event.id,
+        message_id: event.metadata?.messageId || ""
+      },
+      crm: {
+        client_name: config.clientName || "",
+        workspace_slug: config.workspaceSlug || ""
+      },
+      links: [{ label: "Workspace chat source", href: location.pathname + location.search, kind: "surface" }],
+      metadata: {
+        ...event.metadata,
+        relay_configured: Boolean(config.apiBase),
+        relay_tracking_enabled: Boolean(config.trackEventsToRelay),
+        path: event.path,
+        cached_event_id: event.id,
+        cached_at: event.at
+      }
+    };
+  }
+
+  async function sendCommandBridgeEvent(event) {
+    try {
+      const response = await fetch(COMMAND_BRIDGE_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: gateHeaders(),
+        body: JSON.stringify(commandBridgePayload(event))
+      });
+      const body = await response.json().catch(() => ({ ok: response.ok, status: response.status }));
+      const detail = { ok: Boolean(response.ok && body?.ok !== false), status: response.status, body, cached_event_id: event.id };
+      win.dispatchEvent(new CustomEvent("workspace-chat:live-event", { detail }));
+      return detail;
+    } catch (error) {
+      const detail = { ok: false, cached_event_id: event.id, error: error?.message || "workspace_chat_live_event_failed" };
+      win.dispatchEvent(new CustomEvent("workspace-chat:live-event", { detail }));
+      return detail;
+    }
+  }
+
   function cssValue(names) {
     const styles = getComputedStyle(doc.documentElement);
     for (const name of names) {
@@ -138,12 +202,20 @@
       workspaceSlug: config.workspaceSlug,
       path: location.pathname,
       at: new Date().toISOString(),
+      liveEndpoint: COMMAND_BRIDGE_ENDPOINT,
+      liveStatus: "queued_live_write",
       metadata
     };
     const events = loadEvents();
     events.push(event);
     save(eventsKey, events.slice(-250));
     win.dispatchEvent(new CustomEvent("workspace-chat:event", { detail: event }));
+    sendCommandBridgeEvent(event).then((result) => {
+      const nextEvents = loadEvents().map((item) => item?.id === event.id
+        ? { ...item, liveStatus: result?.ok ? "posted" : "live_write_failed", liveResult: result }
+        : item);
+      save(eventsKey, nextEvents.slice(-250));
+    });
     return event;
   }
 
@@ -573,8 +645,8 @@
         return;
       }
       const replyBody = relayStatus && relayStatus.ok
-        ? `Sent into the ${config.clientName || config.appName} live workspace lane. An operator can review it with this workspace account context.`
-        : `Saved in this app and queued for ${config.clientName || config.appName} workspace sync. Live delivery turns on when the Relay13 workspace and domain allowlist are published.`;
+        ? `Relay13-confirmed live workspace delivery for ${config.clientName || config.appName}. An operator can review it with this workspace account context.`
+        : `Browser-local pending cache for ${config.clientName || config.appName}. No Relay13 delivery receipt was returned; Command Bridge confirmation is recorded only if the shared 0S gate accepts the live event.`;
       const reply = addMessage("operator", replyBody, { kind: relayStatus && relayStatus.ok ? "relay-confirmation" : "queued-confirmation", relayStatus });
       track("message.reply", { messageId: reply.id, kind: relayStatus && relayStatus.ok ? "relay-confirmation" : "queued-confirmation" });
     }, 180);
@@ -608,6 +680,7 @@
         <div class="metraiyux-chat-messages" data-chat-messages></div>
         <div class="metraiyux-chat-foot">
           <div class="metraiyux-chat-disclaimer">${config.accountDisclaimer || DEFAULT_DISCLAIMER}</div>
+          <div class="metraiyux-chat-disclaimer">Telemetry status: Relay13 or Command Bridge confirmed only after a live receipt; otherwise browser-local pending cache.</div>
           <form class="metraiyux-chat-form" data-chat-form>
             <input data-chat-input type="text" autocomplete="off" placeholder="Message this workspace" aria-label="Message this workspace">
             <button type="submit">Send</button>

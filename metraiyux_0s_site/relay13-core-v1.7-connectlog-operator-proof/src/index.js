@@ -428,28 +428,74 @@ function randomHex(bytes = 32) { const a = new Uint8Array(bytes); crypto.getRand
 async function sha256Hex(input) { const data = new TextEncoder().encode(input); const hash = await crypto.subtle.digest('SHA-256', data); return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join(''); }
 function getBearer(request) { const h = request.headers.get('authorization') || ''; return h.toLowerCase().startsWith('bearer ') ? h.slice(7).trim() : ''; }
 function timingSafeEqual(a, b) { const aa = new TextEncoder().encode(String(a || '')); const bb = new TextEncoder().encode(String(b || '')); if (aa.length !== bb.length) return false; let out = 0; for (let i = 0; i < aa.length; i++) out |= aa[i] ^ bb[i]; return out === 0; }
-function platformAdminTokens(env) {
-  return [
-    env.PLATFORM_ADMIN_TOKEN,
-    env.RELAY13_PLATFORM_ADMIN_TOKEN,
-    env.RELAY13_ADMIN_TOKEN,
-    env.FOUNDER_COMMAND_RELAY13_ADMIN_TOKEN,
-    env.METRAIYUX_0S_RELAY13_ADMIN_TOKEN
-  ].map(value => String(value || '').trim()).filter(value => value.length >= 32);
+function boolEnv(value) { return /^(1|true|yes|on)$/i.test(String(value || '').trim()); }
+function sharedProxySecret(env) { return String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.RELAY13_INTERNAL_PROXY_SECRET || '').trim(); }
+function sharedProxyAuth(request, env) {
+  const secret = sharedProxySecret(env);
+  if (!secret) return false;
+  return String(request.headers.get('x-0s-shared-gate') || '').toLowerCase() === 'operator'
+    && String(request.headers.get('x-0s-internal-proxy-secret') || '').trim() === secret;
 }
-function isPlatformAdmin(request, env) {
-  const token = getBearer(request);
-  return Boolean(token && platformAdminTokens(env).some(expected => timingSafeEqual(token, expected)));
+function skygateOrigin(env) { return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || '').replace(/\/+$/, ''); }
+function fs27Configured(env) { return Boolean(env.SKYGATEFS27_WORKER?.fetch || skygateOrigin(env)); }
+function scopeList(scope) { return Array.isArray(scope) ? scope.map(String) : String(scope || '').split(/\s+/).filter(Boolean); }
+function allowsRelay13Admin(claims) {
+  if (!claims?.active && !claims?.ok) return false;
+  const role = String(claims.role || claims.user?.role || '').toLowerCase();
+  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((item) => item.toLowerCase()));
+  return ['founder', 'owner', 'admin', 'operator'].includes(role)
+    || scopes.has('admin.read')
+    || scopes.has('admin.write')
+    || scopes.has('gateway.invoke')
+    || scopes.has('relay13.admin');
+}
+async function skygateRequest(env, path, init = {}) {
+  const origin = skygateOrigin(env);
+  if (env.SKYGATEFS27_WORKER?.fetch) {
+    const response = await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skygatefs27.internal${path}`, init));
+    if (response.status !== 404 || !origin) return response;
+  }
+  if (!origin) throw new Error('SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured.');
+  return fetch(`${origin}${path}`, init);
+}
+async function introspectRelay13AdminToken(token, env) {
+  if (!fs27Configured(env)) return { ok: false, status: 503, code: 'fs27_required', error: 'Canonical FS27/SkyGate session is required for Relay13 admin access.' };
+  if (!token) return { ok: false, status: 401, error: 'Missing FS27/SkyGate bearer.' };
+  for (const path of ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect']) {
+    const res = await skygateRequest(env, path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    if (res.status === 404) continue;
+    const data = await res.json().catch(() => ({ active: false, error: 'Invalid FS27/SkyGate response' }));
+    if (!res.ok || data.active !== true) return { ok: false, status: res.ok ? 401 : res.status, error: data.error || 'FS27/SkyGate token is inactive or invalid.', skygate: data };
+    if (!allowsRelay13Admin(data)) return { ok: false, status: 403, error: 'FS27/SkyGate token is active but not Relay13 admin-scoped.', skygate: data };
+    return { ok: true, via: 'fs27-skygate', skygate: data };
+  }
+  return { ok: false, status: 404, error: 'FS27/SkyGate introspection endpoint was not found.' };
 }
 function corsHeaders(env, request) {
   const origin = request.headers.get('origin') || '';
   const allowed = (env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean);
   const originHost = requestHost(origin);
-  if (originHost && CLIENT_WIDGET_ORIGINS.has(originHost)) return { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key', vary: 'Origin' };
-  if (allowed.length === 0 || allowed.includes(origin)) return { 'access-control-allow-origin': origin || '*', 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key', vary: 'Origin' };
+  if (originHost && CLIENT_WIDGET_ORIGINS.has(originHost)) return { 'access-control-allow-origin': origin, 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key, x-0s-gate-session, x-skye-gate-session, x-skygate-session, x-fs27-session, x-0s-shared-gate, x-0s-internal-proxy-secret', vary: 'Origin' };
+  if (allowed.length === 0 || allowed.includes(origin)) return { 'access-control-allow-origin': origin || '*', 'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS', 'access-control-allow-headers': 'content-type, authorization, x-relay13-api-key, x-0s-gate-session, x-skye-gate-session, x-skygate-session, x-fs27-session, x-0s-shared-gate, x-0s-internal-proxy-secret', vary: 'Origin' };
   return {};
 }
-function requireAdmin(request, env) { return isPlatformAdmin(request, env) ? { ok: true, admin: true } : { ok: false, response: json({ ok: false, error: 'Unauthorized' }, 401, corsHeaders(env, request)) }; }
+function gateTokenFromRequest(request) {
+  return getBearer(request)
+    || String(request.headers.get('x-0s-gate-session') || '').trim()
+    || String(request.headers.get('x-skye-gate-session') || '').trim()
+    || String(request.headers.get('x-skygate-session') || '').trim()
+    || String(request.headers.get('x-fs27-session') || '').trim();
+}
+async function requireAdmin(request, env) {
+  if (sharedProxyAuth(request, env)) return { ok: true, admin: true, via: '0s-internal-proxy' };
+  const gate = await introspectRelay13AdminToken(gateTokenFromRequest(request), env);
+  if (gate.ok) return { ok: true, admin: true, via: gate.via, skygate: gate.skygate };
+  return { ok: false, response: json({ ok: false, error: gate.error || 'Unauthorized', code: gate.code || 'FS27_GATE_REQUIRED' }, gate.status || 401, corsHeaders(env, request)) };
+}
 async function readJson(request) {
   const size = Number(request.headers.get('content-length') || 0);
   if (size > MAX_JSON_BYTES) throw new Response(JSON.stringify({ ok: false, error: 'Payload too large' }), { status: 413, headers: JSON_HEADERS });
@@ -524,12 +570,12 @@ async function ensureClientWidgetWorkspace(env, slug) {
   return workspace;
 }
 async function listWorkspaces(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const rows = await env.DB.prepare(`SELECT id, slug, name, status, monthly_conversation_limit, monthly_message_limit, max_message_chars, created_at, updated_at FROM workspaces ORDER BY created_at DESC LIMIT 100`).all();
   return json({ ok: true, workspaces: rows.results || [] }, 200, corsHeaders(env, request));
 }
 async function createWorkspace(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const input = await readJson(request); const id = uuid('ws_'); const slug = normalizeSlug(input.slug || input.name) || `workspace-${Date.now()}`; const name = safeText(input.name || slug, 160); const t = nowIso();
   await env.DB.prepare(`INSERT INTO workspaces (id, slug, name, monthly_conversation_limit, monthly_message_limit, max_message_chars, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(id, slug, name, Number(input.monthly_conversation_limit || 5000), Number(input.monthly_message_limit || 50000), Math.min(Math.max(Number(input.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS), 500), 4000), t, t).run();
@@ -540,14 +586,14 @@ async function createWorkspace(request, env) {
   return json({ ok: true, workspace: { id, slug, name, status: 'active' } }, 201, corsHeaders(env, request));
 }
 async function listWorkspaceDomains(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const workspaceId = safeText(new URL(request.url).searchParams.get('workspace_id') || '', 100);
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const rows = await env.DB.prepare(`SELECT id, workspace_id, domain, status, created_at FROM workspace_domains WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 100`).bind(workspaceId).all();
   return json({ ok: true, domains: rows.results || [] }, 200, corsHeaders(env, request));
 }
 async function createWorkspaceDomain(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const input = await readJson(request); const workspaceId = safeText(input.workspace_id || '', 100); const domain = requestHost(`https://${safeText(input.domain || '', 240).replace(/^https?:\/\//, '')}`);
   if (!workspaceId || !domain) return json({ ok: false, error: 'workspace_id and domain required' }, 400, corsHeaders(env, request));
   const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request));
@@ -574,7 +620,7 @@ async function getWidgetConfig(request, env) {
   return json({ ok: true, config: row, guardrails: publicGuardrailPolicy(guardrails) }, 200, corsHeaders(env, request));
 }
 async function createApiKey(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const input = await readJson(request); const workspaceId = safeText(input.workspace_id, 100); const workspace = await workspaceById(env, workspaceId);
   if (!workspace) return json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request));
   const scopes = Array.isArray(input.scopes) ? input.scopes.filter((s) => SCOPES.has(s)) : ['conversations:create','conversations:read','messages:read','messages:write','widget:read'];
@@ -585,14 +631,14 @@ async function createApiKey(request, env) {
   return json({ ok: true, api_key: { id, key: rawKey, key_prefix: keyPrefix, scopes, warning: 'Copy this key now. It is not stored raw and will not be shown again.' } }, 201, corsHeaders(env, request));
 }
 async function listApiKeys(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const workspaceId = safeText(new URL(request.url).searchParams.get('workspace_id') || '', 100);
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const rows = await env.DB.prepare(`SELECT id, workspace_id, name, key_prefix, scopes_json, status, created_at, last_used_at, expires_at, revoked_at FROM api_keys WHERE workspace_id = ? ORDER BY created_at DESC LIMIT 100`).bind(workspaceId).all();
   return json({ ok: true, api_keys: rows.results || [] }, 200, corsHeaders(env, request));
 }
 async function revokeApiKey(request, env, keyId) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const t = nowIso(); const row = await env.DB.prepare(`SELECT workspace_id FROM api_keys WHERE id = ?`).bind(keyId).first();
   await env.DB.prepare(`UPDATE api_keys SET status = 'revoked', revoked_at = ? WHERE id = ?`).bind(t, keyId).run();
   await audit(env, { workspaceId: row?.workspace_id || null, actorType: 'admin', actorId: keyId, eventType: 'api_key.revoke', body: keyId });
@@ -990,7 +1036,7 @@ async function queueNotificationEvent(env, { workspaceId, recipientKey = 'operat
 
 async function listNotificationPreferences(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'notifications:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const rows = await env.DB.prepare(`SELECT * FROM user_notification_preferences WHERE workspace_id = ? ORDER BY updated_at DESC LIMIT 100`).bind(workspaceId).all();
@@ -999,7 +1045,7 @@ async function listNotificationPreferences(request, env) {
 
 async function upsertNotificationPreferencesEndpoint(request, env) {
   const input = await readJson(request); let workspaceId = safeText(input.workspace_id || '', 100); let auth = null;
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { auth = await verifyApiKey(request, env, 'notifications:write'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found or inactive' }, 404, corsHeaders(env, request));
@@ -1012,7 +1058,7 @@ async function upsertNotificationPreferencesEndpoint(request, env) {
 
 async function listNotificationEvents(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'notifications:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '100', 10), 1), 200);
@@ -1089,7 +1135,7 @@ async function createPaidEventConversation(env, workspaceId, input, artifact, ac
 
 async function createPaidEventHandoff(request, env) {
   const input = await readJson(request); let workspaceId = safeText(input.workspace_id || '', 100); let auth = null;
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { auth = await verifyApiKey(request, env, 'paid_events:write'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found or inactive' }, 404, corsHeaders(env, request));
@@ -1113,7 +1159,7 @@ async function createPaidEventHandoff(request, env) {
 
 async function listPaidEventHandoffs(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'paid_events:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '100', 10), 1), 200);
@@ -1273,7 +1319,7 @@ async function createConnectLogScanConversation(request, env) {
 
 async function upsertConnectLogCardEndpoint(request, env) {
   const input = await readJson(request); let workspaceId = safeText(input.workspace_id || '', 100); let auth = null;
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { auth = await verifyApiKey(request, env, 'connectlog:write'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found or inactive' }, 404, corsHeaders(env, request));
@@ -1286,7 +1332,7 @@ async function upsertConnectLogCardEndpoint(request, env) {
 
 async function listConnectLogCards(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'connectlog:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const rows = await env.DB.prepare(`SELECT * FROM connectlog_cards WHERE workspace_id = ? ORDER BY updated_at DESC LIMIT 200`).bind(workspaceId).all();
@@ -1295,7 +1341,7 @@ async function listConnectLogCards(request, env) {
 
 async function listConnectLogRequests(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'connectlog:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const rows = await env.DB.prepare(`SELECT connectlog_contact_requests.*, conversations.subject, conversations.status AS conversation_status, conversations.last_message_preview, conversations.last_message_at FROM connectlog_contact_requests JOIN conversations ON conversations.id = connectlog_contact_requests.conversation_id WHERE connectlog_contact_requests.workspace_id = ? ORDER BY connectlog_contact_requests.created_at DESC LIMIT 200`).bind(workspaceId).all();
@@ -1304,7 +1350,7 @@ async function listConnectLogRequests(request, env) {
 
 async function connectLogBridgeStats(request, env) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'connectlog:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const cards = await env.DB.prepare(`SELECT COUNT(*) AS count FROM connectlog_cards WHERE workspace_id = ? AND status = 'active'`).bind(workspaceId).first();
@@ -1377,7 +1423,7 @@ async function guardrailsProof(request, env) {
 }
 
 async function adminReadGuardrails(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const resolved = await resolveWorkspaceForGuardrails(request, env);
   if (!resolved.ok) return resolved.response;
   const policy = await ensureWorkspaceGuardrails(env, resolved.workspace);
@@ -1386,7 +1432,7 @@ async function adminReadGuardrails(request, env) {
 }
 
 async function adminUpdateGuardrails(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const input = await readJson(request);
   const workspaceId = safeText(input.workspace_id || '', 100);
   const workspace = await workspaceById(env, workspaceId);
@@ -1421,7 +1467,7 @@ async function adminUpdateGuardrails(request, env) {
 async function createConversation(request, env) {
   const input = await readJson(request); let workspaceId = safeText(input.workspace_id, 100); let auth = null; let source = 'widget';
   if (getBearer(request) || request.headers.get('x-relay13-api-key')) {
-    const admin = requireAdmin(request, env);
+    const admin = await requireAdmin(request, env);
     if (admin.ok) {
       if (!workspaceId) return json({ ok: false, error: 'workspace_id required for admin conversation creation' }, 400, corsHeaders(env, request));
       source = 'admin';
@@ -1485,7 +1531,7 @@ async function persistMessage(env, { workspaceId, conversationId, senderRole, se
   return { id, conversation_id: conversationId, workspace_id: workspaceId, sender_role: senderRole, sender_name: safeText(senderName, 140), body: cleanBody, created_at: t, delivered_at: t };
 }
 async function listConversations(request, env) {
-  const url = new URL(request.url); const admin = requireAdmin(request, env); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
+  const url = new URL(request.url); const admin = await requireAdmin(request, env); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100);
   if (!admin.ok) { const auth = await verifyApiKey(request, env, 'conversations:read'); if (!auth.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); workspaceId = auth.workspaceId; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const status = safeText(url.searchParams.get('status') || '', 20); const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10), 1), 100);
@@ -1499,7 +1545,7 @@ async function markRead(env, conversationId, workspaceId, readerKey) {
 }
 async function listMessages(request, env, conversationId) {
   const url = new URL(request.url); let workspaceId = safeText(url.searchParams.get('workspace_id') || '', 100); let reader = '';
-  const admin = requireAdmin(request, env);
+  const admin = await requireAdmin(request, env);
   if (!admin.ok) {
     const visitorToken = safeText(url.searchParams.get('visitor_token') || '', 200);
     if (visitorToken) { const hash = await sha256Hex(visitorToken); const conv = await env.DB.prepare(`SELECT workspace_id FROM conversations WHERE id = ? AND visitor_token_hash = ?`).bind(conversationId, hash).first(); if (!conv) return json({ ok: false, error: 'Unauthorized' }, 401, corsHeaders(env, request)); workspaceId = conv.workspace_id; reader = 'customer'; }
@@ -1514,7 +1560,7 @@ async function listMessages(request, env, conversationId) {
 async function createMessage(request, env, conversationId) {
   const input = await readJson(request); let auth = null; let workspaceId = safeText(input.workspace_id, 100); let senderRole = safeText(input.sender_role || 'customer', 30); const visitorToken = safeText(input.visitor_token || '', 200);
   if (visitorToken) { const hash = await sha256Hex(visitorToken); const conv = await env.DB.prepare(`SELECT workspace_id FROM conversations WHERE id = ? AND visitor_token_hash = ?`).bind(conversationId, hash).first(); if (!conv) return json({ ok: false, error: 'Unauthorized' }, 401, corsHeaders(env, request)); workspaceId = conv.workspace_id; senderRole = 'customer'; }
-  else { auth = await verifyApiKey(request, env, 'messages:write'); if (!auth.ok) { const admin = requireAdmin(request, env); if (!admin.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); } if (auth?.ok) workspaceId = auth.workspaceId; if (senderRole !== 'operator' && senderRole !== 'system') senderRole = 'operator'; }
+  else { auth = await verifyApiKey(request, env, 'messages:write'); if (!auth.ok) { const admin = await requireAdmin(request, env); if (!admin.ok) return json({ ok: false, error: auth.error }, 401, corsHeaders(env, request)); } if (auth?.ok) workspaceId = auth.workspaceId; if (senderRole !== 'operator' && senderRole !== 'system') senderRole = 'operator'; }
   if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const conv = await validateConversationWorkspace(env, conversationId, workspaceId); if (!conv) return json({ ok: false, error: 'Conversation not found' }, 404, corsHeaders(env, request));
   const body = safeText(input.body || input.message || '', conv.max_message_chars || DEFAULT_MAX_MESSAGE_CHARS); if (!body) return json({ ok: false, error: 'Message body required' }, 400, corsHeaders(env, request));
@@ -1539,7 +1585,7 @@ async function createMessage(request, env, conversationId) {
   catch (e) { return json({ ok: false, error: safeText(e.message || 'Message rejected', 200) }, 429, corsHeaders(env, request)); }
 }
 async function updateConversation(request, env, conversationId) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response;
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response;
   const input = await readJson(request); const workspaceId = safeText(input.workspace_id, 100); if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const status = STATUSES.has(input.status) ? input.status : null; const assignedTo = input.assigned_to !== undefined ? safeText(input.assigned_to, 160) : null; const current = await env.DB.prepare(`SELECT id, status, assigned_to FROM conversations WHERE id = ? AND workspace_id = ?`).bind(conversationId, workspaceId).first(); if (!current) return json({ ok: false, error: 'Conversation not found' }, 404, corsHeaders(env, request));
   const nextStatus = status || current.status; const nextAssigned = assignedTo ?? current.assigned_to;
@@ -1549,17 +1595,17 @@ async function updateConversation(request, env, conversationId) {
   return json({ ok: true, conversation: { id: conversationId, workspace_id: workspaceId, status: nextStatus, assigned_to: nextAssigned } }, 200, corsHeaders(env, request));
 }
 async function dashboard(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response; const workspaceId = safeText(new URL(request.url).searchParams.get('workspace_id') || '', 100); if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response; const workspaceId = safeText(new URL(request.url).searchParams.get('workspace_id') || '', 100); if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request));
   const stats = await env.DB.prepare(`SELECT COUNT(*) AS total, SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) AS open_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending_count, SUM(CASE WHEN status='closed' THEN 1 ELSE 0 END) AS closed_count, SUM(message_count) AS total_messages, SUM(operator_unread_count) AS unread_for_operator FROM conversations WHERE workspace_id = ?`).bind(workspaceId).first();
   return json({ ok: true, stats: stats || {} }, 200, corsHeaders(env, request));
 }
 async function createJob(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response; const input = await readJson(request); const workspaceId = safeText(input.workspace_id || '', 100); const type = safeText(input.type || '', 80);
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response; const input = await readJson(request); const workspaceId = safeText(input.workspace_id || '', 100); const type = safeText(input.type || '', 80);
   if (!SYSTEM_JOB_TYPES.has(type)) return json({ ok: false, error: 'Unsupported job type' }, 400, corsHeaders(env, request));
   const id = uuid('job_'); const t = nowIso(); await env.DB.prepare(`INSERT INTO jobs (id, workspace_id, type, status, requested_by, payload_json, created_at) VALUES (?, ?, ?, 'queued', 'admin', ?, ?)`).bind(id, workspaceId || null, type, JSON.stringify(input.payload || {}), t).run(); await env.DB.prepare(`INSERT INTO job_logs (id, job_id, workspace_id, level, message, created_at) VALUES (?, ?, ?, 'info', ?, ?)`).bind(uuid('log_'), id, workspaceId || null, `Job queued: ${type}`, t).run(); await audit(env, { workspaceId: workspaceId || null, actorType: 'admin', eventType: 'job.create', body: type, metadata: { job_id: id } }); return json({ ok: true, job: { id, workspace_id: workspaceId || null, type, status: 'queued', created_at: t } }, 201, corsHeaders(env, request));
 }
 async function publishWidgetConfig(request, env) {
-  const admin = requireAdmin(request, env); if (!admin.ok) return admin.response; const input = await readJson(request); const workspaceId = safeText(input.workspace_id || '', 100); if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request)); const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request));
+  const admin = await requireAdmin(request, env); if (!admin.ok) return admin.response; const input = await readJson(request); const workspaceId = safeText(input.workspace_id || '', 100); if (!workspaceId) return json({ ok: false, error: 'workspace_id required' }, 400, corsHeaders(env, request)); const workspace = await workspaceById(env, workspaceId); if (!workspace) return json({ ok: false, error: 'Workspace not found' }, 404, corsHeaders(env, request));
   const current = await env.DB.prepare(`SELECT COALESCE(MAX(version),0) AS maxv FROM widget_configs WHERE workspace_id = ?`).bind(workspaceId).first(); const version = Number(current?.maxv || 0) + 1; const t = nowIso(); const id = uuid('cfg_');
   await env.DB.batch([env.DB.prepare(`UPDATE widget_configs SET status='retired' WHERE workspace_id = ? AND status='published'`).bind(workspaceId), env.DB.prepare(`INSERT INTO widget_configs (id, workspace_id, version, status, brand_name, welcome_text, launcher_text, operator_name, primary_color, accent_color, logo_url, settings_json, created_at, published_at) VALUES (?, ?, ?, 'published', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, workspaceId, version, safeText(input.brand_name || 'Messages', 160), safeText(input.welcome_text || 'Send us a message. We will reply here.', 300), safeText(input.launcher_text || 'Message us', 80), safeText(input.operator_name || 'Operator', 120), safeText(input.primary_color || '#f6c85f', 24), safeText(input.accent_color || '#9a6cff', 24), safeText(input.logo_url || '', 500), JSON.stringify(input.settings || {}), t, t), env.DB.prepare(`INSERT INTO releases (id, workspace_id, release_type, version, status, artifact_ref, created_by, created_at, published_at) VALUES (?, ?, 'widget_config', ?, 'published', ?, 'admin', ?, ?)`).bind(uuid('rel_'), workspaceId, String(version), id, t, t)]);
   await audit(env, { workspaceId, actorType: 'admin', eventType: 'widget.publish', body: `version ${version}` }); return json({ ok: true, config: { id, workspace_id: workspaceId, version, status: 'published' } }, 201, corsHeaders(env, request));
@@ -1575,7 +1621,7 @@ export default {
       const path = url.pathname.replace(/\/$/, '') || '/';
       if (path === '/api/health') return json({ ok: true, service: 'relay13-core-v1.7-connectlog-operator-proof', time: nowIso() }, 200, corsHeaders(env, request));
       if (path === '/api/bootstrap' && request.method === 'POST') {
-        const admin = requireAdmin(request, env);
+        const admin = await requireAdmin(request, env);
         if (!admin.ok) return admin.response;
         return json({ ok: true, workspace: await ensureBootstrapWorkspace(env) }, 200, corsHeaders(env, request));
       }
@@ -1670,16 +1716,17 @@ export class ThreadRoom {
     this.presence(conversationId);
     return new Response(null, { status: 101, webSocket: client });
   }
-  async authorize(conversationId, role, workspaceId, tokenValue) {
-    if (!conversationId || !tokenValue) return { ok: false, error: 'Missing token', status: 401 };
-    if (role === 'operator') {
-      if ((this.env.PLATFORM_ADMIN_TOKEN || '').length >= 32 && timingSafeEqual(tokenValue, this.env.PLATFORM_ADMIN_TOKEN) && workspaceId) {
-        const conv = await this.env.DB.prepare(`SELECT id FROM conversations WHERE id = ? AND workspace_id = ?`).bind(conversationId, workspaceId).first();
-        if (!conv) return { ok: false, error: 'Conversation not found', status: 404 };
-        return { ok: true, workspaceId };
-      }
-      return { ok: false, error: 'Invalid operator token', status: 401 };
-    }
+	  async authorize(conversationId, role, workspaceId, tokenValue) {
+	    if (!conversationId || !tokenValue) return { ok: false, error: 'Missing token', status: 401 };
+	    if (role === 'operator') {
+	      const gate = await introspectRelay13AdminToken(tokenValue, this.env);
+      if (gate.ok && workspaceId) {
+	        const conv = await this.env.DB.prepare(`SELECT id FROM conversations WHERE id = ? AND workspace_id = ?`).bind(conversationId, workspaceId).first();
+	        if (!conv) return { ok: false, error: 'Conversation not found', status: 404 };
+	        return { ok: true, workspaceId };
+	      }
+	      return { ok: false, error: gate.error || 'Invalid operator token', status: gate.status || 401 };
+	    }
     const hash = await sha256Hex(tokenValue);
     const conv = await this.env.DB.prepare(`SELECT workspace_id FROM conversations WHERE id = ? AND visitor_token_hash = ?`).bind(conversationId, hash).first();
     if (!conv) return { ok: false, error: 'Invalid visitor token', status: 401 };

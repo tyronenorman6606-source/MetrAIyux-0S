@@ -971,7 +971,6 @@ async function validateSaasVisuals(page, entry) {
 
 const nexusRoutes = [
   { path: '/SkyeMusicNexus/public/index.html', label: 'artist-dashboard', expects: ['Platform Dashboard', 'Upload Studio', 'Music Player'], guidance: true },
-  { path: '/SkyeMusicNexus/public/create.html', label: 'create', expects: ['Creation Hub', 'Native DAW', 'Upload Studio'], guidance: true },
   { path: '/SkyeMusicNexus/public/daw.html', label: 'daw', expects: ['SkyeMusicNexus DAW', 'Audio', 'Export'], daw: true },
   { path: '/SkyeMusicNexus/public/discover.html', label: 'discover', expects: ['SkyeMusicNexus // Discover', 'Spotify-style listening lanes'], guidance: true, staticFalse: true },
   { path: '/SkyeMusicNexus/public/feed.html', label: 'feed', expects: ['Open Social Feed', 'Provider publishing bay'], guidance: true },

@@ -10,6 +10,7 @@ const artifactRoot = path.join(repoRoot, 'test-artifacts', '0s-operating-proof-m
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const receiptPath = path.join(artifactRoot, stamp, 'receipt.json');
 const latestPath = path.join(artifactRoot, '0s-operating-proof-matrix-latest.json');
+const perAppProofPath = path.join(repoRoot, 'test-artifacts', '0s-per-app-operating-proof', '0s-per-app-operating-proof-latest.json');
 const osJsPath = path.join(repoRoot, 'metraiyux_0s_site', '0s', 'os.js');
 const closureManifestPath = path.join(repoRoot, 'metraiyux_0s_site', 'data', '0s-closure-workflows.json');
 const deployScriptPath = path.join(repoRoot, 'scripts', 'deploy-0s-worker.mjs');
@@ -197,6 +198,17 @@ function receiptStatus(receiptPathValue = '') {
     };
   } catch {
     return { path: receiptPathValue, exists: true, ok: false, parse_error: true };
+  }
+}
+
+function readPerAppProofRows() {
+  if (!fs.existsSync(perAppProofPath)) return new Map();
+  try {
+    const data = JSON.parse(read(perAppProofPath));
+    if (data?.ok !== true || !Array.isArray(data.rows)) return new Map();
+    return new Map(data.rows.map((row) => [row.id, row]));
+  } catch {
+    return new Map();
   }
 }
 
@@ -460,9 +472,9 @@ const appFamilyRules = [
   { family: 'skyenet-full-runtime', pattern: /skyenet|deploy|publish|source-custody/i },
   { family: 'skyepay-commerce-financial-ops', pattern: /skyecommerce|skyepay|commerce|checkout|split|profit|storefront|kaixu-storefront|pricing/i },
   { family: 'relay13-communications-center', pattern: /relay13|connectlog|inbox|chat|conversation/i },
-  { family: 'content-engine-provider-dispatch', pattern: /content|forge|media|blog|devisional|publisher|growth-operator|webgrowth|brandkit|brand-id|webcreator|arizona-growth/i },
+  { family: 'content-engine-provider-dispatch', pattern: /marketing|marketing-made-easy|content|forge|media|blog|devisional|publisher|growth-operator|webgrowth|brandkit|brand-id|brandid|webcreator|arizona-growth/i },
   { family: 'jobping-product-depth', pattern: /jobping/i },
-  { family: 'external-provider-hardening', pattern: /provider|skyerrors|skyehawk|skyevault|citadeldb|company-knowledge|key-gate|keygate|aegis|api|vault|secret|authenticator|doctor-ops|skyeops|arcade/i },
+  { family: 'external-provider-hardening', pattern: /provider|skyerrors|skyehawk|skyevault|citadeldb|company-knowledge|key-gate|keygate|aegis|api|vault|secret|authenticator|doctor-ops|skyeops|arcade|houseoperations|houseops|local-brain|cabinet-brain|neural-map|neural/i },
   { family: 'broad-real-user-saas-skymail-skynet', pattern: /saas|northstar|gate-signup|signup|real-user|gate/i },
   { family: 'valuation-deck-alignment', pattern: /valuation|commercial-terms|terms/i }
 ];
@@ -516,8 +528,9 @@ function stateProfileForApp(app = {}) {
   return 'remote_stateful';
 }
 
-function appMissingDepth({ profile, directReceipt, familyState, routeOk }) {
+function appMissingDepth({ profile, directReceipt, familyState, routeOk, appProof }) {
   if (!routeOk) return ['route_or_shared_gate_render'];
+  if (appProof?.ok === true) return [];
   if (directReceipt && familyState === 'green') return [];
   if (profile === 'read_only_static' || profile === 'proof_asset') {
     return [
@@ -547,6 +560,7 @@ function appMissingDepth({ profile, directReceipt, familyState, routeOk }) {
 
 function appBehaviorMatrix(routeRows, lanes) {
   const laneById = new Map(lanes.map((lane) => [lane.id, lane]));
+  const perAppProofRows = readPerAppProofRows();
   const rows = routeRows.map((row) => {
     const canonicalFamily = canonicalFamilyForApp(row, laneById);
     const familyLane = canonicalFamily ? laneById.get(canonicalFamily) : null;
@@ -555,7 +569,8 @@ function appBehaviorMatrix(routeRows, lanes) {
     const directReceipt = directAppLaneMap.get(row.id) === canonicalFamily;
     const familyState = familyLane?.state || 'unmapped';
     const familyReceiptOk = familyLane?.receipt?.ok === true || familyLane?.evidence_receipts?.some((item) => item.ok) || familyLane?.behavior_receipts?.some((item) => item.ok);
-    const missing = appMissingDepth({ profile, directReceipt, familyState, routeOk });
+    const appProof = perAppProofRows.get(row.id) || null;
+    const missing = appMissingDepth({ profile, directReceipt, familyState, routeOk, appProof });
     const state = !routeOk || familyState === 'red'
       ? 'red'
       : missing.length === 0
@@ -575,11 +590,20 @@ function appBehaviorMatrix(routeRows, lanes) {
       route_gate_ok: row.unauth?.ok === true,
       route_authenticated_ok: row.authenticated?.ok === true,
       route_ok: routeOk,
-      coverage_model: directReceipt
+      coverage_model: appProof?.ok === true
+        ? 'app_specific_behavior_receipt'
+        : directReceipt
         ? 'direct_app_lane_receipt'
         : canonicalFamily
         ? 'family_lane_evidence_only'
         : 'route_auth_only_unmapped',
+      app_specific_receipt: appProof ? {
+        ok: appProof.ok === true,
+        source_file: appProof.source_file || '',
+        source_sha256: appProof.source_sha256 || '',
+        proof_model: appProof.proof_model?.model || '',
+        generated_at: appProof.generated_at || ''
+      } : null,
       missing_depth: missing,
       next_build_step: missing.length === 0
         ? 'Keep this app receipt fresh when the mounted app changes.'
@@ -675,7 +699,7 @@ async function main() {
   const login = credential.kind === 'bearer'
     ? { status: 0, ok: true, body: null, bearer_reused: true, elapsed_ms: 0 }
     : credential.value
-    ? await fetchAny(`${baseUrl}/api/founder-command/login`, {
+    ? await fetchAny(`${baseUrl}/api/owner/admin-login`, {
       method: 'POST',
       headers: { accept: 'application/json', 'content-type': 'application/json' },
       body: JSON.stringify({ code: credential.value })

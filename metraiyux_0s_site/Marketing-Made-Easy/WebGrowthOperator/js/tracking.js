@@ -14,13 +14,20 @@
     return raw.replace(/^Bearer\s+/i,'').trim();
   }
   function gateHeaders(){
-    var keys = ['FREE99_PLATFORM_GATE_SESSION','FREE99_PLATFORM_GATE_SESSION_MARKETING_MADE_EASY','skye_gate_session','skygate_session','skyegate_session','skyeGateSession','skye_gate_token','skygate_token','skyegate_token','metraiyux_gate_session','metraiyux_admin_session'];
+    var bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    var bridgeSession = null;
+    try {
+      bridgeSession = bridge && (bridge.requireSession && bridge.requireSession({platformId:'webgrowthoperator', usageLane:'marketing-intake'})) || (bridge && bridge.current && bridge.current());
+    } catch(err) {}
+    var bridgeToken = tokenFromValue(bridgeSession && bridgeSession.token);
+    if(bridgeToken) return {'authorization':'Bearer ' + bridgeToken, 'x-skye-gate-session':bridgeToken, 'x-free99-gate-session':bridgeToken};
+    var keys = ['METRAIYUX_GATE_SESSION','SKYGATEFS27_GATE_SESSION','SKYE_GATE_SESSION'];
     for(var s=0;s<2;s++){
       var store = s === 0 ? window.sessionStorage : window.localStorage;
       try{
         for(var i=0;i<keys.length;i++){
           var token = tokenFromValue(store.getItem(keys[i]));
-          if(token) return {'authorization':'Bearer ' + token, 'x-skye-gate-session':token, 'x-free99-gate-session':token, 'x-free99-admin-code':token};
+          if(token) return {'authorization':'Bearer ' + token, 'x-skye-gate-session':token, 'x-free99-gate-session':token};
         }
       }catch(err){}
     }

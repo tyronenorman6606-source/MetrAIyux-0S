@@ -185,7 +185,7 @@ a:focus-visible {
   min-height: 76px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 0.8rem clamp(1rem, 4vw, 3rem);
   background: rgba(5, 13, 13, 0.78);
@@ -215,10 +215,35 @@ a:focus-visible {
   color: var(--gold);
 }
 
+.powered-by {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(246, 211, 95, 0.34);
+  border-radius: var(--radius);
+  background: rgba(246, 211, 95, 0.09);
+  color: var(--text);
+  padding: 0.45rem 0.68rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.powered-by span {
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.powered-by strong {
+  color: var(--gold);
+}
+
 .navlinks {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  margin-left: auto;
 }
 
 .navlinks a,
@@ -308,6 +333,51 @@ a:focus-visible {
 
 .hero-copy {
   max-width: 760px;
+}
+
+.hero-side {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.media-intro {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  border: 1px solid rgba(179, 255, 217, 0.22);
+  border-radius: var(--radius);
+  background: #050807;
+  box-shadow: var(--shadow);
+}
+
+.media-intro video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  background: #050807;
+}
+
+.intro-caption {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem;
+  background: linear-gradient(180deg, transparent, rgba(3, 8, 10, 0.88));
+}
+
+.intro-caption span {
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.intro-caption strong {
+  color: #fff;
+  line-height: 1.25;
 }
 
 .neon-title,
@@ -825,6 +895,7 @@ a:focus-visible {
 
   .nav-toggle {
     display: inline-flex;
+    margin-left: auto;
   }
 
   .navlinks {
@@ -837,12 +908,25 @@ a:focus-visible {
     border-bottom: 1px solid rgba(179, 255, 217, 0.18);
   }
 
+  .powered-by {
+    padding: 0.4rem 0.52rem;
+    font-size: 0.68rem;
+  }
+
+  .powered-by span {
+    display: none;
+  }
+
   body.menu-open .navlinks {
     display: grid;
   }
 
   .command-hero {
     min-height: auto;
+  }
+
+  .media-intro video {
+    aspect-ratio: 4 / 3;
   }
 
   .neon-title,

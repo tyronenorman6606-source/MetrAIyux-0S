@@ -10,7 +10,7 @@ const ContentEngineLane = (() => {
   }
 
   function token(){
-    return window.SkygateAuthBridge?.token?.() || sessionStorage.getItem('adminBrainToken') || '';
+    return window.SkygateAuthBridge?.token?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
   }
 
   function authHeaders(extra = {}){
@@ -193,8 +193,7 @@ const ContentEngineLane = (() => {
       renderStatus();
     });
     $('saveToken')?.addEventListener('click', async () => {
-      if (window.SkygateAuthBridge) await window.SkygateAuthBridge.saveTokenFromInput('tokenInput', 'skygateAuthStatus');
-      else sessionStorage.setItem('adminBrainToken', $('tokenInput').value.trim());
+      await window.SkygateAuthBridge?.saveTokenFromInput?.('tokenInput', 'skygateAuthStatus');
       renderStatus();
     });
     handle('loadArticles', loadArticles);

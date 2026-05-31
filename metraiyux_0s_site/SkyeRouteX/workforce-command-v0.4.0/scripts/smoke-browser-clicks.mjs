@@ -87,10 +87,14 @@ async function attachGateSession(page, { session, user }) {
     };
     localStorage.setItem('skye_session', session);
     localStorage.setItem('skye_user', JSON.stringify(user));
-    sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(gate));
-    sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX', JSON.stringify(gate));
-    localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(gate));
-    localStorage.setItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX', JSON.stringify(gate));
+    for (const key of ['METRAIYUX_GATE_SESSION', 'SKYGATEFS27_GATE_SESSION', 'SKYE_GATE_SESSION']) {
+      sessionStorage.setItem(key, JSON.stringify(gate));
+      localStorage.setItem(key, JSON.stringify(gate));
+    }
+    for (const key of ['FREE99_PLATFORM_GATE_SESSION', 'FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX']) {
+      sessionStorage.removeItem(key);
+      localStorage.removeItem(key);
+    }
   }, { session, user });
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => !document.getElementById('free99PlatformGate'), null, { timeout: 5000 });

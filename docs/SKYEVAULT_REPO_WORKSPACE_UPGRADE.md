@@ -7,13 +7,13 @@ SkyeVault now has three repo lanes instead of one archive-only lane.
 Use this when the workspace should behave like a normal Git remote:
 
 ```bash
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:git:remote
+SKYEVAULT_GATE_INTROSPECT_URL="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skygate/auth-introspect" npm run vault:git:remote
 npm run vault:repo -- init --dir=./client-workspace --workspace=acme --repo=app
 cd ./client-workspace
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run --prefix /workspaces/MetrAIyux-0S vault:repo -- push --dir=. --branch=main
+SKYEVAULT_GATE_BEARER="<shared 0S/FS27/SkyGate bearer>" npm run --prefix /workspaces/MetrAIyux-0S vault:repo -- push --dir=. --branch=main
 ```
 
-The worktree stores a clean `vault` remote URL. The token is supplied at runtime through `SKYEVAULT_GIT_REMOTE_TOKEN`, so it does not get written into `.git/config`.
+The worktree stores a clean `vault` remote URL. The shared gate bearer is supplied at runtime through `SKYEVAULT_GATE_BEARER` or another accepted gate-session env var, so it does not get written into `.git/config`.
 
 Useful commands:
 

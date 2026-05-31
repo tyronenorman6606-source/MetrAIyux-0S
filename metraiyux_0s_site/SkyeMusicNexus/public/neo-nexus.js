@@ -290,8 +290,18 @@
     return /(^|\.)skye-music-nexus\.pages\.dev$/i.test(window.location.hostname);
   }
   const staticPreviewOverride = window.SKYE_MUSIC_NEXUS_STATIC_PREVIEW;
-  const staticPreview = staticPreviewOverride === true
-    || (staticPreviewOverride !== false && window.location.protocol === 'http:' && /^(127\.0\.0\.1|localhost)$/.test(window.location.hostname));
+  const explicitStaticPreview = window.SKYE_MUSIC_NEXUS_ALLOW_STATIC_PREVIEW === true
+    && (staticPreviewOverride === true || new URLSearchParams(window.location.search).get('static_preview') === '1');
+  const localStaticPreview = staticPreviewOverride !== false
+    && window.location.protocol === 'http:'
+    && /^(127\.0\.0\.1|localhost)$/.test(window.location.hostname);
+  const staticPreview = explicitStaticPreview || localStaticPreview;
+  const allowStaticFallback = staticPreview || window.SKYE_MUSIC_NEXUS_ALLOW_STATIC_FALLBACK === true;
+  if (!allowStaticFallback) {
+    state.social.feedItems = [];
+    state.social.stories = [];
+    state.social.summary = { connectors: 0, readyConnectors: 0, feedItems: 0, queuedPosts: 0, publishedPosts: 0, providerTokenRequired: 0 };
+  }
   const auth = window.createSkyGateAuth ? window.createSkyGateAuth({ storageKey: 'skye_music_nexus_session' }) : null;
   const previewSeconds = 24;
   window.__SKYE_MUSIC_PLAYBACK = { isPlaying: false, queueLength: 0, mode: 'idle', currentTime: 0 };
@@ -530,10 +540,10 @@
     try {
       response = needsAuth && auth ? await auth.fetch(url.toString(), init) : await fetch(url.toString(), init);
     } catch (err) {
-      if (standalonePagesHost() || window.location.pathname.includes('/SkyeMusicNexus/public/')) return staticFunctionResponse(name, options);
+      if (allowStaticFallback) return staticFunctionResponse(name, options);
       throw err;
     }
-    if ([401, 403, 404].includes(response.status) && (standalonePagesHost() || window.location.pathname.includes('/SkyeMusicNexus/public/'))) {
+    if ([401, 403, 404].includes(response.status) && allowStaticFallback) {
       return staticFunctionResponse(name, options);
     }
     return readJson(response);
@@ -2768,7 +2778,7 @@
 
     const orderList = $('#storeOrderList');
     if (orderList) {
-      orderList.innerHTML = orders.length ? orders.map((order) => recordCard('order', order.title || order.orderId, `${fmtMoney((order.totalCents || 0) / 100)} total · ${fmtMoney((order.artistNetCents || 0) / 100)} artist net`, [order.status || 'pending', order.fulfillmentStatus || 'not started', order.buyerEmail || 'no buyer email'])).join('') : '<article class="record-card"><h4>No order intents yet</h4><p>Record an order intent to generate a SkyePay checkout route while the store stays protected by client access.</p></article>';
+      orderList.innerHTML = orders.length ? orders.map((order) => recordCard('order', order.title || order.orderId, `${fmtMoney((order.totalCents || 0) / 100)} total · ${fmtMoney((order.artistNetCents || 0) / 100)} artist net`, [order.status || 'pending', order.fulfillmentStatus || 'not started', order.buyerEmail || 'no buyer email'])).join('') : '<article class="record-card"><h4>No order intents yet</h4><p>Record an order intent to request a SkyePay route while the store stays protected by client access.</p></article>';
     }
 
     $$('select[name="productId"]').forEach((select) => {
@@ -4930,59 +4940,6 @@
     wireContestForms();
   }
 
-  function ensureMcpChrome() {
-    const pageName = (window.location.pathname.split('/').pop() || 'index.html').replace(/\.html$/i, '') || 'index';
-    const roomName = pageName === 'index' ? 'dashboard' : pageName;
-    document.documentElement.setAttribute('data-mcp-neon-scrollbar', '');
-    document.body.classList.add('one-music-site', 'skyesol-living-page', `room-${roomName}`);
-
-    const addChromeNode = (selector, createNode) => {
-      if (document.querySelector(selector)) return null;
-      const node = createNode();
-      document.body.insertBefore(node, document.body.firstChild);
-      return node;
-    };
-
-    addChromeNode('.neon-motion-chrome', () => {
-      const node = document.createElement('div');
-      node.className = 'neon-motion-chrome';
-      node.dataset.motionChrome = '';
-      node.setAttribute('aria-hidden', 'true');
-      return node;
-    });
-
-    addChromeNode('.skyesol-living-field', () => {
-      const node = document.createElement('canvas');
-      node.className = 'living-background skyesol-living-field';
-      node.setAttribute('aria-hidden', 'true');
-      return node;
-    });
-
-    addChromeNode('.skyesol-grain', () => {
-      const node = document.createElement('div');
-      node.className = 'skyesol-grain';
-      node.setAttribute('aria-hidden', 'true');
-      return node;
-    });
-
-    addChromeNode('.skyesol-scanline', () => {
-      const node = document.createElement('div');
-      node.className = 'skyesol-scanline';
-      node.setAttribute('aria-hidden', 'true');
-      return node;
-    });
-
-    if (!window.__skyeMusicNexusPublicLivingMounted && typeof window.mountSkyeSolLivingBackground === 'function') {
-      window.__skyeMusicNexusPublicLivingMounted = true;
-      window.mountSkyeSolLivingBackground({
-        canvasSelector: '.skyesol-living-field',
-        particleDensity: 18000,
-        maxParticles: 96,
-        minParticles: 34,
-      });
-    }
-  }
-
   function initCanvas() {
     const canvas = $('#pulse-field');
     if (!canvas) return;
@@ -5056,7 +5013,6 @@
   }
 
   async function init() {
-    ensureMcpChrome();
     ensureProofNavLink();
     ensureCommandDashboardNavLink();
     ensureLivingArtistNavLinks();

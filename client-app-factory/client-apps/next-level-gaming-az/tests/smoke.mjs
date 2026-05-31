@@ -22,6 +22,8 @@ const required = [
   "assets/app.js",
   "assets/icons/icon.svg",
   "assets/media/next-level-logo.png",
+  "assets/media/next-level-hero.mp4",
+  "assets/media/next-level-hero-poster.jpg",
   "assets/media/cyber-city-hero.jpg",
   "assets/media/shop-photo-1.jpg",
   "assets/media/shop-photo-2.jpg",
@@ -50,7 +52,9 @@ const assertions = {
   hasLivingCanvas: js.includes("requestAnimationFrame(animate)") && html.includes("data-living-background"),
   hasNeonScrollbar: css.includes("::-webkit-scrollbar-thumb"),
   hasRequestForm: (await readFile(path.join(root, "quote.html"), "utf8")).includes("data-event-request-form"),
-  hasPreviewGate: (await readFile(path.join(root, "preview.html"), "utf8")).includes("data-preview-gate")
+  hasPreviewGate: (await readFile(path.join(root, "preview.html"), "utf8")).includes("data-preview-gate"),
+  hasRealIntroMedia: html.includes("data-intro-video") && html.includes("assets/media/next-level-hero.mp4"),
+  hasSkyeKnowlogyBadge: html.includes("Powered by") && html.includes("SkyeKnowlogy")
 };
 
 const ok = Object.values(assertions).every(Boolean);

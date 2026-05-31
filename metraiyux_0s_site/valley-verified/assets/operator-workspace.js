@@ -4,6 +4,12 @@
   const DATA = '/valley-verified/data/';
   const STORE = 'valleyVerified.operatorWorkspace.v1.';
   const src = (label, file) => ({ label, url: `${DATA}${file}` });
+  const BOUNDARY = Object.freeze({
+    SEED: 'seed',
+    DRY_RUN: 'dry_run',
+    PROOF_ONLY: 'proof_only',
+    WORKER_CONFIRMED: 'worker_confirmed'
+  });
 
   const groups = {
     owner: [src('Owner CRM', 'owner-crm-index.json'), src('Owner verification', 'owner-verification-packets.json'), src('Owner messaging', 'owner-messaging-model.json')],
@@ -30,16 +36,16 @@
     'ae-work-orders': ['AE work order workspace', 'Work orders', 'City work orders and AE execution planning.', [groups.ae[1], groups.ae[2], groups.lead[0]]],
     'ae-assignments': ['AE assignment workspace', 'Assignments', 'Assignment contracts, stages, and territories.', [groups.ae[2], groups.ae[3], groups.ae[0]]],
     outreach: ['Outreach workspace', 'Outbound desk', 'Outreach packets, lead routing, and playbooks.', [groups.lead[2], groups.lead[0], groups.lead[1], groups.lead[3]]],
-    'lead-inbox': ['Lead inbox workspace', 'Lead routing', 'Lead lanes, candidate counts, and routing status.', [groups.lead[0], groups.lead[1], groups.lifecycle[2]]],
-    'lead-routing': ['Lead routing workspace', 'Routing rules', 'Rule-level candidate routing and dispatch context.', [groups.lead[1], groups.lead[0], groups.lead[2]]],
-    'lead-records': ['Lead records workspace', 'Lead records', 'Lead contracts, routing lanes, and candidate pools.', [src('Lead records model', 'lead-records-model.json'), groups.lead[0], groups.lead[1]]],
-    'lead-routing-service': ['Lead routing service workspace', 'Lead service', 'Service model, routing rules, and inbox queues.', [src('Lead routing service model', 'lead-routing-service-model.json'), groups.lead[1], groups.lead[0]]],
-    'admin-review': ['Admin review workspace', 'Admin review', 'Admin packets, quality flags, and approvals.', [...groups.admin, ...groups.audit]],
-    'admin-actions': ['Admin actions workspace', 'Admin actions', 'Action packets, batches, and runtime contracts.', [groups.admin[0], groups.admin[1], groups.admin[3], groups.audit[0]]],
+    'lead-inbox': ['Lead inbox workspace', 'Lead routing', 'Seed lead lanes, candidate counts, and routing status; not delivered-lead telemetry.', [groups.lead[0], groups.lead[1], groups.lifecycle[2]]],
+    'lead-routing': ['Lead routing workspace', 'Routing rules', 'Seed rule-level candidate routing and dispatch context.', [groups.lead[1], groups.lead[0], groups.lead[2]]],
+    'lead-records': ['Lead records workspace', 'Lead records', 'Proof-only lead contracts, routing lanes, and candidate pools.', [src('Lead records model', 'lead-records-model.json'), groups.lead[0], groups.lead[1]]],
+    'lead-routing-service': ['Lead routing service workspace', 'Lead service', 'Proof-only service model, routing rules, and inbox queues.', [src('Lead routing service model', 'lead-routing-service-model.json'), groups.lead[1], groups.lead[0]]],
+    'admin-review': ['Admin review workspace', 'Admin review', 'Proof-only admin packets, quality flags, and approvals.', [...groups.admin, ...groups.audit]],
+    'admin-actions': ['Admin actions workspace', 'Admin actions', 'Dry-run action packets, batches, and runtime contracts.', [groups.admin[0], groups.admin[1], groups.admin[3], groups.audit[0]]],
     'admin-console': ['Admin console workspace', 'Admin console', 'Proof-safe controls paired with queues and runtime decisions.', [src('Admin console model', 'admin-console-model.json'), ...groups.admin]],
     'admin-api': ['Admin API workspace', 'Admin API', 'Admin API contracts and backend action models.', [src('Admin API model', 'admin-api-model.json'), src('Platform API index', 'platform-api-index.json'), src('Backend action contracts', 'backend-action-contracts.json'), groups.admin[3]]],
     'admin-batch': ['Admin batch workspace', 'Batch operations', 'Batch review, duplicate suppression, and enrichment.', [groups.admin[1], groups.audit[1], groups.owner[1]]],
-    'action-queue': ['Action queue workspace', 'Action queue', 'Action packets and lifecycle records as a tracked queue.', [groups.admin[0], groups.lifecycle[0], groups.audit[0]]],
+    'action-queue': ['Action queue workspace', 'Action queue', 'Proof-only action packets and lifecycle records as a tracked queue model.', [groups.admin[0], groups.lifecycle[0], groups.audit[0]]],
     'approval-flow': ['Approval flow workspace', 'Approvals', 'Approval contracts and change-set context.', [groups.admin[2], src('Admin change-set template', 'admin-change-set-template.json'), groups.admin[0]]],
     audit: ['Audit workspace', 'Audit and trust', 'Moderation, duplicates, claims, and audit decisions.', [...groups.audit, groups.admin[0]]],
     'protected-admin': ['Protected admin workspace', 'Upstream-auth admin', 'Queues and exports beside the protected shell.', [...groups.admin, groups.lifecycle[0], groups.audit[0]]],
@@ -78,11 +84,26 @@
       const res = await fetch(feed.url, { cache: 'no-store' });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data = await res.json();
-      const records = extract(data).slice(0, 240).map((record, index) => normalize(record, feed.label, index));
-      return { ...feed, ok: true, data, records, count: declaredCount(data, records.length), stamp: text(data.updated_at || data.generated_at || data.version || '') };
+      const boundary = feedBoundary(feed, data);
+      const records = extract(data).slice(0, 240).map((record, index) => normalize(record, feed.label, index, boundary));
+      return { ...feed, ok: true, boundary, worker_confirmed: boundary === BOUNDARY.WORKER_CONFIRMED, data, records, count: declaredCount(data, records.length), stamp: text(data.updated_at || data.generated_at || data.version || '') };
     } catch (error) {
-      return { ...feed, ok: false, records: [], count: 0, stamp: '', error: error.message || 'load failed' };
+      return { ...feed, ok: false, boundary: BOUNDARY.PROOF_ONLY, worker_confirmed: false, records: [], count: 0, stamp: '', error: error.message || 'load failed' };
     }
+  }
+
+  function feedBoundary(feed, data) {
+    if (data?.worker_confirmed && data?.worker_receipt) return BOUNDARY.WORKER_CONFIRMED;
+    if (/dry run/i.test(feed.label) || /dry-run/i.test(feed.url)) return BOUNDARY.DRY_RUN;
+    if (/admin|approval|runtime|claim|lead|outreach|revenue/i.test(feed.label)) return BOUNDARY.PROOF_ONLY;
+    return BOUNDARY.SEED;
+  }
+
+  function boundaryLabel(boundary) {
+    if (boundary === BOUNDARY.WORKER_CONFIRMED) return 'worker-confirmed';
+    if (boundary === BOUNDARY.DRY_RUN) return 'dry-run';
+    if (boundary === BOUNDARY.PROOF_ONLY) return 'proof-only';
+    return 'seed';
   }
 
   function extract(data) {
@@ -127,11 +148,13 @@
     return Number(hit ?? (data?.overflow_count ? fallback + Number(data.overflow_count) : fallback));
   }
 
-  function normalize(record, feedLabel, index) {
+  function normalize(record, feedLabel, index, boundary = BOUNDARY.SEED) {
     const id = text(record.id || record.business_id || record.rule_id || record.lead_lane_id || record.action_id || record.identity_key || `${slug(feedLabel)}-${index}`);
     const flags = Array.isArray(record.flags) ? record.flags.join(', ') : record.flags;
     return {
       id,
+      boundary,
+      worker_confirmed: boundary === BOUNDARY.WORKER_CONFIRMED,
       feedLabel,
       feedSlug: slug(feedLabel),
       title: text(record.name || record.business_name || record.title || record.action || record.rule_id || record.lead_lane_id || record.stage || record.batch || id),
@@ -170,15 +193,15 @@
     return `
       <div class="vv-operator-shell">
         <div class="vv-op-head">
-          <div><p class="vv-op-kicker">${esc(lane)}</p><h2>${esc(title)}</h2><p>${esc(brief)} This route now has its own operator workspace mounted on top of the generated public renderer.</p></div>
-          <div class="vv-op-actions"><button class="btn primary" data-op="packet">Prepare packet</button><button class="btn" data-op="download">Export ledger</button></div>
+          <div><p class="vv-op-kicker">${esc(lane)}</p><h2>${esc(title)}</h2><p>${esc(brief)} Counts below are seed/proof-only unless a Worker receipt marks them worker_confirmed.</p></div>
+          <div class="vv-op-actions"><button class="btn primary" data-op="packet">Prepare proof packet</button><button class="btn" data-op="download">Export dry-run ledger</button></div>
         </div>
-        <div class="vv-op-metrics">${metric('Loaded sources', `${loaded}/${model.feeds.length}`)}${metric('Queue records', fmt(total))}${metric('Ledger entries', fmt(model.ledger.length))}${metric('Open actions', fmt(open))}</div>
+        <div class="vv-op-metrics">${metric('Seed/proof sources', `${loaded}/${model.feeds.length}`)}${metric('Seed/proof records', fmt(total))}${metric('Browser dry-run entries', fmt(model.ledger.length))}${metric('Open dry-run actions', fmt(open))}</div>
         ${guideMarkup()}
-        <div class="vv-op-filters">${filter('all', 'All queues')}${model.feeds.map(feed => filter(slug(feed.label), feed.label)).join('')}</div>
+        <div class="vv-op-filters">${filter('all', 'All seed/proof queues')}${model.feeds.map(feed => filter(slug(feed.label), feed.label)).join('')}</div>
         <div class="vv-op-layout">
-          <section class="vv-op-panel"><div class="vv-op-panel-head"><div><p class="vv-op-kicker">Work queue</p><h3>${rows.length ? `${rows.length} active rows` : 'No rows loaded'}</h3></div><span>${esc(route)}</span></div><div class="vv-op-list">${rows.slice(0, 18).map(row).join('') || '<p class="vv-op-empty">The selected feed did not expose object rows.</p>'}</div></section>
-          <aside class="vv-op-panel"><div class="vv-op-panel-head"><div><p class="vv-op-kicker">Source health</p><h3>Route feeds</h3></div></div><div class="vv-source-list">${model.feeds.map(feed).join('')}</div>${noteForm()}<div class="vv-ledger-list">${model.ledger.slice(0, 8).map(ledger).join('') || '<p class="vv-op-empty">No browser-local operator actions yet.</p>'}</div></aside>
+          <section class="vv-op-panel"><div class="vv-op-panel-head"><div><p class="vv-op-kicker">Seed/proof queue</p><h3>${rows.length ? `${rows.length} seed/proof rows` : 'No rows loaded'}</h3></div><span>${esc(route)}</span></div><div class="vv-op-list">${rows.slice(0, 18).map(row).join('') || '<p class="vv-op-empty">The selected feed did not expose object rows.</p>'}</div></section>
+          <aside class="vv-op-panel"><div class="vv-op-panel-head"><div><p class="vv-op-kicker">Source boundary</p><h3>Route feeds</h3></div></div><div class="vv-source-list">${model.feeds.map(feed).join('')}</div>${noteForm()}<div class="vv-ledger-list">${model.ledger.slice(0, 8).map(ledger).join('') || '<p class="vv-op-empty">No browser-local dry-run actions yet.</p>'}</div></aside>
         </div>
       </div>`;
   }
@@ -211,19 +234,19 @@
 
   function row(item) {
     const entry = model.ledger.find(saved => saved.id === item.id);
-    return `<article class="vv-op-row"><div><span class="vv-row-source">${esc(item.feedLabel)}</span><h4>${esc(item.title)}</h4><p>${esc(item.note || 'No next action supplied in source data.')}</p><div class="vv-row-meta">${item.meta.map(part => `<span>${esc(part)}</span>`).join('')}<span>${esc(item.status)}</span>${entry ? `<span>ledger: ${esc(entry.status)}</span>` : ''}</div></div><div class="vv-row-actions">${item.href ? `<a class="btn small" href="${esc(item.href)}">Open</a>` : ''}<button class="btn small" data-row-action="claimed" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Claim</button><button class="btn small" data-row-action="ready" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Ready</button><button class="btn small" data-row-action="blocked" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Block</button></div></article>`;
+    return `<article class="vv-op-row"><div><span class="vv-row-source">${esc(item.feedLabel)}</span><h4>${esc(item.title)}</h4><p>${esc(item.note || 'No next action supplied in source data.')}</p><div class="vv-row-meta">${item.meta.map(part => `<span>${esc(part)}</span>`).join('')}<span>${esc(item.status)}</span><span>${esc(boundaryLabel(item.boundary))}</span>${entry ? `<span>dry-run ledger: ${esc(entry.status)}</span>` : ''}</div></div><div class="vv-row-actions">${item.href ? `<a class="btn small" href="${esc(item.href)}">Open</a>` : ''}<button class="btn small" data-row-action="claimed" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Claim dry-run</button><button class="btn small" data-row-action="ready" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Ready dry-run</button><button class="btn small" data-row-action="blocked" data-id="${esc(item.id)}" data-title="${esc(item.title)}">Block dry-run</button></div></article>`;
   }
 
   function feed(item) {
-    return `<article class="vv-source-item"><div><strong>${esc(item.label)}</strong><span>${esc(item.stamp || item.url.replace(DATA, ''))}</span></div><a href="${esc(item.url)}">${esc(item.ok ? `${fmt(item.count)} rows` : item.error)}</a></article>`;
+    return `<article class="vv-source-item"><div><strong>${esc(item.label)}</strong><span>${esc(`${boundaryLabel(item.boundary)} / ${item.stamp || item.url.replace(DATA, '')}`)}</span></div><a href="${esc(item.url)}">${esc(item.ok ? `${fmt(item.count)} ${boundaryLabel(item.boundary)} rows` : item.error)}</a></article>`;
   }
 
   function noteForm() {
-    return `<form class="vv-note-form"><label>Operator note<textarea name="note" placeholder="Record the decision, blocker, or next handoff."></textarea></label><label>Disposition<select name="status"><option value="review">Review</option><option value="claimed">Claimed</option><option value="ready">Ready</option><option value="blocked">Blocked</option><option value="done">Done</option></select></label><button class="btn primary" type="submit">Save note</button></form>`;
+    return `<form class="vv-note-form"><label>Operator dry-run note<textarea name="note" placeholder="Record the decision, blocker, or next handoff."></textarea></label><label>Disposition<select name="status"><option value="review">Review</option><option value="claimed">Claimed</option><option value="ready">Ready</option><option value="blocked">Blocked</option><option value="done">Done</option></select></label><button class="btn primary" type="submit">Save dry-run note</button></form>`;
   }
 
   function ledger(item) {
-    return `<article class="vv-ledger-item"><strong>${esc(item.title)}</strong><span>${esc(item.status)} / ${esc(item.at)}</span>${item.note ? `<p>${esc(item.note)}</p>` : ''}</article>`;
+    return `<article class="vv-ledger-item"><strong>${esc(item.title)}</strong><span>${esc(item.status)} / ${esc(boundaryLabel(item.boundary || BOUNDARY.DRY_RUN))} / ${esc(item.at)}</span>${item.note ? `<p>${esc(item.note)}</p>` : ''}</article>`;
   }
 
   function bind(root) {
@@ -237,7 +260,7 @@
     }));
     root.querySelector('[data-op="download"]')?.addEventListener('click', download);
     root.querySelector('[data-op="packet"]')?.addEventListener('click', () => {
-      save({ id: uid(), title: `${config[0]} packet`, status: 'review', note: `Prepared from ${model.feeds.filter(feed => feed.ok).length} source feed(s).` });
+      save({ id: uid(), title: `${config[0]} proof packet`, status: 'review', note: `Dry-run packet prepared from ${model.feeds.filter(feed => feed.ok).length} source feed(s).` });
       download();
       render();
     });
@@ -251,7 +274,7 @@
   }
 
   function save(entry) {
-    const next = { id: entry.id || uid(), route, lane: config[1], title: entry.title || config[0], status: entry.status || 'review', note: entry.note || '', at: new Date().toISOString() };
+    const next = { id: entry.id || uid(), route, lane: config[1], title: entry.title || config[0], status: entry.status || 'review', note: entry.note || '', boundary: BOUNDARY.DRY_RUN, dry_run: true, worker_confirmed: false, worker_receipt: null, at: new Date().toISOString() };
     model.ledger = [next, ...model.ledger.filter(item => item.id !== next.id)].slice(0, 120);
     try { localStorage.setItem(STORE + route, JSON.stringify(model.ledger)); } catch {}
   }
@@ -266,7 +289,17 @@
   }
 
   function exportPacket() {
-    return { exported_at: new Date().toISOString(), route, lane: config[1], sources: model.feeds.map(({ label, url, ok, count, error }) => ({ label, url, ok, count, error: error || null })), actions: model.ledger };
+    return {
+      exported_at: new Date().toISOString(),
+      route,
+      lane: config[1],
+      boundary: BOUNDARY.DRY_RUN,
+      dry_run: true,
+      worker_confirmed: false,
+      worker_receipt: null,
+      sources: model.feeds.map(({ label, url, ok, count, error, boundary, worker_confirmed }) => ({ label, url, ok, count, boundary, worker_confirmed, error: error || null })),
+      actions: model.ledger
+    };
   }
 
   function download() {

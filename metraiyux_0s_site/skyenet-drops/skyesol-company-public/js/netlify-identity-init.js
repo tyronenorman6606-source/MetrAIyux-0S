@@ -1,106 +1,42 @@
 /**
- * Netlify Identity — Token Handler & Init & Role-Based Logic
+ * SkyeSol public auth bridge.
  *
- * 1. Handles Identity confirmation/invite tokens.
- * 2. Injects Login/Logout buttons into the nav.
- * 3. Redirects users based on roles (Client, Admin, Ops).
- * 4. Protects admin pages from unauthorized access.
+ * Netlify Identity is intentionally disabled on SkyeNet. Owner, client, and
+ * paid AI access must resolve through the shared 0S/FS27 gate session.
  */
 (function () {
   "use strict";
 
-  /* ── HELPERS ─────────────────────────────────────────────────────── */
-
-  function waitForWidget(cb, tries) {
-    tries = tries || 0;
-    if (window.netlifyIdentity) return cb(window.netlifyIdentity);
-    if (tries > 50) return; // give up after ~5 s
-    setTimeout(function () { waitForWidget(cb, tries + 1); }, 100);
+  function gateLoginUrl() {
+    var login = new URL("https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html");
+    login.searchParams.set("return", window.location.href);
+    return login.toString();
   }
 
-  function detectToken() {
-    var hash = window.location.hash || "";
-    var types = ["confirmation_token", "invite_token", "recovery_token", "access_token"];
-    for (var i = 0; i < types.length; i++) {
-      if (hash.indexOf(types[i] + "=") !== -1) return types[i];
-    }
-    return null;
+  function currentSession() {
+    var bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    return bridge && typeof bridge.current === "function" ? bridge.current() : null;
   }
 
-  /* ── MAIN LOGIC ──────────────────────────────────────────────────── */
-
-  waitForWidget(function (identity) {
-    var tokenType = detectToken();
-    
-    // 1. Handle Token from URL (e.g. email confirmation)
-    if (tokenType) {
-      identity.open();
-    }
-
-    // 2. Bind Events
-    identity.on("login", function (user) {
-      // Drop hash to prevent replay
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, "", window.location.pathname);
+  window.SkyeSolIdentity = {
+    provider: "fs27-skygate",
+    currentUser: currentSession,
+    open: function () { window.location.href = gateLoginUrl(); },
+    login: function () { window.location.href = gateLoginUrl(); },
+    logout: function () {
+      var bridge = window.MetrAIyuxGateBridge || null;
+      if (bridge && typeof bridge.clear === "function") bridge.clear();
+      window.location.href = "/index.html";
+    },
+    on: function (eventName, handler) {
+      if (eventName === "init" && typeof handler === "function") {
+        setTimeout(function () { handler(currentSession()); }, 0);
       }
-
-      var roles = (user && user.app_metadata && user.app_metadata.roles) || [];
-      console.log("User logged in with roles:", roles);
-
-      // Redirect based on highest privilege
-      if (roles.includes("ops") || roles.includes("executive")) {
-        document.location.href = "/admin-executive.html";
-      } else if (roles.includes("admin")) {
-        document.location.href = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=https%3A%2F%2Fskyenet.skyesol%2F";
-      } else {
-        // Default / Client
-        var seen = localStorage.getItem("sol_welcome_seen");
-        if (!seen) {
-          localStorage.setItem("sol_welcome_seen", "1");
-          document.location.href = "/welcome/"; // Optional welcome flow
-        } else {
-          document.location.href = "/platforms.html"; // Contractor Portal
-        }
-      }
-    });
-
-    identity.on("logout", function () {
-      console.log("User logged out");
-      document.location.href = "/index.html";
-    });
-
-    // 3. Inject Login/Logout Button (Retry loop for partials injection)
-    function injectButton() {
-        var navLinks = document.getElementById("navLinks");
-        if (navLinks && !document.getElementById("authBtn")) {
-            var btn = document.createElement("a");
-            btn.id = "authBtn";
-            btn.style.cursor = "pointer";
-            btn.style.fontWeight = "bold";
-            btn.style.color = "var(--gold)";
-            btn.className = "nav-auth-btn";
-            
-            if (identity.currentUser()) {
-                btn.textContent = "Logout";
-                btn.onclick = function(e) { e.preventDefault(); identity.logout(); };
-            } else {
-                btn.textContent = "Login";
-                btn.onclick = function(e) { e.preventDefault(); identity.open(); };
-            }
-            navLinks.appendChild(btn);
-            return true;
-        }
-        return false;
     }
+  };
 
-    // Try immediately, then poll for a bit (handles partials.js injection delay)
-    if (!injectButton()) {
-        var attempts = 0;
-        var interval = setInterval(function() {
-            if (injectButton() || attempts > 50) clearInterval(interval);
-            attempts++;
-        }, 100);
-    }
-  });
-
+  if (/(?:confirmation_token|invite_token|recovery_token|access_token)=/i.test(window.location.hash || "")) {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    window.location.href = gateLoginUrl();
+  }
 })();

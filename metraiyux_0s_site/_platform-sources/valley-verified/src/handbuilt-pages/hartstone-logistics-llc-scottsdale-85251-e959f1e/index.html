@@ -1,650 +1,154 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HartStone Logistics LLC. | Scottsdale Logistics | Valley Verified</title>
-  <meta name="description" content="Owner-researched Valley Verified landing for HartStone Logistics LLC. in Scottsdale, Arizona.">
-  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <style>
-    :root {
-      color-scheme: light;
-      --vv-ink: #18202b;
-      --vv-muted: #5e6b78;
-      --vv-line: #d7e0ea;
-      --vv-paper: #f7fafc;
-      --vv-white: #ffffff;
-      --vv-blue: #234e70;
-      --vv-blue-dark: #193950;
-      --vv-amber: #c48a30;
-      --vv-mint: #e8f4f0;
-      --vv-steel: #edf3f7;
-      --vv-shadow: 0 18px 54px rgba(20, 38, 56, 0.13);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      color: var(--vv-ink);
-      background:
-        linear-gradient(135deg, rgba(35, 78, 112, 0.13), rgba(196, 138, 48, 0.11) 52%, rgba(255, 255, 255, 0.88)),
-        var(--vv-paper);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.55;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .shell {
-      width: min(1140px, calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .topbar {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 18px;
-      align-items: center;
-      padding: 22px 0;
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--vv-blue-dark);
-      font-weight: 900;
-      text-decoration: none;
-    }
-
-    .brand-mark {
-      display: grid;
-      place-items: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      color: var(--vv-white);
-      background: var(--vv-blue);
-      font-weight: 900;
-    }
-
-    .topbar nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .topbar nav a {
-      border: 1px solid rgba(35, 78, 112, 0.22);
-      border-radius: 999px;
-      padding: 9px 13px;
-      color: var(--vv-blue-dark);
-      background: rgba(255, 255, 255, 0.78);
-      font-size: 0.92rem;
-      text-decoration: none;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: 22px;
-      align-items: stretch;
-      padding: 34px 0 22px;
-    }
-
-    .hero-card,
-    .panel,
-    .signal {
-      border: 1px solid rgba(215, 224, 234, 0.92);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      box-shadow: var(--vv-shadow);
-    }
-
-    .hero-card {
-      display: grid;
-      align-content: center;
-      padding: clamp(28px, 4vw, 48px);
-    }
-
-    .hero-map {
-      position: relative;
-      overflow: hidden;
-      min-height: 460px;
-      padding: clamp(24px, 4vw, 42px);
-      background:
-        linear-gradient(155deg, rgba(25, 57, 80, 0.94), rgba(35, 78, 112, 0.82)),
-        var(--vv-blue);
-      color: var(--vv-white);
-    }
-
-    .hero-map::before,
-    .hero-map::after {
-      position: absolute;
-      inset: auto;
-      content: "";
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .hero-map::before {
-      width: 340px;
-      height: 340px;
-      right: -120px;
-      top: -90px;
-    }
-
-    .hero-map::after {
-      width: 260px;
-      height: 260px;
-      left: -90px;
-      bottom: -110px;
-    }
-
-    .route-lines {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      gap: 14px;
-      margin-top: 40px;
-    }
-
-    .route-line {
-      display: grid;
-      grid-template-columns: 14px 1fr auto;
-      gap: 12px;
-      align-items: center;
-      min-height: 56px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 8px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.09);
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--vv-amber);
-    }
-
-    .route-line strong,
-    .route-line span {
-      display: block;
-    }
-
-    .route-line span {
-      color: rgba(255, 255, 255, 0.76);
-      font-size: 0.92rem;
-    }
-
-    .eyebrow {
-      margin: 0 0 12px;
-      color: var(--vv-blue-dark);
-      font-size: 0.78rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .hero-map .eyebrow {
-      color: rgba(255, 255, 255, 0.82);
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      overflow-wrap: anywhere;
-    }
-
-    h1 {
-      max-width: 11ch;
-      margin: 0;
-      color: var(--vv-blue-dark);
-      font-size: clamp(3rem, 8vw, 6.25rem);
-      line-height: 0.94;
-      letter-spacing: 0;
-    }
-
-    h2 {
-      margin: 0 0 14px;
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
-      line-height: 1.08;
-      letter-spacing: 0;
-    }
-
-    h3 {
-      margin: 0 0 8px;
-      font-size: 1.05rem;
-      letter-spacing: 0;
-    }
-
-    .lead {
-      max-width: 650px;
-      margin: 22px 0 0;
-      color: #40505f;
-      font-size: clamp(1.05rem, 2vw, 1.26rem);
-    }
-
-    .status-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 36px;
-      border: 1px solid rgba(35, 78, 112, 0.22);
-      border-radius: 999px;
-      padding: 8px 12px;
-      color: var(--vv-blue-dark);
-      background: var(--vv-steel);
-      font-size: 0.88rem;
-      font-weight: 900;
-    }
-
-    .section {
-      padding: 28px 0;
-    }
-
-    .section-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .panel {
-      padding: clamp(22px, 4vw, 34px);
-    }
-
-    .fact-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .fact {
-      min-height: 96px;
-      padding: 16px;
-      border: 1px solid var(--vv-line);
-      border-radius: 8px;
-      background: var(--vv-white);
-    }
-
-    .fact strong,
-    .signal strong {
-      display: block;
-      color: var(--vv-ink);
-      font-size: 0.9rem;
-    }
-
-    .fact span,
-    .signal span {
-      display: block;
-      margin-top: 5px;
-      color: var(--vv-muted);
-      font-size: 0.95rem;
-    }
-
-    .contact-strip {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .signal {
-      padding: 16px;
-      box-shadow: none;
-    }
-
-    .signal a {
-      color: var(--vv-blue-dark);
-      font-weight: 900;
-      text-decoration: none;
-    }
-
-    .source-list {
-      display: grid;
-      gap: 14px;
-      margin: 18px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .source-list li {
-      padding: 14px 16px;
-      border-left: 4px solid var(--vv-blue);
-      background: var(--vv-steel);
-    }
-
-    .source-list strong {
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .skyemail {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
-      gap: 18px;
-      border: 2px solid rgba(35, 78, 112, 0.32);
-      background:
-        linear-gradient(145deg, rgba(237, 243, 247, 0.98), rgba(232, 244, 240, 0.94)),
-        var(--vv-white);
-    }
-
-    .steps {
-      display: grid;
-      gap: 12px;
-      margin: 18px 0 0;
-      padding: 0;
-      list-style: none;
-      counter-reset: step;
-    }
-
-    .steps li {
-      position: relative;
-      min-height: 64px;
-      padding: 14px 16px 14px 54px;
-      border: 1px solid rgba(35, 78, 112, 0.18);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.86);
-    }
-
-    .steps li::before {
-      counter-increment: step;
-      content: counter(step);
-      position: absolute;
-      left: 16px;
-      top: 14px;
-      display: grid;
-      place-items: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      color: var(--vv-white);
-      background: var(--vv-blue);
-      font-size: 0.82rem;
-      font-weight: 900;
-    }
-
-    .seat-meter {
-      display: grid;
-      gap: 12px;
-    }
-
-    .seat-number {
-      display: grid;
-      place-items: center;
-      min-height: 150px;
-      border: 1px solid rgba(35, 78, 112, 0.22);
-      border-radius: 8px;
-      background: var(--vv-white);
-      text-align: center;
-    }
-
-    .seat-number strong {
-      display: block;
-      color: var(--vv-blue-dark);
-      font-size: 4rem;
-      line-height: 1;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      border: 1px solid rgba(35, 78, 112, 0.28);
-      border-radius: 8px;
-      padding: 11px 16px;
-      color: var(--vv-blue-dark);
-      background: var(--vv-white);
-      font-weight: 900;
-      text-decoration: none;
-    }
-
-    .btn.primary {
-      color: var(--vv-white);
-      border-color: var(--vv-blue);
-      background: var(--vv-blue);
-    }
-
-    .muted {
-      color: var(--vv-muted);
-    }
-
-    .footer {
-      padding: 34px 0 44px;
-      color: var(--vv-muted);
-      font-size: 0.92rem;
-    }
-
-    @media (max-width: 860px) {
-      .topbar,
-      .hero,
-      .section-grid,
-      .skyemail,
-      .contact-strip {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        align-items: start;
-      }
-
-      .topbar nav {
-        justify-content: start;
-      }
-
-      .hero-map {
-        min-height: 360px;
-      }
-
-      h1 {
-        max-width: 100%;
-      }
-
-      .fact-list {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HartStone Logistics LLC. | Valley Verified Scottsdale</title>
+<meta name="description" content="HartStone Logistics LLC. Valley Verified profile: source-backed Logistics facts, contact route, why Skyes Over London verifies it, and concise SkyEmail handoff.">
+<link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="HartStone Logistics LLC. | Valley Verified Scottsdale">
+<meta property="og:description" content="HartStone Logistics is Valley Verified as a Scottsdale-based woman-owned freight brokerage and 3PL with source-backed service modes.">
+<meta property="og:url" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/">
+<meta property="og:image" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/assets/valley-verified-logo.png">
+<meta name="theme-color" content="#23444a">
+<link rel="icon" href="/assets/valley-verified-logo.png">
+<link rel="stylesheet" href="/assets/styles.css">
+<style> :root { color-scheme: light; --ink: #172124; --muted: #5d686b; --page: #f7f7f1; --paper: #ffffff; --line: #d9ded8; --pine: #23444a; --river: #2f6f83; --gold: #d79335; --clay: #b94d3f; --sage: #6d8d75; --shadow: 0 20px 54px rgba(23, 33, 36, 0.12); } * { box-sizing: border-box; } html { scroll-behavior: smooth; } body { margin: 0; background: linear-gradient(130deg, rgba(215, 147, 53, 0.18), transparent 34rem), linear-gradient(180deg, #ffffff 0%, var(--page) 82%); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.58; letter-spacing: 0; } a { color: inherit; } .page { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 56px; } .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 8px 0 26px; color: var(--muted); } .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 900; } .brand img { width: 38px; height: 38px; border-radius: 8px; } nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; } nav a, .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 8px; padding: 0 15px; background: rgba(255,255,255,.88); text-decoration: none; font-weight: 850; } .button.primary { border-color: var(--pine); background: var(--pine); color: #fff; } .button.source { border-color: rgba(35,68,74,.28); } .hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(300px, .72fr); gap: 18px; align-items: stretch; } .hero-copy, .record-card, .panel, .skyemail { border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); } .hero-copy { padding: clamp(30px, 6vw, 62px); } .eyebrow { margin: 0 0 12px; color: var(--river); font-size: .78rem; font-weight: 950; text-transform: uppercase; letter-spacing: 0; } h1, h2, h3, p { margin-top: 0; } h1 { max-width: 900px; margin-bottom: 18px; font-size: clamp(2.75rem, 7vw, 6.25rem); line-height: .94; letter-spacing: 0; } h2 { margin-bottom: 14px; font-size: clamp(1.6rem, 3.2vw, 2.72rem); line-height: 1.04; letter-spacing: 0; } h3 { margin-bottom: 8px; font-size: 1.05rem; letter-spacing: 0; } .lede, .panel p, .skyemail p { color: var(--muted); font-size: 1.04rem; } .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; } .record-card { overflow: hidden; display: grid; align-content: space-between; } .plate { min-height: 230px; padding: 24px; color: #fff; background: linear-gradient(135deg, rgba(35,68,74,.96), rgba(47,111,131,.9)), linear-gradient(90deg, var(--gold), var(--clay)); } .plate span { display: inline-flex; border: 1px solid rgba(255,255,255,.48); border-radius: 999px; padding: 7px 11px; font-size: .78rem; font-weight: 950; text-transform: uppercase; } .plate strong { display: block; margin-top: 54px; font-size: clamp(1.8rem, 4.5vw, 3.45rem); line-height: .98; letter-spacing: 0; } .status-list { display: grid; gap: 0; padding: 20px 22px; } .status-list div { display: flex; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); padding: 12px 0; color: var(--muted); } .status-list div:first-child { border-top: 0; } .status-list strong { color: var(--ink); text-align: right; } .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; } .panel { padding: 24px; } .wide { grid-column: span 2; } .full { grid-column: 1 / -1; } .list, .contact-list, .source-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; } .list li, .source-list li { border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .list li:first-child, .source-list li:first-child { border-top: 0; padding-top: 0; } .list strong, .contact-list strong, .source-list a, dd { color: var(--ink); } .contact-list li { display: grid; gap: 5px; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .contact-list li:first-child { border-top: 0; padding-top: 0; } .contact-list strong { font-size: .78rem; font-weight: 950; text-transform: uppercase; } dl.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; } dl.facts div { border-top: 1px solid var(--line); padding-top: 12px; } dt { color: var(--muted); font-size: .76rem; font-weight: 950; text-transform: uppercase; } dd { margin: 3px 0 0; font-weight: 800; } .source-list li { display: grid; gap: 5px; } .source-list span { color: var(--muted); font-size: .95rem; } .note { border-left: 4px solid var(--gold); padding-left: 14px; } .skyemail { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 18px; margin-top: 18px; padding: clamp(24px, 5vw, 42px); } .seat-meter { display: grid; gap: 10px; align-content: start; } .meter-bar { height: 14px; overflow: hidden; border-radius: 999px; background: #e3e7e4; } .meter-bar span { display: block; width: 90%; height: 100%; background: linear-gradient(90deg, var(--sage), var(--gold), var(--clay)); } .footer { margin-top: 22px; color: var(--muted); font-size: .92rem; } @media (max-width: 920px) { .topline, .hero, .skyemail { display: grid; grid-template-columns: 1fr; } .topline { align-items: start; } .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } } @media (max-width: 560px) { .page { width: min(100% - 20px, 1160px); } nav, .actions { width: 100%; } nav a, .button { width: 100%; } .status-list div, dl.facts { display: grid; grid-template-columns: 1fr; } .status-list strong { text-align: left; } } </style>
+<script type="application/ld+json"> { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/#business", "name": "HartStone Logistics LLC.", "description": "HartStone Logistics is Valley Verified as a Scottsdale-based woman-owned freight brokerage and 3PL with source-backed service modes.", "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/", "telephone": "(480) 480-6844", "address": { "@type": "PostalAddress", "streetAddress": "7014 E. Camelback Rd. c/o Industrious Set B100A", "addressLocality": "Scottsdale", "addressRegion": "AZ", "postalCode": "85251", "addressCountry": "US" }, "areaServed": "Scottsdale, AZ 85251", "additionalType": "Business Services", "identifier": "e959f1e54f9f", "sameAs": "https://hartstonelogistics.com/" } </script>
 </head>
-<body data-static-hand-page="true">
-  <header class="shell topbar" aria-label="Valley Verified">
-    <a class="brand" href="/valley-verified/">
-      <span class="brand-mark">VV</span>
-      <span>Valley Verified</span>
-    </a>
-    <nav aria-label="Business page links">
-      <a href="/valley-verified/directory/">Directory</a>
-      <a href="/valley-verified/category/business-services/">Business Services</a>
-      <a href="/valley-verified/city/scottsdale/">Scottsdale</a>
-    </nav>
-  </header>
-
-  <main>
-    <section class="shell hero" aria-labelledby="business-title">
-      <div class="hero-card">
-        <p class="eyebrow">Owner-researched verified status</p>
-        <h1 id="business-title">HartStone Logistics LLC.</h1>
-        <p class="lead">Scottsdale logistics listing in the Valley Verified network, matched to a public directory source and published with only the business facts available in the record.</p>
-        <div class="status-row" aria-label="Status summary">
-          <span class="pill">PUBLIC DIRECTORY VERIFIED</span>
-          <span class="pill">Last checked May 19, 2026</span>
-          <span class="pill">Requests accepted</span>
-        </div>
-      </div>
-
-      <aside class="hero-map" aria-label="Logistics summary">
-        <p class="eyebrow">Business Services / Logistics</p>
-        <h2>Local record, clear contact route, no guessed channels.</h2>
-        <div class="route-lines">
-          <div class="route-line">
-            <span class="dot" aria-hidden="true"></span>
-            <div>
-              <strong>Phone</strong>
-              <span><a href="tel:+14804806844">(480) 480-6844</a></span>
-            </div>
-            <span>direct</span>
-          </div>
-          <div class="route-line">
-            <span class="dot" aria-hidden="true"></span>
-            <div>
-              <strong>Address</strong>
-              <span>7014 E. Camelback Rd. c/o Industrious Set B100A</span>
-            </div>
-            <span>Scottsdale</span>
-          </div>
-          <div class="route-line">
-            <span class="dot" aria-hidden="true"></span>
-            <div>
-              <strong>Record scope</strong>
-              <span>Transportation/Logistics / Logistics</span>
-            </div>
-            <span>85251</span>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="shell section section-grid" aria-labelledby="facts-title">
-      <div class="panel">
-        <p class="eyebrow">Business facts</p>
-        <h2 id="facts-title">What the record supports</h2>
-        <p class="muted">The listing is unclaimed. The public record does not publish a website, booking URL, or email address. Contact the provider directly to confirm availability, scope, and pricing.</p>
-        <div class="contact-strip" aria-label="Published contact fields">
-          <div class="signal">
-            <strong>Phone</strong>
-            <span><a href="tel:+14804806844">(480) 480-6844</a></span>
-          </div>
-          <div class="signal">
-            <strong>City</strong>
-            <span>Scottsdale, AZ</span>
-          </div>
-          <div class="signal">
-            <strong>ZIP</strong>
-            <span>85251</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="fact-list">
-          <div class="fact">
-            <strong>Business</strong>
-            <span>HartStone Logistics LLC.</span>
-          </div>
-          <div class="fact">
-            <strong>Category</strong>
-            <span>Business Services</span>
-          </div>
-          <div class="fact">
-            <strong>Service lane</strong>
-            <span>Logistics</span>
-          </div>
-          <div class="fact">
-            <strong>License type</strong>
-            <span>Transportation/Logistics / Logistics</span>
-          </div>
-          <div class="fact">
-            <strong>Pricing mode</strong>
-            <span>Contact for quote</span>
-          </div>
-          <div class="fact">
-            <strong>Source hash</strong>
-            <span>e959f1e54f9f</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="shell section section-grid" aria-labelledby="source-title">
-      <div class="panel">
-        <p class="eyebrow">Contact and source</p>
-        <h2 id="source-title">Public-source receipt</h2>
-        <p>The Valley Verified record identifies this business from a public directory listing and carries forward the phone and Scottsdale address shown on this page.</p>
-      </div>
-      <div class="panel">
-        <ul class="source-list">
-          <li>
-            <strong>Source URL</strong>
-            <a href="https://business.phoenixchamber.com/list/category/transportation-and-logistics-12210" target="_blank" rel="noopener">Phoenix Chamber transportation and logistics directory</a>
-          </li>
-          <li>
-            <strong>Source file</strong>
-            <span>seed/businesses/inbox/valley_verified_public_lead_build_2026-05-19_v4.csv</span>
-          </li>
-          <li>
-            <strong>Source lines</strong>
-            <span>L201-L206</span>
-          </li>
-          <li>
-            <strong>Source policy</strong>
-            <span>Public directory/company listing only; no synthetic contacts or guessed emails.</span>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="shell section">
-      <div class="panel skyemail" aria-labelledby="skyemail-title">
-        <div>
-          <p class="eyebrow">SkyEmail acceptance</p>
-          <h2 id="skyemail-title">Accept the free SkyEmail account through the shared 0S/SkyGate lane.</h2>
-          <p class="muted">SkyEmail access stays on the shared 0S/SkyGate sign-in path. After acceptance, notify owner to provision workspace.</p>
-          <ol class="steps">
-            <li>Accept the free SkyEmail account for this Valley Verified listing.</li>
-            <li>Sign in through shared 0S/SkyGate; no separate app password is used here.</li>
-            <li>Team activation begins within 24 hours after provisioning.</li>
-            <li>K4i escalation starts after 24 hours if the workspace is not active.</li>
-          </ol>
-          <div class="button-row">
-            <a class="btn primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=hartstone-logistics-llc-scottsdale-85251-e959f1e">Accept SkyEmail</a>
-            <a class="btn" href="/admin/login.html?return=/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/">Shared 0S/SkyGate sign-in</a>
-          </div>
-        </div>
-        <aside class="seat-meter" aria-label="SkyEmail seat guidance">
-          <div class="seat-number">
-            <div>
-              <strong>9</strong>
-              <span>9 seats left</span>
-            </div>
-          </div>
-          <div class="signal">
-            <strong>Seat warning</strong>
-            <span>Warn at 2 seats remaining.</span>
-          </div>
-          <div class="signal">
-            <strong>Seat purchases</strong>
-            <span>Buy additional seats in groups of 5.</span>
-          </div>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <footer class="shell footer">
-    <p>Canonical profile: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/hartstone-logistics-llc-scottsdale-85251-e959f1e/</p>
-  </footer>
+<body data-static-hand-page="true" class="vv-static-page hartstone-logistics-llc-page">
+<div class="page">
+<header class="topline" aria-label="Valley Verified navigation">
+<a class="brand" href="/valley-verified/">
+<img src="/assets/valley-verified-logo.png" alt="" aria-hidden="true">
+<span>Valley Verified</span>
+</a>
+<nav>
+<a href="#why">Why verified</a>
+<a href="#facts">Facts</a>
+<a href="#source">Sources</a>
+<a href="#skyemail">SkyEmail</a>
+</nav>
+</header>
+<main>
+<section class="hero" aria-labelledby="hartstone-logistics-llc-title">
+<div class="hero-copy">
+<p class="eyebrow">Skyes Over London says Valley Verified</p>
+<h1 id="hartstone-logistics-llc-title">HartStone Logistics LLC.</h1>
+<p class="lede">HartStone Logistics is Valley Verified as a Scottsdale-based woman-owned freight brokerage and 3PL with source-backed service modes.</p>
+<div class="actions">
+<a class="button primary" href="tel:+14804806844">Call (480) 480-6844</a>
+<a class="button" href="https://hartstonelogistics.com/" target="_blank" rel="noopener">Open website</a>
+<a class="button source" href="#skyemail">Accept SkyEmail</a>
+</div>
+</div>
+<aside class="record-card" aria-label="HartStone Logistics LLC. verification record">
+<div class="plate">
+<span>Business Services</span>
+<strong>Logistics</strong>
+</div>
+<div class="status-list">
+<div><span>Verification read</span><strong>Official + public sources</strong></div>
+<div><span>Owner claim</span><strong>unclaimed</strong></div>
+<div><span>Last local review</span><strong>2026-05-19</strong></div>
+<div><span>Source count</span><strong>3</strong></div>
+</div>
+</aside>
+</section>
+<section class="grid" id="why" aria-label="Why HartStone Logistics LLC. is Valley Verified">
+<article class="panel wide">
+<p class="eyebrow">Customer read</p>
+<h2>Why this business is here</h2>
+<p>Official sources describe 24/7/365 logistics specialists and freight services including truckload, LTL, reefer, flatbed, drayage/intermodal, expedited, and hot shot shipping.</p>
+<p class="note">Skyes Over London marks this profile Valley Verified because the page is built from a named public record, local contact facts, and live source checks. Where sources are thin or conflicting, the page says so plainly.</p>
+</article>
+<article class="panel">
+<p class="eyebrow">Best fit</p>
+<h2>Who uses it</h2>
+<ul class="list">
+<li>Shippers looking for dedicated freight brokerage and 3PL support.</li>
+<li>Businesses that need Scottsdale contact context plus national freight modes.</li>
+<li>Operations teams comparing dry van, refrigerated, flatbed, drayage, expedited, or hot shot routing.</li>
+</ul>
+</article>
+</section>
+<section class="grid" id="facts" aria-label="HartStone Logistics LLC. facts and contact details">
+<article class="panel">
+<p class="eyebrow">Contact</p>
+<h2>Public route</h2>
+<ul class="contact-list">
+<li><strong>Phone</strong><a href="tel:+14804806844">(480) 480-6844</a></li>
+<li><strong>Address</strong><span>7014 E. Camelback Rd. c/o Industrious Set B100A, Scottsdale, AZ 85251</span></li>
+<li><strong>Website</strong><a href="https://hartstonelogistics.com/" target="_blank" rel="noopener">hartstonelogistics.com</a></li>
+<li><strong>Email</strong><span>No public email in the local record.</span></li>
+</ul>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Verified facts</p>
+<h2>What the sources support</h2>
+<dl class="facts">
+<div><dt>Category</dt><dd>Business Services</dd></div>
+<div><dt>Service lane</dt><dd>Logistics</dd></div>
+<div><dt>Market</dt><dd>Scottsdale, AZ 85251</dd></div>
+<div><dt>Verified basis</dt><dd>Official source plus public record</dd></div>
+<div><dt>Claim status</dt><dd>unclaimed</dd></div>
+<div><dt>Last reviewed</dt><dd>2026-05-19</dd></div>
+</dl>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Proof points</p>
+<h2>Why Skyes trusts this profile</h2>
+<ul class="list">
+<li>Official site confirms 7014 E. Camelback Road c/o Industrious Suite B100A.</li>
+<li>Official services page lists the specific freight modes.</li>
+<li>Chamber transportation source provides the original Valley Verified directory basis.</li>
+</ul>
+</article>
+<article class="panel">
+<p class="eyebrow">Timing</p>
+<h2>Hours note</h2>
+<p>Public hours were not confirmed in the local business record. Use the business phone or official site for time-sensitive visits.</p>
+</article>
+<article class="panel full" id="source">
+<p class="eyebrow">Source trail</p>
+<h2>Research used for this rewrite</h2>
+<ul class="source-list">
+<li><a href="https://hartstonelogistics.com/" target="_blank" rel="noopener">HartStone Logistics official site</a><span>Official site describes HartStone as a woman-owned freight brokerage and 3PL with logistics specialists available 24/7/365.</span></li>
+<li><a href="https://hartstonelogistics.com/services" target="_blank" rel="noopener">HartStone Logistics services</a><span>Services page lists freight modes including truckload, LTL, reefer, flatbed, drayage/intermodal, expedited, and hot shot support.</span></li>
+<li><a href="https://business.phoenixchamber.com/list/category/transportation-and-logistics-12210" target="_blank" rel="noopener">Transportation and Logistics Category | Greater Phoenix Chamber</a><span>Source description references: Greater Phoenix Chamber | Transportation and Logistics Relevant topic cues found: Logistics, Local SMB / service business, Public directory record, Business / Professional Services. Use this source to confirm company positioning, contact details, and page-specific service language before publishing.</span></li>
+</ul>
+</article>
+<article class="panel full">
+<p class="eyebrow">Important boundary</p>
+<h2>What is not overstated</h2>
+<p>Rates, lanes, carrier availability, insurance, and shipment timing are quote- and load-specific.</p>
+</article>
+</section>
+<section class="skyemail" id="skyemail" aria-labelledby="hartstone-logistics-llc-skyemail">
+<div>
+<p class="eyebrow">SkyEmail acceptance</p>
+<h2 id="hartstone-logistics-llc-skyemail">Accept the free SkyEmail account for HartStone Logistics LLC..</h2>
+<p>Use the shared 0S/SkyGate sign-in lane to accept the mailbox handoff. The business profile remains customer-focused; SkyEmail is only the owner action route.</p>
+<div class="actions">
+<a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=hartstone-logistics-llc-scottsdale-85251-e959f1e">Accept SkyEmail</a>
+<a class="button" href="/skyegate/">Sign in through 0S/SkyGate</a>
+</div>
+</div>
+<div class="seat-meter">
+<h3>Provisioning checklist</h3>
+<ul class="list">
+<li><strong>Owner handoff:</strong> route the HartStone Logistics LLC. acceptance through the shared 0S owner queue.</li>
+<li><strong>K4i escalation:</strong> escalate if the mailbox is not active 24 hours after provisioning starts.</li>
+<li><strong>Seat pool:</strong> 9 seats left; warn at 2 seats and buy in groups of 5.</li>
+</ul>
+<div class="meter-bar" aria-label="9 seats left"><span></span></div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<p>Valley Verified source record: seed/businesses/inbox/valley_verified_public_lead_build_2026-05-19_v4.csv | e959f1e54f9f. Browser verification is owner-handled for this repo.</p>
+</footer>
+</div>
 </body>
 </html>

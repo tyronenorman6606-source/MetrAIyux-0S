@@ -1,6 +1,6 @@
 # SkyeNet Client App Migration Todo
 
-Generated: 2026-05-30T07:24:35.729Z
+Generated: 2026-05-31T01:54:50.408Z
 
 ## Architecture Rule
 
@@ -51,7 +51,7 @@ Client/customer public apps, media bundles, artist storefronts, and generated bu
 - Target: `https://skyenet.skyeroutex-logistics/`
 - 0S Worker staged: no
 - Stale deploy target: no
-- Linked receipts: `test-artifacts/skyemail-skyeroutex-logistics-provision/provision-latest.json`, `test-artifacts/skyemail-skyeroutex-logistics-provision-readiness/readiness-latest.json`, `test-artifacts/skyeroutex-logistics-company-brain-upgrade/receipt.json`, `test-artifacts/skyeroutex-logistics-public-deploy-blocked-2026-05-27T18-41-42Z.json`, `test-artifacts/skyeroutex-logistics-public-live-proof-2026-05-27T19-18-03Z.json`
+- Linked receipts: `test-artifacts/skyemail-skyeroutex-logistics-provision/provision-latest.json`, `test-artifacts/skyemail-skyeroutex-logistics-provision-readiness/readiness-latest.json`, `test-artifacts/skyeroutex-logistics-company-brain-upgrade/receipt.json`, `test-artifacts/skyeroutex-logistics-public-deploy-blocked-2026-05-27T18-41-42Z.json`, `test-artifacts/skyeroutex-logistics-public-live-proof-2026-05-27T19-18-03Z.json`, `metraiyux_0s_site/skyenet-drops/skyeroutex-logistics-public/deploy-target.json`
 - Deploy: `npm run skyenet:deploy --   --api https://skyenet.graylondonskyes.workers.dev/api/skyenet   --dir metraiyux_0s_site/skyenet-drops/skyeroutex-logistics-public   --source-root metraiyux_0s_site/skyenet-drops/skyeroutex-logistics-public   --project skyeroutex-logistics-public   --workspace skyeroutex-logistics   --host skyenet.skyeroutex-logistics   --mount /   --url-mode subdomain   --public   --concurrency 4`
 - Notes: Already staged as a SkyeNet drop; confirm route receipt, DNS/custom-host binding, and source custody before public copy points here.
 
@@ -63,7 +63,7 @@ Client/customer public apps, media bundles, artist storefronts, and generated bu
 - Target: `https://skyenet.skyesol/`
 - 0S Worker staged: no
 - Stale deploy target: no
-- Linked receipts: `test-artifacts/skyesol-company-public-live-proof-2026-05-27T23-39-50Z.json`, `test-artifacts/skyesol-company-public-live-proof-2026-05-28T00-07-35-976Z.json`, `test-artifacts/skyesol-company-public-live-proof-2026-05-28T00-29-48-380Z.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/Blogs/blog-manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeDocx/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/SovereignVariables/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/THE NET WORKS/FEATURING/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/THE%20NET%20WORKS/FEATURING/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/docs/ai-endpoints-usage.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/docs/functions-endpoints-map.json`
+- Linked receipts: `test-artifacts/skyesol-company-public-live-proof-2026-05-27T23-39-50Z.json`, `test-artifacts/skyesol-company-public-live-proof-2026-05-28T00-07-35-976Z.json`, `test-artifacts/skyesol-company-public-live-proof-2026-05-28T00-29-48-380Z.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/Blogs/blog-manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeDocx/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/SovereignVariables/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/THE NET WORKS/FEATURING/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/THE%20NET%20WORKS/FEATURING/manifest.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/deploy-target.json`, `metraiyux_0s_site/skyenet-drops/skyesol-company-public/docs/ai-endpoints-usage.json`
 - Deploy: `npm run skyenet:deploy --   --api https://skyenet.graylondonskyes.workers.dev/api/skyenet   --dir metraiyux_0s_site/skyenet-drops/skyesol-company-public   --source-root metraiyux_0s_site/skyenet-drops/skyesol-company-public   --project skyesol-company-public   --workspace skyesol   --host skyenet.skyesol   --mount /   --url-mode subdomain   --public   --concurrency 4`
 - Notes: Already staged as a SkyeNet drop; confirm route receipt, DNS/custom-host binding, and source custody before public copy points here.
 
@@ -75,7 +75,7 @@ Client/customer public apps, media bundles, artist storefronts, and generated bu
 - Target: `https://skyenet.solenterprises/`
 - 0S Worker staged: no
 - Stale deploy target: no
-- Linked receipts: `test-artifacts/direct-mcp/solenterprises-public-mcp-tooling-receipt.json`, `test-artifacts/solenterprises-public-live-proof-2026-05-28T00-39-56-574Z.json`, `test-artifacts/solenterprises-public-live-proof-2026-05-28T00-43-55-397Z.json`, `metraiyux_0s_site/skyenet-drops/solenterprises-public/MCP_TOOLING_RECEIPT.json`, `metraiyux_0s_site/skyenet-drops/solenterprises-public/skyenet-migration.json`
+- Linked receipts: `test-artifacts/direct-mcp/solenterprises-public-mcp-tooling-receipt.json`, `test-artifacts/solenterprises-public-live-proof-2026-05-28T00-39-56-574Z.json`, `test-artifacts/solenterprises-public-live-proof-2026-05-28T00-43-55-397Z.json`, `metraiyux_0s_site/skyenet-drops/solenterprises-public/MCP_TOOLING_RECEIPT.json`, `metraiyux_0s_site/skyenet-drops/solenterprises-public/deploy-target.json`, `metraiyux_0s_site/skyenet-drops/solenterprises-public/skyenet-migration.json`
 - Deploy: `npm run skyenet:deploy --   --api https://skyenet.graylondonskyes.workers.dev/api/skyenet   --dir metraiyux_0s_site/skyenet-drops/solenterprises-public   --source-root metraiyux_0s_site/skyenet-drops/solenterprises-public   --project solenterprises-public   --workspace solenterprises   --host skyenet.solenterprises   --mount /   --url-mode subdomain   --public   --concurrency 4`
 - Notes: Already staged as a SkyeNet drop; confirm route receipt, DNS/custom-host binding, and source custody before public copy points here.
 

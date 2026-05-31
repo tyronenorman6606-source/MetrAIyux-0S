@@ -78,7 +78,7 @@ async function fetchAny(url, init = {}) {
 async function login() {
   const credential = await ownerCredential();
   if (!credential.value) return { credential_source: '', token: '', status: 0, ok: false };
-  const response = await fetchAny(`${zeroOsBase}/api/founder-command/login`, {
+  const response = await fetchAny(`${zeroOsBase}/api/owner/admin-login`, {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/json' },
     body: JSON.stringify({ code: credential.value })

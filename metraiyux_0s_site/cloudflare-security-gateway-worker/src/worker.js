@@ -1,8 +1,8 @@
 
-const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,Authorization,x-0s-shared-gate,x-0s-internal-proxy-secret"};
+const CORS={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Headers":"Content-Type,Authorization,x-0s-gate-session,x-skye-gate-session,x-skygate-session,x-fs27-session,x-0s-shared-gate,x-0s-internal-proxy-secret"};
 const j=(data,status=200)=>new Response(JSON.stringify(data,null,2),{status,headers:{"content-type":"application/json",...CORS}});
 const now=()=>new Date().toISOString();
-const uuid=()=>crypto.randomUUID();
+const uuid=()=>globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `uuid_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
 async function body(req){try{return await req.json()}catch{return {}}}
 function sharedGateRequired(env){return ['1','true','yes','on'].includes(String(env.ZERO_OS_SHARED_GATE_REQUIRED||env.SKYE_SHARED_GATE_REQUIRED||'').toLowerCase());}
 function sharedProxySecret(env){return String(env.ZERO_OS_INTERNAL_PROXY_SECRET||env.METRAIYUX_0S_INTERNAL_PROXY_SECRET||env.OMEGA_INTERNAL_PROXY_SECRET||'').trim();}
@@ -11,15 +11,59 @@ function sharedProxyAuth(req,env){
   if(!secret) return false;
   return String(req.headers.get('x-0s-shared-gate')||'').toLowerCase()==='operator' && String(req.headers.get('x-0s-internal-proxy-secret')||'').trim()===secret;
 }
-function adminAuth(req,env){
-  if(sharedProxyAuth(req,env)) return true;
-  if(sharedProxySecret(env)||sharedGateRequired(env)) return false;
-  const need=env.ADMIN_TOKEN; if(!need) return false; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===need;
+function boolEnv(value){return /^(1|true|yes|on)$/i.test(String(value||'').trim());}
+function skygateOrigin(env){return String(env.SKYGATEFS27_ORIGIN||env.SKYGATE_ORIGIN||'').replace(/\/+$/,'');}
+function fs27Configured(env){return Boolean(env.SKYGATEFS27_WORKER?.fetch||skygateOrigin(env));}
+function bearer(req){return String(req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'').trim();}
+function scopeList(scope){return Array.isArray(scope)?scope.map(String):String(scope||'').split(/\s+/).filter(Boolean);}
+function gateTokens(req){return [
+  bearer(req),
+  req.headers.get('x-0s-gate-session'),
+  req.headers.get('x-skye-gate-session'),
+  req.headers.get('x-skygate-session'),
+  req.headers.get('x-fs27-session')
+].map(v=>String(v||'').trim()).filter(Boolean);}
+function operatorClaims(data){
+  if(!data?.active&&!data?.ok) return false;
+  const role=String(data.role||data.user?.role||'').toLowerCase();
+  const scopes=new Set(scopeList(data.scope||data.scopes||data.user?.scope).map(s=>s.toLowerCase()));
+  return ['founder','owner','admin','operator'].includes(role)||scopes.has('admin.read')||scopes.has('admin.write')||scopes.has('gateway.invoke');
 }
-function customerAuth(req,env){
-  if(sharedProxyAuth(req,env)) return true;
-  if(sharedProxySecret(env)||sharedGateRequired(env)) return false;
-  if(!env.CUSTOMER_COMMAND_TOKEN) return true; return (req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'')===env.CUSTOMER_COMMAND_TOKEN;
+async function skygateRequest(env,path,init={}){
+  const origin=skygateOrigin(env);
+  if(env.SKYGATEFS27_WORKER?.fetch){
+    const res=await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skygatefs27.internal${path}`,init));
+    if(res.status!==404||!origin) return res;
+  }
+  if(!origin) throw new Error('SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured.');
+  return fetch(`${origin}${path}`,init);
+}
+async function introspectGate(token,env,{operator=false}={}){
+  if(!fs27Configured(env)) return {ok:false,status:503,code:'fs27_required',error:'Canonical FS27/SkyGate session is required.'};
+  if(!token) return {ok:false,status:401,error:'Missing FS27/SkyGate bearer.'};
+  for(const path of ['/auth-introspect','/auth/introspect','/.netlify/functions/auth-introspect']){
+    const res=await skygateRequest(env,path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token})});
+    if(res.status===404) continue;
+    const data=await res.json().catch(()=>({active:false,error:'Invalid FS27/SkyGate response'}));
+    if(!res.ok||data.active!==true) return {ok:false,status:res.ok?401:res.status,error:data.error||'FS27/SkyGate token is inactive or invalid.',skygate:data};
+    if(operator&&!operatorClaims(data)) return {ok:false,status:403,error:'FS27/SkyGate token is active but not operator-scoped.',skygate:data};
+    return {ok:true,via:'fs27-skygate',skygate:data};
+  }
+  return {ok:false,status:404,error:'FS27/SkyGate introspection endpoint was not found.'};
+}
+async function adminAuth(req,env){
+  if(sharedProxyAuth(req,env)) return {ok:true,via:'0s-internal-proxy'};
+  const token=gateTokens(req)[0];
+  if(token) return introspectGate(token,env,{operator:true});
+  if(boolEnv(env.OMEGA_ALLOW_LEGACY_ADMIN_TOKEN)&&env.ADMIN_TOKEN&&bearer(req)===env.ADMIN_TOKEN) return {ok:true,via:'explicit-legacy-admin-token'};
+  return {ok:false,status:401,error:'FS27/SkyGate operator session required.'};
+}
+async function customerAuth(req,env){
+  if(sharedProxyAuth(req,env)) return {ok:true,via:'0s-internal-proxy'};
+  const token=gateTokens(req)[0];
+  if(token) return introspectGate(token,env);
+  if(boolEnv(env.OMEGA_ALLOW_LEGACY_CUSTOMER_TOKEN)&&env.CUSTOMER_COMMAND_TOKEN&&bearer(req)===env.CUSTOMER_COMMAND_TOKEN) return {ok:true,via:'explicit-legacy-customer-token'};
+  return {ok:false,status:401,error:'FS27/SkyGate customer session required.'};
 }
 function scan(command,payload={}){
   const text=String(command||'');
@@ -53,16 +97,17 @@ export default {async fetch(req,env){
   const url=new URL(req.url);
   if(url.pathname==='/' || url.pathname==='/health' || url.pathname==='/api/omega/status') return j({ok:true,service:'0meg4kAI Security Gateway',d1:!!env.OMEGA_DB,kv:!!env.OMEGA_KV,queue:!!env.OMEGA_QUEUE,resend:!!env.RESEND_API_KEY,time:now()});
   if(url.pathname==='/api/omega/scan' && req.method==='POST'){
+    const auth=await adminAuth(req,env); if(!auth.ok) return j({ok:false,error:auth.error,code:auth.code},auth.status||401);
     const b=await body(req); const result=scan(b.command_text||b.command||'',b); const event={id:uuid(),source:b.source||'manual_scan',workspace_id:b.workspace_id||'',command_text:b.command_text||b.command||'',payload:b,created_at:now(),...result};
     await record(env,event); const approval_email=event.decision==='allow_customer_scoped'?{sent:false,reason:'not_needed'}:await notify(env,event); return j({ok:true,event,approval_email});
   }
   if(url.pathname==='/api/omega/customer-command' && req.method==='POST'){
-    if(!customerAuth(req,env)) return j({ok:false,error:'unauthorized_customer_command'},401);
+    const auth=await customerAuth(req,env); if(!auth.ok) return j({ok:false,error:auth.error,code:auth.code},auth.status||401);
     const b=await body(req); const result=scan(b.command_text||b.command||'',b); const event={id:uuid(),source:'customer_command',workspace_id:b.workspace_id||'',command_text:b.command_text||b.command||'',payload:b,created_at:now(),...result};
     await record(env,event); const approval_email=event.decision==='allow_customer_scoped'?{sent:false,reason:'not_needed'}:await notify(env,event); return j({ok:true,event,approval_email});
   }
   if(url.pathname==='/api/omega/audit'){
-    if(!adminAuth(req,env)) return j({ok:false,error:'unauthorized_admin_audit'},401);
+    const auth=await adminAuth(req,env); if(!auth.ok) return j({ok:false,error:auth.error,code:auth.code},auth.status||401);
     if(!env.OMEGA_DB) return j({ok:true,rows:[],note:'OMEGA_DB not bound'});
     const rows=await env.OMEGA_DB.prepare('SELECT * FROM omega_security_events ORDER BY created_at DESC LIMIT 200').all(); return j({ok:true,rows:rows.results||[]});
   }

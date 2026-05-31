@@ -12,11 +12,7 @@
   }
 
   function gateToken() {
-    return window.MetrAIyuxGateBridge?.current?.()?.token
-      || sessionStorage.getItem('adminBrainToken')
-      || sessionStorage.getItem('metraiyux.gate.token')
-      || sessionStorage.getItem('skye.gate.token')
-      || '';
+    return window.MetrAIyuxGateBridge?.current?.()?.token || '';
   }
 
   function authHeaders(headers = {}) {
@@ -29,6 +25,7 @@
       ...headers,
       ...bridgeHeaders,
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(token ? { 'x-free99-gate-session': token, 'x-skye-gate-session': token } : {}),
     };
   }
 
@@ -69,7 +66,8 @@
         room: 'builder',
         brief: payload.project || payload.brief || {},
         runtime: { files: payload.files || {} },
-        allowLiveAi: true,
+        allowLiveAi: Boolean(gateToken()),
+        authRequiredForLiveAi: true,
       });
     },
     state() {

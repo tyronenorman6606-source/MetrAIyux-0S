@@ -448,6 +448,58 @@ function renderEnvVars(data = {}) {
   ])));
 }
 
+function renderSupportProfile(profile = {}) {
+  const node = document.querySelector('#supportProfile');
+  if (!node) return;
+  const emails = Array.isArray(profile.emails) ? profile.emails : [];
+  const phones = Array.isArray(profile.phones) ? profile.phones : [];
+  const rows = [
+    el('article', { className: 'list-item compact' }, [
+      el('span', { text: 'Approved profile' }),
+      el('strong', { text: text(profile.organization, 'Skyes Over London LC') }),
+      profile.source
+        ? el('a', { text: 'Source page', attrs: { href: profile.source } })
+        : el('small', { text: 'Source page unavailable' })
+    ])
+  ];
+  if (profile.public_site) {
+    rows.push(el('article', { className: 'list-item compact' }, [
+      el('span', { text: 'Public site' }),
+      el('strong', { text: profile.public_site }),
+      el('a', { text: 'Open site', attrs: { href: profile.public_site } })
+    ]));
+  }
+  for (const record of emails) {
+    rows.push(el('article', { className: 'list-item compact' }, [
+      el('span', { text: record.label || 'Email' }),
+      el('strong', { text: record.value || '' }),
+      record.href ? el('a', { text: 'Email', attrs: { href: record.href } }) : el('small', { text: 'No email link' })
+    ]));
+  }
+  for (const record of phones) {
+    rows.push(el('article', { className: 'list-item compact' }, [
+      el('span', { text: record.label || 'Phone' }),
+      el('strong', { text: record.value || record.e164 || '' }),
+      record.href ? el('a', { text: 'Call', attrs: { href: record.href } }) : el('small', { text: 'No phone link' })
+    ]));
+  }
+  node.replaceChildren(...rows);
+}
+
+async function refreshSupportProfile() {
+  if (!document.querySelector('#supportProfile')) return null;
+  try {
+    const response = await fetch('/support.json', { headers: { accept: 'application/json' } });
+    const body = await response.json();
+    if (!response.ok || body?.ok === false) throw new Error(body?.error || `Support profile failed with HTTP ${response.status}`);
+    renderSupportProfile(body);
+    return body;
+  } catch (error) {
+    setMessage('#supportProfile', error.message);
+    return null;
+  }
+}
+
 async function refreshEnvVars(token = storedToken(), projectId = selectedEnvProject()) {
   if (!document.querySelector('#envList')) return null;
   if (!token) {
@@ -468,6 +520,7 @@ async function renderDashboard(token = storedToken()) {
     setMessage('#deploymentList', 'Paste a shared gate session or use the shared gate login.');
     setMessage('#routeList', 'Waiting for gate session.');
     setMessage('#receiptList', 'Waiting for gate session.');
+    setMessage('#exportStatus', 'Paste a shared gate session before exporting customer data.');
     return null;
   }
   const dashboard = await apiJson(`/api/skyenet/dashboard${workspaceQuery()}`, token);
@@ -532,6 +585,61 @@ async function downloadSource(url, token, fallbackName) {
   status.textContent = `Downloaded ${filename}.`;
 }
 
+function exportQuery(form) {
+  const query = new URLSearchParams();
+  for (const [key, value] of new FormData(form).entries()) {
+    const clean = text(value);
+    if (clean) query.set(key, clean);
+  }
+  const suffix = query.toString();
+  return suffix ? `?${suffix}` : '';
+}
+
+function syncExportDefaults() {
+  const form = document.querySelector('#exportForm');
+  if (!form) return;
+  const params = new URLSearchParams(window.location.search);
+  const workspaceInput = form.querySelector('[name="workspace_id"]');
+  const projectInput = form.querySelector('[name="project_id"]');
+  const workspace = params.get('workspace_id') || params.get('workspace') || document.querySelector('#deployForm [name="workspace_id"]')?.value || '';
+  const project = params.get('project_id') || document.querySelector('#envForm [name="project_id"]')?.value || document.querySelector('#deployForm [name="project_id"]')?.value || '';
+  if (workspaceInput && !workspaceInput.value) workspaceInput.value = workspace;
+  if (projectInput && !projectInput.value) projectInput.value = project;
+}
+
+async function requestCustomerExport(form, token) {
+  const status = document.querySelector('#exportStatus');
+  if (!token) throw new Error('A shared gate session is required before exporting customer data.');
+  syncExportDefaults();
+  if (status) status.textContent = 'Requesting customer export...';
+  const response = await fetch(`/api/skyenet/export${exportQuery(form)}`, { headers: authHeaders(token) });
+  const contentType = response.headers.get('content-type') || '';
+  if (!response.ok) {
+    const detail = contentType.includes('json')
+      ? await response.json().catch(() => ({}))
+      : { error: await response.text().catch(() => '') };
+    throw new Error(detail.error || detail.code || `Customer export failed with HTTP ${response.status}`);
+  }
+  if (contentType.includes('application/json')) {
+    const body = await response.json();
+    if (body?.ok === false) throw new Error(body.error || body.code || 'Customer export failed.');
+    const data = body.skynet || body;
+    if (status) status.textContent = data.export_url || data.download_url ? 'Customer export is ready.' : 'Customer export response received.';
+    return { kind: 'json', data };
+  }
+  const blob = await response.blob();
+  const filename = downloadNameFromDisposition(response.headers.get('content-disposition'), 'skyenet-customer-export.json');
+  const anchor = document.createElement('a');
+  anchor.href = URL.createObjectURL(blob);
+  anchor.download = filename;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(anchor.href), 1000);
+  if (status) status.textContent = `Downloaded ${filename}.`;
+  return { kind: 'download', filename, bytes: blob.size };
+}
+
 async function transferSource(button, token) {
   const status = document.querySelector('#sourceStatus');
   if (!token) throw new Error('A shared gate session is required before source transfer.');
@@ -558,7 +666,9 @@ async function transferSource(button, token) {
 }
 
 async function refresh(token = storedToken()) {
-  await Promise.allSettled([renderStatus(token), renderDashboard(token), refreshEnvVars(token)]);
+  syncExportDefaults();
+  if (document.querySelector('#exportStatus') && token) setMessage('#exportStatus', 'Ready to request a customer export.');
+  await Promise.allSettled([renderStatus(token), renderDashboard(token), refreshEnvVars(token), refreshSupportProfile()]);
 }
 
 const form = document.querySelector('#tokenForm');
@@ -594,6 +704,27 @@ if (envForm) {
   });
 }
 
+const exportForm = document.querySelector('#exportForm');
+if (exportForm) {
+  syncExportDefaults();
+  exportForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = exportForm.querySelector('button[type="submit"]');
+    const resultNode = document.querySelector('#exportResult');
+    const token = storedToken();
+    button.disabled = true;
+    try {
+      const result = await requestCustomerExport(exportForm, token);
+      if (resultNode) resultNode.textContent = JSON.stringify(result.data || result, null, 2);
+    } catch (error) {
+      setMessage('#exportStatus', error.message);
+      if (resultNode) resultNode.textContent = JSON.stringify({ ok: false, error: error.message }, null, 2);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
 const deployForm = document.querySelector('#deployForm');
 if (deployForm) {
   const projectInput = deployForm.querySelector('[name="project_id"]');
@@ -616,6 +747,10 @@ if (deployForm) {
       if (resultNode) resultNode.textContent = JSON.stringify(result, null, 2);
       const projectField = envForm?.querySelector('[name="project_id"]');
       if (projectField && !projectField.value) projectField.value = result.project_id;
+      const exportProjectField = exportForm?.querySelector('[name="project_id"]');
+      const exportWorkspaceField = exportForm?.querySelector('[name="workspace_id"]');
+      if (exportProjectField && !exportProjectField.value) exportProjectField.value = result.project_id;
+      if (exportWorkspaceField && !exportWorkspaceField.value) exportWorkspaceField.value = result.workspace_id;
       await refresh(token);
     } catch (error) {
       setMessage('#deployStatus', error.message);

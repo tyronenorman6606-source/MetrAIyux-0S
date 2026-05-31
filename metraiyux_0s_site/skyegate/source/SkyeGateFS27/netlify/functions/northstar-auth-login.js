@@ -4,10 +4,23 @@ import { q } from "./_lib/db.js";
 import { countRecentFailedLogins, createWorkspaceSession, enforceLoginWindow, enforceWorkspaceRateLimit, recordLoginAttempt, safeText, slugify } from "./_lib/signinpro.js";
 import { verifyPassword } from "./_lib/passwords.js";
 
+function boolEnv(value) {
+  return /^(1|true|yes|on)$/i.test(String(value || "").trim());
+}
+
 export default wrap(async (req) => {
   const cors = buildCors(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
   if (req.method !== "POST") return json(405, { ok: false, error: "Method not allowed." }, cors);
+
+  if (!boolEnv(process.env.SIGNINPRO_ALLOW_LEGACY_PASSWORD_LOGIN)) {
+    return json(410, {
+      ok: false,
+      error: "northstar_password_login_disabled_by_shared_gate",
+      gate: "FS27/SkyGate/Free99",
+      next_step: "Sign in once through FS27/SkyGate and pass the shared gate bearer to NorthStar."
+    }, cors);
+  }
 
   const body = await req.json().catch(() => null);
   if (!body) return badRequest("Invalid JSON", cors);

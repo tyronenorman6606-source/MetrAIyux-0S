@@ -1,46 +1,43 @@
 (function () {
-  const SESSION_KEY = "skye.omega.session";
-  const TOKEN_KEY = "skye.omega.token";
+  const SESSION_KEY = "skyesol.fs27.bridge.session";
 
-  function readJson(key) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
+  function gateBridge() {
+    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   }
 
-  function writeJson(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+  function normalize(session) {
+    if (!session || typeof session !== "object" || !session.token) return null;
+    return {
+      ...session,
+      source: session.source || "0s-gate-card-bridge",
+      client: session.client || "SkyeSol",
+      status: session.status || "free99_gate_session"
+    };
   }
 
   function getSession() {
-    return readJson(SESSION_KEY);
+    return normalize(gateBridge()?.current?.());
   }
 
   function getToken() {
-    return String(localStorage.getItem(TOKEN_KEY) || "");
+    return String(getSession()?.token || "");
   }
 
   function setSession(session, token) {
-    const nextSession = session && typeof session === "object" ? session : {};
-    writeJson(SESSION_KEY, nextSession);
-    if (typeof token === "string" && token) {
-      localStorage.setItem(TOKEN_KEY, token);
-    } else if (typeof nextSession.token === "string" && nextSession.token) {
-      localStorage.setItem(TOKEN_KEY, nextSession.token);
+    const nextSession = normalize({ ...(session || {}), token: token || session?.token || "" });
+    if (nextSession) {
+      gateBridge()?.persist?.(nextSession, { silent: true });
+      gateBridge()?.record?.("skyesol_gate_ready", nextSession, nextSession);
     }
-    return nextSession;
+    return nextSession || {};
   }
 
   function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(TOKEN_KEY);
+    gateBridge()?.clear?.();
   }
 
   window.SkyeStandaloneSession = {
-    keys: { session: SESSION_KEY, token: TOKEN_KEY },
+    keys: { session: SESSION_KEY },
     getSession,
     getToken,
     setSession,

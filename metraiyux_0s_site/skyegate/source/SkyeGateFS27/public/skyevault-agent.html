@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkyeVault Agent | SkyePay</title>
+  <meta name="description" content="Buy and install the SkyeVault repo custody agent through SkyePay, shared FS27 auth, encrypted baseline snapshots, additive deltas, and gated package delivery." />
+  <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html" />
+  <link rel="stylesheet" href="assets/skyepay.css" />
+  <style>
+    .agent-proof-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+    .agent-proof-grid article,.agent-lane-card{border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(10,18,22,.72);padding:14px}
+    .agent-proof-grid b,.agent-lane-card b{display:block;color:#f1d27b;margin-bottom:6px}
+    .agent-lane-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+    .agent-lane-card{min-height:160px;text-align:left;color:inherit;cursor:pointer}
+    .agent-lane-card[aria-pressed="true"]{border-color:#73efbd;box-shadow:0 0 0 2px rgba(115,239,189,.18)}
+    .agent-lane-card em{display:block;color:#73efbd;font-style:normal;font-weight:900;margin:8px 0}
+    .agent-lane-card span{display:block;color:rgba(238,247,255,.76);line-height:1.45}
+    .agent-command-list{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}
+    .agent-command-list li{border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px;background:rgba(255,255,255,.04)}
+    .agent-command-list code{display:block;margin-top:6px;color:#eafff8;white-space:pre-wrap;word-break:break-word}
+    @media(max-width:920px){.agent-proof-grid,.agent-lane-grid{grid-template-columns:1fr}.pay-nav nav{flex-wrap:wrap}}
+  </style>
+</head>
+<body class="store-body">
+  <div class="motion-progress" aria-hidden="true"><span id="skypayProgress"></span></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+  <div class="scanline" aria-hidden="true"></div>
+
+  <header class="pay-nav">
+    <a class="pay-brand neon-magnetic" href="skyepay.html" aria-label="Back to SkyePay">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
+      <span>SkyeVault Agent</span>
+    </a>
+    <nav>
+      <a href="#buy">Buy</a>
+      <a href="#proof">Proof</a>
+      <a href="skyepay-store.html?client=metraiyux-0s&offer=skyevault-pro-access">Store</a>
+      <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/">Install Center</a>
+    </nav>
+  </header>
+
+  <main class="store-shell" id="buy">
+    <section class="store-hero">
+      <div class="store-hero-copy">
+        <p class="eyebrow">Repo custody agent</p>
+        <h1><span class="neon-gradient-text text-effects">Sell the backup lane.</span> Deliver the actual installer.</h1>
+        <p class="lead">SkyeVault Agent is the paid repo-custody installer for client workspaces. It creates an encrypted full baseline, then sends encrypted changed-file deltas and tombstones so the buyer can recover a repo without depending on Codespaces, GitHub access, or one giant upload every ten minutes.</p>
+        <div class="agent-proof-grid" id="proof">
+          <article><b>Baseline</b><span>Encrypted literal repo snapshot, including dirty and untracked work when configured.</span></article>
+          <article><b>Delta</b><span>Additive encrypted changed-file packs after the baseline.</span></article>
+          <article><b>Restore</b><span>Verify and restore commands are included in the package.</span></article>
+          <article><b>Auth</b><span>SkyePay provisions a workspace portal key; shared FS27/SkyGate bearer is optional for owner/admin lanes.</span></article>
+        </div>
+      </div>
+
+      <aside class="store-command-panel" aria-labelledby="checkoutTitle">
+        <p class="eyebrow">SkyePay checkout</p>
+        <h2 id="checkoutTitle">Choose SkyeVault Pro</h2>
+        <p id="checkoutSummary">Loading live SkyePay offer data.</p>
+        <form id="agentCheckoutForm" class="pay-form compact-form">
+          <label>
+            Buyer name
+            <input name="customer_name" autocomplete="name" placeholder="Client owner" required />
+          </label>
+          <label>
+            Receipt email
+            <input name="customer_email" type="email" autocomplete="email" placeholder="owner@company.com" required />
+          </label>
+          <label>
+            Company
+            <input name="company_name" autocomplete="organization" placeholder="Company name" />
+          </label>
+          <label class="legal-acceptance">
+            <input name="legal_acceptance" type="checkbox" required />
+            <span>I agree to the Legal Skyes transaction terms, payment/refund policy, arbitration boundary, privacy policy, and no-guarantee proof boundary.</span>
+          </label>
+          <button class="primary-action neon-magnetic" id="checkoutButton" type="submit">Open secure checkout</button>
+          <p class="fine-print">After SkyePay confirms payment through its secure processor, the buyer returns to the gated 0S install center with the checkout session attached.</p>
+        </form>
+        <div class="status-panel" id="agentStatusPanel" hidden>
+          <p class="eyebrow">Checkout status</p>
+          <h3 id="agentStatusTitle">Ready</h3>
+          <p id="agentStatusText">Choose a lane and open checkout.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="store-band skypay-reveal">
+      <div>
+        <p class="eyebrow">Available lanes</p>
+        <h2>Starter, Pro, and Command are live SkyePay offers.</h2>
+      </div>
+      <p>The cards below load from `/skyepay/offers`, so prices and storage limits stay tied to the FS27 catalog instead of hardcoded copy.</p>
+    </section>
+
+    <section class="agent-lane-grid" id="agentLaneGrid" aria-live="polite"></section>
+
+    <section class="store-band skypay-reveal">
+      <div>
+        <p class="eyebrow">Installer contents</p>
+        <h2>The package is a Node CLI, not a PDF promise.</h2>
+      </div>
+      <p>It ships `doctor`, `init`, `snapshot`, `sync`, `watch`, `verify`, and `restore` commands. Owner/admin package download is gated by shared 0S auth; buyer download is gated by paid SkyePay session and workspace provisioning.</p>
+    </section>
+
+    <ul class="agent-command-list">
+      <li><b>Install</b><code>tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+npm install --omit=dev
+node bin/skyevault-agent.mjs doctor --json</code></li>
+      <li><b>Sync</b><code>node bin/skyevault-agent.mjs init --workspace="$SKYEVAULT_WORKSPACE_ID" --repo=/path/to/repo --vault-url="$SKYEVAULT_DROP_URL"
+export SKYEVAULT_PORTAL_KEY="&lt;workspace portal key from install center&gt;"
+export SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;"
+node bin/skyevault-agent.mjs sync --upload --json
+node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload</code></li>
+      <li><b>Recover</b><code>node bin/skyevault-agent.mjs verify --receipt=/path/to/full-or-delta-receipt.json --json
+node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delta-receipts=/path/to/delta-receipt.json --out=/tmp/restored-repo --json</code></li>
+    </ul>
+  </main>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const state = { offers: [], selectedOfferId: params.get('offer') || 'skyevault-pro-access' };
+      const laneGrid = document.getElementById('agentLaneGrid');
+      const form = document.getElementById('agentCheckoutForm');
+      const button = document.getElementById('checkoutButton');
+      const statusPanel = document.getElementById('agentStatusPanel');
+      const statusTitle = document.getElementById('agentStatusTitle');
+      const statusText = document.getElementById('agentStatusText');
+      const title = document.getElementById('checkoutTitle');
+      const summary = document.getElementById('checkoutSummary');
+      const legalVersion = 'legal-skyes-transaction-pack-2026-05-28';
+
+      function money(cents) {
+        return '$' + (Math.round(Number(cents || 0)) / 100).toLocaleString('en-US', { maximumFractionDigits: 0 });
+      }
+      function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+      }
+      function status(head, text, error) {
+        statusPanel.hidden = false;
+        statusTitle.textContent = head;
+        statusText.textContent = text;
+        statusPanel.classList.toggle('bad', Boolean(error));
+      }
+      function selectedOffer() {
+        return state.offers.find((offer) => offer.id === state.selectedOfferId) || state.offers[0];
+      }
+      function priceLine(offer) {
+        if (!offer) return 'Loading';
+        if (offer.price_summary) return offer.price_summary.replace(', then', ' then');
+        if (offer.mode === 'subscription') return money(offer.recurring_cents) + '/mo';
+        return money(offer.setup_cents) + ' today';
+      }
+      function render() {
+        const offer = selectedOffer();
+        if (!offer) return;
+        state.selectedOfferId = offer.id;
+        title.textContent = offer.title || 'SkyeVault Agent';
+        summary.textContent = `${priceLine(offer)}. ${offer.description || ''}`;
+        laneGrid.innerHTML = state.offers.map((item) => {
+          const limits = item.rate_limits || {};
+          const storage = limits.vault_storage_mb ? `${Math.round(limits.vault_storage_mb / 1024)}GB vault` : 'vault limit';
+          const files = limits.vault_file_limit ? `${limits.vault_file_limit} files` : 'file limit';
+          const workspaces = limits.vault_workspace_limit ? `${limits.vault_workspace_limit} workspace${limits.vault_workspace_limit === 1 ? '' : 's'}` : 'workspace limit';
+          return `<button type="button" class="agent-lane-card neon-magnetic" data-offer-id="${escapeHtml(item.id)}" aria-pressed="${item.id === state.selectedOfferId}">
+            <b>${escapeHtml(item.title)}</b>
+            <em>${escapeHtml(priceLine(item))}</em>
+            <span>${escapeHtml([storage, files, workspaces].join(' | '))}</span>
+          </button>`;
+        }).join('');
+        laneGrid.querySelectorAll('button').forEach((card) => {
+          card.addEventListener('click', () => {
+            state.selectedOfferId = card.dataset.offerId;
+            render();
+          });
+        });
+      }
+      function requestToken(payload) {
+        const email = String(payload.customer_email || '').trim().toLowerCase();
+        const key = `skyevault-agent:${state.selectedOfferId}:${email}`;
+        try {
+          const existing = sessionStorage.getItem(key);
+          if (existing) return existing;
+          const token = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`).replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 160);
+          sessionStorage.setItem(key, token);
+          return token;
+        } catch {
+          return `${Date.now()}-${Math.random()}`.replace(/[^a-zA-Z0-9:_-]/g, '').slice(0, 160);
+        }
+      }
+      async function fetchJson(url, init) {
+        const res = await fetch(url, init);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) throw new Error(data.error || `HTTP ${res.status}`);
+        return data;
+      }
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const offer = selectedOffer();
+        if (!offer) return status('Offer not ready', 'The SkyePay catalog did not return a SkyeVault offer yet.', true);
+        if (!form.legal_acceptance.checked) return status('Legal acceptance required', 'Accept the transaction terms before checkout.', true);
+        const acceptedAt = new Date().toISOString();
+        const payload = {
+          client_slug: 'metraiyux-0s',
+          offer_id: offer.id,
+          customer_name: form.customer_name.value,
+          customer_email: form.customer_email.value,
+          company_name: form.company_name.value,
+          legal_acceptance: {
+            legal_terms_accepted: true,
+            arbitration_accepted: true,
+            payments_policy_accepted: true,
+            no_outcome_guarantee_accepted: true,
+            truthful_review_boundary_acknowledged: true,
+            privacy_policy_accepted: true,
+            legal_version: legalVersion,
+            accepted_at: acceptedAt,
+            acceptance_surface: 'skyevault-agent-page',
+            source_url: location.href
+          }
+        };
+        payload.idempotency_key = requestToken(payload);
+        button.disabled = true;
+        button.textContent = 'Preparing SkyePay...';
+        status('Creating checkout', 'SkyePay is creating the secure checkout session.');
+        try {
+          const data = await fetchJson('/skyepay/checkout', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', accept: 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!data.url) throw new Error('Checkout URL was not returned.');
+          location.href = data.url;
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = 'Open secure checkout';
+          status('Checkout needs attention', error.message || 'SkyePay could not create checkout.', true);
+        }
+      });
+      window.addEventListener('scroll', () => {
+        const bar = document.getElementById('skypayProgress');
+        if (!bar) return;
+        const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+        bar.style.width = `${Math.min(100, Math.max(0, scrollY / max * 100))}%`;
+      }, { passive: true });
+      fetchJson('/skyepay/offers?client=metraiyux-0s')
+        .then((data) => {
+          state.offers = (data.offers || []).filter((offer) => String(offer.id || '').startsWith('skyevault-'));
+          render();
+          status('Store ready', 'Choose a SkyeVault lane and open checkout.');
+        })
+        .catch((error) => status('Catalog needs attention', error.message || 'Could not load offers.', true));
+    })();
+  </script>
+</body>
+</html>

@@ -1,9 +1,15 @@
 {
-  "status": "active-runtime-proof",
+  "status": "local-runtime-proof",
   "checkedAt": "2026-05-10",
-  "fullSkyeWebCreatorDeliveryRuntime": true,
-  "fullRuntime": true,
+  "localSkyeWebCreatorDeliveryRuntime": true,
+  "fullSkyeWebCreatorDeliveryRuntime": false,
+  "fullRuntime": false,
+  "workerRuntimeProven": false,
+  "liveCustomerVisibilityProven": false,
+  "liveTelemetryProven": false,
   "mode": "same-folder local delivery runtime",
+  "workerRuntimeEndpoint": "/api/marketing-made-easy/webcreator-runtime/*",
+  "boundary": "This receipt proves the same-folder local runtime only. It does not prove live Worker telemetry, shared-gated customer visibility, or downstream service write-through.",
   "smokeCommand": "npm run verify:runtime",
   "proves": [
     "local runtime starts and responds to health",

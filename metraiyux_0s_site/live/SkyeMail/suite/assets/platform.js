@@ -11,6 +11,7 @@
   const deliveryKey = "skymail.delivery.records";
   const launchDraftKey = "skymail.platform.launchDraft";
   const bridgeKey = "skymail.platform.intent.bridge";
+  const liveDeliveryState = { status: "pending", items: [], error: "" };
   const initialState = {
     handoffs: [],
     drafts: [],
@@ -44,6 +45,101 @@
   function loadDeliveries() {
     const parsed = readJson(deliveryKey, []);
     return Array.isArray(parsed) ? parsed : [];
+  }
+
+  function readStoredValue(key) {
+    for (const store of [sessionStorage, localStorage]) {
+      try {
+        const value = store.getItem(key);
+        if (value) return value;
+      } catch {}
+    }
+    return "";
+  }
+
+  function readGateToken() {
+    return String(window.MetrAIyuxGateBridge?.current?.()?.token || "").trim();
+  }
+
+  function activeMailboxEmail() {
+    return String(readStoredValue("SMV_ACTIVE_MAILBOX") || "").trim().toLowerCase();
+  }
+
+  function apiCandidates(path) {
+    const parsed = new URL(String(path || "").startsWith("/") ? path : `/${path}`, window.location.origin);
+    const name = parsed.pathname.replace(/^\/+/, "");
+    return [
+      `/.netlify/functions/skymail-standalone-${name}${parsed.search}`,
+      `/.netlify/functions/${name}${parsed.search}`,
+      `/api/skymail-standalone-${name}${parsed.search}`,
+      `/api/${name}${parsed.search}`,
+    ];
+  }
+
+  async function fetchSkyeMailApi(path) {
+    const token = readGateToken();
+    if (!token) {
+      const error = new Error("Shared 0S Gate session required for live delivery telemetry.");
+      error.status = 401;
+      throw error;
+    }
+    const headers = { accept: "application/json", Authorization: `Bearer ${token}` };
+    const mailbox = activeMailboxEmail();
+    if (mailbox) headers["x-skymail-mailbox-email"] = mailbox;
+    let lastError = null;
+    for (const candidate of apiCandidates(path)) {
+      try {
+        const response = await fetch(candidate, { headers, credentials: "include", cache: "no-store" });
+        const text = await response.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text || `HTTP ${response.status}` }; }
+        if (response.ok) return data;
+        lastError = new Error(data?.error || `HTTP ${response.status}`);
+        lastError.status = response.status;
+        if (![404, 502, 503, 504].includes(response.status)) throw lastError;
+      } catch (error) {
+        lastError = error;
+        if (error.status && ![404, 502, 503, 504].includes(error.status)) throw error;
+      }
+    }
+    throw lastError || new Error("Live delivery telemetry API unavailable.");
+  }
+
+  function liveDeliveryEmptyText() {
+    if (liveDeliveryState.status === "pending") return "Loading real delivery events from the SkyeMail API.";
+    if (liveDeliveryState.status === "unauthenticated") return "Sign in through the shared 0S Gate to load live delivery events. Local suite queues are staged handoffs, not delivery proof.";
+    if (liveDeliveryState.status === "error") return `${liveDeliveryState.error || "Live delivery telemetry is unavailable."} Local suite queues are staged handoffs, not delivery proof.`;
+    return "No live delivery events are stored for this mailbox yet.";
+  }
+
+  function liveDeliveryRows() {
+    return liveDeliveryState.items.slice(0, 6).map((entry) => ({
+      title: entry.subject || entry.event_type || "Delivery event",
+      excerpt: `${entry.from_email || "unknown sender"} -> ${entry.recipient_email || "unknown recipient"}`,
+      source: `${entry.provider || "provider"} ${entry.delivery_status || "event"}`,
+      at: entry.event_created_at || entry.created_at || "",
+    }));
+  }
+
+  function setLiveTelemetryStatus(text) {
+    const node = document.getElementById("mailCitadelStatus");
+    if (node) node.textContent = text;
+  }
+
+  async function refreshLiveDeliveries() {
+    try {
+      const data = await fetchSkyeMailApi("/resend-events-list?limit=6");
+      liveDeliveryState.status = "loaded";
+      liveDeliveryState.items = Array.isArray(data?.events) ? data.events : [];
+      liveDeliveryState.error = "";
+      setLiveTelemetryStatus("Live telemetry loaded");
+    } catch (error) {
+      liveDeliveryState.status = Number(error.status || 0) === 401 ? "unauthenticated" : "error";
+      liveDeliveryState.items = [];
+      liveDeliveryState.error = error.message || "Live delivery telemetry unavailable.";
+      setLiveTelemetryStatus(liveDeliveryState.status === "unauthenticated" ? "Live telemetry gated" : "Live telemetry unavailable");
+    }
+    render();
   }
 
   function suiteHref(path, searchParams) {
@@ -199,20 +295,15 @@
   }
 
   function render() {
-    const deliveries = loadDeliveries();
     renderText("handoffCount", String(state.handoffs.length));
     renderText("draftCount", String(state.drafts.length));
     renderText("campaignCount", String(state.campaigns.length));
+    renderText("liveDeliveryCount", String(liveDeliveryState.items.length));
     renderList('[data-bind="recentHandoffs"]', state.handoffs.slice(0, 6), "Suite pushes from docs, rescue, and automation will appear here.");
     renderList('[data-bind="composeDrafts"]', state.drafts.slice(0, 6), "Compose drafts will show here once staged.");
     renderList('[data-bind="campaignQueue"]', state.campaigns.slice(0, 6), "Campaign batches will appear here once planned.");
     renderList('[data-bind="opsNotes"]', state.opsNotes.slice(0, 6), "Mail operations notes will appear here once recorded.");
-    renderList('[data-bind="recentDeliveries"]', deliveries.slice(0, 6).map((entry) => ({
-      title: entry.subject || "Untitled delivery",
-      excerpt: `${entry.to || "unknown"} · attempts=${entry.attempts || 1}${entry.last_error ? ` · ${entry.last_error}` : ""}`,
-      source: entry.status || "queued",
-      at: entry.at || "",
-    })), "Recent compose sends and retries from the standalone Citadel will surface here.");
+    renderList('[data-bind="recentDeliveries"]', liveDeliveryRows(), liveDeliveryEmptyText());
   }
 
   function downloadJson(filename, payload) {
@@ -241,7 +332,7 @@
         <span class="platform-kicker">Standalone runtime</span>
         <span class="mini-card runtime-pill">Workspace <strong>${escapeHtml(wsId)}</strong></span>
         <span class="mini-card runtime-pill" id="mailSyncStatus">Local state ready</span>
-        <span class="mini-card runtime-pill" id="mailCitadelStatus">Citadel bridge ready</span>
+        <span class="mini-card runtime-pill" id="mailCitadelStatus">Live telemetry checking</span>
       </div>
       <div class="button-row">
         <button class="platform-button ghost" id="mailPushCitadelBtn" type="button">Export Suite State</button>
@@ -267,7 +358,7 @@
 
     async function load() {
       setStatus("Local state ready");
-      setCitadelStatus("Citadel bridge ready");
+      setCitadelStatus("Live telemetry checking");
       render();
       return {
         ok: true,
@@ -478,6 +569,7 @@
   bindStorageSignals();
   markSubnav();
   render();
+  void refreshLiveDeliveries();
   void storageProtocol.load();
 
   window.SkyeMailSuiteRuntime = {

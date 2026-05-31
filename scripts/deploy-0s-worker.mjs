@@ -48,6 +48,7 @@ const WORKER_ASSET_DIR_INCLUDES = [
   'citadeldb',
   'client-app-factory',
   'connectlog-v7.7-relay13-operator-proof',
+  'downloads/skyevault-agent',
   'founder-command',
   'gate',
   'HouseOperations',
@@ -114,6 +115,13 @@ const WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES = [
   'SkyeMusicNexus/artist-storefronts',
   'SkyeMusicNexus/one-music-gh-pages'
 ];
+
+const MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_PREFIXES = [
+  'SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases',
+  'SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine'
+];
+
+const MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_FILES = new Set(loadMusicNexusPublicCatalogFiles());
 
 const WORKER_ASSET_FILE_INCLUDES = [
   'index.html',
@@ -232,11 +240,41 @@ function relativeStagePath(file) {
   return path.relative(REPO_ROOT, file).replace(/\\/g, '/');
 }
 
+function normalizeWorkerAssetPath(value) {
+  const clean = String(value || '').trim().replace(/^https?:\/\/[^/]+/i, '').replace(/^\/+/, '');
+  if (!clean) return '';
+  if (clean.startsWith('SkyeMusicNexus/')) return clean;
+  return `SkyeMusicNexus/${clean}`;
+}
+
+function loadMusicNexusPublicCatalogFiles() {
+  const files = [];
+  const catalogPath = path.join(SITE_ROOT, 'SkyeMusicNexus/public/data/playlists.json');
+  if (!existsSync(catalogPath)) return files;
+  try {
+    const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+    for (const track of catalog.tracks || []) {
+      for (const field of ['audioUrl', 'localAudioHref', 'audio', 'audioFile', 'src']) {
+        const normalized = normalizeWorkerAssetPath(track?.[field]);
+        if (normalized) files.push(normalized);
+      }
+    }
+  } catch (error) {
+    console.warn(`Unable to read Music Nexus public catalog allowlist: ${error.message}`);
+  }
+  return [...new Set(files)];
+}
+
+function isMusicNexusWorkerPublicAllowed(rel) {
+  return MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_FILES.has(rel)
+    || MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_PREFIXES.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`));
+}
+
 function shouldSkipAssetPath(fullPath) {
   const rel = path.relative(SITE_ROOT, fullPath).replace(/\\/g, '/');
   const name = path.basename(fullPath);
   if (shouldSkipAssetFilename(name)) return true;
-  if (WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`))) return true;
+  if (!isMusicNexusWorkerPublicAllowed(rel) && WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`))) return true;
   const segments = rel.split('/').filter(Boolean);
   if (segments.some((segment) => WORKER_ASSET_SKIP_SEGMENTS.has(segment))) return true;
   try {

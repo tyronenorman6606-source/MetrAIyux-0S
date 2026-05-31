@@ -12,7 +12,7 @@ function toEpochMs(value) {
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const displayName = String(body.display_name || '').trim();
     const profileTitle = String(body.profile_title || '').trim();

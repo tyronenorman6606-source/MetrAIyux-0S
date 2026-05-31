@@ -8,6 +8,7 @@
   const REGISTRY_KEY = 'skye0s.identity.registry.v1';
   const MAX_PHOTO_CHARS = 1800000;
   const MAX_SOURCE_IMAGE_BYTES = 12 * 1024 * 1024;
+  const LIVE_EVENT_ENDPOINT = '/api/0s-command-bridge/events';
 
   function parseJson(value, fallback) {
     try {
@@ -33,6 +34,60 @@
 
   function cleanString(value, limit) {
     return String(value == null ? '' : value).trim().slice(0, limit || 240);
+  }
+
+  function gateHeaders() {
+    const headers = { 'content-type': 'application/json' };
+    try {
+      const bridgeHeaders = global.MetrAIyuxGateBridge?.headers?.() || global.Free99PlatformGate?.headers?.() || {};
+      Object.entries(bridgeHeaders).forEach(([key, value]) => {
+        if (value) headers[key] = value;
+      });
+    } catch {}
+    return headers;
+  }
+
+  async function emitIdentityEvent(identity, action) {
+    try {
+      const response = await fetch(LIVE_EVENT_ENDPOINT, {
+        method: 'POST',
+        credentials: 'include',
+        headers: gateHeaders(),
+        body: JSON.stringify({
+          source_app: 'skye-id-bridge',
+          source_surface: global.document?.title || 'Skye ID Bridge',
+          event_type: `skye_id.${action || identity.reason || 'publish'}`,
+          summary: `Skye ID ${action || 'publish'}: ${identity.email || identity.identityId || identity.skyeId || 'identity'}`,
+          entity: {
+            kind: 'identity',
+            id: identity.identityId || identity.skyeId || identity.email || 'identity',
+            label: identity.displayName || identity.email || identity.identityId || 'Skye ID'
+          },
+          ids: {
+            identity_id: identity.identityId || '',
+            skye_id: identity.skyeId || '',
+            email: identity.email || ''
+          },
+          links: [{ label: 'Source page', href: `${location.pathname}${location.search}`, kind: 'surface' }],
+          metadata: {
+            profile_type: identity.profileType || '',
+            source: identity.source || '',
+            reason: identity.reason || '',
+            has_photo: Boolean(identity.photoDataUrl),
+            email_domain: identity.emailDomain || '',
+            pathname: location.pathname,
+            title: global.document?.title || ''
+          }
+        })
+      });
+      const body = await response.json().catch(() => ({ ok: response.ok, status: response.status }));
+      global.dispatchEvent(new CustomEvent('skye0s:identity-live-event', { detail: { ok: Boolean(response.ok && body?.ok !== false), status: response.status, body } }));
+      return body;
+    } catch (error) {
+      const detail = { ok: false, error: error?.message || 'identity_live_event_failed' };
+      global.dispatchEvent(new CustomEvent('skye0s:identity-live-event', { detail }));
+      return detail;
+    }
   }
 
   function normalizeSkyeId(value) {
@@ -175,6 +230,7 @@
     try {
       global.dispatchEvent(new CustomEvent('skye0s:identity-updated', { detail: identity }));
     } catch {}
+    emitIdentityEvent(identity, 'published');
     return identity;
   }
 

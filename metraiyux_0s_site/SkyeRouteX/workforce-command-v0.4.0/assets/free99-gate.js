@@ -9,7 +9,6 @@
   const priceLabel = (data.priceLabel || "Owner-approved platform lane").trim();
   const appRoot = (data.appRoot || location.pathname.replace(/\/[^/]*$/, "/")).trim();
   const scopedRoot = appRoot.endsWith("/") ? appRoot : appRoot + "/";
-  const storageKey = "FREE99_PLATFORM_GATE_SESSION";
   const pendingReturnKey = "FREE99_PENDING_APP_RETURN";
   const localHosts = new Set(["localhost", "127.0.0.1", "::1", ""]);
   const clean = (value) => String(value == null ? "" : value).trim();
@@ -18,10 +17,6 @@
   const isLocalHost = () => localHosts.has(location.hostname) || location.protocol === "file:";
   const gateBridge = () => globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
   let resolvedSession = null;
-
-  function readJson(store, key) {
-    try { return JSON.parse(store.getItem(key) || "null"); } catch { return null; }
-  }
 
   function readSession() {
     const bridge = gateBridge();
@@ -43,18 +38,6 @@
         readonly: true
       };
     }
-
-    for (const key of [storageKey, "METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYGATE_USER_TOKEN", "SKYE_GATE_SESSION"]) {
-      const parsed = readJson(sessionStorage, key) || readJson(localStorage, key);
-      const token = safeToken(parsed && parsed.token ? parsed.token : sessionStorage.getItem(key) || localStorage.getItem(key));
-      if (tokenLooksValid(token)) return { ...(parsed || {}), token, source: parsed?.source || key, platform_id: platformId, billing_mode: billingMode };
-    }
-
-    const saas = readJson(localStorage, "saas_client_session");
-    if (saas && tokenLooksValid(saas.token)) return { ...saas, token: safeToken(saas.token), source: "0s-client-session", platform_id: platformId, billing_mode: billingMode };
-    const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || {};
-    const runtimeToken = safeToken(runtime.userToken || runtime.sessionToken || runtime.authToken || runtime.bearerToken || runtime.auth?.token || runtime.auth?.bearerToken);
-    if (tokenLooksValid(runtimeToken)) return { token: runtimeToken, source: "skygate-runtime", platform_id: platformId, billing_mode: billingMode };
     return null;
   }
 
@@ -66,10 +49,10 @@
       usage_lane: session.usage_lane || "platform-app",
       billing_mode: billingMode,
       price_label: priceLabel,
+      readonly: session.readonly === true,
       issued_at: session.issued_at || new Date().toISOString()
     };
-    sessionStorage.setItem(storageKey, JSON.stringify(cleanSession));
-    gateBridge()?.persist?.(cleanSession, { silent: true });
+    if (!cleanSession.readonly) gateBridge()?.persist?.(cleanSession, { silent: true });
     gateBridge()?.record?.("free99_platform_gate_ready", cleanSession, cleanSession);
     resolvedSession = cleanSession;
     unlockUi();

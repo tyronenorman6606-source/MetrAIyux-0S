@@ -9,10 +9,13 @@ const MAX_SOURCE_DOWNLOAD_FILES = 5000;
 const MAX_SOURCE_PACKAGE_FILES = 20000;
 const MAX_SOURCE_INDEX_FILES = 500000;
 const MAX_SOURCE_QUERY_LIMIT = 5000;
+const SOURCE_INDEX_PAGE_SIZE = 5000;
+const SOURCE_TREE_MATERIALIZE_FILE_LIMIT = 50000;
 const MAX_SOURCE_SEARCH_RESULTS = 250;
 const MAX_SOURCE_SEARCH_CONTENT_FILES = 500;
 const MAX_SOURCE_SEARCH_CONTENT_BYTES = 256 * 1024;
 const MAX_SOURCE_FILE_JSON_BYTES = 2 * 1024 * 1024;
+const MAX_SOURCE_ARCHIVE_INLINE_HASH_BYTES = 64 * 1024 * 1024;
 const MAX_SOURCE_TRANSFER_ARCHIVE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_PLAN = 'free99';
 const SOURCE_TRANSFER_METHODS = {
@@ -188,6 +191,52 @@ function requestLogBucket(env) {
   return env.REQUEST_LOG_BUCKET || env.FS27_REQUEST_LOG_BUCKET || null;
 }
 
+function skynetSupportProfile(env = {}) {
+  const email = (key, fallback) => cleanText(env[key] || fallback, 220);
+  const phone = (key, fallback) => cleanText(env[key] || fallback, 80);
+  const sourceUrl = cleanText(
+    env.SKYENET_SUPPORT_SOURCE_URL || 'https://skyenet.skyesol/leadership/SkyesOverLondon.html',
+    300
+  );
+  const profile = {
+    schema: 'fs27.skynet.support_profile.v1',
+    source: sourceUrl,
+    source_label: 'Skyes Over London public leadership page',
+    contact_policy: 'approved-public-page-values-with-env-overrides',
+    public_site: cleanText(env.SKYENET_SUPPORT_PUBLIC_SITE || 'https://skyenet.solenterprises/', 300),
+    operations: {
+      label: 'Skyes Over London operations',
+      email: email('SKYENET_SUPPORT_OPERATIONS_EMAIL', 'SkyesOverLondonLC@solenterprises.org'),
+      phone: phone('SKYENET_SUPPORT_OPERATIONS_PHONE', '480-469-5416')
+    },
+    founder: {
+      label: 'Gray London Skyes',
+      email: email('SKYENET_SUPPORT_FOUNDER_EMAIL', 'GrayLondonSkyes@solenterprises.org'),
+      phone: phone('SKYENET_SUPPORT_FOUNDER_PHONE', '623-260-7073')
+    },
+    general: {
+      label: 'SOL Enterprises contact',
+      email: email('SKYENET_SUPPORT_GENERAL_EMAIL', 'Contact@solenterprises.org')
+    },
+    b2b: {
+      label: 'SOL Enterprises B2B',
+      email: email('SKYENET_SUPPORT_B2B_EMAIL', 'B2B@solenterprises.org')
+    }
+  };
+  return {
+    ...profile,
+    contacts: [
+      { id: 'operations', type: 'email', label: profile.operations.label, value: profile.operations.email, href: `mailto:${profile.operations.email}` },
+      { id: 'founder', type: 'email', label: profile.founder.label, value: profile.founder.email, href: `mailto:${profile.founder.email}` },
+      { id: 'general', type: 'email', label: profile.general.label, value: profile.general.email, href: `mailto:${profile.general.email}` },
+      { id: 'b2b', type: 'email', label: profile.b2b.label, value: profile.b2b.email, href: `mailto:${profile.b2b.email}` },
+      { id: 'operations-phone', type: 'phone', label: profile.operations.label, value: profile.operations.phone, href: `tel:${profile.operations.phone.replace(/[^0-9+]/g, '')}` },
+      { id: 'founder-phone', type: 'phone', label: profile.founder.label, value: profile.founder.phone, href: `tel:${profile.founder.phone.replace(/[^0-9+]/g, '')}` }
+    ],
+    hardcoded_wrong_contact_fallbacks: false
+  };
+}
+
 function normalizeSlug(value, fallback, max = MAX_PROJECT) {
   const clean = cleanText(value || fallback, max)
     .toLowerCase()
@@ -212,6 +261,11 @@ function capsForPlan(value) {
 
 function truthy(value) {
   return /^(1|true|yes|y|on)$/i.test(String(value || '').trim());
+}
+
+function directRuntimeArchiveConfigured(env) {
+  const value = String(env.RUNTIME_DIRECT_ARCHIVE || env.FS27_RUNTIME_DIRECT_ARCHIVE || '').trim().toLowerCase();
+  return value === 'sync' || truthy(value);
 }
 
 function isAdminPrincipal(auth = {}, request = null) {
@@ -337,15 +391,16 @@ function sourceTransferPath() {
 }
 
 function sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, explicit = '') {
-  const cleanExplicit = cleanText(explicit || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
-  if (cleanExplicit) return cleanExplicit;
-  return [
+  const canonical = [
     'source-packages',
     `customer-${cleanText(principal?.customer_id || '0', 160)}`,
     `workspace-${workspaceId}`,
     `project-${projectId}`,
     `deployment-${deploymentId}`
   ].join('/');
+  const cleanExplicit = cleanText(explicit || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  if (cleanExplicit && (cleanExplicit === canonical || cleanExplicit.startsWith(`${canonical}/`))) return cleanExplicit;
+  return canonical;
 }
 
 function sourceManifestKeyForPackage(sourcePackage = {}) {
@@ -360,6 +415,63 @@ function sourceIndexKeyForPackage(sourcePackage = {}) {
   if (explicit) return explicit;
   const prefix = cleanText(sourcePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
   return prefix ? `${prefix}/.skyenet/source-index.jsonl` : '';
+}
+
+function base64UrlEncodeText(value = '') {
+  const bytes = encodeUtf8(String(value || ''));
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  const encoded = typeof globalThis.btoa === 'function'
+    ? globalThis.btoa(binary)
+    : Buffer.from(bytes).toString('base64');
+  return encoded.replace(/=+$/g, '').replace(/\+/g, '-').replace(/\//g, '_') || '_root';
+}
+
+function sourceIndexPagePrefixForPackage(sourcePackage = {}) {
+  const explicit = cleanText(
+    sourcePackage.index_page_prefix
+    || sourcePackage.indexPagePrefix
+    || sourcePackage.index_pages?.prefix
+    || sourcePackage.indexPages?.prefix
+    || '',
+    MAX_PATH * 2
+  ).replace(/^\/+/, '');
+  if (explicit) return explicit;
+  const prefix = cleanText(sourcePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  return prefix ? `${prefix}/.skyenet/source-index-pages` : '';
+}
+
+function sourceIndexPageKey(sourcePackage = {}, page = 0) {
+  const prefix = sourceIndexPagePrefixForPackage(sourcePackage);
+  return prefix ? `${prefix}/page-${String(Math.max(0, Number(page) || 0)).padStart(6, '0')}.json` : '';
+}
+
+function sourceTreeIndexPrefixForPackage(sourcePackage = {}) {
+  const explicit = cleanText(
+    sourcePackage.tree_index_prefix
+    || sourcePackage.treeIndexPrefix
+    || sourcePackage.tree_index?.prefix
+    || sourcePackage.treeIndex?.prefix
+    || '',
+    MAX_PATH * 2
+  ).replace(/^\/+/, '');
+  if (explicit) return explicit;
+  const prefix = cleanText(sourcePackage.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  return prefix ? `${prefix}/.skyenet/source-tree-index` : '';
+}
+
+function sourceTreeIndexSegment(rawPrefix = '') {
+  return base64UrlEncodeText(cleanText(rawPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, ''));
+}
+
+function sourceTreeMetaKey(sourcePackage = {}, rawPrefix = '') {
+  const prefix = sourceTreeIndexPrefixForPackage(sourcePackage);
+  return prefix ? `${prefix}/${sourceTreeIndexSegment(rawPrefix)}/meta.json` : '';
+}
+
+function sourceTreePageKey(sourcePackage = {}, rawPrefix = '', page = 0) {
+  const prefix = sourceTreeIndexPrefixForPackage(sourcePackage);
+  return prefix ? `${prefix}/${sourceTreeIndexSegment(rawPrefix)}/page-${String(Math.max(0, Number(page) || 0)).padStart(6, '0')}.json` : '';
 }
 
 function sourcePackageHasFiles(sourcePackage = {}) {
@@ -476,6 +588,194 @@ function sourceIndexSummaryFromText(text = '') {
   };
 }
 
+async function putJsonObject(bucket, key, value) {
+  await bucket.put(key, JSON.stringify(value, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' }
+  });
+}
+
+function ensureTreeBucket(tree, prefix = '') {
+  const key = cleanText(prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  let bucket = tree.get(key);
+  if (!bucket) {
+    bucket = { directories: new Map(), files: new Map() };
+    tree.set(key, bucket);
+  }
+  return bucket;
+}
+
+function addSourceRecordToTreeIndex(tree, record) {
+  const sourcePath = sourcePathFromRecord(record);
+  const file = sourceFileRecord(record);
+  const parts = sourcePath.split('/').filter(Boolean);
+  for (let index = 0; index < parts.length; index += 1) {
+    const parent = parts.slice(0, index).join('/');
+    const name = parts[index];
+    const fullPath = parts.slice(0, index + 1).join('/');
+    const bucket = ensureTreeBucket(tree, parent);
+    if (index < parts.length - 1) {
+      bucket.directories.set(fullPath, { type: 'directory', name, path: fullPath });
+    } else {
+      bucket.files.set(fullPath, {
+        type: 'file',
+        name,
+        path: fullPath,
+        size: file?.size || 0,
+        sha256: file?.sha256 || '',
+        content_type: file?.content_type || contentTypeForPath(fullPath)
+      });
+    }
+  }
+}
+
+async function materializeSourceIndexArtifacts(bucket, sourcePackage, text = '', context = {}) {
+  const now = new Date().toISOString();
+  const seen = new Set();
+  const inlineFiles = [];
+  const sampleFiles = [];
+  const tree = new Map();
+  let treeMaterialized = true;
+  let pageFiles = [];
+  let pageIndex = 0;
+  let fileCount = 0;
+  let duplicateCount = 0;
+  let totalBytes = 0;
+  let lineNumber = 0;
+
+  const indexPagePrefix = sourceIndexPagePrefixForPackage(sourcePackage);
+  const treeIndexPrefix = sourceTreeIndexPrefixForPackage(sourcePackage);
+  const flushIndexPage = async () => {
+    if (!pageFiles.length) return;
+    await putJsonObject(bucket, sourceIndexPageKey(sourcePackage, pageIndex), {
+      schema: 'fs27.skynet.source_index_page.v1',
+      page: pageIndex,
+      page_size: SOURCE_INDEX_PAGE_SIZE,
+      count: pageFiles.length,
+      files: sourceRecordListForResponse(pageFiles)
+    });
+    pageIndex += 1;
+    pageFiles = [];
+  };
+
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    lineNumber += 1;
+    const line = raw.trim();
+    if (!line) continue;
+    let value = line;
+    if (line.startsWith('{') || line.startsWith('"')) {
+      try {
+        value = JSON.parse(line);
+      } catch {
+        const error = new Error(`Invalid source index JSONL at line ${lineNumber}`);
+        error.status = 400;
+        error.code = 'BAD_SOURCE_INDEX_LINE';
+        throw error;
+      }
+    }
+    const record = sourceFileRecord(value);
+    if (!record?.path) continue;
+    if (seen.has(record.path)) {
+      duplicateCount += 1;
+      continue;
+    }
+    seen.add(record.path);
+    fileCount += 1;
+    if (fileCount > MAX_SOURCE_INDEX_FILES) {
+      const error = new Error(`SkyeNet private source index has more than ${MAX_SOURCE_INDEX_FILES} files.`);
+      error.status = 413;
+      error.code = 'SOURCE_INDEX_FILE_LIMIT';
+      throw error;
+    }
+    totalBytes += Number(record.size || 0);
+    if (inlineFiles.length < MAX_SOURCE_PACKAGE_FILES) inlineFiles.push(record);
+    if (sampleFiles.length < 1000) sampleFiles.push(record);
+    pageFiles.push(record);
+    if (treeMaterialized && fileCount <= SOURCE_TREE_MATERIALIZE_FILE_LIMIT) {
+      addSourceRecordToTreeIndex(tree, record);
+    } else if (treeMaterialized) {
+      treeMaterialized = false;
+      tree.clear();
+    }
+    if (pageFiles.length >= SOURCE_INDEX_PAGE_SIZE) await flushIndexPage();
+  }
+  await flushIndexPage();
+
+  const indexPages = {
+    schema: 'fs27.skynet.source_index_pages.v1',
+    prefix: indexPagePrefix,
+    page_size: SOURCE_INDEX_PAGE_SIZE,
+    page_count: pageIndex,
+    file_count: fileCount,
+    duplicate_count: duplicateCount,
+    total_bytes: totalBytes,
+    generated_at: now
+  };
+  if (indexPagePrefix) await putJsonObject(bucket, `${indexPagePrefix}/meta.json`, indexPages);
+
+  let treePrefixCount = 0;
+  let treePageCount = 0;
+  if (treeMaterialized) {
+    for (const [rawPrefix, groups] of tree.entries()) {
+      const entries = [
+        ...[...groups.directories.values()].sort((a, b) => a.path.localeCompare(b.path)),
+        ...[...groups.files.values()].sort((a, b) => a.path.localeCompare(b.path))
+      ];
+      const pageCount = Math.max(1, Math.ceil(entries.length / SOURCE_INDEX_PAGE_SIZE));
+      const meta = {
+        schema: 'fs27.skynet.source_tree_meta.v1',
+        prefix: rawPrefix,
+        entry_count: entries.length,
+        page_size: SOURCE_INDEX_PAGE_SIZE,
+        page_count: pageCount,
+        generated_at: now
+      };
+      await putJsonObject(bucket, sourceTreeMetaKey(sourcePackage, rawPrefix), meta);
+      for (let page = 0; page < pageCount; page += 1) {
+        const pageEntries = entries.slice(page * SOURCE_INDEX_PAGE_SIZE, (page + 1) * SOURCE_INDEX_PAGE_SIZE);
+        await putJsonObject(bucket, sourceTreePageKey(sourcePackage, rawPrefix, page), {
+          schema: 'fs27.skynet.source_tree_page.v1',
+          prefix: rawPrefix,
+          page,
+          page_size: SOURCE_INDEX_PAGE_SIZE,
+          count: pageEntries.length,
+          entries: pageEntries
+        });
+        treePageCount += 1;
+      }
+      treePrefixCount += 1;
+    }
+  }
+  const treeIndex = {
+    schema: 'fs27.skynet.source_tree_index.v1',
+    prefix: treeIndexPrefix,
+    mode: treeMaterialized ? 'materialized-prefix-pages' : 'on-demand-from-paged-source-index',
+    page_size: SOURCE_INDEX_PAGE_SIZE,
+    prefix_count: treePrefixCount,
+    page_count: treePageCount,
+    materialized_file_limit: SOURCE_TREE_MATERIALIZE_FILE_LIMIT,
+    generated_at: now
+  };
+  if (treeIndexPrefix) await putJsonObject(bucket, `${treeIndexPrefix}/meta.json`, treeIndex);
+
+  return {
+    file_count: fileCount,
+    duplicate_count: duplicateCount,
+    total_bytes: totalBytes,
+    files: inlineFiles,
+    sample_files: sampleFiles,
+    files_truncated: fileCount > inlineFiles.length,
+    index_pages: indexPages,
+    tree_index: treeIndex,
+    materialized: {
+      index_page_count: pageIndex,
+      tree_prefix_count: treePrefixCount,
+      tree_page_count: treePageCount,
+      generated_at: now,
+      ...context
+    }
+  };
+}
+
 function sourceTextFileLikely(pathname = '', contentType = '') {
   const type = String(contentType || '').toLowerCase();
   const path = String(pathname || '').toLowerCase();
@@ -486,6 +786,8 @@ function sourceTextFileLikely(pathname = '', contentType = '') {
 
 function sourcePackageSummary(sourcePackage = null) {
   if (!sourcePackage) return null;
+  const indexPages = sourcePackage.index_pages || sourcePackage.indexPages || null;
+  const treeIndex = sourcePackage.tree_index || sourcePackage.treeIndex || null;
   return {
     mode: sourcePackage.mode || 'private-full-project',
     prefix: sourcePackage.prefix || '',
@@ -495,6 +797,18 @@ function sourcePackageSummary(sourcePackage = null) {
     manifest_key: sourcePackage.manifest_key || sourceManifestKeyForPackage(sourcePackage),
     index_key: sourcePackage.index_key || sourceIndexKeyForPackage(sourcePackage),
     index_file_count: Number(sourcePackage.index_file_count || sourcePackage.file_count || 0),
+    index_pages: indexPages ? {
+      prefix: indexPages.prefix || sourceIndexPagePrefixForPackage(sourcePackage),
+      page_size: Number(indexPages.page_size || SOURCE_INDEX_PAGE_SIZE),
+      page_count: Number(indexPages.page_count || 0),
+      file_count: Number(indexPages.file_count || sourcePackage.file_count || 0)
+    } : null,
+    tree_index: treeIndex ? {
+      prefix: treeIndex.prefix || sourceTreeIndexPrefixForPackage(sourcePackage),
+      page_size: Number(treeIndex.page_size || SOURCE_INDEX_PAGE_SIZE),
+      prefix_count: Number(treeIndex.prefix_count || 0),
+      page_count: Number(treeIndex.page_count || 0)
+    } : null,
     files_inline: Array.isArray(sourcePackage.files) ? sourcePackage.files.length : 0,
     files_truncated: Boolean(sourcePackage.files_truncated),
     archive: sourcePackage.archive ? {
@@ -798,6 +1112,55 @@ function normalizeAssetPath(value) {
   return normalized;
 }
 
+async function deploymentObjectMetadata(bucket, key) {
+  if (bucket?.head) return bucket.head(key).catch(() => null);
+  if (bucket?.get) return bucket.get(key).catch(() => null);
+  return null;
+}
+
+async function auditDeploymentFiles(bucket, prefix, files, options = {}) {
+  const concurrency = Math.max(1, Math.min(32, Number(options.concurrency || 16)));
+  const maxMissing = Math.max(1, Math.min(250, Number(options.max_missing || options.maxMissing || 50)));
+  let index = 0;
+  let totalBytes = 0;
+  const missing = [];
+  const checked = [];
+  async function worker() {
+    while (index < files.length && missing.length < maxMissing) {
+      const file = files[index];
+      index += 1;
+      const key = `${prefix}/${file}`.replace(/\/+/g, '/');
+      const object = await deploymentObjectMetadata(bucket, key);
+      if (!object) {
+        missing.push(file);
+        continue;
+      }
+      checked.push(file);
+      const size = Number(object.size || 0);
+      if (Number.isFinite(size) && size > 0) totalBytes += size;
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, Math.max(files.length, 1)) }, () => worker()));
+  return {
+    ok: missing.length === 0,
+    checked_count: checked.length,
+    missing_count: missing.length,
+    missing_files: missing,
+    total_bytes: totalBytes
+  };
+}
+
+async function auditSourcePackageFiles(bucket, prefix, records, options = {}) {
+  const files = dedupeSourceFiles(records);
+  const paths = files.map((file) => file.path);
+  const audit = await auditDeploymentFiles(bucket, prefix, paths, options);
+  return {
+    ...audit,
+    file_count: files.length,
+    storage_verified: audit.ok && audit.checked_count === files.length
+  };
+}
+
 function normalizeSourcePath(value) {
   const raw = cleanText(value || '', MAX_PATH).replace(/\\/g, '/').replace(/^\/+/, '');
   const parts = raw.split('/').filter(Boolean);
@@ -813,17 +1176,9 @@ function normalizeSourcePath(value) {
     error.code = 'BAD_SOURCE_PATH';
     throw error;
   }
-  const normalized = parts.join('/');
-  if (/(^|\/)(\.git|\.wrangler)(\/|$)/i.test(normalized)
-    || /(^|\/)\.env(\.|$|\/)/i.test(normalized)
-    || /(^|\/)(id_rsa|id_dsa|id_ecdsa|id_ed25519|\.npmrc|\.pypirc|\.netrc)(\/|$)/i.test(normalized)
-    || /\.(pem|key|p12|pfx|crt|sqlite|sqlite3|db)$/i.test(normalized)) {
-    const error = new Error('Refusing to upload sensitive or generated source path');
-    error.status = 400;
-    error.code = 'PRIVATE_SOURCE_PATH_BLOCKED';
-    throw error;
-  }
-  return normalized;
+  // Private source custody is owner-gated and must preserve the original package path list.
+  // Public deployment assets still use normalizeAssetPath, which keeps public uploads strict.
+  return parts.join('/');
 }
 
 function contentTypeForPath(pathname, fallback = '') {
@@ -964,14 +1319,95 @@ function sourceArchiveError(status, code, message, extra = {}) {
   return error;
 }
 
+function sourceArchiveByteLength(archive = {}) {
+  return Number(archive.byte_length ?? archive.bytes?.byteLength ?? archive.bytes ?? archive.size ?? 0) || 0;
+}
+
+function sourceArchivePayloadForStorage(archive = {}) {
+  return archive.body || archive.stream || archive.bytes || new Uint8Array();
+}
+
 async function buildSourceArchiveBytes(env, principal, workspaceId, projectId, deploymentId, deployment) {
   const bucket = deploymentBucket(env);
   if (!bucket?.get) throw sourceArchiveError(500, 'NO_DEPLOYMENT_BUCKET_READ', 'DEPLOYMENT_ASSET_BUCKET read is not configured');
   const source = await sourceFilesForDeployment(env, deployment);
   const privatePackage = source.source_package;
+  const totalRecordedFiles = source.file_count || source.files.length;
+  const storedArchive = sourceArchiveForPackage(privatePackage || {});
+  if (storedArchive?.downloadable && totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
+    const archiveBucket = sourceTransferBucket(env) || deploymentBucket(env);
+    if (!archiveBucket?.get) throw sourceArchiveError(500, 'NO_SOURCE_ARCHIVE_BUCKET_READ', 'SkyeNet source archive bucket read is not configured');
+    const object = await archiveBucket.get(storedArchive.key).catch(() => null);
+    if (!object) {
+      throw sourceArchiveError(409, 'SOURCE_ARCHIVE_MISSING', 'Stored source archive was not found in SkyeNet private storage.', {
+        key: storedArchive.key
+      });
+    }
+    const byteLength = Number(storedArchive.bytes || object.size || 0);
+    const canStream = object.body && typeof object.body.getReader === 'function';
+    const bytes = byteLength <= MAX_SOURCE_TRANSFER_ARCHIVE_BYTES || !canStream
+      ? await readObjectBytes(object)
+      : null;
+    if (!bytes && !canStream) {
+      throw sourceArchiveError(
+        413,
+        'SOURCE_TRANSFER_ARCHIVE_LIMIT',
+        `Deployment source archive is larger than the synchronous SkyeNet transfer limit of ${bytesLabel(MAX_SOURCE_TRANSFER_ARCHIVE_BYTES)} and cannot be streamed from storage.`,
+        { bytes: byteLength, limit: MAX_SOURCE_TRANSFER_ARCHIVE_BYTES }
+      );
+    }
+    return {
+      bytes,
+      body: bytes || object.body,
+      byte_length: byteLength || bytes?.byteLength || 0,
+      sha256: storedArchive.sha256 || (bytes ? await sha256Hex(bytes) : ''),
+      manifest: {
+        schema: 'fs27.skynet.source_download_manifest.v1',
+        generated_at: new Date().toISOString(),
+        account: {
+          customer_id: principal.customer_id,
+          workspace_id: workspaceId,
+          email: principal.email || '',
+          role: principal.role || ''
+        },
+        deployment: {
+          project_id: projectId,
+          deployment_id: deploymentId,
+          status: deployment.status || '',
+          live_url: deployment.live_url || '',
+          route_key: deployment.route_key || '',
+          asset_prefix: source.prefix || '',
+          source_mode: 'private-full-project',
+          source_package: {
+            mode: privatePackage?.mode || 'private-full-project',
+            file_count: totalRecordedFiles,
+            total_bytes: privatePackage?.total_bytes || 0,
+            public_asset_exposure: false,
+            completed_at: privatePackage?.completed_at || ''
+          },
+          file_count: totalRecordedFiles,
+          total_bytes: privatePackage?.total_bytes || 0
+        },
+        files: [],
+        stored_archive: {
+          key: storedArchive.key,
+          filename: storedArchive.filename,
+          bytes: byteLength,
+          sha256: storedArchive.sha256,
+          content_type: storedArchive.content_type
+        }
+      },
+      files: [],
+      file_count: totalRecordedFiles,
+      total_bytes: privatePackage?.total_bytes || 0,
+      download_name: storedArchive.filename || `${safeDownloadName(projectId, deploymentId, 'source-archive')}.tar`,
+      content_type: storedArchive.content_type || 'application/octet-stream',
+      source_mode: 'private-full-project',
+      stored_archive_reused: true
+    };
+  }
   const files = source.files.map((file) => sourcePathFromRecord(file)).slice(0, MAX_SOURCE_DOWNLOAD_FILES);
   if (!files.length) throw sourceArchiveError(409, 'DEPLOYMENT_SOURCE_EMPTY', 'Deployment has no recorded files to transfer');
-  const totalRecordedFiles = source.file_count || source.files.length;
   if (totalRecordedFiles > MAX_SOURCE_DOWNLOAD_FILES) {
     throw sourceArchiveError(
       413,
@@ -1077,6 +1513,14 @@ async function buildSourceArchiveBytes(env, principal, workspaceId, projectId, d
 }
 
 async function buildSecureSkyePack(archive, context) {
+  if (!archive?.bytes?.byteLength) {
+    throw sourceArchiveError(
+      413,
+      'SECURE_SKYE_PACK_STREAMING_LIMIT',
+      'Secure .skye pack encryption currently requires an in-memory source archive; use skyedrive/skyevault stored archive transfer for oversized packages.',
+      { bytes: sourceArchiveByteLength(archive), limit: MAX_SOURCE_TRANSFER_ARCHIVE_BYTES }
+    );
+  }
   const iv = randomBytes(12);
   const rawKey = randomBytes(32);
   const imported = await globalThis.crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
@@ -1151,6 +1595,7 @@ async function storeSourceTransferArtifact(env, method, archive, context) {
   if (!bucket?.put) {
     throw sourceArchiveError(500, 'NO_SOURCE_TRANSFER_BUCKET', 'SkyeNet source transfer storage is not configured.');
   }
+  const archiveBytes = sourceArchiveByteLength(archive);
   const prefix = sourceTransferStoragePrefix(
     method,
     context.principal,
@@ -1201,7 +1646,7 @@ async function storeSourceTransferArtifact(env, method, archive, context) {
       sha256: pack.pack_sha256,
       encrypted_payload_sha256: pack.encrypted_sha256,
       source_archive_sha256: archive.sha256,
-      source_archive_bytes: archive.bytes.byteLength,
+      source_archive_bytes: archiveBytes,
       created_at: new Date().toISOString(),
       plaintext_source_exposed_to_storage: false
     };
@@ -1228,21 +1673,26 @@ async function storeSourceTransferArtifact(env, method, archive, context) {
       content_type: manifest.content_type,
       bytes: pack.bytes.byteLength,
       sha256: pack.pack_sha256,
-      source_archive_bytes: archive.bytes.byteLength,
+      source_archive_bytes: archiveBytes,
       source_archive_sha256: archive.sha256,
       plaintext_source_exposed_to_storage: false
     };
   }
 
-  const filename = `${safeDownloadName(context.project_id, context.deployment_id, method, 'source')}.tar`;
+  const filename = normalizeArchiveFilename(
+    archive.download_name || `${safeDownloadName(context.project_id, context.deployment_id, method, 'source')}.tar`,
+    context.project_id,
+    context.deployment_id
+  );
   const objectKey = `${prefix}/${filename}`;
   const manifestKey = `${prefix}/manifest.json`;
-  await bucket.put(objectKey, archive.bytes, {
-    httpMetadata: { contentType: 'application/x-tar' },
+  await bucket.put(objectKey, sourceArchivePayloadForStorage(archive), {
+    httpMetadata: { contentType: archive.content_type || 'application/x-tar' },
     customMetadata: {
       ...baseMetadata,
       content_kind: 'source-archive',
-      sha256: archive.sha256
+      sha256: archive.sha256,
+      stored_archive_reused: archive.stored_archive_reused ? 'true' : 'false'
     }
   });
   const manifest = {
@@ -1253,12 +1703,13 @@ async function storeSourceTransferArtifact(env, method, archive, context) {
     bucket_binding: bucketBinding,
     object_key: objectKey,
     filename,
-    content_type: 'application/x-tar',
-    bytes: archive.bytes.byteLength,
+    content_type: archive.content_type || 'application/x-tar',
+    bytes: archiveBytes,
     sha256: archive.sha256,
-    source_archive_bytes: archive.bytes.byteLength,
+    source_archive_bytes: archiveBytes,
     source_archive_sha256: archive.sha256,
     source_mode: archive.source_mode,
+    stored_archive_reused: Boolean(archive.stored_archive_reused),
     created_at: new Date().toISOString()
   };
   await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
@@ -1272,20 +1723,22 @@ async function storeSourceTransferArtifact(env, method, archive, context) {
     key: objectKey,
     manifest_key: manifestKey,
     filename,
-    content_type: 'application/x-tar',
-    bytes: archive.bytes.byteLength,
+    content_type: archive.content_type || 'application/x-tar',
+    bytes: archiveBytes,
     sha256: archive.sha256,
-    source_archive_bytes: archive.bytes.byteLength,
+    source_archive_bytes: archiveBytes,
     source_archive_sha256: archive.sha256,
+    stored_archive_reused: Boolean(archive.stored_archive_reused),
     plaintext_source_exposed_to_storage: true,
     storage_privacy: 'private-gated-transfer-bucket'
   };
 }
 
 function assetPrefix(projectId, deploymentId, explicit = '') {
+  const canonical = `deployments/${projectId}/${deploymentId}`;
   const cleanExplicit = cleanText(explicit, MAX_PATH).replace(/^\/+/, '').replace(/\/+$/, '');
-  if (cleanExplicit) return cleanExplicit;
-  return `deployments/${projectId}/${deploymentId}`;
+  if (cleanExplicit && (cleanExplicit === canonical || cleanExplicit.startsWith(`${canonical}/`))) return cleanExplicit;
+  return canonical;
 }
 
 async function readJson(request) {
@@ -1338,12 +1791,280 @@ async function sourcePackageIndexFiles(env, sourcePackage = {}) {
   return files.filter(Boolean);
 }
 
+async function sourcePackageIndexPagesMeta(env, sourcePackage = {}) {
+  const explicit = sourcePackage.index_pages || sourcePackage.indexPages || null;
+  if (explicit?.page_count) {
+    return {
+      prefix: explicit.prefix || sourceIndexPagePrefixForPackage(sourcePackage),
+      page_size: Number(explicit.page_size || SOURCE_INDEX_PAGE_SIZE),
+      page_count: Number(explicit.page_count || 0),
+      file_count: Number(explicit.file_count || sourcePackage.file_count || 0),
+      generated_at: explicit.generated_at || ''
+    };
+  }
+  const bucket = deploymentBucket(env);
+  const prefix = sourceIndexPagePrefixForPackage(sourcePackage);
+  if (!bucket?.get || !prefix) return null;
+  const meta = await objectJson(await bucket.get(`${prefix}/meta.json`).catch(() => null), null);
+  if (!meta?.page_count) return null;
+  return {
+    prefix,
+    page_size: Number(meta.page_size || SOURCE_INDEX_PAGE_SIZE),
+    page_count: Number(meta.page_count || 0),
+    file_count: Number(meta.file_count || sourcePackage.file_count || 0),
+    generated_at: meta.generated_at || ''
+  };
+}
+
+async function sourcePackageIndexPageFiles(env, sourcePackage = {}, page = 0) {
+  const bucket = deploymentBucket(env);
+  const key = sourceIndexPageKey(sourcePackage, page);
+  if (!bucket?.get || !key) return [];
+  const body = await objectJson(await bucket.get(key).catch(() => null), null);
+  return Array.isArray(body?.files) ? dedupeSourceFiles(body.files) : [];
+}
+
+async function sourcePackageIndexSlice(env, sourcePackage = {}, options = {}) {
+  const meta = await sourcePackageIndexPagesMeta(env, sourcePackage);
+  if (!meta?.page_count) return null;
+  const pageSize = Math.max(1, Number(meta.page_size || SOURCE_INDEX_PAGE_SIZE));
+  const offset = Math.max(0, Number(options.offset || 0));
+  const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(options.limit || 1000)));
+  const prefixFilter = cleanText(options.prefix || options.prefixFilter || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  const files = [];
+  let scannedPages = 0;
+  if (!prefixFilter) {
+    let page = Math.floor(offset / pageSize);
+    let pageOffset = offset % pageSize;
+    while (page < meta.page_count && files.length < limit) {
+      const pageFiles = await sourcePackageIndexPageFiles(env, sourcePackage, page);
+      scannedPages += 1;
+      for (const record of pageFiles.slice(pageOffset)) {
+        files.push(record);
+        if (files.length >= limit) break;
+      }
+      page += 1;
+      pageOffset = 0;
+    }
+    const nextOffset = offset + files.length;
+    return {
+      ok: true,
+      index_paged: true,
+      files,
+      file_count: Number(sourcePackage.file_count || meta.file_count || 0),
+      listed_count: Number(meta.file_count || sourcePackage.file_count || 0),
+      next_cursor: nextOffset < Number(meta.file_count || 0) ? String(nextOffset) : null,
+      scanned_pages: scannedPages,
+      page_size: pageSize,
+      page_count: Number(meta.page_count || 0)
+    };
+  }
+
+  let matched = 0;
+  for (let page = 0; page < meta.page_count; page += 1) {
+    const pageFiles = await sourcePackageIndexPageFiles(env, sourcePackage, page);
+    scannedPages += 1;
+    for (const record of pageFiles) {
+      const sourcePath = sourcePathFromRecord(record);
+      if (!sourcePath.startsWith(prefixFilter)) continue;
+      if (matched >= offset && files.length < limit) files.push(record);
+      matched += 1;
+    }
+  }
+  const nextOffset = offset + files.length;
+  return {
+    ok: true,
+    index_paged: true,
+    files,
+    file_count: Number(sourcePackage.file_count || meta.file_count || 0),
+    listed_count: matched,
+    next_cursor: nextOffset < matched ? String(nextOffset) : null,
+    scanned_pages: scannedPages,
+    page_size: pageSize,
+    page_count: Number(meta.page_count || 0)
+  };
+}
+
+async function sourcePackageTreeSlice(env, sourcePackage = {}, rawPrefix = '', options = {}) {
+  const bucket = deploymentBucket(env);
+  const prefix = cleanText(rawPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  const metaKey = sourceTreeMetaKey(sourcePackage, prefix);
+  if (!bucket?.get || !metaKey) return null;
+  const meta = await objectJson(await bucket.get(metaKey).catch(() => null), null);
+  if (!meta || !Number.isFinite(Number(meta.entry_count))) return null;
+  const pageSize = Math.max(1, Number(meta.page_size || SOURCE_INDEX_PAGE_SIZE));
+  const pageCount = Math.max(0, Number(meta.page_count || 0));
+  const offset = Math.max(0, Number(options.offset || 0));
+  const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(options.limit || 1000)));
+  const entries = [];
+  let page = Math.floor(offset / pageSize);
+  let pageOffset = offset % pageSize;
+  let scannedPages = 0;
+  while (page < pageCount && entries.length < limit) {
+    const body = await objectJson(await bucket.get(sourceTreePageKey(sourcePackage, prefix, page)).catch(() => null), null);
+    const pageEntries = Array.isArray(body?.entries) ? body.entries : [];
+    scannedPages += 1;
+    for (const entry of pageEntries.slice(pageOffset)) {
+      entries.push(entry);
+      if (entries.length >= limit) break;
+    }
+    page += 1;
+    pageOffset = 0;
+  }
+  const nextOffset = offset + entries.length;
+  return {
+    ok: true,
+    tree_paged: true,
+    entries,
+    entry_count: Number(meta.entry_count || 0),
+    next_cursor: nextOffset < Number(meta.entry_count || 0) ? String(nextOffset) : null,
+    scanned_pages: scannedPages,
+    page_size: pageSize,
+    page_count: pageCount
+  };
+}
+
+async function sourcePackageTreeSliceFromIndex(env, sourcePackage = {}, rawPrefix = '', options = {}) {
+  const meta = await sourcePackageIndexPagesMeta(env, sourcePackage);
+  if (!meta?.page_count) return null;
+  const prefix = cleanText(rawPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  const offset = Math.max(0, Number(options.offset || 0));
+  const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(options.limit || 1000)));
+  const directories = new Map();
+  const files = new Map();
+  let scannedPages = 0;
+  for (let page = 0; page < meta.page_count; page += 1) {
+    const pageFiles = await sourcePackageIndexPageFiles(env, sourcePackage, page);
+    scannedPages += 1;
+    for (const record of pageFiles) {
+      const sourcePath = sourcePathFromRecord(record);
+      if (prefix && sourcePath !== prefix && !sourcePath.startsWith(`${prefix}/`)) continue;
+      const relative = prefix ? sourcePath.slice(prefix.length).replace(/^\/+/, '') : sourcePath;
+      if (!relative) continue;
+      const [head, ...rest] = relative.split('/');
+      const fullPath = prefix ? `${prefix}/${head}` : head;
+      if (rest.length) {
+        directories.set(fullPath, { type: 'directory', name: head, path: fullPath });
+      } else {
+        const file = sourceFileRecord(record);
+        files.set(fullPath, {
+          type: 'file',
+          name: head,
+          path: fullPath,
+          size: file?.size || 0,
+          sha256: file?.sha256 || '',
+          content_type: file?.content_type || contentTypeForPath(fullPath)
+        });
+      }
+    }
+  }
+  const entries = [
+    ...[...directories.values()].sort((a, b) => a.path.localeCompare(b.path)),
+    ...[...files.values()].sort((a, b) => a.path.localeCompare(b.path))
+  ];
+  const page = entries.slice(offset, offset + limit);
+  const nextOffset = offset + page.length;
+  return {
+    ok: true,
+    tree_paged: true,
+    tree_on_demand: true,
+    entries: page,
+    entry_count: entries.length,
+    next_cursor: nextOffset < entries.length ? String(nextOffset) : null,
+    scanned_pages: 0,
+    scanned_index_pages: scannedPages,
+    page_size: Number(meta.page_size || SOURCE_INDEX_PAGE_SIZE),
+    page_count: Number(meta.page_count || 0)
+  };
+}
+
+async function sourcePathRecordedInPagedIndex(env, sourcePackage = {}, sourcePath = '') {
+  const target = normalizeSourcePath(sourcePath);
+  const meta = await sourcePackageIndexPagesMeta(env, sourcePackage);
+  if (!meta?.page_count) return null;
+  for (let page = 0; page < meta.page_count; page += 1) {
+    const pageFiles = await sourcePackageIndexPageFiles(env, sourcePackage, page);
+    if (pageFiles.some((file) => sourcePathFromRecord(file) === target)) return true;
+  }
+  return false;
+}
+
+async function searchPagedSourceIndex(env, context, options = {}) {
+  const sourcePackage = context.source.source_package;
+  const meta = await sourcePackageIndexPagesMeta(env, sourcePackage);
+  if (!meta?.page_count) return null;
+  const query = cleanText(options.query || '', 240).toLowerCase();
+  const prefixFilter = cleanText(options.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
+  const limit = Math.max(1, Math.min(MAX_SOURCE_SEARCH_RESULTS, Number(options.limit || 50)));
+  const contentSearch = Boolean(options.contentSearch);
+  const bucket = deploymentBucket(env);
+  const results = [];
+  let contentScanned = 0;
+  let scannedPages = 0;
+
+  for (let page = 0; page < meta.page_count && results.length < limit; page += 1) {
+    const pageFiles = await sourcePackageIndexPageFiles(env, sourcePackage, page);
+    scannedPages += 1;
+    for (const record of pageFiles) {
+      const sourcePath = sourcePathFromRecord(record);
+      if (prefixFilter && !sourcePath.startsWith(prefixFilter)) continue;
+      const file = sourceFileRecord(record);
+      const contentType = file?.content_type || contentTypeForPath(sourcePath);
+      if (sourcePath.toLowerCase().includes(query)) {
+        results.push({
+          path: sourcePath,
+          match: 'path',
+          size: file?.size || 0,
+          sha256: file?.sha256 || '',
+          content_type: contentType
+        });
+        if (results.length >= limit) break;
+        continue;
+      }
+      if (!contentSearch || !bucket?.get || contentScanned >= MAX_SOURCE_SEARCH_CONTENT_FILES) continue;
+      if (file?.size && Number(file.size) > MAX_SOURCE_SEARCH_CONTENT_BYTES) continue;
+      if (!sourceTextFileLikely(sourcePath, contentType)) continue;
+      contentScanned += 1;
+      const objectKey = `${context.prefix}/${sourcePath}`.replace(/\/+/g, '/');
+      const object = await bucket.get(objectKey).catch(() => null);
+      if (!object) continue;
+      const bytes = await readObjectBytes(object);
+      if (bytes.byteLength > MAX_SOURCE_SEARCH_CONTENT_BYTES) continue;
+      const text = new TextDecoder().decode(bytes);
+      const index = text.toLowerCase().indexOf(query);
+      if (index < 0) continue;
+      const start = Math.max(0, index - 80);
+      const end = Math.min(text.length, index + query.length + 120);
+      results.push({
+        path: sourcePath,
+        match: 'content',
+        size: bytes.byteLength,
+        sha256: file?.sha256 || '',
+        content_type: contentType,
+        snippet: text.slice(start, end).replace(/\s+/g, ' ').trim()
+      });
+      if (results.length >= limit) break;
+    }
+  }
+  return {
+    ok: true,
+    index_paged: true,
+    results,
+    content_scanned: contentScanned,
+    scanned_pages: scannedPages,
+    searched_file_count: Number(sourcePackage.file_count || meta.file_count || 0),
+    page_count: Number(meta.page_count || 0)
+  };
+}
+
 async function sourceFilesForDeployment(env, deployment = {}) {
   const privatePackage = sourcePackageHasFiles(deployment.source_package) ? deployment.source_package : null;
   if (privatePackage) {
     const manifest = await sourcePackageManifest(env, privatePackage);
     const manifestFiles = Array.isArray(manifest?.files) ? dedupeSourceFiles(manifest.files) : [];
-    const indexFiles = manifestFiles.length ? [] : await sourcePackageIndexFiles(env, privatePackage);
+    const pagedMeta = await sourcePackageIndexPagesMeta(env, privatePackage);
+    const hasPagedIndex = Boolean(pagedMeta?.page_count);
+    const indexFiles = manifestFiles.length || hasPagedIndex ? [] : await sourcePackageIndexFiles(env, privatePackage);
     const packageFiles = manifestFiles.length
       ? manifestFiles
       : indexFiles.length
@@ -1351,7 +2072,11 @@ async function sourceFilesForDeployment(env, deployment = {}) {
         : dedupeSourceFiles(privatePackage.files || privatePackage.sample_files || manifest?.sample_files || []);
     return {
       source_mode: 'private-full-project',
-      source_package: privatePackage,
+      source_package: {
+        ...privatePackage,
+        index_pages: privatePackage.index_pages || privatePackage.indexPages || manifest?.index_pages || manifest?.indexPages || pagedMeta || null,
+        tree_index: privatePackage.tree_index || privatePackage.treeIndex || manifest?.tree_index || manifest?.treeIndex || null
+      },
       manifest,
       files: packageFiles,
       file_count: Number(privatePackage.file_count || manifest?.file_count || manifest?.files?.length || packageFiles.length || 0),
@@ -1395,7 +2120,7 @@ async function sourceQueryContext(request, env, cors) {
   const prefix = source.prefix || (source.source_package
     ? cleanText(source.source_package.prefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '')
     : assetPrefix(projectId, deploymentId));
-  return { request, auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
+  return { request, env, auth, principal, params, workspaceId, projectId, deploymentId, deployment, source, prefix, url };
 }
 
 async function sourceArchiveResponse(env, archive, context, cors) {
@@ -2009,8 +2734,6 @@ async function handleSourceUpload(request, env, cors) {
     deployment_id: deploymentId
   })).deployment;
   const priorPackage = priorRecord.source_package || {};
-  const nextBytes = Number(priorPackage.total_bytes || 0) + body.byteLength;
-  await enforceSourcePackageQuota(workspaceResult.workspace, nextBytes, auth, request);
   const sha256 = await sha256Hex(body);
   const key = `${prefix}/${sourcePath}`.replace(/\/+/g, '/');
   const contentType = contentTypeForPath(sourcePath, request.headers.get('content-type') || '');
@@ -2028,11 +2751,22 @@ async function handleSourceUpload(request, env, cors) {
   const priorPaths = new Set(priorFiles.map((file) => {
     try { return sourcePathFromRecord(file); } catch { return ''; }
   }).filter(Boolean));
+  const priorSamplePaths = new Set((Array.isArray(priorPackage.sample_files) ? priorPackage.sample_files : []).map((file) => {
+    try { return sourcePathFromRecord(file); } catch { return ''; }
+  }).filter(Boolean));
+  const sourceAlreadyIndexed = priorPaths.has(sourcePath) || priorSamplePaths.has(sourcePath);
+  const nextBytes = sourceAlreadyIndexed
+    ? Math.max(Number(priorPackage.total_bytes || 0), body.byteLength)
+    : Number(priorPackage.total_bytes || 0) + body.byteLength;
+  await enforceSourcePackageQuota(workspaceResult.workspace, nextBytes, auth, request);
   const sourceFiles = priorPaths.has(sourcePath)
     ? priorFiles.slice(0, MAX_SOURCE_PACKAGE_FILES)
     : [...priorFiles, sourceFileRecord({ path: sourcePath, size: body.byteLength, sha256, content_type: contentType })].slice(0, MAX_SOURCE_PACKAGE_FILES);
+  const nextSampleFiles = sourceAlreadyIndexed && Array.isArray(priorPackage.sample_files) && priorPackage.sample_files.length
+    ? priorPackage.sample_files
+    : sourceFiles.slice(0, Math.min(1000, sourceFiles.length));
   const knownCount = Number(priorPackage.file_count || priorFiles.length || 0);
-  const nextFileCount = priorPaths.has(sourcePath) ? Math.max(knownCount, sourceFiles.length) : Math.max(knownCount + 1, sourceFiles.length);
+  const nextFileCount = sourceAlreadyIndexed ? Math.max(knownCount, sourceFiles.length) : Math.max(knownCount + 1, sourceFiles.length);
   if (nextFileCount > MAX_SOURCE_INDEX_FILES) {
     const error = new Error(`SkyeNet private source index has too many files; max is ${MAX_SOURCE_INDEX_FILES}.`);
     error.status = 413;
@@ -2044,7 +2778,7 @@ async function handleSourceUpload(request, env, cors) {
     mode: 'private-full-project',
     prefix,
     files: sourceFiles,
-    sample_files: sourceFiles.slice(0, Math.min(1000, sourceFiles.length)),
+    sample_files: nextSampleFiles,
     files_truncated: nextFileCount > sourceFiles.length || Boolean(priorPackage.files_truncated),
     file_count: nextFileCount,
     total_bytes: nextBytes,
@@ -2052,6 +2786,8 @@ async function handleSourceUpload(request, env, cors) {
     manifest_key: priorPackage.manifest_key || sourceManifestKeyForPackage({ prefix }),
     index_key: priorPackage.index_key || sourceIndexKeyForPackage({ prefix }),
     index_file_count: Number(priorPackage.index_file_count || 0),
+    index_pages: priorPackage.index_pages || priorPackage.indexPages || null,
+    tree_index: priorPackage.tree_index || priorPackage.treeIndex || null,
     public_asset_exposure: false,
     completed_at: priorPackage.completed_at || null,
     updated_at: new Date().toISOString()
@@ -2156,6 +2892,36 @@ async function handleSourceComplete(request, env, cors) {
   const responseFiles = candidateResponseFiles.length === fileCount ? candidateResponseFiles : [];
   const responseSamples = sourceRecordListForResponse(sampleFiles);
   const filesTruncated = fileCount > responseFiles.length;
+  const verificationCandidates = filesFromBody
+    ? files
+    : (inlineRecords.length === fileCount ? inlineRecords : []);
+  const canVerifySourceObjects = verificationCandidates.length > 0
+    && verificationCandidates.length === fileCount
+    && fileCount <= MAX_SOURCE_PACKAGE_FILES;
+  const sourceAudit = canVerifySourceObjects
+    ? await auditSourcePackageFiles(bucket, prefix, verificationCandidates)
+    : {
+        ok: true,
+        storage_verified: false,
+        checked_count: 0,
+        missing_count: 0,
+        missing_files: [],
+        total_bytes: Number(body.total_bytes ?? body.totalBytes ?? indexSummary?.total_bytes ?? priorPackage.total_bytes ?? 0),
+        skipped_reason: fileCount > MAX_SOURCE_PACKAGE_FILES ? 'source-index-too-large-for-request-time-object-verification' : 'no-complete-inline-file-list'
+      };
+  if (!sourceAudit.ok) {
+    return httpJson(409, {
+      ok: false,
+      error: 'SkyeNet source package complete refused because one or more declared private source files are missing from source custody storage.',
+      code: 'SOURCE_OBJECT_MISSING',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      source_prefix: prefix,
+      checked_count: sourceAudit.checked_count,
+      missing_count: sourceAudit.missing_count,
+      missing_files: sourceAudit.missing_files
+    }, cors);
+  }
   const manifest = {
     schema: 'fs27.skynet.source_package_manifest.v1',
     mode: 'private-full-project',
@@ -2171,8 +2937,17 @@ async function handleSourceComplete(request, env, cors) {
     files_truncated: filesTruncated,
     index_key: indexKey,
     index_file_count: Number(indexSummary?.file_count || fileCount),
+    index_pages: priorPackage.index_pages || priorPackage.indexPages || null,
+    tree_index: priorPackage.tree_index || priorPackage.treeIndex || null,
     archive,
-    meta: body.meta && typeof body.meta === 'object' ? body.meta : {}
+    storage_verified: sourceAudit.storage_verified,
+    storage_checked_count: sourceAudit.checked_count,
+    storage_total_bytes: sourceAudit.total_bytes,
+    meta: {
+      ...(body.meta && typeof body.meta === 'object' ? body.meta : {}),
+      storage_verified: sourceAudit.storage_verified,
+      storage_verification_skipped_reason: sourceAudit.skipped_reason || ''
+    }
   };
   await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
     httpMetadata: { contentType: 'application/json; charset=utf-8' }
@@ -2190,12 +2965,16 @@ async function handleSourceComplete(request, env, cors) {
     sample_files: responseSamples,
     files_truncated: filesTruncated,
     file_count: fileCount,
-    total_bytes: Number(body.total_bytes ?? body.totalBytes ?? indexSummary?.total_bytes ?? priorPackage.total_bytes ?? 0),
+    total_bytes: Number(sourceAudit.total_bytes || (body.total_bytes ?? body.totalBytes ?? indexSummary?.total_bytes ?? priorPackage.total_bytes ?? 0)),
     downloadable: true,
     manifest_key: manifestKey,
     index_key: indexKey,
     index_file_count: Number(indexSummary?.file_count || fileCount),
+    index_pages: priorPackage.index_pages || priorPackage.indexPages || null,
+    tree_index: priorPackage.tree_index || priorPackage.treeIndex || null,
     archive,
+    storage_verified: sourceAudit.storage_verified,
+    storage_checked_count: sourceAudit.checked_count,
     public_asset_exposure: false,
     completed_at: manifest.completed_at,
     updated_at: manifest.completed_at
@@ -2215,6 +2994,7 @@ async function handleSourceComplete(request, env, cors) {
     manifest_key: manifestKey,
     index_key: indexKey,
     files_truncated: sourcePackage.files_truncated,
+    storage_verified: sourcePackage.storage_verified,
     public_asset_exposure: false
   });
   return httpJson(200, {
@@ -2238,7 +3018,7 @@ async function handleComplete(request, env, cors) {
   const deploymentId = normalizeSlug(body.deployment_id || body.deploymentId, 'dep_missing', MAX_DEPLOYMENT);
   const prefix = assetPrefix(projectId, deploymentId, body.asset_prefix || body.assetPrefix || '');
   const files = Array.isArray(body.files)
-    ? body.files.map((item) => normalizeAssetPath(item)).slice(0, 20000)
+    ? Array.from(new Set(body.files.map((item) => normalizeAssetPath(item)))).slice(0, 20000)
     : [];
   const hasRootIndex = files.some((file) => file.toLowerCase() === 'index.html');
   if (!hasRootIndex && body.require_root_index !== false && body.requireRootIndex !== false) {
@@ -2249,6 +3029,28 @@ async function handleComplete(request, env, cors) {
       files
     }, cors);
   }
+  const assetAudit = await auditDeploymentFiles(bucket, prefix, files);
+  if (!assetAudit.ok) {
+    return httpJson(409, {
+      ok: false,
+      error: 'SkyeNet deployment complete refused because one or more declared public files are missing from deployment storage.',
+      code: 'DEPLOYMENT_ASSET_MISSING',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      asset_prefix: prefix,
+      checked_count: assetAudit.checked_count,
+      missing_count: assetAudit.missing_count,
+      missing_files: assetAudit.missing_files
+    }, cors);
+  }
+  await enforceDeploymentQuota(
+    env,
+    workspaceResult.workspace,
+    await deploymentUsage(env, workspaceResult.workspace.customer_id, workspaceResult.workspace.workspace_id, { include_routes: false }),
+    assetAudit.total_bytes,
+    auth,
+    request
+  );
   const manifest = {
     schema: 'fs27.deployment_complete.v1',
     project_id: projectId,
@@ -2259,7 +3061,10 @@ async function handleComplete(request, env, cors) {
     files,
     meta: {
       ...(body.meta && typeof body.meta === 'object' ? body.meta : {}),
-      has_root_index: hasRootIndex
+      has_root_index: hasRootIndex,
+      storage_verified: true,
+      storage_checked_count: assetAudit.checked_count,
+      storage_total_bytes: assetAudit.total_bytes
     }
   };
   await bucket.put(`${prefix}/.fs27/deployment-complete.json`, JSON.stringify(manifest, null, 2), {
@@ -2279,7 +3084,7 @@ async function handleComplete(request, env, cors) {
     asset_prefix: prefix,
     files,
     file_count: files.length,
-    total_bytes: existing.total_bytes || 0,
+    total_bytes: assetAudit.total_bytes || existing.total_bytes || 0,
     status: 'complete',
     completed_at: manifest.completed_at
   });
@@ -2288,9 +3093,10 @@ async function handleComplete(request, env, cors) {
     deployment_id: deploymentId,
     asset_prefix: prefix,
     files: files.length,
-    total_bytes: existing.total_bytes || 0
+    total_bytes: assetAudit.total_bytes || existing.total_bytes || 0,
+    storage_verified: true
   });
-  return httpJson(200, { ok: true, project_id: projectId, deployment_id: deploymentId, workspace_id: workspaceResult.workspace.workspace_id, asset_prefix: prefix, files: files.length, deployment: deployment.deployment, receipt }, cors);
+  return httpJson(200, { ok: true, project_id: projectId, deployment_id: deploymentId, workspace_id: workspaceResult.workspace.workspace_id, asset_prefix: prefix, files: files.length, asset_audit: assetAudit, deployment: deployment.deployment, receipt }, cors);
 }
 
 async function handleRoute(request, env, cors) {
@@ -2300,6 +3106,31 @@ async function handleRoute(request, env, cors) {
   const body = await readJson(request);
   const workspaceResult = await ensureWorkspace(env, auth, request, body);
   const record = routeRecordFromBody(body, auth, env, request);
+  const principal = authPrincipal(auth);
+  const completedDeployment = await kvGetJson(
+    receiptKv(env),
+    deploymentKey(principal.customer_id, workspaceResult.workspace.workspace_id, record.project_id, record.active_deployment_id),
+    null
+  );
+  if (!completedDeployment || completedDeployment.status !== 'complete') {
+    return httpJson(409, {
+      ok: false,
+      error: 'SkyeNet route registration requires a completed, storage-verified deployment.',
+      code: 'DEPLOYMENT_NOT_COMPLETE',
+      project_id: record.project_id,
+      deployment_id: record.active_deployment_id,
+      status: completedDeployment?.status || 'missing'
+    }, cors);
+  }
+  if (completedDeployment.asset_prefix && cleanText(completedDeployment.asset_prefix, MAX_PATH) !== record.asset_prefix) {
+    return httpJson(409, {
+      ok: false,
+      error: 'SkyeNet route registration refused because the requested asset prefix does not match the completed deployment.',
+      code: 'DEPLOYMENT_PREFIX_MISMATCH',
+      project_id: record.project_id,
+      deployment_id: record.active_deployment_id
+    }, cors);
+  }
   const key = routeKeyForRecord(record);
   await enforceRouteQuota(env, workspaceResult.workspace, auth, record, key);
   await kv.put(key, JSON.stringify(record, null, 2), {
@@ -2447,9 +3278,12 @@ async function handleDashboard(request, env, cors) {
     route_source: includeFullRouteScan ? 'route-registry-scan' : 'deployment-records',
     route_scan_skipped: !includeFullRouteScan,
     receipts,
+    support: skynetSupportProfile(env),
     links: {
       console: '/skyenet/index.html',
       api: '/api/skyenet',
+      support: '/api/skyenet/support',
+      export: '/api/skyenet/export',
       skyepay: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=skyenet-edge-starter'
     }
   }, cors);
@@ -2638,7 +3472,9 @@ async function handleStatus(request, env, cors) {
       'GET /deploy/dashboard',
 	      'GET/POST/DELETE /deploy/env',
 	      'PUT /deploy/source-upload',
+	      'PUT /deploy/source-index',
 	      'PUT /deploy/source-archive',
+	      'POST /deploy/source-archive-link',
 	      'POST /deploy/source-complete',
 	      'GET /deploy/source-manifest',
 	      'GET /deploy/source-tree',
@@ -2649,7 +3485,9 @@ async function handleStatus(request, env, cors) {
       'GET /deploy/receipts',
       'POST /deploy/rollback',
       'GET /deploy/observability',
-      'GET /deploy/cost-model'
+      'GET /deploy/cost-model',
+      'GET /deploy/support',
+      'GET /deploy/export'
     ],
     capabilities: {
       static_drop_hosting: true,
@@ -2657,8 +3495,16 @@ async function handleStatus(request, env, cors) {
       host_path_routing: true,
       gated_routes: true,
       public_routes: true,
-      fallback_origin_proxy: true,
-      first_party_worker_functions: true,
+	      fallback_origin_proxy: true,
+	      netlify_redirects_file: true,
+	      netlify_headers_file: true,
+	      netlify_toml_redirects_headers: true,
+	      netlify_spa_rewrite_fallbacks: true,
+	      netlify_forms_basic_capture: true,
+	      static_asset_range_requests: true,
+	      static_asset_conditional_etag: true,
+	      static_asset_conditional_last_modified: true,
+	      first_party_worker_functions: true,
       skynet_edge_primary_release_lane: true,
       skynet_sovereign_runtime_compatible: true,
       netlify_function_bundle_converter: true,
@@ -2672,7 +3518,10 @@ async function handleStatus(request, env, cors) {
       asset_missing_route_diagnostic: true,
       direct_live_link_after_publish: true,
 	      source_downloads: true,
+	      source_index_uploads: true,
 	      source_archive_uploads: true,
+	      source_archive_existing_object_links: true,
+	      source_archive_range_downloads: true,
 	      source_archive_direct_downloads: true,
 	      netlify_style_deploy_file_downloads: true,
 	      private_full_project_source_packages: true,
@@ -2697,6 +3546,17 @@ async function handleStatus(request, env, cors) {
       skrucible_forge_static_surface_pass: true,
       deploy_receipts: true,
       customer_dashboard: true,
+      customer_support_profile: true,
+      customer_export_bundle: true,
+      customer_export_private_source_embedded: false,
+      runtime_observability: true,
+      runtime_log_exports: true,
+      runtime_request_log_bucket_configured: Boolean(requestLogBucket(env)?.put),
+      runtime_analytics_engine_configured: Boolean(env.REQUEST_ANALYTICS?.writeDataPoint || env.FS27_REQUEST_ANALYTICS?.writeDataPoint),
+      runtime_queue_configured: Boolean(env.REQUEST_EVENT_QUEUE?.send || env.FS27_REQUEST_EVENT_QUEUE?.send),
+      runtime_direct_archive_enabled: directRuntimeArchiveConfigured(env),
+      citadeldb_rollups_configured: Boolean(env.RUNTIME_ROLLUP_DB?.prepare || env.FS27_RUNTIME_ROLLUP_DB?.prepare),
+      citadel_runtime_ingest_configured: Boolean(env.CITADEL_RUNTIME_INGEST_URL || env.CITADELDB_RUNTIME_INGEST_URL),
       quota_enforcement: true,
       rollback_route_switch: true,
       owned_skyenet_functions_runtime_v1: true,
@@ -2764,6 +3624,138 @@ async function handleRoutes(request, env, cors) {
   return httpJson(200, { ok: true, prefix, workspace_id: workspaceId, count: routes.length, routes, cursor: listed.cursor || null, list_complete: listed.list_complete !== false }, cors);
 }
 
+async function handleSourceIndexUpload(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const bucket = deploymentBucket(env);
+  if (!bucket?.put) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET is not configured', code: 'NO_DEPLOYMENT_BUCKET' }, cors);
+  const url = new URL(request.url);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const principal = authPrincipal(auth);
+  const workspaceResult = await ensureWorkspace(env, auth, request, params);
+  const workspaceId = workspaceResult.workspace.workspace_id;
+  const projectId = normalizeSlug(params.projectId || params.project_id, 'project', MAX_PROJECT);
+  const deploymentId = normalizeSlug(params.deploymentId || params.deployment_id, 'dep_missing', MAX_DEPLOYMENT);
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, params.sourcePrefix || params.source_prefix || '');
+  const indexKey = `${prefix}/.skyenet/source-index.jsonl`;
+  const manifestKey = `${prefix}/.skyenet/source-package.json`;
+  const text = await request.text();
+  const summary = await materializeSourceIndexArtifacts(bucket, { prefix }, text, {
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId
+  });
+  if (!summary.file_count) {
+    return httpJson(400, {
+      ok: false,
+      error: 'Source index upload requires at least one JSONL source record.',
+      code: 'SOURCE_INDEX_EMPTY'
+    }, cors);
+  }
+  await bucket.put(indexKey, text.endsWith('\n') ? text : `${text}\n`, {
+    httpMetadata: { contentType: 'application/x-ndjson; charset=utf-8' }
+  });
+  const existing = (await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  })).deployment;
+  const priorPackage = existing.source_package || {};
+  const now = new Date().toISOString();
+  const archive = sourceArchiveForPackage(priorPackage);
+  const inlineFiles = summary.file_count <= MAX_SOURCE_PACKAGE_FILES ? sourceRecordListForResponse(summary.files) : [];
+  const sampleFiles = sourceRecordListForResponse(summary.sample_files);
+  const manifest = {
+    schema: 'fs27.skynet.source_package_manifest.v1',
+    mode: 'private-full-project',
+    project_id: projectId,
+    deployment_id: deploymentId,
+    customer_id: principal.customer_id,
+    workspace_id: workspaceId,
+    completed_at: priorPackage.completed_at || null,
+    indexed_at: now,
+    public_asset_exposure: false,
+    file_count: summary.file_count,
+    files: inlineFiles,
+    sample_files: sampleFiles,
+    files_truncated: summary.file_count > inlineFiles.length,
+    duplicate_count: summary.duplicate_count,
+    total_bytes: Number(summary.total_bytes || priorPackage.total_bytes || 0),
+    index_key: indexKey,
+    index_file_count: summary.file_count,
+    index_pages: summary.index_pages,
+    tree_index: summary.tree_index,
+    archive,
+    meta: {
+      index_upload: true,
+      source_index_format: 'jsonl',
+      materialized_index_pages: summary.materialized.index_page_count,
+      materialized_tree_prefixes: summary.materialized.tree_prefix_count,
+      materialized_tree_pages: summary.materialized.tree_page_count
+    }
+  };
+  await bucket.put(manifestKey, JSON.stringify(manifest, null, 2), {
+    httpMetadata: { contentType: 'application/json; charset=utf-8' }
+  });
+  const sourcePackage = {
+    schema: 'fs27.skynet.source_package.v1',
+    mode: 'private-full-project',
+    prefix,
+    files: inlineFiles,
+    sample_files: sampleFiles,
+    files_truncated: summary.file_count > inlineFiles.length,
+    file_count: summary.file_count,
+    total_bytes: Number(summary.total_bytes || priorPackage.total_bytes || 0),
+    downloadable: true,
+    manifest_key: manifestKey,
+    index_key: indexKey,
+    index_file_count: summary.file_count,
+    index_pages: summary.index_pages,
+    tree_index: summary.tree_index,
+    archive,
+    public_asset_exposure: false,
+    completed_at: priorPackage.completed_at || null,
+    updated_at: now
+  };
+  const deployment = await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_package: sourcePackage
+  });
+  const receipt = await saveReceipt(env, auth, workspaceId, 'skynet.source.index.uploaded', {
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_prefix: prefix,
+    index_key: indexKey,
+    manifest_key: manifestKey,
+    files: summary.file_count,
+    duplicate_count: summary.duplicate_count,
+    total_bytes: sourcePackage.total_bytes,
+    public_asset_exposure: false
+  });
+  return httpJson(200, {
+    ok: true,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId,
+    source_index: {
+      key: indexKey,
+      manifest_key: manifestKey,
+      file_count: summary.file_count,
+      duplicate_count: summary.duplicate_count,
+      total_bytes: sourcePackage.total_bytes,
+      index_page_count: summary.materialized.index_page_count,
+      tree_prefix_count: summary.materialized.tree_prefix_count,
+      tree_page_count: summary.materialized.tree_page_count,
+      sample_files: sampleFiles,
+      files_truncated: sourcePackage.files_truncated
+    },
+    source_package: sourcePackage,
+    deployment: deployment.deployment,
+    receipt
+  }, cors);
+}
+
 async function handleSourceArchiveUpload(request, env, cors) {
   const auth = await requireDeployAuth(request, cors);
   const bucket = sourceTransferBucket(env) || deploymentBucket(env);
@@ -2777,11 +3769,28 @@ async function handleSourceArchiveUpload(request, env, cors) {
   const deploymentId = normalizeSlug(params.deploymentId || params.deployment_id, 'dep_missing', MAX_DEPLOYMENT);
   const filename = normalizeArchiveFilename(params.filename || params.name || params.path, projectId, deploymentId);
   const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, params.sourcePrefix || params.source_prefix || '');
-  const body = await request.arrayBuffer();
-  const sha256 = await sha256Hex(body);
+  const declaredBytes = Number(request.headers.get('content-length') || request.headers.get('x-skynet-source-archive-bytes') || 0);
+  const suppliedSha256 = cleanText(
+    request.headers.get('x-skynet-source-archive-sha256')
+    || request.headers.get('x-content-sha256')
+    || '',
+    160
+  ).toLowerCase();
+  let body = null;
+  let bodyForStorage = null;
+  let bytes = Number.isFinite(declaredBytes) && declaredBytes > 0 ? declaredBytes : 0;
+  let sha256 = suppliedSha256;
+  if (request.body && suppliedSha256 && bytes > MAX_SOURCE_ARCHIVE_INLINE_HASH_BYTES) {
+    bodyForStorage = request.body;
+  } else {
+    body = await request.arrayBuffer();
+    bytes = body.byteLength;
+    sha256 = await sha256Hex(body);
+    bodyForStorage = body;
+  }
   const contentType = cleanText(request.headers.get('content-type') || contentTypeForPath(filename), 160) || 'application/octet-stream';
   const key = `${prefix}/.skyenet/archive/${filename}`.replace(/\/+/g, '/');
-  await bucket.put(key, body, {
+  await bucket.put(key, bodyForStorage, {
     httpMetadata: { contentType },
     customMetadata: {
       schema: 'fs27.skynet.source_archive.v1',
@@ -2801,7 +3810,7 @@ async function handleSourceArchiveUpload(request, env, cors) {
   const archive = {
     key,
     filename,
-    bytes: body.byteLength,
+    bytes,
     sha256,
     content_type: contentType,
     bucket_binding: sourceTransferBucketBinding(env),
@@ -2821,6 +3830,8 @@ async function handleSourceArchiveUpload(request, env, cors) {
     manifest_key: priorPackage.manifest_key || sourceManifestKeyForPackage({ prefix }),
     index_key: priorPackage.index_key || sourceIndexKeyForPackage({ prefix }),
     index_file_count: Number(priorPackage.index_file_count || priorPackage.file_count || 0),
+    index_pages: priorPackage.index_pages || priorPackage.indexPages || null,
+    tree_index: priorPackage.tree_index || priorPackage.treeIndex || null,
     archive,
     public_asset_exposure: false,
     completed_at: priorPackage.completed_at || null,
@@ -2837,9 +3848,134 @@ async function handleSourceArchiveUpload(request, env, cors) {
     deployment_id: deploymentId,
     key,
     filename,
-    bytes: body.byteLength,
+    bytes,
     sha256,
     content_type: contentType
+  });
+  return httpJson(200, {
+    ok: true,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    workspace_id: workspaceId,
+    source_archive: archive,
+    source_package: sourcePackage,
+    deployment: deployment.deployment,
+    receipt
+  }, cors);
+}
+
+async function handleSourceArchiveLink(request, env, cors) {
+  const auth = await requireDeployAuth(request, cors);
+  const bucket = sourceTransferBucket(env) || deploymentBucket(env);
+  if (!bucket?.get && !bucket?.head) return httpJson(500, { error: 'SkyeNet source archive bucket is not configured', code: 'NO_SOURCE_ARCHIVE_BUCKET' }, cors);
+  const url = new URL(request.url);
+  const params = Object.fromEntries(url.searchParams.entries());
+  const body = request.method === 'POST' ? await readJson(request) : {};
+  const input = { ...params, ...body };
+  const principal = authPrincipal(auth);
+  const workspaceResult = await ensureWorkspace(env, auth, request, input);
+  const workspaceId = workspaceResult.workspace.workspace_id;
+  const projectId = normalizeSlug(input.projectId || input.project_id, 'project', MAX_PROJECT);
+  const deploymentId = normalizeSlug(input.deploymentId || input.deployment_id, 'dep_missing', MAX_DEPLOYMENT);
+  const filename = normalizeArchiveFilename(input.filename || input.name || input.path, projectId, deploymentId);
+  const prefix = sourcePackagePrefix(principal, workspaceId, projectId, deploymentId, input.sourcePrefix || input.source_prefix || '');
+  const key = cleanText(input.key || input.object_key || input.objectKey || `${prefix}/.skyenet/archive/${filename}`, MAX_PATH * 2).replace(/^\/+/, '');
+  if (!key.startsWith(`${prefix}/`)) {
+    return httpJson(400, {
+      ok: false,
+      error: 'Source archive link key must stay inside this deployment source package prefix.',
+      code: 'SOURCE_ARCHIVE_PREFIX_MISMATCH',
+      expected_prefix: prefix,
+      key
+    }, cors);
+  }
+  const metadata = bucket.head ? await bucket.head(key).catch(() => null) : null;
+  const object = metadata || (bucket.get ? await bucket.get(key).catch(() => null) : null);
+  if (!object) {
+    return httpJson(404, {
+      ok: false,
+      error: 'Source archive object was not found in SkyeNet private storage.',
+      code: 'SOURCE_ARCHIVE_OBJECT_NOT_FOUND',
+      key
+    }, cors);
+  }
+  const declaredBytes = Number(input.bytes || input.size || 0);
+  const bytes = Number(object.size || declaredBytes || 0);
+  if (declaredBytes > 0 && bytes > 0 && declaredBytes !== bytes) {
+    return httpJson(409, {
+      ok: false,
+      error: 'Source archive link byte count does not match the object stored in SkyeNet private storage.',
+      code: 'SOURCE_ARCHIVE_SIZE_MISMATCH',
+      key,
+      declared_bytes: declaredBytes,
+      stored_bytes: bytes
+    }, cors);
+  }
+  const sha256 = cleanText(input.sha256 || input.hash || '', 160).toLowerCase();
+  if (!sha256) {
+    return httpJson(400, {
+      ok: false,
+      error: 'Source archive link requires the known SHA-256 digest from the archive recovery receipt.',
+      code: 'SOURCE_ARCHIVE_SHA_REQUIRED',
+      key
+    }, cors);
+  }
+  const contentType = cleanText(input.content_type || input.contentType || contentTypeForPath(filename), 160) || 'application/octet-stream';
+  const existing = (await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId
+  })).deployment;
+  const priorPackage = existing.source_package || {};
+  const now = new Date().toISOString();
+  const archive = {
+    key,
+    filename,
+    bytes,
+    sha256,
+    content_type: contentType,
+    bucket_binding: sourceTransferBucketBinding(env),
+    downloadable: true,
+    linked_at: now,
+    link_receipt: cleanText(input.link_receipt || input.linkReceipt || input.recovery_receipt || input.recoveryReceipt || '', MAX_PATH * 2),
+    source: cleanText(input.source || input.source_label || input.sourceLabel || 'linked-existing-private-archive', 180)
+  };
+  const sourcePackage = {
+    schema: 'fs27.skynet.source_package.v1',
+    mode: priorPackage.mode || 'private-full-project',
+    prefix: priorPackage.prefix || prefix,
+    files: Array.isArray(priorPackage.files) ? priorPackage.files : [],
+    sample_files: Array.isArray(priorPackage.sample_files) ? priorPackage.sample_files : [],
+    files_truncated: Boolean(priorPackage.files_truncated),
+    file_count: Number(priorPackage.file_count || 0),
+    total_bytes: Number(priorPackage.total_bytes || 0),
+    downloadable: true,
+    manifest_key: priorPackage.manifest_key || sourceManifestKeyForPackage({ prefix }),
+    index_key: priorPackage.index_key || sourceIndexKeyForPackage({ prefix }),
+    index_file_count: Number(priorPackage.index_file_count || priorPackage.file_count || 0),
+    index_pages: priorPackage.index_pages || priorPackage.indexPages || null,
+    tree_index: priorPackage.tree_index || priorPackage.treeIndex || null,
+    archive,
+    public_asset_exposure: false,
+    completed_at: priorPackage.completed_at || null,
+    updated_at: now
+  };
+  const deployment = await upsertDeploymentRecord(env, auth, request, {
+    workspace_id: workspaceId,
+    project_id: projectId,
+    deployment_id: deploymentId,
+    source_package: sourcePackage
+  });
+  const receipt = await saveReceipt(env, auth, workspaceId, 'skynet.source.archive.linked', {
+    project_id: projectId,
+    deployment_id: deploymentId,
+    key,
+    filename,
+    bytes,
+    sha256,
+    content_type: contentType,
+    link_receipt: archive.link_receipt,
+    source: archive.source
   });
   return httpJson(200, {
     ok: true,
@@ -2858,6 +3994,35 @@ async function handleSourceManifest(request, env, cors) {
   const prefixFilter = cleanText(context.params.prefix || context.params.path_prefix || context.params.pathPrefix || '', MAX_PATH).replace(/^\/+|\/+$/g, '');
   const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(context.params.limit || 1000)));
   const offset = Math.max(0, Number(context.params.cursor || context.params.offset || 0));
+  const paged = context.source.source_package
+    ? await sourcePackageIndexSlice(env, context.source.source_package, { offset, limit, prefix: prefixFilter })
+    : null;
+  if (paged) {
+    return httpJson(200, {
+      ok: true,
+      schema: 'fs27.skynet.source_manifest_response.v1',
+      source_mode: context.source.source_mode,
+      workspace_id: context.workspaceId,
+      project_id: context.projectId,
+      deployment_id: context.deploymentId,
+      prefix: context.prefix,
+      path_prefix: prefixFilter,
+      file_count: context.source.file_count || paged.file_count,
+      indexed_file_count: paged.file_count,
+      listed_count: paged.listed_count,
+      limit,
+      cursor: String(offset),
+      next_cursor: paged.next_cursor,
+      list_complete: paged.next_cursor === null,
+      files: sourceRecordListForResponse(paged.files),
+      index_paged: true,
+      index_page_size: paged.page_size,
+      index_page_count: paged.page_count,
+      scanned_index_pages: paged.scanned_pages,
+      source_package: sourcePackageSummary(context.source.source_package),
+      manifest_key: context.source.manifest?.manifest_key || sourceManifestKeyForPackage(context.source.source_package || {})
+    }, cors);
+  }
   const filtered = prefixFilter
     ? context.source.files.filter((file) => sourcePathFromRecord(file).startsWith(prefixFilter))
     : context.source.files;
@@ -2893,6 +4058,37 @@ async function handleSourceTree(request, env, cors) {
   }
   const limit = Math.max(1, Math.min(MAX_SOURCE_QUERY_LIMIT, Number(context.params.limit || 1000)));
   const offset = Math.max(0, Number(context.params.cursor || context.params.offset || 0));
+  let paged = context.source.source_package
+    ? await sourcePackageTreeSlice(env, context.source.source_package, rawPrefix, { offset, limit })
+    : null;
+  if (!paged && context.source.source_package) {
+    paged = await sourcePackageTreeSliceFromIndex(env, context.source.source_package, rawPrefix, { offset, limit });
+  }
+  if (paged) {
+    return httpJson(200, {
+      ok: true,
+      schema: 'fs27.skynet.source_tree_response.v1',
+      source_mode: context.source.source_mode,
+      workspace_id: context.workspaceId,
+      project_id: context.projectId,
+      deployment_id: context.deploymentId,
+      prefix: rawPrefix,
+      file_count: context.source.file_count || 0,
+      entry_count: paged.entry_count,
+      limit,
+      cursor: String(offset),
+      next_cursor: paged.next_cursor,
+      list_complete: paged.next_cursor === null,
+      entries: paged.entries,
+      tree_paged: true,
+      tree_page_size: paged.page_size,
+      tree_page_count: paged.page_count,
+      scanned_tree_pages: paged.scanned_pages,
+      scanned_index_pages: paged.scanned_index_pages || 0,
+      tree_on_demand: Boolean(paged.tree_on_demand),
+      source_package: sourcePackageSummary(context.source.source_package)
+    }, cors);
+  }
   const directories = new Map();
   const files = new Map();
   for (const record of context.source.files) {
@@ -2948,6 +4144,33 @@ async function handleSourceSearch(request, env, cors) {
   if (!query) return httpJson(400, { ok: false, error: 'source-search requires q=', code: 'MISSING_SOURCE_SEARCH_QUERY' }, cors);
   const limit = Math.max(1, Math.min(MAX_SOURCE_SEARCH_RESULTS, Number(context.params.limit || 50)));
   const contentSearch = context.params.content === '0' || context.params.content === 'false' ? false : true;
+  const paged = context.source.source_package
+    ? await searchPagedSourceIndex(env, context, { query, prefix: prefixFilter, limit, contentSearch })
+    : null;
+  if (paged) {
+    return httpJson(200, {
+      ok: true,
+      schema: 'fs27.skynet.source_search_response.v1',
+      source_mode: context.source.source_mode,
+      workspace_id: context.workspaceId,
+      project_id: context.projectId,
+      deployment_id: context.deploymentId,
+      query,
+      mode: contentSearch ? 'path-and-small-text-content' : 'path',
+      prefix: prefixFilter,
+      limit,
+      result_count: paged.results.length,
+      searched_file_count: paged.searched_file_count,
+      content_scanned: paged.content_scanned,
+      content_scan_limit: MAX_SOURCE_SEARCH_CONTENT_FILES,
+      content_scan_byte_limit: MAX_SOURCE_SEARCH_CONTENT_BYTES,
+      index_paged: true,
+      index_page_count: paged.page_count,
+      scanned_index_pages: paged.scanned_pages,
+      source_package: sourcePackageSummary(context.source.source_package),
+      results: paged.results
+    }, cors);
+  }
   const bucket = deploymentBucket(env);
   const results = [];
   let content_scanned = 0;
@@ -3017,8 +4240,12 @@ async function handleSourceFile(request, env, cors) {
   const bucket = deploymentBucket(env);
   if (!bucket?.get) return httpJson(500, { error: 'DEPLOYMENT_ASSET_BUCKET read is not configured', code: 'NO_DEPLOYMENT_BUCKET_READ' }, cors);
   const sourcePath = normalizeSourcePath(context.params.path || context.params.source_path || context.params.sourcePath || '');
-  const recorded = context.source.files.some((file) => sourcePathFromRecord(file) === sourcePath);
-  if (context.source.files.length && !recorded) {
+  let recorded = context.source.files.some((file) => sourcePathFromRecord(file) === sourcePath);
+  if (!recorded && context.source.source_package) {
+    const pagedRecorded = await sourcePathRecordedInPagedIndex(env, context.source.source_package, sourcePath);
+    if (pagedRecorded !== null) recorded = pagedRecorded;
+  }
+  if ((context.source.files.length || context.source.source_package) && !recorded) {
     return httpJson(404, {
       ok: false,
       error: 'Source file is not recorded in this deployment source index',
@@ -3199,9 +4426,10 @@ async function handleSourceTransfer(request, env, cors) {
     archive: archive ? {
       filename: archive.download_name,
       source_mode: archive.source_mode,
-      files: archive.files.length,
-      bytes: archive.bytes.byteLength,
-      sha256: archive.sha256
+      files: archive.file_count || archive.files?.length || 0,
+      bytes: sourceArchiveByteLength(archive),
+      sha256: archive.sha256,
+      stored_archive_reused: Boolean(archive.stored_archive_reused)
     } : null,
     destination,
     custody_policy: custodyPolicy
@@ -3220,9 +4448,10 @@ async function handleSourceTransfer(request, env, cors) {
     archive: archive ? {
       filename: archive.download_name,
       source_mode: archive.source_mode,
-      file_count: archive.files.length,
-      bytes: archive.bytes.byteLength,
-      sha256: archive.sha256
+      file_count: archive.file_count || archive.files?.length || 0,
+      bytes: sourceArchiveByteLength(archive),
+      sha256: archive.sha256,
+      stored_archive_reused: Boolean(archive.stored_archive_reused)
     } : null,
     destination,
     custody_policy: custodyPolicy,
@@ -3364,15 +4593,80 @@ async function handleObservability(request, env, cors) {
   await requireDeployAuth(request, cors);
   const url = new URL(request.url);
   const limit = Math.max(1, Math.min(100, Number(url.searchParams.get('limit') || 25)));
+  const projectFilter = cleanText(url.searchParams.get('project_id') || url.searchParams.get('projectId') || '', MAX_PROJECT);
+  const customerFilter = cleanText(url.searchParams.get('customer_id') || url.searchParams.get('customerId') || '', 160);
+  const now = new Date();
+  const yyyy = cleanText(url.searchParams.get('yyyy') || String(now.getUTCFullYear()), 4).replace(/[^0-9]/g, '') || String(now.getUTCFullYear());
+  const mm = cleanText(url.searchParams.get('mm') || String(now.getUTCMonth() + 1).padStart(2, '0'), 2).replace(/[^0-9]/g, '').padStart(2, '0').slice(-2);
+  const dd = cleanText(url.searchParams.get('dd') || String(now.getUTCDate()).padStart(2, '0'), 2).replace(/[^0-9]/g, '').padStart(2, '0').slice(-2);
+  const dayPrefix = `runtime-logs/yyyy=${yyyy}/mm=${mm}/dd=${dd}/`;
+  const cleanCustomer = customerFilter.replace(/[^a-zA-Z0-9._-]+/g, '-');
+  const cleanProject = projectFilter.replace(/[^a-zA-Z0-9._-]+/g, '-');
   const logBucket = requestLogBucket(env);
   let logs = [];
   if (logBucket?.list) {
-    const listed = await logBucket.list({ prefix: 'runtime-logs/', limit }).catch(() => null);
-    logs = (listed?.objects || []).map((object) => ({
-      key: object.key,
-      size: object.size || 0,
-      uploaded: object.uploaded ? new Date(object.uploaded).toISOString() : ''
-    }));
+    const prefix = cleanCustomer
+      ? `${dayPrefix}customer=${cleanCustomer}/${cleanProject ? `project=${cleanProject}/` : ''}`
+      : projectFilter
+        ? dayPrefix
+        : 'runtime-logs/';
+    const objects = [];
+    let cursor = undefined;
+    const maxPages = projectFilter || customerFilter ? 10 : 1;
+    for (let page = 0; page < maxPages && objects.length < limit; page += 1) {
+      const listed = await logBucket.list({ prefix, limit: projectFilter || customerFilter ? 1000 : limit, cursor }).catch(() => null);
+      const pageObjects = (listed?.objects || [])
+        .map((object) => ({
+          key: object.key,
+          size: object.size || 0,
+          uploaded: object.uploaded ? new Date(object.uploaded).toISOString() : ''
+        }))
+        .filter((object) => !cleanProject || object.key.includes(`/project=${cleanProject}/`));
+      objects.push(...pageObjects);
+      cursor = listed?.cursor;
+      if (!cursor || listed?.list_complete !== false) break;
+    }
+    logs = objects.slice(0, limit);
+  }
+  const db = env.RUNTIME_ROLLUP_DB || env.FS27_RUNTIME_ROLLUP_DB || null;
+  let rollups = {
+    configured: Boolean(db?.prepare),
+    query_ok: false,
+    rows: [],
+    error: ''
+  };
+  if (db?.prepare) {
+    try {
+      const where = [];
+      const values = [];
+      if (projectFilter) {
+        where.push('project_id = ?');
+        values.push(projectFilter);
+      }
+      if (customerFilter) {
+        where.push("hour_utc >= strftime('%Y-%m-%dT%H', 'now', '-48 hours')");
+      }
+      const result = await db.prepare(`
+        select hour_utc, project_id, deployment_id, runtime_type, status_family, request_count, error_count, updated_at
+        from runtime_rollups_hourly
+        ${where.length ? `where ${where.join(' and ')}` : ''}
+        order by updated_at desc
+        limit ?
+      `).bind(...values, limit).all();
+      rollups = {
+        configured: true,
+        query_ok: true,
+        rows: Array.isArray(result?.results) ? result.results : [],
+        error: ''
+      };
+    } catch (error) {
+      rollups = {
+        configured: true,
+        query_ok: false,
+        rows: [],
+        error: cleanText(error?.message || 'runtime rollup query failed', 220)
+      };
+    }
   }
   return httpJson(200, {
     ok: true,
@@ -3381,6 +4675,7 @@ async function handleObservability(request, env, cors) {
       request_header: 'x-0s-request-id',
       analytics_engine: Boolean(env.REQUEST_ANALYTICS?.writeDataPoint || env.FS27_REQUEST_ANALYTICS?.writeDataPoint),
       queue: Boolean(env.REQUEST_EVENT_QUEUE?.send || env.FS27_REQUEST_EVENT_QUEUE?.send),
+      direct_archive: directRuntimeArchiveConfigured(env),
       r2_runtime_logs: Boolean(logBucket?.put),
       r2_runtime_log_list: Boolean(logBucket?.list),
       d1_rollups: Boolean(env.RUNTIME_ROLLUP_DB?.prepare || env.FS27_RUNTIME_ROLLUP_DB?.prepare),
@@ -3388,6 +4683,7 @@ async function handleObservability(request, env, cors) {
     },
     runtime_event_schema: 'fs27.runtime_request.v1',
     latest_log_objects: logs,
+    d1_rollups: rollups,
     dashboard_boundaries: [
       'Owner/admin dashboards may show route, request, error, byte, and deployment counts.',
       'Customer dashboards should be scoped by customer_id/project_id and must not expose bearer tokens, cookies, IP addresses, or raw private request bodies.',
@@ -3396,9 +4692,77 @@ async function handleObservability(request, env, cors) {
   }, cors);
 }
 
+async function responseJson(response) {
+  return await response.clone().json().catch(() => ({}));
+}
+
 async function handleCostModel(request, env, cors) {
   await requireDeployAuth(request, cors);
   return httpJson(200, { ok: true, cost_model: skynetCostModel() }, cors);
+}
+
+async function handleSupport(request, env, cors) {
+  await requireDeployAuth(request, cors);
+  return httpJson(200, {
+    ok: true,
+    service: 'fs27-skynet-support',
+    support: skynetSupportProfile(env)
+  }, cors);
+}
+
+async function handleExport(request, env, cors) {
+  const dashboardResponse = await handleDashboard(request, env, cors);
+  if (!dashboardResponse.ok) return dashboardResponse;
+  const dashboard = await responseJson(dashboardResponse);
+  const observabilityResponse = await handleObservability(request, env, cors);
+  const observability = await responseJson(observabilityResponse);
+  const costResponse = await handleCostModel(request, env, cors);
+  const cost = await responseJson(costResponse);
+  const support = skynetSupportProfile(env);
+  const bundle = {
+    ok: true,
+    schema: 'fs27.skynet.customer_export.v1',
+    generated_at: new Date().toISOString(),
+    service: 'fs27-skynet-export',
+    redaction_policy: {
+      raw_bearer_tokens_included: false,
+      raw_cookies_included: false,
+      raw_env_secret_values_included: false,
+      private_source_files_included: false,
+      use_source_download_api_for_private_project_archive: true
+    },
+    account: dashboard.auth || {},
+    workspace: dashboard.workspace || {},
+    usage: dashboard.usage || {},
+    deployments: Array.isArray(dashboard.deployments) ? dashboard.deployments : [],
+    routes: Array.isArray(dashboard.routes) ? dashboard.routes : [],
+    receipts: Array.isArray(dashboard.receipts) ? dashboard.receipts : [],
+    observability: {
+      ok: observability.ok === true,
+      sinks: observability.sinks || {},
+      runtime_event_schema: observability.runtime_event_schema || 'fs27.runtime_request.v1',
+      latest_log_objects: Array.isArray(observability.latest_log_objects) ? observability.latest_log_objects : [],
+      d1_rollups: observability.d1_rollups || { configured: false, query_ok: false, rows: [] },
+      dashboard_boundaries: Array.isArray(observability.dashboard_boundaries) ? observability.dashboard_boundaries : []
+    },
+    cost_model: cost.cost_model || skynetCostModel(),
+    support,
+    links: {
+      dashboard: '/api/skyenet/dashboard',
+      support: '/api/skyenet/support',
+      observability: '/api/skyenet/observability',
+      receipts: '/api/skyenet/receipts',
+      source_download_policy: 'Source code is not embedded in this JSON export; use gated source-download/source-transfer endpoints.'
+    }
+  };
+  const headers = new Headers(cors);
+  headers.set('content-type', 'application/json; charset=utf-8');
+  headers.set('cache-control', 'no-store');
+  if (truthy(new URL(request.url).searchParams.get('download'))) {
+    const workspaceId = normalizeSlug(bundle.workspace?.workspace_id || 'skyenet-workspace', 'skyenet-workspace', 120);
+    headers.set('content-disposition', `attachment; filename="${workspaceId}-skyenet-export.json"`);
+  }
+  return new Response(JSON.stringify(bundle, null, 2), { status: 200, headers });
 }
 
 export async function handleSkyeNetDeployRequest(request, context = {}) {
@@ -3413,7 +4777,9 @@ export async function handleSkyeNetDeployRequest(request, context = {}) {
     if (url.pathname === '/deploy/dashboard' && request.method === 'GET') return await handleDashboard(request, env, cors);
     if (url.pathname === '/deploy/env' && ['GET', 'POST', 'DELETE'].includes(request.method)) return await handleEnvVars(request, env, cors);
     if (url.pathname === '/deploy/source-upload' && ['PUT', 'POST'].includes(request.method)) return await handleSourceUpload(request, env, cors);
+    if (url.pathname === '/deploy/source-index' && ['PUT', 'POST'].includes(request.method)) return await handleSourceIndexUpload(request, env, cors);
     if (url.pathname === '/deploy/source-archive' && ['PUT', 'POST'].includes(request.method)) return await handleSourceArchiveUpload(request, env, cors);
+    if (url.pathname === '/deploy/source-archive-link' && request.method === 'POST') return await handleSourceArchiveLink(request, env, cors);
     if (url.pathname === '/deploy/source-complete' && request.method === 'POST') return await handleSourceComplete(request, env, cors);
     if (url.pathname === '/deploy/source-manifest' && request.method === 'GET') return await handleSourceManifest(request, env, cors);
     if (url.pathname === '/deploy/source-tree' && request.method === 'GET') return await handleSourceTree(request, env, cors);
@@ -3425,6 +4791,8 @@ export async function handleSkyeNetDeployRequest(request, context = {}) {
     if (url.pathname === '/deploy/rollback' && request.method === 'POST') return await handleRollback(request, env, cors);
     if (url.pathname === '/deploy/observability' && request.method === 'GET') return await handleObservability(request, env, cors);
     if (url.pathname === '/deploy/cost-model' && request.method === 'GET') return await handleCostModel(request, env, cors);
+    if (url.pathname === '/deploy/support' && request.method === 'GET') return await handleSupport(request, env, cors);
+    if (url.pathname === '/deploy/export' && request.method === 'GET') return await handleExport(request, env, cors);
     if (url.pathname === '/deploy/init' && request.method === 'POST') return await handleInit(request, env, cors);
     if (url.pathname === '/deploy/upload' && ['PUT', 'POST'].includes(request.method)) return await handleUpload(request, env, cors);
     if (url.pathname === '/deploy/complete' && request.method === 'POST') return await handleComplete(request, env, cors);

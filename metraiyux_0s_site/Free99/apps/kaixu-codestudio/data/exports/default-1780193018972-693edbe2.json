@@ -1,0 +1,2605 @@
+{
+  "schema": "kaixu-codestudio-project-bundle-v1",
+  "exportedAt": "2026-05-31T02:03:38.967Z",
+  "project": {
+    "id": "default",
+    "name": "Default Workspace",
+    "slug": "default",
+    "status": "active",
+    "ownerRef": "upstream:owner",
+    "budget": {
+      "monthlyCapCents": 50000,
+      "hardStop": true
+    },
+    "roles": {
+      "owner": [
+        "owner"
+      ],
+      "admin": [
+        "admin"
+      ],
+      "operator": [
+        "operator"
+      ],
+      "viewer": [
+        "viewer"
+      ]
+    },
+    "createdAt": "2026-05-31T02:03:36.923Z",
+    "updatedAt": "2026-05-31T02:03:37.420Z"
+  },
+  "providerInstalls": [
+    {
+      "id": "prov_mpt4yjgk_16dcea722a",
+      "projectId": "default",
+      "providerId": "twilio",
+      "createdAt": "2026-05-31T02:03:37.604Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:twilio:smoke",
+      "routes": [
+        "sms.send",
+        "voice.call",
+        "webhook.message"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-31T02:03:37.684Z"
+    },
+    {
+      "id": "prov_mpt4yjfp_8482150263",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "createdAt": "2026-05-31T02:03:37.574Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:openai_gateway:smoke",
+      "routes": [
+        "ai.chat",
+        "ai.summarize",
+        "ai.classify"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-31T02:03:37.574Z"
+    },
+    {
+      "id": "prov_mpt4yjf5_c85d861ed5",
+      "projectId": "default",
+      "providerId": "neon",
+      "createdAt": "2026-05-31T02:03:37.553Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:neon:smoke",
+      "routes": [
+        "db.query"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-31T02:03:37.553Z"
+    },
+    {
+      "id": "prov_mpt4yjed_a0f88a698a",
+      "projectId": "default",
+      "providerId": "resend",
+      "createdAt": "2026-05-31T02:03:37.526Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:resend:smoke",
+      "routes": [
+        "email.send",
+        "email.sequence",
+        "webhook.email"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-31T02:03:37.526Z"
+    },
+    {
+      "id": "prov_mpt4yjcj_93846b5cfd",
+      "projectId": "default",
+      "providerId": "stripe",
+      "createdAt": "2026-05-31T02:03:37.459Z",
+      "lastRotatedAt": null,
+      "enabled": true,
+      "secretRef": "vault:default:stripe:smoke",
+      "routes": [
+        "checkout.create",
+        "invoice.send",
+        "webhook.payment"
+      ],
+      "status": "installed",
+      "updatedAt": "2026-05-31T02:03:37.459Z"
+    }
+  ],
+  "workflowRuns": [
+    {
+      "id": "run_mpt4ykh2_280b8c0b6c",
+      "ts": "2026-05-31T02:03:38.918Z",
+      "status": "blocked",
+      "projectId": "default",
+      "templateId": "checkout_email_link",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "to": "smoke@local.test",
+        "amountCents": 9999999,
+        "productName": "Approval Required"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": false,
+      "preflight": {
+        "ok": false,
+        "mode": "fixture",
+        "projectId": "default",
+        "templateId": "checkout_email_link",
+        "workflow": {
+          "id": "checkout_email_link",
+          "title": "Checkout + email link",
+          "category": "Sales",
+          "requiredProviders": [
+            "stripe",
+            "resend"
+          ],
+          "steps": [
+            "create_checkout_session",
+            "email_link",
+            "audit_receipt"
+          ],
+          "output": "checkout_url",
+          "templateId": "checkout_email_link",
+          "runner": "server/platform-engine.mjs#runWorkflow"
+        },
+        "missingProviders": [],
+        "providerProbes": {
+          "stripe": {
+            "ok": true,
+            "provider": "stripe",
+            "mode": "fixture",
+            "configured": true,
+            "missing": [],
+            "note": "Fixture mode exercises adapter code without claiming live provider proof."
+          },
+          "resend": {
+            "ok": true,
+            "provider": "resend",
+            "mode": "fixture",
+            "configured": true,
+            "missing": [],
+            "note": "Fixture mode exercises adapter code without claiming live provider proof."
+          }
+        },
+        "providerInstalls": [
+          {
+            "id": "prov_mpt4yjgk_16dcea722a",
+            "projectId": "default",
+            "providerId": "twilio",
+            "createdAt": "2026-05-31T02:03:37.604Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "sms.send",
+              "voice.call",
+              "webhook.message"
+            ],
+            "status": "installed",
+            "updatedAt": "2026-05-31T02:03:37.684Z"
+          },
+          {
+            "id": "prov_mpt4yjfp_8482150263",
+            "projectId": "default",
+            "providerId": "openai_gateway",
+            "createdAt": "2026-05-31T02:03:37.574Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "ai.chat",
+              "ai.summarize",
+              "ai.classify"
+            ],
+            "status": "installed",
+            "updatedAt": "2026-05-31T02:03:37.574Z"
+          },
+          {
+            "id": "prov_mpt4yjf5_c85d861ed5",
+            "projectId": "default",
+            "providerId": "neon",
+            "createdAt": "2026-05-31T02:03:37.553Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "db.query"
+            ],
+            "status": "installed",
+            "updatedAt": "2026-05-31T02:03:37.553Z"
+          },
+          {
+            "id": "prov_mpt4yjed_a0f88a698a",
+            "projectId": "default",
+            "providerId": "resend",
+            "createdAt": "2026-05-31T02:03:37.526Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "email.send",
+              "email.sequence",
+              "webhook.email"
+            ],
+            "status": "installed",
+            "updatedAt": "2026-05-31T02:03:37.526Z"
+          },
+          {
+            "id": "prov_mpt4yjcj_93846b5cfd",
+            "projectId": "default",
+            "providerId": "stripe",
+            "createdAt": "2026-05-31T02:03:37.459Z",
+            "lastRotatedAt": null,
+            "enabled": true,
+            "secretRef": "[redacted]",
+            "routes": [
+              "checkout.create",
+              "invoice.send",
+              "webhook.payment"
+            ],
+            "status": "installed",
+            "updatedAt": "2026-05-31T02:03:37.459Z"
+          }
+        ],
+        "policy": {
+          "ok": false,
+          "blocks": [
+            {
+              "code": "approval_required",
+              "ruleId": "pol_costly_calls",
+              "message": "Payment amount requires approval over $500."
+            }
+          ],
+          "warnings": [],
+          "workflowId": "checkout_email_link"
+        },
+        "approval": {
+          "id": "appr_mpt4ykha_db92ca8e0c",
+          "ts": "2026-05-31T02:03:38.926Z",
+          "status": "open",
+          "projectId": "default",
+          "reason": "workflow_preflight_blocked",
+          "subject": "checkout_email_link blocked",
+          "requestedBy": null,
+          "policy": {
+            "ok": false,
+            "blocks": [
+              {
+                "code": "approval_required",
+                "ruleId": "pol_costly_calls",
+                "message": "Payment amount requires approval over $500."
+              }
+            ],
+            "warnings": [],
+            "workflowId": "checkout_email_link"
+          },
+          "payload": {
+            "templateId": "checkout_email_link",
+            "input": {
+              "projectId": "default",
+              "to": "smoke@local.test",
+              "amountCents": 9999999,
+              "productName": "Approval Required"
+            }
+          }
+        },
+        "receipt": {
+          "id": "rcpt_mpt4ykhh_33a3bf2820",
+          "type": "workflow_preflight",
+          "ts": "2026-05-31T02:03:38.934Z",
+          "ok": false,
+          "mode": "[redacted]",
+          "projectId": "[redacted]",
+          "templateId": "chec…link",
+          "workflowId": "chec…link",
+          "missingProviders": [],
+          "providerProbes": {
+            "stripe": {
+              "ok": true,
+              "provider": "[redacted]",
+              "mode": "[redacted]",
+              "configured": true,
+              "missing": [],
+              "note": "Fixt…oof."
+            },
+            "resend": {
+              "ok": true,
+              "provider": "[redacted]",
+              "mode": "[redacted]",
+              "configured": true,
+              "missing": [],
+              "note": "Fixt…oof."
+            }
+          },
+          "providerInstalls": [
+            {
+              "id": "prov…722a",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "createdAt": "2026…604Z",
+              "lastRotatedAt": null,
+              "enabled": true,
+              "secretRef": "[redacted]",
+              "routes": [
+                "[redacted]",
+                "voic…call",
+                "webh…sage"
+              ],
+              "status": "inst…lled",
+              "updatedAt": "2026…684Z"
+            },
+            {
+              "id": "prov…0263",
+              "projectId": "[redacted]",
+              "providerId": "open…eway",
+              "createdAt": "2026…574Z",
+              "lastRotatedAt": null,
+              "enabled": true,
+              "secretRef": "[redacted]",
+              "routes": [
+                "[redacted]",
+                "ai.s…rize",
+                "ai.c…sify"
+              ],
+              "status": "inst…lled",
+              "updatedAt": "2026…574Z"
+            },
+            {
+              "id": "prov…1ed5",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "createdAt": "2026…553Z",
+              "lastRotatedAt": null,
+              "enabled": true,
+              "secretRef": "[redacted]",
+              "routes": [
+                "[redacted]"
+              ],
+              "status": "inst…lled",
+              "updatedAt": "2026…553Z"
+            },
+            {
+              "id": "prov…698a",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "createdAt": "2026…526Z",
+              "lastRotatedAt": null,
+              "enabled": true,
+              "secretRef": "[redacted]",
+              "routes": [
+                "emai…send",
+                "emai…ence",
+                "webh…mail"
+              ],
+              "status": "inst…lled",
+              "updatedAt": "2026…526Z"
+            },
+            {
+              "id": "prov…5cfd",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "createdAt": "2026…459Z",
+              "lastRotatedAt": null,
+              "enabled": true,
+              "secretRef": "[redacted]",
+              "routes": [
+                "chec…eate",
+                "invo…send",
+                "webh…ment"
+              ],
+              "status": "inst…lled",
+              "updatedAt": "2026…459Z"
+            }
+          ],
+          "policy": {
+            "ok": false,
+            "blocks": [
+              {
+                "code": "appr…ired",
+                "ruleId": "pol_…alls",
+                "message": "Paym…500."
+              }
+            ],
+            "warnings": [],
+            "workflowId": "chec…link"
+          },
+          "approval": {
+            "id": "appr…8e0c",
+            "ts": "2026…926Z",
+            "status": "[redacted]",
+            "projectId": "[redacted]",
+            "reason": "work…cked",
+            "subject": "chec…cked",
+            "requestedBy": null,
+            "policy": {
+              "ok": false,
+              "blocks": [
+                {
+                  "code": "appr…ired",
+                  "ruleId": "pol_…alls",
+                  "message": "Paym…500."
+                }
+              ],
+              "warnings": [],
+              "workflowId": "chec…link"
+            },
+            "payload": {
+              "templateId": "chec…link",
+              "input": {
+                "projectId": "[redacted]",
+                "to": "smok…test",
+                "amountCents": 9999999,
+                "productName": "Appr…ired"
+              }
+            }
+          }
+        }
+      },
+      "receiptId": "rcpt_mpt4ykhk_d5be3be292",
+      "updatedAt": "2026-05-31T02:03:38.939Z"
+    },
+    {
+      "id": "run_mpt4ykeu_3139cf9771",
+      "ts": "2026-05-31T02:03:38.838Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "db_query_ai_summary",
+      "requestedBy": null,
+      "input": {
+        "sql": "select 'stripe_checkout_completed' as event_type",
+        "prompt": "Summarize the checkout completion webhook and identify follow-up actions.",
+        "projectId": "default",
+        "webhookEventId": "evt_mpt4ykdw_e53d3fdd9a",
+        "webhookPayload": {
+          "projectId": "default",
+          "provider": "stripe",
+          "type": "checkout.session.completed",
+          "data": {
+            "id": "cs_dispatch_smoke"
+          }
+        }
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4ykf6_79eaeef650",
+          "ts": "2026-05-31T02:03:38.850Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "88b87c7da4c2"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4ykf6_fd685a0bf3",
+          "ts": "2026-05-31T02:03:38.850Z",
+          "text": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+        },
+        "summaryMarkdown": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+      },
+      "steps": [
+        {
+          "step": "run_readonly_query",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4ykf6_79eaeef650",
+            "ts": "2026-05-31T02:03:38.850Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "88b87c7da4c2"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summarize_rows",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4ykf6_fd685a0bf3",
+            "ts": "2026-05-31T02:03:38.850Z",
+            "text": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+          }
+        },
+        {
+          "step": "export_summary",
+          "action": "platform.export",
+          "result": {
+            "ok": true,
+            "bytes": 96
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4ykfd_bd2a0e8c9d",
+        "meter_mpt4ykfj_ae36c0583c"
+      ],
+      "receiptId": "rcpt_mpt4ykfr_11860a68fc",
+      "updatedAt": "2026-05-31T02:03:38.872Z"
+    },
+    {
+      "id": "run_mpt4yk9c_863d6e3897",
+      "ts": "2026-05-31T02:03:38.640Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "db_query_ai_summary",
+      "requestedBy": null,
+      "input": {
+        "sql": "select 'stripe_checkout_completed' as event_type",
+        "prompt": "Summarize the checkout completion webhook and identify follow-up actions.",
+        "projectId": "default",
+        "webhookEventId": "evt_mpt4yk8k_562b55d107",
+        "webhookPayload": {
+          "projectId": "default",
+          "provider": "stripe",
+          "type": "checkout.session.completed",
+          "data": {
+            "id": "cs_smoke"
+          }
+        }
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yk9j_1cf2c26d80",
+          "ts": "2026-05-31T02:03:38.648Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "88b87c7da4c2"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yk9k_cf47a5868e",
+          "ts": "2026-05-31T02:03:38.648Z",
+          "text": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+        },
+        "summaryMarkdown": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+      },
+      "steps": [
+        {
+          "step": "run_readonly_query",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yk9j_1cf2c26d80",
+            "ts": "2026-05-31T02:03:38.648Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "88b87c7da4c2"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summarize_rows",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yk9k_cf47a5868e",
+            "ts": "2026-05-31T02:03:38.648Z",
+            "text": "Fixture AI summary for Summarize the checkout completion webhook and identify follow-up actions."
+          }
+        },
+        {
+          "step": "export_summary",
+          "action": "platform.export",
+          "result": {
+            "ok": true,
+            "bytes": 96
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yk9r_ff114e624c",
+        "meter_mpt4yk9z_17301f7251"
+      ],
+      "receiptId": "rcpt_mpt4ykbg_4ceaa2fb7a",
+      "updatedAt": "2026-05-31T02:03:38.775Z"
+    },
+    {
+      "id": "run_mpt4yk6m_c2e334072f",
+      "ts": "2026-05-31T02:03:38.543Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "db_query_ai_summary",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "sql": "select 27 as scheduled_job"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yk6w_9f0e712420",
+          "ts": "2026-05-31T02:03:38.552Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "bf5d56c74506"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yk6w_35de57adf7",
+          "ts": "2026-05-31T02:03:38.552Z",
+          "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+        },
+        "summaryMarkdown": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+      },
+      "steps": [
+        {
+          "step": "run_readonly_query",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yk6w_9f0e712420",
+            "ts": "2026-05-31T02:03:38.552Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "bf5d56c74506"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summarize_rows",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yk6w_35de57adf7",
+            "ts": "2026-05-31T02:03:38.552Z",
+            "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+          }
+        },
+        {
+          "step": "export_summary",
+          "action": "platform.export",
+          "result": {
+            "ok": true,
+            "bytes": 103
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yk72_7e38e64896",
+        "meter_mpt4yk78_27908c78f9"
+      ],
+      "receiptId": "rcpt_mpt4yk7f_879b5af386",
+      "updatedAt": "2026-05-31T02:03:38.574Z"
+    },
+    {
+      "id": "run_mpt4yk3o_44cecd119d",
+      "ts": "2026-05-31T02:03:38.436Z",
+      "status": "blocked",
+      "projectId": "default",
+      "templateId": "missing_workflow_for_dead_letter",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": false,
+      "preflight": {
+        "ok": false,
+        "templateId": "missing_workflow_for_dead_letter",
+        "blocks": [
+          {
+            "code": "unknown_workflow",
+            "message": "Workflow not found."
+          }
+        ]
+      },
+      "receiptId": "rcpt_mpt4yk3u_a74f87c304",
+      "updatedAt": "2026-05-31T02:03:38.443Z"
+    },
+    {
+      "id": "run_mpt4yjzy_8cfcda9e39",
+      "ts": "2026-05-31T02:03:38.302Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "db_query_ai_summary",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "sql": "select 13 as queued_job"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yk02_5417990fc4",
+          "ts": "2026-05-31T02:03:38.306Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "a9dff3de8cdd"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yk02_8815214e10",
+          "ts": "2026-05-31T02:03:38.306Z",
+          "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+        },
+        "summaryMarkdown": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+      },
+      "steps": [
+        {
+          "step": "run_readonly_query",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yk02_5417990fc4",
+            "ts": "2026-05-31T02:03:38.306Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "a9dff3de8cdd"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summarize_rows",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yk02_8815214e10",
+            "ts": "2026-05-31T02:03:38.306Z",
+            "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+          }
+        },
+        {
+          "step": "export_summary",
+          "action": "platform.export",
+          "result": {
+            "ok": true,
+            "bytes": 103
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yk05_c41ad2ae0d",
+        "meter_mpt4yk09_51ea2fe656"
+      ],
+      "receiptId": "rcpt_mpt4yk0f_05f096e928",
+      "updatedAt": "2026-05-31T02:03:38.321Z"
+    },
+    {
+      "id": "run_mpt4yjvj_0675f00f33",
+      "ts": "2026-05-31T02:03:38.143Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "qualify_lead",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "formId": "form_mpt4yjuv_f41cb7734c",
+        "submissionId": "rec_mpt4yjvc_e735dc4691",
+        "email": "lead@local.test",
+        "company": "Smoke Co"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "normalizedLead": {
+          "email": "lead@local.test",
+          "company": "Smoke Co",
+          "source": "platform"
+        },
+        "leadScore": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yjvo_40f1569cc3",
+          "ts": "2026-05-31T02:03:38.148Z",
+          "text": "Fixture AI summary for Score this lead from 0-100 and give the reason as compact JSON. Lead: {\"email\":\""
+        },
+        "crmWrite": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yjvo_ad0bf4beb2",
+          "ts": "2026-05-31T02:03:38.149Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "9c835e0772ca"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      "steps": [
+        {
+          "step": "normalize_lead",
+          "action": "platform.normalize",
+          "result": {
+            "ok": true,
+            "normalized": true
+          }
+        },
+        {
+          "step": "score_fit",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yjvo_40f1569cc3",
+            "ts": "2026-05-31T02:03:38.148Z",
+            "text": "Fixture AI summary for Score this lead from 0-100 and give the reason as compact JSON. Lead: {\"email\":\""
+          }
+        },
+        {
+          "step": "write_crm_note",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yjvo_ad0bf4beb2",
+            "ts": "2026-05-31T02:03:38.149Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "9c835e0772ca"
+              }
+            ],
+            "rowCount": 1
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yjvt_bdaa645a48",
+        "meter_mpt4yjvv_8c29a2d595"
+      ],
+      "receiptId": "rcpt_mpt4yjvy_0e1f292e46",
+      "updatedAt": "2026-05-31T02:03:38.159Z"
+    },
+    {
+      "id": "run_mpt4yjtn_68135a3f96",
+      "ts": "2026-05-31T02:03:38.075Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "visual_workflow",
+      "graphId": "graph_mpt4yjsw_3a56abbdb1",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "sql": "select 57 as visual_graph",
+        "prompt": "Score this visual workflow smoke test"
+      },
+      "mode": "fixture",
+      "ok": true,
+      "output": {
+        "openai_gateway.score_fit": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yjtr_4b82d389dc",
+          "ts": "2026-05-31T02:03:38.079Z",
+          "text": "Fixture AI summary for Score this visual workflow smoke test"
+        },
+        "score": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yjtr_4b82d389dc",
+          "ts": "2026-05-31T02:03:38.079Z",
+          "text": "Fixture AI summary for Score this visual workflow smoke test"
+        },
+        "neon.write_crm_note": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yjts_88dfc2b713",
+          "ts": "2026-05-31T02:03:38.080Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "536901b15843"
+            }
+          ],
+          "rowCount": 1
+        },
+        "crm": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yjts_88dfc2b713",
+          "ts": "2026-05-31T02:03:38.080Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "536901b15843"
+            }
+          ],
+          "rowCount": 1
+        }
+      },
+      "steps": [
+        {
+          "step": "score",
+          "providerId": "openai_gateway",
+          "action": "score_fit",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yjtr_4b82d389dc",
+            "ts": "2026-05-31T02:03:38.079Z",
+            "text": "Fixture AI summary for Score this visual workflow smoke test"
+          }
+        },
+        {
+          "step": "crm",
+          "providerId": "neon",
+          "action": "write_crm_note",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yjts_88dfc2b713",
+            "ts": "2026-05-31T02:03:38.080Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "536901b15843"
+              }
+            ],
+            "rowCount": 1
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yju2_f408eff950",
+        "meter_mpt4yju6_a8d997ca19"
+      ],
+      "receiptId": "rcpt_mpt4yjuf_30d8255d55",
+      "updatedAt": "2026-05-31T02:03:38.104Z"
+    },
+    {
+      "id": "run_mpt4yjmn_0138be6ece",
+      "ts": "2026-05-31T02:03:37.823Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "db_query_ai_summary",
+      "requestedBy": null,
+      "input": {
+        "projectId": "default",
+        "sql": "select 1 as smoke_check",
+        "maxTokens": "[redacted]"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "db": {
+          "ok": true,
+          "provider": "neon",
+          "action": "db.query",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "neon_db.query_mpt4yjn2_6e4b3e3b0e",
+          "ts": "2026-05-31T02:03:37.838Z",
+          "rows": [
+            {
+              "fixture": true,
+              "sqlHash": "553181b0183b"
+            }
+          ],
+          "rowCount": 1
+        },
+        "summary": {
+          "ok": true,
+          "provider": "openai_gateway",
+          "action": "ai.chat",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "openai_gateway_ai.chat_mpt4yjn3_5a1074c8d3",
+          "ts": "2026-05-31T02:03:37.839Z",
+          "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+        },
+        "summaryMarkdown": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+      },
+      "steps": [
+        {
+          "step": "run_readonly_query",
+          "providerId": "neon",
+          "action": "db.query",
+          "result": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yjn2_6e4b3e3b0e",
+            "ts": "2026-05-31T02:03:37.838Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "553181b0183b"
+              }
+            ],
+            "rowCount": 1
+          }
+        },
+        {
+          "step": "summarize_rows",
+          "providerId": "openai_gateway",
+          "action": "ai.chat",
+          "result": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yjn3_5a1074c8d3",
+            "ts": "2026-05-31T02:03:37.839Z",
+            "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+          }
+        },
+        {
+          "step": "export_summary",
+          "action": "platform.export",
+          "result": {
+            "ok": true,
+            "bytes": 103
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yjnq_ff9860a3ee",
+        "meter_mpt4yjnz_24752ce7dc"
+      ],
+      "receiptId": "rcpt_mpt4yjon_3e4504babd",
+      "updatedAt": "2026-05-31T02:03:37.897Z"
+    },
+    {
+      "id": "run_mpt4yjlp_9e56f135fd",
+      "ts": "2026-05-31T02:03:37.789Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "checkout_email_link",
+      "requestedBy": "smoke@local.test",
+      "input": {
+        "projectId": "default",
+        "to": "smoke@local.test",
+        "amountCents": 1300,
+        "productName": "Smoke Checkout"
+      },
+      "mode": "fixture",
+      "engine": "action_registry",
+      "ok": true,
+      "output": {
+        "checkout": {
+          "ok": true,
+          "provider": "stripe",
+          "action": "checkout.create",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "stripe_checkout.create_mpt4yjlt_480e8f9d75",
+          "ts": "2026-05-31T02:03:37.793Z",
+          "checkoutUrl": "fixture://stripe/checkout/cs_mpt4yjlt_35d2d18f33",
+          "amountCents": 1300,
+          "currency": "usd"
+        },
+        "email": {
+          "ok": true,
+          "provider": "resend",
+          "action": "email.send",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "resend_email.send_mpt4yjlu_998257e3d5",
+          "ts": "2026-05-31T02:03:37.794Z",
+          "messageId": "email_mpt4yjlu_cd53173f07",
+          "to": "smoke@local.test",
+          "subject": "Your secure payment link"
+        },
+        "paymentLink": "fixture://stripe/checkout/cs_mpt4yjlt_35d2d18f33",
+        "actionReceipt": {
+          "id": "rcpt_mpt4yjlu_85ef7360a2",
+          "type": "workflow_action_receipt",
+          "ts": "2026…794Z",
+          "ok": true,
+          "workflowId": "chec…link",
+          "outputKeys": "[redacted]"
+        }
+      },
+      "steps": [
+        {
+          "step": "create_checkout_session",
+          "providerId": "stripe",
+          "action": "checkout.create",
+          "result": {
+            "ok": true,
+            "provider": "stripe",
+            "action": "checkout.create",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "stripe_checkout.create_mpt4yjlt_480e8f9d75",
+            "ts": "2026-05-31T02:03:37.793Z",
+            "checkoutUrl": "fixture://stripe/checkout/cs_mpt4yjlt_35d2d18f33",
+            "amountCents": 1300,
+            "currency": "usd"
+          }
+        },
+        {
+          "step": "email_payment_link",
+          "providerId": "resend",
+          "action": "email.send",
+          "result": {
+            "ok": true,
+            "provider": "resend",
+            "action": "email.send",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "resend_email.send_mpt4yjlu_998257e3d5",
+            "ts": "2026-05-31T02:03:37.794Z",
+            "messageId": "email_mpt4yjlu_cd53173f07",
+            "to": "smoke@local.test",
+            "subject": "Your secure payment link"
+          }
+        },
+        {
+          "step": "write_receipt",
+          "action": "platform.receipt",
+          "result": {
+            "ok": true,
+            "receiptId": "rcpt_mpt4yjlu_85ef7360a2"
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yjm5_96af84a309",
+        "meter_mpt4yjm7_2cae549b04"
+      ],
+      "receiptId": "rcpt_mpt4yjm9_62de2b5390",
+      "updatedAt": "2026-05-31T02:03:37.811Z"
+    },
+    {
+      "id": "run_mpt4yjkv_7f409a9640",
+      "ts": "2026-05-31T02:03:37.759Z",
+      "status": "error",
+      "projectId": "default",
+      "templateId": "provider_pack_action",
+      "requestedBy": null,
+      "input": {
+        "to": "+15550100000",
+        "body": "Voice should not masquerade as SMS.",
+        "projectId": "default"
+      },
+      "mode": "fixture",
+      "providerId": "twilio",
+      "route": "voice.call",
+      "engine": "provider_pack_action",
+      "ok": false,
+      "error": "twilio voice.call blocked: voice_call_not_implemented",
+      "steps": [
+        {
+          "step": "voice.call",
+          "providerId": "twilio",
+          "action": "voice.call",
+          "result": {
+            "ok": false,
+            "provider": "twilio",
+            "action": "voice.call",
+            "reason": "voice_call_not_implemented"
+          }
+        }
+      ],
+      "receiptId": "rcpt_mpt4yjky_eb55a57992",
+      "updatedAt": "2026-05-31T02:03:37.764Z"
+    },
+    {
+      "id": "run_mpt4yjjk_e2e7750a37",
+      "ts": "2026-05-31T02:03:37.713Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "provider_pack_action",
+      "requestedBy": null,
+      "input": {
+        "to": "+15550100000",
+        "body": "Fixture SMS proof from CodeStudio smoke.",
+        "projectId": "default"
+      },
+      "mode": "fixture",
+      "providerId": "twilio",
+      "route": "sms.send",
+      "engine": "provider_pack_action",
+      "ok": true,
+      "output": {
+        "twilio.sms.send": {
+          "ok": true,
+          "provider": "twilio",
+          "action": "sms.send",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "twilio_sms.send_mpt4yjjw_ad432a1344",
+          "ts": "2026-05-31T02:03:37.724Z",
+          "messageSid": "SM_mpt4yjjw_85e56221cd",
+          "to": "+15550100000"
+        }
+      },
+      "steps": [
+        {
+          "step": "sms.send",
+          "providerId": "twilio",
+          "action": "sms.send",
+          "result": {
+            "ok": true,
+            "provider": "twilio",
+            "action": "sms.send",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "twilio_sms.send_mpt4yjjw_ad432a1344",
+            "ts": "2026-05-31T02:03:37.724Z",
+            "messageSid": "SM_mpt4yjjw_85e56221cd",
+            "to": "+15550100000"
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yjk8_312741136f"
+      ],
+      "receiptId": "rcpt_mpt4yjka_026283306c",
+      "updatedAt": "2026-05-31T02:03:37.739Z"
+    },
+    {
+      "id": "run_mpt4yjh3_c7ed34e332",
+      "ts": "2026-05-31T02:03:37.623Z",
+      "status": "completed",
+      "projectId": "default",
+      "templateId": "provider_pack_action",
+      "requestedBy": null,
+      "input": {
+        "amountCents": 1313,
+        "productName": "Provider Pack Smoke",
+        "projectId": "default"
+      },
+      "mode": "fixture",
+      "providerId": "stripe",
+      "route": "checkout.create",
+      "engine": "provider_pack_action",
+      "ok": true,
+      "output": {
+        "stripe.checkout.create": {
+          "ok": true,
+          "provider": "stripe",
+          "action": "checkout.create",
+          "mode": "fixture",
+          "fixture": true,
+          "id": "stripe_checkout.create_mpt4yjh7_c0d296c7c2",
+          "ts": "2026-05-31T02:03:37.627Z",
+          "checkoutUrl": "fixture://stripe/checkout/cs_mpt4yjh7_05c3e11864",
+          "amountCents": 1313,
+          "currency": "usd"
+        }
+      },
+      "steps": [
+        {
+          "step": "checkout.create",
+          "providerId": "stripe",
+          "action": "checkout.create",
+          "result": {
+            "ok": true,
+            "provider": "stripe",
+            "action": "checkout.create",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "stripe_checkout.create_mpt4yjh7_c0d296c7c2",
+            "ts": "2026-05-31T02:03:37.627Z",
+            "checkoutUrl": "fixture://stripe/checkout/cs_mpt4yjh7_05c3e11864",
+            "amountCents": 1313,
+            "currency": "usd"
+          }
+        }
+      ],
+      "meterEventIds": [
+        "meter_mpt4yjhr_e3b5d2b7b0"
+      ],
+      "receiptId": "rcpt_mpt4yjhv_799d0fcaa8",
+      "updatedAt": "2026-05-31T02:03:37.653Z"
+    }
+  ],
+  "webhookEvents": [
+    {
+      "id": "evt_mpt4ykdw_e53d3fdd9a",
+      "ts": "2026-05-31T02:03:38.804Z",
+      "status": "dispatched_ran",
+      "projectId": "default",
+      "payload": {
+        "projectId": "default",
+        "provider": "stripe",
+        "type": "checkout.session.completed",
+        "data": {
+          "id": "cs_dispatch_smoke"
+        }
+      },
+      "provider": "stripe",
+      "type": "checkout.session.completed",
+      "requestedBy": null,
+      "idempotencyKey": "stripe:checkout.session.completed:cs_dispatch_smoke",
+      "verification": {
+        "ok": true,
+        "provider": "stripe",
+        "mode": "fixture",
+        "verified": false,
+        "reason": "fixture_signature_bypass"
+      },
+      "replayedAt": "2026-05-31T02:03:38.886Z",
+      "replayedBy": null,
+      "dispatch": {
+        "ok": true,
+        "mode": "run",
+        "ruleId": "stripe-checkout-completed-to-crm-note",
+        "workflowId": "db_query_ai_summary",
+        "runId": "run_mpt4ykeu_3139cf9771",
+        "receiptId": "rcpt_mpt4ykfr_11860a68fc",
+        "error": null
+      },
+      "updatedAt": "2026-05-31T02:03:38.886Z"
+    },
+    {
+      "id": "evt_mpt4yk8k_562b55d107",
+      "ts": "2026-05-31T02:03:38.613Z",
+      "status": "dispatched_ran",
+      "projectId": "default",
+      "payload": {
+        "projectId": "default",
+        "provider": "stripe",
+        "type": "checkout.session.completed",
+        "data": {
+          "id": "cs_smoke"
+        }
+      },
+      "provider": "stripe",
+      "type": "checkout.session.completed",
+      "requestedBy": null,
+      "idempotencyKey": "stripe:checkout.session.completed:cs_smoke",
+      "verification": {
+        "ok": true,
+        "provider": "stripe",
+        "mode": "fixture",
+        "verified": false,
+        "reason": "fixture_signature_bypass"
+      },
+      "replayedAt": "2026-05-31T02:03:38.784Z",
+      "replayedBy": null,
+      "dispatch": {
+        "ok": true,
+        "mode": "run",
+        "ruleId": "stripe-checkout-completed-to-crm-note",
+        "workflowId": "db_query_ai_summary",
+        "runId": "run_mpt4yk9c_863d6e3897",
+        "receiptId": "rcpt_mpt4ykbg_4ceaa2fb7a",
+        "error": null
+      },
+      "updatedAt": "2026-05-31T02:03:38.784Z"
+    }
+  ],
+  "approvals": [
+    {
+      "id": "appr_mpt4ykha_db92ca8e0c",
+      "ts": "2026-05-31T02:03:38.926Z",
+      "status": "open",
+      "projectId": "default",
+      "reason": "workflow_preflight_blocked",
+      "subject": "checkout_email_link blocked",
+      "requestedBy": null,
+      "policy": {
+        "ok": false,
+        "blocks": [
+          {
+            "code": "approval_required",
+            "ruleId": "pol_costly_calls",
+            "message": "Payment amount requires approval over $500."
+          }
+        ],
+        "warnings": [],
+        "workflowId": "checkout_email_link"
+      },
+      "payload": {
+        "templateId": "checkout_email_link",
+        "input": {
+          "projectId": "default",
+          "to": "smoke@local.test",
+          "amountCents": 9999999,
+          "productName": "Approval Required"
+        }
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_mpt4yjzj_16cdb3b23a",
+      "ts": "2026-05-31T02:03:38.287Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "db_query_ai_summary",
+      "input": {
+        "projectId": "default",
+        "sql": "select 13 as queued_job"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018285
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T02:03:37.284Z",
+      "priority": 100,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "retryBackoffMs": 15000,
+      "status": "completed",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": null,
+      "cancelReason": null,
+      "finishedAt": "2026-05-31T02:03:38.326Z",
+      "result": {
+        "ok": true,
+        "mode": "fixture",
+        "runId": "run_mpt4yjzy_8cfcda9e39",
+        "projectId": "default",
+        "templateId": "db_query_ai_summary",
+        "actionRegistry": true,
+        "output": {
+          "db": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yk02_5417990fc4",
+            "ts": "2026-05-31T02:03:38.306Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "a9dff3de8cdd"
+              }
+            ],
+            "rowCount": 1
+          },
+          "summary": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yk02_8815214e10",
+            "ts": "2026-05-31T02:03:38.306Z",
+            "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+          },
+          "summaryMarkdown": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+        },
+        "steps": [
+          {
+            "step": "run_readonly_query",
+            "providerId": "neon",
+            "action": "db.query",
+            "result": {
+              "ok": true,
+              "provider": "neon",
+              "action": "db.query",
+              "mode": "fixture",
+              "fixture": true,
+              "id": "neon_db.query_mpt4yk02_5417990fc4",
+              "ts": "2026-05-31T02:03:38.306Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "a9dff3de8cdd"
+                }
+              ],
+              "rowCount": 1
+            }
+          },
+          {
+            "step": "summarize_rows",
+            "providerId": "openai_gateway",
+            "action": "ai.chat",
+            "result": {
+              "ok": true,
+              "provider": "openai_gateway",
+              "action": "ai.chat",
+              "mode": "fixture",
+              "fixture": true,
+              "id": "openai_gateway_ai.chat_mpt4yk02_8815214e10",
+              "ts": "2026-05-31T02:03:38.306Z",
+              "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+            }
+          },
+          {
+            "step": "export_summary",
+            "action": "platform.export",
+            "result": {
+              "ok": true,
+              "bytes": 103
+            }
+          }
+        ],
+        "meters": [
+          {
+            "id": "meter_mpt4yk05_c41ad2ae0d",
+            "ts": "2026-05-31T02:03:38.309Z",
+            "projectId": "default",
+            "providerId": "neon",
+            "workflowId": "db_query_ai_summary",
+            "runId": "run_mpt4yjzy_8cfcda9e39",
+            "unit": "query",
+            "quantity": 1,
+            "costCents": 0,
+            "metadata": {
+              "mode": "fixture",
+              "packSource": "file:platform/provider-packs/neon.json"
+            }
+          },
+          {
+            "id": "meter_mpt4yk09_51ea2fe656",
+            "ts": "2026-05-31T02:03:38.313Z",
+            "projectId": "default",
+            "providerId": "openai_gateway",
+            "workflowId": "db_query_ai_summary",
+            "runId": "run_mpt4yjzy_8cfcda9e39",
+            "unit": "ai_call",
+            "quantity": 1,
+            "costCents": 1,
+            "metadata": {
+              "mode": "fixture",
+              "packSource": "file:platform/provider-packs/openai_gateway.json"
+            }
+          }
+        ],
+        "receipt": {
+          "id": "rcpt_mpt4yk0f_05f096e928",
+          "type": "workflow_run",
+          "ts": "2026-05-31T02:03:38.319Z",
+          "ok": true,
+          "mode": "[redacted]",
+          "runId": "run_…9e39",
+          "projectId": "[redacted]",
+          "templateId": "db_q…mary",
+          "workflowId": "db_q…mary",
+          "actionRegistry": true,
+          "output": {
+            "db": {
+              "ok": true,
+              "provider": "[redacted]",
+              "action": "[redacted]",
+              "mode": "[redacted]",
+              "fixture": true,
+              "id": "neon…0fc4",
+              "ts": "2026…306Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "a9df…8cdd"
+                }
+              ],
+              "rowCount": 1
+            },
+            "summary": {
+              "ok": true,
+              "provider": "open…eway",
+              "action": "[redacted]",
+              "mode": "[redacted]",
+              "fixture": true,
+              "id": "open…4e10",
+              "ts": "2026…306Z",
+              "text": "Fixt…ion\""
+            },
+            "summaryMarkdown": "Fixt…ion\""
+          },
+          "steps": [
+            {
+              "step": "run_…uery",
+              "providerId": "[redacted]",
+              "action": "[redacted]",
+              "result": {
+                "ok": true,
+                "provider": "[redacted]",
+                "action": "[redacted]",
+                "mode": "[redacted]",
+                "fixture": true,
+                "id": "neon…0fc4",
+                "ts": "2026…306Z",
+                "rows": [
+                  {
+                    "fixture": true,
+                    "sqlHash": "a9df…8cdd"
+                  }
+                ],
+                "rowCount": 1
+              }
+            },
+            {
+              "step": "summ…rows",
+              "providerId": "open…eway",
+              "action": "[redacted]",
+              "result": {
+                "ok": true,
+                "provider": "open…eway",
+                "action": "[redacted]",
+                "mode": "[redacted]",
+                "fixture": true,
+                "id": "open…4e10",
+                "ts": "2026…306Z",
+                "text": "Fixt…ion\""
+              }
+            },
+            {
+              "step": "expo…mary",
+              "action": "plat…port",
+              "result": {
+                "ok": true,
+                "bytes": 103
+              }
+            }
+          ],
+          "meters": [
+            {
+              "id": "mete…ae0d",
+              "ts": "2026…309Z",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "workflowId": "db_q…mary",
+              "runId": "run_…9e39",
+              "unit": "[redacted]",
+              "quantity": 1,
+              "costCents": 0,
+              "metadata": {
+                "mode": "[redacted]",
+                "packSource": "file…json"
+              }
+            },
+            {
+              "id": "mete…e656",
+              "ts": "2026…313Z",
+              "projectId": "[redacted]",
+              "providerId": "open…eway",
+              "workflowId": "db_q…mary",
+              "runId": "run_…9e39",
+              "unit": "[redacted]",
+              "quantity": 1,
+              "costCents": 1,
+              "metadata": {
+                "mode": "[redacted]",
+                "packSource": "file…json"
+              }
+            }
+          ]
+        }
+      },
+      "error": null,
+      "updatedAt": "2026-05-31T02:03:38.326Z"
+    },
+    {
+      "id": "job_mpt4yk14_bce9752418",
+      "ts": "2026-05-31T02:03:38.344Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "db_query_ai_summary",
+      "input": {
+        "projectId": "default",
+        "sql": "select 14 as lock_job"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018342
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T02:03:37.342Z",
+      "priority": 100,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "retryBackoffMs": 15000,
+      "status": "cancelled",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": "2026-05-31T02:03:38.375Z",
+      "cancelReason": "cleanup_lock_extension_smoke",
+      "finishedAt": null,
+      "result": null,
+      "error": null,
+      "updatedAt": "2026-05-31T02:03:38.375Z",
+      "cancelledBy": null
+    },
+    {
+      "id": "job_mpt4yk36_0f88812d7f",
+      "ts": "2026-05-31T02:03:38.418Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "missing_workflow_for_dead_letter",
+      "input": {
+        "projectId": "default"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018416
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T02:03:37.415Z",
+      "priority": 100,
+      "attempts": 1,
+      "maxAttempts": 1,
+      "retryBackoffMs": 15000,
+      "status": "failed",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": null,
+      "cancelReason": null,
+      "finishedAt": "2026-05-31T02:03:38.450Z",
+      "result": {
+        "ok": false,
+        "blocked": true,
+        "runId": "run_mpt4yk3o_44cecd119d",
+        "preflight": {
+          "ok": false,
+          "templateId": "missing_workflow_for_dead_letter",
+          "blocks": [
+            {
+              "code": "unknown_workflow",
+              "message": "Workflow not found."
+            }
+          ]
+        },
+        "receipt": {
+          "id": "rcpt_mpt4yk3u_a74f87c304",
+          "type": "workflow_run_blocked",
+          "ts": "2026-05-31T02:03:38.442Z",
+          "ok": false,
+          "mode": "[redacted]",
+          "runId": "run_…119d",
+          "templateId": "miss…tter",
+          "preflight": {
+            "ok": false,
+            "templateId": "miss…tter",
+            "blocks": [
+              {
+                "code": "unkn…flow",
+                "message": "Work…und."
+              }
+            ]
+          }
+        }
+      },
+      "error": "workflow_blocked",
+      "updatedAt": "2026-05-31T02:03:38.451Z"
+    },
+    {
+      "id": "job_mpt4yk5p_ab9ba2fb76",
+      "ts": "2026-05-31T02:03:38.509Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "db_query_ai_summary",
+      "input": {
+        "projectId": "default",
+        "sql": "select 27 as scheduled_job"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018505
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T02:03:38.509Z",
+      "priority": 50,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "retryBackoffMs": 15000,
+      "status": "completed",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": null,
+      "cancelReason": null,
+      "finishedAt": "2026-05-31T02:03:38.585Z",
+      "result": {
+        "ok": true,
+        "mode": "fixture",
+        "runId": "run_mpt4yk6m_c2e334072f",
+        "projectId": "default",
+        "templateId": "db_query_ai_summary",
+        "actionRegistry": true,
+        "output": {
+          "db": {
+            "ok": true,
+            "provider": "neon",
+            "action": "db.query",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "neon_db.query_mpt4yk6w_9f0e712420",
+            "ts": "2026-05-31T02:03:38.552Z",
+            "rows": [
+              {
+                "fixture": true,
+                "sqlHash": "bf5d56c74506"
+              }
+            ],
+            "rowCount": 1
+          },
+          "summary": {
+            "ok": true,
+            "provider": "openai_gateway",
+            "action": "ai.chat",
+            "mode": "fixture",
+            "fixture": true,
+            "id": "openai_gateway_ai.chat_mpt4yk6w_35de57adf7",
+            "ts": "2026-05-31T02:03:38.552Z",
+            "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+          },
+          "summaryMarkdown": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+        },
+        "steps": [
+          {
+            "step": "run_readonly_query",
+            "providerId": "neon",
+            "action": "db.query",
+            "result": {
+              "ok": true,
+              "provider": "neon",
+              "action": "db.query",
+              "mode": "fixture",
+              "fixture": true,
+              "id": "neon_db.query_mpt4yk6w_9f0e712420",
+              "ts": "2026-05-31T02:03:38.552Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "bf5d56c74506"
+                }
+              ],
+              "rowCount": 1
+            }
+          },
+          {
+            "step": "summarize_rows",
+            "providerId": "openai_gateway",
+            "action": "ai.chat",
+            "result": {
+              "ok": true,
+              "provider": "openai_gateway",
+              "action": "ai.chat",
+              "mode": "fixture",
+              "fixture": true,
+              "id": "openai_gateway_ai.chat_mpt4yk6w_35de57adf7",
+              "ts": "2026-05-31T02:03:38.552Z",
+              "text": "Fixture AI summary for Summarize these query results in Markdown: {\"ok\":true,\"provider\":\"neon\",\"action\""
+            }
+          },
+          {
+            "step": "export_summary",
+            "action": "platform.export",
+            "result": {
+              "ok": true,
+              "bytes": 103
+            }
+          }
+        ],
+        "meters": [
+          {
+            "id": "meter_mpt4yk72_7e38e64896",
+            "ts": "2026-05-31T02:03:38.558Z",
+            "projectId": "default",
+            "providerId": "neon",
+            "workflowId": "db_query_ai_summary",
+            "runId": "run_mpt4yk6m_c2e334072f",
+            "unit": "query",
+            "quantity": 1,
+            "costCents": 0,
+            "metadata": {
+              "mode": "fixture",
+              "packSource": "file:platform/provider-packs/neon.json"
+            }
+          },
+          {
+            "id": "meter_mpt4yk78_27908c78f9",
+            "ts": "2026-05-31T02:03:38.564Z",
+            "projectId": "default",
+            "providerId": "openai_gateway",
+            "workflowId": "db_query_ai_summary",
+            "runId": "run_mpt4yk6m_c2e334072f",
+            "unit": "ai_call",
+            "quantity": 1,
+            "costCents": 1,
+            "metadata": {
+              "mode": "fixture",
+              "packSource": "file:platform/provider-packs/openai_gateway.json"
+            }
+          }
+        ],
+        "receipt": {
+          "id": "rcpt_mpt4yk7f_879b5af386",
+          "type": "workflow_run",
+          "ts": "2026-05-31T02:03:38.571Z",
+          "ok": true,
+          "mode": "[redacted]",
+          "runId": "run_…072f",
+          "projectId": "[redacted]",
+          "templateId": "db_q…mary",
+          "workflowId": "db_q…mary",
+          "actionRegistry": true,
+          "output": {
+            "db": {
+              "ok": true,
+              "provider": "[redacted]",
+              "action": "[redacted]",
+              "mode": "[redacted]",
+              "fixture": true,
+              "id": "neon…2420",
+              "ts": "2026…552Z",
+              "rows": [
+                {
+                  "fixture": true,
+                  "sqlHash": "bf5d…4506"
+                }
+              ],
+              "rowCount": 1
+            },
+            "summary": {
+              "ok": true,
+              "provider": "open…eway",
+              "action": "[redacted]",
+              "mode": "[redacted]",
+              "fixture": true,
+              "id": "open…adf7",
+              "ts": "2026…552Z",
+              "text": "Fixt…ion\""
+            },
+            "summaryMarkdown": "Fixt…ion\""
+          },
+          "steps": [
+            {
+              "step": "run_…uery",
+              "providerId": "[redacted]",
+              "action": "[redacted]",
+              "result": {
+                "ok": true,
+                "provider": "[redacted]",
+                "action": "[redacted]",
+                "mode": "[redacted]",
+                "fixture": true,
+                "id": "neon…2420",
+                "ts": "2026…552Z",
+                "rows": [
+                  {
+                    "fixture": true,
+                    "sqlHash": "bf5d…4506"
+                  }
+                ],
+                "rowCount": 1
+              }
+            },
+            {
+              "step": "summ…rows",
+              "providerId": "open…eway",
+              "action": "[redacted]",
+              "result": {
+                "ok": true,
+                "provider": "open…eway",
+                "action": "[redacted]",
+                "mode": "[redacted]",
+                "fixture": true,
+                "id": "open…adf7",
+                "ts": "2026…552Z",
+                "text": "Fixt…ion\""
+              }
+            },
+            {
+              "step": "expo…mary",
+              "action": "plat…port",
+              "result": {
+                "ok": true,
+                "bytes": 103
+              }
+            }
+          ],
+          "meters": [
+            {
+              "id": "mete…4896",
+              "ts": "2026…558Z",
+              "projectId": "[redacted]",
+              "providerId": "[redacted]",
+              "workflowId": "db_q…mary",
+              "runId": "run_…072f",
+              "unit": "[redacted]",
+              "quantity": 1,
+              "costCents": 0,
+              "metadata": {
+                "mode": "[redacted]",
+                "packSource": "file…json"
+              }
+            },
+            {
+              "id": "mete…78f9",
+              "ts": "2026…564Z",
+              "projectId": "[redacted]",
+              "providerId": "open…eway",
+              "workflowId": "db_q…mary",
+              "runId": "run_…072f",
+              "unit": "[redacted]",
+              "quantity": 1,
+              "costCents": 1,
+              "metadata": {
+                "mode": "[redacted]",
+                "packSource": "file…json"
+              }
+            }
+          ]
+        }
+      },
+      "error": null,
+      "updatedAt": "2026-05-31T02:03:38.585Z"
+    },
+    {
+      "id": "job_mpt4yk2a_afc8cc6ee8",
+      "ts": "2026-05-31T02:03:38.386Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "db_query_ai_summary",
+      "input": {
+        "projectId": "default",
+        "sql": "select 999 as cancel_job"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018384
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T02:04:38.384Z",
+      "priority": 100,
+      "attempts": 0,
+      "maxAttempts": 3,
+      "retryBackoffMs": 15000,
+      "status": "cancelled",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": "2026-05-31T02:03:38.395Z",
+      "cancelReason": "smoke_cancel",
+      "finishedAt": null,
+      "result": null,
+      "error": null,
+      "cancelledBy": null,
+      "updatedAt": "2026-05-31T02:03:38.395Z"
+    },
+    {
+      "id": "job_mpt4yk4q_e313797bc1",
+      "ts": "2026-05-31T02:03:38.474Z",
+      "projectId": "default",
+      "type": "workflow",
+      "workflowId": "missing_workflow_for_dead_letter",
+      "input": {
+        "projectId": "default"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018416
+        }
+      },
+      "approvals": {},
+      "runAt": "2026-05-31T03:03:38.470Z",
+      "priority": 100,
+      "attempts": 0,
+      "maxAttempts": 1,
+      "retryBackoffMs": 15000,
+      "status": "queued",
+      "lockedAt": null,
+      "lockId": null,
+      "lockExpiresAt": null,
+      "cancelledAt": null,
+      "cancelReason": null,
+      "finishedAt": null,
+      "result": null,
+      "error": null,
+      "updatedAt": "2026-05-31T02:03:38.474Z",
+      "retriedFromDeadLetterId": "dead_mpt4yk43_5f13add48d"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "sched_mpt4yk5c_d29a66bb1c",
+      "ts": "2026-05-31T02:03:38.496Z",
+      "projectId": "default",
+      "workflowId": "db_query_ai_summary",
+      "input": {
+        "projectId": "default",
+        "sql": "select 27 as scheduled_job"
+      },
+      "claims": {
+        "roles": [
+          "owner"
+        ],
+        "projectRoles": {
+          "default": [
+            "owner"
+          ]
+        },
+        "__claimVerification": {
+          "ok": true,
+          "mode": "hmac-sha256",
+          "signedAt": 1780193018488
+        }
+      },
+      "approvals": {},
+      "status": "active",
+      "intervalMinutes": 15,
+      "nextRunAt": "2026-05-31T02:18:38.518Z",
+      "label": "Scheduled workflow",
+      "lastRunAt": "2026-05-31T02:03:38.518Z",
+      "updatedAt": "2026-05-31T02:03:38.518Z"
+    }
+  ],
+  "meters": [
+    {
+      "id": "meter_mpt4ykfj_ae36c0583c",
+      "ts": "2026-05-31T02:03:38.863Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4ykeu_3139cf9771",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4ykfd_bd2a0e8c9d",
+      "ts": "2026-05-31T02:03:38.857Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4ykeu_3139cf9771",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk9z_17301f7251",
+      "ts": "2026-05-31T02:03:38.663Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yk9c_863d6e3897",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk9r_ff114e624c",
+      "ts": "2026-05-31T02:03:38.655Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yk9c_863d6e3897",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk78_27908c78f9",
+      "ts": "2026-05-31T02:03:38.564Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yk6m_c2e334072f",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk72_7e38e64896",
+      "ts": "2026-05-31T02:03:38.558Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yk6m_c2e334072f",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk09_51ea2fe656",
+      "ts": "2026-05-31T02:03:38.313Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yjzy_8cfcda9e39",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yk05_c41ad2ae0d",
+      "ts": "2026-05-31T02:03:38.309Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yjzy_8cfcda9e39",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjvv_8c29a2d595",
+      "ts": "2026-05-31T02:03:38.155Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "qualify_lead",
+      "runId": "run_mpt4yjvj_0675f00f33",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjvt_bdaa645a48",
+      "ts": "2026-05-31T02:03:38.153Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "qualify_lead",
+      "runId": "run_mpt4yjvj_0675f00f33",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yju6_a8d997ca19",
+      "ts": "2026-05-31T02:03:38.094Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "visual_workflow",
+      "runId": "run_mpt4yjtn_68135a3f96",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yju2_f408eff950",
+      "ts": "2026-05-31T02:03:38.090Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "visual_workflow",
+      "runId": "run_mpt4yjtn_68135a3f96",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjnz_24752ce7dc",
+      "ts": "2026-05-31T02:03:37.871Z",
+      "projectId": "default",
+      "providerId": "openai_gateway",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yjmn_0138be6ece",
+      "unit": "ai_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/openai_gateway.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjnq_ff9860a3ee",
+      "ts": "2026-05-31T02:03:37.862Z",
+      "projectId": "default",
+      "providerId": "neon",
+      "workflowId": "db_query_ai_summary",
+      "runId": "run_mpt4yjmn_0138be6ece",
+      "unit": "query",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/neon.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjm7_2cae549b04",
+      "ts": "2026-05-31T02:03:37.807Z",
+      "projectId": "default",
+      "providerId": "resend",
+      "workflowId": "checkout_email_link",
+      "runId": "run_mpt4yjlp_9e56f135fd",
+      "unit": "email",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/resend.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjm5_96af84a309",
+      "ts": "2026-05-31T02:03:37.805Z",
+      "projectId": "default",
+      "providerId": "stripe",
+      "workflowId": "checkout_email_link",
+      "runId": "run_mpt4yjlp_9e56f135fd",
+      "unit": "checkout_session",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/stripe.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjk8_312741136f",
+      "ts": "2026-05-31T02:03:37.737Z",
+      "projectId": "default",
+      "providerId": "twilio",
+      "workflowId": "provider_pack_action",
+      "runId": "run_mpt4yjjk_e2e7750a37",
+      "unit": "message_or_call",
+      "quantity": 1,
+      "costCents": 1,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/twilio.json"
+      }
+    },
+    {
+      "id": "meter_mpt4yjhr_e3b5d2b7b0",
+      "ts": "2026-05-31T02:03:37.647Z",
+      "projectId": "default",
+      "providerId": "stripe",
+      "workflowId": "provider_pack_action",
+      "runId": "run_mpt4yjh3_c7ed34e332",
+      "unit": "checkout_session",
+      "quantity": 1,
+      "costCents": 0,
+      "metadata": {
+        "mode": "fixture",
+        "packSource": "file:platform/provider-packs/stripe.json"
+      }
+    }
+  ]
+}

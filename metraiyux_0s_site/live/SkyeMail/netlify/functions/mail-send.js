@@ -38,7 +38,7 @@ async function resendSend(payload){
 exports.handler = async (event) => {
   try{
     if(event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const toList = addressList(body.to);
     const ccList = addressList(body.cc);

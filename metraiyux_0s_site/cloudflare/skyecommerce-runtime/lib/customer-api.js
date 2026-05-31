@@ -24,6 +24,7 @@ import { hashCustomerPassword, verifyCustomerPassword } from './passwords.js';
 import { authSubject, checkAuthLockout, clientIp, recordAuthAttempt, shouldUseSecureCookies } from './security.js';
 
 export const CUSTOMER_SESSION_COOKIE = 'skye_customer_session';
+const SHARED_GATE_CUSTOMER_PASSWORD_HASH = 'shared-0s-gate-only';
 
 function secureCookieAttribute(secure = true) {
   return secure ? '; Secure' : '';
@@ -53,6 +54,120 @@ async function createCustomerSession(env, { customerId, merchantId, email = '', 
     VALUES (?, ?, ?, ?, datetime('now', '+30 day'))
   `, [sessionId, customerId, merchantId, tokenHash]);
   return rawToken;
+}
+
+function sharedGateHandoffSecret(env) {
+  return String(env.SKYECOMMERCE_GATE_HANDOFF_SECRET || '').trim();
+}
+
+function hasSharedGateHandoff(request, env) {
+  const secret = sharedGateHandoffSecret(env);
+  return Boolean(secret && request.headers.get('x-skyecommerce-gate-handoff') === secret);
+}
+
+function sharedGateActor(request, env) {
+  const email = String(
+    request.headers.get('x-skyecommerce-gate-email') ||
+    env.SKYECOMMERCE_OWNER_EMAIL ||
+    ''
+  ).trim().toLowerCase();
+  const name = String(
+    request.headers.get('x-skyecommerce-gate-name') ||
+    env.SKYECOMMERCE_OWNER_NAME ||
+    email
+  ).trim();
+  return { email, name };
+}
+
+function nameParts(name = '') {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.slice(1).join(' ')
+  };
+}
+
+function gateCustomerIdentityMismatch(body = {}, actor = {}) {
+  const requested = String(body.email || '').trim().toLowerCase();
+  return Boolean(requested && actor.email && requested !== actor.email);
+}
+
+function hasAddressValue(address = {}) {
+  return Object.values(address || {}).some((value) => String(value || '').trim());
+}
+
+async function merchantBySlug(env, slug = '') {
+  if (!slugify(slug)) return null;
+  return dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE slug = ? LIMIT 1`, [slugify(slug)]);
+}
+
+async function merchantById(env, merchantId = '') {
+  if (!merchantId) return null;
+  return dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE id = ? LIMIT 1`, [merchantId]);
+}
+
+async function ensureSharedGateCustomer(env, request, merchant, body = {}) {
+  const actor = sharedGateActor(request, env);
+  if (!actor.email) return { error: unauthorized('Shared gate identity is missing an email.') };
+  if (gateCustomerIdentityMismatch(body, actor)) {
+    return {
+      error: json({
+        error: 'Customer email must match the active shared 0S gate identity.',
+        code: 'shared_gate_customer_identity_mismatch'
+      }, 403)
+    };
+  }
+
+  const parsedName = nameParts(actor.name);
+  const firstName = String(body.firstName || parsedName.firstName || '').trim();
+  const lastName = String(body.lastName || parsedName.lastName || '').trim();
+  const phone = String(body.phone || '').trim();
+  const defaultAddress = body.defaultAddress && typeof body.defaultAddress === 'object' ? body.defaultAddress : {};
+  const addressJson = hasAddressValue(defaultAddress) ? JSON.stringify(defaultAddress) : '{}';
+  let row = await dbFirst(env, `SELECT customer_accounts.*, ? AS merchant_slug FROM customer_accounts WHERE merchant_id = ? AND lower(email) = lower(?) LIMIT 1`, [merchant.slug || '', merchant.id, actor.email]);
+  if (!row) {
+    const customerId = uid('cus');
+    await dbRun(env, `
+      INSERT INTO customer_accounts (
+        id, merchant_id, email, password_hash, first_name, last_name, phone, default_address_json, marketing_opt_in
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [customerId, merchant.id, actor.email, SHARED_GATE_CUSTOMER_PASSWORD_HASH, firstName, lastName, phone, addressJson, body.marketingOptIn ? 1 : 0]);
+    row = await dbFirst(env, `SELECT customer_accounts.*, ? AS merchant_slug FROM customer_accounts WHERE id = ? LIMIT 1`, [merchant.slug || '', customerId]);
+  } else if (firstName || lastName || phone || hasAddressValue(defaultAddress)) {
+    await dbRun(env, `
+      UPDATE customer_accounts
+      SET first_name = COALESCE(NULLIF(?, ''), first_name),
+          last_name = COALESCE(NULLIF(?, ''), last_name),
+          phone = COALESCE(NULLIF(?, ''), phone),
+          default_address_json = CASE WHEN ? = 1 THEN ? ELSE default_address_json END,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND merchant_id = ?
+    `, [firstName, lastName, phone, hasAddressValue(defaultAddress) ? 1 : 0, addressJson, row.id, merchant.id]);
+    row = await dbFirst(env, `SELECT customer_accounts.*, ? AS merchant_slug FROM customer_accounts WHERE id = ? LIMIT 1`, [merchant.slug || '', row.id]);
+  }
+
+  const customer = customerRecord(row);
+  customer.merchantName = merchant.brand_name || '';
+  return {
+    session: {
+      id: 'shared-0s-gate-customer',
+      customerId: row.id,
+      merchantId: merchant.id,
+      merchantSlug: merchant.slug,
+      email: actor.email,
+      role: 'customer',
+      sharedGate: true,
+      gateEmail: actor.email,
+      customer
+    }
+  };
+}
+
+async function getSharedGateCustomerSession(request, env, { merchantSlug = '', merchantId = '', body = {} } = {}) {
+  if (!hasSharedGateHandoff(request, env)) return null;
+  const merchant = merchantId ? await merchantById(env, merchantId) : await merchantBySlug(env, merchantSlug);
+  if (!merchant) return null;
+  return ensureSharedGateCustomer(env, request, merchant, body);
 }
 
 export async function getCustomerSession(request, env) {
@@ -120,6 +235,10 @@ async function recordCustomerAuthSuccess(env, guard, kind, identity = '') {
 }
 
 async function requireCustomerSession(request, env, merchantSlug = '') {
+  const sharedGate = await getSharedGateCustomerSession(request, env, { merchantSlug });
+  if (sharedGate?.error) return { error: sharedGate.error };
+  if (sharedGate?.session) return { session: sharedGate.session };
+  if (hasSharedGateHandoff(request, env)) return { error: unauthorized('Shared gate customer session could not be reconciled to this store.') };
   const session = await getCustomerSession(request, env);
   if (!session || !session.customerId) return { error: unauthorized() };
   if (merchantSlug && slugify(merchantSlug) !== slugify(session.merchantSlug || '')) return { error: unauthorized('Customer session does not belong to this store.') };
@@ -228,6 +347,9 @@ function savedCartRecord(row) {
 }
 
 export async function resolveCustomerSessionForMerchant(request, env, merchantId) {
+  const sharedGate = await getSharedGateCustomerSession(request, env, { merchantId });
+  if (sharedGate?.session) return sharedGate.session.customer;
+  if (hasSharedGateHandoff(request, env)) return null;
   const session = await getCustomerSession(request, env);
   if (!session || session.merchantId !== merchantId) return null;
   const customer = await dbFirst(env, `SELECT *, ? AS merchant_slug FROM customer_accounts WHERE id = ? AND merchant_id = ? LIMIT 1`, [session.merchantSlug || '', session.customerId, merchantId]);
@@ -240,6 +362,20 @@ export async function handleCustomerApi(request, env, url) {
 
   if (request.method === 'POST' && url.pathname === '/api/customers/register') {
     const body = normalizeCustomerRegistrationInput(await readJson(request) || {});
+    if (hasSharedGateHandoff(request, env)) {
+      if (!body.slug) return json({ error: 'slug is required.' }, 400);
+      const merchant = await merchantBySlug(env, body.slug);
+      if (!merchant) return json({ error: 'Store not found.' }, 404);
+      const gate = await ensureSharedGateCustomer(env, request, merchant, body);
+      if (gate.error) return gate.error;
+      return json({
+        ok: true,
+        sharedGate: true,
+        sessionSource: 'fs27-gate',
+        customer: gate.session.customer,
+        merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name }
+      });
+    }
     if (!body.slug || !body.email || !body.password) return json({ error: 'slug, email, and password are required.' }, 400);
     const merchant = await dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE slug = ? LIMIT 1`, [slugify(body.slug)]);
     if (!merchant) return json({ error: 'Store not found.' }, 404);
@@ -259,6 +395,20 @@ export async function handleCustomerApi(request, env, url) {
 
   if (request.method === 'POST' && url.pathname === '/api/customers/login') {
     const body = normalizeCustomerRegistrationInput(await readJson(request) || {});
+    if (hasSharedGateHandoff(request, env)) {
+      if (!body.slug) return json({ error: 'slug is required.' }, 400);
+      const merchant = await merchantBySlug(env, body.slug);
+      if (!merchant) return json({ error: 'Store not found.' }, 404);
+      const gate = await ensureSharedGateCustomer(env, request, merchant, body);
+      if (gate.error) return gate.error;
+      return json({
+        ok: true,
+        sharedGate: true,
+        sessionSource: 'fs27-gate',
+        customer: gate.session.customer,
+        merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name }
+      });
+    }
     if (!body.slug || !body.email || !body.password) return json({ error: 'slug, email, and password are required.' }, 400);
     const identity = `${slugify(body.slug)}:${String(body.email || '').trim().toLowerCase()}`;
     const guard = await guardCustomerAuthAttempt(request, env, 'customer_login', identity);
@@ -292,8 +442,12 @@ export async function handleCustomerApi(request, env, url) {
   }
 
   if (request.method === 'GET' && url.pathname === '/api/customers/me') {
-    const session = await getCustomerSession(request, env);
     const slug = url.searchParams.get('slug') || '';
+    const sharedGate = await getSharedGateCustomerSession(request, env, { merchantSlug: slug });
+    if (sharedGate?.error) return sharedGate.error;
+    if (sharedGate?.session) return json({ ok: true, sharedGate: true, customer: sharedGate.session.customer, merchantSlug: sharedGate.session.merchantSlug, merchantName: sharedGate.session.customer.merchantName || '' });
+    if (hasSharedGateHandoff(request, env)) return json({ ok: false, sharedGate: true, customer: null, merchantSlug: slugify(slug) || '' });
+    const session = await getCustomerSession(request, env);
     if (!session) return json({ ok: false, customer: null, merchantSlug: slugify(slug) || '' });
     if (slug && slugify(slug) !== slugify(session.merchantSlug || '')) return json({ ok: false, customer: null, merchantSlug: slugify(slug) });
     return json({ ok: true, customer: session.customer, merchantSlug: session.merchantSlug, merchantName: session.customer.merchantName || '' });

@@ -488,37 +488,6 @@
       }
 
       function readInheritedSession() {
-        const query = new URLSearchParams(location.search);
-        const queryToken = cleanToken(query.get("gate_session") || query.get("skygate_session") || query.get("session"));
-        if (tokenLooksValid(queryToken)) {
-          query.delete("gate_session");
-          query.delete("skygate_session");
-          query.delete("session");
-          history.replaceState({}, document.title, location.pathname + (query.toString() ? "?" + query.toString() : "") + (location.hash || ""));
-          return { token: queryToken, source: "url-fs27-session" };
-        }
-
-        const keys = [
-          "FREE99_PLATFORM_GATE_SESSION",
-          "METRAIYUX_GATE_SESSION",
-          "SKYGATEFS27_GATE_SESSION",
-          "SKYGATE_USER_TOKEN",
-          "SKYGATEFS27_SESSION_TOKEN",
-          "SKYE_GATE_SESSION",
-          "adminBrainToken",
-          "adminSecuritySession",
-          "skygate_token"
-        ];
-
-        for (const key of keys) {
-          const parsed = readJson(sessionStorage, key) || readJson(localStorage, key);
-          const token = tokenFromRecord(parsed) || cleanToken(sessionStorage.getItem(key) || localStorage.getItem(key));
-          if (tokenLooksValid(token)) return { token, tenant: tenantFromRecord(parsed), source: parsed?.source || key };
-        }
-
-        const saas = readJson(localStorage, "saas_client_session");
-        if (saas && tokenLooksValid(tokenFromRecord(saas))) return { token: tokenFromRecord(saas), tenant: tenantFromRecord(saas), source: "0s-client-session" };
-
         const bridge = globalThis.MetrAIyuxGateBridge?.current?.() || globalThis.MetrAIyuxGateBridge?.session?.() || null;
         const bridgeToken = tokenFromRecord(bridge);
         if (tokenLooksValid(bridgeToken)) return { token: bridgeToken, tenant: tenantFromRecord(bridge), source: bridge?.source || "metraiyux-gate-bridge" };
@@ -526,9 +495,17 @@
         const skyGateToken = cleanToken(globalThis.SkygateAuthBridge?.token?.());
         if (tokenLooksValid(skyGateToken)) return { token: skyGateToken, source: "skygate-auth-bridge", tenant: "fs27-owner" };
 
-        const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || {};
-        const runtimeToken = cleanToken(runtime.userToken || runtime.sessionToken || runtime.authToken || runtime.bearerToken || runtime.auth?.token || runtime.auth?.bearerToken);
-        if (tokenLooksValid(runtimeToken)) return { token: runtimeToken, tenant: tenantFromRecord(runtime), source: "skygate-runtime" };
+        const keys = [
+          "METRAIYUX_GATE_SESSION",
+          "SKYGATEFS27_GATE_SESSION",
+          "SKYE_GATE_SESSION"
+        ];
+
+        for (const key of keys) {
+          const parsed = readJson(sessionStorage, key) || readJson(localStorage, key);
+          const token = tokenFromRecord(parsed);
+          if (tokenLooksValid(token)) return { token, tenant: tenantFromRecord(parsed), source: parsed?.source || key };
+        }
 
         for (const cookieName of ["skyegate_session", "fs27_session", "skygatefs27_session"]) {
           const cookieToken = cleanToken(readCookie(cookieName));

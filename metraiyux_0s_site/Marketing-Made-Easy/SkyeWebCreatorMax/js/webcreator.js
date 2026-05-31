@@ -51,12 +51,12 @@
         <div>
           <p class="eyebrow">SkyDexia design vault build</p>
           <h1>Launch an enterprise-grade client experience with motion, depth, and conversion baked in.</h1>
-          <p class="lead">Generated from the SkyeWebCreatorMax stack: Three.js-ready hero layer, premium responsive UI, editable source files, SkyeGateFS13 routing, and AE delivery metadata.</p>
+          <p class="lead">Generated from the SkyeWebCreatorMax stack: Three.js-ready hero layer, premium responsive UI, editable source files, SkyeGateFS13 mirror attempts, and AE delivery metadata pending Worker confirmation.</p>
           <div class="actions"><a class="cta" href="#contact">Book the build</a><a class="ghost" href="#work">See the system</a></div>
         </div>
         <aside class="product-card" aria-label="Generated product interface mockup">
           <div class="window"><span></span><span></span><span></span></div>
-          <div class="metric"><b>$4.8M</b><small>pipeline influenced</small></div>
+          <div class="metric"><b>3 files</b><small>package preview</small></div>
           <div class="chart"><i></i><i></i><i></i><i></i></div>
           <div class="rows"><span></span><span></span><span></span></div>
         </aside>
@@ -64,7 +64,7 @@
       <section class="proof" id="work">
         <article><b>3D Hero</b><span>WebGL scene, fallback canvas, cinematic product framing.</span></article>
         <article><b>SaaS UI</b><span>Dashboard sections, cards, pricing, onboarding, admin flows.</span></article>
-        <article><b>Delivery</b><span>Packaged source, preview, persistence, and AE handoff.</span></article>
+        <article><b>Delivery</b><span>Packaged source, local preview, persistence, and shared-gated AE handoff metadata.</span></article>
       </section>
     </main>
     <script src="./app.js"></script>
@@ -98,9 +98,9 @@ Created in SkyeWebCreatorMax.
 Includes:
 - cinematic animated hero layer
 - premium responsive source
-- editable files and live preview
+- editable files and local preview
 - SkyeGateFS13 event mirror path
-- AE delivery handoff metadata
+- AE delivery handoff metadata pending Worker confirmation
 `,
   };
 
@@ -221,7 +221,7 @@ Includes:
     setFiles(all);
     renderPreview();
     renderProjects();
-    log('Applied editor changes to live preview', { file: activeFile });
+    log('Applied editor changes to local preview', { file: activeFile });
   }
 
   function renderPreview() {
@@ -278,17 +278,17 @@ Includes:
     deliveryList.innerHTML = deliveries.length ? deliveries.map((delivery) => `
       <article class="card">
         <strong>${delivery.projectName}</strong>
-        <small>${delivery.status} · ${delivery.target} · ${delivery.createdAt}</small>
+        <small>${delivery.status} · ${delivery.target} · ${delivery.source || 'browser-local'} · ${delivery.createdAt}</small>
         ${delivery.review ? `<small>review: ${escapeHtml(delivery.review.status)}${delivery.review.owner ? ` · ${escapeHtml(delivery.review.owner)}` : ''}${delivery.review.checkpoint ? ` · ${escapeHtml(delivery.review.checkpoint)}` : ''}</small>` : ''}
         ${delivery.execution ? `<small>execution: ${escapeHtml(delivery.execution.status)}${delivery.execution.owner ? ` · ${escapeHtml(delivery.execution.owner)}` : ''}${delivery.execution.checkpoint ? ` · ${escapeHtml(delivery.execution.checkpoint)}` : ''}</small>` : ''}
       </article>
-    `).join('') : '<article class="card"><strong>No AE packages queued</strong><small>Create or package an artifact to send it toward AE CommandHub.</small></article>';
+    `).join('') : '<article class="card"><strong>No Worker-confirmed AE packages</strong><small>Create a package, then confirm the shared-gated runtime accepted it before treating it as customer-visible.</small></article>';
   }
 
   async function postRuntime(path, body) {
     const response = await fetch(runtimeApiPath(path), {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', ...gateHeaders() },
       body: JSON.stringify(body || {}),
     });
     const data = await response.json().catch(() => ({}));
@@ -297,7 +297,7 @@ Includes:
   }
 
   async function fetchRuntime(path) {
-    const response = await fetch(runtimeApiPath(path));
+    const response = await fetch(runtimeApiPath(path), { headers: gateHeaders() });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || `runtime request failed (${response.status})`);
     return data;
@@ -308,6 +308,32 @@ Includes:
     if (hostLocal && location.port === '4396') return '/api/runtime';
     if (location.pathname.includes('/Marketing-Made-Easy/')) return '/api/marketing-made-easy/webcreator-runtime';
     return '/api/runtime';
+  }
+
+  function gateHeaders() {
+    const headers = {
+      ...(window.MetrAIyuxGateBridge?.headers?.({
+        'x-skye-platform': 'skyewebcreator-max',
+        'x-skye-usage-lane': 'marketing-made-easy'
+      }) || {}),
+    };
+    for (const storage of [sessionStorage, localStorage]) {
+      for (const key of [
+        'ZERO_OS_GATE_SESSION',
+        'FREE99_GATE_SESSION',
+        'SKYE_GATE_SESSION',
+        'skye:gate:session',
+        'adminBrainToken',
+        'metraiyux.gate.token',
+        'skye.gate.token'
+      ]) {
+        const token = storage.getItem(key);
+        if (token && !headers.Authorization) headers.Authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+        if (token && !headers['x-free99-gate-session']) headers['x-free99-gate-session'] = token;
+        if (token && !headers['x-skye-gate-session']) headers['x-skye-gate-session'] = token;
+      }
+    }
+    return headers;
   }
 
   function runtimeApiPath(path) {
@@ -327,6 +353,7 @@ Includes:
         status: item.review?.status || 'queued-for-ae-delivery',
         target: item.target,
         createdAt: item.createdAt,
+        source: 'worker-runtime',
         review: item.review,
         execution: item.execution,
       },
@@ -371,7 +398,7 @@ Includes:
         fetchRuntime('/api/runtime/workflow-timeline'),
       ]);
       runtimeOnline = true;
-      runtimeState.textContent = `Runtime online · ${status.deliveryPacks} packs`;
+      runtimeState.textContent = `Runtime connected · ${status.deliveryPacks} confirmed packs`;
       renderBoardSummary(board.summary || {});
       renderExecutionSummary(board.executionSummary || status.executionBoard || {});
       renderDispatchSummary(board.dispatchSummary || status.dispatchBoard || {});
@@ -380,7 +407,7 @@ Includes:
       return true;
     } catch (error) {
       runtimeOnline = false;
-      runtimeState.textContent = 'Runtime offline';
+      runtimeState.textContent = 'Runtime unavailable or gate required';
       renderBoardSummary({});
       renderExecutionSummary({});
       renderDispatchSummary({});
@@ -406,6 +433,7 @@ Includes:
       status: 'requested',
       designVault: 'design-vault/library',
       gateway: 'SkyeGateFS13',
+      gatewayStatus: 'mirror-pending',
       donorTemplate: template ? {
         id: template.id,
         name: template.name,
@@ -419,7 +447,7 @@ Includes:
     const projects = load(STORAGE_KEY, []);
     projects.unshift(project);
     save(STORAGE_KEY, projects);
-    log('Created SkyeGateFS13-routed project request', project);
+    log('Created browser project request; SkyeGateFS13 mirror is attempted separately', project);
     renderProjects();
     return project;
   }
@@ -430,16 +458,17 @@ Includes:
       id: id('artifact'),
       projectId: project.id,
       projectName: project.name,
-      status: 'queued-for-ae-delivery',
+      status: 'runtime-pending',
       target: 'ae-commandhub',
       files: Object.keys(all),
       sourceSnapshot: all,
+      source: 'browser-pending-runtime',
       createdAt: new Date().toISOString(),
     };
     const deliveries = load(DELIVERY_KEY, []);
     deliveries.unshift(artifact);
     save(DELIVERY_KEY, deliveries);
-    log('Queued generated website package for AE handoff', artifact);
+    log('Prepared browser package pending shared-gated runtime handoff', artifact);
     renderDeliveries();
     if (location.protocol !== 'file:') {
       try {
@@ -459,9 +488,9 @@ Includes:
         });
         syncLocalDeliveryFromRuntime(runtimePack.item);
         await refreshRuntimeBoard();
-        log('Archived delivery pack in same-folder runtime', runtimePack.item);
+        log('Archived delivery pack in Worker runtime', runtimePack.item);
       } catch (error) {
-        log('Local runtime archive skipped', { error: error.message });
+        log('Runtime archive failed; browser package remains pending and is not counted as delivered', { error: error.message });
       }
     }
     return artifact;
@@ -584,7 +613,7 @@ Includes:
       const updated = await postRuntime(`/api/runtime/delivery-packs/${latest.id}/review`, {
         owner: reviewOwner?.value?.trim() || latest.review?.owner || '',
         status: nextStatus,
-        checkpoint: reviewCheckpoint?.value?.trim() || 'advanced in local review board',
+        checkpoint: reviewCheckpoint?.value?.trim() || 'advanced in runtime review board',
         notes: deliveryNotes?.value?.trim() || latest.review?.notes || '',
       });
       syncLocalDeliveryFromRuntime(updated.item);
@@ -611,7 +640,7 @@ Includes:
       const updated = await postRuntime(`/api/runtime/delivery-packs/${latest.id}/execution`, {
         owner: reviewOwner?.value?.trim() || latest.execution?.owner || latest.review?.owner || 'ae-operator',
         status: nextStatus,
-        checkpoint: reviewCheckpoint?.value?.trim() || 'queued in local execution board',
+        checkpoint: reviewCheckpoint?.value?.trim() || 'queued in runtime execution board',
         notes: deliveryNotes?.value?.trim() || latest.execution?.notes || latest.review?.notes || '',
         targets: latest.targets || latest.execution?.targets || [],
       });
@@ -638,14 +667,14 @@ Includes:
       const updated = await postRuntime(`/api/runtime/delivery-packs/${latest.id}/dispatch`, {
         owner: reviewOwner?.value?.trim() || latest.dispatch?.owner || latest.execution?.owner || latest.review?.owner || 'dispatch-operator',
         status: nextStatus,
-        checkpoint: reviewCheckpoint?.value?.trim() || 'queued in local dispatch board',
+        checkpoint: reviewCheckpoint?.value?.trim() || 'queued in runtime dispatch board',
         notes: deliveryNotes?.value?.trim() || latest.dispatch?.notes || latest.execution?.notes || latest.review?.notes || '',
         targets: latest.targets || latest.dispatch?.targets || latest.execution?.targets || [],
       });
       syncLocalDeliveryFromRuntime(updated.item);
       renderDispatchSummary(updated.summary || {});
       await refreshRuntimeBoard();
-      log('Dispatched latest runtime delivery pack', updated.item);
+      log('Updated latest runtime delivery pack dispatch lane', updated.item);
     } catch (error) {
       log('Failed to dispatch runtime delivery pack', { error: error.message });
     }

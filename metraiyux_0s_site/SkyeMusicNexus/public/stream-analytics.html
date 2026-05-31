@@ -46,9 +46,9 @@
       </nav>
       <section class="hero">
         <article class="panel hero-copy">
-          <span class="kicker">Realtime Stream Room</span>
-          <h1>Stream signal, live map, and queue telemetry.</h1>
-          <p>The canonical Nexus Player records play starts, one unified Nexus stream count, completed plays, listen seconds, and artist movement across the network.</p>
+          <span class="kicker">Server Stream Room</span>
+          <h1>Worker-confirmed stream signal and queue telemetry.</h1>
+          <p>The canonical Nexus Player records local playback immediately, but this room only counts streams after the SkyeMusicNexus Worker confirms the traffic summary.</p>
           <div class="stat-grid">
             <div class="stat"><strong id="stat-nexus">0</strong><span>Nexus streams</span></div>
             <div class="stat"><strong id="stat-plays">0</strong><span>play starts</span></div>
@@ -61,7 +61,7 @@
       <section class="grid">
         <article class="panel">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-            <div><span class="kicker">Tracks</span><h2>Live Movement</h2></div>
+            <div><span class="kicker">Tracks</span><h2>Confirmed Movement</h2></div>
             <button class="button" id="refresh">Refresh</button>
           </div>
           <div id="top-tracks"></div>
@@ -104,16 +104,6 @@
           for (const track of state.catalog.tracks || []) {
             byTrack.set(track.trackId, { track, plays: 0, completePlays: 0, listenSeconds: 0, nexusStreams: 0 });
           }
-          const remoteIds = new Set((state.remote?.trafficSummary?.topTracks || []).map((item) => item.trackId));
-          for (const [trackId, totals] of Object.entries(state.local.totals || {})) {
-            if (remoteIds.has(trackId)) continue;
-            const row = byTrack.get(trackId) || { track: (state.catalog.tracks || []).find((item) => item.trackId === trackId) || { trackId, title: trackId, artistName: 'Nexus listener' }, plays: 0, completePlays: 0, listenSeconds: 0, nexusStreams: 0 };
-            row.plays += Number(totals.plays || 0);
-            row.completePlays += Number(totals.completePlays || 0);
-            row.listenSeconds += Number(totals.listenSeconds || 0);
-            row.nexusStreams += Number(totals.nexusStreams || 0);
-            byTrack.set(trackId, row);
-          }
           for (const item of state.remote?.trafficSummary?.topTracks || []) {
             const row = byTrack.get(item.trackId) || { track: { trackId: item.trackId, title: item.title, artistName: item.artistName }, plays: 0, completePlays: 0, listenSeconds: 0, nexusStreams: 0 };
             row.plays = Number(item.playStarts || 0);
@@ -126,7 +116,8 @@
         }
         function render() {
           const rows = mergedRows();
-          const totals = rows.reduce((acc, row) => {
+          const confirmedRows = rows.filter((row) => Number(row.nexusStreams || 0) || Number(row.plays || 0) || Number(row.listenSeconds || 0));
+          const totals = confirmedRows.reduce((acc, row) => {
             acc.nexus += Number(row.nexusStreams || 0);
             acc.plays += Number(row.plays || 0);
             acc.completes += Number(row.completePlays || 0);
@@ -137,20 +128,22 @@
           els.plays.textContent = totals.plays;
           els.completes.textContent = totals.completes;
           els.seconds.textContent = Math.round(totals.seconds);
-          els.tracks.innerHTML = rows.slice(0, 18).map((row) => {
+          els.tracks.innerHTML = confirmedRows.slice(0, 18).map((row) => {
             const track = row.track;
             return `<article class="stream-row"><img src="${track.coverImage || track.artistImage || '../assets/og-card.svg'}" alt=""><span><strong>${track.title || track.trackId}</strong><span>${track.artistName || ''} - ${track.genre || ''}</span><span>${row.nexusStreams || 0} Nexus streams / ${Math.round(row.listenSeconds)} sec</span></span><button class="button" data-nexus-track-id="${track.trackId}">Play</button></article>`;
           }).join('') || '<p>No stream rows yet.</p>';
-          const events = [...(state.local.events || []), ...(state.remote?.traffic || [])].sort((a, b) => String(b.at || b.createdAt || '').localeCompare(String(a.at || a.createdAt || ''))).slice(0, 80);
-          els.feed.innerHTML = events.map((event) => `<article class="event"><strong>${event.eventType || 'event'} - ${event.title || event.trackId || event.dropId || ''}</strong><span>${event.artistName || event.artistSlug || ''}</span><span>${event.listenSeconds || 0} sec - ${event.at || event.createdAt || ''}</span></article>`).join('') || '<p>No playback receipts yet.</p>';
-          drawMap(rows);
+          const remoteEvents = (state.remote?.traffic || []).map((event) => ({ ...event, receiptLane: 'worker-confirmed' }));
+          const pendingEvents = (state.local.events || []).map((event) => ({ ...event, receiptLane: 'browser-pending' }));
+          const events = [...remoteEvents, ...pendingEvents].sort((a, b) => String(b.at || b.createdAt || '').localeCompare(String(a.at || a.createdAt || ''))).slice(0, 80);
+          els.feed.innerHTML = events.map((event) => `<article class="event"><strong>${event.eventType || 'event'} - ${event.title || event.trackId || event.dropId || ''}</strong><span>${event.artistName || event.artistSlug || ''}</span><span>${event.listenSeconds || 0} sec - ${event.at || event.createdAt || ''} - ${event.receiptLane}</span></article>`).join('') || '<p>No playback receipts yet.</p>';
+          drawMap(confirmedRows);
         }
         function drawMap(rows) {
           const canvas = els.canvas;
           const ctx = canvas.getContext('2d');
           const w = canvas.width; const h = canvas.height;
           ctx.clearRect(0, 0, w, h);
-          const active = rows.slice(0, 28);
+          const active = rows.filter((row) => Number(row.nexusStreams || 0) || Number(row.plays || 0) || Number(row.listenSeconds || 0)).slice(0, 28);
           active.forEach((row, index) => {
             const ring = Math.floor(index / 7) + 1;
             const angle = (index / Math.max(1, active.length)) * Math.PI * 2 + performance.now() / 9000;
@@ -163,7 +156,7 @@
             ctx.fill();
             ctx.beginPath(); ctx.moveTo(w / 2, h / 2); ctx.lineTo(x, y); ctx.strokeStyle = 'rgba(247,245,234,.13)'; ctx.stroke();
           });
-          ctx.fillStyle = 'rgba(247,245,234,.92)'; ctx.font = '700 15px Inter, sans-serif'; ctx.fillText('SkyeMusicNexus realtime stream map', 22, 34);
+          ctx.fillStyle = 'rgba(247,245,234,.92)'; ctx.font = '700 15px Inter, sans-serif'; ctx.fillText('SkyeMusicNexus worker-confirmed stream map', 22, 34);
         }
         document.getElementById('refresh').addEventListener('click', load);
         window.addEventListener('skymusicnexus:stream-event', load);

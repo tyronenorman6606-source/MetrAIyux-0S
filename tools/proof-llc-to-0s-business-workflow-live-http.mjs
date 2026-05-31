@@ -182,7 +182,7 @@ async function main() {
     return;
   }
 
-  const login = await fetchAny('Founder Command login issues shared gate token', `${BASE_URL}/api/founder-command/login`, {
+  const login = await fetchAny('Founder Command login issues shared gate token', `${BASE_URL}/api/owner/admin-login`, {
     method: 'POST',
     headers: { accept: 'application/json', 'content-type': 'application/json' },
     body: JSON.stringify({ code: credential.value })

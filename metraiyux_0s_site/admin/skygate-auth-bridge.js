@@ -1,7 +1,5 @@
 const SkygateAuthBridge = (() => {
-  const tokenKey = 'adminBrainToken';
   const endpointKey = 'adminBrainEndpoint';
-  const adminSessionKey = 'adminSecuritySession';
   const claimsKey = 'metraiyux.skygate.claims.v1';
   const defaultWorkerOrigin = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
 
@@ -13,7 +11,7 @@ const SkygateAuthBridge = (() => {
   }
 
   function token() {
-    return sessionStorage.getItem(tokenKey) || window.MetrAIyuxGateBridge?.current()?.token || '';
+    return window.MetrAIyuxGateBridge?.current()?.token || '';
   }
 
   function authHeaders(extra = {}) {
@@ -21,12 +19,10 @@ const SkygateAuthBridge = (() => {
       'x-skye-platform': 'metraiyux-0s-admin',
       'x-skye-usage-lane': '0meg4kai-admin-security'
     }) || {};
-    const adminSession = sessionStorage.getItem(adminSessionKey) || '';
     return {
       ...extra,
       ...bridgeHeaders,
-      ...(token() ? { authorization: `Bearer ${token()}` } : {}),
-      ...(adminSession ? { 'x-admin-session': adminSession } : {})
+      ...(token() ? { authorization: `Bearer ${token()}` } : {})
     };
   }
 
@@ -94,24 +90,22 @@ const SkygateAuthBridge = (() => {
 
   async function saveTokenFromInput(inputId = 'tokenInput', statusId = 'skygateAuthStatus') {
     const input = $(inputId);
-    const value = String(input?.value || '').trim();
+    const value = token();
+    if (input) input.value = '';
     if (!value) {
-      sessionStorage.removeItem(tokenKey);
       sessionStorage.removeItem(claimsKey);
-      showStatus(statusId, 'Admin token cleared for this browser session.');
-      return { ok: true, cleared: true };
+      showStatus(statusId, 'Open the shared FS27 gate first. This admin deck no longer stores pasted admin tokens.', false);
+      return { ok: false, error: 'shared_fs27_gate_session_required' };
     }
 
-    showStatus(statusId, 'Checking token with Skyegate...');
+    showStatus(statusId, 'Checking shared FS27/SkyGate session...');
     const result = await introspect(value);
     if (!result.ok) {
-      sessionStorage.removeItem(tokenKey);
       sessionStorage.removeItem(claimsKey);
-      showStatus(statusId, result.error || 'Token was not accepted by the admin auth bridge.', false);
+      showStatus(statusId, result.error || 'Shared FS27 session was not accepted by the admin auth bridge.', false);
       return result;
     }
 
-    sessionStorage.setItem(tokenKey, value);
     sessionStorage.setItem(claimsKey, JSON.stringify(result.skygate || result));
     window.MetrAIyuxGateBridge?.persist?.({
       token: value,
@@ -130,7 +124,7 @@ const SkygateAuthBridge = (() => {
     });
     const source = 'Skyegate FS27';
     const who = actor();
-    showStatus(statusId, `Admin token accepted by ${source}. Active operator: ${who}.`);
+    showStatus(statusId, `Shared gate session accepted by ${source}. Active operator: ${who}.`);
     return result;
   }
 
@@ -145,24 +139,11 @@ const SkygateAuthBridge = (() => {
   }
 
   function saveAdminSession(sessionToken) {
-    if (sessionToken) {
-      sessionStorage.setItem(adminSessionKey, sessionToken);
-      window.MetrAIyuxGateBridge?.persist?.({
-        token: sessionToken,
-        source: 'admin-security-session',
-        platform_id: 'metraiyux-0s-admin',
-        usage_lane: '0meg4kai-admin-security',
-        role: 'admin',
-        actor: actor(),
-        claims: claims()
-      });
-    } else {
-      sessionStorage.removeItem(adminSessionKey);
-    }
+    return sessionToken ? { ok: false, error: 'admin_security_session_disabled_use_fs27_gate' } : { ok: true, cleared: true };
   }
 
   function adminSession() {
-    return sessionStorage.getItem(adminSessionKey) || '';
+    return '';
   }
 
   return { endpoint, token, authHeaders, claims, actor, introspect, saveTokenFromInput, mirrorEvent, saveAdminSession, adminSession };

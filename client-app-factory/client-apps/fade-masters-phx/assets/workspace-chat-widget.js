@@ -574,7 +574,7 @@
       }
       const replyBody = relayStatus && relayStatus.ok
         ? `Sent into the ${config.clientName || config.appName} live workspace lane. An operator can review it with this workspace account context.`
-        : `Saved in this app and queued for ${config.clientName || config.appName} workspace sync. Live delivery turns on when the Relay13 workspace and domain allowlist are published.`;
+        : `Saved locally and queued for ${config.clientName || config.appName} workspace retry. Relay13 is live, but this app did not receive a live delivery receipt yet.`;
       const reply = addMessage("operator", replyBody, { kind: relayStatus && relayStatus.ok ? "relay-confirmation" : "queued-confirmation", relayStatus });
       track("message.reply", { messageId: reply.id, kind: relayStatus && relayStatus.ok ? "relay-confirmation" : "queued-confirmation" });
     }, 180);

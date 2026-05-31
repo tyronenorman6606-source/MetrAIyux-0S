@@ -1,13 +1,25 @@
 {
+  "runtimeBoundary": {
+    "source": "local-smoke-proof",
+    "liveTelemetry": false,
+    "liveCustomerVisibility": false,
+    "workerConfirmed": false,
+    "workerRuntimeEndpoint": "/api/marketing-made-easy/webcreator-runtime",
+    "note": "Local smoke proof only; shared-gated 0S Worker confirmation is required before customer-visible delivery claims."
+  },
   "deliveryPacks": [
     {
-      "id": "delivery-mps1zuii-8qmhpe",
+      "id": "delivery-mpt5rdtn-zdxsl7",
+      "source": "local-runtime",
+      "workerConfirmed": false,
+      "customerVisible": false,
+      "liveTelemetry": false,
       "projectId": "proof-webcreator-runtime",
       "projectName": "Runtime Proof Website",
       "label": "Founder rollout handoff",
       "target": "ae-commandhub",
-      "notes": "Needs AE command review and downstream route.",
-      "createdAt": "2026-05-30T07:52:53.562Z",
+      "notes": "Local smoke package; needs shared-gated Worker confirmation before AE/customer-visible use.",
+      "createdAt": "2026-05-31T02:26:03.323Z",
       "sourceSnapshot": {
         "index.html": "<main>contact proof gate</main>",
         "styles.css": "body { color: white; }",
@@ -32,43 +44,51 @@
       "review": {
         "status": "dispatched",
         "owner": "ae-operator",
-        "checkpoint": "approved for handoff",
-        "notes": "Approved in local review board.",
-        "updatedAt": "2026-05-30T07:52:53.777Z"
+        "checkpoint": "local review proof only",
+        "notes": "Approved in the local review board only; awaiting shared-gated Worker confirmation.",
+        "workerConfirmed": false,
+        "customerVisible": false,
+        "updatedAt": "2026-05-31T02:26:03.355Z"
       },
       "execution": {
         "status": "fulfilled",
         "owner": "delivery-operator",
-        "checkpoint": "queued for downstream execution",
-        "notes": "Ready for downstream launch handling.",
+        "checkpoint": "local execution proof only",
+        "notes": "Local execution proof only; downstream launch handling is pending shared-gated Worker confirmation.",
+        "workerConfirmed": false,
+        "customerVisible": false,
         "targets": [
           "AE-FlowPro",
           "SkyeProofx"
         ],
-        "updatedAt": "2026-05-30T07:52:53.777Z"
+        "updatedAt": "2026-05-31T02:26:03.355Z"
       },
       "dispatch": {
         "status": "delivered",
         "owner": "dispatch-operator",
-        "checkpoint": "delivered to downstream lane",
-        "notes": "Dispatched into the next operator lane.",
+        "checkpoint": "local dispatch proof only",
+        "notes": "Local dispatch proof only; not delivered to a customer-visible Worker lane.",
+        "workerConfirmed": false,
+        "customerVisible": false,
         "targets": [
           "AE-FlowPro",
           "SkyeProofx"
         ],
-        "updatedAt": "2026-05-30T07:52:53.777Z"
+        "updatedAt": "2026-05-31T02:26:03.355Z"
       }
     }
   ],
   "audit": [
     {
       "type": "delivery_pack_dispatched",
-      "id": "delivery-mps1zuii-8qmhpe",
-      "createdAt": "2026-05-30T07:52:53.777Z",
+      "id": "delivery-mpt5rdtn-zdxsl7",
+      "createdAt": "2026-05-31T02:26:03.355Z",
       "owner": "dispatch-operator",
       "status": "delivered",
-      "checkpoint": "delivered to downstream lane",
-      "notes": "Dispatched into the next operator lane.",
+      "checkpoint": "local dispatch proof only",
+      "notes": "Local dispatch proof only; not delivered to a customer-visible Worker lane.",
+      "workerConfirmed": false,
+      "customerVisible": false,
       "targets": [
         "AE-FlowPro",
         "SkyeProofx"
@@ -76,12 +96,14 @@
     },
     {
       "type": "delivery_pack_execution_updated",
-      "id": "delivery-mps1zuii-8qmhpe",
-      "createdAt": "2026-05-30T07:52:53.587Z",
+      "id": "delivery-mpt5rdtn-zdxsl7",
+      "createdAt": "2026-05-31T02:26:03.346Z",
       "owner": "delivery-operator",
       "status": "active",
-      "checkpoint": "queued for downstream execution",
-      "notes": "Ready for downstream launch handling.",
+      "checkpoint": "local execution proof only",
+      "notes": "Local execution proof only; downstream launch handling is pending shared-gated Worker confirmation.",
+      "workerConfirmed": false,
+      "customerVisible": false,
       "targets": [
         "AE-FlowPro",
         "SkyeProofx"
@@ -89,12 +111,14 @@
     },
     {
       "type": "delivery_pack_reviewed",
-      "id": "delivery-mps1zuii-8qmhpe",
-      "createdAt": "2026-05-30T07:52:53.578Z",
+      "id": "delivery-mpt5rdtn-zdxsl7",
+      "createdAt": "2026-05-31T02:26:03.339Z",
       "owner": "ae-operator",
       "status": "approved",
-      "checkpoint": "approved for handoff",
-      "notes": "Approved in local review board.",
+      "checkpoint": "local review proof only",
+      "notes": "Approved in the local review board only; awaiting shared-gated Worker confirmation.",
+      "workerConfirmed": false,
+      "customerVisible": false,
       "targets": [
         "SkyeLeadVault",
         "SkyeProofx"
@@ -102,12 +126,14 @@
     },
     {
       "type": "delivery_pack_created",
-      "id": "delivery-mps1zuii-8qmhpe",
-      "createdAt": "2026-05-30T07:52:53.562Z",
+      "id": "delivery-mpt5rdtn-zdxsl7",
+      "createdAt": "2026-05-31T02:26:03.323Z",
       "owner": "ae-operator",
       "status": "ready",
       "checkpoint": "ready for packaging",
-      "notes": "Needs AE command review and downstream route.",
+      "notes": "Local smoke package; needs shared-gated Worker confirmation before AE/customer-visible use.",
+      "workerConfirmed": false,
+      "customerVisible": false,
       "targets": [
         "SkyeLeadVault",
         "SkyeProofx"

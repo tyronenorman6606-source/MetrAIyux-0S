@@ -3,8 +3,14 @@
   "app": "SkyeWebCreatorMax",
   "slug": "skyewebcreator",
   "version": "3.0.0",
-  "mode": "static-production-platform-contract",
+  "mode": "static-contract-not-live-telemetry",
   "endpoint": "/handoff-packs",
+  "status": "static-contract-present",
+  "dataSource": "checked-in static route contract",
+  "liveTelemetry": false,
+  "liveCustomerVisibility": false,
+  "workerRuntimeEndpoint": "/api/marketing-made-easy/webcreator-runtime/delivery-packs",
+  "boundary": "Packs below are static examples, not live customer handoffs. Confirm live handoff packs through the shared-gated Worker runtime before presenting them as delivered.",
   "pages": [
     "/dashboard.html",
     "/briefs.html",
@@ -19,7 +25,7 @@
   "packs": [
     {
       "label": "SkyeWebCreatorMax handoff",
-      "status": "ready",
+      "status": "static-contract-ready",
       "owner": "VantaCore"
     }
   ]

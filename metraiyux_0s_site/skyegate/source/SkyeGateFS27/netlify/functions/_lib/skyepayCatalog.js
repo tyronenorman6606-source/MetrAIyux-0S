@@ -619,6 +619,7 @@ function hydratedPolicy(offer, extra) {
     free99_access: Array.isArray(policy.free99_access) ? policy.free99_access : [],
     paid_platform_access: objectOrNull(policy.paid_platform_access),
     platform_usage_buckets: objectOrNull(policy.platform_usage_buckets),
+    skyemail_ai: objectOrNull(policy.skyemail_ai),
     relay13_ai: objectOrNull(policy.relay13_ai)
   };
 }
@@ -2424,24 +2425,25 @@ export const SKYPAY_OFFERS = [
     activation_path: "legal_review_checkout_then_operator_triage"
   },
   {
-    id: "relay13-ai-response-starter",
-    plan_name: "relay13-ai-response-starter",
-    title: "Relay13 AI Response Starter",
-    family: "relay13",
-    description: "Paid add-on that unlocks owner-reviewed AI-generated Relay13 response drafts for a client workspace after Stripe checkout. Local brain triage remains the default path; provider calls stay blocked until the paid add-on is active and capped, and the backup bucket protects traffic spikes before hard stop.",
+    id: "skyemail-ai-response-starter",
+    plan_name: "skyemail-ai-response-starter",
+    title: "SkyEmail AI Response Starter",
+    family: "skyemail",
+    description: "Paid add-on that unlocks owner-reviewed SkyEmail Brain response drafts for a mailbox workspace after Stripe checkout. Local mailbox brain triage remains the default path; FS27/SkyGate Brain calls stay blocked until the paid add-on is active and capped, and the backup bucket protects traffic spikes before hard stop.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
-    lookup_keys: ["relay13_ai_response_starter_monthly"],
+    lookup_keys: ["skyemail_ai_response_starter_monthly"],
     line_items: [
       {
         id: "monthly",
-        name: "Relay13 AI Response Starter",
+        name: "SkyEmail AI Response Starter",
         amount_cents: cents(35),
         type: "recurring",
         interval: "month",
-        lookup_key: "relay13_ai_response_starter_monthly"
+        lookup_key: "skyemail_ai_response_starter_monthly"
       }
     ],
+    require_stripe_lookup_key: true,
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Messaging add-ons",
@@ -2458,12 +2460,11 @@ export const SKYPAY_OFFERS = [
       monthly_cap_cents: 3500,
       default_rpm_limit: 12,
       default_rpd_limit: 200,
-      allowed_providers: ["openai", "gemini"],
+      allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        openai: ["gpt-4o-mini"],
-        gemini: ["gemini-2.5-flash"]
+        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
       },
-      relay13_ai: {
+      skyemail_ai: {
         enabled_after_stripe: true,
         monthly_flat_fee_cents: 3500,
         included_ai_responses_monthly: 125,
@@ -2479,7 +2480,7 @@ export const SKYPAY_OFFERS = [
           "Stripe checkout complete",
           "SkyePay order recorded",
           "Owner approves workspace AI cap",
-          "Relay13 guardrails switch from off to draft_only with monthly limit and backup bucket"
+          "SkyEmail Brain switches from local-only to draft_only with monthly limit and backup bucket"
         ]
       }
     },
@@ -2487,24 +2488,25 @@ export const SKYPAY_OFFERS = [
     activation_path: "paid_pending_owner_approval"
   },
   {
-    id: "relay13-ai-response-plus",
-    plan_name: "relay13-ai-response-plus",
-    title: "Relay13 AI Response Plus",
-    family: "relay13",
-    description: "Higher-volume paid Relay13 response lane with owner-reviewed AI drafts, expanded FAQ tuning, priority routing, and a backup bucket before provider calls hard-stop.",
+    id: "skyemail-ai-response-plus",
+    plan_name: "skyemail-ai-response-plus",
+    title: "SkyEmail AI Response Plus",
+    family: "skyemail",
+    description: "Higher-volume paid SkyEmail Brain lane with owner-reviewed response drafts, expanded FAQ tuning, priority routing, and a backup bucket before FS27/SkyGate Brain calls hard-stop.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
-    lookup_keys: ["relay13_ai_response_plus_monthly"],
+    lookup_keys: ["skyemail_ai_response_plus_monthly"],
     line_items: [
       {
         id: "monthly",
-        name: "Relay13 AI Response Plus",
+        name: "SkyEmail AI Response Plus",
         amount_cents: cents(79),
         type: "recurring",
         interval: "month",
-        lookup_key: "relay13_ai_response_plus_monthly"
+        lookup_key: "skyemail_ai_response_plus_monthly"
       }
     ],
+    require_stripe_lookup_key: true,
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Messaging add-ons",
@@ -2521,12 +2523,11 @@ export const SKYPAY_OFFERS = [
       monthly_cap_cents: 7900,
       default_rpm_limit: 18,
       default_rpd_limit: 400,
-      allowed_providers: ["openai", "gemini"],
+      allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        openai: ["gpt-4o-mini"],
-        gemini: ["gemini-2.5-flash"]
+        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
       },
-      relay13_ai: {
+      skyemail_ai: {
         enabled_after_stripe: true,
         monthly_flat_fee_cents: 7900,
         included_ai_responses_monthly: 425,
@@ -2542,7 +2543,7 @@ export const SKYPAY_OFFERS = [
           "Stripe checkout complete",
           "SkyePay order recorded",
           "Owner approves workspace AI cap",
-          "Relay13 guardrails switch to priority draft mode with usage monitor and backup bucket"
+          "SkyEmail Brain switches to priority draft mode with usage monitor and backup bucket"
         ]
       }
     },
@@ -2550,24 +2551,25 @@ export const SKYPAY_OFFERS = [
     activation_path: "paid_pending_owner_approval"
   },
   {
-    id: "relay13-managed-ai-inbox",
-    plan_name: "relay13-managed-ai-inbox",
-    title: "Relay13 Managed AI Inbox",
-    family: "relay13",
-    description: "Managed Relay13 inbox lane where AI triages, labels, drafts, sends allowlisted routine responses, starts follow-up timers, writes ConnectLog summaries, and escalates risky messages to a human.",
+    id: "skyemail-managed-ai-inbox",
+    plan_name: "skyemail-managed-ai-inbox",
+    title: "SkyEmail Managed AI Inbox",
+    family: "skyemail",
+    description: "Managed SkyEmail inbox lane where the mailbox brain triages, labels, drafts, sends allowlisted routine responses, starts follow-up timers, writes 0S handoff summaries, and escalates risky messages to a human.",
     currency: DEFAULT_CURRENCY,
     mode: "subscription",
-    lookup_keys: ["relay13_managed_ai_inbox_monthly"],
+    lookup_keys: ["skyemail_managed_ai_inbox_monthly"],
     line_items: [
       {
         id: "monthly",
-        name: "Relay13 Managed AI Inbox",
+        name: "SkyEmail Managed AI Inbox",
         amount_cents: cents(149),
         type: "recurring",
         interval: "month",
-        lookup_key: "relay13_managed_ai_inbox_monthly"
+        lookup_key: "skyemail_managed_ai_inbox_monthly"
       }
     ],
+    require_stripe_lookup_key: true,
     trial_days: 0,
     zero_upfront_trial: false,
     store_category: "Messaging add-ons",
@@ -2585,12 +2587,11 @@ export const SKYPAY_OFFERS = [
       monthly_cap_cents: 14900,
       default_rpm_limit: 24,
       default_rpd_limit: 800,
-      allowed_providers: ["openai", "gemini"],
+      allowed_providers: ["fs27_skygate_brain"],
       allowed_models: {
-        openai: ["gpt-4o-mini"],
-        gemini: ["gemini-2.5-flash"]
+        skyemail: ["skyemail-brain-fast", "skyemail-brain-deep", "skyemail-brain-operator"]
       },
-      relay13_ai: {
+      skyemail_ai: {
         enabled_after_stripe: true,
         monthly_flat_fee_cents: 14900,
         included_ai_responses_monthly: 1000,
@@ -2616,7 +2617,7 @@ export const SKYPAY_OFFERS = [
           "Stripe checkout complete",
           "SkyePay order recorded",
           "Owner approves managed inbox policy",
-          "Relay13 guardrails switch to managed inbox mode with usage monitor and backup bucket"
+          "SkyEmail Brain switches to managed inbox mode with usage monitor and backup bucket"
         ]
       }
     },
@@ -2824,6 +2825,13 @@ export const SKYPAY_OFFERS = [
     store_rank: 110,
     badge: "Vault starter",
     includes: ["1 workspace", "1GB vault", "250 files/month", "Starter gate limits"],
+    delivery: {
+      type: "gated-agent-install",
+      install_center: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/?offer=skyevault-starter-access",
+      package_manifest: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/latest.json",
+      agent_package: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz",
+      auth_model: "shared-fs27-skygate-bearer"
+    },
     gate_policy: {
       monthly_cap_cents: 5000,
       default_rpm_limit: 30,
@@ -2867,6 +2875,13 @@ export const SKYPAY_OFFERS = [
     store_rank: 120,
     badge: "Vault pro",
     includes: ["3 workspaces", "25GB vault", "1500 files/month", "Pro gate limits"],
+    delivery: {
+      type: "gated-agent-install",
+      install_center: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/?offer=skyevault-pro-access",
+      package_manifest: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/latest.json",
+      agent_package: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz",
+      auth_model: "shared-fs27-skygate-bearer"
+    },
     gate_policy: {
       monthly_cap_cents: 15000,
       default_rpm_limit: 90,
@@ -2911,6 +2926,13 @@ export const SKYPAY_OFFERS = [
     store_rank: 130,
     badge: "Vault command",
     includes: ["10 workspaces", "100GB vault", "10000 files/month", "Command gate limits"],
+    delivery: {
+      type: "gated-agent-install",
+      install_center: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/?offer=skyevault-command-access",
+      package_manifest: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/latest.json",
+      agent_package: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz",
+      auth_model: "shared-fs27-skygate-bearer"
+    },
     gate_policy: {
       monthly_cap_cents: 50000,
       default_rpm_limit: 240,
@@ -3078,20 +3100,20 @@ export const SKYPAY_CLIENTS = {
   },
   "metraiyux-0s-skm": {
     slug: "metraiyux-0s-skm",
-    client_name: "MetrAIyux 0S - SKM",
+    client_name: "SkyEmail Workspace",
     company_name: "MetrAIyux 0S",
-    workspace_slug: "connectlog-main",
-    default_offer_id: "metraiyux-starter-command",
-    preview_status: "skm_house_paid_test_account",
+    workspace_slug: "skyemail-main",
+    default_offer_id: "skyemail-ai-response-starter",
+    preview_status: "skyemail_live_workspace",
     free_trial_days: 0,
-    skye_merit_account_code: "METRAIYUX-0S-SKM",
+    skye_merit_account_code: "SKYEMAIL-WORKSPACE",
     included_usage: [
-      "House-paid SkyeMerit usage ledger",
-      "Relay13 public-site chat workspace",
-      "ConnectLog relationship request proof",
-      "FS27 messaging lane mirror"
+      "SkyEmail mailbox workspace",
+      "FS27/SkyGate identity continuity",
+      "SkyPay paid AI entitlement ledger",
+      "0S/Citadel event mirror"
     ],
-    special_offer: "Internal SKM account for proving the live 0S chat system before client handoff.",
+    special_offer: "SkyEmail paid AI add-ons unlock only through FS27/SkyPay checkout and Stripe-backed plan receipts.",
     contact: {
       email: "SkyesOverLondonLC@solenterprises.org",
       phone: "(623) 260-7073",
@@ -3220,26 +3242,26 @@ export const SKYPAY_PLATFORM_ROUTES = [
     note: "Upfront review deposit for SovereignDocs vault packet routing. Candidate legal partners stay pending until verification, terms, conflicts, and payout setup are complete."
   },
   {
-    platform_id: "relay13-ai-response-addon",
-    title: "Relay13 AI Response Starter",
-    route: "/skyepay.html?client=metraiyux-0s-skm&offer=relay13-ai-response-starter",
-    default_offer_id: "relay13-ai-response-starter",
+    platform_id: "skyemail-ai-response-addon",
+    title: "SkyEmail AI Response Starter",
+    route: "/skyepay.html?client=metraiyux-0s-skm&offer=skyemail-ai-response-starter",
+    default_offer_id: "skyemail-ai-response-starter",
     wiring_status: "stripe_gate_ready",
     note: "Starter AI response drafts are a paid add-on. Local brain and operator review stay active by default; provider calls stay locked until checkout and owner-approved caps are applied."
   },
   {
-    platform_id: "relay13-ai-response-plus",
-    title: "Relay13 AI Response Plus",
-    route: "/skyepay.html?client=metraiyux-0s-skm&offer=relay13-ai-response-plus",
-    default_offer_id: "relay13-ai-response-plus",
+    platform_id: "skyemail-ai-response-plus",
+    title: "SkyEmail AI Response Plus",
+    route: "/skyepay.html?client=metraiyux-0s-skm&offer=skyemail-ai-response-plus",
+    default_offer_id: "skyemail-ai-response-plus",
     wiring_status: "stripe_gate_ready",
     note: "Higher-volume owner-reviewed response lane with backup bucket protection before provider-call hard stop."
   },
   {
-    platform_id: "relay13-managed-ai-inbox",
-    title: "Relay13 Managed AI Inbox",
-    route: "/skyepay.html?client=metraiyux-0s-skm&offer=relay13-managed-ai-inbox",
-    default_offer_id: "relay13-managed-ai-inbox",
+    platform_id: "skyemail-managed-ai-inbox",
+    title: "SkyEmail Managed AI Inbox",
+    route: "/skyepay.html?client=metraiyux-0s-skm&offer=skyemail-managed-ai-inbox",
+    default_offer_id: "skyemail-managed-ai-inbox",
     wiring_status: "stripe_gate_ready",
     note: "Managed inbox lane where AI triages, labels, sends allowlisted routine replies, starts follow-up timers, and escalates risky messages."
   },
@@ -3345,7 +3367,13 @@ export function listSkyePayPlatformRoutes() {
 }
 
 export function getSkyePayOffer(id) {
-  return SKYPAY_OFFERS.find((offer) => offer.id === safeText(id, 100)) || null;
+  const key = safeText(id, 100);
+  const aliases = {
+    "relay13-ai-response-starter": "skyemail-ai-response-starter",
+    "relay13-ai-response-plus": "skyemail-ai-response-plus",
+    "relay13-managed-ai-inbox": "skyemail-managed-ai-inbox"
+  };
+  return SKYPAY_OFFERS.find((offer) => offer.id === (aliases[key] || key)) || null;
 }
 
 export function buildSkyCartOffer({ offer, addOnOffer }) {
@@ -3630,6 +3658,7 @@ export function publicOffer(offer, client = null) {
     catalog_note: offer.catalog_note || null,
     skye_merit_delivery: Array.isArray(offer.skye_merit_delivery) ? offer.skye_merit_delivery : [],
     relay13_inbox_delivery: offer.relay13_inbox_delivery === true,
+    delivery: objectOrNull(offer.delivery),
     launch_window_ends_on: offer.launch_window_ends_on || null,
     skyecart: objectOrNull(offer.skyecart),
     includes: Array.isArray(offer.includes) ? offer.includes.slice(0, 8) : [],
@@ -3648,19 +3677,20 @@ export function publicOffer(offer, client = null) {
       free99_access: offer.gate_policy.free99_access || [],
       paid_platform_access: offer.gate_policy.paid_platform_access || null,
       platform_usage_buckets: offer.gate_policy.platform_usage_buckets || null,
+      skyemail_ai: offer.gate_policy.skyemail_ai || null,
       relay13_ai: offer.gate_policy.relay13_ai || null
     } : null,
-    ai_response_policy: offer.gate_policy?.relay13_ai ? {
-      monthly_limit: offer.gate_policy.relay13_ai.included_ai_responses_monthly || null,
-      backup_bucket: offer.gate_policy.relay13_ai.backup_bucket_responses_monthly || null,
-      total_protected_messages: offer.gate_policy.relay13_ai.total_protected_responses_monthly || null,
-      local_brain_first: offer.gate_policy.relay13_ai.local_brain_first !== false,
+    ai_response_policy: (offer.gate_policy?.skyemail_ai || offer.gate_policy?.relay13_ai) ? {
+      monthly_limit: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).included_ai_responses_monthly || null,
+      backup_bucket: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).backup_bucket_responses_monthly || null,
+      total_protected_messages: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).total_protected_responses_monthly || null,
+      local_brain_first: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).local_brain_first !== false,
       owner_review_required: offer.owner_approval_required === true,
-      allowlisted_auto_replies: offer.gate_policy.relay13_ai.allow_ai_auto_reply_default === true,
-      mode: offer.gate_policy.relay13_ai.default_mode || null,
-      auto_reply_policy: offer.gate_policy.relay13_ai.auto_reply_policy || null,
-      overflow_policy: offer.gate_policy.relay13_ai.overflow_policy || null,
-      provider_calls_hard_stop_after_backup: offer.gate_policy.relay13_ai.overflow_policy === "use_backup_bucket_then_local_manual_queue"
+      allowlisted_auto_replies: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).allow_ai_auto_reply_default === true,
+      mode: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).default_mode || null,
+      auto_reply_policy: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).auto_reply_policy || null,
+      overflow_policy: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).overflow_policy || null,
+      provider_calls_hard_stop_after_backup: (offer.gate_policy.skyemail_ai || offer.gate_policy.relay13_ai).overflow_policy === "use_backup_bucket_then_local_manual_queue"
     } : null,
     line_items: offer.line_items.map((item) => ({
       id: item.id,
@@ -3725,13 +3755,34 @@ function buildStripeLineItemFromPriceData({ item, offer, client, trialDays }) {
 }
 
 async function findStripePriceByLookupKey({ stripe, item, offer }) {
-  if (!stripe || !item.lookup_key) return null;
-  const result = await stripe.prices.list({
-    active: true,
-    lookup_keys: [item.lookup_key],
-    limit: 1
-  });
-  const price = result?.data?.[0] || null;
+  if (!item.lookup_key) return null;
+  let price = null;
+  if (stripe?.prices?.list) {
+    const result = await stripe.prices.list({
+      active: true,
+      lookup_keys: [item.lookup_key],
+      limit: 1
+    });
+    price = result?.data?.[0] || null;
+  } else {
+    const runtimeEnv = typeof process !== "undefined" && process.env ? process.env : {};
+    const secret = runtimeEnv.STRIPE_SECRET_KEY_LIVE || runtimeEnv.STRIPE_SECRET_KEY || runtimeEnv.STRIPE_SECRET || "";
+    const apiBase = runtimeEnv.STRIPE_API_BASE || "https://api.stripe.com";
+    if (secret) {
+      const params = new URLSearchParams({ active: "true", limit: "1" });
+      params.append("lookup_keys[]", item.lookup_key);
+      const response = await fetch(`${apiBase.replace(/\/+$/, "")}/v1/prices?${params.toString()}`, {
+        headers: { authorization: `Bearer ${secret}`, accept: "application/json" }
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const err = new Error(data?.error?.message || data?.message || "Stripe lookup-key price check failed.");
+        err.status = response.status;
+        throw err;
+      }
+      price = data?.data?.[0] || null;
+    }
+  }
   if (!price) return null;
 
   const amountMatches = Number(price.unit_amount || 0) === Number(item.amount_cents || 0);
@@ -3749,7 +3800,8 @@ export async function buildStripeLineItemsWithCatalogPrices({ stripe, offer, cli
     : offer.mode === "subscription" && activeTrialDays > 0
       ? offer.line_items.filter((item) => item.type === "recurring")
       : offer.line_items;
-  const useLookupKeys = String(process.env.SKYPAY_USE_STRIPE_LOOKUP_KEYS || "true").toLowerCase() !== "false";
+  const runtimeEnv = typeof process !== "undefined" && process.env ? process.env : {};
+  const useLookupKeys = String(runtimeEnv.SKYPAY_USE_STRIPE_LOOKUP_KEYS || "true").toLowerCase() !== "false";
 
   const lineItems = [];
   for (const item of checkoutItems) {
@@ -3761,7 +3813,11 @@ export async function buildStripeLineItemsWithCatalogPrices({ stripe, offer, cli
           continue;
         }
       } catch {
-        // Keep checkout resilient if a Stripe account has not created lookup-key prices yet.
+        if (offer.require_stripe_lookup_key === true) throw new Error(`Required Stripe lookup-key price is not available for ${item.lookup_key}.`);
+        // Keep checkout resilient for older offers that have not created lookup-key prices yet.
+      }
+      if (offer.require_stripe_lookup_key === true) {
+        throw new Error(`Required Stripe lookup-key price is missing for ${item.lookup_key}.`);
       }
     }
     lineItems.push(buildStripeLineItemFromPriceData({ item, offer, client, trialDays: activeTrialDays }));
@@ -3825,9 +3881,9 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
     platform_metering_mode: safeText(offer.gate_policy?.platform_metering_mode, 120),
     free99_platforms: Array.isArray(offer.gate_policy?.free99_access) ? offer.gate_policy.free99_access.join(",") : "",
     platform_usage_bucket_count: String(Object.keys(offer.gate_policy?.platform_usage_buckets || {}).length),
-    relay13_ai_addon: offer.gate_policy?.relay13_ai ? "true" : "false",
-    relay13_ai_included_responses: String(offer.gate_policy?.relay13_ai?.included_ai_responses_monthly || 0),
-    relay13_ai_provider_gate: safeText(offer.gate_policy?.relay13_ai?.provider_call_gate, 120),
+    skyemail_ai_addon: offer.gate_policy?.skyemail_ai ? "true" : "false",
+    skyemail_ai_included_responses: String(offer.gate_policy?.skyemail_ai?.included_ai_responses_monthly || offer.gate_policy?.relay13_ai?.included_ai_responses_monthly || 0),
+    skyemail_ai_provider_gate: safeText(offer.gate_policy?.skyemail_ai?.provider_call_gate || offer.gate_policy?.relay13_ai?.provider_call_gate, 120),
     source_folder: safeText(offer.source_folder || "SkyeGateFS27", 180),
     source_file: safeText(offer.source_file || "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js", 180),
     catalog_source: safeText(offer.catalog_source || "SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js", 180),
@@ -3838,6 +3894,63 @@ export function buildSkyePayMetadata({ client, offer, body = {}, orderId = "", t
   };
 }
 
+const STRIPE_METADATA_KEYS = Object.freeze([
+  "skyepay",
+  "gate",
+  "order_id",
+  "client_slug",
+  "workspace_slug",
+  "offer_id",
+  "plan_name",
+  "offer_family",
+  "vault_workspace",
+  "customer_email",
+  "customer_name",
+  "company_name",
+  "checkout_request_id",
+  "owner_approval_required",
+  "approval_status",
+  "activation_path",
+  "store_category",
+  "free_trial_days",
+  "zero_upfront_trial",
+  "amount_due_today_cents",
+  "original_amount_due_today_cents",
+  "deferred_one_time_cents",
+  "recurring_cents",
+  "legal_acceptance_version",
+  "legal_terms_accepted",
+  "arbitration_accepted",
+  "payments_policy_accepted",
+  "no_outcome_guarantee_accepted",
+  "truthful_review_boundary",
+  "privacy_policy_accepted",
+  "legal_acceptance_at",
+  "legal_acceptance_surface",
+  "skyemerit_code",
+  "skyemerit_pack_id",
+  "skyemerit_applied",
+  "skyemerit_discount_cents",
+  "skyemerit_adjusted_due_cents",
+  "skyecommerce_dynamic",
+  "skyecommerce_merchant_id",
+  "skyecommerce_order_id",
+  "skyecommerce_payment_transaction_id",
+  "skyecart_active",
+  "skyecart_primary_offer_id",
+  "skyecart_add_on_offer_id"
+]);
+
+export function stripeSafeSkyePayMetadata(metadata = {}) {
+  const compact = {};
+  for (const key of STRIPE_METADATA_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(metadata, key)) continue;
+    const value = safeText(metadata[key], 500);
+    if (value) compact[key] = value;
+  }
+  return compact;
+}
+
 export function summarizeOfferTotals(offer) {
   return {
     setup_cents: sumLineItems(offer, "one_time"),
@@ -3846,16 +3959,37 @@ export function summarizeOfferTotals(offer) {
   };
 }
 
+export function skyePayDeliveryReturnUrl({ client, offer, origin, sessionParam = "session_id", sessionValue = "{CHECKOUT_SESSION_ID}" } = {}) {
+  const fallback = new URL("/skyepay.html", origin || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev");
+  const delivery = offer?.delivery && typeof offer.delivery === "object" ? offer.delivery : {};
+  const installCenter = delivery.type === "gated-agent-install" ? safeText(delivery.install_center, 1000) : "";
+  let url = fallback;
+  if (installCenter) {
+    try {
+      url = new URL(installCenter, origin || fallback.origin);
+    } catch {
+      url = fallback;
+    }
+  }
+  url.searchParams.set("client", client?.slug || "metraiyux-0s");
+  url.searchParams.set("status", "success");
+  url.searchParams.set(sessionParam, sessionValue);
+  if (offer?.id) url.searchParams.set("offer", offer.id);
+  return url.toString();
+}
+
 export function makeDemoSession({ client, offer, body = {}, origin }) {
   const requestToken = cleanRequestToken(body.idempotency_key || body.request_id, 120);
   const orderId = requestToken
     ? `skypay_demo_${requestToken}`
     : `skypay_demo_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-  const statusUrl = new URL("/skyepay.html", origin);
-  statusUrl.searchParams.set("client", client.slug);
-  statusUrl.searchParams.set("status", "success");
-  statusUrl.searchParams.set("demo_session", orderId);
-  statusUrl.searchParams.set("offer", offer.id);
+  const statusUrl = skyePayDeliveryReturnUrl({
+    client,
+    offer,
+    origin,
+    sessionParam: "demo_session",
+    sessionValue: orderId
+  });
   const trialDays = resolveSkyePayTrialDays(offer, client);
   const offerDefaultSkyeMeritCode = safeText(offer.skyemerit_default_code || "", 120);
   const offerDefaultSkyeMeritPack = safeText(offer.skyemerit_pack_id || "", 120);
@@ -3872,7 +4006,7 @@ export function makeDemoSession({ client, offer, body = {}, origin }) {
     dry_run: true,
     id: orderId,
     order_id: orderId,
-    url: statusUrl.toString(),
+    url: statusUrl,
     payment_status: "demo_not_charged",
     approval_status: skyePayOfferRequiresOwnerApproval(offer)
       ? "demo_pending_owner_approval"

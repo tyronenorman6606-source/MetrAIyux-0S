@@ -5,16 +5,118 @@ const configuredApiBase = window.SKYEROUTEX_API_BASE;
 const staticMounted = window.SKYEROUTEX_STATIC_SHELL === true ||
   window.location.pathname.includes('/SkyeRouteX/workforce-command-v0.4.0/');
 const API_BASE = configuredApiBase === undefined ? (staticMounted ? null : '') : configuredApiBase;
+const COMMAND_BRIDGE_ENDPOINT = '/api/0s-command-bridge/events';
 function toast(msg, bad = false) { const el = $('toast') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'toast' })); el.textContent = msg; el.className = bad ? 'toast bad' : 'toast'; setTimeout(() => { el.className = 'toast hide'; }, 3200); }
-function gateSession() { return safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX')) || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION')) || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX')) || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION')); }
+function gateBridge() { return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null); }
+function hasGateToken(session) { return Boolean(String(session?.token || '').trim()); }
+function tourSession() { return safeJson(sessionStorage.getItem('SKYEROUTEX_TOUR_SESSION')); }
+function gateSession() {
+  const platformGate = window.Free99PlatformGate?.requireSession?.();
+  if (hasGateToken(platformGate)) return platformGate;
+  const bridge = gateBridge();
+  const bridgeSession = bridge?.requireSession?.({ platformId: 'skyeroutex', usageLane: 'skyeroutex-workforce-command' }) || bridge?.current?.();
+  if (hasGateToken(bridgeSession)) {
+    return {
+      ...bridgeSession,
+      platform_id: bridgeSession.platform_id || 'skyeroutex',
+      usage_lane: bridgeSession.usage_lane || 'skyeroutex-workforce-command',
+      source: bridgeSession.source || '0s-gate-card-bridge'
+    };
+  }
+  const tour = tourSession();
+  if (hasGateToken(tour) && tour.readonly === true) return tour;
+  return null;
+}
 function gateHeaders() { const gate = gateSession(); return gate?.token ? { authorization: `Bearer ${gate.token}`, 'x-skye-gate-session': gate.token, 'x-skye-platform': 'skyeroutex' } : { 'x-skye-platform': 'skyeroutex' }; }
 function apiUrl(path) { if (API_BASE === null) throw new Error('SkyeRouteX API runtime is not mounted. Serve this app through the 0S worker route.'); if (window.MetrAIyuxApi?.path) return new URL(window.MetrAIyuxApi.path('routex', path), location.origin).href; const base = String(API_BASE || '').replace(/\/+$/, ''); const raw = String(path || ''); if (!base) return new URL(raw.startsWith('/') ? raw : '/' + raw, location.origin).href; const normalized = raw.startsWith('/api/') ? raw.slice('/api'.length) : raw; return new URL(`${base}${normalized.startsWith('/') ? normalized : '/' + normalized}`, location.origin).href; }
-async function api(method, path, body) { const headers = { 'content-type': 'application/json', ...gateHeaders() }; const res = await fetch(apiUrl(path), { method, credentials: 'same-origin', headers, body: body ? JSON.stringify(body) : undefined }); const text = await res.text(); let payload; try { payload = JSON.parse(text); } catch { payload = { raw: text }; } if (!res.ok) throw new Error(payload.error || `${method} ${path} failed`); return payload; }
+function setTelemetryLabel(text, bad = false) { const el = $('telemetry-label'); if (!el) return; el.textContent = text; el.classList.toggle('bad', Boolean(bad)); }
+function telemetrySummary(type, detail = {}) { return detail.summary || `${type} · ${detail.method || 'UI'} ${detail.path || 'workforce-command'}`; }
+async function recordRoutexTelemetry(type, detail = {}) {
+  const gate = gateSession();
+  if (!gate?.token) {
+    setTelemetryLabel('waiting for shared gate', true);
+    return { ok: false, skipped: 'missing_gate_session' };
+  }
+  if (gate.readonly === true) {
+    setTelemetryLabel('read-only tour mode');
+    return { ok: true, skipped: 'readonly_tour_session' };
+  }
+  const path = detail.path || location.pathname;
+  const payload = {
+    source_app: 'skyeroutex',
+    source_surface: 'workforce-command-v0.4.0',
+    lane: 'skyeroutex-workforce-command',
+    event_type: type,
+    summary: telemetrySummary(type, detail),
+    entity: {
+      kind: detail.entity_kind || 'routex-api-action',
+      id: detail.entity_id || detail.job_id || detail.assignment_id || path,
+      label: detail.entity_label || path
+    },
+    ids: {
+      job_id: detail.job_id || '',
+      assignment_id: detail.assignment_id || '',
+      route_id: detail.route_id || '',
+      payment_id: detail.payment_id || '',
+      gate_source: gate.source || 'shared-0s-gate'
+    },
+    links: [{ label: 'SkyeRouteX Workforce Command', href: `${location.pathname}${location.search}`, kind: 'surface' }],
+    metadata: {
+      ...detail,
+      api_namespace: '/api/routex',
+      gate_owned: true,
+      worker_confirmation_required: true,
+      pathname: location.pathname,
+      title: document.title || 'SkyeRouteX Workforce Command',
+      emitted_at: new Date().toISOString()
+    }
+  };
+  try {
+    const res = await fetch(COMMAND_BRIDGE_ENDPOINT, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'content-type': 'application/json', ...gateHeaders(), 'x-skye-usage-lane': 'skyeroutex-workforce-command' },
+      body: JSON.stringify(payload)
+    });
+    const saved = await res.json().catch(() => ({ ok: res.ok, status: res.status }));
+    const ok = Boolean(res.ok && saved?.ok !== false);
+    setTelemetryLabel(ok ? 'Command Bridge confirmed' : `Command Bridge failed ${res.status}`, !ok);
+    document.dispatchEvent(new CustomEvent('skyeroutex:command-bridge-event', { detail: { ok, status: res.status, event: saved?.event || null, payload } }));
+    return { ok, status: res.status, saved };
+  } catch (error) {
+    setTelemetryLabel('Command Bridge offline', true);
+    return { ok: false, error: error?.message || 'command_bridge_write_failed' };
+  }
+}
+function shouldRecordApi(method, path) {
+  const verb = String(method || 'GET').toUpperCase();
+  if (verb !== 'GET') return true;
+  return /\/api\/(?:health|integrations\/status|storage\/status|admin\/audit-events|house-command\/workflow|payments\/ledger|compliance\/checks)/.test(path);
+}
+async function api(method, path, body) {
+  const verb = String(method || 'GET').toUpperCase();
+  const gate = gateSession();
+  if (gate?.readonly === true && !['GET', 'HEAD'].includes(verb)) {
+    throw new Error('Read-only tour tokens cannot change SkyeRouteX data.');
+  }
+  const headers = { 'content-type': 'application/json', ...gateHeaders() };
+  const started = Date.now();
+  const res = await fetch(apiUrl(path), { method: verb, credentials: 'same-origin', headers, body: body ? JSON.stringify(body) : undefined });
+  const text = await res.text();
+  let payload;
+  try { payload = JSON.parse(text); } catch { payload = { raw: text }; }
+  const detail = { method: verb, path, status: res.status, ok: res.ok, duration_ms: Date.now() - started };
+  if (shouldRecordApi(verb, path)) {
+    recordRoutexTelemetry(res.ok ? 'routex.api.worker_confirmed' : 'routex.api.worker_failed', detail);
+  }
+  if (!res.ok) throw new Error(payload.error || `${method} ${path} failed`);
+  return payload;
+}
 function readForm(form) { const data = Object.fromEntries(new FormData(form).entries()); form.querySelectorAll('input[type="checkbox"]').forEach(i => data[i.name] = i.checked); return data; }
 function money(cents) { return `$${(Number(cents || 0) / 100).toFixed(2)}`; }
 function item(title, meta, actions = '') { return `<div class="row"><div><strong>${title}</strong><div class="meta">${meta || ''}</div></div><div class="actions">${actions}</div></div>`; }
 function workflowAction(itemType, itemId, status, label) { return `<button class="small" data-workflow="${itemType}:${itemId}:${status}">${label}</button>`; }
-function refreshMe() { const label = $('session-label'); if (!label) return; const gate = gateSession(); label.textContent = currentUser ? `${currentUser.name} · ${currentUser.role}` : gate?.token ? `0S/SkyGate attached · ${gate.source || 'platform gate'}` : 'waiting for 0S/SkyGate'; }
+function refreshMe() { const label = $('session-label'); if (!label) return; const gate = gateSession(); label.textContent = currentUser ? `${currentUser.name} · ${currentUser.role}` : gate?.token ? `0S/SkyGate attached · ${gate.source || 'platform gate'}` : 'waiting for 0S/SkyGate'; if (gate?.token && !$('telemetry-label')?.textContent?.includes('Command Bridge')) setTelemetryLabel('ready to write live events'); }
 async function refreshGateUser() { const r = await api('GET', '/api/me'); currentUser = r.user; refreshMe(); return r.user; }
 async function refreshMarkets() { try { const r = await api('GET', '/api/markets'); const opts = r.markets.map(m => `<option value="${m.id}">${m.city}, ${m.state} · ${m.status}</option>`).join(''); $('market-select').innerHTML = opts; } catch {} }
 async function refreshProviderJobs() { try { const r = await api('GET', '/api/provider/jobs'); $('provider-jobs').innerHTML = r.jobs.map(j => item(j.title, `${j.id} · ${j.city}, ${j.state} · ${j.status} · ${money(j.pay_amount_cents)} · applicants ${j.applicant_count} · assignments ${j.assignment_count}`, `<button class="small" data-applicants="${j.id}">Applicants</button><button class="small" data-export-job="${j.id}">Export Packet</button>`)).join('') || '<div class="meta">No provider jobs yet.</div>'; } catch (e) { $('provider-jobs').innerHTML = `<div class="meta bad">${e.message}</div>`; } }

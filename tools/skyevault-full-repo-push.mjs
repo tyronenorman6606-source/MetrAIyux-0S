@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { cleanBearer, resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = path.resolve(new URL('..', import.meta.url).pathname);
 const args = process.argv.slice(2);
@@ -257,19 +258,15 @@ function directR2Modules() {
   return directR2ModulePromise;
 }
 
-function portalHeaders(portalKey) {
+function portalHeaders(portalKey, gateBearer = '') {
   const headers = { 'content-type': 'application/json' };
   if (portalKey) headers['x-portal-key'] = portalKey;
-  const bearer = env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || '';
-  const free99Code = env.FREE99_ADMIN_CODE || env.SKYEVAULT_FREE99_ADMIN_CODE || '';
-  const adminToken = env.SKYEVAULT_ADMIN_TOKEN || env.ADMIN_TOKEN || '';
+  const bearer = cleanBearer(gateBearer);
   if (bearer) {
-    headers.authorization = /^Bearer\s+/i.test(bearer) ? bearer : `Bearer ${bearer}`;
-    headers['x-skye-gate-session'] = bearer.replace(/^Bearer\s+/i, '');
-    headers['x-free99-gate-session'] = bearer.replace(/^Bearer\s+/i, '');
+    headers.authorization = `Bearer ${bearer}`;
+    headers['x-skye-gate-session'] = bearer;
+    headers['x-free99-gate-session'] = bearer;
   }
-  if (free99Code) headers['x-free99-admin-code'] = free99Code;
-  if (adminToken) headers['x-admin-token'] = adminToken;
   return headers;
 }
 
@@ -373,7 +370,8 @@ async function main() {
   const baseUrl = vaultBaseUrl();
   const useDirectR2 = directR2Mode();
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
-  const headers = portalHeaders(portalKey);
+  const gateAuth = await resolveZeroOsGateAuth({ env });
+  const headers = portalHeaders(portalKey, gateAuth.token);
   const artifactPassphrase = randBase64(48);
   const artifactPepper = crypto.randomBytes(32).toString('hex');
   const controlPassphrase = randBase64(48);

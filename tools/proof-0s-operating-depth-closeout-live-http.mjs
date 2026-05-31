@@ -321,7 +321,7 @@ async function resolveGateToken(env) {
       if (probe.ok) return { token: candidate.value, source_key: candidate.key, mode: 'bearer' };
       continue;
     }
-    for (const route of ['/api/founder-command/login', '/api/owner/admin-login']) {
+    for (const route of ['/api/owner/admin-login', '/api/owner/admin-login']) {
       const response = await fetchAbsolute(`${baseUrl}${route}`, {
         method: 'POST',
         headers: { accept: 'application/json', 'content-type': 'application/json' },

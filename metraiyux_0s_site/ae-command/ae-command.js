@@ -7,12 +7,15 @@ function safeJson(value, fallback = null) {
 }
 
 function gateSession() {
-  return safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_ROUTEX_AE_COMMAND'))
-    || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_ROUTEX_AE_COMMAND'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX'))
-    || safeJson(localStorage.getItem('FREE99_PLATFORM_GATE_SESSION'));
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  const bridgeSession = bridge?.requireSession?.({ platformId: 'routex-ae-command', usageLane: 'routex-ae-command' }) || bridge?.current?.();
+  if (bridgeSession?.token) return bridgeSession;
+  return safeJson(sessionStorage.getItem('METRAIYUX_GATE_SESSION'))
+    || safeJson(sessionStorage.getItem('SKYGATEFS27_GATE_SESSION'))
+    || safeJson(sessionStorage.getItem('SKYE_GATE_SESSION'))
+    || safeJson(localStorage.getItem('METRAIYUX_GATE_SESSION'))
+    || safeJson(localStorage.getItem('SKYGATEFS27_GATE_SESSION'))
+    || safeJson(localStorage.getItem('SKYE_GATE_SESSION'));
 }
 
 function gateHeaders() {

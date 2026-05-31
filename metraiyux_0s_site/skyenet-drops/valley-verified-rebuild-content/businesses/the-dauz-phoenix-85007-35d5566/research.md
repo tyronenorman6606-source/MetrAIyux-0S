@@ -1,26 +1,53 @@
 # The Dauz Research
 
-Status: limited
-Researched: 2026-05-28T06:05:30.853Z
+Status: moderate
+Researched: 2026-05-30
 
-## Confirmed Facts
-- Services: Event Venue / Media Venue, Advertising & Media / Event Venue / Media Venue, Event venue / media venue, Advertising & Media, Local SMB / service business, Public directory record, Creative / Media Services
-- Audience: local guests, families, event visitors
-- Service area: Phoenix, AZ, 85007
+## Why Valley Verified
+
+Skyes Over London says this page is Valley Verified because the official The Dauz site confirms the 750 W Polk Street address, phone, contact email, event types, more than 6,000 square feet indoors, courtyard space, and current booking messaging for events..
+
+## Customer-Facing Facts
+
 - Address: 750 W. Polk Street, Phoenix, AZ 85007
 - Phone: (602) 257-0750
-- Pricing: Pricing not confirmed in available sources; contact business for current scope and quote.
+- Service area: Phoenix, AZ, 85007
+- Service/source category: Event Venue / Media Venue
+- Service/source category: Advertising & Media / Event Venue / Media Venue
+- Service/source category: Advertising & Media
+- Service/source category: Creative / Media Services
+- Service/source category: Wedding venue
+- Service/source category: Corporate gatherings
+- Service/source category: Networking parties
+- Service/source category: Quinceaneras
 
-## Landing Page Use
-- The Dauz serves Phoenix with Event Venue / Media Venue.
-- Phoenix Event Venue / Media Venue details, contact routes, and verified public-source facts.
-- A local landing page centered on what The Dauz actually offers.
+## Proof Points
 
-## Source URLs
-- Advertising & Media QuickLink Category | Greater Phoenix Chamber: https://business.phoenixchamber.com/list/ql/advertising-media-1
+- Advertising & Media QuickLink Category | Greater Phoenix Chamber
+- Public source URL present in Valley Verified record.
+- Local record last verified 2026-05-19.
+- Phone number present in source record.
+- Address present in source record.
+- Official site confirms address, phone, and email.
+- Valley Verified record confirms the same address and public phone trail.
 
-## Warnings
+## Customer Checks
+
+- What exact services are available right now?
+- What areas are served?
+- What are current hours and booking steps?
+- What pricing, deposit, or consultation details should customers know?
+- Pricing not confirmed in available sources; contact business for current scope and quote.
+- Pricing should be confirmed directly before purchase, booking, or engagement.
+
+## Cautions
+
 - No official website was present in the local business record.
 - No confirmed official website source was found during this pass.
 - Hours were not confirmed in the local business record.
 - Pricing was not confirmed; landing copy should ask visitors to contact the business.
+
+## Sources
+
+- https://business.phoenixchamber.com/list/ql/advertising-media-1 - Advertising & Media QuickLink Category | Greater Phoenix Chamber
+- https://www.thedauz.com/ - The Dauz official website

@@ -26,17 +26,17 @@
     </header>
     <section class="hero">
       <div>
-        <p class="kicker">Production Readiness</p>
-        <h2>Client-facing, shared-access protected, and receipt-backed with one beta boundary.</h2>
-        <p>The platform rooms are live behind shared 0S client access. Upload, player, releases, rights, exchange, feed, drops, review, hub, analytics, and stress workflows are receipt-backed through the mounted platform API. DAW beta is intentionally labeled while creation, import, edit, mixdown, save/export, and handoff keep hardening.</p>
+        <p class="kicker">Worker/API Readiness</p>
+        <h2>Client-facing where Worker/API receipts exist, shared-access protected, and explicit about local proof boundaries.</h2>
+        <p>The platform rooms are gated by shared 0S client access. Upload, player, releases, rights, exchange, feed, drops, review, hub, analytics, and stress workflows count as live only when the mounted Worker API confirms them. Browser-local queues, static preview state, and demo fallbacks are not production telemetry. DAW beta is intentionally labeled while creation, import, edit, mixdown, save/export, and handoff keep hardening.</p>
       </div>
-      <div class="metrics"><strong>12+</strong><span>rooms and workflows</span><strong>300</strong><span>activity records retained</span><strong>1</strong><span>DAW beta banner</span></div>
+      <div class="metrics"><strong>12+</strong><span>rooms and workflows</span><strong>Worker</strong><span>confirmed records only</span><strong>1</strong><span>DAW beta banner</span></div>
     </section>
     <section class="grid">
       <article class="panel"><span class="badge">Access</span><h3>Protected Review</h3><p>Review surfaces use shared 0S access. There is no SkyeMusicNexus-specific password lane.</p><a href="./public/admin.html">Open Review</a></article>
       <article class="panel"><span class="badge">DAW beta</span><h3>Native DAW</h3><p>Audio import, transport, pads, keys, edit actions, browser WAV mixdown, save, and export are smoke-proven. Provider-grade DAW polish remains marked beta.</p><a href="./public/daw.html">Open DAW</a></article>
-      <article class="panel"><span class="badge">Records</span><h3>Activity Events</h3><p>Successful music actions append activity records so release work, uploads, drops, feed posts, and reviews can be traced.</p><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/music-analytics?action=observability">Open Activity Records</a></article>
-      <article class="panel"><span class="badge">Receipt</span><h3>Stress Receipt</h3><p>The canonical receipt verifies repeated artist, upload, stream, studio, release, rights, drop, exchange, feed, social, analytics, and read-stress flows.</p><a href="./proof/skyemusicnexus-mounted-worker-stress-latest.json">Open Receipt</a></article>
+      <article class="panel"><span class="badge">Records</span><h3>Activity Events</h3><p>Successful music actions append activity records only when authenticated Worker writes succeed. Browser pending events remain local proof until the Worker confirms them.</p><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/music-analytics?action=observability">Open Activity Records</a></article>
+      <article class="panel"><span class="badge">Receipt</span><h3>Stress Receipt</h3><p>The canonical non-browser receipt verifies repeated artist, upload, stream, studio, release, rights, drop, exchange, feed, social, analytics, and read-stress API flows.</p><a href="./proof/skyemusicnexus-mounted-worker-stress-latest.json">Open Receipt</a></article>
       <article class="panel"><span class="badge">Services</span><h3>Service Manifest</h3><p>The mounted platform exposes the music service manifest at the production API base and keeps private source functions out of the browser contract.</p><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/routes/manifest">Open Manifest</a></article>
       <article class="panel"><span class="badge">Boundary</span><h3>Provider Truth</h3><p>Live DSP ingestion, external social posting, royalty settlement, formal legal review, and provider webhooks require provider credentials and separate receipts.</p><a href="./PROOF_STATUS.md">Open Status</a></article>
       <article class="panel"><span class="badge">Investor Audit</span><h3>Skepticks and SPectic Override</h3><p>Board-room claim matrix that says what is verified, what is stress-backed, and what cannot be sold as finished yet.</p><a href="./skepticks-spectic-override.html">Open Claim Audit</a></article>
@@ -48,9 +48,9 @@
       <article class="panel"><h3>Activity Matrix</h3><p><code>music-analytics</code> returns counts. <code>music-analytics?action=observability</code> returns storage mode, access posture, services, review actions, retained counts, latest activity events, and receipts.</p><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skymusicnexus/observability">Open Activity Records</a></article>
     </section>
     <section class="grid">
-      <article class="panel"><span class="badge">Verification</span><h3>Route Receipts</h3><p>The retained verification set covers local smoke, SkyePay offer checks, route integration, exchange video behavior, and mounted platform stress.</p></article>
-      <article class="panel"><span class="badge">Stress</span><h3>Worker Stress</h3><p>The latest controlled stress report is retained with artist, release, drop, feed, rights, store, brain, gamify, and read-stress coverage.</p></article>
-      <article class="panel"><span class="badge">Production</span><h3>Release Verification</h3><p>After deploy, production verification opens the live platform, signs in through shared 0S access, clicks routes, scrolls desktop/mobile, checks services, and saves a receipt.</p></article>
+      <article class="panel"><span class="badge">Verification</span><h3>Route Receipts</h3><p>The retained verification set covers local smoke, SkyePay offer checks, route integration, exchange video behavior, and mounted Worker/API stress. Static/demo state is excluded from live telemetry claims.</p></article>
+      <article class="panel"><span class="badge">Stress</span><h3>Worker Stress</h3><p>The latest controlled non-browser stress report is retained with artist, release, drop, feed, rights, store, brain, gamify, and read-stress coverage.</p></article>
+      <article class="panel"><span class="badge">Production</span><h3>Release Verification</h3><p>Codex production proof stops at build, Worker/API smoke, gate checks, and retained receipts. Manual browser verification is owner-handled under the repo policy.</p></article>
     </section>
   </main>
   <script src="https://skye-music-nexus.pages.dev/public/nexus-player.js" data-skymusicnexus-player="js" defer></script>

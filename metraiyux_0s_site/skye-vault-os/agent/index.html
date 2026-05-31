@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>SkyeVault Agent Install Center</title>
+  <link rel="icon" type="image/png" href="../../favicon-32.png">
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    :root{color-scheme:dark;--bg:#050706;--panel:#101817;--line:rgba(255,255,255,.14);--text:#f7fff6;--muted:#afc1b8;--gold:#f1d27b;--mint:#73efbd;--cyan:#78d9ff;--bad:#ff8d9b}
+    body.agent-page{margin:0;background:linear-gradient(180deg,rgba(5,7,6,.74),rgba(5,7,6,.96)),url("../../assets/metraiyux-0s-logo-gold-blue-poster.png") center top/cover fixed,var(--bg);color:var(--text)}
+    .agent-shell{width:min(1240px,calc(100% - 28px));margin:0 auto;padding:6rem 0 4rem;display:grid;gap:16px}
+    .agent-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:16px;align-items:stretch}
+    .agent-panel,.agent-step,.agent-file{border:1px solid var(--line);border-radius:8px;background:rgba(16,24,23,.88);box-shadow:0 24px 70px rgba(0,0,0,.28)}
+    .agent-panel{padding:18px}.agent-copy h1{font-size:clamp(2.5rem,6vw,5.4rem);line-height:.94;margin:.25rem 0 .8rem;letter-spacing:0}.agent-copy p,.agent-muted{color:var(--muted);line-height:1.55}.agent-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.agent-step{padding:14px;min-height:126px}.agent-step b{display:block;color:var(--gold);margin-bottom:8px}.agent-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.agent-button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:8px;padding:10px 12px;border:1px solid rgba(241,210,123,.42);background:rgba(255,255,255,.06);color:var(--text);font-weight:900;text-decoration:none}.agent-button.primary{background:var(--gold);color:#0d120f;border-color:var(--gold)}.agent-button.good{background:var(--mint);color:#07110d;border-color:var(--mint)}
+    .agent-command{display:block;white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px;color:#eafff8;line-height:1.55;font-size:.9rem}.agent-file{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px}.agent-file h2{margin:0 0 6px;font-size:1.08rem}.agent-file p{margin:.18rem 0;color:var(--muted);overflow-wrap:anywhere}.agent-status{border:1px solid rgba(120,217,255,.28);border-radius:8px;background:rgba(120,217,255,.07);padding:12px;color:#dff8ff;white-space:pre-wrap;word-break:break-word}.agent-status.bad{border-color:rgba(255,141,155,.38);background:rgba(255,141,155,.08);color:#ffe0e4}.agent-status.good{border-color:rgba(115,239,189,.34);background:rgba(115,239,189,.08);color:#e9fff6}.agent-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.agent-kv div{border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;background:rgba(255,255,255,.04)}.agent-kv b{display:block;color:#fff;overflow-wrap:anywhere}.agent-kv span{display:block;margin-top:4px;color:var(--muted);font-size:.84rem;overflow-wrap:anywhere}@media(max-width:880px){.agent-hero,.agent-grid,.agent-kv{grid-template-columns:1fr}.agent-file{grid-template-columns:1fr}.agent-shell{padding-top:5.2rem}}
+  </style>
+</head>
+<body class="agent-page skyesol-living-page">
+  <canvas class="living-background skyesol-living-field" aria-hidden="true"></canvas>
+  <header class="site-header">
+    <a class="brand" href="../../index.html">
+      <img class="brand-logo floating-logo" src="../../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
+      <span class="brand-text">SkyeVault Agent</span>
+    </a>
+    <nav>
+      <a href="../">VaultOS</a>
+      <a href="../../admin/skyevault-command-center.html">Command Center</a>
+      <a href="../../Free99/apps/skyevaultpro/drive/index.html">Drive</a>
+      <a href="../../admin/login.html">Owner Login</a>
+    </nav>
+  </header>
+
+  <main class="agent-shell">
+    <section class="agent-hero">
+      <div class="agent-panel agent-copy">
+        <p class="eyebrow">Gated install lane</p>
+        <h1>SkyeVault Agent Install Center</h1>
+        <p>This is the paid workspace delivery room for the repo custody agent. The agent creates an encrypted full baseline first, then encrypts delta bundles for changed and deleted files so customer repos are not forced into a giant full upload every run. Buyer upload uses the SkyePay-provisioned workspace portal key; owner/admin lanes can also pass the shared FS27/SkyGate bearer. No separate SkyeVault password is created here.</p>
+        <div class="agent-actions">
+          <a class="agent-button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=skyevault-pro-access" target="_blank" rel="noopener">Open SkyePay</a>
+          <a class="agent-button good" id="downloadButton" href="../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz">Download Agent</a>
+          <a class="agent-button" id="manifestButton" href="../../downloads/skyevault-agent/latest.json">Release Manifest</a>
+        </div>
+      </div>
+      <aside class="agent-panel">
+        <p class="eyebrow">Entitlement check</p>
+        <div id="entitlementStatus" class="agent-status">Reading URL and release manifest.</div>
+        <div class="agent-kv" style="margin-top:12px">
+          <div><b id="releaseVersion">Unknown</b><span>release version</span></div>
+          <div><b id="releaseBytes">Unknown</b><span>package size</span></div>
+          <div><b id="releaseSha">Unknown</b><span>SHA-256</span></div>
+          <div><b>Shared gate</b><span>Auth source</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="agent-grid" aria-label="Install steps">
+      <article class="agent-step"><b>1. Buy or approve</b><span class="agent-muted">SkyePay confirms a SkyeVault Starter, Pro, or Command offer and provisions the workspace through the FS27 vault hook.</span></article>
+      <article class="agent-step"><b>2. Download</b><span class="agent-muted">The customer downloads this signed release package from the gated 0S install room.</span></article>
+      <article class="agent-step"><b>3. Run</b><span class="agent-muted">The agent reads the shared gate bearer from the shell, encrypts baseline and delta custody artifacts locally, and can verify or restore from receipts.</span></article>
+    </section>
+
+    <section class="agent-panel" id="deliveryPanel" hidden>
+      <h2>Unlocked Workspace Env</h2>
+      <p class="agent-muted">This appears only after SkyePay returns an unlocked SkyeVault order. Keep the portal key private; it is the upload key for this provisioned workspace.</p>
+      <code class="agent-command" id="deliveryEnvCommand"></code>
+    </section>
+
+    <section class="agent-panel">
+      <h2>Install Commands</h2>
+      <code class="agent-command">tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+npm install --omit=dev
+node bin/skyevault-agent.mjs doctor --json
+
+export SKYEVAULT_PORTAL_KEY="&lt;workspace portal key&gt;"
+export SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;"
+
+# Optional for owner/admin or stricter deployments:
+export SKYEVAULT_GATE_BEARER="&lt;shared FS27/SkyGate bearer&gt;"
+
+node bin/skyevault-agent.mjs init --workspace=my-company --repo=/path/to/repo --vault-url=https://skyevault-drop.graylondonskyes.workers.dev
+node bin/skyevault-agent.mjs sync --upload --json
+node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload
+node bin/skyevault-agent.mjs verify --receipt=/path/to/full-or-delta-receipt.json --json
+node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delta-receipts=/path/to/delta-receipt.json --out=/tmp/restored-repo --json</code>
+    </section>
+
+    <section class="agent-file">
+      <div>
+        <p class="eyebrow">What the package contains</p>
+        <h2>Portable Node CLI, local encryption, upload session client, baseline/delta sync, verify, restore, doctor/status/watch commands</h2>
+        <p>The default baseline is literal repo custody: committed Git state, untracked files, dirty worktree files, and the `.git` directory. The agent only skips its own output directories unless the buyer runs `--skip-deps`. Future syncs upload changed-file deltas and tombstones against the last baseline. Buyer uploads work with the portal key SkyePay provisions for that workspace.</p>
+      </div>
+      <a class="agent-button primary" id="packageManifestButton" href="../../downloads/skyevault-agent/releases/latest/manifest.json">Open Package Manifest</a>
+    </section>
+  </main>
+
+  <script>
+    const fs27Base = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+    const statusBox = document.getElementById('entitlementStatus');
+    const params = new URLSearchParams(location.search);
+    const deliveryPanel = document.getElementById('deliveryPanel');
+    const deliveryEnvCommand = document.getElementById('deliveryEnvCommand');
+    function entitlementQuery() {
+      const query = new URLSearchParams();
+      for (const key of ['session_id', 'order_id', 'offer']) {
+        const value = params.get(key);
+        if (value) query.set(key, value);
+      }
+      return query.toString();
+    }
+    function withEntitlement(path) {
+      const query = entitlementQuery();
+      return query ? `${path}${path.includes('?') ? '&' : '?'}${query}` : path;
+    }
+    const fmtBytes = (bytes) => {
+      const value = Number(bytes || 0);
+      if (!value) return 'Unknown';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let size = value;
+      let index = 0;
+      while (size >= 1024 && index < units.length - 1) {
+        size /= 1024;
+        index += 1;
+      }
+      return `${size.toFixed(size >= 10 || index === 0 ? 0 : 2)} ${units[index]}`;
+    };
+    function setLockedReleaseLinks() {
+      document.getElementById('manifestButton').href = withEntitlement('../../downloads/skyevault-agent/latest.json');
+      document.getElementById('packageManifestButton').href = withEntitlement('../../downloads/skyevault-agent/releases/latest/manifest.json');
+      document.getElementById('downloadButton').href = withEntitlement('../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz');
+      document.getElementById('downloadButton').textContent = 'Download unlocks after provisioning';
+      document.getElementById('downloadButton').setAttribute('aria-disabled', 'true');
+      document.getElementById('releaseVersion').textContent = 'Locked';
+      document.getElementById('releaseBytes').textContent = 'After entitlement';
+      document.getElementById('releaseSha').textContent = 'After entitlement';
+    }
+    function shellQuote(value) {
+      return `'${String(value || '').replace(/'/g, `'\\''`)}'`;
+    }
+    function renderDeliveryEnv(order) {
+      const delivery = order?.agent_delivery || {};
+      const env = delivery.repo_env || {};
+      if (!delivery.unlocked || !env.SKYEVAULT_PORTAL_KEY) {
+        deliveryPanel.hidden = true;
+        deliveryEnvCommand.textContent = '';
+        return;
+      }
+      const lines = [
+        '# Paste into the repo terminal after extracting the agent package.',
+        '# SKYEVAULT_GATE_BEARER is optional unless your workspace policy requires shared-gate upload.',
+        '# export SKYEVAULT_GATE_BEARER="<shared FS27/SkyGate bearer>"'
+      ];
+      for (const key of ['SKYEVAULT_DROP_URL', 'SKYEVAULT_PORTAL_KEY', 'SKYEVAULT_WORKSPACE_ID', 'SKYEVAULT_DEVELOPER_ID', 'SKYEVAULT_DEVELOPER_NAME', 'SKYEVAULT_DESTINATION_ID']) {
+        if (env[key]) lines.push(`export ${key}=${shellQuote(env[key])}`);
+      }
+      lines.push('export SKYEVAULT_AGENT_PASSPHRASE="<customer-owned unlock passphrase>"');
+      lines.push('');
+      lines.push('node bin/skyevault-agent.mjs init --workspace="$SKYEVAULT_WORKSPACE_ID" --repo=/path/to/repo --vault-url="$SKYEVAULT_DROP_URL"');
+      lines.push('node bin/skyevault-agent.mjs sync --upload --json');
+      lines.push('node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload');
+      deliveryEnvCommand.textContent = lines.join('\n');
+      deliveryPanel.hidden = false;
+    }
+    async function loadManifest(fetchRelease = true) {
+      const manifestHref = withEntitlement('../../downloads/skyevault-agent/latest.json');
+      document.getElementById('manifestButton').href = manifestHref;
+      document.getElementById('packageManifestButton').href = withEntitlement('../../downloads/skyevault-agent/releases/latest/manifest.json');
+      document.getElementById('downloadButton').href = withEntitlement('../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz');
+      if (!fetchRelease) {
+        setLockedReleaseLinks();
+        return null;
+      }
+      const res = await fetch(manifestHref, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`Release manifest returned ${res.status}`);
+      const manifest = await res.json();
+      document.getElementById('releaseVersion').textContent = manifest.package?.version || 'Unknown';
+      document.getElementById('releaseBytes').textContent = fmtBytes(manifest.release?.bytes);
+      document.getElementById('releaseSha').textContent = String(manifest.release?.sha256 || 'Unknown').slice(0, 18) + '...';
+      document.getElementById('downloadButton').href = withEntitlement(manifest.release?.latestArchiveUrl || '../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz');
+      document.getElementById('downloadButton').textContent = 'Download Agent';
+      document.getElementById('downloadButton').removeAttribute('aria-disabled');
+      return manifest;
+    }
+    async function checkOrder() {
+      const sessionId = params.get('session_id');
+      const orderId = params.get('order_id');
+      const offer = params.get('offer') || 'skyevault-pro-access';
+      if (!sessionId && !orderId) {
+        statusBox.textContent = `No SkyePay return was attached. Owner/admin can still use the gated installer. Customers should buy or return from SkyePay offer ${offer}.`;
+        return { hasReturn: false, unlocked: true };
+      }
+      const url = new URL('/skyepay/status', fs27Base);
+      if (sessionId) url.searchParams.set('session_id', sessionId);
+      if (orderId) url.searchParams.set('order_id', orderId);
+      if (offer) url.searchParams.set('offer', offer);
+      const res = await fetch(url.toString(), { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || `SkyePay status returned ${res.status}`);
+      const order = data.order || {};
+      renderDeliveryEnv(order);
+      const goodOffer = String(order.offer_id || '').startsWith('skyevault-');
+      const paymentActive = ['paid', 'complete', 'no_payment_required', 'active', 'trialing'].includes(String(order.payment_status || '').toLowerCase());
+      const unlocked = ['workspace_unlocked', 'auto_unlock_pending', 'ready_to_unlock'].includes(String(order.provisioning_status || ''));
+      statusBox.className = `agent-status ${goodOffer && unlocked ? 'good' : ''}`;
+      const delivery = order.agent_delivery || {};
+      statusBox.textContent = `SkyePay order: ${order.offer_id || 'unknown'}\nPayment: ${order.payment_status || 'unknown'}\nProvisioning: ${order.provisioning_status || 'unknown'}\nWorkspace: ${delivery.workspace_id || order.workspace_slug || 'pending'}\n${goodOffer ? 'Offer is a SkyeVault lane.' : 'Offer is not a SkyeVault lane.'}\n${goodOffer && paymentActive && unlocked ? 'Agent package is unlocked.' : 'Install page is open; package download unlocks after payment and provisioning finish.'}\n${delivery.portal_key_available ? 'Workspace portal key is attached to this SkyePay session.' : 'Workspace portal key appears here after provisioning.'}`;
+      return { hasReturn: true, goodOffer, paymentActive, unlocked: goodOffer && paymentActive && unlocked };
+    }
+    (async () => {
+      try {
+        const order = await checkOrder();
+        await loadManifest(order?.unlocked !== false);
+      } catch (error) {
+        statusBox.className = 'agent-status bad';
+        statusBox.textContent = error.message;
+        setLockedReleaseLinks();
+      }
+    })();
+  </script>
+  <script src="../../script.js"></script>
+</body>
+</html>

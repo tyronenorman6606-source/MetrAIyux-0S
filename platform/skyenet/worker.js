@@ -4,8 +4,12 @@ const DEPLOY_API_MAP = new Map([
   ['/workspace', '/deploy/workspace'],
   ['/dashboard', '/deploy/dashboard'],
   ['/env', '/deploy/env'],
+  ['/support', '/deploy/support'],
+  ['/export', '/deploy/export'],
   ['/source-upload', '/deploy/source-upload'],
+  ['/source-index', '/deploy/source-index'],
   ['/source-archive', '/deploy/source-archive'],
+  ['/source-archive-link', '/deploy/source-archive-link'],
   ['/source-complete', '/deploy/source-complete'],
   ['/source-manifest', '/deploy/source-manifest'],
   ['/source-tree', '/deploy/source-tree'],
@@ -19,6 +23,53 @@ const DEPLOY_API_MAP = new Map([
   ['/cost-model', '/deploy/cost-model'],
   ['/rollback', '/deploy/rollback']
 ]);
+
+const SKYENET_SUPPORT_PROFILE = Object.freeze({
+  ok: true,
+  schema: 'fs27.skynet.support_profile.v1',
+  service: 'skyenet-support',
+  organization: 'Skyes Over London LC',
+  source: 'https://skyenet.skyesol/leadership/SkyesOverLondon.html',
+  source_label: 'Skyes Over London public leadership page',
+  contact_policy: 'approved-public-page-values',
+  public_site: 'https://skyenet.solenterprises/',
+  operations: {
+    label: 'Skyes Over London operations',
+    email: 'SkyesOverLondonLC@solenterprises.org',
+    phone: '480-469-5416'
+  },
+  founder: {
+    label: 'Gray London Skyes',
+    email: 'GrayLondonSkyes@solenterprises.org',
+    phone: '623-260-7073'
+  },
+  general: {
+    label: 'SOL Enterprises contact',
+    email: 'Contact@solenterprises.org'
+  },
+  b2b: {
+    label: 'SOL Enterprises B2B',
+    email: 'B2B@solenterprises.org'
+  },
+  emails: [
+    { label: 'Operations', value: 'SkyesOverLondonLC@solenterprises.org', href: 'mailto:SkyesOverLondonLC@solenterprises.org' },
+    { label: 'Founder', value: 'GrayLondonSkyes@solenterprises.org', href: 'mailto:GrayLondonSkyes@solenterprises.org' },
+    { label: 'General', value: 'Contact@solenterprises.org', href: 'mailto:Contact@solenterprises.org' },
+    { label: 'B2B', value: 'B2B@solenterprises.org', href: 'mailto:B2B@solenterprises.org' }
+  ],
+  phones: [
+    { label: 'Operations', value: '480-469-5416', e164: '+14804695416', href: 'tel:+14804695416' },
+    { label: 'Founder', value: '623-260-7073', e164: '+16232607073', href: 'tel:+16232607073' }
+  ],
+  channels: {
+    operations_email: 'SkyesOverLondonLC@solenterprises.org',
+    founder_email: 'GrayLondonSkyes@solenterprises.org',
+    general_email: 'Contact@solenterprises.org',
+    b2b_email: 'B2B@solenterprises.org',
+    phones: ['480-469-5416', '623-260-7073']
+  },
+  hardcoded_wrong_contact_fallbacks: false
+});
 
 function cleanOrigin(value, fallback) {
   return String(value || fallback || '').replace(/\/+$/, '');
@@ -56,6 +107,12 @@ function notFound() {
       'content-type': 'text/plain; charset=utf-8',
       'cache-control': 'no-store'
     }))
+  });
+}
+
+function supportResponse() {
+  return json(SKYENET_SUPPORT_PROFILE, 200, {
+    'cache-control': 'public, max-age=300'
   });
 }
 
@@ -101,6 +158,24 @@ function consoleResponse() {
           <div id="accountOutput" class="metric-grid">
             <span>Waiting for gate session</span>
           </div>
+        </section>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel">
+          <h2>Support</h2>
+          <div id="supportProfile" class="list-panel">Loading approved support profile...</div>
+        </section>
+        <section class="status-panel wide">
+          <h2>Customer export</h2>
+          <p class="mini-status">Customer exports use the same shared gate session and route through the standalone SkyeNet deploy API.</p>
+          <form id="exportForm" class="token-panel env-form">
+            <label><span>Workspace</span><input name="workspace_id" placeholder="default-workspace"></label>
+            <label><span>Project</span><input name="project_id" placeholder="optional project slug"></label>
+            <label><span>Format</span><select name="format"><option value="json">JSON bundle</option></select></label>
+            <button type="submit">Export customer data</button>
+          </form>
+          <p id="exportStatus" class="mini-status">Waiting for gate session.</p>
+          <pre id="exportResult">No customer export requested from this console yet.</pre>
         </section>
       </section>
       <section class="status-panel wide" aria-live="polite">
@@ -489,6 +564,10 @@ export default {
         zero_os_origin: cleanOrigin(env.ZERO_OS_ORIGIN, ''),
         gate: 'shared FS27/SkyGate/Free99'
       });
+    }
+
+    if (url.pathname === '/support.json') {
+      return supportResponse();
     }
 
     if (url.pathname === '/login' || url.pathname === '/admin/login.html') {

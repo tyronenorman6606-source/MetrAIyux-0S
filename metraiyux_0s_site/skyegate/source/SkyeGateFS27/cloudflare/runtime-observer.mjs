@@ -12,7 +12,7 @@ const RUNTIME_ROLLUP_SQL = `
     error_count integer not null default 0,
     total_duration_ms integer not null default 0,
     total_bytes_out integer not null default 0,
-    updated_at text not null default (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+    updated_at text not null,
     primary key (hour_utc, project_id, deployment_id, runtime_type, status_family)
   );
 `;
@@ -93,6 +93,19 @@ function analyticsDataset(env) {
 
 function requestQueue(env) {
   return env.REQUEST_EVENT_QUEUE || env.FS27_REQUEST_EVENT_QUEUE || null;
+}
+
+function truthy(value) {
+  return /^(1|true|yes|y|on)$/i.test(String(value || '').trim());
+}
+
+function directRuntimeArchiveEnabled(env) {
+  return truthy(env.RUNTIME_DIRECT_ARCHIVE || env.FS27_RUNTIME_DIRECT_ARCHIVE || '');
+}
+
+function directRuntimeArchiveMode(env) {
+  const mode = cleanText(env.RUNTIME_DIRECT_ARCHIVE || env.FS27_RUNTIME_DIRECT_ARCHIVE || '', 20).toLowerCase();
+  return mode === 'sync' ? 'sync' : directRuntimeArchiveEnabled(env) ? 'async' : '';
 }
 
 function routeKv(env) {
@@ -323,7 +336,11 @@ export function observeGatewayRequest(env, context, event) {
   }
 
   const queue = requestQueue(env);
-  if (context?.waitUntil && queue?.send) {
+  if (context?.waitUntil && directRuntimeArchiveMode(env) === 'async') {
+    context.waitUntil(handleRuntimeEventQueue({ messages: [{ body: safe }] }, env, context).catch((error) => {
+      console.warn('runtime direct archive failed', error?.message || error);
+    }));
+  } else if (context?.waitUntil && queue?.send) {
     context.waitUntil(queue.send(safe).catch((error) => {
       console.warn('runtime event queue send failed', error?.message || error);
     }));
@@ -331,11 +348,12 @@ export function observeGatewayRequest(env, context, event) {
   return safe;
 }
 
-function stampRequestId(response, requestId) {
+function stampRequestId(response, requestId, archiveStatus = '') {
   if (!response || !(response instanceof Response)) return response;
   if (response.webSocket) return response;
   const headers = new Headers(response.headers);
   headers.set('x-0s-request-id', requestId);
+  if (archiveStatus) headers.set('x-0s-runtime-archive', archiveStatus);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -366,6 +384,7 @@ export async function withRuntimeLedger(request, env, context, handler) {
 
   let response = null;
   let caught = null;
+  let archiveStatus = '';
   try {
     response = await handler({ requestId, routeRecord, runtimeMeta });
   } catch (error) {
@@ -373,7 +392,7 @@ export async function withRuntimeLedger(request, env, context, handler) {
     runtimeMeta.error_code = cleanText(error?.code || error?.name || 'runtime_exception', 160);
     response = new Response('Internal error', { status: Number(error?.status || 500) || 500 });
   } finally {
-    observeGatewayRequest(env, context, {
+    const safeEvent = observeGatewayRequest(env, context, {
       ...runtimeMeta,
       event_ts: nowIso(),
       status: response?.status || 0,
@@ -388,10 +407,19 @@ export async function withRuntimeLedger(request, env, context, handler) {
       origin_status: runtimeMeta.origin_status || response?.status || 0,
       error_code: runtimeMeta.error_code || ''
     });
+    if (directRuntimeArchiveMode(env) === 'sync') {
+      const archived = await handleRuntimeEventQueue({ messages: [{ body: safeEvent }] }, env, context).catch((error) => {
+        console.warn('runtime sync archive failed', error?.message || error);
+        return { ok: false, error: error?.message || String(error) };
+      });
+      archiveStatus = archived?.ok
+        ? `sync-r2:${archived.results?.r2?.ok ? 1 : 0}-d1:${archived.results?.d1?.ok ? 1 : 0}-citadel:${archived.results?.citadel?.ok ? 1 : 0}${archived.results?.d1?.error ? `-d1err:${cleanText(archived.results.d1.error, 80)}` : ''}`
+        : `sync-error:${cleanText(archived?.error || 'unknown', 120)}`;
+    }
   }
 
   if (caught) throw caught;
-  return stampRequestId(response, requestId);
+  return stampRequestId(response, requestId, archiveStatus);
 }
 
 function jsonl(events) {
@@ -480,7 +508,6 @@ function rollupGroups(events) {
 async function writeD1Rollups(env, events) {
   const db = rollupDb(env);
   if (!db?.prepare || !events.length) return { ok: false, skipped: true, reason: 'RUNTIME_ROLLUP_DB not configured' };
-  await db.exec?.(RUNTIME_ROLLUP_SQL);
   const upsert = `
     insert into runtime_rollups_hourly
       (hour_utc, project_id, deployment_id, runtime_type, status_family, request_count, error_count, total_duration_ms, total_bytes_out, updated_at)

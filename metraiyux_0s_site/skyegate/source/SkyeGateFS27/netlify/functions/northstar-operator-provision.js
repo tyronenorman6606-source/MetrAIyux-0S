@@ -8,7 +8,7 @@ export default wrap(async (req) => {
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
   if (req.method !== "POST") return json(405, { ok: false, error: "Method not allowed." }, cors);
 
-  requireOperatorBearer(req);
+  await requireOperatorBearer(req);
   const body = await req.json().catch(() => ({}));
   const result = await provisionWorkspaceBundle({
     name: safeText(body.name || body.companyName, 180),

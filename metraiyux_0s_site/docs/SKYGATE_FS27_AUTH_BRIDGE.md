@@ -1,18 +1,20 @@
 # Skyegate FS27 Auth Bridge
 
-Updated: 2026-05-15
+Updated: 2026-05-30
 
 ## What Changed
 
-MetrAIyux 0S now treats Skyegate FS27 as the upstream auth and tracking gate for the admin command layer.
+MetrAIyux 0S treats Skyegate FS27 as the upstream auth and tracking gate for the admin command layer.
 
-The legacy Worker `ADMIN_TOKEN` still works, but it is no longer the only path. A Skyegate bearer token can now unlock admin APIs when FS27 `/auth-introspect` returns an active admin, owner, founder, `admin.read`, `admin.write`, or allowed-email identity.
+Legacy Worker `ADMIN_TOKEN`, Free99 admin codes, and app-specific admin codes are not standalone authority. If a legacy code is accepted at all, the 0S Worker must exchange it through the shared FS27/SkyGate lane and then authorize the returned active gate session. If FS27 is not configured, protected owner/admin routes fail closed.
+
+A Skyegate bearer token unlocks admin APIs only when FS27 `/auth-introspect` returns an active admin, owner, founder, `admin.read`, `admin.write`, `keys.write`, `gateway.invoke`, or allowed-email identity.
 
 ## MetrAIyux Endpoints
 
 - `POST /api/admin/auth/introspect`
   - Validates the current browser token against the admin Worker.
-  - Accepts legacy `ADMIN_TOKEN` or active Skyegate admin-scoped bearer tokens.
+  - Accepts active Skyegate admin-scoped bearer tokens. Legacy local admin tokens must not be treated as the final authority.
 
 - `POST /api/skygate/auth-introspect`
   - Full-system Worker bridge to FS27 `/auth-introspect`.
@@ -40,6 +42,9 @@ Optional:
 - `SKYGATE_ADMIN_EMAILS`
   - Comma-separated fallback allowlist if a valid FS27 token does not carry an admin role or admin scope.
 
+- `ZERO_OS_DEV_LOCAL_GATE_FALLBACK`
+  - Local development only. Allows the old shared-code fallback for isolated syntax/dev smoke work when FS27 is unavailable. Do not enable in production.
+
 ## Admin Browser Flow
 
 The admin pages now load `admin/skygate-auth-bridge.js`.
@@ -47,10 +52,9 @@ The admin pages now load `admin/skygate-auth-bridge.js`.
 When the operator pastes a token:
 
 1. The browser calls `/api/admin/auth/introspect`.
-2. The Worker checks legacy `ADMIN_TOKEN` first.
-3. If it is not the legacy token, the Worker calls FS27 `/auth-introspect`.
-4. If FS27 returns an admin-scoped active token, the token is stored in `sessionStorage` for that browser session.
-5. Admin commands, approval decisions, and selected events are mirrored to FS27 when the mirror secret is configured.
+2. The Worker calls FS27 `/auth-introspect`.
+3. If FS27 returns an admin-scoped active token, the token is stored in `sessionStorage` for that browser session.
+4. Admin commands, approval decisions, and selected events are mirrored to FS27 when the mirror secret is configured.
 
 ## Live Routes
 

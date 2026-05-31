@@ -27,9 +27,8 @@
     <section
       class="visual-dashboard"
       data-visual-dashboard
-      data-api="/api/saas/customer-visuals?workspace_id={workspace_id}"
-      data-source="../data/customer-visuals-demo.json"
-      data-fallback="../data/customer-visuals-demo.json">
+      data-require-live="true"
+      data-api="/api/saas/customer-visuals?workspace_id={workspace_id}">
       <div class="visual-board-head" data-visual-workspace></div>
       <p class="visual-status-line" data-visual-status>Waiting for visual data...</p>
 
@@ -62,6 +61,11 @@
       <section class="visual-panel">
         <h2>Recent customer-visible events</h2>
         <div class="visual-timeline" data-visual-timeline></div>
+      </section>
+
+      <section class="visual-panel">
+        <h2>Worker audit trace</h2>
+        <div data-visual-audit></div>
       </section>
     </section>
   </main>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Juno Price Product Room - SkyeMusicNexus</title>
-  <meta name="description" content="Juno Price product room with previews, drops, SkyePay checkout, and share-ready storefront packaging.">
+  <meta name="description" content="Juno Price product room with previews, drops, SkyePay request, and share-ready storefront packaging.">
   <meta name="theme-color" content="#050506">
   <link rel="stylesheet" href="../../artist-storefronts.css">
   <link rel="stylesheet" href="../../../public/nexus-player.css" data-skymusicnexus-player="css">
@@ -24,9 +24,9 @@
   <main class="storefront-wrap product-room">
     <section class="product-room-hero">
       <div class="product-room-copy">
-        <p class="micro">artist product room / SkyePay checkout / no raw JSON CTA</p>
+        <p class="micro">artist product room / SkyePay request / no raw JSON CTA</p>
         <h1>Juno Price Store</h1>
-        <p class="lede">industrial hip-hop / dark pop / noise soul from Gray Gang. This room turns the artist lane into playable products: preview the audio, open the drop package, checkout through SkyePay, and share a clean storefront link.</p>
+        <p class="lede">industrial hip-hop / dark pop / noise soul from Gray Gang. This room turns the artist lane into playable products: preview the audio, open the drop package, request a SkyePay checkout intent, and share a clean storefront link.</p>
         <div class="hero-actions">
           <a class="btn primary" href="#checkout">Shop Products</a>
           <a class="btn" href="../#music">Play Storefront</a>
@@ -47,7 +47,7 @@
       <article class="stat"><strong>1</strong><span>product records packaged as cards</span></article>
       <article class="stat"><strong>0</strong><span>playable / active drops</span></article>
       <article class="stat"><strong>$4.44</strong><span>default digital price</span></article>
-      <article class="stat"><strong>FS27</strong><span>SkyePay checkout lane</span></article>
+      <article class="stat"><strong>FS27</strong><span>SkyePay request lane</span></article>
     </section>
 
     <section id="checkout" class="product-room-layout">
@@ -71,7 +71,7 @@
           <button class="btn" type="button" data-detail-play>Preview</button>
           <a class="btn" href="../#store" data-detail-drop>Open Drop</a>
           <a class="btn" href="../#store" data-detail-visual hidden>Visual Pack</a>
-          <button class="btn primary" type="button" data-detail-checkout>SkyePay Checkout</button>
+          <button class="btn primary" type="button" data-detail-checkout>Request SkyePay</button>
           <button class="btn" type="button" data-detail-share>Share</button>
         </div>
         <output class="product-status-line" data-product-status>Product room ready.</output>
@@ -96,7 +96,7 @@
             <span class="btn disabled">Audio queued</span>
             <a class="btn" href="../#music">Storefront Player</a>
             
-            <button class="btn primary" type="button" data-checkout-product="0">Checkout</button>
+            <button class="btn primary" type="button" data-checkout-product="0">Request Checkout</button>
             <button class="btn" type="button" data-share-product="0">Share</button>
           </div>
         </article>
@@ -156,7 +156,7 @@
     }
     async function checkoutProduct(index){
       const product=PRODUCTS[Number(index)]||PRODUCTS[selectedProduct]||{};
-      setStatus('Creating SkyePay checkout intent...');
+      setStatus('Creating SkyePay request intent...');
       try{
         const response=await fetch('/api/skymusicnexus/music-store',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({action:'record-order',productId:product.productId||product.id,quantity:1})});
         const data=await response.json().catch(()=>({}));

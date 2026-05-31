@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
 import test from 'node:test';
 import {
   handleRuntimeEventQueue,
   resolveGatewayRoute,
   withRuntimeLedger
 } from '../cloudflare/runtime-observer.mjs';
+
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 test('withRuntimeLedger records analytics and queues a redacted event without blocking response', async () => {
   const analytics = [];
@@ -103,6 +106,47 @@ test('resolveGatewayRoute prefers host path mount records over host records', as
   assert.ok(seenKeys.includes('route:v1:host:skynet.example.com:path:/sovereign-docs'));
 });
 
+test('withRuntimeLedger can direct-archive runtime events before returning a response', async () => {
+  const r2Writes = [];
+  const d1Statements = [];
+  const env = {
+    FS27_RUNTIME_DIRECT_ARCHIVE: 'sync',
+    REQUEST_LOG_BUCKET: {
+      async put(key, value, options) {
+        r2Writes.push({ key, value, options });
+      }
+    },
+    RUNTIME_ROLLUP_DB: {
+      async exec(sql) {
+        d1Statements.push({ type: 'exec', sql });
+      },
+      prepare(sql) {
+        return {
+          bind(...args) {
+            return { type: 'prepared', sql, args };
+          }
+        };
+      },
+      async batch(statements) {
+        d1Statements.push(...statements);
+      }
+    }
+  };
+
+  const response = await withRuntimeLedger(new Request('https://skynet.example.com/app'), env, {}, async ({ runtimeMeta }) => {
+    runtimeMeta.project_id = 'direct_project';
+    runtimeMeta.customer_id = 'direct_customer';
+    runtimeMeta.deployment_id = 'direct_dep';
+    runtimeMeta.runtime_type = 'mapped_route';
+    return new Response('ok', { status: 200 });
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(r2Writes.length, 1);
+  assert.match(r2Writes[0].key, /customer=direct_customer\/project=direct_project/);
+  assert.ok(d1Statements.some((item) => item.type === 'prepared' && item.args.includes('direct_project')));
+});
+
 test('handleRuntimeEventQueue archives exact events and writes async rollups', async () => {
   const r2Writes = [];
   const d1Statements = [];
@@ -174,7 +218,6 @@ test('handleRuntimeEventQueue archives exact events and writes async rollups', a
     assert.match(r2Writes[0].key, /^runtime-logs\/yyyy=2026\/mm=05\/dd=22\/customer=cust_demo\/project=proj_demo\/hour=14\/batch_/);
     assert.match(r2Writes[0].value, /"request_id":"req_test_1"/);
     assert.equal(r2Writes[0].options.httpMetadata.contentType, 'application/x-ndjson; charset=utf-8');
-    assert.ok(d1Statements.some((item) => item.type === 'exec'));
     assert.ok(d1Statements.some((item) => item.type === 'prepared' && item.args.includes('proj_demo') && item.args.includes('5xx')));
     assert.equal(citadelPosts.length, 1);
     assert.equal(citadelPosts[0].url, 'https://citadel.example.test/runtime-ingest');

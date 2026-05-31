@@ -5,7 +5,6 @@ The old third-party DAW sidecar path has been removed from this Nexus folder.
 Current creation rooms:
 
 ```txt
-public/create.html
 public/daw.html
 public/nexus-daw.css
 public/nexus-daw.js

@@ -92,6 +92,75 @@ async function holdSkyePayForPayment(session, eventType) {
   );
 }
 
+const skyePayCheckoutCompleteEvents = new Set([
+  "checkout.session.completed",
+  "checkout.session.async_payment_succeeded"
+]);
+
+function okText() {
+  return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
+}
+
+const defaultSkyePayWebhookDeps = {
+  audit,
+  autoUnlockSkyePayOrder,
+  holdSkyePayForPayment,
+  isVaultProvisioningOrder,
+  markVaultProvisioningFailure,
+  markVaultProvisioningResult,
+  mirrorStripeWebhookProviderRuntime,
+  provisionVaultWorkspaceForOrder,
+  sessionCanMoveToOwnerApproval,
+  upsertSkyePayOrderFromSession
+};
+
+export async function handleSkyePayCheckoutCompletion(event, deps = {}) {
+  if (!skyePayCheckoutCompleteEvents.has(event?.type)) return null;
+  const session = event?.data?.object;
+  if (session?.metadata?.skyepay !== "true") return null;
+
+  const d = { ...defaultSkyePayWebhookDeps, ...deps };
+  const order = await d.upsertSkyePayOrderFromSession({ session, source: event.type });
+  const providerRuntime = await d.mirrorStripeWebhookProviderRuntime(event, session, { order, source: "skyepay-checkout-session" });
+  const paymentReady = d.sessionCanMoveToOwnerApproval(session);
+  let delivery = "payment_pending";
+
+  if (!paymentReady) {
+    await d.holdSkyePayForPayment(session, event.type);
+  } else if (d.isVaultProvisioningOrder(order)) {
+    delivery = "vault_workspace";
+    try {
+      const result = await d.provisionVaultWorkspaceForOrder(order, { action: "provision", source: event.type });
+      if (result.ok && !result.skipped) await d.markVaultProvisioningResult(order.id, result);
+    } catch (error) {
+      await d.markVaultProvisioningFailure(order.id, error);
+      await d.audit("system", "SKYEPAY_VAULT_PROVISIONING_FAILED", `skyepay:${order?.id || session.id}`, {
+        event_type: event.type,
+        error: error.message
+      });
+      delivery = "vault_failed";
+    }
+  } else {
+    delivery = "standard_unlock";
+    await d.autoUnlockSkyePayOrder(order, { source: "stripe_webhook", eventType: event.type });
+  }
+
+  await d.audit("system", "SKYEPAY_STRIPE_WEBHOOK", `skyepay:${order?.id || session.id}`, {
+    event_type: event.type,
+    stripe_session_id: session.id,
+    payment_status: session.payment_status || session.status || null,
+    provider_runtime: providerRuntime.provider_runtime
+  });
+
+  return {
+    handled: true,
+    order,
+    providerRuntime,
+    paymentReady,
+    delivery
+  };
+}
+
 /**
  * Stripe webhook handler.
  * Configure your Stripe webhook endpoint to hit:
@@ -121,36 +190,8 @@ export default wrap(async (req) => {
     return json(400, { error: "Webhook signature verification failed" }, { "content-type": "application/json" });
   }
 
-  if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
-    const session = event.data.object;
-    if (session?.metadata?.skyepay === "true") {
-      const order = await upsertSkyePayOrderFromSession({ session, source: event.type });
-      const providerRuntime = await mirrorStripeWebhookProviderRuntime(event, session, { order, source: "skyepay-checkout-session" });
-      if (!sessionCanMoveToOwnerApproval(session)) {
-        await holdSkyePayForPayment(session, event.type);
-      } else if (isVaultProvisioningOrder(order)) {
-        try {
-          const result = await provisionVaultWorkspaceForOrder(order, { action: "provision", source: event.type });
-          if (result.ok && !result.skipped) await markVaultProvisioningResult(order.id, result);
-        } catch (error) {
-          await markVaultProvisioningFailure(order.id, error);
-          await audit("system", "SKYEPAY_VAULT_PROVISIONING_FAILED", `skyepay:${order?.id || session.id}`, {
-            event_type: event.type,
-            error: error.message
-          });
-        }
-      } else {
-        await autoUnlockSkyePayOrder(order, { source: "stripe_webhook", eventType: event.type });
-      }
-      await audit("system", "SKYEPAY_STRIPE_WEBHOOK", `skyepay:${order?.id || session.id}`, {
-        event_type: event.type,
-        stripe_session_id: session.id,
-        payment_status: session.payment_status || session.status || null,
-        provider_runtime: providerRuntime.provider_runtime
-      });
-      return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
-    }
-  }
+  const skyePayCheckout = await handleSkyePayCheckoutCompletion(event);
+  if (skyePayCheckout?.handled) return okText();
 
   if (event.type === "checkout.session.async_payment_failed") {
     const session = event.data.object;
@@ -168,7 +209,7 @@ export default wrap(async (req) => {
         [session.id, JSON.stringify({ stripe_event_type: event.type, provider_runtime: providerRuntime.provider_runtime })]
       );
       await audit("system", "SKYEPAY_PAYMENT_FAILED", `stripe:${session.id}`, { event_type: event.type, provider_runtime: providerRuntime.provider_runtime });
-      return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
+      return okText();
     }
   }
 
@@ -187,7 +228,7 @@ export default wrap(async (req) => {
         [session.id, JSON.stringify({ stripe_event_type: event.type, provider_runtime: providerRuntime.provider_runtime })]
       );
       await audit("system", "SKYEPAY_CHECKOUT_EXPIRED", `stripe:${session.id}`, { event_type: event.type, provider_runtime: providerRuntime.provider_runtime });
-      return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
+      return okText();
     }
   }
 
@@ -267,7 +308,7 @@ export default wrap(async (req) => {
         status: subscription.status || null,
         provider_runtime: providerRuntime.provider_runtime
       });
-      return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
+      return okText();
     }
   }
 
@@ -301,5 +342,5 @@ export default wrap(async (req) => {
     }
   }
 
-  return new Response("ok", { status: 200, headers: { "content-type": "text/plain" } });
+  return okText();
 });

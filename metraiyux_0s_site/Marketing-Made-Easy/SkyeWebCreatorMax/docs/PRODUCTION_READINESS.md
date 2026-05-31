@@ -10,9 +10,11 @@ SkyeWebCreatorMax is considered locally production-shaped when:
 - design-vault refresh passes
 - production-readiness smoke reports only missing env vars
 
+Local production-shaped is not the same as live telemetry proof. Customer-visible delivery, sessions, logs, and runtime board totals are production claims only after the shared-gated Worker routes under `/api/marketing-made-easy/webcreator-runtime/*` are verified with real authenticated HTTP/API checks.
+
 ## Allowed Production Blockers
 
-The only acceptable production blockers are missing deployment/provider variables from:
+For local packaging proof, the acceptable blockers are missing deployment/provider variables from:
 
 ```txt
 config/env.contract.json
@@ -36,6 +38,8 @@ Optional:
 
 - `SKYEWEB_R3_BUCKET`
 - `SKYEWEB_SIGNING_SECRET`
+
+For live/customer-facing claims, missing shared-gated Worker proof is also a blocker. Do not use static endpoint files or browser-local storage as live customer visibility.
 
 ## Smoke
 

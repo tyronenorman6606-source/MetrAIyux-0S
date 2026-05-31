@@ -1,6 +1,6 @@
 /*
-  SkyeMusicNexus Native Creation Studio
-  Drop-in browser logic for /SkyeMusicNexus/public/create.html
+  SkyeMusicNexus Native DAW Studio
+  Drop-in browser logic for /SkyeMusicNexus/public/daw.html
 
   This file intentionally keeps the DAW lane first-party.
 */

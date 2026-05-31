@@ -85,6 +85,19 @@ export class PlatformEngine {
     return this;
   }
   mode(){ return String(process.env.CODESTUDIO_PROVIDER_MODE || 'live'); }
+  allowDevClaimsSample(){ return process.env.CODESTUDIO_ALLOW_UNSIGNED_DEV_CLAIMS === '1'; }
+  claimsOrThrow(claims=null){
+    const hasClaims = claims && typeof claims === 'object' && Object.keys(claims).length > 0;
+    if (hasClaims) return claims;
+    if (this.allowDevClaimsSample()) return this.manifest?.upstreamClaimsSample || {};
+    const error = new Error('Verified FS27/SkyGate claims are required for CodeStudio platform execution.');
+    error.status = 401;
+    error.code = 'fs27_claims_required';
+    throw error;
+  }
+  normalizeAuthClaims(claims=null){
+    return normalizeClaims(this.claimsOrThrow(claims));
+  }
   health(){
     return {
       ok:true,
@@ -96,14 +109,15 @@ export class PlatformEngine {
       actions:this.actionRegistry.list(),
       providerPackActions:this.providerPackActions,
       storage:{active:this.data.adapter || {id:'json'}, available:storageAdapterCatalog()},
-      noAuthImplemented:true,
+      auth:'fs27-or-signed-upstream-claims-required',
+      noAuthImplemented:false,
       upstreamClaimsRequired:true,
       dataStore:this.data.stats(),
       durableOps:['action_registry','provider_pack_executable_actions','signed_claim_verification','webhook_signature_idempotency','storage_adapters','locked_retry_queue','provider_pack_files','jobs','schedules','metering','project_export_import','workflow_graph_builder','provider_route_optimizer','invoice_generator','visual_graph_runner','audit_trail','incident_center','entitlement_gates','forms_and_records'],
     };
   }
   projectFromClaims(input={}, claims={}){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const projectId = projectIdFrom(input, normalized);
     const project = this.data.getProject(projectId);
     return {projectId, project, claims:normalized};
@@ -113,24 +127,24 @@ export class PlatformEngine {
     if (!canAccessProject(project, claims, action)) throw new Error(`Upstream claims blocked for ${action} on project ${project.id}.`);
   }
   listProjects(claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     return this.data.listProjects().filter(project => canAccessProject(project, normalized, 'read'));
   }
   async upsertProject(input={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     if (!canRun(normalized)) throw new Error('Upstream claims do not allow project writes.');
     const project = await this.data.upsertProject(input, normalized);
     const receipt = await this.receipts.write('project_upsert', {ok:true, projectId:project.id, name:project.name});
     return {ok:true, project, receipt};
   }
   listProviderInstalls(projectId='default', claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'read');
     return this.data.listProviderInstalls(project.id);
   }
   async installProvider(projectId='default', payload={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
     const pack = (await this.listProviderPacks()).find(p => p.id === payload.providerId) || null;
@@ -139,7 +153,7 @@ export class PlatformEngine {
     return {ok:true, install, receipt};
   }
   async rotateProvider(projectId='default', providerId, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
     const install = await this.data.rotateProvider({projectId:project.id, providerId});
@@ -155,7 +169,7 @@ export class PlatformEngine {
   async preflight(templateId, {claims=null, input={}, approvals={}}={}){
     const workflow = this.resolveWorkflow(templateId);
     if (!workflow) return {ok:false, templateId, blocks:[{code:'unknown_workflow', message:'Workflow not found.'}]};
-    const {projectId, project, claims:normalizedClaims} = this.projectFromClaims(input, claims || this.manifest?.upstreamClaimsSample);
+    const {projectId, project, claims:normalizedClaims} = this.projectFromClaims(input, claims);
     try { this.assertProjectAccess(project, normalizedClaims, 'run'); }
     catch(error){ return {ok:false, templateId, projectId, blocks:[{code:'project_access_blocked', message:error.message}]}; }
     const providerInstalls = this.data.listProviderInstalls(project.id);
@@ -179,7 +193,7 @@ export class PlatformEngine {
     return {ok, mode:this.mode(), projectId:project.id, templateId, workflow, missingProviders, providerProbes, providerInstalls, policy, approval, receipt};
   }
   async runWorkflow(templateId, {input={}, claims=null, approvals={}}={}){
-    const projectCtx = this.projectFromClaims(input, claims || this.manifest?.upstreamClaimsSample);
+    const projectCtx = this.projectFromClaims(input, claims);
     const runRecord = await this.data.recordWorkflowRun({projectId:projectCtx.project?.id || projectCtx.projectId, templateId, requestedBy:projectCtx.claims.email || projectCtx.claims.sub || null, input, mode:this.mode(), engine:'action_registry'});
     const preflight = await this.preflight(templateId, {claims, input, approvals});
     if (!preflight.ok){
@@ -188,7 +202,7 @@ export class PlatformEngine {
       return {ok:false, blocked:true, runId:runRecord.id, preflight, receipt};
     }
     const workflow = preflight.workflow;
-    const ctx = {input, claims:normalizeClaims(claims || this.manifest?.upstreamClaimsSample), outputs:{}, steps:[], workflow, engine:this};
+    const ctx = {input, claims:this.normalizeAuthClaims(claims), outputs:{}, steps:[], workflow, engine:this};
     try{
       for (const step of workflow.steps || []){
         await this.actionRegistry.runStep(step, ctx);
@@ -205,7 +219,7 @@ export class PlatformEngine {
   }
   // Legacy step methods were removed in v5.9.0. Workflow execution now flows through server/lib/action-registry.mjs only.
   async ingestWebhook(payload, {claims=null, verification=null, rawBody=''}={}){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const projectId = projectIdFrom(payload || {}, normalized);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
@@ -229,7 +243,7 @@ export class PlatformEngine {
   async replayWebhook(eventId, {claims=null, approvals={}}={}){
     const event = this.data.getWebhookEvent(eventId);
     if (!event) return {ok:false, reason:'event_not_found'};
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(event.projectId || projectIdFrom(event.payload || {}, normalized));
     this.assertProjectAccess(project, normalized, 'run');
     const policy = enforcePolicy({manifest:this.manifest, workflow:null, input:{}, claims:normalized, approvals, liveReplay:this.mode() !== 'fixture'});
@@ -269,7 +283,7 @@ export class PlatformEngine {
   listWebhookEvents(options={}){ return this.data.listWebhookEvents(options); }
   listApprovals(options={}){ return this.data.listApprovals(options); }
   async resolveApproval(approvalId, body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     if (!canRun(normalized)) throw new Error('Upstream claims do not allow approval resolution.');
     const approval = await this.data.resolveApproval(approvalId, {status:body.status || 'approved', resolvedBy:normalized.email || normalized.sub || null, note:body.note || ''});
     if (!approval) return {ok:false, reason:'approval_not_found'};
@@ -319,7 +333,7 @@ export class PlatformEngine {
   }
 
   async enqueueJob(body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const projectId = projectIdFrom(body.input || body, normalized);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'run');
@@ -337,7 +351,7 @@ export class PlatformEngine {
     if (!current) return {ok:false, reason:'job_not_found', jobId};
     if (current.cancelledAt || current.status === 'cancelled') return {ok:false, reason:'job_cancelled', job:current};
     if (!['queued','retry','running'].includes(current.status)) return {ok:false, reason:'job_not_runnable', status:current.status, job:current};
-    const normalized = normalizeClaims(claims || current.claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims || current.claims);
     const project = this.data.getProject(current.projectId);
     this.assertProjectAccess(project, normalized, 'run');
     const lockId = id('lock');
@@ -354,7 +368,7 @@ export class PlatformEngine {
   async cancelJob(jobId, body={}, claims=null){
     const current = this.data.getJob(jobId);
     if (!current) return {ok:false, reason:'job_not_found', jobId};
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(current.projectId);
     this.assertProjectAccess(project, normalized, 'write');
     const job = await this.data.cancelJob(jobId, {reason:body.reason || 'cancelled_by_operator', cancelledBy:normalized.email || normalized.sub || null});
@@ -365,7 +379,7 @@ export class PlatformEngine {
   async extendJobLock(jobId, body={}, claims=null){
     const current = this.data.getJob(jobId);
     if (!current) return {ok:false, reason:'job_not_found', jobId};
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(current.projectId);
     this.assertProjectAccess(project, normalized, 'run');
     const job = await this.data.extendJobLock(jobId, {lockId:body.lockId || current.lockId, ttlMs:Number(body.ttlMs || process.env.CODESTUDIO_JOB_LOCK_TTL_MS || 5*60*1000)});
@@ -377,7 +391,7 @@ export class PlatformEngine {
   async retryDeadLetter(deadLetterId, body={}, claims=null){
     const dead = this.data.listDeadLetters({limit:5000}).find(d => d.id === deadLetterId);
     if (!dead) return {ok:false, reason:'dead_letter_not_found', deadLetterId};
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(dead.projectId);
     this.assertProjectAccess(project, normalized, 'run');
     const retried = await this.data.retryDeadLetter(deadLetterId, {runAt:body.runAt || nowISO(), resetAttempts:body.resetAttempts !== false});
@@ -386,7 +400,7 @@ export class PlatformEngine {
   }
 
   async recoverStaleJobs(claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     if (!canRun(normalized)) throw new Error('Upstream claims do not allow queue recovery.');
     const recovered = await this.data.recoverStaleLocks();
     const receipt = await this.receipts.write('job_stale_lock_recovery', {ok:true, recovered});
@@ -408,7 +422,7 @@ export class PlatformEngine {
   }
 
   async upsertSchedule(body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const projectId = projectIdFrom(body.input || body, normalized);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
@@ -436,7 +450,7 @@ export class PlatformEngine {
   meterSummary(options={}){ return this.data.aggregateMeters(options); }
 
   async exportProjectBundle(projectId='default', claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'read');
     const bundle = {
@@ -463,7 +477,7 @@ export class PlatformEngine {
   }
 
   async importProjectBundle(bundle={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     if (!canRun(normalized)) throw new Error('Upstream claims do not allow project imports.');
     if (!bundle || bundle.schema !== 'kaixu-codestudio-project-bundle-v1') return {ok:false, reason:'invalid_bundle_schema'};
     const project = await this.data.upsertProject(bundle.project || {}, normalized);
@@ -479,7 +493,7 @@ export class PlatformEngine {
 
 
   async saveWorkflowGraph(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
     const validation = validateWorkflowGraph(body);
@@ -493,7 +507,7 @@ export class PlatformEngine {
   listWorkflowGraphs(options={}){ return this.data.listWorkflowGraphs(options); }
 
   async optimizeProviderRoute(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'read');
     const packs = await this.listProviderPacks();
@@ -521,7 +535,7 @@ export class PlatformEngine {
   listRouteDecisions(options={}){ return this.data.listRouteDecisions(options); }
 
   async generateUsageInvoice(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'read');
     const period = normalizeInvoicePeriod(body.period || {});
@@ -560,7 +574,7 @@ export class PlatformEngine {
 
 
   async recordAuditEvent(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId || body.projectId || 'default');
     this.assertProjectAccess(project, normalized, 'read');
     const event = await this.data.recordAuditEvent({projectId:project.id, actor:normalized.email || normalized.sub || null, action:body.action || 'platform.audit', target:body.target || '', ok:body.ok !== false, severity:body.severity || 'info', metadata:body.metadata || body});
@@ -571,7 +585,7 @@ export class PlatformEngine {
   listAuditEvents(options={}){ return this.data.listAuditEvents(options); }
 
   async openIncident(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId || body.projectId || 'default');
     this.assertProjectAccess(project, normalized, 'write');
     const incident = await this.data.openIncident({...body, projectId:project.id, ownerRef:body.ownerRef || normalized.email || normalized.sub || ''});
@@ -581,7 +595,7 @@ export class PlatformEngine {
   }
 
   async resolveIncident(incidentId, body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const current = this.data.listIncidents({limit:1000}).find(i => i.id === incidentId);
     if (!current) return {ok:false, error:'incident_not_found'};
     const project = this.data.getProject(current.projectId);
@@ -595,7 +609,7 @@ export class PlatformEngine {
   listIncidents(options={}){ return this.data.listIncidents(options); }
 
   async upsertEntitlement(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId || body.projectId || 'default');
     this.assertProjectAccess(project, normalized, 'write');
     const entitlement = await this.data.upsertEntitlement({...body, projectId:project.id});
@@ -605,7 +619,7 @@ export class PlatformEngine {
   }
 
   async checkEntitlement(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId || body.projectId || 'default');
     this.assertProjectAccess(project, normalized, 'read');
     const result = await this.data.consumeEntitlement({projectId:project.id, key:body.key, quantity:body.consume === false ? 0 : (body.quantity || 1)});
@@ -621,7 +635,7 @@ export class PlatformEngine {
   listEntitlements(options={}){ return this.data.listEntitlements(options); }
 
   async saveRecord(collection='records', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const projectId = body.projectId || projectIdFrom(body, normalized);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'write');
@@ -634,7 +648,7 @@ export class PlatformEngine {
   listRecords(options={}){ return this.data.listRecords(options); }
 
   async saveForm(projectId='default', body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId || body.projectId || 'default');
     this.assertProjectAccess(project, normalized, 'write');
     const form = await this.data.saveForm({...body, projectId:project.id});
@@ -644,7 +658,7 @@ export class PlatformEngine {
   }
 
   async submitForm(formId, body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const form = this.data.getForm(formId);
     if (!form) return {ok:false, error:'form_not_found'};
     const project = this.data.getProject(form.projectId);
@@ -668,7 +682,7 @@ export class PlatformEngine {
   listForms(options={}){ return this.data.listForms(options); }
 
   async runWorkflowGraph(graphId, body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const graph = this.data.listWorkflowGraphs({limit:1000}).find(g => g.id === graphId);
     if (!graph) return {ok:false, error:'graph_not_found'};
     const project = this.data.getProject(graph.projectId);
@@ -710,7 +724,7 @@ export class PlatformEngine {
   }
 
   async runProviderPackAction(projectId='default', providerId, route, body={}, claims=null){
-    const normalized = normalizeClaims(claims || this.manifest?.upstreamClaimsSample);
+    const normalized = this.normalizeAuthClaims(claims);
     const project = this.data.getProject(projectId);
     this.assertProjectAccess(project, normalized, 'run');
     const installs = this.data.listProviderInstalls(project.id);

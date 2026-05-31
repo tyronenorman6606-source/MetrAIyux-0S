@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const inventoryPath = path.resolve(process.env.SKYENET_CLIENT_APP_INVENTORY || 'test-artifacts/skyenet-client-app-migration-inventory/skyenet-client-app-migration-inventory-latest.json');
@@ -14,19 +14,6 @@ const musicNexusSourceScope = String(arg('musicnexus-source-scope', process.env.
 const artifactRoot = path.resolve('test-artifacts/skyenet-client-app-deploy');
 const latestReceipt = path.join(artifactRoot, 'skyenet-client-app-deploy-latest.json');
 const templateClientIds = new Set(['skye-app-template']);
-const credentialKeys = [
-  'ZERO_OS_GATE_CODE',
-  'METRAIYUX_OWNER_ADMIN_CODE',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
 function arg(name, fallback = '') {
   const prefix = `--${name}=`;
   const hit = process.argv.find((item) => item.startsWith(prefix));
@@ -43,57 +30,12 @@ function rel(file) {
   return path.relative(repoRoot, file).replace(/\\/g, '/');
 }
 
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
 async function readJson(file, fallback = null) {
   try {
     return JSON.parse(await fs.readFile(file, 'utf8'));
   } catch {
     return fallback;
   }
-}
-
-async function readEnvFile(file) {
-  if (!file || !existsSync(file)) return {};
-  const rows = {};
-  const text = await fs.readFile(file, 'utf8');
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-    if (match) rows[match[1]] = unquote(match[2]);
-  }
-  return rows;
-}
-
-function expandEnvRefs(values) {
-  const out = { ...values };
-  for (let pass = 0; pass < 3; pass += 1) {
-    for (const [key, value] of Object.entries(out)) {
-      out[key] = String(value || '').replace(/\$\{([A-Z0-9_]+)\}/g, (_match, ref) => out[ref] || '');
-    }
-  }
-  return out;
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean).map((file) => path.resolve(file));
-  let merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(file));
-  merged = expandEnvRefs(merged);
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
 }
 
 async function fetchText(url, init = {}, timeoutMs = 20_000) {
@@ -208,34 +150,24 @@ async function fetchBytesLimited(url, init = {}, timeoutMs = 25_000, limitBytes 
 function authHeaders(token) {
   return {
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };
 }
 
 async function ownerLogin() {
-  const existing = String(process.env.SKYENET_AUTH || process.env.ZERO_OS_GATE_SESSION || '').replace(/^Bearer\s+/i, '').trim();
-  if (existing) return { ok: true, credential_source: 'process-env:SKYENET_AUTH/ZERO_OS_GATE_SESSION', token: existing, login: null };
-  const credential = await ownerCredential();
-  if (!credential.value) return { ok: false, credential_source: 'missing', token: '', login: null, error: 'No shared owner gate credential found.' };
-  const login = await fetchJson(`${zeroOsBase}/api/founder-command/login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase });
   return {
-    ok: Boolean(login.ok && token),
-    credential_source: credential.key,
-    token,
+    ok: Boolean(auth.token),
+    credential_source: auth.credential?.key || 'missing',
+    token: auth.token || '',
     login: {
-      status: login.status,
-      ok: Boolean(login.ok && token),
-      token_received: Boolean(token),
-      elapsed_ms: login.elapsed_ms
+      status: auth.response?.status || 0,
+      ok: Boolean(auth.token),
+      token_received: Boolean(auth.token),
+      elapsed_ms: auth.response?.elapsed_ms || auth.response?.elapsedMs || 0
     },
-    error: token ? '' : login.body?.error || 'Shared gate login did not return a bearer token.'
+    error: auth.token ? '' : auth.response?.body?.error || 'Shared gate login did not return a bearer token.'
   };
 }
 
@@ -330,6 +262,10 @@ function routeKeyForTarget(target = {}) {
     : `route:v1:host:${host}:path:${mount}`;
 }
 
+function sameSkynetId(a, b) {
+  return String(a || '').toLowerCase() === String(b || '').toLowerCase();
+}
+
 function deployArgs(candidate, concurrency) {
   const target = targetFor(candidate);
   const args = [
@@ -403,7 +339,10 @@ async function routeRecordSmoke(candidate, deploymentId, token) {
     headers: authHeaders(token)
   });
   const routeItem = Array.isArray(routes.body?.routes)
-    ? routes.body.routes.find((item) => item?.route?.hostname === target.hostname && item?.route?.project_id === candidate.id)
+    ? routes.body.routes.find((item) =>
+        sameSkynetId(item?.route?.hostname, target.hostname)
+        && sameSkynetId(item?.route?.project_id, candidate.id)
+      )
     : null;
   const route = routeItem?.route || null;
   const expectedMount = cleanMountPath(target.mount_path || '/') === '/' ? '' : cleanMountPath(target.mount_path || '/');
@@ -412,8 +351,8 @@ async function routeRecordSmoke(candidate, deploymentId, token) {
     && route
     && route.url_mode === expectedMode
     && route.mount_path === expectedMount
-    && route.workspace_id === workspaceId
-    && route.project_id === candidate.id
+    && sameSkynetId(route.workspace_id, workspaceId)
+    && sameSkynetId(route.project_id, candidate.id)
     && route.active_deployment_id === deploymentId
     && route.public_access === true);
 
@@ -422,7 +361,7 @@ async function routeRecordSmoke(candidate, deploymentId, token) {
   });
   const deployments = dashboard.body?.deployments || dashboard.body?.skynet?.deployments || [];
   const deployment = Array.isArray(deployments)
-    ? deployments.find((item) => item?.project_id === candidate.id && item?.deployment_id === deploymentId)
+    ? deployments.find((item) => sameSkynetId(item?.project_id, candidate.id) && item?.deployment_id === deploymentId)
     : null;
   const dashboardOk = Boolean(dashboard.ok && deployment && (!deployment.route_key || deployment.route_key === routeKeyForTarget(target)));
   const publicHttp = await fetchText(target.live_url, {}, 8000);

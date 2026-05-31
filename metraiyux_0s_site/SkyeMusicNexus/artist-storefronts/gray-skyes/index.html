@@ -233,7 +233,7 @@
             <h3>${escapeHtml(product.title)}</h3>
             <strong>$${((Number(product.priceCents || 444) || 444) / 100).toFixed(2)}</strong>
             ${product.pwaUrl ? `<a class="btn" href="${escapeHtml(product.pwaUrl)}">Open Drop PWA</a>` : ''}
-            <button class="btn primary" type="button" data-grid-buy="${index}">SkyePay checkout</button>
+            <button class="btn primary" type="button" data-grid-buy="${index}">SkyePay request</button>
           </article>
         `).join('');
         grid.querySelectorAll('[data-grid-buy]').forEach((button) => {

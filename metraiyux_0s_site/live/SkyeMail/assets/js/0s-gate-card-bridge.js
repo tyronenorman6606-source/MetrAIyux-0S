@@ -7,9 +7,12 @@
   const SESSION_KEYS = [
     "METRAIYUX_GATE_SESSION",
     "SKYGATEFS27_GATE_SESSION",
+    "SKYE_GATE_SESSION"
+  ];
+  const LEGACY_SESSION_KEYS = [
+    ...SESSION_KEYS,
     "SKYGATEFS27_USER_TOKEN",
     "SKYGATE_USER_TOKEN",
-    "SKYE_GATE_SESSION",
     "SKYGATE_SESSION_TOKEN",
     "FREE99_PLATFORM_GATE_SESSION",
     "adminBrainToken",
@@ -153,30 +156,8 @@
     return normalizeSession({ token: text }, source);
   }
 
-  function sessionFromUrl() {
-    const params = new URLSearchParams(location.search);
-    const token = safeToken(params.get("gate_session") || params.get("skygate_session") || params.get("session") || "");
-    if (!tokenLooksValid(token)) return null;
-    const session = normalizeSession({
-      token,
-      source: "url-gate-session",
-      platform_id: params.get("platform") || "metraiyux-0s",
-      usage_lane: params.get("usage_lane") || "skyemail-gate-card",
-      workspace_id: params.get("workspace") || "",
-      client: params.get("client") || "",
-      email: params.get("email") || ""
-    }, "url-gate-session");
-    params.delete("gate_session");
-    params.delete("skygate_session");
-    params.delete("session");
-    try {
-      history.replaceState({}, document.title, `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}${location.hash || ""}`);
-    } catch {}
-    return session;
-  }
-
   function sessionFromRuntime() {
-    const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || globalThis.METRAIYUX_0S_SESSION || {};
+    const runtime = globalThis.METRAIYUX_0S_SESSION || {};
     return normalizeSession(runtime, runtime.source || "runtime");
   }
 
@@ -190,33 +171,19 @@
   }
 
   function current() {
-    return sessionFromUrl() || sessionFromStorage() || sessionFromRuntime();
+    return sessionFromStorage() || sessionFromRuntime();
   }
 
   function persist(input, options = {}) {
     const session = normalizeSession(input, input?.source || "0s-gate-card-bridge");
     if (!session) return null;
     const serialized = JSON.stringify(session);
-    ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYE_GATE_SESSION", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+    SESSION_KEYS.forEach((key) => {
       writeStore(sessionStorage, key, serialized);
       writeStore(localStorage, key, serialized);
     });
-    writeStore(sessionStorage, "SKYGATE_USER_TOKEN", session.token);
-    writeStore(localStorage, "SKYGATE_USER_TOKEN", session.token);
-    writeStore(sessionStorage, "SKYGATE_SESSION_TOKEN", session.token);
     writeStore(sessionStorage, CLAIMS_KEY, JSON.stringify(session.claims || {}));
     globalThis.METRAIYUX_0S_SESSION = session;
-    globalThis.__SKYEGATE_RUNTIME__ = {
-      ...(globalThis.__SKYEGATE_RUNTIME__ || {}),
-      sessionToken: session.token,
-      userToken: session.token,
-      authToken: session.token,
-      auth: { token: session.token },
-      claims: session.claims,
-      gateCards: session.gate_cards,
-      actor: session.actor,
-      source: session.source
-    };
     if (!options.silent) record("gate_session_persisted", {
       source: session.source,
       platform_id: session.platform_id,
@@ -227,7 +194,7 @@
   }
 
   function clear() {
-    ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYGATE_USER_TOKEN", "SKYE_GATE_SESSION", "SKYGATE_SESSION_TOKEN", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+    LEGACY_SESSION_KEYS.forEach((key) => {
       removeStore(sessionStorage, key);
       removeStore(localStorage, key);
     });
@@ -246,8 +213,6 @@
     return {
       Authorization: `Bearer ${session.token}`,
       authorization: `Bearer ${session.token}`,
-      "x-admin-token": session.token,
-      "x-free99-admin-code": session.token,
       "x-free99-gate-session": session.token,
       "x-skye-gate-session": session.token,
       "x-skygate-session": session.token,

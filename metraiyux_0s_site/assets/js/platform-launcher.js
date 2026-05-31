@@ -5,6 +5,7 @@
   const checkoutBase = "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html?client=metraiyux-0s&offer=";
   const localCheckout = (offer) => `skyepay.html?client=metraiyux-0s&offer=${encodeURIComponent(offer)}`;
   const liveCheckout = (offer) => `${checkoutBase}${encodeURIComponent(offer)}`;
+  const telemetryEndpoint = "/api/0s-command-bridge/events";
 
   const platforms = [
     {
@@ -143,6 +144,56 @@
     return platforms.find((platform) => platform.id === state.platform) || platforms[0];
   }
 
+  function gateHeaders() {
+    const headers = { "content-type": "application/json" };
+    try {
+      const gateHeaders = window.MetrAIyuxGateBridge?.headers?.() || window.Free99PlatformGate?.headers?.() || {};
+      Object.entries(gateHeaders).forEach(([key, value]) => {
+        if (value) headers[key] = value;
+      });
+    } catch {}
+    return headers;
+  }
+
+  async function emitLauncherEvent(eventType, metadata = {}) {
+    const platform = activePlatform();
+    const payload = {
+      source_app: "saas-platform-launcher",
+      source_surface: "SkyePay Platform Launcher",
+      event_type: `platform_launcher.${eventType}`,
+      summary: metadata.summary || `${platform.title} launcher ${eventType}`,
+      entity: {
+        kind: metadata.entityKind || "platform",
+        id: metadata.entityId || platform.id,
+        label: metadata.entityLabel || platform.title
+      },
+      ids: {
+        platform_id: platform.id,
+        offer_id: metadata.offerId || "",
+        card_title: metadata.cardTitle || ""
+      },
+      links: [{ label: "SkyePay launcher", href: location.pathname + location.search, kind: "surface" }],
+      metadata: {
+        ...metadata,
+        platform_id: platform.id,
+        query: state.query,
+        pathname: location.pathname,
+        title: document.title || ""
+      }
+    };
+    try {
+      const response = await fetch(telemetryEndpoint, {
+        method: "POST",
+        credentials: "include",
+        headers: gateHeaders(),
+        body: JSON.stringify(payload)
+      });
+      return response.json().catch(() => ({ ok: response.ok, status: response.status }));
+    } catch (error) {
+      return { ok: false, error: error?.message || "launcher_event_failed" };
+    }
+  }
+
   function renderTabs() {
     const tabs = root.querySelector("[data-platform-tabs]");
     if (!tabs) return;
@@ -158,6 +209,11 @@
     tabs.querySelectorAll("[data-platform-id]").forEach((button) => {
       button.addEventListener("click", () => {
         state.platform = button.dataset.platformId;
+        emitLauncherEvent("platform_selected", {
+          entityKind: "platform",
+          entityId: state.platform,
+          entityLabel: activePlatform().title
+        });
         render();
         root.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -194,9 +250,21 @@
           ${card.listed && card.due ? `<div class="price-after-merit"><span>${esc(card.listed)} listed</span><b>${esc(card.due)} today</b></div>` : ""}
           <p>${esc(card.text)}</p>
           <div class="launcher-tags">${(card.tags || []).slice(0, 4).map((tag) => `<span>${esc(tag)}</span>`).join("")}</div>
-          <a class="saas-btn" href="${esc(card.href)}">${esc(card.cta || "Open")}</a>
+          <a class="saas-btn" href="${esc(card.href)}" data-launcher-card-link data-card-title="${esc(card.title)}" data-card-price="${esc(card.price)}">${esc(card.cta || "Open")}</a>
         </article>
       `).join("") : `<p class="notice">No ${esc(platform.title)} cards match this search yet. Try a platform name, offer name, or buyer problem.</p>`;
+      cards.querySelectorAll("[data-launcher-card-link]").forEach((link) => {
+        link.addEventListener("click", () => {
+          emitLauncherEvent("card_opened", {
+            entityKind: "offer-card",
+            entityId: link.getAttribute("href") || "",
+            entityLabel: link.dataset.cardTitle || "",
+            cardTitle: link.dataset.cardTitle || "",
+            price: link.dataset.cardPrice || "",
+            href: link.getAttribute("href") || ""
+          });
+        });
+      });
     }
   }
 
@@ -209,6 +277,7 @@
   if (search) {
     search.addEventListener("input", () => {
       state.query = search.value || "";
+      emitLauncherEvent("search", { summary: "SkyePay launcher search", query: state.query });
       const query = state.query.toLowerCase().trim();
       const exactPlatform = platforms.find((platform) => platformIdentityMatches(platform, query));
       if (exactPlatform) {
@@ -225,9 +294,14 @@
     });
   }
 
-  root.querySelectorAll("[data-launcher-demo]").forEach((button) => {
+  root.querySelectorAll("[data-launcher-platform], [data-launcher-demo]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.platform = button.dataset.launcherDemo || platforms[0].id;
+      state.platform = button.dataset.launcherPlatform || button.dataset.launcherDemo || platforms[0].id;
+      emitLauncherEvent("shortcut_selected", {
+        entityKind: "platform",
+        entityId: state.platform,
+        entityLabel: activePlatform().title
+      });
       if (search) {
         search.value = "";
         state.query = "";

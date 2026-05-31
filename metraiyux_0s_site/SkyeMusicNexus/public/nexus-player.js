@@ -568,6 +568,8 @@
       progressPct: durationSeconds ? Math.min(100, Math.round((listenSeconds / durationSeconds) * 100)) : 0,
       nexusMetricEligible: metricEvent,
       publicMetricEligible: metricEvent,
+      serverConfirmed: false,
+      receiptLane: 'browser_pending_upload',
       source: sourceType === 'nexus_radio' ? 'canonical-nexus-radio' : sourceType,
       at: new Date().toISOString(),
     };
@@ -585,6 +587,20 @@
     saveJson(STREAM_KEY, state.ledger);
     window.dispatchEvent(new CustomEvent('skymusicnexus:stream-event', { detail: event }));
     return event;
+  }
+
+  function markEventPosted(eventId, payload = {}) {
+    if (!eventId) return;
+    state.ledger.events = (state.ledger.events || []).map((event) => event.eventId === eventId
+      ? {
+          ...event,
+          serverConfirmed: true,
+          receiptLane: 'worker-confirmed',
+          serverReceiptId: payload.receiptId || payload.eventId || payload.id || event.serverReceiptId || '',
+          confirmedAt: new Date().toISOString(),
+        }
+      : event);
+    saveJson(STREAM_KEY, state.ledger);
   }
 
   function queueTelemetry(event) {
@@ -630,7 +646,9 @@
         queueTelemetry(event);
         return;
       }
-      emitAchievementAwards(await response.json().catch(() => ({})));
+      const payload = await response.json().catch(() => ({}));
+      markEventPosted(event.eventId, payload);
+      emitAchievementAwards(payload);
     }).catch(() => {
       if (!navigator.sendBeacon) {
         queueTelemetry(event);
@@ -658,7 +676,11 @@
           body: JSON.stringify({ action: 'track-public-event', ...event, replayedFromOutbox: true }),
         });
         if (!response.ok) remaining.push(event);
-        else emitAchievementAwards(await response.json().catch(() => ({})));
+        else {
+          const payload = await response.json().catch(() => ({}));
+          markEventPosted(event.eventId, payload);
+          emitAchievementAwards(payload);
+        }
       } catch {
         remaining.push(event);
       }

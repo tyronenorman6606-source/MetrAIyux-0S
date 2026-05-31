@@ -7,7 +7,7 @@ This is the Git-hosting lane. It is separate from the Git vault pack lane.
 
 ## Start A Local Remote
 
-Owner-private 0S source custody should use the managed wrapper. It starts the local smart-HTTP Git service, stores the local service token in ignored private state, seeds the bare repo, syncs refs, and proves a fresh clone:
+Owner-private 0S source custody must use the managed wrapper. It starts the local smart-HTTP Git service in shared-gate mode, seeds the bare repo, syncs refs, and proves a fresh clone:
 
 ```bash
 npm run vault:origin:start
@@ -22,12 +22,9 @@ Current owner origin shape:
 http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git
 ```
 
-The token is not printed. It is stored at `.skyevault-out/git-remote/owner-git-origin.env` with private file permissions. That token is a local service credential for Git Basic auth, not a separate founder/admin account; owner account identity stays in the shared 0S/FS27/SkyGate/Free99 gate lane.
+Normal auth is the same 0S/FS27/SkyGate/Free99 owner gate session used by the rest of the 0S. The wrapper exchanges the shared owner code through `/api/owner/admin-login` when needed, starts the Git service with `SKYEVAULT_GATE_INTROSPECT_URL`, and sends Git commands with `Authorization: Bearer <shared gate bearer>`.
 
-Browser prompt credentials for the local Git origin:
-
-- username: `x-token`
-- password: the local value of `SKYEVAULT_GIT_REMOTE_TOKEN` in `.skyevault-out/git-remote/owner-git-origin.env`
+`.skyevault-out/git-remote/owner-git-origin.env` is still used for ignored runtime metadata such as the base URL, workspace, repo, auth mode, and introspection URL. It must not become a new founder/admin password file in normal mode.
 
 Use this helper to print the access instructions without printing the password:
 
@@ -35,7 +32,7 @@ Use this helper to print the access instructions without printing the password:
 npm run vault:origin:access
 ```
 
-Use this helper to rotate the local Git password and restart/resync the origin:
+In normal mode there is no SkyeVault Git password to rotate. This helper reports the shared-gate status and tells the operator to refresh or revoke the 0S/FS27 session instead:
 
 ```bash
 npm run vault:origin:reset-token
@@ -51,13 +48,11 @@ May 30, 2026 proof for this repo:
 - fresh clone proof path: `/tmp/skyevault-owner-git-origin-proof-20260530T074843Z/MetrAIyux-0S`
 - proof result: cloned `HEAD` matched local `HEAD`, and `git fsck --connectivity-only` passed
 
-To clone from a fresh terminal without putting the token in the URL:
+To clone from a fresh terminal without putting credentials in the URL:
 
 ```bash
-set -a
-. .skyevault-out/git-remote/owner-git-origin.env
-set +a
-git -c "http.extraHeader=Authorization: Basic $(printf 'x-token:%s' "$SKYEVAULT_GIT_REMOTE_TOKEN" | base64 -w0)" \
+export SKYEVAULT_GATE_BEARER="<shared 0S/FS27/SkyGate bearer>"
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" \
   clone http://127.0.0.1:8787/metraiyux-0s-owner/MetrAIyux-0S.git MetrAIyux-0S
 ```
 
@@ -66,7 +61,7 @@ Autosync integration: the managed daemon sets `SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYN
 ## Raw Service Start
 
 ```bash
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' \
+SKYEVAULT_GATE_INTROSPECT_URL="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skygate/auth-introspect" \
 SKYEVAULT_GIT_REMOTE_ROOT=/srv/skyevault/git-remotes \
 npm run vault:git:remote
 ```
@@ -79,10 +74,11 @@ Runtime knobs:
 SKYEVAULT_GIT_REMOTE_HOST=127.0.0.1
 SKYEVAULT_GIT_REMOTE_PORT=8787
 SKYEVAULT_GIT_REMOTE_ROOT=/srv/skyevault/git-remotes
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager'
+SKYEVAULT_GATE_INTROSPECT_URL=https://metraiyux-0s-full-system.graylondonskyes.workers.dev/api/skygate/auth-introspect
+SKYEVAULT_GATE_ADMIN_ALL_WORKSPACES=1
 ```
 
-For local development only, `--dev-no-auth` disables auth.
+For local development only, `--dev-no-auth` disables auth. For emergency local restore only, the server still supports static-token mode with `SKYEVAULT_GIT_REMOTE_TOKEN`, but that path must be explicitly marked as emergency/local and must not be presented as a founder/admin login.
 
 Open the operator console at:
 
@@ -90,14 +86,15 @@ Open the operator console at:
 http://127.0.0.1:8787/__skyevault/ui
 ```
 
-With auth enabled, the browser uses Basic auth. The username can be any value; the password is `SKYEVAULT_GIT_REMOTE_TOKEN`.
+With shared-gate auth enabled, terminal/IDE Git commands must send `Authorization: Bearer <shared gate bearer>`. A browser visit to a `.git` path is informational only; it is not a login page.
 
 ## Push Like A Git Remote
 
 ```bash
-git remote add vault http://x-token:${SKYEVAULT_GIT_REMOTE_TOKEN}@127.0.0.1:8787/acme/my-repo.git
-git push vault main
-git fetch vault
+git remote add vault http://127.0.0.1:8787/acme/my-repo.git
+export SKYEVAULT_GATE_BEARER="<shared 0S/FS27/SkyGate bearer>"
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" push vault main
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" fetch vault
 ```
 
 Or let the workspace helper set up the local folder and keep receipts for the Git-style operations:
@@ -107,10 +104,10 @@ npm run vault:repo -- init --dir=./my-repo --workspace=acme --repo=my-repo
 npm run vault:repo -- status --dir=./my-repo
 npm run vault:repo -- diff --dir=./my-repo
 npm run vault:repo -- commit --dir=./my-repo --message="Update workspace"
-SKYEVAULT_GIT_REMOTE_TOKEN='from-secret-manager' npm run vault:repo -- push --dir=./my-repo --branch=main
+SKYEVAULT_GATE_BEARER="<shared gate bearer>" npm run vault:repo -- push --dir=./my-repo --branch=main
 ```
 
-The helper stores a clean remote URL and supplies the token through a runtime HTTP auth header when pushing/fetching.
+The helper stores a clean remote URL and supplies the shared gate bearer through a runtime HTTP auth header when pushing/fetching.
 
 The server auto-creates a bare repo on first authenticated access unless started with `--no-auto-create`.
 
@@ -118,17 +115,17 @@ Supported Git smart HTTP behavior:
 
 - `git push` through `git-receive-pack`
 - `git fetch` and `git clone` through `git-upload-pack`
-- Basic auth token in the password slot
-- Bearer auth for API endpoints
+- Bearer auth for Git and API endpoints
+- Emergency-local Basic token support only when explicitly enabled
 - Bare repo storage under `${SKYEVAULT_GIT_REMOTE_ROOT}/repos/<workspace>/<repo>.git`
 - Pre-receive policy hooks for protected refs
 
 ## Operator API
 
-All operator API routes require the same token as the Git remote.
+All operator API routes require the same shared gate bearer as the Git remote.
 
 ```bash
-curl -H "Authorization: Bearer ${SKYEVAULT_GIT_REMOTE_TOKEN}" \
+curl -H "Authorization: Bearer ${SKYEVAULT_GATE_BEARER}" \
   http://127.0.0.1:8787/__skyevault/repos
 ```
 
@@ -148,13 +145,14 @@ Routes:
 The remote service stores a real bare Git repository, so normal `git clone` is the primary download path:
 
 ```bash
-git clone http://x-token:${SKYEVAULT_GIT_REMOTE_TOKEN}@127.0.0.1:8787/acme/my-repo.git
+git -c "http.extraHeader=Authorization: Bearer $SKYEVAULT_GATE_BEARER" \
+  clone http://127.0.0.1:8787/acme/my-repo.git
 ```
 
 For portable/offline download, export a bundle:
 
 ```bash
-curl -X POST -H "Authorization: Bearer ${SKYEVAULT_GIT_REMOTE_TOKEN}" \
+curl -X POST -H "Authorization: Bearer ${SKYEVAULT_GATE_BEARER}" \
   http://127.0.0.1:8787/__skyevault/repos/acme/my-repo/export
 
 git clone /srv/skyevault/git-remotes/exports/acme/my-repo/my-repo-YYYYMMDDTHHMMSSZ.bundle restored-repo

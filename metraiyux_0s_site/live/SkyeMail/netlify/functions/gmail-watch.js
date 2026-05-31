@@ -4,7 +4,7 @@ const { enableGoogleWatch, getWatchConfig, stopGoogleWatch, loadGoogleMailbox } 
 exports.handler = async (event) => {
   try {
     const method = String(event.httpMethod || 'GET').toUpperCase();
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
 
     if (method === 'GET') {
       const mailbox = await loadGoogleMailbox(auth.sub);

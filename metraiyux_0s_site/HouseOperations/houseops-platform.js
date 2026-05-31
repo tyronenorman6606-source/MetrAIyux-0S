@@ -3,17 +3,48 @@
   const STORAGE_KEY = 'skye0s.houseops.truth.v2';
   const GATE_BRIDGE_KEY = 'skye0s.houseops.gate.bridge.v1';
   const PRODUCTION_API_BASE = '/api/houseops';
+  const COMMAND_BRIDGE_ENDPOINT = '/api/0s-command-bridge/events';
   const SKYPAY_ORIGIN = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
   const PLAN_CATALOG = {
+    'houseoperations-command': {
+      id: 'houseoperations-command',
+      name: 'HouseOperations Command',
+      setup: 2500,
+      monthly: 497,
+      offer: 'metraiyux-houseoperations-command',
+      activation: 'SkyePay checkout creates the paid-pending HouseOperations Command order; FS27 owner approval activates the runtime workspace.',
+      includes: [
+        '1 HouseOperations command room',
+        'task/vendor/schedule/owner-alert/proof runtime workflows',
+        '1 local SkyeBox encrypted authenticator vault',
+        'FS27 PIN Gate handoff and exportable gate mirror packets',
+        'tutorial runbook and runtime claim contract'
+      ]
+    },
+    'houseoperations-managed': {
+      id: 'houseoperations-managed',
+      name: 'HouseOperations Managed',
+      setup: 5000,
+      monthly: 997,
+      offer: 'metraiyux-houseoperations-managed',
+      activation: 'Owner-approved managed rollout after SkyePay payment, scope review, and gate policy write.',
+      includes: [
+        'up to 3 HouseOperations command rooms',
+        'managed weekly proof review',
+        '3 local SkyeBox vault handoffs',
+        'custom FS27 event mirror policy',
+        'operator handoff and billing receipts'
+      ]
+    },
     'starter-command': {
       id: 'starter-command',
-      name: 'Starter Command with HouseOps preview',
+      name: 'Starter Command with HouseOps runtime lane',
       setup: 1500,
       monthly: 397,
       offer: 'metraiyux-starter-command',
-      activation: 'SkyePay checkout creates the paid-pending 0S Starter order; FS27 owner approval activates the workspace.',
+      activation: 'SkyePay checkout creates the paid-pending 0S Starter order; FS27 owner approval activates the runtime workspace.',
       includes: [
-        'HouseOperations local preview lane',
+        'HouseOperations runtime-backed command lane',
         '1 local SkyeBox encrypted authenticator vault',
         'task/vendor/schedule/owner-alert/proof workflows',
         'FS27 PIN Gate handoff and exportable gate mirror packets'
@@ -88,13 +119,13 @@
     ['create-billing', 'Create billing intent', 'Records the approved 0S plan intent or quote-only review route.']
   ];
   const claimContract = [
-    ['task_intake', 'Create and store house tasks', 'Task form/button writes records in the browser cache; /api/houseops/tasks is the gated cloud storage route.'],
-    ['vendor_intake', 'Create and store vendor requests', 'Vendor form writes value/contact/status; /api/houseops/vendors is the gated cloud storage route.'],
+    ['task_intake', 'Create and store house tasks', 'Task form/button writes browser-pending rows and posts to /api/houseops/tasks when the shared gate is active.'],
+    ['vendor_intake', 'Create and store vendor requests', 'Vendor form writes value/contact/status and posts to /api/houseops/vendors when the shared gate is active.'],
     ['workboard', 'Move work through states', 'Advance buttons update task/vendor status and the Worker exposes matching advance routes.'],
     ['owner_alerts', 'Show and resolve owner alerts', 'Blocked/review/high-priority tasks render in Alerts and can be resolved.'],
-    ['proof_ledger', 'Save proof snapshots', 'Save Proof writes proof ledger rows; /api/houseops/proof persists cloud proof snapshots.'],
+    ['proof_ledger', 'Save proof snapshots', 'Save Proof writes proof ledger rows and mirrors to /api/houseops/proof when the shared gate is active.'],
     ['backup_export', 'Export backup JSON', 'Export downloads houseoperations-standalone-backup.json.'],
-    ['gate_packet_export', 'Queue/export FS27 mirror packets', 'Queue Gate Mirror creates packets; /api/houseops/gate-packets persists cloud handoff packets.'],
+    ['gate_packet_export', 'Queue/export FS27 mirror packets', 'Queue Gate Mirror creates packets and posts /api/houseops/gate-packets when the shared gate is active.'],
     ['skyebox_vault', 'Open encrypted local TOTP vault', 'SkyeBox creates/unlocks WebCrypto vault, saves TOTP, exports encrypted backup.'],
     ['pin_gate', 'Hand off to FS27 PIN/recovery gate', 'FS27 has setup/login/recovery/rotation endpoints and PIN Gate UI; runtime requires FS27 env/DB.'],
     ['billing_intent', 'Create approved plan intent', 'Billing page records bundled 0S plan scope, current setup/monthly price, quote-only boundaries, and activation boundary.'],
@@ -152,6 +183,15 @@
     tutorialRuns: []
   };
 
+  const seedIds = {
+    tasks: new Set(seed.tasks.map((item) => item.id)),
+    schedule: new Set(seed.schedule.map((item) => item.id)),
+    vendors: new Set(seed.vendors.map((item) => item.id)),
+    assignments: new Set(seed.assignments.map((item) => item.id)),
+    proofs: new Set(seed.proofs.map((item) => item.id)),
+    activity: new Set(seed.activity.map((item) => item.id))
+  };
+
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (match) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[match]));
@@ -164,9 +204,17 @@
     if (/^(localhost|127\.0\.0\.1)$/i.test(location.hostname)) return '';
     return PRODUCTION_API_BASE;
   })();
+  const liveRuntime = () => Boolean(HOUSEOPS_API_BASE);
+  const localSeedAllowed = () => !liveRuntime() || window.HOUSEOPS_ALLOW_LOCAL_SEED === true;
+  let runtimeHydrated = false;
+  let runtimeSyncing = false;
+  const LOCAL_OFFLINE_STATUS = 'local_offline_pending';
+  const LIVE_BRIDGE_STATUS = 'live_bridge_receipt';
 
   function runtimeModeLabel() {
-    return HOUSEOPS_API_BASE ? '0S Worker runtime' : 'browser-local runtime';
+    if (!HOUSEOPS_API_BASE) return 'browser-local runtime; all rows are local/offline';
+    if (runtimeHydrated) return '0S Worker configured and hydrated; rows still require live bridge receipts';
+    return '0S Worker configured; local rows stay offline until bridge receipts return';
   }
 
   function endpointHref(path) {
@@ -208,9 +256,17 @@
   }
 
   function normalize(data) {
-    const next = { ...clone(seed), ...(data || {}) };
+    const empty = { tasks: [], schedule: [], vendors: [], assignments: [], proofs: [], activity: [], gatePackets: [], billingIntents: [], tutorialRuns: [] };
+    const base = localSeedAllowed() ? clone(seed) : empty;
+    const next = { ...base, ...(data || {}) };
     for (const key of ['tasks', 'schedule', 'vendors', 'assignments', 'proofs', 'activity', 'gatePackets', 'billingIntents', 'tutorialRuns']) {
-      if (!Array.isArray(next[key])) next[key] = clone(seed[key]);
+      if (!Array.isArray(next[key])) next[key] = clone(base[key] || []);
+    }
+    if (!localSeedAllowed()) {
+      for (const key of ['tasks', 'schedule', 'vendors', 'assignments', 'proofs', 'activity']) {
+        const ids = seedIds[key] || new Set();
+        next[key] = next[key].filter((item) => !ids.has(item?.id));
+      }
     }
     return next;
   }
@@ -218,9 +274,9 @@
   function read() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      return write(normalize(saved || seed));
+      return write(normalize(saved || (localSeedAllowed() ? seed : {})));
     } catch (_) {
-      return write(clone(seed));
+      return write(localSeedAllowed() ? clone(seed) : {});
     }
   }
 
@@ -233,6 +289,126 @@
   function save(data) {
     write(data);
     render();
+  }
+
+  function gateHeaders() {
+    const headers = {};
+    for (const storage of [sessionStorage, localStorage]) {
+      for (const key of ['ZERO_OS_GATE_SESSION', 'FREE99_GATE_SESSION', 'SKYE_GATE_SESSION', 'skye:gate:session']) {
+        const token = storage.getItem(key);
+        if (token && !headers.Authorization) headers.Authorization = /^bearer\s+/i.test(token) ? token : `Bearer ${token}`;
+      }
+    }
+    return headers;
+  }
+
+  async function apiRequest(path, options = {}) {
+    if (!HOUSEOPS_API_BASE) return null;
+    const response = await fetch(`${HOUSEOPS_API_BASE}/${String(path || '').replace(/^\/+/, '')}`, {
+      ...options,
+      headers: { 'content-type': 'application/json', ...gateHeaders(), ...(options.headers || {}) }
+    });
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response.json().catch(() => ({ ok: true }));
+  }
+
+  function bridgeReceiptFrom(result) {
+    if (!result || typeof result !== 'object') return null;
+    const nested = result.bridge_receipt || result.bridgeReceipt || result.live_bridge_receipt || result.liveBridgeReceipt || result.receipt || result.runtimeReceipt || result.event_receipt;
+    if (nested && typeof nested === 'object') {
+      return {
+        ...nested,
+        id: nested.id || nested.receipt_id || nested.receiptId || result.receipt_id || result.event_id || 'accepted',
+        source: nested.source || result.source || result.backend || '0s-worker',
+        accepted_at: nested.accepted_at || nested.acceptedAt || nested.created_at || result.accepted_at || result.created_at || new Date().toISOString()
+      };
+    }
+    const receiptId = result.receipt_id || result.receiptId || result.bridge_receipt_id || result.bridgeReceiptId || result.live_bridge_receipt_id || result.liveBridgeReceiptId;
+    const eventId = result.event_id || result.eventId || result.command_event_id || result.commandEventId;
+    const accepted = result.accepted === true || result.status === 'accepted' || result.status === 'recorded';
+    if (!receiptId && !eventId && !accepted) return null;
+    return {
+      id: receiptId || eventId || 'accepted',
+      source: result.source || result.backend || '0s-worker',
+      accepted_at: result.accepted_at || result.acceptedAt || result.created_at || new Date().toISOString()
+    };
+  }
+
+  function commandBridgePayload(action, payload = {}) {
+    return {
+      type: action,
+      action,
+      lane: 'houseoperations',
+      source: 'HouseOperations',
+      summary: payload.summary || payload.title || payload.name || payload.action || action,
+      status: payload.status || 'recorded',
+      ids: {
+        task_id: payload.id || payload.task_id || '',
+        vendor_id: payload.vendor_id || '',
+        gate_packet_id: payload.gate_packet_id || ''
+      },
+      money: payload.value ? { amount_cents: Math.round(Number(payload.value || 0) * 100), currency: 'USD' } : undefined,
+      metadata: {
+        app: 'HouseOperations',
+        runtime_base: HOUSEOPS_API_BASE || 'browser-local',
+        created_at: new Date().toISOString(),
+        payload
+      }
+    };
+  }
+
+  async function emitHouseEvent(action, payload = {}) {
+    if (!COMMAND_BRIDGE_ENDPOINT || !liveRuntime()) return null;
+    const response = await fetch(COMMAND_BRIDGE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...gateHeaders() },
+      body: JSON.stringify(commandBridgePayload(action, payload))
+    });
+    if (!response.ok) throw new Error(`command bridge ${response.status}`);
+    return response.json().catch(() => ({ ok: true }));
+  }
+
+  async function runtimeWrite(path, payload, action) {
+    if (!liveRuntime()) return null;
+    try {
+      const result = await apiRequest(path, { method: 'POST', body: JSON.stringify(payload || {}) });
+      const bridgeResult = await emitHouseEvent(action, payload).catch(() => null);
+      await syncRuntime({ silent: true });
+      return bridgeResult || result;
+    } catch (error) {
+      const data = read();
+      pushActivity(data, 'Runtime', `${action || path} pending runtime write: ${error.message}`, 'runtime');
+      write(data);
+      toast('Runtime write pending. Check gate session.');
+      return null;
+    }
+  }
+
+  async function syncRuntime(options = {}) {
+    if (!liveRuntime() || runtimeSyncing) return;
+    runtimeSyncing = true;
+    try {
+      const local = read();
+      const payload = await apiRequest('exports');
+      const cloudState = payload?.state && typeof payload.state === 'object' ? payload.state : {};
+      const next = normalize({
+        ...cloudState,
+        billingIntents: local.billingIntents,
+        tutorialRuns: local.tutorialRuns
+      });
+      runtimeHydrated = true;
+      write(next);
+      if (!options.silent) toast('HouseOperations runtime synced.');
+      render();
+    } catch (error) {
+      runtimeHydrated = false;
+      const data = read();
+      pushActivity(data, 'Runtime', `sync failed: ${error.message}`, 'runtime');
+      write(data);
+      if (!options.silent) toast('Runtime sync failed. Check gate session.');
+    } finally {
+      runtimeSyncing = false;
+    }
   }
 
   function gateConfig() {
@@ -266,6 +442,54 @@
     return `<span class="badge ${kind}">${esc(status)}</span>`;
   }
 
+  function hasBridgeReceipt(record) {
+    return Boolean(record?.bridge_receipt || record?.live_bridge_receipt || record?.boundary?.liveBridgeReceipt);
+  }
+
+  function recordBoundaryLabel(record) {
+    return hasBridgeReceipt(record) ? 'live bridge receipt' : 'local/offline';
+  }
+
+  function recordBoundaryBadge(record) {
+    const status = record?.sync_status && record.sync_status !== LIVE_BRIDGE_STATUS ? ` / ${record.sync_status}` : '';
+    const label = `${recordBoundaryLabel(record)}${status}`;
+    return `<span class="badge ${hasBridgeReceipt(record) ? 'good' : 'warn'}">${esc(label)}</span>`;
+  }
+
+  function markLocalPending(record, source = 'browser-local') {
+    if (!record || typeof record !== 'object') return record;
+    record.sync_status = LOCAL_OFFLINE_STATUS;
+    record.bridge_receipt = null;
+    record.bridge_confirmed_at = null;
+    record.boundary = {
+      source,
+      label: 'local/offline',
+      liveBridgeReceipt: null,
+      pendingSince: new Date().toISOString()
+    };
+    return record;
+  }
+
+  function markBridgeAccepted(listName, id, result) {
+    const receipt = bridgeReceiptFrom(result);
+    if (!receipt || !id) return;
+    const data = read();
+    const list = data[listName];
+    if (!Array.isArray(list)) return;
+    const item = list.find((row) => row.id === id || row.gate_packet_id === id);
+    if (!item) return;
+    item.sync_status = LIVE_BRIDGE_STATUS;
+    item.bridge_receipt = receipt;
+    item.bridge_confirmed_at = receipt.accepted_at || new Date().toISOString();
+    item.boundary = { source: receipt.source || '0s-worker', label: 'live bridge receipt', liveBridgeReceipt: receipt };
+    write(data);
+    render();
+  }
+
+  function acceptRuntimeWrite(listName, id, promise) {
+    void Promise.resolve(promise).then((result) => markBridgeAccepted(listName, id, result)).catch(() => {});
+  }
+
   function kpis() {
     const data = read();
     const s = stats(data);
@@ -284,20 +508,20 @@
       <td><b>${esc(task.title)}</b><br><span class="small-copy">${esc(task.owner)} / ${esc(task.lane || 'general')}</span></td>
       <td>${esc(task.due)}</td>
       <td>${badge(task.priority)}</td>
-      <td>${badge(task.status)}</td>
+      <td>${badge(task.status)} ${recordBoundaryBadge(task)}</td>
       <td><button class="btn" data-action="advance-task" data-id="${esc(task.id)}">Advance</button></td>
     </tr>`).join('');
   }
 
   function scheduleRows(data = read()) {
-    return data.schedule.map((event) => `<div class="event"><time>${esc(event.time)}</time><div><b>${esc(event.title)}</b><span>${esc(event.lane)}</span></div>${badge(event.status)}</div>`).join('');
+    return data.schedule.map((event) => `<div class="event"><time>${esc(event.time)}</time><div><b>${esc(event.title)}</b><span>${esc(event.lane)} / ${recordBoundaryLabel(event)}</span></div>${badge(event.status)} ${recordBoundaryBadge(event)}</div>`).join('');
   }
 
   function vendorRows(data = read()) {
     return data.vendors.map((vendor) => `<tr>
       <td><b>${esc(vendor.name)}</b><br><span class="small-copy">${esc(vendor.request)} / ${esc(vendor.contact || 'no contact')}</span></td>
       <td>${money(vendor.value)}</td>
-      <td>${badge(vendor.status)}</td>
+      <td>${badge(vendor.status)} ${recordBoundaryBadge(vendor)}</td>
       <td><button class="btn" data-action="advance-vendor" data-id="${esc(vendor.id)}">Advance</button></td>
     </tr>`).join('');
   }
@@ -306,12 +530,12 @@
     return data.assignments.map((team) => `<tr>
       <td><b>${esc(team.team)}</b><br><span class="small-copy">${esc(team.owner)} / ${esc(team.lane)}</span></td>
       <td><div class="meter"><i style="--value:${Number(team.load || 0)}%"></i></div></td>
-      <td>${badge(team.load >= 82 ? 'watch' : 'green')}</td>
+      <td>${badge(team.load >= 82 ? 'watch' : 'green')} ${recordBoundaryBadge(team)}</td>
     </tr>`).join('');
   }
 
   function proofRows(data = read()) {
-    return data.proofs.map((proof) => `<tr><td><b>${esc(proof.title)}</b><br><span class="small-copy">${esc(proof.note)}</span></td><td>${badge(proof.status)}</td><td>${esc(proof.at)}</td></tr>`).join('');
+    return data.proofs.map((proof) => `<tr><td><b>${esc(proof.title)}</b><br><span class="small-copy">${esc(proof.note)}</span></td><td>${badge(proof.status)} ${recordBoundaryBadge(proof)}</td><td>${esc(proof.at)}</td></tr>`).join('');
   }
 
   function ownerAlertRows(data = read()) {
@@ -319,16 +543,16 @@
     if (!alerts.length) return '<div class="emptyPanel"><h3>No owner alerts</h3><p>Nothing is blocked, high-priority, or waiting for closeout review.</p></div>';
     return alerts.map((task) => `<div class="alertItem">
       <div><b>${esc(task.title)}</b><span>${esc(task.owner)} / ${esc(task.due)} / ${esc(task.note || '')}</span></div>
-      <div>${badge(task.status)} <button class="btn small" data-action="resolve-alert" data-id="${esc(task.id)}">Resolve</button></div>
+      <div>${badge(task.status)} ${recordBoundaryBadge(task)} <button class="btn small" data-action="resolve-alert" data-id="${esc(task.id)}">Resolve</button></div>
     </div>`).join('');
   }
 
   function activityRows(data = read()) {
-    return data.activity.slice(0, 8).map((row) => `<div class="event"><time>${esc(row.at)}</time><div><b>${esc(row.actor)}</b><span>${esc(row.action)}</span></div>${badge(row.lane)}</div>`).join('');
+    return data.activity.slice(0, 8).map((row) => `<div class="event"><time>${esc(row.at)}</time><div><b>${esc(row.actor)}</b><span>${esc(row.action)} / ${recordBoundaryLabel(row)} ledger</span></div>${badge(row.lane)} ${recordBoundaryBadge(row)}</div>`).join('');
   }
 
   function workBoard(data = read()) {
-    return `<div class="workBoard">${flow.map((status) => `<section class="workColumn"><h3>${esc(status)}</h3>${data.tasks.filter((task) => task.status === status).map((task) => `<article class="workCard"><b>${esc(task.title)}</b><span>${esc(task.owner)} / ${esc(task.due)}</span><p>${esc(task.note || '')}</p><div>${badge(task.priority)} <button class="btn small" data-action="advance-task" data-id="${esc(task.id)}">Advance</button></div></article>`).join('') || '<p class="small-copy">No work here.</p>'}</section>`).join('')}</div>`;
+    return `<div class="workBoard">${flow.map((status) => `<section class="workColumn"><h3>${esc(status)}</h3>${data.tasks.filter((task) => task.status === status).map((task) => `<article class="workCard"><b>${esc(task.title)}</b><span>${esc(task.owner)} / ${esc(task.due)} / ${recordBoundaryLabel(task)}</span><p>${esc(task.note || '')}</p><div>${badge(task.priority)} ${recordBoundaryBadge(task)} <button class="btn small" data-action="advance-task" data-id="${esc(task.id)}">Advance</button></div></article>`).join('') || '<p class="small-copy">No work here.</p>'}</section>`).join('')}</div>`;
   }
 
   function taskIntakeForm() {
@@ -368,7 +592,7 @@
     const cfg = gateConfig();
     return `<div class="panel span12"><div class="panelHead"><div><h2>SkyeGate bridge</h2><p>HouseOperations now knows where the parent gate is and can export mirror packets for review, execution, and dispatch state.</p></div><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">PIN Gate</a></div><div class="panelBody bridgeGrid">
       <div class="bridgeCard"><b>Gate origin</b><code>${esc(cfg.origin || 'not configured')}</code><span>${esc(cfg.appId || 'metraiyux-houseoperations')}</span></div>
-      <div class="bridgeCard"><b>Queued packets</b><strong>${data.gatePackets.length}</strong><span>local mirror packets ready to export or send through FS27 event mirror when the Worker secret is configured.</span></div>
+      <div class="bridgeCard"><b>Queued packets</b><strong>${data.gatePackets.length}</strong><span>Runtime-confirmed packets require a bridge receipt; browser-pending packets remain marked local/offline until the Worker accepts them.</span></div>
       <div class="bridgeActions"><button class="btn primary" data-action="queue-gate-mirror">Queue Gate Mirror</button><button class="btn" data-action="export-gate-packet">Export Gate Packet</button><a class="btn" href="../proof/houseoperations-skyebox-expansion-receipt.html">Proof Receipt</a></div>
     </div></div>`;
   }
@@ -391,7 +615,8 @@
   function billingIntentRows(data = read()) {
     if (!data.billingIntents.length) return '<div class="emptyPanel"><h3>No billing intents yet</h3><p>Create one from the billing form before sending a client to an approved checkout or quote review route.</p></div>';
     return data.billingIntents.slice(0, 6).map((intent) => `<div class="runtimeRow">
-      <div><b>${esc(intent.company || intent.customer_email || intent.plan_name)}</b><br><code>${esc(intent.id)}</code><span class="small-copy">${esc(intent.plan_name)} / ${esc(intent.price_label || `${money(intent.setup_usd)} setup / ${money(intent.monthly_usd)} monthly`)} / ${esc(intent.status)}</span></div>
+      <div><b>${esc(intent.company || intent.customer_email || intent.plan_name)}</b><br><code>${esc(intent.id)}</code><span class="small-copy">${esc(intent.plan_name)} / ${esc(intent.price_label || `${money(intent.setup_usd)} setup / ${money(intent.monthly_usd)} monthly`)} / ${esc(intent.status)} / ${recordBoundaryLabel(intent)}</span></div>
+      ${recordBoundaryBadge(intent)}
       <a class="btn" href="${esc(intent.checkout_url)}">${esc(intent.checkout_label || 'Checkout')}</a>
     </div>`).join('');
   }
@@ -429,7 +654,7 @@
 
   function tutorialRunRows(data = read()) {
     if (!data.tutorialRuns.length) return '<div class="emptyPanel"><h3>No tutorial steps recorded</h3><p>Run a step or use Run Full Tutorial to produce a local handoff receipt.</p></div>';
-    return data.tutorialRuns.slice(0, 10).map((run) => `<div class="event"><time>${esc(run.at_display)}</time><div><b>${esc(run.label)}</b><span>${esc(run.result)}</span></div>${badge('done')}</div>`).join('');
+    return data.tutorialRuns.slice(0, 10).map((run) => `<div class="event"><time>${esc(run.at_display)}</time><div><b>${esc(run.label)}</b><span>${esc(run.result)} / ${recordBoundaryLabel(run)}</span></div>${badge('done')} ${recordBoundaryBadge(run)}</div>`).join('');
   }
 
   function commandHero(eyebrow, title, body, actions = '') {
@@ -445,7 +670,7 @@
         <p>${esc(body)}</p>
         <div class="actions commandActions">${actions}</div>
       </div>
-      <div class="missionStack" aria-label="HouseOperations live status">
+      <div class="missionStack" aria-label="HouseOperations runtime status">
         <div class="missionPlate mainPlate"><span>Open</span><strong>${s.open}</strong><small>work orders</small></div>
         <div class="missionPlate"><span>Owner</span><strong>${s.blocked}</strong><small>escalations</small></div>
         <div class="missionPlate"><span>Vendor</span><strong>${money(s.vendorValue)}</strong><small>tracked value</small></div>
@@ -460,7 +685,7 @@
       <div class="panelBody runwayGrid">
         <a class="runwayTile" href="../Free99/apps/skyebox-authenticator/index.html"><span>01</span><h3>SkyeBox Authenticator</h3><p>Encrypted local TOTP vault, backup export, offline PWA assets, and proof scripts.</p></a>
         <a class="runwayTile" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html"><span>02</span><h3>FS27 PIN Gate</h3><p>Generated Gate ID plus PIN unlock, recovery path, and owner-controlled activation boundary.</p></a>
-        <a class="runwayTile" href="./runtime.html"><span>03</span><h3>Runtime Proof</h3><p>Endpoint checks, claim contract, local proof ledger, and exportable mirror packets.</p></a>
+        <a class="runwayTile" href="./runtime.html"><span>03</span><h3>Runtime Proof</h3><p>Endpoint checks, claim contract, local/offline proof ledger, and exportable mirror packets.</p></a>
         <a class="runwayTile" href="./billing.html"><span>04</span><h3>Billing Intent</h3><p>Bundled 0S scope, current plan pricing, approved handoff route, and activation receipt.</p></a>
       </div>
     </section>`;
@@ -470,17 +695,17 @@
     const rows = data.proofs.slice(0, 4).map((proof, index) => `<article class="spineNode">
       <span>${String(index + 1).padStart(2, '0')}</span>
       <div><h3>${esc(proof.title)}</h3><p>${esc(proof.note)}</p></div>
-      ${badge(proof.status)}
+      ${badge(proof.status)} ${recordBoundaryBadge(proof)}
     </article>`).join('');
-    return `<section class="panel span4 proofSpine"><div class="panelHead"><div><h2>Proof spine</h2><p>Receipts tied to the running app.</p></div></div><div class="panelBody">${rows}</div></section>`;
+    return `<section class="panel span4 proofSpine"><div class="panelHead"><div><h2>Proof spine</h2><p>Local/offline proof rows unless a live bridge receipt is attached.</p></div></div><div class="panelBody">${rows}</div></section>`;
   }
 
   function dashboardView() {
     return `<section class="grid opsFloor">
       ${commandHero(
         'HouseOperations Command / radical v3',
-        'Run the house from a live operations floor.',
-        'Task intake, vendors, schedule pressure, owner decisions, proof, billing, vault custody, and Gate packets are now laid out as one working command surface.',
+        'Run the house from a local-first operations floor.',
+        'Task intake, vendors, schedule pressure, owner decisions, proof, billing, vault custody, and Gate packets stay separated from browser-local drafts until the 0S Worker confirms them.',
         '<button class="btn primary" data-action="new-task">New Task</button><button class="btn" data-action="new-vendor">New Vendor</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn" data-action="export">Export</button>'
       )}
       <div class="span12 commandTicker">${kpis()}</div>
@@ -491,7 +716,7 @@
       <div class="panel span8 commandSurface"><div class="panelHead"><div><h2>Task Command</h2><p>Owner, due date, priority, and state stay editable through the same app actions.</p></div><a class="btn" href="./tasks.html">Open workboard</a></div><div class="panelBody tableWrap"><table><thead><tr><th>Task</th><th>Due</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody>${taskRows()}</tbody></table></div></div>
       <div class="panel span4 alertTower"><div class="panelHead"><div><h2>Owner alert tower</h2><p>High, blocked, and review items only.</p></div></div><div class="panelBody alertList">${ownerAlertRows()}</div></div>
       <div class="panel span8 workFloor"><div class="panelHead"><div><h2>Workboard floor</h2><p>State movement across open, queued, review, and done.</p></div></div><div class="panelBody">${workBoard()}</div></div>
-      <div class="panel span4"><div class="panelHead"><div><h2>Activity Trail</h2><p>Latest local operating events.</p></div></div><div class="panelBody timeline">${activityRows()}</div></div>
+      <div class="panel span4"><div class="panelHead"><div><h2>Activity Trail</h2><p>Latest runtime and local operating events.</p></div></div><div class="panelBody timeline">${activityRows()}</div></div>
     </section>`;
   }
 
@@ -517,7 +742,7 @@
 
   function runtimeView() {
     const apiPaths = ['health','status','tasks','vendors','schedule','alerts','assignments','proof','gate-packets','queue','handoff-packs','review-board','execution-board','dispatch-board','v1/runtime-summary','v1/sessions','exports','audit'];
-    return `<section class="grid">${gatePanel()}<div class="panel span12"><div class="panelHead"><div><h2>Runtime Proof</h2><p>${runtimeModeLabel()} endpoints plus preserved legacy shell links.</p></div></div><div class="panelBody runtimeList">
+    return `<section class="grid">${gatePanel()}<div class="panel span12"><div class="panelHead"><div><h2>Runtime Proof</h2><p>${runtimeModeLabel()} endpoints plus preserved legacy shell links. Hydrated: ${runtimeHydrated ? 'yes' : 'pending'}.</p></div><button class="btn" data-action="sync-runtime">Sync Runtime</button></div><div class="panelBody runtimeList">
       ${apiPaths.map((path) => `<div class="runtimeRow"><div><b>${path}</b><br><code>${esc(endpointHref(path))}</code></div><a class="btn" href="${esc(endpointHref(path))}">Open</a></div>`).join('')}
       <div class="runtimeRow"><div><b>SkyeBox Authenticator Vault</b><br><code>../Free99/apps/skyebox-authenticator/index.html</code></div><a class="btn" href="../Free99/apps/skyebox-authenticator/index.html">Open</a></div>
       <div class="runtimeRow"><div><b>SkyeGate PIN Gate</b><br><code>https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html</code></div><a class="btn" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/pin-gate.html">Open</a></div>
@@ -525,7 +750,7 @@
       <div class="runtimeRow"><div><b>HouseOperations billing</b><br><code>./billing.html</code></div><a class="btn" href="./billing.html">Open</a></div>
       <div class="runtimeRow"><div><b>0S expansion proof hub</b><br><code>../live/houseoperations-skyebox-operator-proof.html</code></div><a class="btn" href="../live/houseoperations-skyebox-operator-proof.html">Open</a></div>
       <div class="runtimeRow"><div><b>Legacy routed shell</b><br><code>./_legacy_shell/index.html</code></div><a class="btn" href="./_legacy_shell/index.html">Open</a></div>
-    </div></div><div class="panel span12"><div class="panelHead"><div><h2>Truth Contract</h2><p>Every sellable claim maps to a working control, endpoint, export, or proof run.</p></div><button class="btn" data-action="export-claim-contract">Export Claim Contract</button></div><div class="panelBody tableWrap"><table><thead><tr><th>ID</th><th>Claim</th><th>Backing proof</th><th>Status</th></tr></thead><tbody>${claimRows()}</tbody></table></div></div><div class="panel span12"><div class="panelHead"><div><h2>Proof Ledger</h2><p>Local HouseOperations proof rows.</p></div></div><div class="panelBody tableWrap"><table><thead><tr><th>Proof</th><th>Status</th><th>At</th></tr></thead><tbody>${proofRows()}</tbody></table></div></div></section>`;
+    </div></div><div class="panel span12"><div class="panelHead"><div><h2>Truth Contract</h2><p>Every sellable claim maps to a working control, endpoint, export, or proof run.</p></div><button class="btn" data-action="export-claim-contract">Export Claim Contract</button></div><div class="panelBody tableWrap"><table><thead><tr><th>ID</th><th>Claim</th><th>Backing proof</th><th>Status</th></tr></thead><tbody>${claimRows()}</tbody></table></div></div><div class="panel span12"><div class="panelHead"><div><h2>Proof Ledger</h2><p>Local/offline proof rows unless a live bridge receipt is present.</p></div></div><div class="panelBody tableWrap"><table><thead><tr><th>Proof</th><th>Status</th><th>At</th></tr></thead><tbody>${proofRows()}</tbody></table></div></div></section>`;
   }
 
   function billingView() {
@@ -556,14 +781,14 @@
       )}
       <div class="span12 commandTicker">${kpis()}</div>
       <div class="panel span12 tutorialDeck"><div class="panelHead"><div><h2>Guided Run</h2><p>${completed}/${tutorialSteps.length} tutorial steps recorded in this browser.</p></div></div><div class="panelBody">${tutorialCards(data)}</div></div>
-      <div class="panel span7 receiptConsole"><div class="panelHead"><div><h2>Tutorial Receipt</h2><p>Every completed step writes a local run row.</p></div></div><div class="panelBody timeline">${tutorialRunRows(data)}</div></div>
+      <div class="panel span7 receiptConsole"><div class="panelHead"><div><h2>Tutorial Receipt</h2><p>Every completed step writes a local/offline run row.</p></div></div><div class="panelBody timeline">${tutorialRunRows(data)}</div></div>
       <div class="panel span5 ruleConsole"><div class="panelHead"><div><h2>Operating Rule</h2><p>What paid users should understand before handoff.</p></div></div><div class="panelBody laneGrid"><div class="lane"><h3>Local state</h3><p>Tasks, vendors, proof, tutorial runs, and billing intents live in this browser until exported or mirrored.</p></div><div class="lane"><h3>SkyeBox custody</h3><p>TOTP secrets stay in the encrypted local vault; FS27 PIN recovery does not recover TOTP secrets.</p></div><div class="lane"><h3>Paid access</h3><p>SkyePay/FS27 own payment, approval, and entitlement enforcement.</p></div></div></div>
     </section>`;
   }
 
   function settingsView() {
     const cfg = gateConfig();
-    return `<section class="grid"><div class="panel span6"><div class="panelHead"><div><h2>Settings</h2><p>0S-owned controls.</p></div></div><div class="panelBody formGrid"><button class="btn primary" data-action="fullscreen">Enter Fullscreen</button><button class="btn" data-action="export">Export Backup</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn danger" data-action="reset">Reset Local State</button></div></div><div class="panel span6"><div class="panelHead"><div><h2>SkyeGate bridge settings</h2><p>Store only public origin/app metadata here. Event mirror secrets belong in Worker/env, not the browser.</p></div></div><div class="panelBody"><form class="intakeForm" data-form="gate"><label>Gate origin<input name="origin" value="${esc(cfg.origin || '')}" placeholder="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"></label><label>App id<input name="appId" value="${esc(cfg.appId || 'metraiyux-houseoperations')}"></label><button class="btn primary" type="submit">Save Gate Bridge</button></form></div></div><div class="panel span12"><div class="panelHead"><div><h2>Storage</h2><p>Browser cache plus gated Worker namespace.</p></div></div><div class="panelBody runtimeList"><div class="runtimeRow"><div><b>Browser cache key</b><br><code>${STORAGE_KEY}</code></div>${badge('owned')}</div><div class="runtimeRow"><div><b>Worker API base</b><br><code>${esc(HOUSEOPS_API_BASE || 'not mounted on localhost')}</code></div>${badge(HOUSEOPS_API_BASE ? 'live/gated' : 'local')}</div><div class="runtimeRow"><div><b>Legacy closure</b><br><code>_legacy_shell/</code></div>${badge('pass')}</div><div class="runtimeRow"><div><b>Runtime endpoints</b><br><code>health / status / tasks / vendors / schedule / alerts / assignments / proof / exports</code></div>${badge(HOUSEOPS_API_BASE ? 'worker' : 'local')}</div></div></div></section>`;
+    return `<section class="grid"><div class="panel span6"><div class="panelHead"><div><h2>Settings</h2><p>0S-owned controls.</p></div></div><div class="panelBody formGrid"><button class="btn primary" data-action="fullscreen">Enter Fullscreen</button><button class="btn" data-action="export">Export Backup</button><button class="btn" data-action="save-proof">Save Proof</button><button class="btn danger" data-action="reset">Reset Local State</button></div></div><div class="panel span6"><div class="panelHead"><div><h2>SkyeGate bridge settings</h2><p>Store only public origin/app metadata here. Event mirror secrets belong in Worker/env, not the browser.</p></div></div><div class="panelBody"><form class="intakeForm" data-form="gate"><label>Gate origin<input name="origin" value="${esc(cfg.origin || '')}" placeholder="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev"></label><label>App id<input name="appId" value="${esc(cfg.appId || 'metraiyux-houseoperations')}"></label><button class="btn primary" type="submit">Save Gate Bridge</button></form></div></div><div class="panel span12"><div class="panelHead"><div><h2>Storage</h2><p>Browser cache plus gated Worker namespace; records are local/offline until a bridge receipt is stored.</p></div></div><div class="panelBody runtimeList"><div class="runtimeRow"><div><b>Browser cache key</b><br><code>${STORAGE_KEY}</code></div>${badge('local/offline')}</div><div class="runtimeRow"><div><b>Worker API base</b><br><code>${esc(HOUSEOPS_API_BASE || 'not mounted on localhost')}</code></div>${badge(HOUSEOPS_API_BASE ? 'configured' : 'local')}</div><div class="runtimeRow"><div><b>Legacy closure</b><br><code>_legacy_shell/</code></div>${badge('pass')}</div><div class="runtimeRow"><div><b>Runtime endpoints</b><br><code>health / status / tasks / vendors / schedule / alerts / assignments / proof / exports</code></div>${badge(HOUSEOPS_API_BASE ? 'configured' : 'local')}</div></div></div></section>`;
   }
 
   const views = { dashboard: dashboardView, tasks: tasksView, schedule: scheduleView, vendors: vendorsView, alerts: alertsView, assignments: assignmentsView, runtime: runtimeView, billing: billingView, tutorial: tutorialView, settings: settingsView };
@@ -619,13 +844,13 @@
 
   function pushActivity(data, actor, action, lane = 'command') {
     const stamp = new Date();
-    data.activity.unshift({ id: uid('act'), at: stamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), actor, action, lane });
+    data.activity.unshift(markLocalPending({ id: uid('act'), at: stamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), actor, action, lane }, 'browser-local activity'));
     data.activity = data.activity.slice(0, 30);
   }
 
   function addTask(payload = {}) {
     const data = read();
-    data.tasks.unshift({
+    const task = {
       id: uid('task'),
       title: payload.title || 'New house task',
       owner: payload.owner || 'House Desk',
@@ -634,25 +859,29 @@
       status: 'open',
       lane: payload.lane || 'owner',
       note: payload.note || 'Created from HouseOperations intake.'
-    });
+    };
+    data.tasks.unshift(markLocalPending({ ...task }, 'browser-local task'));
     pushActivity(data, payload.owner || 'House Desk', `created task: ${payload.title || 'New house task'}`, payload.lane || 'owner');
     save(data);
     toast('Task added.');
+    acceptRuntimeWrite('tasks', task.id, runtimeWrite('tasks', task, 'houseops.task.created'));
   }
 
   function addVendor(payload = {}) {
     const data = read();
-    data.vendors.unshift({
+    const vendor = {
       id: uid('ven'),
       name: payload.name || 'New Vendor',
       request: payload.request || 'New request',
       value: Number(payload.value || 500),
       status: payload.status || 'open',
       contact: payload.contact || ''
-    });
+    };
+    data.vendors.unshift(markLocalPending({ ...vendor }, 'browser-local vendor'));
     pushActivity(data, 'Vendor Desk', `created vendor: ${payload.name || 'New Vendor'}`, 'vendor');
     save(data);
     toast('Vendor added.');
+    acceptRuntimeWrite('vendors', vendor.id, runtimeWrite('vendors', vendor, 'houseops.vendor.created'));
   }
 
   function advance(listName, id) {
@@ -660,9 +889,12 @@
     const item = data[listName].find((row) => row.id === id);
     if (!item) return;
     item.status = flow[Math.min(Math.max(0, flow.indexOf(item.status)) + 1, flow.length - 1)] || 'queued';
+    markLocalPending(item, `browser-local ${listName}`);
     pushActivity(data, item.owner || item.name || 'House Desk', `advanced ${item.title || item.request || item.name} to ${item.status}`, item.lane || 'command');
     save(data);
     toast('State advanced.');
+    const path = listName === 'vendors' ? `vendors/${encodeURIComponent(id)}/advance` : `tasks/${encodeURIComponent(id)}/advance`;
+    acceptRuntimeWrite(listName, id, runtimeWrite(path, item, `houseops.${listName === 'vendors' ? 'vendor' : 'task'}.advanced`));
   }
 
   function resolveAlert(id) {
@@ -671,24 +903,28 @@
     if (!item) return;
     item.status = 'done';
     item.priority = item.priority === 'high' ? 'medium' : item.priority;
+    markLocalPending(item, 'browser-local alert');
     pushActivity(data, 'Owner Desk', `resolved owner alert: ${item.title}`, 'owner');
     save(data);
     toast('Owner alert resolved.');
+    acceptRuntimeWrite('tasks', id, runtimeWrite(`alerts/${encodeURIComponent(id)}/resolve`, item, 'houseops.alert.resolved'));
   }
 
   function saveProof() {
     const data = read();
     const s = stats(data);
-    data.proofs.unshift({
+    const proof = {
       id: uid('pf'),
       title: 'HouseOperations proof snapshot',
       status: 'pass',
       at: new Date().toLocaleString(),
       note: `Snapshot saved with ${s.open} open work orders, ${s.blocked} owner escalations, ${data.vendors.length} vendors, and ${data.gatePackets.length} queued gate packets.`
-    });
+    };
+    data.proofs.unshift(markLocalPending({ ...proof }, 'browser-local proof'));
     pushActivity(data, 'Proof Desk', 'saved proof snapshot', 'proof');
     save(data);
     toast('Proof saved.');
+    acceptRuntimeWrite('proofs', proof.id, runtimeWrite('proof', proof, 'houseops.proof.saved'));
   }
 
   function queueGateMirror() {
@@ -707,10 +943,11 @@
       vendor_count: data.vendors.length,
       proof_count: data.proofs.length
     };
-    data.gatePackets.unshift(packet);
+    data.gatePackets.unshift(markLocalPending(packet, 'browser-local gate packet'));
     pushActivity(data, 'SkyeGate Bridge', `queued mirror packet ${packet.id}`, 'gate');
     save(data);
     toast('Gate mirror packet queued.');
+    acceptRuntimeWrite('gatePackets', packet.id, runtimeWrite('gate-packets', packet, 'houseops.gate_packet.queued'));
   }
 
   function createBillingIntent(payload = {}) {
@@ -728,8 +965,8 @@
       setup_usd: plan.setup,
       monthly_usd: plan.monthly,
       price_label: plan.priceLabel || `${money(plan.setup)} setup / ${money(plan.monthly)} monthly`,
-      customer_email: payload.customer_email || 'preview-client@example.com',
-      company: payload.company || 'Preview Client',
+      customer_email: payload.customer_email || '',
+      company: payload.company || 'Owner review draft',
       client_slug: clientSlug,
       payment_method: payload.payment_method || 'SkyePay card checkout',
       checkout_url: planCheckoutUrl(plan, clientSlug),
@@ -741,10 +978,15 @@
         ? 'Standalone HouseOperations managed custody is quote-only until policy and live proof are approved.'
         : 'HouseOperations records the 0S commercial intent locally; SkyePay/FS27 owns payment confirmation, plan policy write, and activation.'
     };
-    data.billingIntents.unshift(intent);
+    data.billingIntents.unshift(markLocalPending(intent, 'browser-local billing intent'));
     pushActivity(data, 'Billing Desk', `created billing intent for ${plan.name}`, 'billing');
     save(data);
     toast('Billing intent created.');
+    acceptRuntimeWrite('billingIntents', intent.id, emitHouseEvent('houseops.billing_intent.created', {
+      ...intent,
+      value: Number(intent.monthly_usd || 0),
+      summary: `Billing intent for ${intent.company || intent.customer_email || intent.plan_name}`
+    }).catch(() => null));
     return intent;
   }
 
@@ -772,7 +1014,9 @@
       label,
       result,
       at: stamp.toISOString(),
-      at_display: stamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      at_display: stamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      sync_status: LOCAL_OFFLINE_STATUS,
+      boundary: { source: 'browser-local tutorial', label: 'local/offline', liveBridgeReceipt: null, pendingSince: stamp.toISOString() }
     });
     pushActivity(data, 'Tutorial', `completed tutorial step: ${label}`, 'tutorial');
     save(data);
@@ -790,10 +1034,11 @@
       lane: 'owner',
       note: 'Created by the HouseOperations tutorial to prove owner-alert routing.'
     };
-    data.tasks.unshift(task);
+    data.tasks.unshift(markLocalPending(task, 'browser-local tutorial alert'));
     pushActivity(data, 'Tutorial', `created owner alert: ${task.title}`, 'owner');
     save(data);
     toast('Owner alert created.');
+    acceptRuntimeWrite('tasks', task.id, runtimeWrite('tasks', task, 'houseops.alert.created'));
   }
 
   function runTutorialStep(stepId) {
@@ -922,6 +1167,7 @@
         if (action === 'run-full-tutorial') runFullTutorial();
         if (action === 'export-tutorial-receipt') exportTutorialReceipt();
         if (action === 'export') exportBackup();
+        if (action === 'sync-runtime') syncRuntime();
         if (action === 'fullscreen') document.documentElement.requestFullscreen?.();
         if (action === 'reset') {
           localStorage.removeItem(STORAGE_KEY);
@@ -943,11 +1189,12 @@
     window.addEventListener('resize', update);
   }
 
-  window.HouseOperations = { read, saveProof, queueGateMirror, exportGatePacket, createBillingIntent, runTutorialStep, runFullTutorial, render };
+  window.HouseOperations = { read, saveProof, queueGateMirror, exportGatePacket, createBillingIntent, runTutorialStep, runFullTutorial, syncRuntime, render };
   document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.dataset.houseopsSurfaceVersion = 'radical-v3-20260517';
     initMotionChrome();
     render();
+    void syncRuntime({ silent: true });
   });
 })();
 

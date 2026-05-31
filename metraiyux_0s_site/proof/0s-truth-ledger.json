@@ -1,7 +1,7 @@
 {
-  "ok": false,
+  "ok": true,
   "schema": "metraiyux.0s.truth-ledger.v1",
-  "generated_at": "2026-05-30T19:44:12.393Z",
+  "generated_at": "2026-05-31T03:06:38.544Z",
   "source_manifest": "metraiyux_0s_site/data/0s-closure-workflows.json",
   "no_browser_proof_run": true,
   "owner_manual_live_check": true,
@@ -10,21 +10,21 @@
     "operating_matrix": {
       "path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "ok": true,
-      "generated_at": "2026-05-30T19:43:30.793Z",
+      "generated_at": "2026-05-31T02:36:06.748Z",
       "route_failures": 0,
       "behavior_green": 22,
       "behavior_yellow": 0,
       "behavior_red": 0,
-      "app_behavior_state": "yellow",
-      "app_behavior_green": 23,
-      "app_behavior_yellow": 84,
+      "app_behavior_state": "green",
+      "app_behavior_green": 107,
+      "app_behavior_yellow": 0,
       "app_behavior_red": 0,
-      "literal_per_app_depth_closed": false
+      "literal_per_app_depth_closed": true
     },
     "live_capability_watch": {
       "path": "test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json",
       "ok": true,
-      "generated_at": "2026-05-30T19:11:16.667Z",
+      "generated_at": "2026-05-30T19:44:25.295Z",
       "summary": {
         "total": 2,
         "pass": 2,
@@ -42,31 +42,18 @@
   },
   "summary": {
     "total": 22,
-    "built": 21,
-    "partial": 1,
+    "built": 22,
+    "partial": 0,
     "failing_proof": 0,
     "unproven": 0,
     "not_built_or_untracked": 0,
     "not_tracked": 0,
     "provider_or_real_world_gated": 11,
     "external_boundaries": 11,
-    "p0_not_built": [
-      "per-app-operating-proof-matrix"
-    ],
+    "p0_not_built": [],
     "p1_not_built": []
   },
-  "repair_queue": [
-    {
-      "id": "per-app-operating-proof-matrix",
-      "priority": "P0",
-      "computed_truth": "partial",
-      "gap_class": "none",
-      "proof_command": "npm run 0s:operating-proof-matrix",
-      "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
-      "external_boundaries": [],
-      "next_step": "Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models."
-    }
-  ],
+  "repair_queue": [],
   "workflows": [
     {
       "id": "shared-owner-gate",
@@ -323,20 +310,20 @@
       "priority": "P0",
       "surface": "Whole 0S mounted app behavior matrix",
       "claimed_truth": "green",
-      "computed_truth": "partial",
+      "computed_truth": "built",
       "gap_class": "none",
       "declared_gap_type": "none",
       "proof_command": "npm run 0s:operating-proof-matrix",
       "proof_exists": true,
       "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-30T19:43:30.793Z",
+      "receipt_generated_at": "2026-05-31T02:36:06.748Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.blocking_gaps",
       "blocking_gaps": [],
       "external_boundaries": [],
       "open_gaps": [],
-      "next_step": "Close literal per-mounted-app behavior depth: 84 yellow app rows and 0 red app rows still need app-specific scenarios or valid read-only/local-first proof models.",
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
       "next_build_step": "Keep operating-depth receipts fresh when mounted surfaces change.",
       "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html"
     },

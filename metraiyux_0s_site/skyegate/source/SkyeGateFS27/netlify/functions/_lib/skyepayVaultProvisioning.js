@@ -18,8 +18,80 @@ function vaultBaseUrl() {
   return clean(process.env.SKYEVAULT_DROP_URL || process.env.SKYEVAULT_PROVISIONING_URL || "", 400).replace(/\/$/, "");
 }
 
-function provisioningSecret() {
-  return clean(process.env.SKYEVAULT_PROVISIONING_SECRET || process.env.PROVISIONING_SHARED_SECRET || "", 400);
+function normalizeBearer(value) {
+  return clean(value, 4096).replace(/^Bearer\s+/i, "");
+}
+
+function firstEnv(names = []) {
+  for (const name of names) {
+    const value = normalizeBearer(process.env[name]);
+    if (value) return { name, value };
+  }
+  return { name: "", value: "" };
+}
+
+function fs27Origin() {
+  return clean(
+    process.env.SKYGATEFS27_ORIGIN
+      || process.env.SKYGATEFS27_WORKER_ORIGIN
+      || process.env.FS27_LIVE_BASE
+      || process.env.URL
+      || "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev",
+    400
+  ).replace(/\/$/, "");
+}
+
+function adminEmail() {
+  return clean(
+    process.env.FS27_ADMIN_EMAIL
+      || process.env.SKYGATEFS27_ADMIN_EMAIL
+      || process.env.SKYGATE_ADMIN_EMAIL
+      || process.env.METRAIYUX_OWNER_EMAIL
+      || process.env.METRAIYUX_ADMIN_EMAIL,
+    254
+  ).toLowerCase();
+}
+
+function adminPassword() {
+  return clean(
+    process.env.FS27_ADMIN_PASSWORD
+      || process.env.SKYGATEFS27_ADMIN_PASSWORD
+      || process.env.SKYGATE_ADMIN_PASSWORD
+      || process.env.SKYGATEFS13_ADMIN_PASSWORD
+      || process.env.ADMIN_PASSWORD,
+    400
+  );
+}
+
+async function loginProvisioningBearer() {
+  const email = adminEmail();
+  const password = adminPassword();
+  if (!email || !password) return { token: "", source: "" };
+  const response = await fetch(`${fs27Origin()}/admin/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json", accept: "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+  const data = await response.json().catch(() => ({}));
+  const token = normalizeBearer(data.gateToken || data.gateBearerToken || data.session?.token || data.token || "");
+  if (!response.ok || !token) {
+    const error = new Error(data.error || `FS27 admin login failed with ${response.status}.`);
+    error.status = response.status;
+    throw error;
+  }
+  return { token, source: "fs27-admin-login" };
+}
+
+async function provisioningBearer() {
+  const direct = firstEnv([
+    "SKYEVAULT_PROVISIONING_GATE_BEARER",
+    "SKYEVAULT_GATE_BEARER",
+    "ZERO_OS_GATE_SESSION",
+    "FREE99_GATE_SESSION",
+    "MCP_GATE_SESSION"
+  ]);
+  if (direct.value) return { token: direct.value, source: direct.name };
+  return loginProvisioningBearer();
 }
 
 export function isVaultProvisioningOrder(order) {
@@ -70,20 +142,41 @@ function provisioningPayload(order, action = "provision") {
   };
 }
 
+function safeRepoEnv(repoEnv = {}) {
+  const allowed = [
+    "SKYEVAULT_DROP_URL",
+    "SKYEVAULT_PORTAL_KEY",
+    "SKYEVAULT_WORKSPACE_ID",
+    "SKYEVAULT_DEVELOPER_ID",
+    "SKYEVAULT_DEVELOPER_NAME",
+    "SKYEVAULT_DESTINATION_ID"
+  ];
+  const out = {};
+  for (const key of allowed) {
+    const value = clean(repoEnv?.[key], key === "SKYEVAULT_PORTAL_KEY" ? 400 : 220);
+    if (value) out[key] = value;
+  }
+  return out;
+}
+
 export async function provisionVaultWorkspaceForOrder(order, { action = "provision", source = "skyepay" } = {}) {
   if (!isVaultProvisioningOrder(order)) return { ok: true, skipped: true, reason: "not_vault_order" };
   const baseUrl = vaultBaseUrl();
-  const secret = provisioningSecret();
-  if (!baseUrl || !secret) {
-    const error = new Error("SkyeVault provisioning is not configured.");
+  const bearer = await provisioningBearer();
+  if (!baseUrl || !bearer.token) {
+    const error = new Error("SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared FS27/SkyGate bearer or admin login env.");
     error.status = 500;
     throw error;
   }
+  const gateBearer = bearer.token.replace(/^Bearer\s+/i, "");
   const response = await fetch(`${baseUrl}/.netlify/functions/provision-workspace`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-skyevault-provisioning-secret": secret
+      authorization: `Bearer ${gateBearer}`,
+      "x-skye-gate-session": gateBearer,
+      "x-free99-gate-session": gateBearer,
+      "x-skyepay-lane": "skyevault-agent-provisioning"
     },
     body: JSON.stringify(provisioningPayload(order, action))
   });
@@ -99,6 +192,7 @@ export async function provisionVaultWorkspaceForOrder(order, { action = "provisi
     action,
     workspace_id: data.workspace?.workspaceId || order.workspace_slug || null,
     key_created: data.keyCreated === true,
+    gate_source: bearer.source || "shared-gate",
     stripe_subscription_id: order.stripe_subscription_id || null
   });
   return data;
@@ -122,6 +216,8 @@ export async function markVaultProvisioningResult(orderId, result, status = "wor
           ok: result?.ok === true,
           workspaceId: result?.workspace?.workspaceId || null,
           keyCreated: result?.keyCreated === true,
+          portalKeyReturned: Boolean(result?.portalKey),
+          repoEnv: safeRepoEnv(result?.repoEnv || {}),
           provisionedAt: new Date().toISOString()
         }
       })

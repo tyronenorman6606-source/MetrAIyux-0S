@@ -6,7 +6,7 @@ const { saveGoogleContact } = require('./_people');
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const id = String(body.id || '').trim();
     const email = String(body.email || '').trim().toLowerCase();

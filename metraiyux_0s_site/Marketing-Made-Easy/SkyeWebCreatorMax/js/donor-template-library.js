@@ -48,40 +48,40 @@
       <aside class="sidebar">
         <div class="brand"><span></span><strong>ArcLight Ops</strong></div>
         <nav><a class="active" href="#overview">Overview</a><a href="#revenue">Revenue</a><a href="#deployments">Deployments</a><a href="#clients">Clients</a><a href="#audit">Audit</a><a href="#settings">Settings</a></nav>
-        <section class="ai-card"><b>SkyDexia Watch</b><p>Gateway, delivery, and client-risk signals are being orchestrated across the platform bus.</p></section>
+        <section class="ai-card"><b>SkyDexia Watch</b><p>Reference gateway, delivery, and client-risk signals are shown as sample console data until the shared-gated Worker supplies live state.</p></section>
       </aside>
       <section class="workspace">
         <header class="topbar" id="overview">
-          <div><p class="eyebrow">Donor-backed enterprise console</p><h1>Command center for client delivery, revenue, and agent operations.</h1></div>
-          <button id="runDelivery" type="button">Run AE Delivery</button>
+          <div><p class="eyebrow">Donor-backed enterprise console</p><h1>Reference command center for client delivery, revenue, and agent operations.</h1></div>
+          <button id="runDelivery" type="button">Prepare AE Delivery</button>
         </header>
         <section class="metrics" id="revenue">
-          <article><span>Total Pipeline</span><b>$8.42M</b><i></i></article>
-          <article><span>Live Builds</span><b>128</b><i></i></article>
-          <article><span>Gate Events</span><b>42.9K</b><i></i></article>
-          <article><span>Risk Score</span><b>1.7%</b><i></i></article>
+          <article><span>Sample Pipeline</span><b>No live value</b><i></i></article>
+          <article><span>Sample Builds</span><b>Reference only</b><i></i></article>
+          <article><span>Sample Gate Events</span><b>Static proof</b><i></i></article>
+          <article><span>Sample Risk Score</span><b>Not live</b><i></i></article>
         </section>
         <section class="grid" id="deployments">
           <article class="chart-card">
-            <div class="card-head"><b>Fulfillment Velocity</b><span>Last 30 days</span></div>
+            <div class="card-head"><b>Fulfillment Velocity</b><span>Sample 30-day shape</span></div>
             <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </article>
           <article class="table-card" id="clients">
-            <div class="card-head"><b>Client Builds</b><span>Gateway synced</span></div>
+            <div class="card-head"><b>Reference Builds</b><span>Static sample data</span></div>
             <table>
-              <thead><tr><th>Client</th><th>Lane</th><th>Status</th><th>Value</th></tr></thead>
+              <thead><tr><th>Client</th><th>Lane</th><th>Status</th><th>Proof</th></tr></thead>
               <tbody>
-                <tr><td>Nova Health</td><td>AE</td><td><mark>Ready</mark></td><td>$420K</td></tr>
-                <tr><td>Foundry Bank</td><td>SkyDexia</td><td><mark>Design</mark></td><td>$780K</td></tr>
-                <tr><td>Sol Retail</td><td>GateFS13</td><td><mark>Queued</mark></td><td>$260K</td></tr>
-                <tr><td>Atlas Labs</td><td>R2</td><td><mark>Stored</mark></td><td>$510K</td></tr>
+                <tr><td>Reference Client A</td><td>AE</td><td><mark>Sample ready</mark></td><td>Static only</td></tr>
+                <tr><td>Reference Client B</td><td>SkyDexia</td><td><mark>Sample design</mark></td><td>Static only</td></tr>
+                <tr><td>Reference Client C</td><td>GateFS13</td><td><mark>Sample queued</mark></td><td>Static only</td></tr>
+                <tr><td>Reference Client D</td><td>R2</td><td><mark>Sample stored</mark></td><td>Static only</td></tr>
               </tbody>
             </table>
           </article>
         </section>
         <section class="ops-row" id="audit">
-          <article><b>Audit Trail</b><p id="deliveryStatus">No delivery run in this browser session yet.</p></article>
-          <article id="settings"><b>Settings</b><p>Gateway mirror, AE delivery, and R2 persistence are ready to bind once production vars are configured.</p></article>
+          <article><b>Audit Trail</b><p id="deliveryStatus">No Worker-confirmed delivery in this browser session yet.</p></article>
+          <article id="settings"><b>Settings</b><p>Gateway mirror, AE delivery, and R2 persistence stay pending until shared-gated production vars and Worker confirmation are present.</p></article>
         </section>
       </section>
     </main>
@@ -92,15 +92,15 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 10%,rgba(57,255,136,.18),transparent 28%),linear-gradient(135deg,#050807,#091412 54%,#111827);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif}.app-shell{min-height:100vh;display:grid;grid-template-columns:280px minmax(0,1fr)}.sidebar{border-right:1px solid var(--line);background:rgba(5,8,7,.78);backdrop-filter:blur(18px);padding:18px;display:grid;grid-template-rows:auto 1fr auto;gap:22px;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:10px}.brand span{width:34px;height:34px;border-radius:8px;background:conic-gradient(var(--green),var(--cyan),var(--rose),var(--green));box-shadow:0 0 30px rgba(57,255,136,.35)}nav{display:grid;gap:8px}nav a{border:1px solid transparent;border-radius:8px;padding:11px;color:var(--muted);font-weight:800;text-decoration:none}.active,nav a:hover{color:var(--green);background:rgba(57,255,136,.1);border-color:rgba(57,255,136,.42)}.ai-card,.metrics article,.chart-card,.table-card,.ops-row article{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.055);box-shadow:0 24px 80px rgba(0,0,0,.32)}.ai-card{padding:16px}.ai-card p,.topbar p,.card-head span,.ops-row p{color:var(--muted);line-height:1.45}.workspace{padding:18px;display:grid;gap:14px}.topbar{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.eyebrow{margin:0 0 8px;color:var(--green);font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.14em}h1{max-width:900px;margin:0;font-size:clamp(34px,5vw,70px);line-height:.9;letter-spacing:0}button{border:0;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--cyan));color:#021007;font-weight:950;padding:13px 16px;cursor:pointer}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metrics article{padding:16px}.metrics span{color:var(--muted);font-size:12px;font-weight:800}.metrics b{display:block;margin-top:12px;font-size:clamp(28px,4vw,48px);line-height:.9}.metrics i{display:block;height:8px;margin-top:16px;border-radius:999px;background:linear-gradient(90deg,var(--green),transparent)}.grid{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(420px,1.1fr);gap:12px}.chart-card,.table-card,.ops-row article{padding:16px}.card-head{display:flex;justify-content:space-between;gap:14px;margin-bottom:18px}.bars{height:360px;display:flex;align-items:end;gap:12px}.bars i{flex:1;border-radius:8px 8px 0 0;background:linear-gradient(to top,var(--green),var(--rose));box-shadow:0 0 28px rgba(57,255,136,.2)}.bars i:nth-child(1){height:38%}.bars i:nth-child(2){height:58%}.bars i:nth-child(3){height:72%}.bars i:nth-child(4){height:45%}.bars i:nth-child(5){height:84%}.bars i:nth-child(6){height:66%}.bars i:nth-child(7){height:92%}.bars i:nth-child(8){height:74%}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid rgba(255,255,255,.08);padding:15px 10px;color:var(--muted)}tr{cursor:pointer}tr:hover td{color:var(--ink);background:rgba(57,255,136,.045)}th{color:var(--ink);font-size:12px;text-transform:uppercase;letter-spacing:.1em}mark{border-radius:999px;padding:5px 8px;background:rgba(57,255,136,.12);color:var(--green)}.ops-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:980px){.app-shell{grid-template-columns:1fr}.metrics,.grid,.ops-row{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.topbar{display:grid}}`,
         'app.js': `const rows = [...document.querySelectorAll('tbody tr')];
 const status = document.getElementById('deliveryStatus');
-rows.forEach((row,index)=>{row.style.animationDelay=(index*90)+'ms';row.addEventListener('click',()=>{status.textContent='Opened client row: '+row.cells[0].textContent+' / '+row.cells[1].textContent;document.getElementById('audit').scrollIntoView({behavior:'smooth'});});});
-document.getElementById('runDelivery').addEventListener('click',()=>{status.textContent='AE delivery queued at '+new Date().toLocaleTimeString()+'. Gateway mirror will attach when production vars are set.';document.getElementById('audit').scrollIntoView({behavior:'smooth'});});
+rows.forEach((row,index)=>{row.style.animationDelay=(index*90)+'ms';row.addEventListener('click',()=>{status.textContent='Opened static reference row: '+row.cells[0].textContent+' / '+row.cells[1].textContent;document.getElementById('audit').scrollIntoView({behavior:'smooth'});});});
+document.getElementById('runDelivery').addEventListener('click',()=>{status.textContent='Reference AE delivery prepared locally at '+new Date().toLocaleTimeString()+'. It is not customer-visible until the shared-gated Worker accepts it.';document.getElementById('audit').scrollIntoView({behavior:'smooth'});});
 console.log('Enterprise Ops Console generated from shadcn dashboard and TailGrids registry references.');`,
         'README.md': `# Enterprise Ops Console
 
 Donor-backed generation using:
 - shadcn-ui dashboard example page, section cards, and data-table components
 - TailGrids table, sidebar, and card registry primitives
-- SkyeGateFS13 / AE CommandHub delivery assumptions
+- Static SkyeGateFS13 / AE CommandHub delivery boundaries; no live customer delivery is claimed
 `,
       },
     },
@@ -146,7 +146,7 @@ Donor-backed generation using:
         </aside>
       </section>
       <section class="product-demo" id="demo">
-        <article><b id="demoState">Product orbit is live</b><p>Use the controls below to switch the scene mode. The canvas responds instantly in this standalone export.</p><div class="control-row"><button type="button" data-mode="orbit">Orbit</button><button type="button" data-mode="explode">Explode</button><button type="button" data-mode="calm">Calm</button></div></article>
+        <article><b id="demoState">Product orbit is active locally</b><p>Use the controls below to switch the scene mode. The canvas responds instantly in this standalone export.</p><div class="control-row"><button type="button" data-mode="orbit">Orbit</button><button type="button" data-mode="explode">Explode</button><button type="button" data-mode="calm">Calm</button></div></article>
       </section>
       <section class="features" id="system">
         <article><b>Presentation Controls</b><p>Inspired by drei story patterns for product inspection and spatial storytelling.</p></article>
@@ -209,17 +209,17 @@ Donor-backed generation using:
       <section class="cards" id="proof">
         <article><b>Offer Architecture</b><span>Hero, social proof, problem framing, and CTA density tuned for conversion.</span></article>
         <article><b>Component Discipline</b><span>Card, tabs, accordion, button, and badge patterns mapped from donor libraries.</span></article>
-        <article><b>Delivery Ready</b><span>Standalone files, editable source, SkyeGateFS13 events, and AE handoff metadata.</span></article>
+        <article><b>Delivery Ready</b><span>Standalone files, editable source, SkyeGateFS13 event attempts, and AE handoff metadata pending Worker confirmation.</span></article>
       </section>
       <section class="pricing" id="pricing"><div><b>Founder Stack</b><strong>$12K</strong><span>Premium launch system with platform integration.</span></div><div><b>Enterprise Stack</b><strong>$48K</strong><span>Multi-surface build with dashboard, auth, and delivery ops.</span></div></section>
-      <section class="start" id="start"><form><b>Start a build</b><label>Name<input name="name" placeholder="Your name"></label><label>Email<input name="email" type="email" placeholder="you@internal.invalid"></label><label>Project brief<textarea name="brief" placeholder="Tell us what you want built"></textarea></label><button type="submit">Request Proposal</button><p id="formStatus">Proposal queue is ready.</p></form></section>
+      <section class="start" id="start"><form><b>Start a build</b><label>Name<input name="name" placeholder="Your name"></label><label>Email<input name="email" type="email" placeholder="you@internal.invalid"></label><label>Project brief<textarea name="brief" placeholder="Tell us what you want built"></textarea></label><button type="submit">Request Proposal</button><p id="formStatus">Proposal queue waits for the shared-gated bridge.</p></form></section>
     </main>
     <script src="./app.js"></script>
   </body>
 </html>`,
         'styles.css': `:root{color-scheme:dark;--green:#39ff88;--blue:#5df1ff;--pink:#ff5c8a;--ink:#f7fff9;--muted:#9fb7ab;--line:rgba(139,255,188,.2)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:radial-gradient(circle at 18% 10%,rgba(57,255,136,.22),transparent 26%),radial-gradient(circle at 86% 8%,rgba(255,92,138,.18),transparent 28%),linear-gradient(145deg,#030805,#071511 50%,#121827);color:var(--ink)}nav{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:22px clamp(18px,5vw,72px);border-bottom:1px solid rgba(255,255,255,.08);background:rgba(3,8,5,.5);backdrop-filter:blur(18px);position:sticky;top:0;z-index:5}nav div{display:flex;gap:12px;align-items:center;flex-wrap:wrap}a{color:var(--muted);text-decoration:none;font-weight:850}.button,button{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;min-height:42px;padding:10px 16px;background:linear-gradient(135deg,var(--green),var(--blue));color:#021007!important;font-weight:950;box-shadow:0 0 38px rgba(57,255,136,.28);border:0;cursor:pointer}.ghost{display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:8px;min-height:42px;padding:10px 16px;color:var(--ink);background:rgba(255,255,255,.06)}.hero{min-height:78vh;display:grid;align-content:center;padding:clamp(34px,7vw,104px);max-width:1180px}.eyebrow{margin:0 0 16px;color:var(--green);font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.16em}h1{margin:0;font-size:clamp(58px,9vw,140px);line-height:.82;letter-spacing:0}.hero p:not(.eyebrow){max-width:780px;color:var(--muted);font-size:clamp(18px,2.1vw,25px);line-height:1.4}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.cards,.pricing{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 clamp(18px,6vw,104px) 24px}.cards article,.pricing div,.start form{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.055);backdrop-filter:blur(18px);padding:20px;min-height:190px}.cards b,.pricing b,.start b{display:block;color:var(--green);font-size:20px;margin-bottom:10px}.cards span,.pricing span,.start p{color:var(--muted);line-height:1.45}.pricing{grid-template-columns:repeat(2,minmax(0,1fr));padding-bottom:24px}.pricing strong{display:block;font-size:clamp(42px,7vw,88px);line-height:.9;margin:16px 0;color:var(--ink)}.start{padding:0 clamp(18px,6vw,104px) 70px}.start form{display:grid;gap:12px;max-width:760px}.start label{display:grid;gap:6px;color:var(--muted);font-weight:800}.start input,.start textarea{width:100%;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:rgba(0,0,0,.22);color:var(--ink);padding:12px;font:inherit}.start textarea{min-height:120px;resize:vertical}@media(max-width:820px){nav{align-items:flex-start;flex-direction:column}.cards,.pricing{grid-template-columns:1fr}h1{font-size:56px}}`,
         'app.js': `document.querySelectorAll('.cards article').forEach((card,index)=>{card.style.transform='translateY(18px)';card.style.opacity='0';setTimeout(()=>{card.style.transition='600ms ease';card.style.transform='translateY(0)';card.style.opacity='1'},index*120)});
-document.querySelector('form').addEventListener('submit',(event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={name:data.get('name')||'',email:data.get('email')||'',brief:data.get('brief')||'',source:'SkyeWebCreatorMax-template'};const result=window.SkyeIntegrationBridge?.enqueueWebsiteRequest?.(payload);document.getElementById('formStatus').textContent=result?'Proposal queued for AE review: '+(payload.email||'anonymous visitor')+'.':'AE bridge offline. Proposal was not queued for '+(payload.email||'anonymous visitor')+'.';});
+document.querySelector('form').addEventListener('submit',(event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={name:data.get('name')||'',email:data.get('email')||'',brief:data.get('brief')||'',source:'SkyeWebCreatorMax-template'};const result=window.SkyeIntegrationBridge?.enqueueWebsiteRequest?.(payload);document.getElementById('formStatus').textContent=result?'Proposal accepted by the shared-gated bridge for AE review: '+(payload.email||'anonymous visitor')+'.':'AE bridge offline. Proposal was not queued for '+(payload.email||'anonymous visitor')+'.';});
 console.log('Conversion Landing System generated from TailGrids and shadcn component references.');`,
         'README.md': `# Conversion Landing System
 

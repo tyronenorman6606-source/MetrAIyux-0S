@@ -79,17 +79,10 @@ const SkyeVaultCommandCenter = (() => {
   }
 
   function activeBearer() {
-    const direct = window.SkygateAuthBridge?.token?.() || sessionStorage.getItem('adminBrainToken') || '';
-    if (direct) return direct;
-    try {
-      const raw = sessionStorage.getItem('FREE99_PLATFORM_GATE_SESSION') || localStorage.getItem('FREE99_PLATFORM_GATE_SESSION') || '';
-      if (raw) { const p = JSON.parse(raw); if (p.token) return p.token; }
-    } catch {}
-    return localStorage.getItem('quantumskyes_mcp_owner_token') || '';
+    return window.SkygateAuthBridge?.token?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
   }
 
   function authHeaders(extra = {}) {
-    const legacy = String(els.legacy.value || localStorage.getItem('skyevault.legacyAdminToken') || '').trim();
     const bearer = activeBearer();
     const headers = { ...extra };
     if (bearer) {
@@ -98,8 +91,6 @@ const SkyeVaultCommandCenter = (() => {
       headers['x-skye-gate-session'] = bearer;
       headers['x-skye-platform'] = 'metraiyux-0s-admin';
       headers['x-skye-usage-lane'] = 'skyevault-command-center';
-    } else if (legacy) {
-      headers['x-admin-token'] = legacy;
     }
     return headers;
   }

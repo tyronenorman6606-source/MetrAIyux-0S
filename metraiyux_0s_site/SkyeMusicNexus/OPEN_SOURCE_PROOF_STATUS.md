@@ -2,7 +2,7 @@
 
 ✅ Existing roomed static/Netlify structure respected.
 
-✅ Native creation hub wired at `public/create.html`.
+✅ Native creation hub wired at `public/daw.html`.
 
 ✅ First-party fullscreen DAW built at `public/daw.html`.
 

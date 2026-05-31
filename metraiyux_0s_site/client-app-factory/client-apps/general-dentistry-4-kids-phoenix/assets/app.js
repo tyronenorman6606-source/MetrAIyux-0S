@@ -1,1 +1,176 @@
-const gsap=window.gsap||{registerPlugin(){},utils:{toArray:s=>[...document.querySelectorAll(s)]},from(){}};const ScrollTrigger=window.ScrollTrigger||{update(){}};const Lenis=window.Lenis||class{constructor(){}raf(){}};gsap.registerPlugin?.(ScrollTrigger);window.__DENTAL_APP_STACK__={gsap:!!window.gsap,lenis:!!window.Lenis,scrollTrigger:!!window.ScrollTrigger,localVendor:true};const APP={"slug":"general-dentistry-4-kids-phoenix","name":"General Dentistry 4 Kids - Phoenix","phone":"(602) 996-6065","appUrl":"https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/general-dentistry-4-kids-phoenix/","valleyUrl":"https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/general-dentistry-4-kids-phoenix-85032-237e895/"};const $=(s,ctx=document)=>ctx.querySelector(s);const $$=(s,ctx=document)=>[...ctx.querySelectorAll(s)];const STORE='dental-app:'+APP.slug+':routes';const PROOF='dental-app:'+APP.slug+':proof';const esc=v=>String(v||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));function read(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}}function write(k,v){localStorage.setItem(k,JSON.stringify(v.slice(0,100)))}function row(k,o){const rows=read(k);rows.unshift({...o,createdAt:new Date().toLocaleString()});write(k,rows);render()}function render(){const q=$('[data-queue]');if(!q)return;const k=document.querySelector('[data-proof-form]')?PROOF:STORE;const rows=read(k);$('[data-count]').textContent=rows.length+' rows';q.innerHTML=rows.length?rows.map(r=>'<div class="queue-item"><strong>'+esc(r.name||r.kind||'Route row')+'</strong><small>'+esc(r.kind||'')+' · '+esc(r.urgency||'')+' · '+esc(r.payment||'')+' · '+esc(r.createdAt)+'</small><small>'+esc(r.note||'No note')+'</small></div>').join(''):'<div class="queue-item"><strong>No rows yet.</strong><small>Use the form or quick tools to create app data in this browser.</small></div>'}function playVideos(){$$('video[data-hero-video]').forEach(v=>{v.muted=true;v.playsInline=true;v.play?.().catch(()=>{})})}function initIntro(){const intro=$('[data-app-intro]'),btn=$('[data-enter-intro]');if(!intro)return;const readyMs=Number(intro.dataset.readyMs||1200),introMs=Number(intro.dataset.introMs||3600);setTimeout(()=>{btn.disabled=false;btn.textContent='Open App'},readyMs);const done=()=>{document.body.classList.remove('intro-active');document.body.classList.add('intro-complete');setTimeout(playVideos,50)};btn.addEventListener('click',done);setTimeout(done,introMs)}function bg(){const canvas=$('.living-field'),ctx=canvas?.getContext('2d');if(!ctx)return;let w=0,h=0,pts=[];const resize=()=>{const d=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;canvas.width=w*d;canvas.height=h*d;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(d,0,0,d,0,0);pts=Array.from({length:Math.min(70,Math.max(28,Math.floor(w*h/26000)))},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2+0.5,s:Math.random()*0.4+0.1}))};const draw=t=>{ctx.clearRect(0,0,w,h);ctx.globalCompositeOperation='screen';pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x+Math.sin(t*.001*p.s+i)*28,p.y+Math.cos(t*.001*p.s+i)*20,p.r,0,Math.PI*2);ctx.fillStyle=i%2?'rgba(84,214,199,.18)':'rgba(244,201,93,.16)';ctx.fill()});requestAnimationFrame(draw)};addEventListener('resize',resize,{passive:true});resize();requestAnimationFrame(draw)}function init(){initIntro();bg();playVideos();addEventListener('visibilitychange',playVideos);const lenis=new Lenis({lerp:.14,wheelMultiplier:.8,smoothWheel:true});function raf(t){lenis.raf(t);ScrollTrigger.update();requestAnimationFrame(raf)}requestAnimationFrame(raf);$('[data-menu-toggle]')?.addEventListener('click',()=>$('.links')?.classList.toggle('open'));addEventListener('scroll',()=>{$('.progressbar').style.width=(scrollY/Math.max(1,document.body.scrollHeight-innerHeight)*100)+'%'},{passive:true});gsap.utils.toArray('.service-card,.panel').forEach(el=>gsap.from(el,{opacity:0,y:24,duration:.6,scrollTrigger:{trigger:el,start:'top 88%'}}));$('[data-share-site]')?.addEventListener('click',async()=>{const data={title:APP.name,text:APP.name+' app',url:location.href};if(navigator.share)await navigator.share(data).catch(()=>{});else await navigator.clipboard?.writeText(location.href)});$('[data-route-form]')?.addEventListener('submit',e=>{e.preventDefault();row(STORE,Object.fromEntries(new FormData(e.currentTarget)));e.currentTarget.reset()});$('[data-proof-form]')?.addEventListener('submit',e=>{e.preventDefault();row(PROOF,Object.fromEntries(new FormData(e.currentTarget)));e.currentTarget.reset()});$('[data-build-route]')?.addEventListener('click',()=>{const need=$('[data-build-need]').value,time=$('[data-build-time]').value,pay=$('[data-build-pay]').value;$('[data-route-output]').innerHTML='<strong>'+esc(need)+' · '+esc(time)+'</strong><p>Office handoff: capture callback, confirm '+esc(pay).toLowerCase()+', route to official booking/call, and save an intake row.</p>';row(STORE,{name:'Route builder',kind:need,urgency:time,payment:pay,note:'Built from route builder'})});$$('[data-triage]').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.triage;$('[data-triage-output]').innerHTML='<strong>'+esc(s)+'</strong><p>Call '+APP.phone+' or official booking. This app does not diagnose; it routes urgent context.</p>';row(STORE,{name:'Urgent route',kind:s,urgency:'Urgent',payment:'Unknown',note:'Triage selected'})}));render()}document.addEventListener('DOMContentLoaded',init);
+const gsap = window.gsap || { registerPlugin() {}, utils: { toArray: (selector) => [...document.querySelectorAll(selector)] }, from() {} };
+const ScrollTrigger = window.ScrollTrigger || { update() {} };
+const Lenis = window.Lenis || class { constructor() {} raf() {} };
+gsap.registerPlugin?.(ScrollTrigger);
+window.__DENTAL_APP_STACK__ = { gsap: !!window.gsap, lenis: !!window.Lenis, scrollTrigger: !!window.ScrollTrigger, localVendor: true };
+const APP = {
+  slug: "general-dentistry-4-kids-phoenix",
+  name: "General Dentistry 4 Kids - Phoenix",
+  phone: "(602) 996-6065",
+  appUrl: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/client-app-factory/client-apps/general-dentistry-4-kids-phoenix/",
+  valleyUrl: "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/general-dentistry-4-kids-phoenix-85032-237e895/"
+};
+const LOCAL_STATUS = "browser-local pending/static artifact";
+const LOCAL_SOURCE = "localStorage";
+const $ = (selector, context = document) => context.querySelector(selector);
+const $$ = (selector, context = document) => [...context.querySelectorAll(selector)];
+const STORE = "dental-app:" + APP.slug + ":routes";
+const PROOF = "dental-app:" + APP.slug + ":proof";
+const esc = (value) => String(value || "").replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char]));
+
+function read(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function write(key, value) {
+  localStorage.setItem(key, JSON.stringify(value.slice(0, 100)));
+}
+
+function localRow(data) {
+  return {
+    ...data,
+    createdAt: new Date().toLocaleString(),
+    telemetryStatus: data.telemetryStatus || LOCAL_STATUS,
+    telemetrySource: data.telemetrySource || LOCAL_SOURCE,
+    telemetryReceipt: data.telemetryReceipt || "none"
+  };
+}
+
+function row(key, data) {
+  const rows = read(key);
+  rows.unshift(localRow(data));
+  write(key, rows);
+  render();
+}
+
+function render() {
+  const queue = $("[data-queue]");
+  if (!queue) return;
+  const key = document.querySelector("[data-proof-form]") ? PROOF : STORE;
+  const rows = read(key);
+  const count = $("[data-count]");
+  if (count) count.textContent = rows.length + " rows - " + LOCAL_STATUS;
+  queue.innerHTML = rows.length
+    ? rows.map((item) => '<div class="queue-item"><strong>' + esc(item.name || item.kind || "Route row") + '</strong><small>' + esc(item.kind || "") + ' · ' + esc(item.urgency || "") + ' · ' + esc(item.payment || "") + ' · ' + esc(item.createdAt) + '</small><small>Telemetry: ' + esc(item.telemetryStatus || LOCAL_STATUS) + ' · Source: ' + esc(item.telemetrySource || LOCAL_SOURCE) + '</small><small>' + esc(item.note || "No note") + '</small></div>').join("")
+    : '<div class="queue-item"><strong>No rows yet.</strong><small>Rows created here are browser-local pending/static artifacts until a Worker, Relay, or Command Bridge receipt exists.</small></div>';
+}
+
+function playVideos() {
+  $$("video[data-hero-video]").forEach((video) => {
+    video.muted = true;
+    video.playsInline = true;
+    video.play?.().catch(() => {});
+  });
+}
+
+function initIntro() {
+  const intro = $("[data-app-intro]");
+  const button = $("[data-enter-intro]");
+  if (!intro) return;
+  const readyMs = Number(intro.dataset.readyMs || 1200);
+  const introMs = Number(intro.dataset.introMs || 3600);
+  setTimeout(() => {
+    button.disabled = false;
+    button.textContent = "Open App";
+  }, readyMs);
+  const done = () => {
+    document.body.classList.remove("intro-active");
+    document.body.classList.add("intro-complete");
+    setTimeout(playVideos, 50);
+  };
+  button.addEventListener("click", done);
+  setTimeout(done, introMs);
+}
+
+function bg() {
+  const canvas = $(".living-field");
+  const ctx = canvas?.getContext("2d");
+  if (!ctx) return;
+  let width = 0;
+  let height = 0;
+  let points = [];
+  const resize = () => {
+    const ratio = Math.min(devicePixelRatio || 1, 1.5);
+    width = innerWidth;
+    height = innerHeight;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    points = Array.from({ length: Math.min(70, Math.max(28, Math.floor(width * height / 26000))) }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      r: Math.random() * 2 + 0.5,
+      s: Math.random() * 0.4 + 0.1
+    }));
+  };
+  const draw = (time) => {
+    ctx.clearRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "screen";
+    points.forEach((point, index) => {
+      ctx.beginPath();
+      ctx.arc(point.x + Math.sin(time * 0.001 * point.s + index) * 28, point.y + Math.cos(time * 0.001 * point.s + index) * 20, point.r, 0, Math.PI * 2);
+      ctx.fillStyle = index % 2 ? "rgba(84,214,199,.18)" : "rgba(244,201,93,.16)";
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  };
+  addEventListener("resize", resize, { passive: true });
+  resize();
+  requestAnimationFrame(draw);
+}
+
+function init() {
+  initIntro();
+  bg();
+  playVideos();
+  addEventListener("visibilitychange", playVideos);
+  const lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 0.8, smoothWheel: true });
+  function raf(time) {
+    lenis.raf(time);
+    ScrollTrigger.update();
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+  $("[data-menu-toggle]")?.addEventListener("click", () => $(".links")?.classList.toggle("open"));
+  addEventListener("scroll", () => {
+    const progress = $(".progressbar");
+    if (progress) progress.style.width = (scrollY / Math.max(1, document.body.scrollHeight - innerHeight) * 100) + "%";
+  }, { passive: true });
+  gsap.utils.toArray(".service-card,.panel").forEach((element) => gsap.from(element, { opacity: 0, y: 24, duration: 0.6, scrollTrigger: { trigger: element, start: "top 88%" } }));
+  $("[data-share-site]")?.addEventListener("click", async () => {
+    const data = { title: APP.name, text: APP.name + " app", url: location.href };
+    if (navigator.share) await navigator.share(data).catch(() => {});
+    else await navigator.clipboard?.writeText(location.href);
+  });
+  $("[data-route-form]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    row(STORE, Object.fromEntries(new FormData(event.currentTarget)));
+    event.currentTarget.reset();
+  });
+  $("[data-proof-form]")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    row(PROOF, Object.fromEntries(new FormData(event.currentTarget)));
+    event.currentTarget.reset();
+  });
+  $("[data-build-route]")?.addEventListener("click", () => {
+    const need = $("[data-build-need]").value;
+    const time = $("[data-build-time]").value;
+    const pay = $("[data-build-pay]").value;
+    $("[data-route-output]").innerHTML = "<strong>" + esc(need) + " · " + esc(time) + "</strong><p>Office handoff: capture callback, confirm " + esc(pay).toLowerCase() + ", route to official booking/call, and save a browser-local pending intake row.</p>";
+    row(STORE, { name: "Route builder", kind: need, urgency: time, payment: pay, note: "Built from route builder" });
+  });
+  $$("[data-triage]").forEach((button) => button.addEventListener("click", () => {
+    const selection = button.dataset.triage;
+    $("[data-triage-output]").innerHTML = "<strong>" + esc(selection) + "</strong><p>Call " + APP.phone + " or official booking. This app does not diagnose; it routes urgent context.</p>";
+    row(STORE, { name: "Urgent route", kind: selection, urgency: "Urgent", payment: "Unknown", note: "Triage selected" });
+  }));
+  render();
+}
+
+document.addEventListener("DOMContentLoaded", init);

@@ -70,7 +70,7 @@
 
     <section id="store" class="gray-panel">
       <p class="micro">Reflection storefront products</p>
-      <h2>Playable drops, PWA packages, SkyePay checkout</h2>
+      <h2>Playable drops, PWA packages, SkyePay request</h2>
       <div class="music-player-panel">
         <p class="micro">Skye Radio</p>
         <h3 data-brain-now>Command Mirror</h3>
@@ -130,7 +130,7 @@
           <strong>$${((Number(product.priceCents || 444) || 444) / 100).toFixed(2)}</strong>
           ${product.audioFile ? `<button class="btn" type="button" data-brain-play="${index}">Play</button>` : ''}
           <a class="btn" href="${product.pwaUrl || '#store'}">Open Drop PWA</a>
-          <button class="btn primary" type="button" data-brain-buy="${index}">SkyePay checkout</button>
+          <button class="btn primary" type="button" data-brain-buy="${index}">SkyePay request</button>
         </article>`).join('') || '<article class="product-tile"><span>queued</span><h3>Brain drop pending</h3><strong>$4.44</strong></article>';
       brainProductHost.querySelectorAll('[data-brain-play]').forEach((button) => button.addEventListener('click', () => {
         const product = live[Number(button.dataset.brainPlay)] || {};

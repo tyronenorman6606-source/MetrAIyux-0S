@@ -3,7 +3,7 @@ const { json, verifyAuth } = require("./_utils");
 
 exports.handler = async (event) => {
   try{
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const userId = auth.sub;
 
     const ures = await query(`select handle, email, recovery_enabled, created_at from users where id=$1 limit 1`, [userId]);

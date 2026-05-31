@@ -158,14 +158,20 @@ export default `<!doctype html>
       if (!clean) return;
       const shared = {
         token: clean,
-        source: source || 'free99-admin-code',
+        source: source || 'owner-admin-login',
         platform_id: 'metraiyux-0s',
         usage_lane: 'fs27-owner-gate',
         issued_at: new Date().toISOString()
       };
-      localStorage.setItem('quantumskyes_mcp_owner_token', clean);
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-      localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
+      const serialized = JSON.stringify(shared);
+      ['METRAIYUX_GATE_SESSION', 'SKYGATEFS27_GATE_SESSION', 'SKYE_GATE_SESSION'].forEach((key) => {
+        sessionStorage.setItem(key, serialized);
+        localStorage.setItem(key, serialized);
+      });
+      ['FREE99_PLATFORM_GATE_SESSION', 'adminBrainToken', 'adminSecuritySession', 'quantumskyes_mcp_owner_token', 'SKYGATE_USER_TOKEN', 'SKYGATE_SESSION_TOKEN'].forEach((key) => {
+        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+      });
       window.MetrAIyuxGateBridge?.persist?.(shared, {silent:true});
     }
 
@@ -189,17 +195,8 @@ export default `<!doctype html>
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || 'Free99 admin code unlock failed.');
-        ownerToken = data.token || '';
-        persistSharedGateToken(ownerToken, 'free99-admin-code');
-        const gateToken = data.gateToken || data.gateBearerToken || '';
-        if (gateToken) {
-          const shared = {token: gateToken, source: 'fs27-admin-login', platform_id: 'metraiyux-0s', usage_lane: 'fs27-owner-gate', issued_at: new Date().toISOString()};
-          sessionStorage.setItem('adminBrainToken', gateToken);
-          sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-          localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-          localStorage.setItem('quantumskyes_mcp_owner_token', gateToken);
-          window.MetrAIyuxGateBridge?.persist?.(shared, {silent: true});
-        }
+        ownerToken = data.gateToken || data.gateBearerToken || data.token || '';
+        persistSharedGateToken(ownerToken, 'fs27-owner-admin-login');
         tokenPreview.textContent = maskToken(ownerToken);
         if (returnTo) {
           setStatus('Free99 admin code accepted. Opening this app...', 'ok');

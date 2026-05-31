@@ -11,6 +11,8 @@ process.env.CODESTUDIO_PROVIDER_MODE = process.env.CODESTUDIO_PROVIDER_MODE || '
 process.env.CODESTUDIO_RECEIPT_DIR = process.env.CODESTUDIO_RECEIPT_DIR || './receipts/smoke';
 process.env.CODESTUDIO_DATA_DIR = process.env.CODESTUDIO_DATA_DIR || './data/smoke';
 process.env.CODESTUDIO_CORS_ORIGIN = '*';
+process.env.CODESTUDIO_UPSTREAM_CLAIMS_SECRET = process.env.CODESTUDIO_UPSTREAM_CLAIMS_SECRET || 'smoke-claims-secret';
+const SMOKE_CLAIMS = {sub:'smoke-user', email:'smoke@local.test', roles:['owner'], projectRoles:{default:['owner']}};
 await fs.rm(path.join(root, process.env.CODESTUDIO_DATA_DIR), {recursive:true, force:true});
 await fs.rm(path.join(root, process.env.CODESTUDIO_RECEIPT_DIR), {recursive:true, force:true});
 
@@ -43,6 +45,13 @@ try{
     return {mode:res.mode, providerCount:Object.keys(res.providers || {}).length};
   });
 
+  await check('platform routes reject missing FS27 or signed upstream claims', async () => {
+    const res = await fetch(base + '/api/platform/providers/probe');
+    const payload = await res.json();
+    assert(res.status === 401, 'unsigned platform route should reject');
+    assert(JSON.stringify(payload).includes('Signed upstream claims required') || JSON.stringify(payload).includes('FS27/SkyGate'), 'missing auth error should mention gate claims');
+    return {status:res.status, error:payload.error?.message || payload.error};
+  });
 
   await check('OpenAPI document and action registry are exposed', async () => {
     const api = await get('/api/platform/openapi.json');
@@ -420,13 +429,14 @@ async function check(name, fn){
   if (!entry.ok) throw new Error(`${name}: ${entry.error}`);
 }
 async function get(pathname){
-  const res = await fetch(base + pathname);
+  const res = await fetch(base + pathname, {headers:signedHeaders(SMOKE_CLAIMS, process.env.CODESTUDIO_UPSTREAM_CLAIMS_SECRET)});
   const json = await res.json();
   if (!res.ok){ const e = new Error(`GET ${pathname} failed ${res.status}`); e.payload = json; throw e; }
   return json;
 }
 async function post(pathname, body){
-  const res = await fetch(base + pathname, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+  const claims = body?.claims || SMOKE_CLAIMS;
+  const res = await fetch(base + pathname, {method:'POST', headers:{'Content-Type':'application/json', ...signedHeaders(claims, process.env.CODESTUDIO_UPSTREAM_CLAIMS_SECRET)}, body:JSON.stringify(body)});
   const json = await res.json();
   if (!res.ok){ const e = new Error(`POST ${pathname} failed ${res.status}`); e.payload = json; throw e; }
   return json;

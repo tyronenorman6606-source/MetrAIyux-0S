@@ -423,6 +423,16 @@ function mountLivingBackground() {
   raf = requestAnimationFrame(animate);
 }
 
+function mountMediaIntro() {
+  $$("[data-intro-video]").forEach((video) => {
+    video.muted = true;
+    video.playsInline = true;
+    const play = () => video.play().catch(() => {});
+    if (video.readyState >= 2) play();
+    else video.addEventListener("canplay", play, { once: true });
+  });
+}
+
 function mountInstall() {
   const banner = $("[data-install-banner]");
   let deferredPrompt = null;
@@ -544,6 +554,7 @@ mountLibraryMotion();
 mountFramerRuntimePulse();
 mountCursorGlow();
 mountLivingBackground();
+mountMediaIntro();
 mountInstall();
 mountRequestForm();
 renderLedger();

@@ -5,7 +5,7 @@ const { getHostedMailbox, zohoApiConfigured, zohoListFolders } = require('./_mai
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const hosted = await getHostedMailbox(auth.sub).catch(() => null);
     if (hosted?.provider === 'zoho' && zohoApiConfigured()) {
       const folders = await zohoListFolders(hosted.provider_account_id);

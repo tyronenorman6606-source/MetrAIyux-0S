@@ -88,6 +88,25 @@ async function call(e, pathname, { method = 'GET', body, contentType, extraHeade
   return { response, data };
 }
 
+async function publishMinimalDeployment(e, { workspaceId, planName = 'free99', project, deployment, extraHeaders = {} }) {
+  assert.equal((await call(e, '/deploy/init', {
+    method: 'POST',
+    extraHeaders,
+    body: { workspace_id: workspaceId, plan_name: planName, project_id: project, deployment_id: deployment }
+  })).response.status, 200);
+  assert.equal((await call(e, `/deploy/upload?workspaceId=${workspaceId}&projectId=${project}&deploymentId=${deployment}&path=index.html`, {
+    method: 'PUT',
+    contentType: 'text/html; charset=utf-8',
+    extraHeaders,
+    body: `<h1>${project}</h1>`
+  })).response.status, 200);
+  assert.equal((await call(e, '/deploy/complete', {
+    method: 'POST',
+    extraHeaders,
+    body: { workspace_id: workspaceId, plan_name: planName, project_id: project, deployment_id: deployment, files: ['index.html'] }
+  })).response.status, 200);
+}
+
 const e = env();
 const workspace = await call(e, '/deploy/workspace', {
   method: 'POST',
@@ -133,13 +152,15 @@ assert.equal(receipts.response.status, 200);
 assert.ok(receipts.data.count >= deployCount);
 
 const quotaEnv = env();
+await publishMinimalDeployment(quotaEnv, { workspaceId: 'customer-31', project: 'free-one', deployment: 'dep_one' });
 await call(quotaEnv, '/deploy/route', {
   method: 'POST',
-  body: { hostname: 'skynet.example.com', mount_path: '/skyenet/free-one', project_id: 'free-one', deployment_id: 'dep_one', public_access: true, default_auth: 'public' }
+  body: { workspace_id: 'customer-31', hostname: 'skynet.example.com', mount_path: '/skyenet/free-one', project_id: 'free-one', deployment_id: 'dep_one', public_access: true, default_auth: 'public' }
 });
+await publishMinimalDeployment(quotaEnv, { workspaceId: 'customer-31', project: 'free-two', deployment: 'dep_two' });
 const blocked = await call(quotaEnv, '/deploy/route', {
   method: 'POST',
-  body: { hostname: 'skynet.example.com', mount_path: '/skyenet/free-two', project_id: 'free-two', deployment_id: 'dep_two', public_access: true, default_auth: 'public' }
+  body: { workspace_id: 'customer-31', hostname: 'skynet.example.com', mount_path: '/skyenet/free-two', project_id: 'free-two', deployment_id: 'dep_two', public_access: true, default_auth: 'public' }
 });
 assert.equal(blocked.response.status, 429);
 assert.equal(blocked.data.code, 'SKYENET_PUBLIC_ROUTE_QUOTA');
@@ -160,6 +181,13 @@ assert.equal(adminWorkspace.response.status, 200);
 assert.equal(adminWorkspace.data.workspace.admin_override, true);
 assert.equal(adminWorkspace.data.workspace.free99_credits_limited, false);
 for (const project of ['admin-one', 'admin-two']) {
+  await publishMinimalDeployment(adminEnv, {
+    workspaceId: 'owner-unlocked',
+    planName: 'free99',
+    project,
+    deployment: `dep_${project}`,
+    extraHeaders: adminHeaders
+  });
   const route = await call(adminEnv, '/deploy/route', {
     method: 'POST',
     extraHeaders: adminHeaders,

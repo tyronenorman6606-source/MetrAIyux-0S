@@ -24,6 +24,13 @@
     ['Data sources', 'Which data files feed this route?'],
     ['Export packet', 'What should I export or send after review?']
   ];
+  const PROOF_ONLY_BOUNDARY = {
+    boundary: 'proof_only',
+    proof_only: true,
+    worker_confirmed: false,
+    worker_receipt: null
+  };
+  const WORKER_CONFIRMED_BOUNDARY = 'worker_confirmed';
 
   const model = {
     mode: 'public',
@@ -62,12 +69,9 @@
         </div>
         <div class="vv-brain-context" data-brain-context></div>
         <form class="vv-admin-login" data-admin-login hidden>
-          <label>Admin password or gate token
-            <input data-admin-token name="token" type="password" autocomplete="current-password" placeholder="Paste admin password, operator token, or SkyGate token" />
-          </label>
           <div class="vv-admin-login-actions">
-            <button type="submit">Unlock admin</button>
-            <button type="button" data-admin-forget>Forget token</button>
+            <button type="submit">Use shared 0S gate</button>
+            <button type="button" data-admin-forget>Clear session view</button>
           </div>
           <p data-admin-login-status></p>
         </form>
@@ -165,30 +169,30 @@
     p.querySelector('[data-brain-kicker]').textContent = 'Operator access';
     p.querySelector('[data-brain-title]').textContent = 'Admin Login';
     const context = p.querySelector('[data-brain-context]');
-    context.innerHTML = '<strong>Admin Brain is gated</strong><span>Enter your operator/SkyGate token to unlock the admin menu on this browser.</span>';
+    context.innerHTML = '<strong>Admin Brain is gated</strong><span>Use the shared 0S/FS27 gate session to unlock the admin menu on this browser.</span>';
     setBrainControlsVisible(false);
     setAdminLoginVisible(true);
-    const tokenInput = p.querySelector('[data-admin-login] [name="token"]');
-    if (tokenInput) tokenInput.focus();
   }
 
   async function submitAdminLogin(event) {
     event.preventDefault();
     const form = event.currentTarget;
     const status = form.querySelector('[data-admin-login-status]');
-    const token = text(form.elements.token.value);
-    if (!token) {
-      status.textContent = 'Paste an operator or SkyGate token first.';
+    const gate = currentGateSession();
+    if (!gate?.token) {
+      status.textContent = 'No shared 0S gate session found. Opening the FS27 login.';
+      setTimeout(() => {
+        const login = new URL('/admin/login.html', location.origin);
+        login.searchParams.set('return', location.pathname + location.search + location.hash);
+        location.href = login.toString();
+      }, 450);
       return;
     }
     status.textContent = 'Checking owner gate...';
-    const session = await ownerAdminLogin(token);
-    if (session?.token) saveAdminToken(session.token);
-    else saveAdminToken(token);
     status.textContent = 'Loading admin brain...';
     model.adminIndex = await loadAdminIndex();
     if (!model.adminAuthorized) {
-      status.textContent = session?.error || 'Admin gate rejected that password or token.';
+      status.textContent = 'The shared 0S gate session is not authorized for Valley admin access.';
       return;
     }
     form.reset();
@@ -208,7 +212,7 @@
     refreshLaunchers();
     openAdminLogin();
     const status = panel().querySelector('[data-admin-login-status]');
-    if (status) status.textContent = 'Admin token removed from this browser.';
+    if (status) status.textContent = 'Local admin token aliases cleared. Shared gate session remains the authority.';
   }
 
   function setAdminLoginVisible(visible) {
@@ -249,7 +253,7 @@
       const matches = await providerMatches(question);
       if (matches.length) {
         return htmlBlock('Provider matches', [
-          'I found live Valley routes that match the request. Open the best fit, save it, or send the request into the relay lane so the lead is captured.',
+          'I found published Valley routes from the seed index. Open the best fit, save it, or request a Worker-confirmed relay receipt before treating it as a captured lead.',
           linkList(matches.map(item => [item.name, item.url, [item.city, item.category].filter(Boolean).join(' / ')]))
         ]);
       }
@@ -257,7 +261,7 @@
 
     if (!admin && /claim|owner|update|correct|wrong|listing/.test(lower)) {
       return htmlBlock('Claim or update a listing', [
-        'Use the claim lane when a business owner needs corrections, ownership review, or verification support.',
+        'Use the claim lane when a business owner needs corrections, ownership review, or verification support. Browser-built claim packets are proof-only until an authenticated Worker receipt exists.',
         linkList([
           ['Claim lane', link('/valley-verified/claim/'), 'Build a claim packet'],
           ['For businesses', link('/valley-verified/for-businesses/'), 'Owner-facing route'],
@@ -295,7 +299,7 @@
     return htmlBlock(admin ? 'Admin fallback' : 'Visitor fallback', [
       admin
         ? 'I do not have a precise match in the build index. Start with the current route guide, inspect the listed data sources, then capture an operator note so the next build can improve this path.'
-        : 'I can route you through the directory, match engine, claim lane, pricing, or relay capture. Send the request below if you want the platform to keep the lead.',
+        : 'I can route you through the directory, match engine, claim lane, pricing, or relay capture. Send the request below if you want the Worker relay to confirm the lead.',
       linkList(admin ? adminDefaultLinks() : publicDefaultLinks())
     ]);
   }
@@ -309,7 +313,7 @@
       'Prepare or export the packet after review.'
     ];
     return htmlBlock(workflow.title || 'Admin workflow', [
-      workflow.summary || 'This admin route is fed by generated build artifacts and browser-local operator actions.',
+      workflow.summary || 'This admin route is fed by generated seed artifacts and browser-local proof-only operator actions.',
       `<ol>${steps.map(step => `<li>${esc(step)}</li>`).join('')}</ol>`,
       linkList((workflow.links || adminDefaultLinks()).map(item => Array.isArray(item) ? item : [item.label, item.href, item.description]))
     ]);
@@ -347,6 +351,7 @@
       id: `vvrelay_${Date.now()}_${Math.random().toString(16).slice(2)}`,
       type: model.mode === 'admin' ? 'valley_verified.admin_brain_note' : 'valley_verified.public_relay_lead',
       created_at: new Date().toISOString(),
+      ...PROOF_ONLY_BOUNDARY,
       mode: model.mode,
       route: currentRoute(),
       source_url: location.href,
@@ -361,19 +366,29 @@
       transcript: model.messages.slice(-8)
     };
     saveLocalLead(lead);
-    status.textContent = 'Captured locally. Sending to 0S relay lane...';
+    status.textContent = 'Saved proof-only locally. Sending to the 0S relay Worker...';
     try {
-      const res = await fetch(relayEndpoint(), {
+      const endpoint = relayEndpoint();
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(lead)
       });
       const body = await res.json().catch(() => ({}));
-      status.textContent = res.ok && body.ok
-        ? `Captured in production relay: ${body.lead?.id || lead.id}`
-        : `Local capture saved. Production relay said: ${body.error || res.status}`;
+      if (res.ok && body.ok) {
+        const receipt = {
+          endpoint,
+          status: res.status,
+          lead_id: body.lead?.id || lead.id,
+          confirmed_at: new Date().toISOString()
+        };
+        saveLocalLead({ ...lead, boundary: WORKER_CONFIRMED_BOUNDARY, proof_only: false, worker_confirmed: true, worker_receipt: receipt });
+        status.textContent = `Worker-confirmed relay receipt: ${receipt.lead_id}`;
+      } else {
+        status.textContent = `Proof-only local capture saved. Production relay said: ${body.error || res.status}`;
+      }
     } catch (error) {
-      status.textContent = `Local capture saved. Production relay unavailable here: ${error.message || 'network error'}`;
+      status.textContent = `Proof-only local capture saved. Production relay unavailable here: ${error.message || 'network error'}`;
     }
     form.reset();
   }
@@ -385,8 +400,8 @@
     const workflow = admin && index?.workflows?.find(item => cleanRoute(item.route) === route);
     const context = panel().querySelector('[data-brain-context]');
     context.innerHTML = admin && workflow
-      ? `<strong>${esc(workflow.title)}</strong><span>${esc(workflow.summary || 'Build-aware admin route.')}</span>`
-      : `<strong>${esc(index?.site?.name || 'Valley Verified')}</strong><span>${esc(index?.site?.generated_at || index?.generated_at || '')}</span>`;
+      ? `<strong>${esc(workflow.title)}</strong><span>${esc(workflow.summary || 'Seed/proof-only admin route.')}</span>`
+      : `<strong>${esc(index?.site?.name || 'Valley Verified')}</strong><span>${esc(index?.site?.generated_at || index?.generated_at || 'seed index')}</span>`;
   }
 
   function renderSuggestions() {
@@ -480,43 +495,21 @@
   }
 
   function operatorAuthHeaders() {
-    const headers = {};
-    try {
-      const token = sessionStorage.getItem('metraiyux.adminToken')
-        || sessionStorage.getItem('valleyVerified.adminToken')
-        || localStorage.getItem('metraiyux.adminToken')
-        || localStorage.getItem('valleyVerified.adminToken')
-        || '';
-      if (token) {
-        const clean = token.replace(/^Bearer\s+/i, '');
-        headers.authorization = `Bearer ${clean}`;
-        headers['x-admin-token'] = clean;
-      }
-    } catch {}
-    return headers;
+    const bridgeHeaders = gateBridge()?.headers?.({
+      'x-skye-platform': 'valley-verified',
+      'x-skye-usage-lane': 'valley-admin-brain'
+    }) || {};
+    const token = currentGateSession()?.token || '';
+    return token ? { ...bridgeHeaders, authorization: `Bearer ${token}`, 'x-skye-gate-session': token } : bridgeHeaders;
   }
 
-  function saveAdminToken(token) {
-    const clean = token.replace(/^Bearer\s+/i, '');
-    try {
-      sessionStorage.setItem('valleyVerified.adminToken', clean);
-    } catch {}
+  function gateBridge() {
+    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   }
 
-  async function ownerAdminLogin(password) {
-    try {
-      const res = await fetch(`${location.origin}/api/owner/admin-login`, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: {'content-type': 'application/json', 'x-admin-token': password.replace(/^Bearer\s+/i, '')},
-        body: JSON.stringify({password})
-      });
-      const body = await res.json().catch(() => ({}));
-      if (res.ok && body.token) return body;
-      return {error: body.error || `Owner gate rejected the login (${res.status}).`};
-    } catch (error) {
-      return {error: error.message || 'Owner gate login failed.'};
-    }
+  function currentGateSession() {
+    const session = gateBridge()?.current?.() || null;
+    return session && session.token ? session : null;
   }
 
   function dataUrl(file) {

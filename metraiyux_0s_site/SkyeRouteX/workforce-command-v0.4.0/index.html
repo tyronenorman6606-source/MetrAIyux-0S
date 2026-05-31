@@ -11,7 +11,11 @@
   (() => {
     const params = new URLSearchParams(location.search || '');
     const token = String(params.get('tour_token') || params.get('tourToken') || '').trim();
-    if (!/^rtx_tour_[A-Za-z0-9_.-]{12,}$/i.test(token)) return;
+    const tourMode = /^rtx_tour_[A-Za-z0-9_.-]{12,}$/i.test(token);
+    if (!tourMode) {
+      document.write('<script src="./assets/free99-gate.js" data-platform-id="skyeroutex" data-platform-name="SkyeRouteX Workforce Command" data-billing-mode="gate_owned" data-price-label="0S shared FS27/SkyGate owner session required" data-app-root="/SkyeRouteX/workforce-command-v0.4.0/"><\\/script>');
+      return;
+    }
     try {
       const session = {
         token,
@@ -22,12 +26,15 @@
         readonly: true,
         issued_at: new Date().toISOString()
       };
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX', JSON.stringify(session));
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(session));
+      sessionStorage.setItem('SKYEROUTEX_TOUR_SESSION', JSON.stringify(session));
+      sessionStorage.removeItem('FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX');
+      const cleanUrl = new URL(location.href);
+      cleanUrl.searchParams.delete('tour_token');
+      cleanUrl.searchParams.delete('tourToken');
+      history.replaceState(history.state, '', cleanUrl.toString());
     } catch {}
   })();
   </script>
-  <script src="./assets/free99-gate.js" data-platform-id="skyeroutex" data-platform-name="SkyeRouteX Workforce Command" data-billing-mode="gate_owned" data-price-label="0S shared FS27/SkyGate owner session required" data-app-root="/SkyeRouteX/workforce-command-v0.4.0/"></script>
 </head>
 <body data-platform-id="skyeroutex" class="skyesol-living-page">
 <div data-skyrtx-visualizer-partial aria-hidden="true"></div>
@@ -97,7 +104,7 @@
           </div>
         </div>
       </div>
-      <div class="statusbar"><span>Gate session:</span> <strong id="session-label">waiting for 0S/SkyGate</strong></div>
+      <div class="statusbar"><span>Gate session:</span> <strong id="session-label">waiting for 0S/SkyGate</strong><span>Command telemetry:</span> <strong id="telemetry-label">waiting for shared gate</strong></div>
     </section>
 
     <section id="ae-panel" class="panel command-panel">

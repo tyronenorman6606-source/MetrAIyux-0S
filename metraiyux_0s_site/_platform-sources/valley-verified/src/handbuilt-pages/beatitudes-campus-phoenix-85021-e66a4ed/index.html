@@ -1,584 +1,153 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Beatitudes Campus | Valley Verified</title>
-  <meta name="description" content="Valley Verified business profile for Beatitudes Campus in Phoenix, Arizona. Senior living and care campus contact handoff.">
-  <link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <style>
-    :root {
-      color-scheme: light;
-      --ink: #24302b;
-      --muted: #647069;
-      --canvas: #f7f5ef;
-      --mist: #e8f0ec;
-      --panel: #ffffff;
-      --sage: #6e8d7b;
-      --fern: #315b48;
-      --sun: #d59c63;
-      --clay: #bf735c;
-      --line: #d9ded6;
-      --sky: #dcebf0;
-      --shadow: 0 18px 44px rgba(49, 91, 72, 0.13);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body[data-static-hand-page="true"] {
-      margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at 12% 12%, rgba(220, 235, 240, 0.9) 0 140px, transparent 141px),
-        linear-gradient(180deg, #fbfaf7 0%, var(--canvas) 64%, #eef3ef 100%);
-      color: var(--ink);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.58;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .page {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 52px;
-    }
-
-    .mast {
-      display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
-      gap: 26px;
-      min-height: 560px;
-      align-items: stretch;
-    }
-
-    .locator,
-    .intro,
-    .info-band,
-    .source-panel,
-    .skyemail,
-    .seat-item {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.92);
-      box-shadow: var(--shadow);
-    }
-
-    .locator {
-      padding: 22px;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 18px;
-      background:
-        linear-gradient(180deg, rgba(232, 240, 236, 0.8), rgba(255, 255, 255, 0.94)),
-        var(--panel);
-    }
-
-    .locator-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      color: var(--fern);
-      font-size: 0.84rem;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-
-    .status-dot {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status-dot::before {
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--clay);
-      box-shadow: 0 0 0 5px rgba(191, 115, 92, 0.18);
-    }
-
-    .map-card {
-      position: relative;
-      min-height: 330px;
-      border: 1px solid rgba(49, 91, 72, 0.18);
-      border-radius: 8px;
-      overflow: hidden;
-      background:
-        linear-gradient(90deg, transparent 0 19%, rgba(49, 91, 72, 0.09) 19% 20%, transparent 20% 49%, rgba(49, 91, 72, 0.09) 49% 50%, transparent 50% 74%, rgba(49, 91, 72, 0.09) 74% 75%, transparent 75%),
-        linear-gradient(180deg, transparent 0 24%, rgba(49, 91, 72, 0.09) 24% 25%, transparent 25% 54%, rgba(49, 91, 72, 0.09) 54% 55%, transparent 55% 79%, rgba(49, 91, 72, 0.09) 79% 80%, transparent 80%),
-        var(--mist);
-    }
-
-    .map-card::before,
-    .map-card::after {
-      content: "";
-      position: absolute;
-      border-radius: 999px;
-      background: rgba(110, 141, 123, 0.2);
-      transform: rotate(-18deg);
-    }
-
-    .map-card::before {
-      width: 76%;
-      height: 44px;
-      left: -12%;
-      top: 42%;
-    }
-
-    .map-card::after {
-      width: 54%;
-      height: 34px;
-      right: -8%;
-      top: 23%;
-      transform: rotate(28deg);
-    }
-
-    .pin {
-      position: absolute;
-      left: 55%;
-      top: 46%;
-      transform: translate(-50%, -50%);
-      width: 84px;
-      height: 84px;
-      border-radius: 50% 50% 50% 8px;
-      background: var(--fern);
-      rotate: -45deg;
-      box-shadow: 0 14px 28px rgba(49, 91, 72, 0.26);
-    }
-
-    .pin::after {
-      content: "";
-      position: absolute;
-      inset: 24px;
-      border-radius: 50%;
-      background: var(--sun);
-      box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.32);
-    }
-
-    .map-label {
-      position: absolute;
-      left: 24px;
-      right: 24px;
-      bottom: 22px;
-      padding: 14px 16px;
-      border: 1px solid rgba(49, 91, 72, 0.16);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--fern);
-      font-weight: 850;
-    }
-
-    .locator-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 11px 15px;
-      border: 1px solid var(--fern);
-      border-radius: 7px;
-      background: var(--fern);
-      color: #ffffff;
-      font-weight: 850;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .button.secondary {
-      background: transparent;
-      color: var(--fern);
-    }
-
-    .intro {
-      padding: clamp(26px, 5vw, 54px);
-      align-self: stretch;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(232, 240, 236, 0.72)),
-        var(--panel);
-    }
-
-    .eyebrow {
-      margin: 0 0 13px;
-      color: var(--clay);
-      font-size: 0.82rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-
-    h1 {
-      margin: 0;
-      color: var(--ink);
-      font-size: clamp(2.7rem, 6vw, 5.8rem);
-      line-height: 0.98;
-      letter-spacing: 0;
-    }
-
-    .lead {
-      max-width: 660px;
-      margin: 24px 0 0;
-      color: var(--muted);
-      font-size: clamp(1.04rem, 2vw, 1.24rem);
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin-top: 28px;
-    }
-
-    .chip {
-      padding: 8px 11px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: #fffdfa;
-      color: var(--fern);
-      font-size: 0.9rem;
-      font-weight: 800;
-    }
-
-    .details {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 18px;
-      margin-top: 18px;
-    }
-
-    .info-band,
-    .source-panel {
-      padding: 22px;
-    }
-
-    h2 {
-      margin: 0 0 16px;
-      color: var(--fern);
-      font-size: clamp(1.32rem, 2vw, 1.72rem);
-      letter-spacing: 0;
-    }
-
-    .fact-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .fact {
-      min-height: 104px;
-      padding: 14px;
-      border: 1px solid rgba(49, 91, 72, 0.14);
-      border-radius: 8px;
-      background: #fffdfa;
-    }
-
-    .fact span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: 0;
-    }
-
-    .fact strong {
-      display: block;
-      margin-top: 8px;
-      color: var(--ink);
-      font-size: 1rem;
-      overflow-wrap: anywhere;
-    }
-
-    .source-panel {
-      background:
-        linear-gradient(180deg, rgba(220, 235, 240, 0.78), rgba(255, 255, 255, 0.96)),
-        var(--panel);
-    }
-
-    .source-links {
-      display: grid;
-      gap: 12px;
-    }
-
-    .source-link {
-      display: grid;
-      gap: 6px;
-      padding: 14px;
-      border: 1px solid rgba(49, 91, 72, 0.14);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.74);
-      text-decoration: none;
-    }
-
-    .source-link strong {
-      color: var(--fern);
-    }
-
-    .source-link span {
-      color: var(--muted);
-      overflow-wrap: anywhere;
-    }
-
-    .skyemail {
-      margin-top: 18px;
-      padding: 24px;
-      background:
-        linear-gradient(135deg, rgba(49, 91, 72, 0.96), rgba(110, 141, 123, 0.88)),
-        var(--fern);
-      color: #ffffff;
-    }
-
-    .skyemail-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 0.96fr) minmax(300px, 1.04fr);
-      gap: 20px;
-      align-items: start;
-    }
-
-    .skyemail h2,
-    .skyemail .eyebrow {
-      color: #ffffff;
-    }
-
-    .skyemail p {
-      color: rgba(255, 255, 255, 0.86);
-    }
-
-    .mailbox {
-      display: block;
-      max-width: 100%;
-      margin: 12px 0 18px;
-      padding: 11px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.12);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 0.9rem;
-      overflow-wrap: anywhere;
-    }
-
-    .skyemail .button {
-      border-color: #ffd59e;
-      background: #ffd59e;
-      color: #26342e;
-    }
-
-    .steps {
-      display: grid;
-      gap: 10px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .steps li {
-      padding: 13px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-left: 5px solid #ffd59e;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .seat-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .seat-item {
-      padding: 16px;
-      border-color: rgba(255, 255, 255, 0.22);
-      background: rgba(255, 255, 255, 0.12);
-      box-shadow: none;
-    }
-
-    .seat-item strong {
-      display: block;
-      color: #ffffff;
-      font-size: 1.5rem;
-      line-height: 1;
-    }
-
-    .seat-item span {
-      display: block;
-      margin-top: 4px;
-      color: rgba(255, 255, 255, 0.84);
-    }
-
-    footer {
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    @media (max-width: 900px) {
-      .mast,
-      .details,
-      .skyemail-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .mast {
-        min-height: 0;
-      }
-
-      .locator {
-        order: 2;
-      }
-
-      .intro {
-        order: 1;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .page {
-        width: min(100% - 22px, 1120px);
-        padding-top: 14px;
-      }
-
-      .locator,
-      .intro,
-      .info-band,
-      .source-panel,
-      .skyemail {
-        padding: 18px;
-      }
-
-      .locator-actions,
-      .fact-grid,
-      .seat-row {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: clamp(2.2rem, 15vw, 3.6rem);
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beatitudes Campus | Valley Verified Phoenix</title>
+<meta name="description" content="Beatitudes Campus Valley Verified profile: source-backed Senior Living / Care Campus facts, contact route, why Skyes Over London verifies it, and concise SkyEmail handoff.">
+<link rel="canonical" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="Beatitudes Campus | Valley Verified Phoenix">
+<meta property="og:description" content="Beatitudes Campus is Valley Verified as a Phoenix senior living and care campus on Glendale Avenue with an official site and Chamber health-care record.">
+<meta property="og:url" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/">
+<meta property="og:image" content="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/assets/valley-verified-logo.png">
+<meta name="theme-color" content="#23444a">
+<link rel="icon" href="/assets/valley-verified-logo.png">
+<link rel="stylesheet" href="/assets/styles.css">
+<style> :root { color-scheme: light; --ink: #172124; --muted: #5d686b; --page: #f7f7f1; --paper: #ffffff; --line: #d9ded8; --pine: #23444a; --river: #2f6f83; --gold: #d79335; --clay: #b94d3f; --sage: #6d8d75; --shadow: 0 20px 54px rgba(23, 33, 36, 0.12); } * { box-sizing: border-box; } html { scroll-behavior: smooth; } body { margin: 0; background: linear-gradient(130deg, rgba(215, 147, 53, 0.18), transparent 34rem), linear-gradient(180deg, #ffffff 0%, var(--page) 82%); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.58; letter-spacing: 0; } a { color: inherit; } .page { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 56px; } .topline { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 8px 0 26px; color: var(--muted); } .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 900; } .brand img { width: 38px; height: 38px; border-radius: 8px; } nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; } nav a, .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 8px; padding: 0 15px; background: rgba(255,255,255,.88); text-decoration: none; font-weight: 850; } .button.primary { border-color: var(--pine); background: var(--pine); color: #fff; } .button.source { border-color: rgba(35,68,74,.28); } .hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(300px, .72fr); gap: 18px; align-items: stretch; } .hero-copy, .record-card, .panel, .skyemail { border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: var(--shadow); } .hero-copy { padding: clamp(30px, 6vw, 62px); } .eyebrow { margin: 0 0 12px; color: var(--river); font-size: .78rem; font-weight: 950; text-transform: uppercase; letter-spacing: 0; } h1, h2, h3, p { margin-top: 0; } h1 { max-width: 900px; margin-bottom: 18px; font-size: clamp(2.75rem, 7vw, 6.25rem); line-height: .94; letter-spacing: 0; } h2 { margin-bottom: 14px; font-size: clamp(1.6rem, 3.2vw, 2.72rem); line-height: 1.04; letter-spacing: 0; } h3 { margin-bottom: 8px; font-size: 1.05rem; letter-spacing: 0; } .lede, .panel p, .skyemail p { color: var(--muted); font-size: 1.04rem; } .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; } .record-card { overflow: hidden; display: grid; align-content: space-between; } .plate { min-height: 230px; padding: 24px; color: #fff; background: linear-gradient(135deg, rgba(35,68,74,.96), rgba(47,111,131,.9)), linear-gradient(90deg, var(--gold), var(--clay)); } .plate span { display: inline-flex; border: 1px solid rgba(255,255,255,.48); border-radius: 999px; padding: 7px 11px; font-size: .78rem; font-weight: 950; text-transform: uppercase; } .plate strong { display: block; margin-top: 54px; font-size: clamp(1.8rem, 4.5vw, 3.45rem); line-height: .98; letter-spacing: 0; } .status-list { display: grid; gap: 0; padding: 20px 22px; } .status-list div { display: flex; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); padding: 12px 0; color: var(--muted); } .status-list div:first-child { border-top: 0; } .status-list strong { color: var(--ink); text-align: right; } .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; } .panel { padding: 24px; } .wide { grid-column: span 2; } .full { grid-column: 1 / -1; } .list, .contact-list, .source-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; } .list li, .source-list li { border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .list li:first-child, .source-list li:first-child { border-top: 0; padding-top: 0; } .list strong, .contact-list strong, .source-list a, dd { color: var(--ink); } .contact-list li { display: grid; gap: 5px; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); } .contact-list li:first-child { border-top: 0; padding-top: 0; } .contact-list strong { font-size: .78rem; font-weight: 950; text-transform: uppercase; } dl.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; } dl.facts div { border-top: 1px solid var(--line); padding-top: 12px; } dt { color: var(--muted); font-size: .76rem; font-weight: 950; text-transform: uppercase; } dd { margin: 3px 0 0; font-weight: 800; } .source-list li { display: grid; gap: 5px; } .source-list span { color: var(--muted); font-size: .95rem; } .note { border-left: 4px solid var(--gold); padding-left: 14px; } .skyemail { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 18px; margin-top: 18px; padding: clamp(24px, 5vw, 42px); } .seat-meter { display: grid; gap: 10px; align-content: start; } .meter-bar { height: 14px; overflow: hidden; border-radius: 999px; background: #e3e7e4; } .meter-bar span { display: block; width: 90%; height: 100%; background: linear-gradient(90deg, var(--sage), var(--gold), var(--clay)); } .footer { margin-top: 22px; color: var(--muted); font-size: .92rem; } @media (max-width: 920px) { .topline, .hero, .skyemail { display: grid; grid-template-columns: 1fr; } .topline { align-items: start; } .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } } @media (max-width: 560px) { .page { width: min(100% - 20px, 1160px); } nav, .actions { width: 100%; } nav a, .button { width: 100%; } .status-list div, dl.facts { display: grid; grid-template-columns: 1fr; } .status-list strong { text-align: left; } } </style>
+<script type="application/ld+json"> { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/#business", "name": "Beatitudes Campus", "description": "Beatitudes Campus is Valley Verified as a Phoenix senior living and care campus on Glendale Avenue with an official site and Chamber health-care record.", "url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/", "telephone": "(602) 995-6100", "address": { "@type": "PostalAddress", "streetAddress": "1610 W. Glendale Ave.", "addressLocality": "Phoenix", "addressRegion": "AZ", "postalCode": "85021", "addressCountry": "US" }, "areaServed": "Phoenix, AZ 85021", "additionalType": "Health And Care", "identifier": "638e30f607e3", "sameAs": "https://www.beatitudescampus.org" } </script>
 </head>
-<body data-static-hand-page="true">
-  <main class="page">
-    <section class="mast" aria-labelledby="profile-title">
-      <aside class="locator" aria-label="Care campus locator">
-        <div class="locator-top">
-          <span class="status-dot">Owner-researched Valley Verified record</span>
-          <span>85021</span>
-        </div>
-        <div class="map-card" aria-label="Phoenix campus locator map graphic">
-          <div class="pin" aria-hidden="true"></div>
-          <div class="map-label">Phoenix, AZ 85021 care campus profile</div>
-        </div>
-        <div class="locator-actions">
-          <a class="button" href="tel:+16029956100">Call (602) 995-6100</a>
-          <a class="button secondary" href="https://www.beatitudescampus.org">Open website</a>
-        </div>
-      </aside>
-
-      <div class="intro">
-        <p class="eyebrow">Health And Care / senior living / care campus</p>
-        <h1 id="profile-title">Beatitudes Campus</h1>
-        <p class="lead">A Phoenix senior living and care campus record with contact, category, website, and source handoff details arranged for the Valley Verified directory.</p>
-        <div class="chips" aria-label="Profile tags">
-          <span class="chip">Phoenix, AZ 85021</span>
-          <span class="chip">Senior Living</span>
-          <span class="chip">Care Campus</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="details" aria-label="Business facts and source handoff">
-      <article class="info-band">
-        <h2>Campus Facts</h2>
-        <div class="fact-grid">
-          <div class="fact">
-            <span>Business</span>
-            <strong>Beatitudes Campus</strong>
-          </div>
-          <div class="fact">
-            <span>Location</span>
-            <strong>Phoenix, AZ 85021</strong>
-          </div>
-          <div class="fact">
-            <span>Directory lane</span>
-            <strong>Health And Care / Senior Living / Care Campus</strong>
-          </div>
-          <div class="fact">
-            <span>Phone</span>
-            <strong><a href="tel:+16029956100">(602) 995-6100</a></strong>
-          </div>
-        </div>
-      </article>
-
-      <article class="source-panel">
-        <h2>Website And Source</h2>
-        <div class="source-links">
-          <a class="source-link" href="https://www.beatitudescampus.org">
-            <strong>Business website</strong>
-            <span>https://www.beatitudescampus.org</span>
-          </a>
-          <a class="source-link" href="https://business.phoenixchamber.com/list/ql/health-care-11">
-            <strong>Source handoff</strong>
-            <span>Phoenix Chamber health care listing</span>
-          </a>
-        </div>
-      </article>
-    </section>
-
-    <section class="skyemail" aria-labelledby="skyemail-title">
-      <div class="skyemail-layout">
-        <div>
-          <p class="eyebrow">Free SkyEmail workspace</p>
-          <h2 id="skyemail-title">Beatitudes Campus SkyEmail acceptance</h2>
-          <p>The free Valley Verified SkyEmail mailbox is reserved for this campus record. Use the accept URL to sign in and begin the workspace handoff.</p>
-          <span class="mailbox">beatitudes.campus@skyemail.solenterprises.org</span>
-          <a class="button" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=beatitudes-campus-phoenix-85021-e66a4ed&amp;mailbox=beatitudes.campus%40skyemail.solenterprises.org">Accept SkyEmail</a>
-          <p>Accept URL: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=beatitudes-campus-phoenix-85021-e66a4ed&amp;mailbox=beatitudes.campus%40skyemail.solenterprises.org</p>
-        </div>
-        <div>
-          <ul class="steps">
-            <li>Open the accept URL and sign in through SkyeMail for the Valley Verified workspace.</li>
-            <li>The owner notification is sent to provision the workspace after acceptance.</li>
-            <li>Activation completes within 24 hours after team provisioning. If it is not active after 24 hours, escalate through K4i.</li>
-          </ul>
-        </div>
-      </div>
-      <div class="seat-row" aria-label="SkyEmail seat status">
-        <div class="seat-item">
-          <strong>9</strong>
-          <span>seats remaining</span>
-        </div>
-        <div class="seat-item">
-          <strong>2</strong>
-          <span>warn at 2 seats</span>
-        </div>
-        <div class="seat-item">
-          <strong>5</strong>
-          <span>buy more in groups of 5</span>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      Valley Verified canonical profile: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified/business/beatitudes-campus-phoenix-85021-e66a4ed/
-    </footer>
-  </main>
+<body data-static-hand-page="true" class="vv-static-page beatitudes-campus-page">
+<div class="page">
+<header class="topline" aria-label="Valley Verified navigation">
+<a class="brand" href="/valley-verified/">
+<img src="/assets/valley-verified-logo.png" alt="" aria-hidden="true">
+<span>Valley Verified</span>
+</a>
+<nav>
+<a href="#why">Why verified</a>
+<a href="#facts">Facts</a>
+<a href="#source">Sources</a>
+<a href="#skyemail">SkyEmail</a>
+</nav>
+</header>
+<main>
+<section class="hero" aria-labelledby="beatitudes-campus-title">
+<div class="hero-copy">
+<p class="eyebrow">Skyes Over London says Valley Verified</p>
+<h1 id="beatitudes-campus-title">Beatitudes Campus</h1>
+<p class="lede">Beatitudes Campus is Valley Verified as a Phoenix senior living and care campus on Glendale Avenue with an official site and Chamber health-care record.</p>
+<div class="actions">
+<a class="button primary" href="tel:+16029956100">Call (602) 995-6100</a>
+<a class="button" href="https://www.beatitudescampus.org" target="_blank" rel="noopener">Open website</a>
+<a class="button source" href="#skyemail">Accept SkyEmail</a>
+</div>
+</div>
+<aside class="record-card" aria-label="Beatitudes Campus verification record">
+<div class="plate">
+<span>Health And Care</span>
+<strong>Senior Living / Care Campus</strong>
+</div>
+<div class="status-list">
+<div><span>Verification read</span><strong>Official + public sources</strong></div>
+<div><span>Owner claim</span><strong>unclaimed</strong></div>
+<div><span>Last local review</span><strong>2026-05-19</strong></div>
+<div><span>Source count</span><strong>2</strong></div>
+</div>
+</aside>
+</section>
+<section class="grid" id="why" aria-label="Why Beatitudes Campus is Valley Verified">
+<article class="panel wide">
+<p class="eyebrow">Customer read</p>
+<h2>Why this business is here</h2>
+<p>The source set supports a senior-living campus identity, direct public phone, and Phoenix address; the page is for families comparing campus-level options.</p>
+<p class="note">Skyes Over London marks this profile Valley Verified because the page is built from a named public record, local contact facts, and live source checks. Where sources are thin or conflicting, the page says so plainly.</p>
+</article>
+<article class="panel">
+<p class="eyebrow">Best fit</p>
+<h2>Who uses it</h2>
+<ul class="list">
+<li>Older adults and families comparing Phoenix senior living communities.</li>
+<li>Caregivers who need a verified campus phone and location.</li>
+<li>Referral partners checking a source-backed senior-care record.</li>
+</ul>
+</article>
+</section>
+<section class="grid" id="facts" aria-label="Beatitudes Campus facts and contact details">
+<article class="panel">
+<p class="eyebrow">Contact</p>
+<h2>Public route</h2>
+<ul class="contact-list">
+<li><strong>Phone</strong><a href="tel:+16029956100">(602) 995-6100</a></li>
+<li><strong>Address</strong><span>1610 W. Glendale Ave., Phoenix, AZ 85021</span></li>
+<li><strong>Website</strong><a href="https://www.beatitudescampus.org" target="_blank" rel="noopener">beatitudescampus.org</a></li>
+<li><strong>Email</strong><span>No public email in the local record.</span></li>
+</ul>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Verified facts</p>
+<h2>What the sources support</h2>
+<dl class="facts">
+<div><dt>Category</dt><dd>Health And Care</dd></div>
+<div><dt>Service lane</dt><dd>Senior Living / Care Campus</dd></div>
+<div><dt>Market</dt><dd>Phoenix, AZ 85021</dd></div>
+<div><dt>Verified basis</dt><dd>Official source plus public record</dd></div>
+<div><dt>Claim status</dt><dd>unclaimed</dd></div>
+<div><dt>Last reviewed</dt><dd>2026-05-19</dd></div>
+</dl>
+</article>
+<article class="panel wide">
+<p class="eyebrow">Proof points</p>
+<h2>Why Skyes trusts this profile</h2>
+<ul class="list">
+<li>Official website confirms the campus identity.</li>
+<li>Chamber health-care source confirms address and phone.</li>
+<li>Valley Verified source record preserves review date and imported public listing context.</li>
+</ul>
+</article>
+<article class="panel">
+<p class="eyebrow">Timing</p>
+<h2>Hours note</h2>
+<p>Public hours were not confirmed in the local business record. Use the business phone or official site for time-sensitive visits.</p>
+</article>
+<article class="panel full" id="source">
+<p class="eyebrow">Source trail</p>
+<h2>Research used for this rewrite</h2>
+<ul class="source-list">
+<li><a href="https://beatitudescampus.org/" target="_blank" rel="noopener">Beatitudes Campus official site</a><span>Official source for the Phoenix senior living campus.</span></li>
+<li><a href="https://business.phoenixchamber.com/list/ql/health-care-11" target="_blank" rel="noopener">Health Care QuickLink Category | Greater Phoenix Chamber</a><span>Source description references: Greater Phoenix Chamber | Health Care Relevant topic cues found: Health Care / Senior Living / Care, Health Care, Public directory record, Healthcare / Wellness. Use this source to confirm company positioning, contact details, and page-specific service language before publishing.</span></li>
+</ul>
+</article>
+<article class="panel full">
+<p class="eyebrow">Important boundary</p>
+<h2>What is not overstated</h2>
+<p>Living options, care levels, availability, tours, and pricing are set by Beatitudes Campus.</p>
+</article>
+</section>
+<section class="skyemail" id="skyemail" aria-labelledby="beatitudes-campus-skyemail">
+<div>
+<p class="eyebrow">SkyEmail acceptance</p>
+<h2 id="beatitudes-campus-skyemail">Accept the free SkyEmail account for Beatitudes Campus.</h2>
+<p>Use the shared 0S/SkyGate sign-in lane to accept the mailbox handoff. The business profile remains customer-focused; SkyEmail is only the owner action route.</p>
+<div class="actions">
+<a class="button primary" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/live/SkyeMail/login.html?workspace=valley-verified&amp;business=beatitudes-campus-phoenix-85021-e66a4ed">Accept SkyEmail</a>
+<a class="button" href="/skyegate/">Sign in through 0S/SkyGate</a>
+</div>
+</div>
+<div class="seat-meter">
+<h3>Provisioning checklist</h3>
+<ul class="list">
+<li><strong>Owner handoff:</strong> route the Beatitudes Campus acceptance through the shared 0S owner queue.</li>
+<li><strong>K4i escalation:</strong> escalate if the mailbox is not active 24 hours after provisioning starts.</li>
+<li><strong>Seat pool:</strong> 9 seats left; warn at 2 seats and buy in groups of 5.</li>
+</ul>
+<div class="meter-bar" aria-label="9 seats left"><span></span></div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<p>Valley Verified source record: seed/businesses/inbox/valley_verified_public_lead_build_2026-05-19_v4.csv | 638e30f607e3. Browser verification is owner-handled for this repo.</p>
+</footer>
+</div>
 </body>
 </html>

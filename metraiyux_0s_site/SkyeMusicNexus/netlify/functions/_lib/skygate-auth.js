@@ -18,9 +18,9 @@ function parsePart(part) {
   return JSON.parse(Buffer.from(clean(part), 'base64url').toString('utf8'));
 }
 function publicKeyFor(header) {
-  const pem = clean(process.env.SKYGATE_PUBLIC_KEY_PEM || process.env.SKYGATEFS13_PUBLIC_KEY_PEM);
+  const pem = clean(process.env.SKYGATEFS27_PUBLIC_KEY_PEM || process.env.SKYGATE_PUBLIC_KEY_PEM || process.env.SKYGATEFS13_PUBLIC_KEY_PEM);
   if (pem) return pem.replace(/\\n/g, '\n');
-  const raw = clean(process.env.SKYGATE_JWKS_JSON || process.env.SKYGATEFS13_JWKS_JSON);
+  const raw = clean(process.env.SKYGATEFS27_JWKS_JSON || process.env.SKYGATE_JWKS_JSON || process.env.SKYGATEFS13_JWKS_JSON);
   if (!raw) return null;
   const jwks = JSON.parse(raw);
   const keys = Array.isArray(jwks.keys) ? jwks.keys : [];
@@ -54,10 +54,11 @@ function verifyExternalSkyGateToken(token, options = {}) {
   if (!valid) return { ok: false, statusCode: 401, error: 'SkyGate token signature invalid.' };
   const now = Math.floor(Date.now() / 1000);
   if (payload.exp && now > Number(payload.exp)) return { ok: false, statusCode: 401, error: 'SkyGate token expired.' };
-  const audience = clean(options.audience || process.env.SKYGATE_EXPECTED_AUDIENCE || 'skygatefs13');
+  const audience = clean(options.audience || process.env.SKYGATEFS27_EXPECTED_AUDIENCE || process.env.SKYGATE_EXPECTED_AUDIENCE || process.env.SKYGATEFS13_EXPECTED_AUDIENCE || 'skygatefs27,skygatefs13,skye-music-nexus');
+  const expectedAudiences = audience.split(',').map(clean).filter(Boolean);
   const audiences = Array.isArray(payload.aud) ? payload.aud.map(clean) : [clean(payload.aud)].filter(Boolean);
-  if (audience && !audiences.includes(audience)) return { ok: false, statusCode: 401, error: 'SkyGate token audience mismatch.' };
-  const issuer = clean(process.env.SKYGATE_ISSUER || '');
+  if (expectedAudiences.length && !audiences.some((item) => expectedAudiences.includes(item))) return { ok: false, statusCode: 401, error: 'SkyGate token audience mismatch.' };
+  const issuer = clean(process.env.SKYGATEFS27_ISSUER || process.env.SKYGATE_ISSUER || process.env.SKYGATEFS13_ISSUER || '');
   if (issuer && clean(payload.iss) !== issuer) return { ok: false, statusCode: 401, error: 'SkyGate token issuer mismatch.' };
   const roles = Array.isArray(options.roles) ? options.roles.map(clean).filter(Boolean) : [];
   if (roles.length && !roles.includes(clean(payload.role))) {

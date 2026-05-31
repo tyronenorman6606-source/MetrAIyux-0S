@@ -510,7 +510,6 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
       issued_at: new Date().toISOString()
     };
     for (const key of [
-      "FREE99_PLATFORM_GATE_SESSION",
       "METRAIYUX_GATE_SESSION",
       "SKYGATEFS27_GATE_SESSION",
       "SKYE_GATE_SESSION"
@@ -524,7 +523,6 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
 
   function clearInheritedGateSession() {
     for (const key of [
-      "FREE99_PLATFORM_GATE_SESSION",
       "METRAIYUX_GATE_SESSION",
       "SKYGATEFS27_GATE_SESSION",
       "SKYE_GATE_SESSION"

@@ -80,35 +80,47 @@
     </section>
   </main>
   <script>
-    const rules = [
-      {code:"SKYEMERIT-FIRST-23",title:"First-Time Spark",rate_bps:2300,floor_cents:0,cap_cents:670000,min_transaction_cents:1,max_transaction_cents:670000},
-      {code:"SKYEMERIT-FIRST-28",title:"First-Time Lift",rate_bps:2800,floor_cents:0,cap_cents:940000,min_transaction_cents:670001,max_transaction_cents:940000},
-      {code:"SKYEMERIT-FIRST-31",title:"First-Time SkyeLine",rate_bps:3100,floor_cents:0,cap_cents:940000,min_transaction_cents:940001,max_transaction_cents:null},
-      {code:"SKYEMERIT-SKYELINE-22",title:"SkyeLine Guard 22",rate_bps:2200,floor_cents:300000,cap_cents:1000000,min_transaction_cents:300001,max_transaction_cents:null}
-    ];
     const money = (cents) => "$" + (Math.round(cents) / 100).toLocaleString("en-US", {maximumFractionDigits:2});
-    function calculate(rule, subtotal) {
-      const max = rule.max_transaction_cents == null ? null : rule.max_transaction_cents;
-      const applies = subtotal >= rule.min_transaction_cents && (max == null || subtotal <= max);
-      const eligible = applies ? Math.max(0, Math.min(subtotal, rule.cap_cents) - rule.floor_cents) : 0;
-      const discount = Math.round(eligible * rule.rate_bps / 10000);
-      return {code:rule.code,title:rule.title,eligible_cents:eligible,discount_cents:discount,payable_cents:subtotal-discount,applies};
+    function gateHeaders() {
+      const keys = ["FREE99_PLATFORM_GATE_SESSION","METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYGATE_USER_TOKEN","SKYE_GATE_SESSION","adminBrainToken"];
+      const headers = {accept:"application/json"};
+      for (const key of keys) {
+        const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
+        if (!raw) continue;
+        let token = raw;
+        try { token = JSON.parse(raw).token || raw; } catch {}
+        token = String(token || "").replace(/^Bearer\s+/i, "").trim();
+        if (token) {
+          headers.authorization = `Bearer ${token}`;
+          headers["x-free99-gate-session"] = token;
+          headers["x-skye-gate-session"] = token;
+          break;
+        }
+      }
+      return headers;
     }
-    function runCalc() {
+    async function runCalc() {
       const form = document.getElementById("skyemeritCalc");
       const subtotal = Math.round(Number(form.subtotal.value || 0) * 100);
       const code = form.code.value;
-      const candidates = code === "SKYEMERIT-FIRST-BEST" ? rules.slice(0,3) : rules.filter((rule) => rule.code === code);
-      const result = candidates.map((rule) => calculate(rule, subtotal)).sort((a,b) => b.discount_cents - a.discount_cents)[0];
-      document.getElementById("skyemeritReceipt").textContent = JSON.stringify({
-        subtotal: money(subtotal),
-        rule: result.code,
-        eligible: money(result.eligible_cents),
-        discount: money(result.discount_cents),
-        payable: money(result.payable_cents),
-        gate_required: true,
-        stripe_promo_stack: result.discount_cents > 0 ? "disabled_when_applied" : "available_if_no_skyemerit"
-      }, null, 2);
+      const receipt = document.getElementById("skyemeritReceipt");
+      try {
+        const res = await fetch(`/api/saas/skyemerit/preview?subtotal_cents=${encodeURIComponent(subtotal)}&code=${encodeURIComponent(code)}`, {cache:"no-store", credentials:"include", headers:gateHeaders()});
+        const data = await res.json();
+        if (!res.ok || data.ok === false) throw new Error(data.error || `Request failed: ${res.status}`);
+        const result = data.selected || {};
+        receipt.textContent = JSON.stringify({
+          subtotal: money(subtotal),
+          rule: result.code,
+          eligible: money(result.eligible_cents),
+          discount: money(result.discount_cents),
+          payable: money(result.payable_cents),
+          gate_required: true,
+          source: "/api/saas/skyemerit/preview"
+        }, null, 2);
+      } catch (error) {
+        receipt.textContent = JSON.stringify({ok:false,error:error.message || "skyemerit_preview_unavailable"}, null, 2);
+      }
     }
     document.getElementById("calcBtn").addEventListener("click", runCalc);
     runCalc();

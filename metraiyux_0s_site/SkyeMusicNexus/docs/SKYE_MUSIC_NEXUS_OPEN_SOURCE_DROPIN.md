@@ -4,7 +4,7 @@ This document now tracks the first-party creation lane.
 
 ## Current Rooms
 
-- `public/create.html` — creation command hub.
+- `public/daw.html` — DAW command room.
 - `public/daw.html` — native fullscreen SkyeMusicNexus DAW.
 - `public/stems.html` — stem, bounce, master, and reference staging.
 - `public/exports.html` — project packet, export queue, and Release Forge handoff.

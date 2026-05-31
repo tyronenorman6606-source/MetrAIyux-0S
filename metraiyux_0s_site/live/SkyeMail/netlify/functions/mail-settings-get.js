@@ -6,7 +6,7 @@ const { getHostedMailbox, listMailboxAliases } = require('./_mailbox-provider');
 exports.handler = async (event) => {
   try {
     if (String(event.httpMethod || 'GET').toUpperCase() !== 'GET') return json(405, { error: 'Method not allowed.' });
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const prefRes = await query(`select display_name, profile_title, profile_phone, profile_company, profile_website, signature_text, signature_html, preferred_from_alias, updated_at from user_preferences where user_id=$1 limit 1`, [auth.sub]);
     const prefs = prefRes.rows[0] || null;
     const hostedMailbox = await getHostedMailbox(auth.sub).catch(() => null);

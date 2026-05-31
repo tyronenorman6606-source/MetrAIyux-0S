@@ -53,7 +53,6 @@ test('Valley publish webhook dispatch runs through the shared provider runtime',
     SITE_TASK_QUEUE: { async send() {} },
     VALLEY_CONTENT_CALENDAR_URL: 'https://calendar.valley.test/feed.json',
     VALLEY_PUBLISH_WEBHOOK_URL: 'https://webhook.valley.test/publish',
-    VALLEY_PUBLISH_ADMIN_TOKEN: 'owner-token',
     ZERO_OS_PROVIDER_SANDBOX: '1',
     SKYGATEFS27_WORKER: {
       async fetch(request) {
@@ -79,8 +78,7 @@ test('Valley publish webhook dispatch runs through the shared provider runtime',
     method: 'POST',
     headers: {
       authorization: 'Bearer owner-token',
-      'content-type': 'application/json',
-      'x-valley-publish-token': 'owner-token'
+      'content-type': 'application/json'
     },
     body: JSON.stringify({ now: '2026-05-29T00:00:00.000Z' })
   }), e, c);

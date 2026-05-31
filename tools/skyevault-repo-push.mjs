@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { cleanBearer, resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
 const args = new Set(process.argv.slice(2));
@@ -326,55 +327,13 @@ async function fetchTextWithRetry(url, options, retryOptions) {
   throw new Error(`${label} failed after ${retries} retries.`);
 }
 
-function ownerCredentialCandidates(env) {
-  return [
-    'ZERO_OS_GATE_SESSION',
-    'MCP_GATE_SESSION',
-    'SKYENET_AUTH',
-    'FREE99_ADMIN_CODE',
-    'ZERO_OS_GATE_CODE',
-    'OWNER_ADMIN_CODE',
-    'METRAIYUX_ADMIN_CODE',
-    'SKYGATE_ADMIN_PASSWORD',
-    'FS27_ADMIN_PASSWORD'
-  ].map((key) => ({ key, value: env[key] })).filter((item) => item.value);
-}
-
-async function postJson(url, body) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  const text = await response.text();
-  let json = {};
-  try {
-    json = text ? JSON.parse(text) : {};
-  } catch {
-    json = { raw: text.slice(0, 300) };
-  }
-  return { response, json };
+function zeroOsBaseUrl(env) {
+  return String(env.ZERO_OS_BASE_URL || env.METRAIYUX_0S_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 }
 
 async function resolveOwnerBearer(env) {
-  const existing = env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || env.ZERO_OS_GATE_SESSION || env.SKYENET_AUTH || '';
-  if (existing) return existing;
-  const zeroOsBase = String(env.ZERO_OS_BASE_URL || env.METRAIYUX_0S_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
-  for (const item of ownerCredentialCandidates(env)) {
-    if (/SESSION|AUTH/.test(item.key)) return item.value;
-  }
-  for (const item of ownerCredentialCandidates(env)) {
-    for (const route of ['/api/founder-command/login', '/api/owner/admin-login']) {
-      try {
-        const { response, json } = await postJson(`${zeroOsBase}${route}`, { code: item.value });
-        const token = json.gateBearerToken || json.gateToken || json.token || '';
-        if (response.ok && token) return token;
-      } catch {
-        // Try the next shared gate credential without printing secret material.
-      }
-    }
-  }
-  return '';
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: zeroOsBaseUrl(env), env });
+  return auth.token || '';
 }
 
 function gitValue(args, fallback = 'unknown') {
@@ -410,12 +369,10 @@ async function uploadArchive(archive, archiveHash, summary) {
   const origin = String(env.SKYEVAULT_UPLOAD_ORIGIN || baseUrl).replace(/\/$/, '');
   const portalKey = env.SKYEVAULT_PORTAL_KEY || env.CLIENT_PORTAL_KEY || '';
   if (!portalKey) throw new Error('Missing CLIENT_PORTAL_KEY or SKYEVAULT_PORTAL_KEY.');
-  const free99AdminCode = env.FREE99_ADMIN_CODE || env.SKYEVAULT_FREE99_ADMIN_CODE || '';
-  const adminToken = env.SKYEVAULT_ADMIN_TOKEN || env.ADMIN_TOKEN || '';
   const ownerCustody = ownerCustodyFields(env);
   const gateBearer = ownerCustody.custodyScope === 'owner-private'
     ? await resolveOwnerBearer(env)
-    : (env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.FREE99_GATE_SESSION || '');
+    : cleanBearer(env.SKYEVAULT_GATE_BEARER || env.SKYEVAULT_GATE_SESSION || env.MCP_GATE_SESSION || env.ZERO_OS_GATE_SESSION || env.SKYENET_AUTH || '');
   const workspaceId = ownerCustody.workspaceId;
   const customerId = String(uploadCustomerId || env.SKYEVAULT_CUSTOMER_ID || env.SKYEVAULT_GATE_CUSTOMER_ID || env.SKYEVAULT_ACCOUNT_ID || '').trim();
   const repoId = String(uploadRepoId || env.SKYEVAULT_REPO_ID || repoName).trim();
@@ -491,13 +448,12 @@ async function uploadArchive(archive, archiveHash, summary) {
 
   const api = async (apiPath, payload) => {
     const headers = { 'content-type': 'application/json', 'x-portal-key': portalKey, origin };
-    if (gateBearer) {
-      headers.authorization = /^Bearer\s+/i.test(gateBearer) ? gateBearer : `Bearer ${gateBearer}`;
-      headers['x-skye-gate-session'] = gateBearer.replace(/^Bearer\s+/i, '');
-      headers['x-free99-gate-session'] = gateBearer.replace(/^Bearer\s+/i, '');
+    const bearer = cleanBearer(gateBearer);
+    if (bearer) {
+      headers.authorization = `Bearer ${bearer}`;
+      headers['x-skye-gate-session'] = bearer;
+      headers['x-free99-gate-session'] = bearer;
     }
-    if (free99AdminCode) headers['x-free99-admin-code'] = free99AdminCode;
-    if (adminToken) headers['x-admin-token'] = adminToken;
     const { response, text } = await fetchTextWithRetry(`${baseUrl}${apiPath}`, {
       method: 'POST',
       headers,

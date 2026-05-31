@@ -8,7 +8,7 @@ window.SMV = (function(){
     { id:'spam', href:'spam.html', label:'Spam', labelId:'SPAM', hint:'Filtered mail' },
 	    { id:'trash', href:'trash.html', label:'Trash', labelId:'TRASH', hint:'Recovery + delete' },
 	    { id:'contacts', href:'contacts.html', label:'Contacts', hint:'People + shortcuts' },
-	    { id:'brain', href:'brain.html', label:'Brain', hint:'Local mailbox brain + kAIxu lane' },
+	    { id:'brain', href:'brain.html', label:'Brain', hint:'Local mailbox brain + FS27 lane' },
 	    { id:'workspace', href:'workspace.html', label:'0S Workbench', hint:'Docs, CRM, calendar, finance, audit' },
 	    { id:'calendar', href:'dashboard.html#calendar', label:'Calendar', hint:'0S schedule lane' },
     { id:'monitoring', href:'monitoring.html', label:'Monitoring', hint:'Delivery + webhook health' },

@@ -30,15 +30,9 @@
     return `${n.toLocaleString()}${unit ? ` ${unit}` : ""}`;
   };
   const sharedGateKeys = [
-    "FREE99_PLATFORM_GATE_SESSION",
     "METRAIYUX_GATE_SESSION",
     "SKYGATEFS27_GATE_SESSION",
-    "SKYGATE_USER_TOKEN",
-    "SKYE_GATE_SESSION",
-    "SKYE_MUSIC_NEXUS_GATE_SESSION",
-    "skye_music_nexus_session",
-    "quantumskyes_mcp_owner_token",
-    "adminBrainToken"
+    "SKYE_GATE_SESSION"
   ];
   function cleanToken(value) {
     return String(value || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
@@ -54,26 +48,95 @@
     }
   }
   function sharedGateToken() {
+    const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    const bridgeSession = bridge?.requireSession?.({ platformId: "metraiyux-0s", usageLane: "visual-data-kit" }) || bridge?.current?.();
+    const bridgeToken = cleanToken(bridgeSession?.token || "");
+    if (bridgeToken) return bridgeToken;
     for (const key of sharedGateKeys) {
       const token = tokenFromStore(sessionStorage, key) || tokenFromStore(localStorage, key);
       if (token) return token;
     }
     return "";
   }
+  function readJson(store, key) {
+    try {
+      return JSON.parse(store.getItem(key) || "null");
+    } catch {
+      return null;
+    }
+  }
+  function activeWorkspaceId(root) {
+    const url = new URL(location.href);
+    const active = readJson(localStorage, "saas_active_workspace") || {};
+    const staged = readJson(localStorage, "saas_workspace") || {};
+    return root.dataset.workspace ||
+      url.searchParams.get("workspace") ||
+      url.searchParams.get("workspace_id") ||
+      active.workspace_id ||
+      active.workspace_slug ||
+      staged.workspace_id ||
+      staged.workspace_slug ||
+      "";
+  }
+  function authHeaders(extra = {}) {
+    const token = sharedGateToken();
+    return token ? {
+      ...extra,
+      authorization: `Bearer ${token}`,
+      "x-free99-gate-session": token,
+      "x-skye-gate-session": token,
+      "x-skygate-session": token
+    } : { ...extra };
+  }
+  async function recordVisualTelemetry(eventType, payload = {}) {
+    try {
+      const res = await fetch("/api/saas/action-event", {
+        method: "POST",
+        credentials: "include",
+        headers: authHeaders({ "content-type": "application/json", accept: "application/json" }),
+        body: JSON.stringify({
+          type: eventType,
+          action: eventType,
+          event_type: eventType,
+          lane: "saas-customer-visuals",
+          summary: payload.summary || eventType,
+          workspace_id: payload.workspace_id || "",
+          workspace_slug: payload.workspace_slug || "",
+          source: "visual-data-kit",
+          surface: document.title || location.pathname,
+          metadata: {
+            ...payload,
+            pathname: location.pathname,
+            search: location.search,
+            title: document.title || ""
+          }
+        })
+      });
+      const data = await res.json().catch(() => ({ ok: res.ok, status: res.status }));
+      document.dispatchEvent(new CustomEvent("saas:visual-telemetry", { detail: { ok: Boolean(res.ok && data?.ok !== false), status: res.status, data } }));
+      return data;
+    } catch (error) {
+      return { ok: false, error: error?.message || "visual_telemetry_write_failed" };
+    }
+  }
 
   function resolveSources(root) {
-    const url = new URL(location.href);
-    const workspaceId = root.dataset.workspace || url.searchParams.get("workspace") || url.searchParams.get("workspace_id") || "";
+    const workspaceId = activeWorkspaceId(root);
+    root.dataset.resolvedWorkspace = workspaceId;
     const sources = [];
-    if (workspaceId && root.dataset.api) {
+    const requireLive = root.dataset.requireLive !== "false";
+    if (root.dataset.api) {
+      if (root.dataset.api.includes("{workspace_id}") && !workspaceId && requireLive) return sources;
       sources.push({
         kind: "live",
         label: "Live API",
         url: root.dataset.api.replace("{workspace_id}", encodeURIComponent(workspaceId))
       });
     }
-    if (root.dataset.source) sources.push({ kind: "source", label: "Static source", url: root.dataset.source });
-    if (root.dataset.fallback && root.dataset.fallback !== root.dataset.source) sources.push({ kind: "fallback", label: "Fallback data", url: root.dataset.fallback });
+    if (!requireLive) {
+      if (root.dataset.source) sources.push({ kind: "source", label: "Static source", url: root.dataset.source });
+      if (root.dataset.fallback && root.dataset.fallback !== root.dataset.source) sources.push({ kind: "fallback", label: "Fallback data", url: root.dataset.fallback });
+    }
     return sources;
   }
 
@@ -81,21 +144,26 @@
     const sources = resolveSources(root);
     const attempts = [];
     let lastError = null;
+    if (!sources.length && root.dataset.requireLive !== "false") {
+      throw new Error("workspace_id_required_for_live_visuals");
+    }
     for (const source of sources) {
       try {
-        const headers = {};
-        const token = sharedGateToken();
-        if (source.kind === "live" && token) {
-          headers.authorization = `Bearer ${token}`;
-          headers["x-free99-gate-session"] = token;
-          headers["x-skye-gate-session"] = token;
-          headers["x-skygate-session"] = token;
-        }
+        const headers = source.kind === "live" ? authHeaders({ accept: "application/json" }) : {};
         const res = await fetch(source.url, { cache: "no-store", credentials: "include", headers });
         const data = await res.json();
         attempts.push({ source: source.url, kind: source.kind, status: res.status, ok: res.ok && data?.ok !== false });
         if (res.ok && data && data.ok !== false) {
           const visuals = data.visuals || data;
+          recordVisualTelemetry("customer_visuals.loaded", {
+            workspace_id: root.dataset.resolvedWorkspace || visuals.workspace?.workspace_id || "",
+            workspace_slug: visuals.workspace?.workspace_slug || "",
+            source_url: source.url,
+            source_kind: source.kind,
+            status: res.status,
+            live: source.kind === "live",
+            attempts
+          });
           return Object.assign({}, visuals, {
             __visualDataSource: {
               kind: source.kind,
@@ -302,11 +370,17 @@
           : "";
         status.textContent = source.live
           ? `Live visual data loaded from ${source.url}: ${data.generated_at || new Date().toISOString()}`
-          : `Fallback visual data is being shown from ${source.url}. Live endpoint did not supply this render.${attempted}`;
+          : `Static visual data is being shown from ${source.url}. This surface is not marked production-live.${attempted}`;
       }
     } catch (error) {
       if (status) status.textContent = `Visual data unavailable: ${error.message}`;
       root.classList.add("visual-dashboard-error");
+      recordVisualTelemetry("customer_visuals.failed", {
+        workspace_id: root.dataset.resolvedWorkspace || activeWorkspaceId(root),
+        error: error?.message || "visual_data_unavailable",
+        require_live: root.dataset.requireLive !== "false",
+        api: root.dataset.api || ""
+      });
     }
   }
 

@@ -5,7 +5,7 @@ const CORS = {
   'content-type':'application/json',
   'access-control-allow-origin':'*',
   'access-control-allow-methods':'GET,POST,OPTIONS',
-  'access-control-allow-headers':'content-type,authorization,x-admin-session,x-override-session,x-idempotency-key,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret'
+  'access-control-allow-headers':'content-type,authorization,x-admin-token,x-free99-admin-code,x-free99-gate-session,x-skye-gate-session,x-skygate-session,x-admin-session,x-override-session,x-idempotency-key,x-skygate-app,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret'
 };
 const routes = [
   {keys:['post','social','content','campaign','blog','seo','linkedin','instagram','facebook','twitter','x ','tiktok'], primary:'Valentina Reyes — Marketing & Brand Brain', secondary:'Victor Saint — QA Brain', task:'Draft content, run claims/brand review, queue social draft for approval.'},
@@ -261,6 +261,17 @@ function bearer(request){
 function skygateOrigin(env){
   return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || '').replace(/\/+$/,'');
 }
+function fs27Configured(env){
+  return Boolean(env.SKYGATEFS27_WORKER?.fetch || skygateOrigin(env));
+}
+function fs27RequiredResult(label='admin request'){
+  return {
+    ok:false,
+    status:503,
+    code:'fs27_required',
+    error:`Canonical FS27/SkyGate session is required for ${label}. Configure SKYGATEFS27_WORKER or SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN.`
+  };
+}
 function internalProxySecret(env){
   return String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.ADMIN_AUTOMATION_INTERNAL_PROXY_SECRET || '').trim();
 }
@@ -291,15 +302,15 @@ function allowsAdminGate(claims, env){
 }
 async function introspectSkygate(token, env){
   const origin = skygateOrigin(env);
-  if (!origin && !env.SKYGATE_WORKER) return {ok:false, error:'SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured on this Worker.'};
-  if (!token) return {ok:false, error:'Missing Authorization bearer token.'};
+  if (!origin && !env.SKYGATEFS27_WORKER?.fetch) return fs27RequiredResult('admin request');
+  if (!token) return {ok:false, status:401, error:'Missing Authorization bearer token.'};
   const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
   let last = null;
   for (const path of paths) {
     let res;
-    if (env.SKYGATE_WORKER) {
+    if (env.SKYGATEFS27_WORKER?.fetch) {
       // Service binding avoids Worker-to-Worker URL routing issues with run_worker_first
-      res = await env.SKYGATE_WORKER.fetch(new Request(`https://skygate-internal${path}`, {
+      res = await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skygatefs27.internal${path}`, {
         method:'POST',
         headers:{'content-type':'application/json'},
         body:JSON.stringify({token})
@@ -314,20 +325,78 @@ async function introspectSkygate(token, env){
     const data = await res.json().catch(()=>({active:false, error:'Invalid Skyegate response'}));
     last = {res, data, path};
     if (res.status === 404) continue;
-    if (!res.ok) return {ok:false, error:data.error || `Skyegate introspection returned ${res.status}`, skygate:data, path};
-    if (!data.active) return {ok:false, error:data.error || 'Skyegate token is inactive or invalid.', skygate:data, path};
-    if (!allowsAdminGate(data, env)) return {ok:false, error:'Skyegate token is active but not admin-scoped for MetrAIyux 0S.', skygate:data, path};
+    if (!res.ok) return {ok:false, status:res.status, error:data.error || `Skyegate introspection returned ${res.status}`, skygate:data, path};
+    if (data.active !== true) return {ok:false, status:401, error:data.error || 'Skyegate token is inactive or invalid.', skygate:data, path};
+    if (!allowsAdminGate(data, env)) return {ok:false, status:403, error:'Skyegate token is active but not admin-scoped for MetrAIyux 0S.', skygate:data, path};
     return {ok:true, via:'skygate', skygate:data, actor:data.email || data.username || data.sub || 'skygate-admin', path};
   }
-  return {ok:false, error:last ? `Skyegate introspection endpoint was not found at ${origin || 'service-binding'}.` : 'Skyegate introspection did not run.'};
+  return {ok:false, status:404, error:last ? `Skyegate introspection endpoint was not found at ${origin || 'service-binding'}.` : 'Skyegate introspection did not run.'};
+}
+async function skygateRequest(env, path, init={}){
+  const origin = skygateOrigin(env);
+  if (env.SKYGATEFS27_WORKER?.fetch) {
+    try {
+      const response = await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skygatefs27.internal${path}`, init));
+      if (response.status !== 404 || !origin) return response;
+    } catch {
+      if (!origin) throw new Error('SkyGate FS27 service binding failed and no origin is configured.');
+    }
+  }
+  if (!origin) throw new Error('SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is not configured.');
+  return fetch(`${origin}${path}`, init);
+}
+async function loginFs27Gate(code, env){
+  if (!fs27Configured(env)) return fs27RequiredResult('legacy admin code exchange');
+  const password = String(code || '').trim();
+  if (!password) return {ok:false, status:401, error:'Missing FS27/SkyGate exchange credential.'};
+  const res = await skygateRequest(env, '/admin/login', {
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify({password, code:password})
+  });
+  const data = await res.json().catch(()=>({}));
+  return {ok:res.ok && Boolean(data.token || data.gateToken || data.gateBearerToken), status:res.status, data, error:data.error || null};
+}
+function cookieValue(request, name){
+  const cookie = request.headers.get('cookie') || '';
+  const hit = cookie.split(';').map(part => part.trim()).find(part => part.startsWith(`${name}=`));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : '';
+}
+function presentedGateCredentials(request){
+  const values = [
+    bearer(request),
+    request.headers.get('x-admin-token'),
+    request.headers.get('x-free99-admin-code'),
+    request.headers.get('x-free99-gate-session'),
+    request.headers.get('x-skye-gate-session'),
+    request.headers.get('x-skygate-session'),
+    cookieValue(request, 'free99_gate_session'),
+    cookieValue(request, 'skye_gate_session'),
+    cookieValue(request, 'skygate_session')
+  ].map(value => String(value || '').replace(/^Bearer\s+/i,'').trim()).filter(Boolean);
+  return [...new Set(values)];
+}
+function legacyAdminCodes(env){
+  return [env.ADMIN_TOKEN, env.ADMIN_AUTOMATION_ADMIN_TOKEN]
+    .map(value => String(value || '').trim())
+    .filter(Boolean);
 }
 async function primaryAuth(request, env){
-  const token = bearer(request);
-  if (sharedGateProxyAuth(request, env)) return {ok:true, via:'zero_os_shared_gate_proxy', actor:'0s-shared-gate'};
-  if (env.SKYGATE_WORKER || skygateOrigin(env)) return introspectSkygate(token, env);
-  if (env.ADMIN_TOKEN && token && token === env.ADMIN_TOKEN) return {ok:true, via:'legacy_admin_token', actor:'legacy-admin'};
-  if (!env.ADMIN_TOKEN) return {ok:false, error:'Neither ADMIN_TOKEN nor SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN is configured on this Worker.'};
-  return {ok:false, error:'Unauthorized admin request.'};
+  if (sharedGateProxyAuth(request, env) && !fs27Configured(env)) return fs27RequiredResult('admin proxy request');
+  if (!fs27Configured(env)) return fs27RequiredResult('admin request');
+  const credentials = presentedGateCredentials(request);
+  if (!credentials.length) return {ok:false, status:401, error:'Missing FS27/SkyGate bearer or gate session.'};
+  const credential = credentials[0];
+  if (legacyAdminCodes(env).includes(credential)) {
+    const exchange = await loginFs27Gate(credential, env);
+    if (!exchange.ok) {
+      return {ok:false, status:exchange.status || 401, error:'Canonical FS27/SkyGate admin session is required for legacy admin code exchange.', skygate:exchange.data || null};
+    }
+    const exchangedToken = exchange.data.token || exchange.data.gateToken || exchange.data.gateBearerToken || '';
+    const gate = await introspectSkygate(exchangedToken, env);
+    return gate.ok ? {...gate, via:'skygate-admin-exchange'} : gate;
+  }
+  return introspectSkygate(credential, env);
 }
 
 function encryptionSecret(env){
@@ -1384,14 +1453,14 @@ export default {
         approval_recipient: env.ADMIN_APPROVAL_EMAIL ? 'configured' : 'missing',
         secret_rotation:{cloudflare_api:Boolean(env.CLOUDFLARE_ACCOUNT_ID && (env.CLOUDFLARE_API_TOKEN || env.CF_API_TOKEN)), supported:Object.keys(SECRET_TARGETS)},
         mfa:{required:boolEnv(env.ADMIN_MFA_REQUIRED), active_devices:mfaDevices.length, encrypted_storage:Boolean(encryptionSecret(env))},
-        skygate_auth:Boolean(skygateOrigin(env)),
-        skygate_event_mirror:Boolean(skygateOrigin(env) && mirrorSecret(env)),
+        skygate_auth:fs27Configured(env),
+        skygate_event_mirror:Boolean(fs27Configured(env) && mirrorSecret(env)),
         time:new Date().toISOString()
       }, {headers:CORS});
     }
     if (url.pathname === '/api/admin/auth/introspect' && request.method === 'POST') {
       const a = await primaryAuth(request, env);
-      return Response.json({ok:a.ok, via:a.via || null, actor:a.actor || null, skygate:a.skygate || null, error:a.ok ? null : a.error}, {status:a.ok ? 200 : 401, headers:CORS});
+      return Response.json({ok:a.ok, via:a.via || null, actor:a.actor || null, skygate:a.skygate || null, error:a.ok ? null : a.error, code:a.code || undefined}, {status:a.ok ? 200 : (a.status || 401), headers:CORS});
     }
     let authContext = null;
     if (url.pathname.startsWith('/api/admin/')) {
@@ -1404,7 +1473,7 @@ export default {
         '/api/admin/security/override-session'
       ].includes(url.pathname);
       authContext = await auth(request, env, {skipMfa:primaryOnly});
-      if(!authContext.ok) return Response.json({ok:false,error:authContext.error, skygate:authContext.skygate || null}, {status:401, headers:CORS});
+      if(!authContext.ok) return Response.json({ok:false,error:authContext.error, code:authContext.code || undefined, skygate:authContext.skygate || null}, {status:authContext.status || 401, headers:CORS});
     }
     if (url.pathname === '/api/admin/security/status') {
       const devices = await listMfaDevices(env);

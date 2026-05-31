@@ -492,6 +492,20 @@ const CLIENT_APP_INTAKE_CONFIG = {
   business_name: 'Empire Pallets',
   app_url: 'https://empire-pallets.pages.dev/'
 };
+const WORKER_CONFIRMED_STATUS = "worker-confirmed";
+const LOCAL_PENDING_STATUS = "browser-local pending/static artifact";
+
+function sharedGateHeaders() {
+  const headers = { "Content-Type": "application/json" };
+  try {
+    const bridgeHeaders = window.MetrAIyuxGateBridge?.headers?.() || window.Free99PlatformGate?.headers?.() || {};
+    Object.entries(bridgeHeaders).forEach(([key, value]) => {
+      if (value) headers[key] = value;
+    });
+  } catch {}
+  return headers;
+}
+
 function intakeFormData(form) {
   const data = Object.fromEntries(new FormData(form).entries());
   if (!data.source) data.source = params.get('source') || 'app';
@@ -503,6 +517,17 @@ function encodeFormData(form) {
   if (!data.get("source")) data.set("source", params.get("source") || "app");
   data.set("submittedAt", new Date().toISOString());
   return new URLSearchParams(data).toString();
+}
+function storeIntakeRow(data, telemetryStatus, receipt = {}) {
+  const previewRecords = JSON.parse(localStorage.getItem("empirePreviewRequests") || "[]");
+  previewRecords.push({
+    ...data,
+    telemetryStatus,
+    telemetrySource: telemetryStatus === WORKER_CONFIRMED_STATUS ? "FS27 client-app-intake Worker" : "localStorage",
+    telemetryReceipt: receipt?.id || receipt?.intake_id || receipt?.record_id || receipt?.conversation_id || receipt?.relay?.conversation_id || "none",
+    telemetryReceiptBody: receipt
+  });
+  localStorage.setItem("empirePreviewRequests", JSON.stringify(previewRecords.slice(-10)));
 }
 
 $$("[data-record-form]").forEach((form) => {
@@ -518,17 +543,19 @@ $$("[data-record-form]").forEach((form) => {
     try {
       const response = await fetch(CLIENT_APP_INTAKE_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        headers: sharedGateHeaders(),
         body: JSON.stringify({ ...CLIENT_APP_INTAKE_CONFIG, ...data, page_url: location.href })
       });
       if (!response.ok) throw new Error(`Form returned ${response.status}`);
-      if (result) result.textContent = "Request received. Empire Pallets can review it in the 0S lead lane and respond with the right next step.";
+      const receipt = await response.json().catch(() => ({ ok: true, status: response.status }));
+      storeIntakeRow(data, WORKER_CONFIRMED_STATUS, receipt);
+      const receiptId = receipt?.id || receipt?.intake_id || receipt?.record_id || receipt?.conversation_id || receipt?.relay?.conversation_id || "FS27 receipt";
+      if (result) result.textContent = `Worker-confirmed FS27 intake received (${receiptId}). Empire Pallets can review it in the 0S lead lane and respond with the right next step.`;
       form.reset();
     } catch {
-      const previewRecords = JSON.parse(localStorage.getItem("empirePreviewRequests") || "[]");
-      previewRecords.push(Object.fromEntries(new URLSearchParams(payload).entries()));
-      localStorage.setItem("empirePreviewRequests", JSON.stringify(previewRecords.slice(-10)));
-      if (result) result.textContent = "Network fallback saved this request locally. Reopen online and submit again to push it into the 0S lead lane.";
+      storeIntakeRow(Object.fromEntries(new URLSearchParams(payload).entries()), LOCAL_PENDING_STATUS, { reason: "network_fallback_no_worker_receipt" });
+      if (result) result.textContent = "Browser-local pending/static artifact only. No Worker or Relay receipt was returned; reopen online and submit again to push it into the 0S lead lane.";
     } finally {
       submitButton?.removeAttribute("disabled");
     }

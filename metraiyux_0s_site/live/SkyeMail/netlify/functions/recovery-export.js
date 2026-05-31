@@ -1,18 +1,17 @@
 const { query } = require("./_db");
-const { json, requireEnv } = require("./_utils");
+const { json } = require("./_utils");
+const { requireFs27 } = require("./_skygate");
 
 /*
   Admin recovery export:
   - ONLY returns the stored admin-encrypted private key blob if recovery_enabled=true.
-  - Requires ADMIN_RECOVERY_TOKEN.
+  - Requires a shared FS27/SkyGate admin/operator session.
   - This endpoint does NOT decrypt anything server-side.
-  - Admin can decrypt the blob offline with ADMIN_RECOVERY_PRIVATE_KEY_PEM.
+  - Admin can decrypt the blob offline with the owner-held recovery private key.
 */
 exports.handler = async (event) => {
   try{
-    const token = (event.headers && (event.headers["x-admin-token"] || event.headers["X-Admin-Token"])) ? String(event.headers["x-admin-token"] || event.headers["X-Admin-Token"]) : "";
-    const need = requireEnv("ADMIN_RECOVERY_TOKEN");
-    if(!token || token !== need) return json(401, { error: "Unauthorized" });
+    await requireFs27(event, { admin: true });
 
     const handle = (event.queryStringParameters && event.queryStringParameters.handle) ? String(event.queryStringParameters.handle).trim() : "";
     if(!handle) return json(400, { error: "handle required" });

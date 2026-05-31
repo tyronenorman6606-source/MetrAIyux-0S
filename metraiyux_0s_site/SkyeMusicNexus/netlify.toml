@@ -16,20 +16,18 @@
     Access-Control-Allow-Methods = "GET, POST, PUT, OPTIONS"
 
 [[headers]]
-  for = "/create.html"
-  [headers.values]
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Embedder-Policy = "require-corp"
-    Cross-Origin-Resource-Policy = "cross-origin"
-    Permissions-Policy = "cross-origin-isolated=(self)"
-
-[[headers]]
   for = "/daw.html"
   [headers.values]
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Embedder-Policy = "require-corp"
     Cross-Origin-Resource-Policy = "cross-origin"
     Permissions-Policy = "cross-origin-isolated=(self)"
+
+[[redirects]]
+  from = "/create.html"
+  to = "/404.html"
+  status = 404
+  force = true
 
 [[redirects]]
   from = "/api/music/analytics"

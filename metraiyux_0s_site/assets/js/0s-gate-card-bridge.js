@@ -5,9 +5,12 @@
   const SESSION_KEYS = [
     "METRAIYUX_GATE_SESSION",
     "SKYGATEFS27_GATE_SESSION",
+    "SKYE_GATE_SESSION"
+  ];
+  const LEGACY_SESSION_KEYS = [
+    ...SESSION_KEYS,
     "SKYGATEFS27_USER_TOKEN",
     "SKYGATE_USER_TOKEN",
-    "SKYE_GATE_SESSION",
     "SKYGATE_SESSION_TOKEN",
     "FREE99_PLATFORM_GATE_SESSION",
     "adminBrainToken",
@@ -17,6 +20,7 @@
   const CLAIMS_KEY = "metraiyux.skygate.claims.v1";
   const EVENT_KEY = "metraiyux.gate.events.v1";
   const MAX_EVENTS = 160;
+  const LIVE_EVENT_ENDPOINT = "/api/0s-command-bridge/events";
 
   const clean = (value) => String(value == null ? "" : value).trim();
   const safeToken = (value) => clean(value).replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 8192);
@@ -155,31 +159,8 @@
     return normalized;
   }
 
-  function sessionFromUrl() {
-    const params = new URLSearchParams(location.search);
-    const token = safeToken(params.get("gate_session") || params.get("skygate_session") || params.get("session") || "");
-    if (!tokenLooksValid(token)) return null;
-    const session = normalizeSession({
-      token,
-      source: "url-gate-session",
-      platform_id: params.get("platform") || "metraiyux-0s",
-      usage_lane: params.get("usage_lane") || "0s-gate-card",
-      workspace_id: params.get("workspace") || "",
-      client: params.get("client") || "",
-      email: params.get("email") || ""
-    }, "url-gate-session");
-    params.delete("gate_session");
-    params.delete("skygate_session");
-    params.delete("session");
-    const next = `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}${location.hash || ""}`;
-    try {
-      history.replaceState({}, document.title, next);
-    } catch {}
-    return session;
-  }
-
   function sessionFromRuntime() {
-    const runtime = globalThis.__SKYEGATE_RUNTIME__ || globalThis.__KAIXU_RUNTIME__ || globalThis.METRAIYUX_0S_SESSION || {};
+    const runtime = globalThis.METRAIYUX_0S_SESSION || {};
     return normalizeSession(runtime, runtime.source || "runtime");
   }
 
@@ -198,33 +179,19 @@
   }
 
   function current() {
-    return sessionFromUrl() || sessionFromStorage() || sessionFromRuntime();
+    return sessionFromStorage() || sessionFromRuntime();
   }
 
   function persist(input, options = {}) {
     const session = normalizeSession(input, input?.source || "0s-gate-card-bridge");
     if (!session) return null;
     const serialized = JSON.stringify(session);
-    ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYE_GATE_SESSION", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+    SESSION_KEYS.forEach((key) => {
       writeStore(sessionStorage, key, serialized);
       writeStore(localStorage, key, serialized);
     });
-    writeStore(sessionStorage, "SKYGATE_USER_TOKEN", session.token);
-    writeStore(localStorage, "SKYGATE_USER_TOKEN", session.token);
-    writeStore(sessionStorage, "SKYGATE_SESSION_TOKEN", session.token);
     writeStore(sessionStorage, CLAIMS_KEY, JSON.stringify(session.claims || {}));
     globalThis.METRAIYUX_0S_SESSION = session;
-    globalThis.__SKYEGATE_RUNTIME__ = {
-      ...(globalThis.__SKYEGATE_RUNTIME__ || {}),
-      sessionToken: session.token,
-      userToken: session.token,
-      authToken: session.token,
-      auth: { token: session.token },
-      claims: session.claims,
-      gateCards: session.gate_cards,
-      actor: session.actor,
-      source: session.source
-    };
     if (!options.silent) record("gate_session_persisted", {
       source: session.source,
       platform_id: session.platform_id,
@@ -235,7 +202,7 @@
   }
 
   function clear() {
-    ["METRAIYUX_GATE_SESSION", "SKYGATEFS27_GATE_SESSION", "SKYGATE_USER_TOKEN", "SKYE_GATE_SESSION", "SKYGATE_SESSION_TOKEN", "FREE99_PLATFORM_GATE_SESSION"].forEach((key) => {
+    LEGACY_SESSION_KEYS.forEach((key) => {
       removeStore(sessionStorage, key);
       removeStore(localStorage, key);
     });
@@ -300,6 +267,64 @@
     return readJson(localStorage, EVENT_KEY) || [];
   }
 
+  function liveEventPayload(event) {
+    return {
+      source_app: event.platform_id || "metraiyux-0s",
+      source_surface: "0s-gate-card-bridge",
+      event_type: event.type || "gate_event",
+      summary: event.detail?.summary || event.type || "0S gate event",
+      entity: {
+        kind: event.detail?.entity_kind || "gate-session",
+        id: event.detail?.entity_id || event.detail?.workspace_id || event.detail?.client_id || event.usage_lane || "shared-gate",
+        label: event.detail?.entity_label || event.usage_lane || "Shared 0S gate"
+      },
+      ids: {
+        workspace_id: event.detail?.workspace_id || event.detail?.workspaceId || "",
+        client_id: event.detail?.client_id || event.detail?.clientId || "",
+        customer_id: event.detail?.customer_id || event.detail?.customerId || "",
+        gate_event_id: event.id
+      },
+      links: [{ label: "Source page", href: `${location.pathname}${location.search}`, kind: "surface" }],
+      metadata: {
+        ...event.detail,
+        cached_event_id: event.id,
+        cached_at: event.at,
+        actor: event.actor,
+        source: event.source,
+        pathname: location.pathname,
+        title: document.title || ""
+      }
+    };
+  }
+
+  async function sendLiveEvent(event) {
+    if (!event || event.live_status === "posted") return { ok: false, skipped: true };
+    try {
+      const response = await fetch(LIVE_EVENT_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+          ...headers()
+        },
+        body: JSON.stringify(liveEventPayload(event))
+      });
+      const body = await response.json().catch(() => ({ ok: response.ok, status: response.status }));
+      const detail = {
+        ...body,
+        ok: Boolean(response.ok && body?.ok !== false),
+        status: response.status,
+        cached_event_id: event.id
+      };
+      document.dispatchEvent(new CustomEvent("metraiyux:gate-event-live", { detail }));
+      return detail;
+    } catch (error) {
+      const detail = { ok: false, cached_event_id: event.id, error: error?.message || "live_gate_event_write_failed" };
+      document.dispatchEvent(new CustomEvent("metraiyux:gate-event-live", { detail }));
+      return detail;
+    }
+  }
+
   function record(type, detail = {}, session = current()) {
     const event = {
       id: `gateevt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
@@ -309,11 +334,20 @@
       usage_lane: detail.usage_lane || session?.usage_lane || "0s-gate-card",
       actor: detail.actor || session?.actor || "0s-operator",
       source: detail.source || session?.source || "0s-gate-card-bridge",
+      live_endpoint: LIVE_EVENT_ENDPOINT,
+      live_status: session ? "queued_live_write" : "missing_gate_session",
       detail
     };
     const events = readEvents().concat(event).slice(-MAX_EVENTS);
     writeStore(localStorage, EVENT_KEY, JSON.stringify(events));
     document.dispatchEvent(new CustomEvent("metraiyux:gate-event", { detail: event }));
+    sendLiveEvent(event).then((result) => {
+      const currentEvents = readEvents();
+      const nextEvents = currentEvents.map((item) => item?.id === event.id
+        ? { ...item, live_status: result?.ok ? "posted" : "live_write_failed", live_result: result }
+        : item);
+      writeStore(localStorage, EVENT_KEY, JSON.stringify(nextEvents));
+    });
     return event;
   }
 

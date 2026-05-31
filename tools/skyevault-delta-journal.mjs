@@ -15,7 +15,7 @@ const dryRun = flag('--dry-run') || envFlag('SKYEVAULT_DELTA_DRY_RUN', false);
 const force = flag('--force') || envFlag('SKYEVAULT_DELTA_FORCE', false);
 const upload = flag('--upload') || envFlag('SKYEVAULT_DELTA_UPLOAD', false);
 const scanGenerated = flag('--scan-generated') || envFlag('SKYEVAULT_DELTA_SCAN_GENERATED', false);
-const maxFileMb = numberValue('max-file-mb', Number(process.env.SKYEVAULT_DELTA_MAX_FILE_MB || 25), 1);
+const maxFileMb = numberValue('max-file-mb', Number(process.env.SKYEVAULT_DELTA_MAX_FILE_MB || 5000), 1);
 const maxFileBytes = maxFileMb * 1024 * 1024;
 
 const SKIP_DIRS = new Set([
@@ -45,36 +45,6 @@ const SELF_GENERATED_OUTPUTS = new Set([
   'metraiyux_0s_site/proof/skyevault-autosync-proof.html',
   'metraiyux_0s_site/proof/skyevault-autosync-proof.json',
   'metraiyux_0s_site/proof/skyevault-autosync-proof-log.json'
-]);
-
-const MEDIA_EXTS = new Set([
-  '.3gp',
-  '.aac',
-  '.aiff',
-  '.ape',
-  '.avif',
-  '.flac',
-  '.gif',
-  '.heic',
-  '.heif',
-  '.jpeg',
-  '.jpg',
-  '.m4a',
-  '.m4v',
-  '.mkv',
-  '.mov',
-  '.mp3',
-  '.mp4',
-  '.ogg',
-  '.opus',
-  '.png',
-  '.psd',
-  '.raw',
-  '.tif',
-  '.tiff',
-  '.wav',
-  '.webm',
-  '.webp'
 ]);
 
 const SECRET_PATTERNS = [
@@ -326,7 +296,6 @@ function skipReasonForPath(relativePath, file = path.resolve(repoRoot, relativeP
   if (isSelfGeneratedOutput(clean)) return 'self-generated-proof-output';
   if (parts.some((part) => SKIP_DIRS.has(part))) return 'skipped-infra-or-cache-dir';
   if (!scanGenerated && parts.some((part) => GENERATED_SKIP_DIRS.has(part))) return 'generated-output-dir';
-  if (MEDIA_EXTS.has(path.extname(file).toLowerCase())) return 'production-media-extension';
   return '';
 }
 
@@ -663,7 +632,7 @@ function packDelta({ outDir, state, changedFiles, tombstones }) {
       role: 'fast encrypted custody between full source-custody snapshots',
       scanGenerated,
       maxFileMb,
-      skippedMediaExtensions: [...MEDIA_EXTS].sort(),
+      mediaExtensionsIncluded: true,
       skippedDirectories: [...SKIP_DIRS].sort(),
       skippedGeneratedDirectories: [...GENERATED_SKIP_DIRS].sort()
     },

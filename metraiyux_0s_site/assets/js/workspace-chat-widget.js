@@ -6,6 +6,7 @@
   const CONFIG_KEY = "MetrAIyuxWorkspaceChatConfig";
   const API_KEY = "MetrAIyuxWorkspaceChat";
   const DEFAULT_DISCLAIMER = "Messages are tied to this workspace account and may be used for support, proof receipts, QA, and follow-up inside the client build lane.";
+  const COMMAND_BRIDGE_ENDPOINT = "/api/0s-command-bridge/events";
 
   if (win[API_KEY] && win[API_KEY].__mounted) return;
 
@@ -101,6 +102,75 @@
     return String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
   }
 
+  function gateHeaders() {
+    const headers = { "Content-Type": "application/json" };
+    try {
+      const bridgeHeaders = win.MetrAIyuxGateBridge?.headers?.() || win.Free99PlatformGate?.headers?.() || {};
+      Object.entries(bridgeHeaders).forEach(([key, value]) => {
+        if (value) headers[key] = value;
+      });
+    } catch {}
+    return headers;
+  }
+
+  function commandBridgePayload(event) {
+    return {
+      source_app: "workspace-chat",
+      source_surface: config.appName || config.clientName || "Workspace chat",
+      event_type: `workspace_chat.${event.eventType || "event"}`,
+      summary: `${config.clientName || config.appName || "Workspace"} ${event.eventType || "event"}`,
+      entity: {
+        kind: "workspace",
+        id: config.workspaceId || config.workspaceSlug || "workspace",
+        label: config.clientName || config.appName || config.workspaceSlug || "Workspace"
+      },
+      ids: {
+        workspace_id: config.workspaceId || "",
+        workspace_slug: config.workspaceSlug || "",
+        chat_event_id: event.id,
+        message_id: event.metadata?.messageId || ""
+      },
+      crm: {
+        client_name: config.clientName || "",
+        workspace_slug: config.workspaceSlug || ""
+      },
+      links: [{ label: "Workspace chat source", href: location.pathname + location.search, kind: "surface" }],
+      metadata: {
+        ...event.metadata,
+        relay_configured: Boolean(config.apiBase),
+        relay_tracking_enabled: Boolean(config.trackEventsToRelay),
+        route: activeRoute()?.value || "",
+        path: event.path,
+        cached_event_id: event.id,
+        cached_at: event.at
+      }
+    };
+  }
+
+  async function sendCommandBridgeEvent(event) {
+    try {
+      const response = await fetch(COMMAND_BRIDGE_ENDPOINT, {
+        method: "POST",
+        credentials: "include",
+        headers: gateHeaders(),
+        body: JSON.stringify(commandBridgePayload(event))
+      });
+      const body = await response.json().catch(() => ({ ok: response.ok, status: response.status }));
+      const detail = {
+        ok: Boolean(response.ok && body?.ok !== false),
+        status: response.status,
+        body,
+        cached_event_id: event.id
+      };
+      win.dispatchEvent(new CustomEvent("workspace-chat:live-event", { detail }));
+      return detail;
+    } catch (error) {
+      const detail = { ok: false, cached_event_id: event.id, error: error?.message || "workspace_chat_live_event_failed" };
+      win.dispatchEvent(new CustomEvent("workspace-chat:live-event", { detail }));
+      return detail;
+    }
+  }
+
   function cssValue(names) {
     const styles = getComputedStyle(doc.documentElement);
     for (const name of names) {
@@ -142,12 +212,20 @@
       workspaceSlug: config.workspaceSlug,
       path: location.pathname,
       at: new Date().toISOString(),
+      liveEndpoint: COMMAND_BRIDGE_ENDPOINT,
+      liveStatus: "queued_live_write",
       metadata
     };
     const events = loadEvents();
     events.push(event);
     save(eventsKey, events.slice(-250));
     win.dispatchEvent(new CustomEvent("workspace-chat:event", { detail: event }));
+    sendCommandBridgeEvent(event).then((result) => {
+      const nextEvents = loadEvents().map((item) => item?.id === event.id
+        ? { ...item, liveStatus: result?.ok ? "posted" : "live_write_failed", liveResult: result }
+        : item);
+      save(eventsKey, nextEvents.slice(-250));
+    });
     return event;
   }
 

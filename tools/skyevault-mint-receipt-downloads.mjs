@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { cleanBearer, resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 function parseArgs(argv) {
   const out = { receipts: [], expires: 3600 };
@@ -67,20 +68,6 @@ function receiptIdsFromHandoff(file) {
   ].filter((item) => item.receiptId);
 }
 
-function ownerCredentialCandidates(env) {
-  return [
-    'ZERO_OS_GATE_SESSION',
-    'MCP_GATE_SESSION',
-    'SKYENET_AUTH',
-    'FREE99_ADMIN_CODE',
-    'ZERO_OS_GATE_CODE',
-    'OWNER_ADMIN_CODE',
-    'METRAIYUX_ADMIN_CODE',
-    'SKYGATE_ADMIN_PASSWORD',
-    'FS27_ADMIN_PASSWORD'
-  ].map((key) => ({ key, value: env[key] })).filter((item) => item.value);
-}
-
 async function postJson(url, body, headers = {}) {
   const response = await fetch(url, {
     method: 'POST',
@@ -95,24 +82,6 @@ async function postJson(url, body, headers = {}) {
     json = { raw: text.slice(0, 500) };
   }
   return { response, json };
-}
-
-async function resolveBearer(env, zeroOsBase) {
-  for (const item of ownerCredentialCandidates(env)) {
-    if (/SESSION|AUTH/.test(item.key)) return { token: item.value, source: item.key };
-  }
-  for (const item of ownerCredentialCandidates(env)) {
-    for (const route of ['/api/founder-command/login', '/api/owner/admin-login']) {
-      try {
-        const { response, json } = await postJson(`${zeroOsBase}${route}`, { code: item.value });
-        const token = json.gateBearerToken || json.gateToken || json.token || '';
-        if (response.ok && token) return { token, source: item.key, route };
-      } catch {
-        // Try the next shared gate credential without printing secret material.
-      }
-    }
-  }
-  throw new Error('No shared owner credential could mint a 0S bearer.');
 }
 
 function escapeHtml(value) {
@@ -180,7 +149,7 @@ function writeHtmlDownloadOpener(file, result) {
     <section class="panel">
       <p class="eyebrow">Owner private handoff</p>
       <h1>SkyeVault direct downloads</h1>
-      <p class="lead">These buttons are private, short-lived signed object URLs minted from the shared 0S/FS27/SkyGate/Free99 owner gate session. They are download tickets, not another login.</p>
+      <p class="lead">These buttons are private, short-lived signed object URLs minted from the shared 0S/FS27/SkyGate/Free99 owner gate session. They are download tickets, not another login. If a ticket expires, use Refresh signed links on the local launcher page.</p>
       <div class="truth-grid">
         <article><b>One Login</b><span>The shared gate session is the owner/admin login for vault receipts and link minting.</span></article>
         <article><b>Temporary Ticket</b><span>Each Direct Download button is a signed SkyeVault object URL that expires automatically.</span></article>
@@ -190,7 +159,7 @@ function writeHtmlDownloadOpener(file, result) {
     </section>
     ${rows}
     <section class="panel">
-      <p><strong class="ok">${okDownloads.length}</strong> signed download link${okDownloads.length === 1 ? '' : 's'} minted at ${escapeHtml(result.createdAt)}. Open the Owner Login only when a fresh shared gate session is needed: <a class="button secondary" href="${escapeHtml(`${result.zeroOsBase}/admin/login.html`)}" target="_blank" rel="noopener">Owner Login</a></p>
+      <p><strong class="ok">${okDownloads.length}</strong> signed download link${okDownloads.length === 1 ? '' : 's'} minted at ${escapeHtml(result.createdAt)}. Open the Owner Login only when a fresh shared gate session is needed: <a class="button secondary" href="${escapeHtml(`${result.zeroOsBase}/admin/login.html`)}" target="_blank" rel="noopener">Owner Login</a> <a class="button secondary" href="/refresh">Refresh signed links</a></p>
       <p>Private JSON receipt: <code>${escapeHtml(result.outputReceipt || '')}</code></p>
     </section>
   </main>
@@ -216,12 +185,13 @@ async function main() {
   const unique = [...new Map(items.map((item) => [item.receiptId, item])).values()];
   if (!unique.length) throw new Error('No receipt IDs were provided.');
 
-  const auth = await resolveBearer(env, zeroOsBase);
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase, env });
+  const token = cleanBearer(auth.token);
+  if (!token) throw new Error('No shared owner credential could mint a 0S bearer.');
   const headers = {
-    authorization: `Bearer ${auth.token}`,
-    'x-admin-token': auth.token,
-    'x-free99-gate-session': auth.token,
-    'x-skye-gate-session': auth.token,
+    authorization: `Bearer ${token}`,
+    'x-free99-gate-session': token,
+    'x-skye-gate-session': token,
     origin: zeroOsBase
   };
 

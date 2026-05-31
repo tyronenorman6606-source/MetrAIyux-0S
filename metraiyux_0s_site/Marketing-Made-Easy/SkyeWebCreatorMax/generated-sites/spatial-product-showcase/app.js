@@ -59,7 +59,7 @@ document.querySelector('form').addEventListener('submit', (event) => {
   };
   const result = window.SkyeIntegrationBridge?.enqueueWebsiteRequest?.(payload);
   document.getElementById('formStatus').textContent = result
-    ? 'Website request queued for AE review for ' + email + '.'
+    ? 'Website request accepted by the shared-gated bridge for AE review for ' + email + '.'
     : 'AE bridge offline. Website request was not queued for ' + email + '.';
 });
 

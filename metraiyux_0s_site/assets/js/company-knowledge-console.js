@@ -70,21 +70,9 @@
     els.status.classList.toggle('warning', !ok);
   }
 
-  function readSession(key) {
-    try { return JSON.parse(sessionStorage.getItem(key) || localStorage.getItem(key) || 'null'); } catch { return null; }
-  }
-
   function activeBearer() {
-    const pasted = String(els.token?.value || '').trim();
-    if (pasted) return pasted;
     const bridge = window.SkygateAuthBridge?.token?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
     if (bridge) return bridge;
-    const admin = sessionStorage.getItem('adminBrainToken') || '';
-    if (admin) return admin;
-    const free99 = readSession('FREE99_PLATFORM_GATE_SESSION');
-    if (free99?.token) return free99.token;
-    const client = readSession('saas_client_session');
-    if (client?.token && !client.static_mode) return client.token;
     return '';
   }
 
@@ -101,6 +89,54 @@
     };
   }
 
+  async function recordKnowledgeTelemetry(eventType, detail = {}) {
+    const base = basePayload();
+    try {
+      const response = await fetch('/api/0s-command-bridge/events', {
+        method: 'POST',
+        credentials: 'include',
+        headers: authHeaders({ 'content-type': 'application/json' }),
+        body: JSON.stringify({
+          source_app: 'company-knowledge',
+          source_surface: mode === 'admin' ? 'admin-company-knowledge-console' : 'saas-company-knowledge-console',
+          lane: 'company-knowledge',
+          event_type: eventType,
+          summary: detail.summary || `${eventType} · ${detail.path || base.knowledgeBaseId || 'knowledge-base'}`,
+          entity: {
+            kind: detail.entity_kind || 'knowledge-base',
+            id: detail.entity_id || detail.knowledgeBaseId || base.knowledgeBaseId,
+            label: detail.entity_label || base.displayName || base.knowledgeBaseId
+          },
+          ids: {
+            knowledge_base_id: detail.knowledgeBaseId || base.knowledgeBaseId || '',
+            knowledge_item_id: detail.knowledgeItemId || detail.itemId || '',
+            client_id: detail.clientId || base.clientId || '',
+            workspace_id: detail.workspaceId || base.workspaceId || ''
+          },
+          links: [{ label: 'Company Knowledge', href: `${location.pathname}${location.search}`, kind: 'surface' }],
+          metadata: {
+            ...detail,
+            mode,
+            owner_type: base.ownerType,
+            pathname: location.pathname,
+            title: document.title || ''
+          }
+        })
+      });
+      const data = await response.json().catch(() => ({ ok: response.ok, status: response.status }));
+      document.dispatchEvent(new CustomEvent('company-knowledge:telemetry', { detail: { ok: Boolean(response.ok && data?.ok !== false), status: response.status, data } }));
+      return data;
+    } catch (error) {
+      return { ok: false, error: error?.message || 'knowledge_telemetry_write_failed' };
+    }
+  }
+
+  function shouldRecordApi(path, options = {}) {
+    const method = String(options.method || 'GET').toUpperCase();
+    if (method !== 'GET') return true;
+    return /\/api\/0s\/company-knowledge\/(?:context|status)/.test(path);
+  }
+
   async function api(path, options = {}) {
     const endpoint = state.endpoint || cleanOrigin(els.endpoint?.value || location.origin);
     const response = await fetch(`${endpoint}${path}`, {
@@ -112,16 +148,25 @@
       })
     });
     const data = await response.json().catch(() => ({ ok: false, error: `Invalid JSON response from ${path}` }));
+    if (shouldRecordApi(path, options)) {
+      recordKnowledgeTelemetry(response.ok && data.ok !== false ? 'company_knowledge.worker_confirmed' : 'company_knowledge.worker_failed', {
+        path,
+        method: String(options.method || 'GET').toUpperCase(),
+        status: response.status,
+        ok: response.ok && data.ok !== false,
+        knowledgeBaseId: data.base?.id || data.item?.knowledgeBaseId || basePayload().knowledgeBaseId,
+        knowledgeItemId: data.item?.id || ''
+      });
+    }
     if (!response.ok || data.ok === false) throw new Error(data.error || `Request failed with ${response.status}`);
     return data;
   }
 
   function applyTenantDefaults() {
-    const session = readSession('saas_client_session') || {};
-    const workspace = readSession('saas_active_workspace') || {};
+    const session = window.MetrAIyuxGateBridge?.current?.() || {};
     const query = new URLSearchParams(location.search);
-    const clientId = query.get('clientId') || query.get('client') || session.client_id || workspace.client_id || '';
-    const workspaceId = query.get('workspaceId') || query.get('workspace') || session.workspace_id || workspace.workspace_id || '';
+    const clientId = query.get('clientId') || query.get('client') || session.client_id || session.clientId || '';
+    const workspaceId = query.get('workspaceId') || query.get('workspace') || session.workspace_id || session.workspaceId || '';
     if (!platformDefault) {
       if (els.baseScope) els.baseScope.value = 'tenant';
       if (els.clientId && !els.clientId.value) els.clientId.value = clientId;
@@ -371,4 +416,3 @@
 
   document.addEventListener('DOMContentLoaded', boot);
 })();
-

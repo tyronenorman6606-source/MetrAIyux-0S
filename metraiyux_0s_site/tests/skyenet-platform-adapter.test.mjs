@@ -47,18 +47,31 @@ class MemoryR2 {
     });
   }
 
-  async get(key) {
+  async get(key, options = {}) {
     const stored = this.map.get(key);
     if (!stored) return null;
-    const body = stored.body;
+    const originalBody = stored.body;
+    const range = options?.range;
+    let body = originalBody;
+    if (range && Number.isFinite(range.offset) && Number.isFinite(range.length)) {
+      const start = Math.max(0, Number(range.offset));
+      const end = start + Math.max(0, Number(range.length));
+      body = typeof originalBody === 'string'
+        ? originalBody.slice(start, end)
+        : originalBody.slice(start, end);
+    }
     return {
       key,
       body,
       size: stored.size,
       uploaded: stored.uploaded,
+      httpEtag: `"mem-${stored.size}-${key.replace(/[^A-Za-z0-9]+/g, '-').slice(0, 48)}"`,
       customMetadata: stored.options?.customMetadata || {},
       async text() {
         return typeof body === 'string' ? body : new TextDecoder().decode(body);
+      },
+      async arrayBuffer() {
+        return typeof body === 'string' ? new TextEncoder().encode(body).buffer : body;
       },
       async json() {
         return JSON.parse(await this.text());
@@ -66,6 +79,8 @@ class MemoryR2 {
       writeHttpMetadata(headers) {
         const type = stored.options?.httpMetadata?.contentType;
         if (type) headers.set('content-type', type);
+        const cacheControl = stored.options?.httpMetadata?.cacheControl;
+        if (cacheControl) headers.set('cache-control', cacheControl);
       }
     };
   }
@@ -232,11 +247,91 @@ test('SN-02 SkyeNet status and route manifest expose the gated deploy lane', asy
   assert.equal(status.data.skynet.capabilities.function_runtime_env_isolation, true);
   assert.equal(status.data.skynet.capabilities.function_runtime_egress_default_deny, true);
   assert.equal(status.data.skynet.capabilities.arbitrary_uploaded_serverless_functions, false);
+  assert.equal(status.data.skynet.capabilities.static_asset_conditional_last_modified, true);
 
   const manifest = await call(e, '/api/0s/route-manifest', { token: 'gate-token' });
   assert.equal(manifest.response.status, 200);
   assert.equal(manifest.data.api_bases.skynet, '/api/skyenet');
   assert.ok(manifest.data.apps.some((app) => app.id === 'skyenet' && app.base === '/api/skyenet'));
+});
+
+test('SN-02b SkyeNet exposes approved support, observability, receipts, cost, and customer export lanes', async () => {
+  const e = envWithActualFs27();
+  await e.__fsEnv.REQUEST_LOG_BUCKET.put('runtime-logs/yyyy=2026/mm=05/skyenet-proof.jsonl', '{"schema":"fs27.runtime_request.v1"}\n');
+  const token = 'gate-token';
+
+  const status = await call(e, '/api/skyenet/status', { token });
+  assert.equal(status.response.status, 200);
+  assert.equal(status.data.skynet.capabilities.customer_support_profile, true);
+  assert.equal(status.data.skynet.capabilities.customer_export_bundle, true);
+  assert.equal(status.data.skynet.capabilities.customer_export_private_source_embedded, false);
+  assert.equal(status.data.skynet.capabilities.runtime_observability, true);
+  assert.equal(status.data.skynet.capabilities.runtime_log_exports, true);
+
+  const support = await call(e, '/api/skyenet/support', { token });
+  assert.equal(support.response.status, 200);
+  assert.equal(support.data.skynet.support.source, 'https://skyenet.skyesol/leadership/SkyesOverLondon.html');
+  assert.equal(support.data.skynet.support.operations.email, 'SkyesOverLondonLC@solenterprises.org');
+  assert.equal(support.data.skynet.support.founder.email, 'GrayLondonSkyes@solenterprises.org');
+  assert.equal(support.data.skynet.support.general.email, 'Contact@solenterprises.org');
+  assert.equal(support.data.skynet.support.b2b.email, 'B2B@solenterprises.org');
+  assert.equal(support.data.skynet.support.hardcoded_wrong_contact_fallbacks, false);
+
+  const observability = await call(e, '/api/skyenet/observability?limit=5', { token });
+  assert.equal(observability.response.status, 200);
+  assert.equal(observability.data.skynet.sinks.r2_runtime_logs, true);
+  assert.equal(observability.data.skynet.sinks.r2_runtime_log_list, true);
+  assert.ok(observability.data.skynet.latest_log_objects.some((item) => item.key.includes('skyenet-proof.jsonl')));
+
+  const receipts = await call(e, '/api/skyenet/receipts?workspace_id=metraiyux-0s-owner', { token });
+  assert.equal(receipts.response.status, 200);
+  assert.equal(receipts.data.skynet.ok, true);
+  assert.ok(Array.isArray(receipts.data.skynet.receipts));
+
+  const cost = await call(e, '/api/skyenet/cost-model', { token });
+  assert.equal(cost.response.status, 200);
+  assert.equal(cost.data.skynet.cost_model.currency, 'usd');
+
+  const exported = await call(e, '/api/skyenet/export?workspace_id=metraiyux-0s-owner&limit=5', { token });
+  assert.equal(exported.response.status, 200);
+  assert.equal(exported.data.skynet.schema, 'fs27.skynet.customer_export.v1');
+  assert.equal(exported.data.skynet.redaction_policy.raw_bearer_tokens_included, false);
+  assert.equal(exported.data.skynet.redaction_policy.raw_env_secret_values_included, false);
+  assert.equal(exported.data.skynet.support.operations.email, 'SkyesOverLondonLC@solenterprises.org');
+  assert.equal(exported.data.skynet.observability.sinks.r2_runtime_logs, true);
+  assert.ok(!JSON.stringify(exported.data.skynet).includes('gate-token'));
+});
+
+test('SN-02c SkyeNet source archive link is mounted through the actual FS27 Worker route table', async () => {
+  const e = envWithActualFs27();
+  const token = 'gate-token';
+  const projectId = 'source-link-route';
+  const deploymentId = 'dep_source_link';
+
+  const index = await call(e, `/api/skyenet/source-index?project_id=${projectId}&deployment_id=${deploymentId}`, {
+    method: 'PUT',
+    token,
+    headers: { 'content-type': 'application/x-ndjson; charset=utf-8' },
+    body: '{"path":"src/app.js","size":22,"content_type":"text/javascript; charset=utf-8"}\n'
+  });
+  assert.equal(index.response.status, 200);
+  const prefix = index.data.skynet.source_package.prefix;
+
+  const missingLink = await call(e, '/api/skyenet/source-archive-link', {
+    method: 'POST',
+    token,
+    body: {
+      project_id: projectId,
+      deployment_id: deploymentId,
+      key: `${prefix}/.skyenet/archive/source.tar.zst`,
+      filename: 'source.tar.zst',
+      bytes: 1,
+      sha256: '84f81d49f65775e9a765a383a333c81d68ae7bdc7c35a72f29616401d4009c8b',
+      content_type: 'application/zstd'
+    }
+  });
+  assert.equal(missingLink.response.status, 404);
+  assert.equal(missingLink.data.skynet.code, 'SOURCE_ARCHIVE_OBJECT_NOT_FOUND');
 });
 
 test('SN-03 SkyeNet proxy initializes, uploads, completes, and registers a route through FS27', async () => {
@@ -318,6 +413,15 @@ test('SN-03 SkyeNet proxy initializes, uploads, completes, and registers a route
   const search = await call(e, `/api/skyenet/source-search?project_id=${projectId}&deployment_id=${deploymentId}&q=demo`, { token });
   assert.equal(search.response.status, 200);
   assert.ok(search.data.skynet.results.some((result) => result.path === 'index.html'));
+
+  const sourceIndex = await call(e, `/api/skyenet/source-index?project_id=${projectId}&deployment_id=${deploymentId}`, {
+    method: 'PUT',
+    token,
+    headers: { 'content-type': 'application/x-ndjson; charset=utf-8' },
+    body: '{"path":"src/app.js","size":22,"content_type":"text/javascript; charset=utf-8"}\n'
+  });
+  assert.equal(sourceIndex.response.status, 200);
+  assert.equal(sourceIndex.data.skynet.source_index.file_count, 1);
 });
 
 test('SN-04 SkyeNet published path serves uploaded asset without 0S gate redirect', async () => {
@@ -418,7 +522,141 @@ test('SN-05 SkyeNet public resolver serves routes with human mount names and leg
   assert.match(text, /Human route SkyeNet Asset/);
 });
 
-test('SN-06 SkyeNet registered routes with missing root assets return a diagnostic instead of a fake route miss', async () => {
+test('SN-05b SkyeNet honors Netlify-style _redirects and _headers from deployment assets', async () => {
+  const e = envWithActualFs27();
+  const token = 'gate-token';
+  const projectId = 'rules-demo';
+  const deploymentId = 'dep_rules_demo';
+
+  assert.equal((await call(e, '/api/skyenet/deploy/init', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, title: 'Rules Demo' }
+  })).response.status, 200);
+
+  const uploads = [
+    ['index.html', '<h1>SPA Shell</h1>'],
+    ['landing.html', '<h1>Landing Target</h1>'],
+    ['toml.html', '<h1>Toml Target</h1>'],
+    ['force-me.html', '<h1>Force Source</h1>'],
+    ['contact.html', '<form name="contact" method="POST" data-netlify="true"><input name="form-name" value="contact"></form>'],
+    ['assets/data.txt', '0123456789abcdef'],
+    ['_redirects', '/old /landing.html 301\n/app/* /index.html 200\n/landing.html /index.html 200\n/force-me.html /index.html 200!\n'],
+    ['_headers', '/*\n  X-SkyeNet-Test: rules-applied\n/landing.html\n  X-Landing-Header: yes\n'],
+    ['netlify.toml', '[[redirects]]\nfrom = "/toml-old"\nto = "/toml.html"\nstatus = 302\n\n[[headers]]\nfor = "/toml.html"\n[headers.values]\nX-Toml-Header = "yes"\n']
+  ];
+  for (const [assetPath, body] of uploads) {
+    const params = new URLSearchParams({ projectId, deploymentId, path: assetPath });
+    assert.equal((await call(e, `/api/skyenet/deploy/upload?${params.toString()}`, {
+      method: 'PUT',
+      token,
+      headers: { 'content-type': assetPath.endsWith('.html') ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8' },
+      body
+    })).response.status, 200);
+  }
+
+  assert.equal((await call(e, '/api/skyenet/deploy/complete', {
+    method: 'POST',
+    token,
+    body: { project_id: projectId, deployment_id: deploymentId, files: uploads.map(([assetPath]) => assetPath) }
+  })).response.status, 200);
+
+  assert.equal((await call(e, '/api/skyenet/deploy/route', {
+    method: 'POST',
+    token,
+    body: {
+      hostname: 'metraiyux.example',
+      mount_path: '/skyenet/rules-demo',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      public_access: true,
+      default_auth: 'public'
+    }
+  })).response.status, 200);
+
+  const redirect = await siteWorker.fetch(req('/skyenet/rules-demo/old'), e, ctx());
+  assert.equal(redirect.status, 301);
+  assert.equal(redirect.headers.get('x-skynet-route'), 'netlify-redirect');
+  assert.equal(redirect.headers.get('location'), 'https://metraiyux.example/skyenet/rules-demo/landing.html');
+
+  const landing = await siteWorker.fetch(req('/skyenet/rules-demo/landing.html'), e, ctx());
+  assert.equal(landing.status, 200);
+  assert.equal(landing.headers.get('x-skynet-route'), 'r2-deployment');
+  assert.equal(landing.headers.get('x-skyenet-test'), 'rules-applied');
+  assert.equal(landing.headers.get('x-landing-header'), 'yes');
+  assert.match(await landing.text(), /Landing Target/);
+
+  const rewrite = await siteWorker.fetch(req('/skyenet/rules-demo/app/deep/link'), e, ctx());
+  assert.equal(rewrite.status, 200);
+  assert.equal(rewrite.headers.get('x-skynet-route'), 'netlify-rewrite');
+  assert.equal(rewrite.headers.get('x-skynet-rewrite-target'), '/index.html');
+  assert.match(await rewrite.text(), /SPA Shell/);
+
+  const forcedRewrite = await siteWorker.fetch(req('/skyenet/rules-demo/force-me.html'), e, ctx());
+  assert.equal(forcedRewrite.status, 200);
+  assert.equal(forcedRewrite.headers.get('x-skynet-route'), 'netlify-rewrite');
+  assert.equal(forcedRewrite.headers.get('x-skynet-rewrite-target'), '/index.html');
+  assert.match(await forcedRewrite.text(), /SPA Shell/);
+
+  const tomlRedirect = await siteWorker.fetch(req('/skyenet/rules-demo/toml-old'), e, ctx());
+  assert.equal(tomlRedirect.status, 302);
+  assert.equal(tomlRedirect.headers.get('x-skynet-route'), 'netlify-redirect');
+  assert.equal(tomlRedirect.headers.get('location'), 'https://metraiyux.example/skyenet/rules-demo/toml.html');
+
+  const tomlAsset = await siteWorker.fetch(req('/skyenet/rules-demo/toml.html'), e, ctx());
+  assert.equal(tomlAsset.status, 200);
+  assert.equal(tomlAsset.headers.get('x-skynet-route'), 'r2-deployment');
+  assert.equal(tomlAsset.headers.get('x-toml-header'), 'yes');
+  assert.match(await tomlAsset.text(), /Toml Target/);
+
+  const range = await siteWorker.fetch(req('/skyenet/rules-demo/assets/data.txt', { headers: { range: 'bytes=2-5' } }), e, ctx());
+  assert.equal(range.status, 206);
+  assert.equal(range.headers.get('accept-ranges'), 'bytes');
+  assert.equal(range.headers.get('content-range'), 'bytes 2-5/16');
+  assert.equal(await range.text(), '2345');
+
+  const fullAsset = await siteWorker.fetch(req('/skyenet/rules-demo/assets/data.txt'), e, ctx());
+  const etag = fullAsset.headers.get('etag');
+  assert.ok(etag);
+  const conditional = await siteWorker.fetch(req('/skyenet/rules-demo/assets/data.txt', { headers: { 'if-none-match': etag } }), e, ctx());
+  assert.equal(conditional.status, 304);
+  assert.equal(conditional.headers.get('etag'), etag);
+  const lastModified = fullAsset.headers.get('last-modified');
+  assert.ok(lastModified);
+  const conditionalDate = await siteWorker.fetch(req('/skyenet/rules-demo/assets/data.txt', { headers: { 'if-modified-since': lastModified } }), e, ctx());
+  assert.equal(conditionalDate.status, 304);
+  assert.equal(conditionalDate.headers.get('last-modified'), lastModified);
+
+  const formBody = new URLSearchParams({
+    'form-name': 'contact',
+    name: 'Ada',
+    message: 'SkyeNet form capture works'
+  }).toString();
+  const form = await siteWorker.fetch(req('/skyenet/rules-demo/contact', {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body: formBody
+  }), e, ctx());
+  const formData = await form.json();
+  assert.equal(form.status, 202);
+  assert.equal(form.headers.get('x-skynet-route'), 'netlify-form');
+  assert.equal(formData.ok, true);
+  assert.equal(formData.form_name, 'contact');
+  assert.ok(e.__fsEnv.REQUEST_LOG_BUCKET.map.has(formData.receipt_key));
+
+  const ruleFile = await siteWorker.fetch(req('/skyenet/rules-demo/_redirects'), e, ctx());
+  assert.equal(ruleFile.status, 404);
+  assert.equal(ruleFile.headers.get('x-skynet-route'), 'rule-asset-blocked');
+
+  const tomlRuleFile = await siteWorker.fetch(req('/skyenet/rules-demo/netlify.toml'), e, ctx());
+  assert.equal(tomlRuleFile.status, 404);
+  assert.equal(tomlRuleFile.headers.get('x-skynet-route'), 'rule-asset-blocked');
+});
+
+test('SN-06 SkyeNet refuses route registration before a storage-verified complete', async () => {
   const e = envWithActualFs27();
   const token = 'gate-token';
   const projectId = 'missing-root-public';
@@ -430,7 +668,7 @@ test('SN-06 SkyeNet registered routes with missing root assets return a diagnost
     body: { project_id: projectId, deployment_id: deploymentId, title: 'Missing Root Public' }
   })).response.status, 200);
 
-  assert.equal((await call(e, '/api/skyenet/deploy/route', {
+  const route = await call(e, '/api/skyenet/deploy/route', {
     method: 'POST',
     token,
     body: {
@@ -441,16 +679,15 @@ test('SN-06 SkyeNet registered routes with missing root assets return a diagnost
       public_access: true,
       default_auth: 'public'
     }
-  })).response.status, 200);
+  });
+  assert.equal(route.response.status, 409);
+  assert.equal(route.data.skynet?.code, 'DEPLOYMENT_NOT_COMPLETE');
 
   const live = await siteWorker.fetch(req('/skyenet/missing-root-public'), e, ctx());
   const text = await live.text();
   assert.equal(live.status, 404);
-  assert.equal(live.headers.get('x-0s-skynet-surface-proxy'), 'fs27-service-binding');
-  assert.equal(live.headers.get('x-skynet-route'), 'asset-missing');
-  assert.match(text, /route found, asset missing/i);
-  assert.match(text, /index\.html/i);
-  assert.doesNotMatch(text, /^SkyeNet route not found$/i);
+  assert.equal(live.headers.get('x-0s-skynet-route-miss'), 'true');
+  assert.match(text, /^SkyeNet route not found$/i);
 });
 
 test('SN-07 Founder Command can be mounted as a private SkyeNet surface with shared gate headers', async () => {

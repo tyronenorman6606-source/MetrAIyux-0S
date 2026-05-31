@@ -9,6 +9,10 @@ const BLOCKED_PREFIXES = [
   '/SkyeMusicNexus/song-creation-bin',
   '/song-creator',
   '/SkyeMusicNexus/song-creator',
+  '/create.html',
+  '/public/create.html',
+  '/SkyeMusicNexus/create.html',
+  '/SkyeMusicNexus/public/create.html',
 ];
 
 const PROTECTED_CREATIVE_EXTENSIONS = new Set([
@@ -29,6 +33,8 @@ function isBlocked(pathname) {
 function isProtectedCreativeAsset(pathname) {
   const clean = String(pathname || '').replace(/\/+/g, '/');
   if (!clean.startsWith('/artist-storefronts/')) return false;
+  if (/\/drops\/[^/]+\/audio\//i.test(clean)) return false;
+  if (/^\/artist-storefronts\/gray-skyes\/media\/audio\//i.test(clean)) return false;
   if (/\/pics2vid\/package\.json$/i.test(clean)) return true;
   if (/\/(?:audio|media\/audio)\//i.test(clean) && !/\/drops\/[^/]+\/audio\//i.test(clean)) return true;
   return PROTECTED_CREATIVE_EXTENSIONS.has(extensionFor(clean));

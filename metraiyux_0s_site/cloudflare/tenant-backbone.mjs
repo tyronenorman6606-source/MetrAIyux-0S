@@ -622,7 +622,7 @@ export async function createMediaReusePackage(env, body = {}) {
 async function requireAuth(deps, request, env, label) {
   if (deps?.requireGateAuth) return deps.requireGateAuth(request, env, label);
   if (deps?.requireOperatorAuth) return deps.requireOperatorAuth(request, env, label);
-  return { ok: true, actor: 'local-test' };
+  return { ok: false, response: json({ ok: false, error: `${label || '0S tenant backbone'} requires the canonical FS27/SkyGate auth helper.`, code: 'fs27_helper_required' }, 503) };
 }
 
 async function readBody(request) {

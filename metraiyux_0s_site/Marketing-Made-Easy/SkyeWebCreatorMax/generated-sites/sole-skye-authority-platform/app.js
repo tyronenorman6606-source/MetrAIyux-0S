@@ -53,8 +53,8 @@ document.querySelectorAll('[data-mode]').forEach((button) => {
 const panels = {
   audit: ['Audit Trail', '[audit] Source refs exist.\\n[audit] Dead links: 0.\\n[audit] House style contract loaded.'],
   design: ['Design Vault', '[vault] shadcn + TailGrids + R3F + drei + Triplex indexed.\\n[vault] SOLE / SkyeSol style floor attached.'],
-  delivery: ['AE Delivery', '[delivery] Artifact can route to AE CommandHub once gateway vars are set.\\n[delivery] Local export is usable now.'],
-  gateway: ['SkyeGateFS13', '[gateway] Waiting for production env vars.\\n[gateway] Local UI state is active and verified.'],
+  delivery: ['AE Delivery', '[delivery] Artifact stays local until the shared-gated Worker accepts it.\\n[delivery] Local export is usable now.'],
+  gateway: ['SkyeGateFS13', '[gateway] Waiting for shared FS27/SkyGate/Free99 runtime wiring.\\n[gateway] Local UI state is active and verified.'],
 };
 
 document.querySelectorAll('[data-panel]').forEach((button) => {
@@ -83,7 +83,7 @@ document.getElementById('buildForm').addEventListener('submit', (event) => {
   };
   const result = window.SkyeIntegrationBridge?.enqueueWebsiteRequest?.(payload);
   document.getElementById('formStatus').textContent = result
-    ? 'Queued for AE review: ' + data.get('project') + ' / ' + data.get('lane') + '.'
+    ? 'Accepted by the shared-gated bridge for AE review: ' + data.get('project') + ' / ' + data.get('lane') + '.'
     : 'AE bridge offline. Queue write failed for ' + data.get('project') + ' / ' + data.get('lane') + '.';
 });
 
@@ -105,7 +105,7 @@ gateOverlay.addEventListener('click', (event) => {
 document.getElementById('verifyGate').addEventListener('click', () => {
   const phrase = document.getElementById('gatePhrase').value.trim();
   document.getElementById('gateStatus').textContent = phrase
-    ? 'Portal verified locally for "' + phrase + '". Production auth can replace this shell cleanly.'
+    ? 'Portal verified locally for "' + phrase + '". Shared 0S auth must replace this shell before live/customer use.'
     : 'Enter an access phrase to verify the local portal shell.';
 });
 document.addEventListener('keydown', (event) => {

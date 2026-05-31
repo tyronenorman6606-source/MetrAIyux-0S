@@ -14,6 +14,7 @@ import {
 } from './zero-os-automation-spine.mjs';
 import { handleCompanyKnowledgeRoute } from './company-knowledge.mjs';
 import { handleSkyeCommerceRoute } from './skyecommerce-adapter.mjs';
+import { handleSaasSelfServeRoute } from './saas-selfserve-adapter.mjs';
 import adminLoginHtml from './generated-admin-login-page.mjs';
 import contractorPacketInboxHtml from './generated-contractor-packet-inbox-page.mjs';
 // Changelog bundle refresh: 2026-05-20 gate-owned remote QuantumSkyes MCP lane.
@@ -597,12 +598,7 @@ const OWNER_ADMIN_CREDENTIAL_ENV_KEYS = [
   'SKYGATEFS27_OWNER_PASSWORD',
   'SKYGATEFS13_ADMIN_PASSWORD',
   'QA_ADMIN_PASSWORD',
-  'PHC_BOOTSTRAP_ADMIN_CODE',
-  'SITE_OPERATOR_ADMIN_TOKEN',
-  'METRAIYUX_ADMIN_TOKEN',
-  'ADMIN_TOKEN',
-  'SKYGATEFS13_WORKER_ADMIN_TOKEN',
-  'MCP_HTTP_BEARER_TOKEN'
+  'PHC_BOOTSTRAP_ADMIN_CODE'
 ];
 const FREE99_DEMO_CREDENTIAL_ENV_KEYS = [
   'FREE99_SIGNINPRO_DEMO_CODE',
@@ -885,10 +881,14 @@ function gateAdminSessionPayload(token, gateData = {}, env = {}) {
 async function loginFs27Gate(password, env) {
   const origin = 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
   if (!origin && !env.SKYGATEFS27_WORKER?.fetch) return {ok: false, error: 'FS27 gate not configured'};
-  // Use the env-stored FS27 password when available — user's local code ≠ FS27 gate password
+  const fs27Email = String(
+    env.FS27_ADMIN_EMAIL || env.SKYGATEFS27_ADMIN_EMAIL || env.SKYGATE_ADMIN_EMAIL ||
+    env.METRAIYUX_OWNER_EMAIL || env.METRAIYUX_ADMIN_EMAIL || firstAdminEmail(env)
+  ).trim().toLowerCase();
+  // Prefer the submitted shared owner credential so 0S and FS27 stay one auth lane.
   const fs27Pass = String(
-    env.SKYGATEFS13_ADMIN_PASSWORD || env.SKYGATEFS27_ADMIN_PASSWORD ||
-    env.FS27_ADMIN_PASSWORD || env.SKYGATE_ADMIN_PASSWORD || password || ''
+    password || env.SKYGATEFS13_ADMIN_PASSWORD || env.SKYGATEFS27_ADMIN_PASSWORD ||
+    env.FS27_ADMIN_PASSWORD || env.SKYGATE_ADMIN_PASSWORD || ''
   ).trim();
   if (!fs27Pass) return {ok: false, error: 'FS27 gate password not configured'};
   try {
@@ -898,7 +898,7 @@ async function loginFs27Gate(password, env) {
     const res = await skygateRequest(env, '/admin/login', {
       method: 'POST',
       headers: {'content-type': 'application/json'},
-      body: JSON.stringify({password: fs27Pass}),
+      body: JSON.stringify({password: fs27Pass, ...(fs27Email ? {email: fs27Email} : {})}),
       signal
     });
     const data = await res.json().catch(() => ({}));
@@ -913,9 +913,13 @@ function gateAuthFailureStatus(status, fallback = 401) {
 }
 async function loginFs27GatePublic(password, env) {
   const origin = skygateOrigin(env) || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+  const fs27Email = String(
+    env.FS27_ADMIN_EMAIL || env.SKYGATEFS27_ADMIN_EMAIL || env.SKYGATE_ADMIN_EMAIL ||
+    env.METRAIYUX_OWNER_EMAIL || env.METRAIYUX_ADMIN_EMAIL || firstAdminEmail(env)
+  ).trim().toLowerCase();
   const fs27Pass = String(
-    env.SKYGATEFS13_ADMIN_PASSWORD || env.SKYGATEFS27_ADMIN_PASSWORD ||
-    env.FS27_ADMIN_PASSWORD || env.SKYGATE_ADMIN_PASSWORD || password || ''
+    password || env.SKYGATEFS13_ADMIN_PASSWORD || env.SKYGATEFS27_ADMIN_PASSWORD ||
+    env.FS27_ADMIN_PASSWORD || env.SKYGATE_ADMIN_PASSWORD || ''
   ).trim();
   if (!origin || !fs27Pass) return {ok: false, error: 'FS27 public gate login is not configured'};
   try {
@@ -925,7 +929,7 @@ async function loginFs27GatePublic(password, env) {
     const res = await fetch(`${origin}/admin/login`, {
       method: 'POST',
       headers: {'content-type': 'application/json'},
-      body: JSON.stringify({password: fs27Pass}),
+      body: JSON.stringify({password: fs27Pass, ...(fs27Email ? {email: fs27Email} : {})}),
       signal
     });
     const data = await res.json().catch(() => ({}));
@@ -2127,11 +2131,12 @@ function skygateOrigin(env){
 }
 async function skygateRequest(env, path, init = {}) {
   const origin = skygateOrigin(env) || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev';
+  const apiPath = String(path || '').startsWith('/deploy/');
   if (env.SKYGATEFS27_WORKER?.fetch) {
     try {
       const response = await env.SKYGATEFS27_WORKER.fetch(new Request(`https://skyegatefs27.internal${path}`, init));
       if (response.status !== 404 && (response.status < 500 || !origin)) return response;
-      if (response.status === 404 && !origin) return response;
+      if (response.status === 404 && (apiPath || !origin)) return response;
     } catch {
       if (!origin) throw new Error('SkyGate service binding failed and no public origin is configured.');
     }
@@ -2273,7 +2278,9 @@ function skynetDeployPath(url) {
   if (suffix === '/routes') return '/deploy/routes';
   if (suffix === '/workspace') return '/deploy/workspace';
   if (suffix === '/dashboard') return '/deploy/dashboard';
+  if (suffix === '/source-index') return '/deploy/source-index';
   if (suffix === '/source-archive') return '/deploy/source-archive';
+  if (suffix === '/source-archive-link') return '/deploy/source-archive-link';
   if (suffix === '/source-manifest') return '/deploy/source-manifest';
   if (suffix === '/source-tree') return '/deploy/source-tree';
   if (suffix === '/source-file') return '/deploy/source-file';
@@ -2283,6 +2290,8 @@ function skynetDeployPath(url) {
   if (suffix === '/rollback') return '/deploy/rollback';
   if (suffix === '/observability') return '/deploy/observability';
   if (suffix === '/cost-model') return '/deploy/cost-model';
+  if (suffix === '/support') return '/deploy/support';
+  if (suffix === '/export') return '/deploy/export';
   if (suffix.startsWith('/deploy/')) return suffix;
   return '';
 }
@@ -2477,8 +2486,9 @@ async function handleFounderCommandStaticRoute(request, env, url) {
 }
 async function handleSkyeNetPublishedSurfaceRoute(request, env, url) {
   if (!isSkyeNetPublishedSurfacePath(url.pathname)) return null;
-  if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method.toUpperCase())) {
-    return json({ok:false, error:'SkyeNet static routes only accept GET, HEAD, and OPTIONS today.'}, 405);
+  const method = request.method.toUpperCase();
+  if (!['GET', 'HEAD', 'OPTIONS', 'POST'].includes(method)) {
+    return json({ok:false, error:'SkyeNet static routes only accept GET, HEAD, OPTIONS, and Netlify Forms POST today.'}, 405);
   }
   if (!env.SKYGATEFS27_WORKER?.fetch) return null;
   const privateSurface = isPrivateSkyeNetSurfacePath(url.pathname);
@@ -2497,11 +2507,15 @@ async function handleSkyeNetPublishedSurfaceRoute(request, env, url) {
   }
   headers.set('x-0s-skynet-surface-proxy', 'metraiyux-0s');
   headers.set('x-forwarded-host', url.hostname);
-  const response = await env.SKYGATEFS27_WORKER.fetch(new Request(request.url, {
-    method: request.method,
+  const hasBody = method !== 'GET' && method !== 'HEAD';
+  const upstreamInit = {
+    method,
     headers,
+    body: hasBody ? request.body : undefined,
     redirect: 'manual'
-  }));
+  };
+  if (hasBody) upstreamInit.duplex = 'half';
+  const response = await env.SKYGATEFS27_WORKER.fetch(new Request(request.url, upstreamInit));
   if (!response.headers.get('x-skynet-route')) {
     return new Response('SkyeNet route not found', {
       status: 404,
@@ -2666,6 +2680,21 @@ function gateIdentity(claims = {}, env = null){
 function emailAllowlist(env){
   return String(env.SKYGATE_ADMIN_EMAILS || env.METRAIYUX_ADMIN_EMAILS || '').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
 }
+function envFlagEnabled(value) {
+  return ['1', 'true', 'yes', 'on', 'dev', 'local'].includes(String(value || '').trim().toLowerCase());
+}
+function explicitLocalSharedGateFallbackAllowed(env = {}) {
+  return false;
+}
+function localSharedGateFallbackDisabledResponse(label = 'gated route') {
+  return json({
+    ok:false,
+    error:`Canonical FS27/SkyGate session is required for ${label}.`,
+    code:'fs27_required',
+    local_shared_gate_code:'disabled',
+    message:'Free99/admin codes must be exchanged through the shared FS27/SkyGate lane before they can authorize 0S access.'
+  }, 503);
+}
 function allowsAdminGate(claims, env){
   if (!claims?.active && !claims?.ok) return false;
   const role = String(claims.role || claims.user?.role || '').toLowerCase();
@@ -2685,7 +2714,7 @@ async function requireOperatorAuth(request, env, label = 'operator mutation'){
   const expected = ownerAdminAcceptedCodes(env);
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
-      return {ok:true, via:'local-shared-gate-code', actor:'owner-admin'};
+      return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
     }
     const matched = presented.find(value => expected.includes(value));
     const gateLogin = await loginFs27Gate(matched, env);
@@ -2712,7 +2741,7 @@ async function requireOperatorAuth(request, env, label = 'operator mutation'){
     }
     return {ok:true, via:'skygate', actor:gate.data?.email || gate.data?.username || gate.data?.sub || 'skygate-admin', gate};
   }
-  return {ok:false, response:json({ok:false, error:`Unauthorized ${label}. Configure ADMIN_TOKEN/SITE_OPERATOR_ADMIN_TOKEN or SkyGate auth on this Worker.`}, 401)};
+  return {ok:false, response:json({ok:false, error:`Unauthorized ${label}. Configure SKYGATEFS27_ORIGIN/SKYGATE_ORIGIN or SKYGATEFS27_WORKER for the canonical FS27/SkyGate lane.`}, 401)};
 }
 async function requireGateAuth(request, env, label = 'gated route'){
   const token = bearer(request);
@@ -2720,7 +2749,7 @@ async function requireGateAuth(request, env, label = 'gated route'){
   const expected = ownerAdminAcceptedCodes(env);
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
-      return {ok:true, via:'local-shared-gate-code', actor:'owner-admin', role:'admin', identity:{email:'owner-admin', role:'admin'}};
+      return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
     }
     const matched = presented.find(value => expected.includes(value));
     const gateLogin = await loginFs27Gate(matched, env);
@@ -3144,7 +3173,8 @@ function appRouteEdgeAuthPolicy(mount, request, pathname, matchedBase = mount.ba
     return 'gate';
   }
   if (mount.id === 'saas') {
-    if (MUTATING_METHODS.has(request.method.toUpperCase())) return 'operator';
+    if (suffix === '/ledger' || suffix === '/billing/webhook' || suffix.startsWith('/admin')) return 'operator';
+    if (MUTATING_METHODS.has(request.method.toUpperCase())) return 'gate';
     return 'gate';
   }
   if (!MUTATING_METHODS.has(request.method.toUpperCase())) return false;
@@ -3528,8 +3558,7 @@ function paidLaneActor(identity = {}) {
 function paidLaneProofModeAllowed(auth = {}, env = {}) {
   const identity = auth.identity || {};
   const role = String(identity.role || auth.role || '').toLowerCase();
-  return auth.via === 'local-shared-gate-code'
-    || auth.via === 'skygate-admin-exchange'
+  return auth.via === 'skygate-admin-exchange'
     || identity.isAdmin === true
     || ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)
     || allowsAdminGate(auth.gate?.data || {}, env);
@@ -4791,15 +4820,18 @@ async function handleAppApiRoute(request, env, ctx, url) {
   const {mount, base:matchedBase} = match;
   if (mount.id === 'media') return null;
   const edgeAuthPolicy = appRouteEdgeAuthPolicy(mount, request, url.pathname, matchedBase);
+  let edgeAuth = null;
   if (edgeAuthPolicy === 'operator') {
     const label = mount.id === 'kaixuCodestudio'
       ? 'kAIxu CodeStudio platform mutation'
       : `${mount.name} mutation`;
     const auth = await requireOperatorAuth(request, env, label);
     if (!auth.ok) return auth.response;
+    edgeAuth = auth;
   } else if (edgeAuthPolicy === 'gate') {
     const auth = await requireGateAuth(request, env, `${mount.name} gated route`);
     if (!auth.ok) return auth.response;
+    edgeAuth = auth;
   }
   if (mount.id === 'clientAppFactory' && !appExternalConfigured(env, mount)) {
     return handleClientAppFactoryRoute(request, env, url, matchedBase);
@@ -4861,16 +4893,28 @@ async function handleAppApiRoute(request, env, ctx, url) {
   if (mount.id === 'skymusicnexus' && !appExternalConfigured(env, mount)) return musicHandleRoute(request, env, url, ctx);
   if (mount.id === 'profit' && !appExternalConfigured(env, mount)) return profitHandleRoute(request, env, url, matchedBase);
   if (mount.id === 'houseops' && !appExternalConfigured(env, mount)) return houseopsHandleRoute(request, env, url, matchedBase);
+  if (mount.id === 'saas' && !appExternalConfigured(env, mount)) {
+    return handleSaasSelfServeRoute(request, env, ctx, url, matchedBase, mount, {
+      json,
+      readJson,
+      auth: edgeAuth,
+      commandBridgeAppendEvent,
+      commandBridgeEventsPayload,
+      founderSkyEmailServiceSummary,
+      founderSkyEmailServiceToken,
+      mirrorSkygateEvent
+    });
+  }
   if (!appMountConfigured(env, mount)) return appRouteNotMounted(mount, env, url.pathname);
   const targetUrl = new URL(request.url);
   targetUrl.pathname = appTargetPath(mount, url.pathname, matchedBase);
   const upstreamHeaders = new Headers(request.headers);
   if (mount.id === 'relay13') {
-    const adminToken = founderRelay13AdminCredential(env);
+    const proxySecret = founderRelay13AdminCredential(env);
     const apiToken = founderRelay13ApiCredential(env);
-    if (adminToken) {
-      upstreamHeaders.set('authorization', `Bearer ${adminToken}`);
-      upstreamHeaders.set('x-0s-shared-gate', 'relay13-admin-proxy');
+    if (proxySecret) {
+      upstreamHeaders.set('x-0s-shared-gate', 'operator');
+      upstreamHeaders.set('x-0s-internal-proxy-secret', proxySecret);
     }
     if (apiToken && !upstreamHeaders.has('x-relay13-api-key')) {
       upstreamHeaders.set('x-relay13-api-key', apiToken);
@@ -4878,7 +4922,7 @@ async function handleAppApiRoute(request, env, ctx, url) {
     }
   }
   if (mount.id === 'saas') {
-    upstreamHeaders.set('x-0s-shared-gate', 'operator');
+    upstreamHeaders.set('x-0s-shared-gate', edgeAuthPolicy === 'operator' ? 'operator' : 'gate');
     upstreamHeaders.set('x-0s-gate-verified-by', 'metraiyux-0s-worker');
     const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || '').trim();
     if (proxySecret) upstreamHeaders.set('x-0s-internal-proxy-secret', proxySecret);
@@ -5499,7 +5543,12 @@ async function commandBridgeAppendEvent(env, input = {}, auth = {}) {
     event.ids?.packet_id,
     event.ids?.review_id,
     event.ids?.routex_job_id,
+    event.ids?.workspace_id,
+    event.ids?.workspace_slug,
     event.ids?.client_id,
+    event.ids?.customer_id,
+    event.ids?.identity_id,
+    event.ids?.email,
     event.ids?.skynet_project_id
   ].filter(Boolean).map(value => commandBridgeClean(value, 180).replace(/[^A-Za-z0-9._:-]+/g, '_')));
   const value = JSON.stringify(event);
@@ -7143,16 +7192,7 @@ function founderCleanMetadata(value = {}, maxKeys = 20, maxChars = 700) {
   return out;
 }
 function founderRelay13AdminCredential(env) {
-  return uniqueCredentials([
-    env.RELAY13_PLATFORM_ADMIN_TOKEN,
-    env.RELAY13_ADMIN_TOKEN,
-    env.PLATFORM_ADMIN_TOKEN,
-    env.CONNECTLOG_RELAY13_ADMIN_TOKEN,
-    env.SKYGATEFS13_WORKER_ADMIN_TOKEN,
-    env.SITE_OPERATOR_ADMIN_TOKEN,
-    env.METRAIYUX_ADMIN_TOKEN,
-    env.ADMIN_TOKEN
-  ])[0] || '';
+  return String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.RELAY13_INTERNAL_PROXY_SECRET || '').trim();
 }
 function founderRelay13ApiCredential(env) {
   return uniqueCredentials([
@@ -7166,8 +7206,8 @@ function founderRelay13Origin(env) {
   return String(env.RELAY13_WORKER_ORIGIN || env.RELAY13_ORIGIN || 'https://relay13-core.graylondonskyes.workers.dev').replace(/\/+$/, '');
 }
 function founderRelay13AdminHeaders(env, extra = {}) {
-  const token = founderRelay13AdminCredential(env);
-  return token ? {'authorization':`Bearer ${token}`, ...extra} : {...extra};
+  const secret = founderRelay13AdminCredential(env);
+  return secret ? {'x-0s-shared-gate':'operator', 'x-0s-internal-proxy-secret':secret, ...extra} : {...extra};
 }
 async function founderRelay13Fetch(env, path, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -7239,8 +7279,8 @@ function founderRelay13ConversationPayload(body = {}, auth = null, env = {}) {
 }
 async function founderRelay13Workspace(env, workspaceSlug) {
   const slug = founderRelay13WorkspaceSlug(workspaceSlug, env);
-  const adminToken = founderRelay13AdminCredential(env);
-  if (!adminToken) return {ok:false, slug, admin:false, error:'Relay13 admin token is not configured on the 0S Worker.'};
+  const proxySecret = founderRelay13AdminCredential(env);
+  if (!proxySecret) return {ok:false, slug, admin:false, error:'Relay13 internal shared-gate proxy is not configured on the 0S Worker.'};
   const headers = founderRelay13AdminHeaders(env);
   const listed = await founderRelay13Json(env, '/api/admin/workspaces', {headers});
   if (listed.ok) {
@@ -7391,9 +7431,9 @@ async function founderCommandInbox(request, env, ctx, auth, url) {
   const workspaceSlug = founderRelay13WorkspaceSlug(url.searchParams.get('workspace'), env);
   const conversationId = founderCleanText(url.searchParams.get('conversation_id') || url.searchParams.get('conversation') || '', 140);
   const receipts = (await readKVLedger(env, 200)).filter(item => String(item.type || '').startsWith('founder_command.inbox'));
-  const adminToken = founderRelay13AdminCredential(env);
-  if (!adminToken) {
-    return json({ok:true, mode:'kv_only_relay13_admin_missing', relay13:{origin:founderRelay13Origin(env), admin:false, service_binding:Boolean(env.RELAY13_WORKER?.fetch)}, workspace:{slug:workspaceSlug}, conversations:[], messages:[], receipts, message:'Relay13 admin token is not configured on the 0S Worker; showing saved Founder Command receipts only.'});
+  const proxySecret = founderRelay13AdminCredential(env);
+  if (!proxySecret) {
+    return json({ok:true, mode:'kv_only_relay13_proxy_missing', relay13:{origin:founderRelay13Origin(env), admin:false, service_binding:Boolean(env.RELAY13_WORKER?.fetch)}, workspace:{slug:workspaceSlug}, conversations:[], messages:[], receipts, message:'Relay13 internal shared-gate proxy is not configured on the 0S Worker; showing saved Founder Command receipts only.'});
   }
   const resolved = await founderRelay13Workspace(env, workspaceSlug);
   if (!resolved.ok || !resolved.workspace?.id) {
@@ -7429,8 +7469,8 @@ async function founderCommandInboxMessage(request, env, ctx, auth) {
   const message = founderCleanText(body.message || body.body || '', 3000);
   if (!conversationId) return json({ok:false, error:'conversation_id required'}, 400);
   if (!message) return json({ok:false, error:'message required'}, 400);
-  const adminToken = founderRelay13AdminCredential(env);
-  if (!adminToken) return json({ok:false, error:'Relay13 admin token is not configured on the 0S Worker for operator replies.'}, 502);
+  const proxySecret = founderRelay13AdminCredential(env);
+  if (!proxySecret) return json({ok:false, error:'Relay13 internal shared-gate proxy is not configured on the 0S Worker for operator replies.'}, 502);
   const workspace = body.workspace_id ? {ok:true, workspace:{id:founderCleanText(body.workspace_id, 140), slug:founderRelay13WorkspaceSlug(body.workspace, env)}} : await founderRelay13Workspace(env, body.workspace);
   if (!workspace.ok || !workspace.workspace?.id) return json({ok:false, error:workspace.error || 'Relay13 workspace unavailable.'}, 502);
   const sent = await founderRelay13Json(env, `/api/v1/conversations/${encodeURIComponent(conversationId)}/messages`, {
@@ -10472,7 +10512,14 @@ async function founderCommandWorkSystem(request, env, ctx, auth, url) {
   });
 }
 async function handleFounderCommandRoute(request, env, ctx, url) {
-  if (url.pathname === '/api/founder-command/login') return handleOwnerAdminLogin(request, env);
+  if (url.pathname === '/api/founder-command/login') {
+    return json({
+      ok:false,
+      error:'canonical_owner_admin_login_required',
+      canonical:'/api/owner/admin-login',
+      message:'Founder Command login minting is owned by the shared FS27/SkyGate owner admin route.'
+    }, {status:410});
+  }
   if (!url.pathname.startsWith('/api/founder-command')) return null;
   if (request.method === 'OPTIONS') return json({ok:true});
   const auth = await requireOperatorAuth(request, env, 'Founder Command');
@@ -10560,12 +10607,8 @@ function compactValleyArticle(article) {
     url: article.url || (article.slug ? `https://phx-verified-network.pages.dev/insights/${article.slug}/` : null)
   };
 }
-function valleyTickAuthorized(request, env) {
-  const expected = String(env.VALLEY_PUBLISH_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
-  if (!expected) return false;
-  const bearerToken = String(request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
-  const headerToken = String(request.headers.get('x-valley-publish-token') || request.headers.get('x-admin-token') || '').trim();
-  return bearerToken === expected || headerToken === expected;
+async function valleyTickAuthorized(request, env) {
+  return requireOperatorAuth(request, env, 'Valley content schedule execution');
 }
 function valleyProviderRuntimeSandbox(env) {
   return zeroOsEnvFlag(env, ['VALLEY_PROVIDER_RUNTIME_SANDBOX', 'ZERO_OS_PROVIDER_SANDBOX']);
@@ -11811,6 +11854,10 @@ function profitNormalizePack(pack = {}) {
     label: profitText(pack.label, 180) || 'Alias close review',
     target: profitText(pack.target, 120) || 'AE-FlowPro',
     notes: profitText(pack.notes, 1000),
+    revenue: profitNumber(pack.revenue ?? pack.ask ?? pack.snapshot?.revenue, 0),
+    cost: profitNumber(pack.cost ?? pack.directCost ?? pack.snapshot?.cost, 0),
+    chance: profitNumber(pack.chance ?? pack.confidence ?? pack.snapshot?.chance, 0),
+    heat: profitNumber(pack.heat ?? pack.snapshot?.heat, 0),
     snapshot: profitNormalizeSnapshot(pack.snapshot || {}),
     recommended_actions: profitList(pack.recommended_actions || pack.recommendedActions, 10),
     review: profitNormalizeReview(pack.review || {status:pack.status, owner:pack.owner, notes:pack.notes}),
@@ -17155,7 +17202,7 @@ const MUSIC_OPERATOR_ACTIONS = Object.freeze({
   'music-store': new Set(['fulfill-order', 'confirm-skypay-order', 'record-skypay-confirmation', 'publish-skynet-storefront']),
   'music-ads': new Set(['approve-campaign', 'place-campaign', 'pause-campaign', 'record-event']),
   'music-collectives': new Set(['approve-rename','auto-approve-expired']),
-  'music-provider-hooks': new Set(['generate-ai-song','create-ai-song']),
+  'music-provider-hooks': new Set(['queue-ai-song','generate-ai-song','create-ai-song']),
   'music-workforce': new Set(['create-job', 'create-release-job', 'create-drop-job', 'assign', 'submit-proof', 'approve-work', 'close-job', 'sync', 'sync-status']),
   'music-gamify': new Set(['award-merits', 'draw-giveaway', 'close-giveaway'])
 });
@@ -18481,16 +18528,12 @@ function musicToken(request) {
   return bearer(request) || String(request.headers.get('x-skygate-session') || '').trim();
 }
 async function requireMusicGate(request, env, label = 'SkyeMusicNexus function') {
-  const expected = String(env.SITE_OPERATOR_ADMIN_TOKEN || env.METRAIYUX_ADMIN_TOKEN || env.ADMIN_TOKEN || '').trim();
-  const token = musicToken(request);
-  const headerToken = adminHeaderToken(request);
-  if (expected && (token === expected || headerToken === expected)) return {ok:true, via:'admin_token', actor:'legacy-admin', role:'admin'};
   if (skygateOrigin(env) || env.SKYGATEFS27_WORKER?.fetch) {
     const gate = await introspectSkygate(request, env);
     if (!gate.ok) return {ok:false, response:musicJson({ok:false, error:gate.error || `Unauthorized ${label}.`, skygate:gate.data || null}, gate.status || 401)};
     return {ok:true, via:'skygate', actor:gate.data?.email || gate.data?.username || gate.data?.sub || 'skygate-user', role:gate.data?.role || gate.data?.user?.role || 'user', gate};
   }
-  return {ok:false, response:musicJson({ok:false, error:`Unauthorized ${label}. Configure ADMIN_TOKEN/SITE_OPERATOR_ADMIN_TOKEN or SkyGate auth on this Worker.`}, 401)};
+  return {ok:false, response:musicJson({ok:false, error:`Unauthorized ${label}. Configure the canonical FS27/SkyGate lane on this Worker. Legacy admin tokens are not accepted.`}, 401)};
 }
 async function requireMusicAccess(request, env, fnName, action) {
   if (fnName === 'music-drops' && action === 'track-public-event') return {ok:true, actor:'public-listener', role:'public'};
@@ -18890,7 +18933,7 @@ function musicSongCreationCheckoutUrl(order = {}) {
     lane:order.offerId || '',
     orderId:order.orderId || order.id || '',
     amountCents:String(order.totalCents || 0),
-    return:'/SkyeMusicNexus/song-creator/'
+    return:'/SkyeMusicNexus/public/pricing-song-creation.html'
   });
   return `/skyepay-store.html?${params.toString()}`;
 }
@@ -19189,7 +19232,7 @@ async function musicSongCreationDispatchRun({state, lane, run, estimate, brief, 
       updatedAt:musicNow()
     };
     state.drops.items = musicUpsert(state.drops.items, drop);
-    musicGamifyRecordActivity(state, {artistId, activityType:'drop_create', releaseId:'', source:'music-song-creation:auto-dispatch', note:`Created song creation drop ${run.title}`});
+    musicGamifyRecordActivity(state, {artistId, activityType:'drop_create', releaseId:'', source:'retired-song-lane:auto-dispatch', note:`Created song package drop ${run.title}`});
   }
   const receiptId = musicId('song_creation_receipt');
   const dropUrl = drop ? `/SkyeMusicNexus/public/drops.html#${drop.dropId}` : '';
@@ -19617,7 +19660,7 @@ async function musicHandleSongCreation(method, url, state, body, access, env) {
         product.updatedAt = musicNow();
         state.store.products = musicUpsert(state.store.products, product);
       }
-      musicGamifyRecordActivity(state, {artistId, activityType:'drop_create', releaseId:'', source:'music-song-creation:fulfill-package', note:`Fulfilled song creation drop ${drop.title}`});
+      musicGamifyRecordActivity(state, {artistId, activityType:'drop_create', releaseId:'', source:'retired-song-lane:fulfill-package', note:`Fulfilled song package drop ${drop.title}`});
     }
     const receiptId = musicId('song_creation_receipt');
     run.status = 'fulfilled';
@@ -24587,7 +24630,6 @@ async function musicHandleFunction(request, env, url, fnName, ctx = null) {
   else if (fnName === 'music-workforce') response = await musicHandleWorkforce(method, url, state, body, access, env);
   else if (fnName === 'music-payments') response = await musicHandlePayments(method, url, state, body, access);
   else if (fnName === 'music-collectives') response = await musicHandleCollectives(method, url, state, body, access, env);
-  else if (fnName === 'music-song-creation') response = await musicHandleSongCreation(method, url, state, body, access, env);
   else if (fnName === 'music-analytics') response = method === 'GET'
     ? (url.searchParams.get('action') === 'observability' ? musicJson(musicObservability(state, env)) : url.searchParams.get('action') === 'visuals' ? musicJson({ok:true, visuals:musicVisuals(state, env)}) : url.searchParams.get('action') === 'artist-stats' ? musicJson(musicArtistStatsEnvelope(state)) : musicJson({ok:true, ...musicAnalytics(state), artistStats:musicArtistStatsEnvelope(state).totals, trafficSummary:musicDropTrafficSummary(state.drops?.traffic || [])}))
     : musicJson({ok:false, error:'Method not allowed'}, 405);
@@ -27372,8 +27414,7 @@ const ZERO_OS_GATE_ENTRY_PATHS = new Set([
   '/api/marketing-keys/logout',
   '/api/skygate/auth-introspect',
   '/api/0s/gate/signup',
-  '/api/0s/gate/signup/draft',
-  '/api/founder-command/login'
+  '/api/0s/gate/signup/draft'
 ]);
 const ZERO_OS_GATE_PREFIXES = [
   '/0s',
@@ -27546,14 +27587,9 @@ function skyEmailSessionHandoffPageResponse(env) {
     const status = document.getElementById('handoff-status');
     const params = new URLSearchParams(location.search);
     const storageKeys = [
-      'FREE99_PLATFORM_GATE_SESSION',
       'METRAIYUX_GATE_SESSION',
       'SKYGATEFS27_GATE_SESSION',
-      'SKYGATE_USER_TOKEN',
-      'SKYE_GATE_SESSION',
-      'SKYGATE_SESSION_TOKEN',
-      'adminBrainToken',
-      'quantumskyes_mcp_owner_token'
+      'SKYE_GATE_SESSION'
     ];
 
     function set(message) {
@@ -27645,6 +27681,9 @@ function publicLiveRedirectResponse(url, method = 'GET') {
   });
 }
 function isPrivateSourcePath(pathname) {
+  // SkyeNet deployment assets are resolved by FS27 route records; the local
+  // repo source denylist must not preempt platform-hosted public routes.
+  if (isSkyeNetPublishedSurfacePath(pathname)) return false;
   if (pathname.startsWith('/api/key-gate-13th/')) return false;
   if (pathname === '/api/admin/approval-email/test') return false;
   if (isSkyEmailLiveMountPath(pathname)) return false;
@@ -27944,6 +27983,105 @@ function legacySkyeVaultProDocxRedirectResponse(url) {
     }
   });
 }
+function isSkyeVaultAgentPackagePath(pathname) {
+  return pathname === '/downloads/skyevault-agent'
+    || pathname.startsWith('/downloads/skyevault-agent/');
+}
+function isSkyeVaultAgentInstallPath(pathname) {
+  return pathname === '/skye-vault-os/agent'
+    || pathname === '/skye-vault-os/agent/'
+    || pathname === '/skye-vault-os/agent/index.html';
+}
+function skyeVaultAgentPaymentActive(status = '') {
+  return ['paid', 'complete', 'no_payment_required', 'active', 'trialing'].includes(String(status || '').toLowerCase());
+}
+function skyeVaultAgentProvisioningActive(status = '') {
+  return ['workspace_unlocked', 'auto_unlock_pending', 'ready_to_unlock'].includes(String(status || '').toLowerCase());
+}
+async function checkSkyeVaultAgentSkyPaySession(env, url) {
+  const sessionId = String(url.searchParams.get('session_id') || '').trim();
+  const orderId = String(url.searchParams.get('order_id') || '').trim();
+  const offer = String(url.searchParams.get('offer') || '').trim();
+  if (!sessionId && !orderId) {
+    return {
+      ok: false,
+      response: json({
+        ok: false,
+        error: 'skyevault_agent_skyepay_session_required',
+        message: 'SkyeVault Agent package downloads require owner/admin auth or a confirmed SkyePay return session for a SkyeVault offer.',
+        skyepay: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&offer=skyevault-pro-access'
+      }, 402)
+    };
+  }
+  const statusParams = new URLSearchParams();
+  if (sessionId) statusParams.set('session_id', sessionId);
+  if (orderId) statusParams.set('order_id', orderId);
+  if (offer) statusParams.set('offer', offer);
+  const statusPath = `/skyepay/status?${statusParams.toString()}`;
+  const response = await skygateRequest(env, statusPath, {
+    method: 'GET',
+    headers: { accept: 'application/json' }
+  });
+  const data = await response.json().catch(() => ({}));
+  const order = data.order || {};
+  const offerId = String(order.offer_id || offer || '');
+  const realSkyeVaultSession = response.ok
+    && data.ok !== false
+    && offerId.startsWith('skyevault-');
+  if (!realSkyeVaultSession) {
+    return {
+      ok: false,
+      response: json({
+        ok: false,
+        error: 'skyevault_agent_entitlement_not_unlocked',
+        offer_id: offerId || null,
+        payment_status: order.payment_status || null,
+        provisioning_status: order.provisioning_status || null,
+        message: 'The SkyeVault Agent package unlocks only after SkyePay confirms payment and workspace provisioning.'
+      }, 402)
+    };
+  }
+  return { ok: true, via: 'skyepay-session', order, entitlementUnlocked: skyeVaultAgentPaymentActive(order.payment_status) && skyeVaultAgentProvisioningActive(order.provisioning_status) };
+}
+async function checkSkyeVaultAgentSkyPayAccess(env, url) {
+  const session = await checkSkyeVaultAgentSkyPaySession(env, url);
+  if (!session.ok) return session;
+  const order = session.order || {};
+  const offerId = String(order.offer_id || url.searchParams.get('offer') || '');
+  const allowed = session.entitlementUnlocked === true
+    && skyeVaultAgentPaymentActive(order.payment_status)
+    && skyeVaultAgentProvisioningActive(order.provisioning_status);
+  if (!allowed) {
+    return {
+      ok: false,
+      response: json({
+        ok: false,
+        error: 'skyevault_agent_entitlement_not_unlocked',
+        offer_id: offerId || null,
+        payment_status: order.payment_status || null,
+        provisioning_status: order.provisioning_status || null,
+        message: 'The SkyeVault Agent package unlocks only after SkyePay confirms payment and workspace provisioning.'
+      }, 402)
+    };
+  }
+  return session;
+}
+async function requireSkyeVaultAgentPackageAccess(request, env, url) {
+  const skyepay = await checkSkyeVaultAgentSkyPayAccess(env, url);
+  if (skyepay.ok) return skyepay;
+  const hasGateCredential = bearer(request) || presentedGateCredentials(request)[0];
+  if (hasGateCredential) {
+    const auth = await requireGateAuth(request, env, `SkyeVault Agent package ${url.pathname}`);
+    if (auth.ok) {
+      const adminRole = ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(String(auth.role || auth.identity?.role || '').toLowerCase())
+        || auth.identity?.isAdmin === true
+        || allowsAdminGate(auth.gate?.data || { ok: true, active: true, role: auth.role || auth.identity?.role, email: auth.identity?.email }, env);
+      if (adminRole) return { ok: true, via: 'owner-admin', auth };
+    }
+    return auth;
+  }
+  return skyepay;
+}
 function removedSovereignDocsDocxMaxAppRedirectResponse(url) {
   if (!url.pathname.startsWith('/Free99/apps/sovereigndocs/skye-docx-max')) return null;
   const target = sovereignDocsCanonicalSkyeDocxUrl(url, { sd_mode: 'builder' });
@@ -28045,6 +28183,16 @@ async function enforceZeroOsGate(request, env, url, ctx = null) {
   if (request.method === 'POST' && url.pathname === '/api/skymusicnexus/music-drops') return null;
   if (request.method === 'GET' && url.pathname === '/api/skymusicnexus/music-drops' && url.searchParams.get('action') === 'traffic-summary') return null;
   if (request.method === 'GET' && url.pathname === '/api/skymusicnexus/music-drops' && url.searchParams.get('action') === 'achievement-wall') return null;
+  if (isSkyeVaultAgentInstallPath(url.pathname) && (url.searchParams.get('session_id') || url.searchParams.get('order_id'))) {
+    const agentPageAccess = await checkSkyeVaultAgentSkyPaySession(env, url);
+    if (!agentPageAccess.ok) return agentPageAccess.response;
+    return null;
+  }
+  if (isSkyeVaultAgentPackagePath(url.pathname)) {
+    const packageAccess = await requireSkyeVaultAgentPackageAccess(request, env, url);
+    if (!packageAccess.ok) return packageAccess.response;
+    return null;
+  }
   const routexTourAccess = await skyeRouteXTourGateAccess(request, env, url);
   if (routexTourAccess.ok) return null;
   if (routexTourAccess.response) return routexTourAccess.response;
@@ -28072,7 +28220,6 @@ function isPublicZeroOsApiLane(request, url) {
   if (method === 'GET' && url.pathname === '/api/skyeroutex/tour-token/status') return true;
   if (method === 'POST' && url.pathname === '/api/site-operator/intake') return true;
   if (method === 'POST' && PUBLIC_PROXY_INTAKE_PATHS.has(url.pathname)) return true;
-  if (!MUTATING_METHODS.has(method) && PROXIES.some(([prefix]) => prefix !== '/api/saas/' && url.pathname.startsWith(prefix))) return true;
   if (method === 'GET' && (url.pathname === '/api/site-operator/status' || url.pathname === '/api/site-operator/live-surfaces')) return true;
   return false;
 }
@@ -28296,12 +28443,17 @@ export default {
       const requestedExecute = url.searchParams.get('execute') === '1' || body.execute === true;
       const explicitDryRun = url.searchParams.get('dry_run') === '1' || body.dry_run === true;
       const execute = requestedExecute && !explicitDryRun;
-      if (execute && !valleyTickAuthorized(request, env)) {
-        return json({
-          ok:false,
-          error:'Manual Valley publish ticks require VALLEY_PUBLISH_ADMIN_TOKEN or ADMIN_TOKEN. Use dry_run=1 for a public status check.',
-          dry_run_available:true
-        }, 401);
+      if (execute) {
+        const auth = await valleyTickAuthorized(request, env);
+        if (!auth.ok) {
+          const response = auth.response || json({
+            ok:false,
+            error:'Manual Valley publish ticks require an active FS27/SkyGate operator session. Use dry_run=1 for a public status check.',
+            dry_run_available:true
+          }, 401);
+          response.headers.set('x-0s-valley-publish-auth', 'fs27-operator-required');
+          return response;
+        }
       }
       const result = await runValleyContentScheduleTick(env, ctx, {source:'manual', execute, now:body.now || null});
       return json(result, result.ok ? 200 : 502);
@@ -28386,6 +28538,8 @@ export default {
       return json({ok:true, task, queued: Boolean(env.SITE_TASK_QUEUE), stored: Boolean(env.SITE_EVENTS_KV)});
     }
     if (url.pathname === '/api/site-operator/ledger') {
+      const auth = await requireOperatorAuth(request, env, 'site operator ledger');
+      if (!auth.ok) return auth.response;
       const events = await readKVLedger(env);
       return json({ok:true, persistence: Boolean(env.SITE_OPERATOR_WORKER || env.SITE_OPERATOR_WORKER_ORIGIN) ? 'd1' : 'kv', events});
     }

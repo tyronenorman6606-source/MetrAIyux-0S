@@ -12,7 +12,18 @@ const BASE = `http://127.0.0.1:${PORT}`;
 
 function resetStore() {
   fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
-  fs.writeFileSync(STORE_PATH, JSON.stringify({ deliveryPacks: [], audit: [] }, null, 2));
+  fs.writeFileSync(STORE_PATH, JSON.stringify({
+    runtimeBoundary: {
+      source: 'local-smoke-proof',
+      liveTelemetry: false,
+      liveCustomerVisibility: false,
+      workerConfirmed: false,
+      workerRuntimeEndpoint: '/api/marketing-made-easy/webcreator-runtime',
+      note: 'Local smoke proof only; shared-gated 0S Worker confirmation is required before customer-visible delivery claims.',
+    },
+    deliveryPacks: [],
+    audit: [],
+  }, null, 2));
 }
 
 async function waitForHealth() {
@@ -51,7 +62,7 @@ try {
       projectName: 'Runtime Proof Website',
       label: 'Founder rollout handoff',
       target: 'ae-commandhub',
-      notes: 'Needs AE command review and downstream route.',
+      notes: 'Local smoke package; needs shared-gated Worker confirmation before AE/customer-visible use.',
       sourceSnapshot: {
         'index.html': '<main>contact proof gate</main>',
         'styles.css': 'body { color: white; }',
@@ -59,11 +70,11 @@ try {
         'README.md': '# Proof',
       },
       review: {
-        owner: 'ae-operator',
-        status: 'ready',
-        checkpoint: 'ready for packaging',
-        notes: 'Needs AE command review and downstream route.',
-      },
+      owner: 'ae-operator',
+      status: 'ready',
+      checkpoint: 'ready for packaging',
+      notes: 'Local smoke package; needs shared-gated Worker confirmation before AE/customer-visible use.',
+    },
     }),
   }).then((response) => response.json());
   const packId = createResponse.item?.id;
@@ -73,8 +84,8 @@ try {
     body: JSON.stringify({
       owner: 'ae-operator',
       status: 'approved',
-      checkpoint: 'approved for handoff',
-      notes: 'Approved in local review board.',
+      checkpoint: 'local review proof only',
+      notes: 'Approved in the local review board only; awaiting shared-gated Worker confirmation.',
     }),
   }).then((response) => response.json());
   const executionResponse = await fetch(`${BASE}/api/runtime/delivery-packs/${packId}/execution`, {
@@ -83,8 +94,8 @@ try {
     body: JSON.stringify({
       owner: 'delivery-operator',
       status: 'active',
-      checkpoint: 'queued for downstream execution',
-      notes: 'Ready for downstream launch handling.',
+      checkpoint: 'local execution proof only',
+      notes: 'Local execution proof only; downstream launch handling is pending shared-gated Worker confirmation.',
       targets: ['AE-FlowPro', 'SkyeProofx'],
     }),
   }).then((response) => response.json());
@@ -94,8 +105,8 @@ try {
     body: JSON.stringify({
       owner: 'dispatch-operator',
       status: 'delivered',
-      checkpoint: 'delivered to downstream lane',
-      notes: 'Dispatched into the next operator lane.',
+      checkpoint: 'local dispatch proof only',
+      notes: 'Local dispatch proof only; not delivered to a customer-visible Worker lane.',
       targets: ['AE-FlowPro', 'SkyeProofx'],
     }),
   }).then((response) => response.json());
@@ -132,9 +143,15 @@ try {
     && first?.dispatch?.owner === 'dispatch-operator'
     && first?.dispatch?.status === 'delivered'
     && Array.isArray(first?.targets) && first.targets.length >= 1
-    && detail.item?.review?.checkpoint === 'approved for handoff'
-    && detail.item?.execution?.checkpoint === 'queued for downstream execution'
-    && detail.item?.dispatch?.checkpoint === 'delivered to downstream lane'
+    && detail.item?.workerConfirmed === false
+    && detail.item?.customerVisible === false
+    && detail.item?.review?.checkpoint === 'local review proof only'
+    && detail.item?.review?.workerConfirmed === false
+    && detail.item?.execution?.checkpoint === 'local execution proof only'
+    && detail.item?.execution?.workerConfirmed === false
+    && detail.item?.dispatch?.checkpoint === 'local dispatch proof only'
+    && detail.item?.dispatch?.customerVisible === false
+    && store.runtimeBoundary?.liveTelemetry === false
     && store.deliveryPacks.length >= 1
     && store.audit.some((entry) => entry.type === 'delivery_pack_created')
     && store.audit.some((entry) => entry.type === 'delivery_pack_reviewed')

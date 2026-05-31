@@ -164,11 +164,11 @@
             <h2>Runtime + recovery</h2>
           </div>
         </div>
-        <p class="helper">For a live deployment, set <code>APP_ACCESS_TOKEN</code> and <code>SCHEDULER_API_KEY</code>. Store the token here so the dashboard can make protected requests. External schedulers call <code>/api/automation/tick</code>; GitHub backup writes drafts, queue, settings, and logs into your repo for recovery. Free99 access still requires a 0S, FS27, SkyGate, or local admin gate session.</p>
-        <label class="field-label" for="accessToken">Dashboard access token</label>
+        <p class="helper">For a live deployment, configure <code>SKYGATEFS27_ORIGIN</code> or <code>SKYGATE_ORIGIN</code> so dashboard requests verify against the shared 0S gate. External schedulers call <code>/api/automation/tick</code> with <code>SCHEDULER_API_KEY</code>; GitHub backup writes drafts, queue, settings, and logs into your repo for recovery.</p>
+        <label class="field-label" for="accessToken">Shared gate session</label>
         <div class="inline-field">
-          <input id="accessToken" type="password" placeholder="Paste APP_ACCESS_TOKEN or SCHEDULER_API_KEY" autocomplete="current-password" />
-          <button id="saveAccessTokenBtn" class="tiny">Save Token</button>
+          <input id="accessToken" type="password" placeholder="Managed by the 0S/FS27 gate bridge" autocomplete="off" readonly />
+          <button id="saveAccessTokenBtn" class="tiny">Clear Session</button>
         </div>
         <div class="stack-actions">
           <button id="runAutomationTickBtn" class="secondary">Run Scheduler Tick</button>

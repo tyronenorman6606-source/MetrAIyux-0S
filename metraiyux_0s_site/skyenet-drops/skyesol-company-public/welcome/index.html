@@ -9,8 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#05050a">
-  <script>window.netlifyIdentityWidget = { APIUrl: 'https://skyenet.skyesol/.netlify/identity' };</script>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="../js/netlify-identity-init.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -379,8 +378,8 @@
     localStorage.setItem('sol_welcome_seen', '1');
   }
 
-  if (window.netlifyIdentity) {
-    netlifyIdentity.on('init', function(user) {
+  if (window.SkyeSolIdentity) {
+    window.SkyeSolIdentity.on('init', function(user) {
       if (!user) {
         window.location.href = '/account/?next=/welcome/';
         return;
@@ -399,7 +398,7 @@
       document.getElementById('page').classList.add('visible');
     });
 
-    netlifyIdentity.on('logout', function() {
+    window.SkyeSolIdentity.on('logout', function() {
       window.location.href = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=https%3A%2F%2Fskyenet.skyesol%2F';
     });
   } else {

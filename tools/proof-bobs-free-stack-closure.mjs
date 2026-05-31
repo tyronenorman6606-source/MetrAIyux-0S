@@ -359,7 +359,7 @@ async function main() {
     return;
   }
 
-  const login = await fetchJson(`${zeroOsBase}/api/founder-command/login`, {
+  const login = await fetchJson(`${zeroOsBase}/api/owner/admin-login`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ code: credential.value })

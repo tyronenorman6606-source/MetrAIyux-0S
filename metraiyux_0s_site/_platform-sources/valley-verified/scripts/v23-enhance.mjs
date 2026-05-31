@@ -7,7 +7,7 @@ const ROOT = path.resolve(path.dirname(__filename), '..');
 const DIST = path.join(ROOT, 'dist');
 const REPO_ROOT = path.resolve(ROOT, '../../..');
 const TODAY = new Date().toISOString().slice(0, 10);
-const DEFAULT_SITE_URL = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/valley-verified';
+const DEFAULT_SITE_URL = 'https://skyenet.graylondonskyes.workers.dev/valley-verified-marketplace';
 const SITE_URL = String(process.env.VALLEY_VERIFIED_CANONICAL_URL || process.env.SITE_URL || process.env.URL || DEFAULT_SITE_URL).replace(/\/+$/, '');
 const SITE_ORIGIN = (() => { try { return new URL(SITE_URL).origin; } catch { return DEFAULT_SITE_URL.replace(/\/valley-verified\/?$/, ''); } })();
 const SKYEMAIL_SIGNIN_ORIGIN = String(process.env.SKYEMAIL_SIGNIN_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -761,18 +761,18 @@ const clientBuilds = [
     industry:'Gaming retail and events',
     copy:'A Goodyear trading-card-shop app with weekly events, free table play, shop photos, TCGPlayer handoff, event request, scan route, and Valley Verified backlink.',
     actualApp:'Next Level Gaming AZ is a real app-build example for a gaming shop: event discovery, shop proof, TCGPlayer handoff, event requests, calls, scan routing, and player-friendly mobile actions.',
-    url:`${SITE_ORIGIN}/client-app-factory/client-apps/next-level-gaming-goodyear/`,
+    url:`${SITE_ORIGIN}/next-level-gaming-az/`,
     valleyUrl:'/business/next-level-gaming-goodyear/',
-    image:'/client-app-factory/client-apps/next-level-gaming-goodyear/assets/media/shop-photo-1.jpg',
-    poster:'/client-app-factory/client-apps/next-level-gaming-goodyear/assets/media/cyber-city-hero.jpg',
+    video:'/assets/client-builds/next-level-live-build.mp4',
+    poster:'/assets/client-builds/next-level-live-build-poster.jpg',
     mediaAlt:'Next Level Gaming AZ live app preview',
-    sourceFolder:'client-app-factory/client-apps/next-level-gaming-goodyear',
+    sourceFolder:'client-app-factory/client-apps/next-level-gaming-az',
     metrics:['Weekly events','TCGPlayer handoff','Scan route'],
     appRoutes:['Events','Shop','Scan route','Event request','TCGPlayer handoff','58 seats','Weekly TCG board','Mobile install'],
     deliverables:['Branded gaming-retail app surface','Weekly events and table-play routing','Shop photo proof and real store context','TCGPlayer shopping handoff','Event request and organizer contact path','QR scan route for in-store and print handoff','Two-way Valley Verified backlink and live-app handoff'],
     value:['Turns a local card shop into a real player action surface instead of a thin listing.','Gives customers one route for events, shopping, calls, scans, and store proof.','Shows Valley Verified buyers what a scoped gaming-retail app can look like when it is actually built.','Keeps placeholder media out of the proof lane.'],
     buyerActions:['Check events','Open TCGPlayer handoff','Request an event','Share the live app or Valley post'],
-    proof:[['Build source','client-app-factory/client-apps/next-level-gaming-goodyear'],['Live build URL',`${SITE_ORIGIN}/client-app-factory/client-apps/next-level-gaming-goodyear/`],['Valley route','/business/next-level-gaming-goodyear/']]
+    proof:[['Build source','client-app-factory/client-apps/next-level-gaming-az'],['Live build URL',`${SITE_ORIGIN}/next-level-gaming-az/`],['Valley route','/business/next-level-gaming-goodyear/']]
   },
   {
     id:'fade-masters',
@@ -1067,6 +1067,8 @@ async function copyClientBuildAssets(){
     ['Skye-Clients/bobs-smoke-shop-mcp-redo/assets/videos/bobs-live-homepage-poster.jpg', 'assets/client-builds/bobs-live-build-poster.jpg'],
     ['Skye-Clients/empire-pallets-v3-app/assets/media/empire-hero.mp4', 'assets/client-builds/empire-live-build.mp4'],
     ['Skye-Clients/empire-pallets-v3-app/assets/media/empire-hero-poster.jpg', 'assets/client-builds/empire-live-build-poster.jpg'],
+    ['client-app-factory/client-apps/next-level-gaming-az/assets/media/next-level-hero.mp4', 'assets/client-builds/next-level-live-build.mp4'],
+    ['client-app-factory/client-apps/next-level-gaming-az/assets/media/next-level-hero-poster.jpg', 'assets/client-builds/next-level-live-build-poster.jpg'],
     ['Skye-Clients/480-realty-property-management-app/assets/brand/480-realty-hero.mp4', 'assets/client-builds/480-live-build.mp4'],
     ['Skye-Clients/480-realty-property-management-app/assets/live-site/480-home-hero.png', 'assets/client-builds/480-live-build-poster.png'],
     ['Skye-Clients/480-realty-property-management-app/assets/live-site/480-preview-qr.png', 'assets/client-builds/480-live-build-qr.png'],

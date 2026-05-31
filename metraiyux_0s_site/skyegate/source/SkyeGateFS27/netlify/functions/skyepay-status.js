@@ -62,5 +62,8 @@ export default wrap(async (req) => {
   );
 
   if (!res.rowCount) return json(404, { error: "SkyePay order not found" }, headers);
-  return json(200, { ok: true, order: publicSkyePayOrder(res.rows[0]) }, headers);
+  return json(200, {
+    ok: true,
+    order: publicSkyePayOrder(res.rows[0], { includeVaultAgentSecrets: Boolean(sessionId) })
+  }, headers);
 });

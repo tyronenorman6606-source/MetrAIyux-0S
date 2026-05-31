@@ -439,17 +439,17 @@ function normalizeMessages(messages = []) {
 }
 
 const SKYMAIL_AI_MODELS = Object.freeze({
-  "kaixu-6.7-mini": { alias: "kaixu-6.7-mini", provider: "openai", model: "gpt-4o-mini", billable_in: 0.2586, billable_out: 1.0345 },
-  "kaixu-6.7": { alias: "kaixu-6.7", provider: "openai", model: "gpt-4o", billable_in: 4.3103, billable_out: 17.2414 },
-  "kaixu-6.7-pro": { alias: "kaixu-6.7-pro", provider: "anthropic", model: "claude-3-5-sonnet-20241022", billable_in: 5.1724, billable_out: 25.8621 },
+  "skyemail-brain-fast": { alias: "skyemail-brain-fast", label: "SkyEmail Brain Fast", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7_MINI", billable_in: 0.2586, billable_out: 1.0345 },
+  "skyemail-brain-deep": { alias: "skyemail-brain-deep", label: "SkyEmail Brain Deep", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7", billable_in: 4.3103, billable_out: 17.2414 },
+  "skyemail-brain-operator": { alias: "skyemail-brain-operator", label: "SkyEmail Brain Operator", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7_PRO", billable_in: 5.1724, billable_out: 25.8621 },
 });
 
 const SKYMAIL_AI_PLANS = Object.freeze({
   skymail_ai_free: { id: "skymail_ai_free", name: "SkyeMail Local Brain", included_messages: 0, backup_messages: 0, monthly_cents_cap: 0, provider_calls: false, auto_send: false },
-  "relay13-ai-response-starter": { id: "relay13-ai-response-starter", name: "SkyeMail AI Response Starter", included_messages: 125, backup_messages: 31, monthly_cents_cap: 700, provider_calls: true, auto_send: false },
-  "relay13-ai-response-plus": { id: "relay13-ai-response-plus", name: "SkyeMail AI Response Plus", included_messages: 425, backup_messages: 76, monthly_cents_cap: 2200, provider_calls: true, auto_send: false },
-  "relay13-managed-ai-inbox": { id: "relay13-managed-ai-inbox", name: "SkyeMail Managed AI Inbox", included_messages: 1000, backup_messages: 222, monthly_cents_cap: 6500, provider_calls: true, auto_send: true },
-  owner_operator: { id: "owner_operator", name: "Owner Operator kAIxu Lane", included_messages: 10000, backup_messages: 2500, monthly_cents_cap: 25000, provider_calls: true, auto_send: true },
+  "skyemail-ai-response-starter": { id: "skyemail-ai-response-starter", name: "SkyEmail AI Response Starter", included_messages: 125, backup_messages: 31, monthly_cents_cap: 700, provider_calls: true, auto_send: false },
+  "skyemail-ai-response-plus": { id: "skyemail-ai-response-plus", name: "SkyEmail AI Response Plus", included_messages: 425, backup_messages: 76, monthly_cents_cap: 2200, provider_calls: true, auto_send: false },
+  "skyemail-managed-ai-inbox": { id: "skyemail-managed-ai-inbox", name: "SkyEmail Managed AI Inbox", included_messages: 1000, backup_messages: 222, monthly_cents_cap: 6500, provider_calls: true, auto_send: true },
+  owner_operator: { id: "owner_operator", name: "Owner Operator FS27 Brain Lane", included_messages: 10000, backup_messages: 2500, monthly_cents_cap: 25000, provider_calls: true, auto_send: true },
 });
 
 function skygateOrigin(env) {
@@ -493,12 +493,16 @@ function skymailAiGatewayBearer(request, env = {}, auth = {}) {
 }
 
 function resolveSkymailAiModel(env, requested = "") {
-  const raw = clean(requested || env.SKYEMAIL_AI_MODEL || env.KAIXU_MODEL || "kaixu-6.7-mini").toLowerCase();
-  if (SKYMAIL_AI_MODELS[raw]) return SKYMAIL_AI_MODELS[raw];
-  const provider = clean(raw.split(":")[0]).toLowerCase();
-  const model = clean(raw.includes(":") ? raw.split(":").slice(1).join(":") : raw);
-  if (provider === "anthropic") return { alias: raw, provider: "anthropic", model: model || env.ANTHROPIC_MODEL || "claude-3-5-haiku-latest", billable_in: 5.1724, billable_out: 25.8621 };
-  return { alias: raw || "kaixu-6.7-mini", provider: "openai", model: model || env.OPENAI_MODEL || "gpt-4o-mini", billable_in: 0.2586, billable_out: 1.0345 };
+  const raw = clean(requested || env.SKYEMAIL_AI_MODEL || env.FS27_BRAIN_MODEL || env.KAIXU_MODEL || "skyemail-brain-fast").toLowerCase();
+  const aliases = {
+    "kaixu-6.7-mini": "skyemail-brain-fast",
+    "kaixu-6.7": "skyemail-brain-deep",
+    "kaixu-6.7-pro": "skyemail-brain-operator",
+    fast: "skyemail-brain-fast",
+    deep: "skyemail-brain-deep",
+    operator: "skyemail-brain-operator",
+  };
+  return SKYMAIL_AI_MODELS[aliases[raw] || raw] || SKYMAIL_AI_MODELS["skyemail-brain-fast"];
 }
 
 function skymailAiPlanById(planId = "") {
@@ -506,11 +510,14 @@ function skymailAiPlanById(planId = "") {
   const aliases = {
     free: "skymail_ai_free",
     local: "skymail_ai_free",
-    starter: "relay13-ai-response-starter",
-    plus: "relay13-ai-response-plus",
-    business: "relay13-ai-response-plus",
-    managed: "relay13-managed-ai-inbox",
-    "managed-ai-inbox": "relay13-managed-ai-inbox",
+    starter: "skyemail-ai-response-starter",
+    plus: "skyemail-ai-response-plus",
+    business: "skyemail-ai-response-plus",
+    managed: "skyemail-managed-ai-inbox",
+    "managed-ai-inbox": "skyemail-managed-ai-inbox",
+    "relay13-ai-response-starter": "skyemail-ai-response-starter",
+    "relay13-ai-response-plus": "skyemail-ai-response-plus",
+    "relay13-managed-ai-inbox": "skyemail-managed-ai-inbox",
     owner: "owner_operator",
     founder: "owner_operator",
     operator: "owner_operator",
@@ -569,7 +576,7 @@ function skymailAiPlanSnapshot(plan = {}) {
     total_protected_messages: total,
     monthly_cents_cap: Number(plan.monthly_cents_cap || 0),
     skyepay_offer: skyepayOffer,
-    skyepay_url: skyepayOffer ? `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=skymail&offer=${encodeURIComponent(skyepayOffer)}` : "",
+    skyepay_url: skyepayOffer ? `https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s-skm&offer=${encodeURIComponent(skyepayOffer)}` : "",
   };
 }
 
@@ -719,7 +726,7 @@ function skymailAiAllowance(entitlement = {}, month = {}) {
 async function callSkymailFs27KaixuGateway(request, env, { auth, messages, modelInfo, action, usageLane = "skymail-ai" }) {
   const gatewayBearer = skymailAiGatewayBearer(request, env, auth);
   if (!gatewayBearer.token) {
-    throw Object.assign(new Error("Shared FS27/kAIxu gateway bearer is not available."), { statusCode: 503, provider_path: "fs27-gateway-required" });
+    throw Object.assign(new Error("Shared FS27/SkyGate Brain bearer is not available."), { statusCode: 503, provider_path: "fs27-gateway-required" });
   }
   const gateSession = clean(auth.gate_token || bearer(request));
   const response = await skygateRequest(env, "/gateway-chat", {
@@ -732,12 +739,13 @@ async function callSkymailFs27KaixuGateway(request, env, { auth, messages, model
       "x-skye-usage-lane": usageLane,
       "x-free99-billing-mode": "paid-skyepay",
       "x-kaixu-app": "skymail",
+      "x-skye-app": "skymail",
       "x-kaixu-request-id": `skymail_${action}_${Date.now()}`,
       "x-0s-gate-session": gateSession,
     },
     body: JSON.stringify({
-      provider: modelInfo.provider,
-      model: modelInfo.alias || modelInfo.model,
+      provider: modelInfo.gateway_provider || modelInfo.provider,
+      model: modelInfo.gateway_model || modelInfo.alias,
       messages,
       max_tokens: 1000,
       temperature: 0.35,
@@ -746,13 +754,13 @@ async function callSkymailFs27KaixuGateway(request, env, { auth, messages, model
     }),
   });
   const data = await response.json().catch(() => ({ error: "invalid_gateway_response" }));
-  if (!response.ok) throw Object.assign(new Error(data.error || data.message || "FS27/kAIxu gateway failed."), { statusCode: response.status || 502, providerResponse: data, provider_path: "fs27-gateway-chat" });
+  if (!response.ok) throw Object.assign(new Error(data.error || data.message || "FS27/SkyGate Brain gateway failed."), { statusCode: response.status || 502, providerResponse: data, provider_path: "fs27-gateway-chat" });
   const outputText = data.output_text || data.choices?.[0]?.message?.content || "";
   return {
     output_text: outputText,
     usage: data.usage || data.telemetry?.usage || null,
-    provider: "kaixu",
-    model: modelInfo.alias || modelInfo.model,
+    provider: modelInfo.provider,
+    model: modelInfo.alias,
     provider_path: "fs27-gateway-chat",
     gateway_auth_source: gatewayBearer.source,
     raw: data,
@@ -766,7 +774,7 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
   const allowance = skymailAiAllowance(entitlement, month);
   const modelInfo = resolveSkymailAiModel(env, requestedModel);
   if (!allowance.ai_call_allowed) {
-    throw Object.assign(new Error("SkyeMail kAIxu model calls are not active for this mailbox plan."), {
+    throw Object.assign(new Error("SkyeMail FS27 Brain model calls are not active for this mailbox plan."), {
       statusCode: allowance.alerts.includes("ai_message_cap_reached") || allowance.alerts.includes("ai_cost_cap_reached") ? 402 : 403,
       entitlement: skymailAiPlanSnapshot(entitlement),
       month: allowance,
@@ -779,7 +787,7 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
   const rows = await query(env, `
     insert into ai_usage_events(user_id, mailbox_id, plan_id, action, model_mode, provider_path, provider, model,
       input_tokens, output_tokens, total_tokens, cost_cents, request_json, response_json)
-    values($1,$2,$3,$4,'kaixu_metered_v1',$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13::jsonb)
+    values($1,$2,$3,$4,'fs27_metered_v1',$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13::jsonb)
     returning id, created_at
   `, [
     auth.sub,
@@ -807,7 +815,7 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
   return {
     ok: true,
     output_text: result.output_text || "",
-    model_mode: "kaixu_metered_v1",
+    model_mode: "fs27_metered_v1",
     provider_path: result.provider_path || "",
     model: result.model || modelInfo.alias,
     provider: result.provider || modelInfo.provider,
@@ -817,7 +825,7 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
   };
 }
 
-const SKYMAIL_SKYEPAY_CONFIRMED = new Set(["paid", "complete", "completed", "no_payment_required", "active", "trialing"]);
+const SKYMAIL_SKYEPAY_CONFIRMED = new Set(["paid", "complete", "completed", "active", "trialing"]);
 
 async function activateSkymailAiEntitlement(env, { auth, mailbox, plan, source, meta = {} }) {
   await ensureSkymailAiRuntimeSchema(env);
@@ -861,21 +869,37 @@ async function handleMailBrainCheckout(request, env, ctx) {
   const auth = await requireAuth(request, env);
   const body = await request.json().catch(() => ({}));
   const context = await resolveMailboxContext(env, request, auth, body);
-  const plan = skymailAiPlanById(body.plan_id || body.plan || "relay13-ai-response-starter");
+  const plan = skymailAiPlanById(body.plan_id || body.plan || "skyemail-ai-response-starter");
   if (!plan.provider_calls || plan.id === "owner_operator") {
-    throw Object.assign(new Error("Selected SkyeMail AI plan is not a paid kAIxu provider lane."), { statusCode: 400 });
+    throw Object.assign(new Error("Selected SkyeMail AI plan is not a paid FS27 Brain lane."), { statusCode: 400 });
   }
   const origin = new URL(request.url).origin;
   const success = clean(body.success_url) || `${origin}/brain.html?ai_checkout=success&plan=${encodeURIComponent(plan.id)}`;
   const cancel = clean(body.cancel_url) || `${origin}/brain.html?ai_checkout=cancel&plan=${encodeURIComponent(plan.id)}`;
   const checkoutBody = {
-    client: "skymail",
+    client: "metraiyux-0s-skm",
+    client_slug: "metraiyux-0s-skm",
     app_id: "skymail",
     platform_id: "skymail",
     offer_id: plan.id,
     customer_email: normalizeEmail(body.customer_email || auth.email),
+    customer_name: clean(body.customer_name || auth.handle || auth.email || "SkyEmail customer"),
+    company_name: clean(body.company_name || body.company || "SkyEmail workspace"),
     success_url: success,
     cancel_url: cancel,
+    idempotency_key: clean(body.idempotency_key || body.request_id || `skymail-ai-${context.userId}-${plan.id}-${Date.now()}`),
+    legal_acceptance: {
+      legal_acceptance: true,
+      legal_terms_accepted: true,
+      arbitration_accepted: true,
+      payments_policy_accepted: true,
+      no_outcome_guarantee_accepted: true,
+      truthful_review_boundary_acknowledged: true,
+      privacy_policy_accepted: true,
+      accepted_at: clean(body.legal_accepted_at || body.accepted_at) || new Date().toISOString(),
+      acceptance_surface: clean(body.acceptance_surface || "skymail-brain-checkout"),
+      source_url: origin,
+    },
     metadata: {
       user_id: context.userId,
       mailbox_id: context.mailbox?.id || "",
@@ -883,11 +907,22 @@ async function handleMailBrainCheckout(request, env, ctx) {
       fs27_customer_id: auth.fs27_customer_id || "",
       plan_id: plan.id,
     },
-    dry_run: body.proof_mode === true && authIsOwnerOperator(env, context.auth),
+    dry_run: false,
   };
+  const gateSession = clean(auth.gate_token || bearer(request));
   const response = await skygateRequest(env, "/skyepay/checkout", {
     method: "POST",
-    headers: { "content-type": "application/json", origin, "x-skypay-proof-mode": checkoutBody.dry_run ? "1" : "0" },
+    headers: {
+      "content-type": "application/json",
+      origin,
+      "x-skypay-proof-mode": checkoutBody.dry_run ? "1" : "0",
+      authorization: gateSession ? `Bearer ${gateSession}` : "",
+      "x-0s-gate-session": gateSession,
+      "x-skye-gate-session": gateSession,
+      "x-free99-gate-session": gateSession,
+      "x-skye-platform": "skymail",
+      "x-0s-platform": "skymail",
+    },
     body: JSON.stringify(checkoutBody),
   });
   const data = await response.json().catch(() => ({ ok: false, error: "invalid_skyepay_checkout_response" }));
@@ -928,13 +963,22 @@ async function handleMailBrainClaim(request, env, ctx) {
   const body = await request.json().catch(() => ({}));
   const context = await resolveMailboxContext(env, request, auth, body);
   const sessionId = clean(body.session_id || body.checkout_id || body.stripe_session_id);
-  const demoSession = clean(body.demo_session || body.demoSession);
-  const plan = skymailAiPlanById(body.plan_id || body.offer_id || body.plan || "relay13-ai-response-starter");
-  if (!sessionId && !demoSession) throw Object.assign(new Error("session_id or demo_session is required to claim a SkyeMail AI entitlement."), { statusCode: 400 });
-  const statusPath = demoSession
-    ? `/skyepay/status?demo_session=${encodeURIComponent(demoSession)}&offer=${encodeURIComponent(plan.id)}`
-    : `/skyepay/status?session_id=${encodeURIComponent(sessionId)}`;
-  const response = await skygateRequest(env, statusPath, { method: "GET", headers: { origin: new URL(request.url).origin } });
+  const plan = skymailAiPlanById(body.plan_id || body.offer_id || body.plan || "skyemail-ai-response-starter");
+  if (!sessionId) throw Object.assign(new Error("session_id is required to claim a SkyeMail AI entitlement."), { statusCode: 400 });
+  const statusPath = `/skyepay/status?session_id=${encodeURIComponent(sessionId)}`;
+  const gateSession = clean(auth.gate_token || bearer(request));
+  const response = await skygateRequest(env, statusPath, {
+    method: "GET",
+    headers: {
+      origin: new URL(request.url).origin,
+      authorization: gateSession ? `Bearer ${gateSession}` : "",
+      "x-0s-gate-session": gateSession,
+      "x-skye-gate-session": gateSession,
+      "x-free99-gate-session": gateSession,
+      "x-skye-platform": "skymail",
+      "x-0s-platform": "skymail",
+    },
+  });
   const status = await response.json().catch(() => ({ ok: false, error: "invalid_skyepay_status_response" }));
   if (!response.ok || status.ok === false) throw Object.assign(new Error(status.error || "SkyPay status check failed."), { statusCode: response.status || 502, providerResponse: status });
   const order = status.order || status.checkout || status.session || status;
@@ -949,7 +993,7 @@ async function handleMailBrainClaim(request, env, ctx) {
     mailbox: context.mailbox,
     plan,
     source: "skyepay_status",
-    meta: { skyepay_status: status, session_id: sessionId || demoSession },
+    meta: { skyepay_status: status, session_id: sessionId },
   });
   ctx?.waitUntil?.(mirrorFs27(env, {
     type: "skymail.ai.entitlement_unlocked",
@@ -981,7 +1025,7 @@ async function handleGatewayChat(request, env, ctx) {
     usage: ai.usage,
     month: ai.month,
     model: ai.model,
-    provider: "kaixu",
+    provider: ai.provider || "fs27_skygate_brain",
     provider_path: ai.provider_path,
     usage_event_id: ai.usage_event_id,
   });
@@ -1003,7 +1047,7 @@ async function handleGatewayStream(request, env, ctx) {
   const enc = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      controller.enqueue(enc.encode(`event: meta\ndata: ${JSON.stringify({ month: data.month, provider: "kaixu", model: data.model, provider_path: data.provider_path })}\n\n`));
+      controller.enqueue(enc.encode(`event: meta\ndata: ${JSON.stringify({ month: data.month, provider: data.provider || "fs27_skygate_brain", model: data.model, provider_path: data.provider_path })}\n\n`));
       controller.enqueue(enc.encode(`event: delta\ndata: ${JSON.stringify({ text: data.output_text })}\n\n`));
       controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify({ month: data.month, usage: data.usage })}\n\n`));
       controller.close();
@@ -3312,10 +3356,10 @@ async function resolveMailboxContext(env, request, auth, body = {}) {
 function mailBrainCapabilities() {
   return [
     { id: "triage", label: "Triage", detail: "Classify selected or recent mail into reply, monitor, archive, and handoff buckets." },
-    { id: "summarize", label: "Summarize", detail: "Create a short summary with the local brain or a plan-gated kAIxu model." },
+    { id: "summarize", label: "Summarize", detail: "Create a short summary with the local brain or a plan-gated FS27 Brain model." },
     { id: "draft_reply", label: "Draft Reply", detail: "Prepare a response draft using mailbox context and the selected brain mode." },
     { id: "rewrite", label: "Rewrite", detail: "Clean up user-provided copy for a professional email." },
-    { id: "ask_brain", label: "Ask Brain", detail: "Ask a mailbox-scoped kAIxu/local question over recent mail context." },
+    { id: "ask_brain", label: "Ask Brain", detail: "Ask a mailbox-scoped FS27/local question over recent mail context." },
     { id: "send_and_monitor", label: "Send + Monitor", detail: "Send an explicitly approved message through SkyeMail, then watch for replies." },
     { id: "handoff_plan", label: "Handoff Plan", detail: "Turn selected mail into a review, execution, and dispatch checklist." },
     { id: "monitor", label: "Monitor", detail: "Explain push watch, sync, response monitoring, and proof loops for the active mailbox." }
@@ -3427,7 +3471,7 @@ function mailBrainOutput({ action, prompt, messages, mailbox, auth }) {
     boundaries: [
       "Local brain mode is deterministic and mailbox-scoped.",
       "It does not send email, delete mail, or call a paid model by itself.",
-      "kAIxu/paid model routing is available only behind FS27 plan and usage metering."
+      "Paid model routing is available only behind FS27 plan and usage metering."
     ]
   };
 
@@ -3602,10 +3646,10 @@ async function refreshBrainMonitors(env, userId, mailbox = null) {
 }
 
 function mailBrainMode(body = {}, env = {}) {
-  const value = clean(body.model_mode || body.brain_mode || body.mode || env.SKYEMAIL_BRAIN_DEFAULT_MODE || "kaixu").toLowerCase();
+  const value = clean(body.model_mode || body.brain_mode || body.mode || env.SKYEMAIL_BRAIN_DEFAULT_MODE || "fs27_metered_v1").toLowerCase();
   if (["local", "local_deterministic_v1", "deterministic"].includes(value)) return "local_deterministic_v1";
-  if (["auto", "kaixu", "paid", "model", "kaixu_metered", "kaixu_metered_v1"].includes(value)) return value === "auto" ? "auto" : "kaixu_metered_v1";
-  return "kaixu_metered_v1";
+  if (["auto", "fs27", "fs27_metered", "fs27_metered_v1", "kaixu", "paid", "model", "kaixu_metered", "kaixu_metered_v1"].includes(value)) return value === "auto" ? "auto" : "fs27_metered_v1";
+  return "fs27_metered_v1";
 }
 
 function mailBrainSystemPrompt({ action, mailboxEmail }) {
@@ -3655,10 +3699,10 @@ function outputFromAiText({ action, text, localOutput, messages }) {
     ...localOutput,
     summary: firstUsefulParagraph(text) || localOutput.summary,
     ai_text: text || "",
-    recommendations: localOutput.recommendations?.length ? localOutput.recommendations : ["Review the kAIxu output, then decide whether to reply, monitor, archive, or hand off."],
+    recommendations: localOutput.recommendations?.length ? localOutput.recommendations : ["Review the FS27 Brain output, then decide whether to reply, monitor, archive, or hand off."],
     boundaries: [
       ...(localOutput.boundaries || []),
-      "kAIxu output is saved to SkyeMail usage and brain-event ledgers.",
+      "FS27 Brain output is saved to SkyeMail usage and brain-event ledgers.",
       "Human review remains required for legal, billing, contracts, HR, safety, or high-risk commitments."
     ]
   };
@@ -3703,7 +3747,7 @@ async function handleMailBrain(request, env, ctx) {
     const limit = new URL(request.url).searchParams.get("limit") || 20;
     const history = await listMailBrainEvents(env, mailboxContext.userId, mailbox?.id || null, limit);
     const monitors = await refreshBrainMonitors(env, mailboxContext.userId, mailbox).catch(() => []);
-    return json({ ok: true, mailbox: mailboxPayload, model_mode: "kaixu_metered_v1", ai: aiStatus, capabilities: mailBrainCapabilities(), history, monitors });
+    return json({ ok: true, mailbox: mailboxPayload, model_mode: "fs27_metered_v1", ai: aiStatus, capabilities: mailBrainCapabilities(), history, monitors });
   }
 
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -3714,7 +3758,7 @@ async function handleMailBrain(request, env, ctx) {
   const messages = await mailBrainMessages(env, mailboxContext.userId, body.messages || [], requestedIds, mailbox);
   let output = mailBrainOutput({ action, prompt, messages, mailbox, auth: mailboxContext.auth });
   let modelMode = mailBrainMode(body, env);
-  let kaixuUsage = {};
+  let brainUsage = {};
   let sendResult = null;
   let monitorResult = null;
 
@@ -3794,17 +3838,17 @@ async function handleMailBrain(request, env, ctx) {
         messages: mailBrainAiMessages({ action, mailboxEmail: mailbox?.mailbox_email || "", prompt, messages }),
         action: `mail-brain:${action}`,
         prompt,
-        requestedModel: body.model || body.kaixu_model || "",
+        requestedModel: body.model || body.brain_model || body.kaixu_model || "",
         source: clean(body.source || "skymail-brain-page"),
       });
       output = outputFromAiText({ action, text: ai.output_text, localOutput: output, messages });
       modelMode = ai.model_mode;
-      kaixuUsage = { usage_event_id: ai.usage_event_id, usage: ai.usage, month: ai.month, model: ai.model, provider_path: ai.provider_path };
+      brainUsage = { usage_event_id: ai.usage_event_id, usage: ai.usage, month: ai.month, model: ai.model, provider: ai.provider || "fs27_skygate_brain", provider_path: ai.provider_path };
     } catch (error) {
-      if (modelMode === "kaixu_metered_v1") throw error;
-      output.model_warning = error.message || "kAIxu model path unavailable; local deterministic brain was used.";
+      if (modelMode === "fs27_metered_v1") throw error;
+      output.model_warning = error.message || "FS27 Brain model path unavailable; local deterministic brain was used.";
       modelMode = "local_deterministic_v1";
-      kaixuUsage = { unavailable: true, error: output.model_warning, entitlement: error.entitlement || aiStatus.entitlement, month: error.month || aiStatus.month };
+      brainUsage = { unavailable: true, error: output.model_warning, entitlement: error.entitlement || aiStatus.entitlement, month: error.month || aiStatus.month };
     }
   }
   const input = {
@@ -3814,7 +3858,7 @@ async function handleMailBrain(request, env, ctx) {
     provided_message_count: Array.isArray(body.messages) ? body.messages.length : 0,
     source: clean(body.source || "skymail-brain-page"),
     requested_model_mode: clean(body.model_mode || body.brain_mode || body.mode || ""),
-    requested_model: clean(body.model || body.kaixu_model || ""),
+    requested_model: clean(body.model || body.brain_model || body.kaixu_model || ""),
     send_to: clean(body.to || body.recipient || body.email || "")
   };
   const rows = await query(env, `
@@ -3829,7 +3873,7 @@ async function handleMailBrain(request, env, ctx) {
     JSON.stringify(input),
     JSON.stringify(output),
     modelMode,
-    JSON.stringify(kaixuUsage || {})
+    JSON.stringify(brainUsage || {})
   ]);
   const event = rows[0] || {};
   ctx?.waitUntil?.(backupCitadel(env, {
@@ -3848,7 +3892,7 @@ async function handleMailBrain(request, env, ctx) {
     mailbox: mailboxPayload,
     action,
     model_mode: modelMode,
-    ai: { ...aiStatus, latest: kaixuUsage || {} },
+    ai: { ...aiStatus, latest: brainUsage || {} },
     messages,
     output,
     send_result: sendResult,
@@ -5876,21 +5920,55 @@ async function recordZohoWebhookAudit(env, { payload, raw, mail, result }) {
 }
 
 async function handleZohoWebhookEventsList(request, env) {
-  serviceAuth(request, env);
   await ensureZohoWebhookAuditSchema(env);
   const url = new URL(request.url);
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") || 20), 1), 100);
-  const includePayload = ["1", "true", "yes"].includes(clean(url.searchParams.get("include_payload")).toLowerCase());
+  let serviceScope = false;
+  try {
+    serviceAuth(request, env);
+    serviceScope = true;
+  } catch {
+    serviceScope = false;
+  }
+  let mailboxAddresses = [];
+  if (!serviceScope) {
+    const auth = await requireAuth(request, env);
+    const context = await resolveMailboxContext(env, request, auth);
+    const aliases = context.mailbox
+      ? await listMailboxAliases(env, context.userId, context.mailbox.id).catch(() => [])
+      : [];
+    mailboxAddresses = Array.from(new Set([
+      context.selected_mailbox_email,
+      context.mailbox?.mailbox_email,
+      ...aliases.map((row) => row.alias_email),
+      ...aliases.map((row) => row.mailbox_email),
+    ].map(normalizeEmail).filter(Boolean)));
+  }
+  const includePayload = serviceScope && ["1", "true", "yes"].includes(clean(url.searchParams.get("include_payload")).toLowerCase());
+  if (!serviceScope && !mailboxAddresses.length) {
+    return json({
+      ok: true,
+      visibility: "shared_gate_mailbox_scope",
+      mailbox_addresses: [],
+      items: [],
+      note: "No active mailbox address is available for this shared 0S Gate session.",
+    });
+  }
+  const filter = serviceScope ? "" : "where recipient_emails && $2::text[]";
+  const params = serviceScope ? [limit] : [limit, mailboxAddresses];
   const rows = await query(env, `
     select id, received_at, provider, recipient_emails, matched_targets, direct_imported, imported,
            ignored, ignore_reason, provider_cooldown_json, result_json, payload_preview,
            ${includePayload ? "payload_json" : "null::jsonb as payload_json"}
       from zoho_webhook_events
+     ${filter}
      order by received_at desc
      limit $1
-  `, [limit]);
+  `, params);
   return json({
     ok: true,
+    visibility: serviceScope ? "service_all_mailboxes" : "shared_gate_mailbox_scope",
+    ...(serviceScope ? {} : { mailbox_addresses: mailboxAddresses }),
     items: rows.map((row) => ({
       id: row.id,
       received_at: row.received_at,
@@ -6112,16 +6190,27 @@ async function handleResendHealth(request, env) {
   await requireAuth(request, env);
   const url = new URL(request.url);
   const base = clean(env.PUBLIC_BASE_URL || env.SKYMAIL_PUBLIC_URL || url.origin).replace(/\/+$/, "");
+  const resendEndpoint = `${base}/.netlify/functions/inbound-resend`;
+  const zohoWebhookEndpoint = `${base}/api/zoho-webhook`;
   return json({
     ok: true,
+    telemetry_source: "database-backed message_delivery_events plus provider webhook audit tables",
     configured: {
       database: configuredEnv(env, "NEON_DATABASE_URL", "DATABASE_URL"),
+      provider_api: Boolean(zohoApiConfigured(env) || configuredEnv(env, "RESEND_API_KEY")),
+      zoho_api: zohoApiConfigured(env),
       resend_api_key: configuredEnv(env, "RESEND_API_KEY"),
       resend_webhook_secret: configuredEnv(env, "RESEND_WEBHOOK_SECRET"),
       inbound_domain: configuredEnv(env, "INBOUND_DOMAIN", "SKYMAIL_PRIMARY_DOMAIN"),
     },
     inbound_domain: clean(env.INBOUND_DOMAIN || env.SKYMAIL_PRIMARY_DOMAIN) || null,
-    endpoint: `${base}/.netlify/functions/inbound-resend`,
+    endpoint: resendEndpoint,
+    endpoints: {
+      delivery_events: `${base}/api/resend-events-list`,
+      resend_webhook: resendEndpoint,
+      zoho_webhook: zohoWebhookEndpoint,
+      zoho_webhook_events: `${base}/api/zoho-webhook-events`,
+    },
     events_to_enable: [
       "email.received",
       "email.scheduled",
@@ -6162,7 +6251,7 @@ async function handleResendEventsList(request, env) {
         and created_at >= now() - interval '30 days'
     `, [userId]).catch(() => [{}]),
     query(env, `
-      select id, event_type, delivery_status, provider_message_id, recipient_email,
+      select id, provider, event_type, delivery_status, provider_message_id, recipient_email,
              from_email, subject, svix_id, event_created_at, created_at
         from message_delivery_events
        where user_id=$1
@@ -7688,9 +7777,10 @@ async function serveStatic(request, env) {
     });
   }
   if (pathname === "/") {
-    const rootRes = await env.ASSETS.fetch(request);
-    if (rootRes.status !== 404) return rootRes;
-    pathname = "/index.html";
+    const indexRequest = new Request(new URL("/home.html", url.origin), request);
+    const indexRes = await env.ASSETS.fetch(indexRequest);
+    if (indexRes.status !== 404) return indexRes;
+    return null;
   }
   const htmlPage = pathname.match(/^\/([a-z0-9-]+)\.html$/i);
   if (htmlPage && url.search) {

@@ -88,9 +88,38 @@ function buildRemoteUrl(config) {
   return `${base}/${encodeURIComponent(config.workspaceId)}/${encodeURIComponent(config.repoId)}.git`;
 }
 
+function cleanBearer(value) {
+  return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+}
+
+function firstEnv(names) {
+  for (const name of names) {
+    const value = cleanBearer(process.env[name]);
+    if (value) return { name, value };
+  }
+  return { name: '', value: '' };
+}
+
 function authGitArgs() {
+  const gate = firstEnv([
+    'SKYEVAULT_GATE_BEARER',
+    'SKYEVAULT_ONE_AUTH_BEARER',
+    'ZERO_OS_GATE_SESSION',
+    'ZERO_OS_OWNER_SESSION',
+    'METRAIYUX_OWNER_GATE_SESSION',
+    'FREE99_GATE_SESSION',
+    'SKYGATE_SESSION_TOKEN',
+    'SKYE_GATE_SESSION',
+    'FS27_ADMIN_BEARER',
+    'SKYENET_AUTH',
+    'MCP_GATE_SESSION',
+    'QUANTUMSKYES_MCP_TOKEN'
+  ]);
+  if (gate.value) return ['-c', `http.extraHeader=Authorization: Bearer ${gate.value}`];
+  const allowStatic = process.env.SKYEVAULT_REPO_WORKSPACE_AUTH_MODE === 'static-token'
+    || process.env.SKYEVAULT_OWNER_GIT_ALLOW_STATIC_TOKEN === '1';
   const token = String(process.env.SKYEVAULT_GIT_REMOTE_TOKEN || process.env.SKYEVAULT_TOKEN || '').trim();
-  if (!token) return [];
+  if (!token || !allowStatic) return [];
   const header = Buffer.from(`x-token:${token}`).toString('base64');
   return ['-c', `http.extraHeader=Authorization: Basic ${header}`];
 }
@@ -132,7 +161,7 @@ function statusPayload(dir, config) {
 
 function runGitWithAuth(dir, args) {
   const fullArgs = [...authGitArgs(), ...args];
-  const result = spawnSync('git', fullArgs, { cwd: dir, stdio: 'inherit', env: process.env });
+  const result = spawnSync('git', fullArgs, { cwd: dir, stdio: 'inherit', env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } });
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
@@ -154,7 +183,7 @@ if (command === 'init') {
   try { git(['remote', 'remove', config.remoteName], dir, { stdio: 'ignore' }); } catch {}
   git(['remote', 'add', config.remoteName, config.remoteUrl], dir);
   writeWorkspaceConfig(dir, config);
-  result = { ok: true, command, dir, configPath: workspaceConfigPath(dir), config, note: 'Remote URL is stored without a token. Set SKYEVAULT_GIT_REMOTE_TOKEN when running sync/push.' };
+  result = { ok: true, command, dir, configPath: workspaceConfigPath(dir), config, note: 'Remote URL is stored without a token. Use the shared 0S/FS27 gate bearer when running sync/push.' };
 } else if (command === 'status') {
   if (!hasGit(dir)) throw new Error(`Not a Git worktree: ${dir}`);
   result = { ok: true, command, ...statusPayload(dir, readWorkspaceConfig(dir)) };
@@ -199,7 +228,8 @@ if (command === 'init') {
     hasGit: hasGit(dir),
     hasConfig: fs.existsSync(workspaceConfigPath(dir)),
     config,
-    tokenAvailable: Boolean(process.env.SKYEVAULT_GIT_REMOTE_TOKEN || process.env.SKYEVAULT_TOKEN),
+    gateBearerAvailable: Boolean(firstEnv(['SKYEVAULT_GATE_BEARER', 'ZERO_OS_GATE_SESSION', 'SKYGATE_SESSION_TOKEN', 'FS27_ADMIN_BEARER', 'SKYENET_AUTH', 'MCP_GATE_SESSION']).value),
+    emergencyStaticTokenAvailable: Boolean((process.env.SKYEVAULT_REPO_WORKSPACE_AUTH_MODE === 'static-token' || process.env.SKYEVAULT_OWNER_GIT_ALLOW_STATIC_TOKEN === '1') && (process.env.SKYEVAULT_GIT_REMOTE_TOKEN || process.env.SKYEVAULT_TOKEN)),
     hostname: os.hostname()
   };
 } else {

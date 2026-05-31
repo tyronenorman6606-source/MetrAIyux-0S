@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="SkyeWebCreatorMax production creator for brief intake, template selection, source editing, live preview, quality checks, and delivery handoff.">
+  <meta name="description" content="SkyeWebCreatorMax shared-gate creator for brief intake, template selection, source editing, local preview, quality checks, and Worker-confirmed delivery handoff.">
   <title>SkyeWebCreatorMax</title>
   <style>
     :root{
@@ -303,11 +303,11 @@
   </style>
 </head>
 <body>
-  <main class="shell">
+  <main class="shell" data-runtime-lane="/api/marketing-made-easy/webcreator-runtime">
     <header class="topbar">
       <a class="brand" href="./index.html">
         <span class="mark"><img src="../../assets/metraiyux-0s-emblem-transparent.png" alt="" aria-hidden="true"></span>
-        <span><h1>SkyeWebCreatorMax</h1><p>Production web creator</p></span>
+        <span><h1>SkyeWebCreatorMax</h1><p>Shared-gate web creator</p></span>
       </a>
       <nav class="nav" aria-label="Creator sections">
         <button class="active" type="button" data-scroll="brief">Brief</button>
@@ -321,16 +321,17 @@
       <div>
         <p class="eyebrow">AI web foundry</p>
         <h2>Build the site, inspect the source, ship the package.</h2>
-        <p class="lede">A full creator workspace with intake, donor-backed templates, editable files, instant preview, quality gates, and AE delivery handoff on one surface.</p>
+        <p class="lede">A full creator workspace with intake, donor-backed templates, editable files, local preview, quality gates, and Worker-confirmed AE handoff on one surface.</p>
         <div class="hero-actions">
           <a class="button primary" href="#brief">Start Build</a>
+          <a hidden href="./builder.html" data-view="builder">Builder route</a>
           <a class="button" href="./landing.html">Open Showcase</a>
           <a class="button" href="#preview">Generated Preview Lane</a>
         </div>
       </div>
       <aside class="pulse-board" aria-label="Workspace status">
         <article><span>Workspace</span><b id="connectionState">Gateway warming</b></article>
-        <article><span>Gate</span><b id="gatePill">GateFS13 ready</b></article>
+        <article><span>Gate</span><b id="gatePill">Gate check pending</b></article>
         <article><span>Delivery</span><b id="runtimeState">Checking board</b></article>
       </aside>
     </section>
@@ -379,7 +380,7 @@
       </section>
 
       <section class="panel preview-panel" id="preview">
-        <h3>Live Preview</h3>
+        <h3>Local Preview</h3>
         <iframe id="previewFrame" class="preview-frame" title="Generated website preview"></iframe>
         <div id="qualityGrid" class="quality-grid"></div>
       </section>
@@ -395,7 +396,7 @@
       </section>
 
       <section class="panel" id="delivery">
-        <h3>Delivery Package</h3>
+        <h3>Delivery Proof Package</h3>
         <div class="form-grid">
           <label>Package label<input id="deliveryLabel" value="Client launch package"></label>
           <label>Reviewer<input id="reviewOwner" value="AE Review"></label>
@@ -408,7 +409,7 @@
             </select>
           </label>
           <label>Checkpoint<input id="reviewCheckpoint" value="Source, preview, and package review"></label>
-          <label>Delivery notes<textarea id="deliveryNotes">Package source, preview, quality checks, and handoff metadata for AE review.</textarea></label>
+          <label>Delivery notes<textarea id="deliveryNotes">Package source, local preview, quality checks, and handoff metadata pending Worker confirmation.</textarea></label>
         </div>
         <div class="button-row">
           <button class="primary" type="button" id="packageArtifact">Package Artifact</button>
@@ -421,7 +422,7 @@
 
       <section class="panel">
         <h3>Event Log</h3>
-        <pre id="eventLog" class="log">Booting SkyeWebCreatorMax...</pre>
+        <pre id="eventLog" class="log">Booting SkyeWebCreatorMax local workspace...</pre>
       </section>
     </section>
 
@@ -438,7 +439,7 @@
         <div id="projectList" class="list-stack"></div>
       </section>
       <section class="panel">
-        <h3>Delivery Queue</h3>
+        <h3>Delivery Proof Queue</h3>
         <div id="deliveryList" class="list-stack"></div>
       </section>
     </section>

@@ -39,8 +39,6 @@ function getBearer(event) {
   const m = h.match(/^Bearer\s+(.+)$/i);
   if (m) return m[1].trim();
   const directHeaders = [
-    "x-admin-token",
-    "x-free99-admin-code",
     "x-free99-gate-session",
     "x-skye-gate-session",
     "x-skygate-session",
@@ -51,11 +49,9 @@ function getBearer(event) {
     if (value) return value;
   }
   const cookieNames = [
-    "free99_gate_session",
-    "skye_gate_session",
-    "skygate_session",
-    "FREE99_PLATFORM_GATE_SESSION",
-    "METRAIYUX_GATE_SESSION"
+    "METRAIYUX_GATE_SESSION",
+    "SKYGATEFS27_GATE_SESSION",
+    "SKYE_GATE_SESSION"
   ];
   for (const name of cookieNames) {
     const value = decodeURIComponent(getCookie(event, name) || "").replace(/^Bearer\s+/i, "").trim();

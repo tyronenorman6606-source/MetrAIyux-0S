@@ -15,7 +15,8 @@ const steps = [
   ['v20-enhance', ['scripts/v20-enhance.mjs']],
   ['v22-enhance', ['scripts/v22-enhance.mjs']],
   ['v23-enhance', ['scripts/v23-enhance.mjs']],
-  ['client-facing-copy', ['scripts/client-facing-copy.mjs']]
+  ['client-facing-copy', ['scripts/client-facing-copy.mjs']],
+  ['path-route-prefix', ['scripts/path-route-prefix.mjs']]
 ];
 
 for (const [label, args] of steps) {

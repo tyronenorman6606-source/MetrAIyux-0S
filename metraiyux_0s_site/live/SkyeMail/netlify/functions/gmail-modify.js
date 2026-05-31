@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     if (String(event.httpMethod || 'POST').toUpperCase() !== 'POST') {
       return json(405, { error: 'Method not allowed.' });
     }
-    const auth = verifyAuth(event);
+    const auth = await verifyAuth(event);
     const body = parseJson(event);
     const id = String(body.id || '').trim();
     const addLabelIds = Array.isArray(body.addLabelIds) ? body.addLabelIds.map(String) : [];
