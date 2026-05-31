@@ -154,10 +154,10 @@
     <h1>SkyeLedger <span>Intelligence Cockpit</span></h1>
     <p class="section-desc">Stream long-form regulatory summaries, risk narratives, and board memoranda through kAIxuGateway13 only. Every chunk updates the usage ledger, surfaces HTTP 401/402/429/500 states, and logs `meta`/`delta`/`done` events to the kaixu_events BroadcastChannel.</p>
     <div class="key-panel">
-      <input id="kaixu-key" type="password" placeholder="Kaixu Virtual Key" autocomplete="new-password">
-      <button id="save-key">Store key</button>
-      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Request a kAIxU Key</a>
-      <span style="color:rgba(255,255,255,0.7);font-size:12px;">Only KAIXU_VIRTUAL_KEY is persisted.</span>
+      <input id="kaixu-key" type="password" placeholder="FS27 / SkyGate session" autocomplete="new-password">
+      <button id="save-key">Use gate session</button>
+      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Open FS27 Gate</a>
+      <span style="color:rgba(255,255,255,0.7);font-size:12px;">Only FS27_GATE_SESSION is persisted.</span>
     </div>
   </div>
 
@@ -205,7 +205,7 @@
     <div class="workflow-grid">
       <div class="intel-card">
         <h3>Step 1 · Save the key</h3>
-        <p>Store your `KAIXU_VIRTUAL_KEY` via the hero panel so every summary and stream authenticates through kAIxuGateway13.</p>
+        <p>Store your `FS27_GATE_SESSION` via the hero panel so every summary and stream authenticates through kAIxuGateway13.</p>
       </div>
       <div class="intel-card">
         <h3>Step 2 · Generate summary</h3>
@@ -313,6 +313,8 @@
   <script src="../js/main.js"></script>
   <script src="../js/growth.js"></script>
   <script src="../js/sol-intro.js"></script>
+  <script src="../_shared/standalone-session.js"></script>
+  <script src="../js/kaixu-session.js"></script>
   <script src="../js/kaixu-gate.js"></script>
   <script>
     // kAIxu Gate v2 — all AI calls route via kaixu-gate.js → kaixu67.skyesoverlondon.workers.dev
@@ -345,7 +347,7 @@
     const saveKeyButton = document.getElementById('save-key');
     const sourceText = document.getElementById('source-text');
 
-    let kaixuKey = localStorage.getItem('kaixu_virtual_key') || '';
+    let kaixuKey = window.KaixuSession?.getToken?.() || window.SkyeStandaloneSession?.getToken?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
     keyInput.value = kaixuKey;
     const ensureKey = () => kaixuKey && kaixuKey.trim().length > 0;
 
@@ -356,9 +358,9 @@
         return;
       }
       kaixuKey = value;
-      localStorage.setItem('kaixu_virtual_key', kaixuKey);
+      window.KaixuSession?.setSession?.({ token: kaixuKey, source: 'skyesol-kaixu-gate', usage_lane: 'kaixu-ai' });
       updateStatus('Kaixu key stored.', false);
-      logDiagnostic('key-saved', { stored: true });
+      logDiagnostic('gate-session-linked', { stored: true });
     });
 
     summaryButton.addEventListener('click', () => {

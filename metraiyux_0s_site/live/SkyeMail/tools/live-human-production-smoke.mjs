@@ -168,7 +168,7 @@ try {
   await publicPage("/sent.html");
   await publicPage("/pricing.html", ["FS27 Brain"]);
 
-  const gate = await resolveZeroOsGateAuth({ envFiles: [path.join(skymailRoot, ".env")] });
+  const gate = await resolveZeroOsGateAuth({ envFiles: [path.join(repoRoot, ".env"), path.join(skymailRoot, ".env")] });
   record("shared gate token resolved", { ok: gate.ok, status: gate.ok ? 200 : 401, detail: { source: gate.credential?.source || "missing", key: gate.credential?.key || "" } });
   assert.equal(gate.ok, true, "No shared FS27/SkyGate bearer could be resolved.");
 

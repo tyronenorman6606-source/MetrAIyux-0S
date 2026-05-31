@@ -212,9 +212,9 @@
     <h1>SkyeFlow <span>Automations</span></h1>
     <p class="section-desc">Consult for governed plans and develop streams for real automation. Every prompt routes through kAIxuGateway13 with the shared kaixuStreamChat helper so budgets track, diagnostics publish to the kaixu_events BroadcastChannel, and HTTP 401/402/429/500 states surface in the UI.</p>
     <div class="key-panel">
-      <input id="kaixu-key" type="password" placeholder="Kaixu Virtual Key" autocomplete="new-password">
-      <button id="save-key">Store key</button>
-      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Request a kAIxU Key</a>
+      <input id="kaixu-key" type="password" placeholder="FS27 / SkyGate session" autocomplete="new-password">
+      <button id="save-key">Use gate session</button>
+      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Open FS27 Gate</a>
     </div>
   </div>
 
@@ -284,7 +284,7 @@
     <div class="workflow-grid">
       <div class="workflow-card">
         <h3>Step 1 · Store the key</h3>
-        <p>Enter your `KAIXU_VIRTUAL_KEY` in the panel at the top and hit Store key. The key only lives in `localStorage` and gates every gateway call.</p>
+        <p>Enter your `FS27_GATE_SESSION` in the panel at the top and hit Use gate session. The session stays in the shared FS27 gate bridge and gates every gateway call.</p>
       </div>
       <div class="workflow-card">
         <h3>Step 2 · Consult</h3>
@@ -392,6 +392,8 @@
   <script src="../js/main.js"></script>
   <script src="../js/growth.js"></script>
   <script src="../js/sol-intro.js"></script>
+  <script src="../_shared/standalone-session.js"></script>
+  <script src="../js/kaixu-session.js"></script>
   <script src="../js/kaixu-gate.js"></script>
   <script>
     // kAIxu Gate v2 — all AI calls route via kaixu-gate.js → kaixu67.skyesoverlondon.workers.dev
@@ -428,7 +430,7 @@
     const keyInput = document.getElementById('kaixu-key');
     const saveKeyButton = document.getElementById('save-key');
 
-    let kaixuKey = localStorage.getItem('kaixu_virtual_key') || '';
+    let kaixuKey = window.KaixuSession?.getToken?.() || window.SkyeStandaloneSession?.getToken?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
     keyInput.value = kaixuKey;
 
     const ensureKey = () => kaixuKey && kaixuKey.trim().length > 0;
@@ -440,7 +442,7 @@
         return;
       }
       kaixuKey = value;
-      localStorage.setItem('kaixu_virtual_key', kaixuKey);
+      window.KaixuSession?.setSession?.({ token: kaixuKey, source: 'skyesol-kaixu-gate', usage_lane: 'kaixu-ai' });
       updateStatus('Kaixu key stored locally.', false);
     });
 

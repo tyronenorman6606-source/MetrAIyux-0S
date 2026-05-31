@@ -122,10 +122,10 @@
     <h1>SkyeOps <span>Mission Control</span></h1>
     <p class="section-desc">Listen for keywords embedded in SkyeDocx templates, fire kAIxuGateway13 streams with the shared helper, and pause or resume the timeline when caps are hit. Every response logs usage through the kaixu_events BroadcastChannel and the Neon-backed logs endpoint.</p>
     <div class="key-panel">
-      <input id="kaixu-key" type="password" placeholder="Kaixu Virtual Key" autocomplete="new-password">
-      <button id="save-key">Store key</button>
-      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Request a kAIxU Key</a>
-      <span style="font-size:12px;color:rgba(255,255,255,0.65);">KAIXU_VIRTUAL_KEY is the only persisted secret.</span>
+      <input id="kaixu-key" type="password" placeholder="FS27 / SkyGate session" autocomplete="new-password">
+      <button id="save-key">Use gate session</button>
+      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Open FS27 Gate</a>
+      <span style="font-size:12px;color:rgba(255,255,255,0.65);">FS27_GATE_SESSION is the only persisted secret.</span>
     </div>
   </div>
 
@@ -286,6 +286,8 @@
   <script src="../js/main.js"></script>
   <script src="../js/growth.js"></script>
   <script src="../js/sol-intro.js"></script>
+  <script src="../_shared/standalone-session.js"></script>
+  <script src="../js/kaixu-session.js"></script>
   <script src="../js/kaixu-gate.js"></script>
   <script>
     // kAIxu Gate v2 — all AI calls route via kaixu-gate.js → kaixu67.skyesoverlondon.workers.dev
@@ -320,7 +322,7 @@
     const lastLabelEl = document.getElementById('last-label');
     const diagnosticLog = document.getElementById('diagnostic-log');
 
-    let kaixuKey = localStorage.getItem('kaixu_virtual_key') || '';
+    let kaixuKey = window.KaixuSession?.getToken?.() || window.SkyeStandaloneSession?.getToken?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
     let opsController = null;
     let isPaused = false;
     keyInput.value = kaixuKey;
@@ -333,9 +335,9 @@
         return;
       }
       kaixuKey = value;
-      localStorage.setItem('kaixu_virtual_key', kaixuKey);
+      window.KaixuSession?.setSession?.({ token: kaixuKey, source: 'skyesol-kaixu-gate', usage_lane: 'kaixu-ai' });
       updateAlert('Kaixu key saved.', false);
-      logDiagnostic('key-saved', { stored: true });
+      logDiagnostic('gate-session-linked', { stored: true });
     });
 
     startButton.addEventListener('click', () => {

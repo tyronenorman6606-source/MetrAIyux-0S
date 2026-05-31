@@ -67,8 +67,10 @@
      handleNonStreamResponse status-code checks continue to work.
      ────────────────────────────────────────────────────────── */
   async function postToGateway(_endpoints, payload) {
-    const key = (typeof kaixuKey === 'string' && kaixuKey.trim())
-              || localStorage.getItem('kaixu_virtual_key')
+    const key = global.KaixuSession?.getToken?.()
+              || global.SkyeStandaloneSession?.getToken?.()
+              || global.MetrAIyuxGateBridge?.current?.()?.token
+              || (typeof kaixuKey === 'string' && kaixuKey.trim())
               || '';
 
     return fetch(`${GATE_BASE}/v1/generate`, {

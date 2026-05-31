@@ -91,10 +91,10 @@
     <h1>SkyeDrive <span>Fortune 500 Vault & Workspace</span></h1>
     <p class="section-desc">Secure uploads, streamed indexing, and budgeted compliance trails for every SkyeDocx asset. Every storage action runs through kAIxuGateway13 and the kAIxu Gate client so finance/legal always see the ledger.</p>
     <div class="key-panel">
-      <input id="kaixu-key" type="password" placeholder="Kaixu Virtual Key" autocomplete="new-password" />
-      <button id="save-key">Store key</button>
-      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Request a kAIxU Key</a>
-      <span style="font-size:12px;color:rgba(255,255,255,0.65);">KAIXU_VIRTUAL_KEY only.</span>
+      <input id="kaixu-key" type="password" placeholder="FS27 / SkyGate session" autocomplete="new-password" />
+      <button id="save-key">Use gate session</button>
+      <a class="request-key" href="https://skyenet.skyesol/leadership/SkyesOverLondon.htmlpages/services/real-intelligence/getkaixu-api" target="_blank" rel="noreferrer noopener">Open FS27 Gate</a>
+      <span style="font-size:12px;color:rgba(255,255,255,0.65);">FS27_GATE_SESSION only.</span>
     </div>
   </div>
 
@@ -264,6 +264,8 @@
   <script src="../js/main.js"></script>
   <script src="../js/growth.js"></script>
   <script src="../js/sol-intro.js"></script>
+  <script src="../_shared/standalone-session.js"></script>
+  <script src="../js/kaixu-session.js"></script>
   <script src="../js/kaixu-gate.js"></script>
   <script>
     // kAIxu Gate v2 — all AI calls route via kaixu-gate.js → kaixu67.skyesoverlondon.workers.dev
@@ -295,7 +297,7 @@
     const diagnosticsEl = document.getElementById('diagnostics');
     const lastDeltaEl = document.getElementById('last-delta');
 
-    let kaixuKey = localStorage.getItem('kaixu_virtual_key') || '';
+    let kaixuKey = window.KaixuSession?.getToken?.() || window.SkyeStandaloneSession?.getToken?.() || window.MetrAIyuxGateBridge?.current?.()?.token || '';
     keyInput.value = kaixuKey;
     const ensureKey = () => kaixuKey && kaixuKey.trim().length > 0;
 
@@ -309,16 +311,16 @@
 
     saveKeyButton.addEventListener('click', () => {
       const value = keyInput.value.trim();
-      if (!value) { uploadStatus.textContent = 'Key required.'; uploadStatus.classList.add('alert'); return; }
+      if (!value) { uploadStatus.textContent = 'Gate session required.'; uploadStatus.classList.add('alert'); return; }
       kaixuKey = value;
-      localStorage.setItem('kaixu_virtual_key', kaixuKey);
-      uploadStatus.textContent = 'Key stored.';
+      window.KaixuSession?.setSession?.({ token: kaixuKey, source: 'skyesol-kaixu-gate', usage_lane: 'kaixu-ai' });
+      uploadStatus.textContent = 'Gate session ready.';
       uploadStatus.classList.remove('alert');
-      logEntry('key-saved', { stored: true });
+      logEntry('gate-session-linked', { stored: true });
     });
 
     uploadButton.addEventListener('click', () => {
-      if (!ensureKey()) { uploadStatus.textContent = 'Provide Kaixu key before uploading.'; uploadStatus.classList.add('alert'); return; }
+      if (!ensureKey()) { uploadStatus.textContent = 'Open FS27 gate session before uploading.'; uploadStatus.classList.add('alert'); return; }
       streamUpload();
     });
 

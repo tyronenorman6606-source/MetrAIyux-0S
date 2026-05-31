@@ -1622,14 +1622,28 @@ async function zohoUploadAttachments(env, accountId, attachments = []) {
     const bytes = decodeAttachmentBytes(attachment.data_b64);
     if (!bytes?.length) continue;
     const params = new URLSearchParams({
-      fileName: attachment.filename,
+      uploadType: "multipart",
       isInline: attachment.inline ? "true" : "false",
     });
-    const res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${params.toString()}`, {
-      method: "POST",
-      headers: { "content-type": attachment.mime_type || "application/octet-stream" },
-      body: bytes,
-    });
+    const form = new FormData();
+    form.append("attach", new Blob([bytes], { type: attachment.mime_type || "application/octet-stream" }), attachment.filename);
+    let res = null;
+    try {
+      res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${params.toString()}`, {
+        method: "POST",
+        body: form,
+      });
+    } catch (error) {
+      if (Number(error.statusCode || 0) !== 415) throw error;
+      const rawParams = new URLSearchParams({
+        fileName: attachment.filename,
+        isInline: attachment.inline ? "true" : "false",
+      });
+      res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${rawParams.toString()}`, {
+        method: "POST",
+        body: bytes,
+      });
+    }
     const data = await res.json().catch(() => ({}));
     const rows = Array.isArray(data?.data) ? data.data : (data?.data ? [data.data] : []);
     for (const row of rows) {
