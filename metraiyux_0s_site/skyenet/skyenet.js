@@ -11,7 +11,6 @@ const state = {
 
 const els = {
   authPanel: document.querySelector('#authPanel'),
-  manualToken: document.querySelector('#manualToken'),
   saveTokenButton: document.querySelector('#saveTokenButton'),
   statusDot: document.querySelector('#statusDot'),
   statusText: document.querySelector('#statusText'),
@@ -48,12 +47,6 @@ const els = {
   deployButton: document.querySelector('#deployButton'),
   refreshButton: document.querySelector('#refreshButton')
 };
-
-const tokenKeys = [
-  'METRAIYUX_GATE_SESSION',
-  'SKYGATEFS27_GATE_SESSION',
-  'SKYE_GATE_SESSION'
-];
 
 const buildRootNames = new Set(['dist', 'build', 'out', 'public', 'site', 'www', 'static']);
 
@@ -112,23 +105,16 @@ function workspaceQuery() {
 function loadToken() {
   const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   const bridgeSession = bridge?.requireSession?.({ platformId: 'skyenet', usageLane: 'skyenet-console' }) || bridge?.current?.();
-  if (bridgeSession?.token) return String(bridgeSession.token).replace(/^Bearer\s+/i, '').trim();
-  for (const key of tokenKeys) {
-    const value = localStorage.getItem(key) || sessionStorage.getItem(key);
-    if (!value) continue;
-    try {
-      const parsed = value.startsWith('{') ? JSON.parse(value) : null;
-      const token = String(parsed?.token || value).replace(/^Bearer\s+/i, '').trim();
-      if (token) return token;
-    } catch {
-      return value.replace(/^Bearer\s+/i, '').trim();
-    }
-  }
-  return '';
+  return bridgeSession?.token ? String(bridgeSession.token).replace(/^Bearer\s+/i, '').trim() : '';
 }
 
 function authHeaders(extra = {}) {
   const headers = new Headers(extra);
+  const bridgeHeaders = window.MetrAIyuxGateBridge?.headers?.({
+    'x-skye-platform': 'skyenet',
+    'x-skye-usage-lane': 'skyenet-console'
+  }) || {};
+  Object.entries(bridgeHeaders).forEach(([key, value]) => headers.set(key, value));
   if (state.token) {
     headers.set('Authorization', `Bearer ${state.token}`);
     headers.set('x-skye-gate-session', state.token);
@@ -810,16 +796,12 @@ els.routeHost.value = hostGuess();
 state.token = loadToken();
 
 els.saveTokenButton.addEventListener('click', () => {
-  const value = els.manualToken.value.replace(/^Bearer\s+/i, '').trim();
-  if (!value) return;
+  const value = loadToken();
+  if (!value) {
+    window.location.href = '../admin/login.html?return=/skyenet/index.html';
+    return;
+  }
   state.token = value;
-  window.MetrAIyuxGateBridge?.persist?.({
-    token: value,
-    source: 'skyenet-console-shared-gate-entry',
-    platform_id: 'skyenet',
-    usage_lane: 'skyenet-console',
-    issued_at: new Date().toISOString()
-  }, { silent: true });
   els.authPanel.hidden = true;
   refresh();
 });

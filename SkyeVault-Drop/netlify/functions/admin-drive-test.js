@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess, adminAuditDetails } from './_lib/security.js';
 import { loadConfig, writeAuditEventSafe } from './_lib/config.js';
 import { getFolderMetadata, createAndTrashHealthcheck } from './_lib/google-drive.js';
 
@@ -9,7 +9,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event);
     const writeTest = body.writeTest !== false;
     const { config } = await loadConfig();
@@ -44,7 +44,7 @@ export async function handler(event) {
       }
     }
 
-    const audit = await writeAuditEventSafe('admin-drive-test-ran', { writeTest, destinationCount: results.length, failed: results.filter((item) => !item.ok).length });
+    const audit = await writeAuditEventSafe('admin-drive-test-ran', adminAuditDetails(admin, { writeTest, destinationCount: results.length, failed: results.filter((item) => !item.ok).length }));
     return json(200, { ok: true, results, audit }, noStoreCors(event));
   } catch (error) {
     return json(error.statusCode || 500, { ok: false, error: error.message }, noStoreCors(event));

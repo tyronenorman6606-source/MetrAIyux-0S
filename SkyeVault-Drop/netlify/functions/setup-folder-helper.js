@@ -1,5 +1,6 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess, adminAuditDetails } from './_lib/security.js';
+import { writeAuditEventSafe } from './_lib/config.js';
 import { getServiceAccountIdentity, getFolderMetadata, createAndTrashHealthcheck } from './_lib/google-drive.js';
 
 async function testFolder(folderId, label, writeTest) {
@@ -33,7 +34,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event);
     const writeTest = body.writeTest !== false;
     const folders = Array.isArray(body.folders) ? body.folders.slice(0, 50) : [];
@@ -42,11 +43,17 @@ export async function handler(event) {
     for (const folder of folders) {
       results.push(await testFolder(String(folder.folderId || '').trim(), String(folder.label || folder.id || 'Folder').trim(), writeTest));
     }
+    const audit = await writeAuditEventSafe('setup-folder-helper-ran', adminAuditDetails(admin, {
+      writeTest,
+      folderCount: results.length,
+      failed: results.filter((item) => !item.ok).length
+    }));
     return json(200, {
       ok: results.every((item) => item.ok),
       serviceAccount,
       instruction: `Use R2 prefixes such as vault-system, client-uploads/primary, client-uploads/overflow, and vault-system/backups. This helper validates the configured bucket can read/write each prefix.`,
-      results
+      results,
+      audit
     }, noStoreCors(event));
   } catch (error) {
     return json(error.statusCode || 500, { ok: false, error: error.message }, noStoreCors(event));

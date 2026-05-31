@@ -22,7 +22,8 @@ const qa = (selector, root = document) => Array.from(root.querySelectorAll(selec
 const defaults = {
   siteOrigin: '',
   customOrigin: '',
-  adminTokenValue: '',
+  operatorSessionSecretValue: '',
+  receiptSigningSecretValue: '',
   portalKeyValue: '',
   serviceAccountEmail: '',
   configFolderId: '',
@@ -169,7 +170,8 @@ function collectState() {
   return {
     siteOrigin: q('#siteOrigin').value.trim(),
     customOrigin: q('#customOrigin').value.trim(),
-    adminTokenValue: q('#adminTokenValue').value.trim(),
+    operatorSessionSecretValue: q('#operatorSessionSecretValue').value.trim(),
+    receiptSigningSecretValue: q('#receiptSigningSecretValue').value.trim(),
     portalKeyValue: q('#portalKeyValue').value.trim(),
     serviceAccountEmail: q('#serviceAccountEmail').value.trim(),
     configFolderId: q('#configFolderId').value.trim(),
@@ -247,14 +249,13 @@ function buildOutputs() {
   const vaultConfig = buildVaultConfig(state);
   const envLines = [
     ['ALLOWED_ORIGINS', origins.join(',')],
-    ['ADMIN_TOKEN', state.adminTokenValue || 'replace-with-long-random-admin-token'],
-    ['OPERATOR_SESSION_SECRET', state.adminTokenValue ? `${state.adminTokenValue}-operator-session` : 'generate-a-separate-long-random-operator-session-secret'],
+    ['OPERATOR_SESSION_SECRET', state.operatorSessionSecretValue || 'generate-a-long-random-operator-session-secret'],
     ['CLIENT_PORTAL_KEY', state.portalKeyValue || 'replace-with-client-upload-code'],
     ['R2_ACCESS_KEY_ID', state.serviceAccountEmail || 'replace-with-r2-access-key-id'],
     ['R2_SECRET_ACCESS_KEY', state.privateKeyValue || 'replace-with-r2-secret-access-key'],
     ['R2_BUCKET', state.r2BucketValue || 'client-drop-vault'],
     ['R2_CONFIG_PREFIX', state.configFolderId || 'vault-system'],
-    ['RECEIPT_SIGNING_SECRET', state.adminTokenValue || 'generate-a-separate-long-random-receipt-secret'],
+    ['RECEIPT_SIGNING_SECRET', state.receiptSigningSecretValue || 'generate-a-separate-long-random-receipt-secret'],
     ['NOTIFY_WEBHOOK_URL', state.notifyWebhookUrl],
     ['NOTIFY_WEBHOOK_SECRET', state.notifyWebhookSecret],
     ['RESEND_API_KEY', state.resendApiKey],
@@ -307,7 +308,6 @@ function buildOutputs() {
   ].join('\n');
 
   q('#diagnosticOrigin').value = q('#diagnosticOrigin').value || normalizeOrigin(state.siteOrigin) || window.location.origin;
-  q('#diagnosticToken').value = q('#diagnosticToken').value || state.adminTokenValue;
 }
 
 function renderChecklist() {
@@ -470,7 +470,13 @@ async function runDiagnostics() {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        ...(token ? { 'x-admin-token': token } : {})
+        ...(token ? {
+          authorization: `Bearer ${token}`,
+          'x-admin-token': token,
+          'x-free99-admin-code': token,
+          'x-free99-gate-session': token,
+          'x-skye-gate-session': token
+        } : {})
       },
       body: JSON.stringify({ liveTest })
     });
@@ -483,7 +489,8 @@ async function runDiagnostics() {
 
 function bindEvents() {
   q('#generateTokens').addEventListener('click', () => {
-    q('#adminTokenValue').value = randomToken(36);
+    q('#operatorSessionSecretValue').value = randomToken(36);
+    q('#receiptSigningSecretValue').value = randomToken(36);
     q('#portalKeyValue').value = `client-${randomToken(12)}`;
     if (q('#notifyWebhookSecret')) q('#notifyWebhookSecret').value = randomToken(24);
     saveState();
@@ -508,7 +515,7 @@ function bindEvents() {
     });
   }
 
-  qa('#siteOrigin,#customOrigin,#adminTokenValue,#portalKeyValue,#serviceAccountEmail,#configFolderId,#r2BucketValue,#brandNameValue,#supportEmailValue,#publicHeadlineValue,#publicSubheadlineValue,#publicInstructionsValue,#retentionNoticeValue,#requireUsageRightsValue,#requireRetentionAckValue,#requireClientNameValue,#requireClientEmailValue,#requireProjectNameValue,#blockedExtensionsValue,#routingModeValue,#chunkSizeValue,#privateKeyValue,#notifyWebhookUrl,#notifyWebhookSecret,#resendApiKey,#notifyEmailTo,#notifyEmailFrom').forEach((input) => {
+  qa('#siteOrigin,#customOrigin,#operatorSessionSecretValue,#receiptSigningSecretValue,#portalKeyValue,#serviceAccountEmail,#configFolderId,#r2BucketValue,#brandNameValue,#supportEmailValue,#publicHeadlineValue,#publicSubheadlineValue,#publicInstructionsValue,#retentionNoticeValue,#requireUsageRightsValue,#requireRetentionAckValue,#requireClientNameValue,#requireClientEmailValue,#requireProjectNameValue,#blockedExtensionsValue,#routingModeValue,#chunkSizeValue,#privateKeyValue,#notifyWebhookUrl,#notifyWebhookSecret,#resendApiKey,#notifyEmailTo,#notifyEmailFrom').forEach((input) => {
     input.addEventListener('input', () => {
       saveState();
       buildOutputs();

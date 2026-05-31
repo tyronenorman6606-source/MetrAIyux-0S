@@ -4,15 +4,6 @@
   const STORE_API = '/api/skymusicnexus/music-store';
   const ASSETS_API = '/api/skymusicnexus/music-assets';
   const GATE_AI_API = '/api/founder-command/pwa-factory/analyze';
-  const GATE_STORAGE_KEYS = [
-    'free99_gate_session',
-    'skye_gate_session',
-    'skyegate_session',
-    'skygate_session',
-    'metraiyux_gate_session',
-    'metraiyux_owner_session',
-    'owner_admin_session'
-  ];
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -58,27 +49,20 @@
   }
 
   function storedGateToken() {
-    for (const key of GATE_STORAGE_KEYS) {
-      for (const store of [sessionStorage, localStorage]) {
-        try {
-          const raw = store.getItem(key);
-          if (!raw) continue;
-          const parsed = raw.startsWith('{') ? JSON.parse(raw) : null;
-          const token = cleanGateToken(parsed?.token || parsed?.session || parsed?.gateToken || raw);
-          if (token) return token;
-        } catch {}
-      }
-    }
-    return '';
+    const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+    const session = bridge?.requireSession?.({ platformId: 'pwa-factory', usageLane: 'pwa-drop-factory' }) || bridge?.current?.();
+    return cleanGateToken(session?.token || '');
   }
 
   function gateHeaders(extra = {}) {
-    const bridgeHeaders = window.Free99PlatformGate?.headers?.() || {};
+    const bridgeHeaders = window.MetrAIyuxGateBridge?.headers?.({
+      'x-skye-platform': 'pwa-factory',
+      'x-skye-usage-lane': 'pwa-drop-factory'
+    }) || {};
     const token = storedGateToken();
     const headers = { ...bridgeHeaders, ...extra };
     if (token) {
       headers.authorization = headers.authorization || `Bearer ${token}`;
-      headers['x-admin-token'] = headers['x-admin-token'] || token;
       headers['x-free99-gate-session'] = headers['x-free99-gate-session'] || token;
       headers['x-skye-gate-session'] = headers['x-skye-gate-session'] || token;
     }

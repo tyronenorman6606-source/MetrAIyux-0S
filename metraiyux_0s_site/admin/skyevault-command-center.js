@@ -16,8 +16,6 @@ const SkyeVaultCommandCenter = (() => {
   const $ = (id) => document.getElementById(id);
   const els = {
     origin: $('vaultOrigin'),
-    token: $('fs27Token'),
-    legacy: $('legacyAdminToken'),
     load: $('loadVault'),
     status: $('vaultStatus'),
     workspace: $('vaultWorkspace'),
@@ -441,14 +439,12 @@ npm run vault:autosync:notify:${payload.enabled ? 'on -- --to=' + (payload.notif
   }
 
   async function saveBearerIfPresent() {
-    if (!String(els.token.value || '').trim()) return null;
-    return window.SkygateAuthBridge?.saveTokenFromInput?.('fs27Token', 'skygateAuthStatus');
+    return window.SkygateAuthBridge?.saveTokenFromInput?.('', 'skygateAuthStatus');
   }
 
   async function loadVault() {
     state.origin = cleanOrigin(els.origin.value || 'https://skyevault-drop.graylondonskyes.workers.dev');
     localStorage.setItem('skyevault.commandCenter.origin', state.origin);
-    if (els.legacy.value.trim()) localStorage.setItem('skyevault.legacyAdminToken', els.legacy.value.trim());
 
     setStatus('Checking shared gate session and loading SkyeVault receipts...');
     const gate = await saveBearerIfPresent();

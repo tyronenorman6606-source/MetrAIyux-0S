@@ -2,54 +2,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const BASE_URL = String(process.env.ZERO_OS_LIVE_BASE || process.env.FOUNDER_COMMAND_LIVE_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const OUT_DIR = path.join(repoRoot, 'test-artifacts', 'founder-company-enrollment-live-http');
 const LATEST = path.join(OUT_DIR, 'founder-company-enrollment-live-http-latest.json');
-const CREDENTIAL_KEYS = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
 async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of CREDENTIAL_KEYS) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: BASE_URL });
+  return { key: auth.credential?.key || 'shared-fs27-gate', value: auth.token || '' };
 }
 
 async function fetchJson(url, init = {}) {
@@ -90,7 +51,6 @@ function authHeaders(token, extra = {}) {
   return {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token,
     ...extra

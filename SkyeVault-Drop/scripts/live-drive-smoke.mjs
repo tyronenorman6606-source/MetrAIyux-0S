@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveZeroOsGateAuth } from '../../tools/lib/zero-os-gate-auth.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -60,7 +61,6 @@ async function call(name, handler, evt) {
 }
 
 loadDotEnv();
-requiredEnv('ADMIN_TOKEN');
 requiredEnv('R2_ACCOUNT_ID');
 requiredEnv('R2_ACCESS_KEY_ID');
 requiredEnv('R2_SECRET_ACCESS_KEY');
@@ -70,7 +70,12 @@ if (!process.env.R2_CONFIG_PREFIX && !process.env.R2_CONFIG_FOLDER_ID && !proces
   process.exit(1);
 }
 
-const adminHeaders = { 'x-admin-token': process.env.ADMIN_TOKEN };
+const gateAuth = await resolveZeroOsGateAuth({ envFiles: [path.join(root, '.env'), path.join(root, '..', '.env'), path.join(root, '..', 'env.txt')] });
+if (!gateAuth.ok || !gateAuth.token) {
+  console.error('Missing shared FS27/SkyGate bearer for SkyeVault live smoke.');
+  process.exit(1);
+}
+const adminHeaders = { authorization: `Bearer ${gateAuth.token}`, 'x-skye-gate-session': gateAuth.token };
 const portalHeaders = process.env.CLIENT_PORTAL_KEY ? { 'x-portal-key': process.env.CLIENT_PORTAL_KEY } : {};
 
 const [{ handler: publicConfig }, { handler: adminConfig }, { handler: adminDriveTest }, { handler: uploadSession }, { handler: uploadComplete }, { handler: uploadStatus }] = await Promise.all([

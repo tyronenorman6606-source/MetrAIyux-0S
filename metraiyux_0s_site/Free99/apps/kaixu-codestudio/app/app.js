@@ -378,7 +378,7 @@ const state = {
   // vault
   vaultSealed: null,
   vaultUnlocked: false,
-  vaultSecret: null, // optional encrypted 0S/SkyGate fallback, in-memory only
+  vaultSecret: null, // unlock marker only; auth stays in the shared gate bridge
   workspaceKey: null, // random key for workspace encryption (in-memory only)
   vaultMeta: null,   // decrypted object
   vaultLastActivity: Date.now(),
@@ -549,13 +549,10 @@ async function vaultUnlockFlow(){
   openModal('vault_unlock', {});
 }
 
-async function vaultSetup(passphrase, gatewayKey, workspaceEncrypt, policyTemplate){
+async function vaultSetup(passphrase, _gatewayKey, workspaceEncrypt, policyTemplate){
   const pp = String(passphrase || '');
-  const key = String(gatewayKey || activeGatewayBearer() || '').trim();
   if (pp.length < 10) throw new Error('Passphrase must be at least 10 characters.');
-  if (!key || key.length < 8) throw new Error('Sign into 0S/SkyGate or attach a fallback session before creating the vault.');
   const payload = {
-    gatewayKey: key,
     workspaceKey: b64.to(crypto.getRandomValues(new Uint8Array(32))),
     createdAt: nowISO(),
     policyTemplate: policyTemplate || state.settings.policyTemplate,
@@ -565,16 +562,16 @@ async function vaultSetup(passphrase, gatewayKey, workspaceEncrypt, policyTempla
   state.vaultSealed = sealed;
   await kvSet(state.db, 'vault', sealed);
   await auditWrite(state.db, 'vault_setup', {workspaceEncrypt: !!workspaceEncrypt, policyTemplate: payload.policyTemplate});
-  toast('Vault created', 'success', 'Your 0S/SkyGate session fallback is encrypted at rest on this device.');
+  toast('Vault created', 'success', 'Local workspace vault created. 0S/SkyGate auth stays bridge-owned.');
 }
 
 async function vaultUnlock(passphrase){
   const sealed = state.vaultSealed;
   if (!sealed) throw new Error('No vault exists.');
   const meta = await vaultOpen(String(passphrase||''), sealed);
-  if (!meta || !meta.gatewayKey) throw new Error('Vault payload invalid.');
+  if (!meta || (!meta.workspaceKey && !meta.gatewayKey)) throw new Error('Vault payload invalid.');
   state.vaultUnlocked = true;
-  state.vaultSecret = String(meta.gatewayKey);
+  state.vaultSecret = 'vault-unlocked';
   state.workspaceKey = meta.workspaceKey ? String(meta.workspaceKey) : null;
   state.vaultMeta = meta;
   if (meta.workspaceEncrypt && !state.workspaceKey){
@@ -694,29 +691,10 @@ function gateBridge(){
   return globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
 }
 
-function readGateStore(key){
-  const raw = sessionStorage.getItem(key) || localStorage.getItem(key) || '';
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return raw.length >= 8 ? { token: raw, source: key } : null;
-  }
-}
-
-function storedGateSession(){
-  for (const key of ['METRAIYUX_GATE_SESSION','SKYGATEFS27_GATE_SESSION','SKYE_GATE_SESSION','FREE99_PLATFORM_GATE_SESSION','saas_client_session']) {
-    const session = readGateStore(key);
-    if (session?.token) return session;
-  }
-  return null;
-}
-
 function activeGatewayBearer(){
   const bridgeSession = gateBridge()?.requireSession?.({ platformId:'kaixu-codestudio', usageLane:'ai-code-studio' })
     || gateBridge()?.current?.();
-  const stored = storedGateSession();
-  return String(bridgeSession?.token || stored?.token || state.vaultSecret || '').trim();
+  return String(bridgeSession?.token || '').trim();
 }
 
 function activeGatewayHeaders(){
@@ -870,7 +848,7 @@ function renderAssistantStatus(text = null){
 // ===== Workspace encryption layer (optional) =====
 async function wsMaybeEncrypt(ws){
   if (!state.settings.workspaceEncrypt) return ws;
-  if (!state.vaultUnlocked || !state.vaultSecret || !state.vaultMeta) throw new Error('Workspace encryption requires unlocked vault.');
+  if (!state.vaultUnlocked || !state.vaultMeta) throw new Error('Workspace encryption requires unlocked vault.');
   // Encrypt entire workspace JSON as ct_b64, keep minimal header for detection
   if (!state.workspaceKey) throw new Error('Workspace key missing (vault payload).');
   const sealed = await vaultSeal(state.workspaceKey, ws, {iterations: 120000});
@@ -880,7 +858,7 @@ async function wsMaybeEncrypt(ws){
 async function wsMaybeDecrypt(stored){
   if (!stored) return null;
   if (stored.encrypted && stored.sealed){
-    if (!state.vaultUnlocked || !state.vaultSecret) throw new Error('Workspace is encrypted. Unlock the vault to open.');
+    if (!state.vaultUnlocked) throw new Error('Workspace is encrypted. Unlock the vault to open.');
     if (!state.workspaceKey) throw new Error('Workspace key missing (vault payload).');
     const ws = await vaultOpen(state.workspaceKey, stored.sealed);
     return ws;
@@ -1051,7 +1029,7 @@ function renderPills(){
 
   // vault
   const has = !!state.vaultSealed;
-  const unlocked = state.vaultUnlocked && !!state.vaultSecret;
+  const unlocked = state.vaultUnlocked;
   const gateReady = !!activeGatewayBearer();
   $('dotVault').className = 'dot ' + (unlocked ? 'ok' : (has ? 'warn' : 'bad'));
   $('txtVault').textContent = unlocked ? 'Vault unlocked' : (gateReady ? 'Gate ready' : (has ? 'Vault locked' : 'No vault'));
@@ -1440,7 +1418,6 @@ function renderFindModal(){
 // ===== Vault modals =====
 function renderVaultSetupModal(){
   const pass = el('input',{class:'input', placeholder:'New passphrase (10+ chars)', type:'password', autocomplete:'new-password'});
-  const key = el('input',{class:'input', placeholder:'0S/SkyGate session fallback (auto-loaded if signed in)', type:'password', autocomplete:'off'});
   const template = el('select',{class:'select'},[
     el('option',{value:'Team', text:'Team'}),
     el('option',{value:'Agency', text:'Agency'}),
@@ -1460,7 +1437,7 @@ function renderVaultSetupModal(){
 
   const btn = el('button',{class:'btn primary', type:'button', onclick: async ()=>{
     try{
-      await vaultSetup(pass.value, key.value, encToggle.checked, template.value);
+      await vaultSetup(pass.value, '', encToggle.checked, template.value);
       await vaultUnlock(pass.value);
       closeModal();
     }catch(e){
@@ -1468,10 +1445,9 @@ function renderVaultSetupModal(){
     }
   }}, 'Create vault');
 
-  modalBody.appendChild(el('div',{class:'small', text:'AI uses the 0S/SkyGate session. This vault is only for local workspace encryption or recovery fallback. Passphrase is never stored.'}));
+  modalBody.appendChild(el('div',{class:'small', text:'AI uses the shared 0S/SkyGate session. This vault is only for local workspace encryption. Passphrase is never stored.'}));
   modalBody.appendChild(el('div',{class:'hr'}));
   modalBody.appendChild(pass);
-  modalBody.appendChild(key);
   modalBody.appendChild(el('div',{class:'row'},[
     el('div',{class:'col', style:null},[
       el('div',{class:'small', text:'Policy template'}),
@@ -1643,7 +1619,7 @@ function renderSettingsModal(){
 
       // If workspace encryption toggled on, require vault unlocked then re-save workspace encrypted.
       if (state.settings.workspaceEncrypt){
-        if (!state.vaultUnlocked || !state.vaultSecret){
+        if (!state.vaultUnlocked){
           toast('Workspace encryption', 'warn', 'Unlock vault then re-save to encrypt workspace.');
         } else {
           await saveWorkspace('encrypt_workspace');

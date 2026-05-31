@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const artifactRoot = path.join(repoRoot, 'test-artifacts', 'company-skynet-host-routes');
@@ -44,69 +44,10 @@ const targets = [
   }
 ];
 
-const credentialKeys = [
-  'ZERO_OS_GATE_CODE',
-  'METRAIYUX_OWNER_ADMIN_CODE',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  if (!file || !existsSync(file)) return {};
-  const rows = {};
-  const text = await fs.readFile(file, 'utf8');
-  for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-    if (match) rows[match[1]] = unquote(match[2]);
-  }
-  return rows;
-}
-
-function expandEnvRefs(values) {
-  const out = { ...values };
-  for (let pass = 0; pass < 3; pass += 1) {
-    for (const [key, value] of Object.entries(out)) {
-      out[key] = String(value || '').replace(/\$\{([A-Z0-9_]+)\}/g, (_match, ref) => out[ref] || '');
-    }
-  }
-  return out;
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean).map((file) => path.resolve(file));
-  let merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(file));
-  merged = expandEnvRefs(merged);
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
-
 function authHeaders(token) {
   return {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };
@@ -440,38 +381,29 @@ async function main() {
     failures: []
   };
 
-  const credential = await ownerCredential();
-  receipt.credential_source = credential.key || 'missing';
-  if (!credential.value) {
-    receipt.failures.push('No shared owner gate credential found in process env, .env, or env.txt.');
+  const gateAuth = await resolveZeroOsGateAuth({ zeroOsBase });
+  receipt.credential_source = gateAuth.credential?.key || gateAuth.credential?.source || 'missing';
+  receipt.login = {
+    status: gateAuth.response?.status || 0,
+    ok: Boolean(gateAuth.ok && gateAuth.token),
+    token_received: Boolean(gateAuth.token),
+    via: gateAuth.response?.via || gateAuth.credential?.source || '',
+    elapsed_ms: Number(Number(gateAuth.response?.elapsedMs || 0).toFixed(2))
+  };
+  if (!gateAuth.token) {
+    receipt.failures.push(gateAuth.response?.body?.error || gateAuth.response?.error || 'Shared FS27/SkyGate helper did not return a bearer.');
   } else {
-    const login = await fetchJson(`${zeroOsBase}/api/owner/admin-login`, {
-      method: 'POST',
-      headers: { accept: 'application/json', 'content-type': 'application/json' },
-      body: JSON.stringify({ code: credential.value })
-    });
-    const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-    receipt.login = {
-      status: login.status,
-      ok: Boolean(login.ok && token),
-      token_received: Boolean(token),
-      elapsed_ms: login.elapsed_ms
-    };
-    if (!token) {
-      receipt.failures.push(login.body?.error || 'Shared gate login did not return a bearer token.');
-    } else {
-      receipt.targets = [];
-      for (const target of targets) {
-        receipt.targets.push(await targetProof(target, token));
-      }
-      const operator = await fetchText(`${zeroOsBase}/api/skyeroutex/operator-entry?return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Findex.html`, {}, 15000);
-      receipt.skyeroutex_operator_entry_anonymous = {
-        status: operator.status,
-        ok: operator.status === 302 && operator.location.includes('/admin/login.html') && operator.location.includes('return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Findex.html'),
-        location: operator.location,
-        elapsed_ms: operator.elapsed_ms
-      };
+    receipt.targets = [];
+    for (const target of targets) {
+      receipt.targets.push(await targetProof(target, gateAuth.token));
     }
+    const operator = await fetchText(`${zeroOsBase}/api/skyeroutex/operator-entry?return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Findex.html`, {}, 15000);
+    receipt.skyeroutex_operator_entry_anonymous = {
+      status: operator.status,
+      ok: operator.status === 302 && operator.location.includes('/admin/login.html') && operator.location.includes('return=%2FSkyeRouteX%2Fworkforce-command-v0.4.0%2Findex.html'),
+      location: operator.location,
+      elapsed_ms: operator.elapsed_ms
+    };
   }
 
   receipt.route_records_ok = receipt.targets.every((item) => item.route_record.ok && item.dashboard.ok);

@@ -3,82 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = '/workspaces/MetrAIyux-0S';
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const appPath = '/key-gate-13th/';
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'key-gate-13th', '0s-live-proof');
 const deploymentVersion = process.env.PROOF_DEPLOYMENT_VERSION || '7926263e-9a3e-456b-b76e-d7f87bd6753b';
-const adminEmail = process.env.PROOF_OWNER_EMAIL || 'owner-proof@metraiyux.local';
 const runId = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
 const navTimeoutMs = Number(process.env.PROOF_NAV_TIMEOUT_MS || 90000);
-
-const secretKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_GATE_CODE',
-  'OWNER_ADMIN_CODE',
-  'ADMIN_CODE',
-  'FS27_ADMIN_CODE',
-  'FS27_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_CODE',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'QA_ADMIN_PASSWORD',
-  'PHC_BOOTSTRAP_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'FREE99_GATE_PASSWORD',
-  'OWNER_ADMIN_PASSWORD',
-  'ADMIN_PASSWORD',
-  'SITE_OPERATOR_ADMIN_TOKEN',
-  'METRAIYUX_ADMIN_TOKEN',
-  'ADMIN_TOKEN'
-];
-
-function readText(file) {
-  try {
-    return fs.readFileSync(file, 'utf8');
-  } catch {
-    return '';
-  }
-}
-
-function unquote(value) {
-  let clean = String(value || '').trim().replace(/^export\s+/, '').trim();
-  while ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1).trim();
-  }
-  return clean;
-}
-
-function envFromText(text, key) {
-  let found = '';
-  for (const line of String(text || '').split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const normalized = trimmed.startsWith('export ') ? trimmed.slice(7).trim() : trimmed;
-    if (normalized.startsWith(`${key}=`)) found = unquote(normalized.slice(key.length + 1));
-    if (normalized.startsWith(`${key}:`)) found = unquote(normalized.slice(key.length + 1));
-  }
-  return found;
-}
-
-function allSecrets(keys) {
-  const texts = [
-    readText(path.join(repoRoot, '.env')),
-    readText(path.join(repoRoot, 'ADMIN_REFERENCE.md')),
-    readText(path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', '.env'))
-  ];
-  const values = [];
-  for (const key of keys) {
-    const direct = unquote(process.env[key] || '');
-    if (direct) values.push(direct);
-    for (const text of texts) {
-      const value = envFromText(text, key);
-      if (value) values.push(value);
-    }
-  }
-  return [...new Set(values.filter(Boolean))];
-}
 
 function relaunchWithXvfbWhenNeeded() {
   if (process.platform !== 'linux') return;
@@ -133,27 +66,19 @@ async function checkUnauth(route, accept = 'text/html') {
 }
 
 async function resolveOwnerGate() {
-  for (const code of allSecrets(secretKeys)) {
-    try {
-      const response = await fetch(urlFor('/api/owner/admin-login'), {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ code })
-      });
-      const data = await response.json().catch(() => ({}));
-      if (response.ok && data.token) return { code, token: data.token };
-    } catch {
-      // Try the next candidate without printing local gate material.
-    }
-  }
-  throw new Error('No local owner/admin candidate unlocked the shared 0S gate.');
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!auth.ok || !token) throw new Error('No shared 0S gate session was available.');
+  return { token };
 }
 
 async function apiFetch(pathname, token, options = {}) {
   const response = await fetch(urlFor(pathname), {
     ...options,
     headers: {
-      authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
+      'x-free99-gate-session': token,
+      'x-skye-gate-session': token,
       'content-type': 'application/json',
       ...(options.headers || {})
     }
@@ -369,37 +294,41 @@ async function runApiProof(token) {
   return { workspaceId, checks };
 }
 
-async function loginOwner(page, code, entry) {
-  const loginUrl = new URL('/admin/login.html', baseUrl);
-  loginUrl.searchParams.set('return', appPath);
-  const response = await page.goto(loginUrl.toString(), { waitUntil: 'domcontentloaded', timeout: navTimeoutMs });
-  entry.actions.push('opened shared 0S owner login');
-  entry.statuses.push({ name: 'owner_login_loaded', ok: Boolean(response?.ok()), status: response?.status() || 0 });
-  await page.waitForSelector('input[name="code"]', { timeout: 20000 });
-  await page.fill('input[name="code"]', code);
-  const emailInput = page.locator('input[name="email"]');
-  if (await emailInput.count()) await emailInput.fill(adminEmail);
-  const gate = await page.evaluate(async (ownerCode) => {
-    const response = await fetch('/api/owner/admin-login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: ownerCode })
-    });
-    const data = await response.json().catch(() => ({}));
-    return {
-      ok: response.ok && Boolean(data.token),
-      status: response.status,
-      hasOwnerToken: Boolean(data.token),
-      hasGateToken: Boolean(data.gateToken || data.gateBearerToken),
-      error: data.error || ''
-    };
-  }, code);
-  entry.statuses.push({ name: 'browser_context_owner_login', ok: gate.ok, state: gate });
-  if (!gate.ok) throw new Error(`Owner login failed in browser context: ${gate.error || gate.status}`);
+async function loginOwner(page, entry) {
   const appResponse = await page.goto(urlFor(appPath), { waitUntil: 'domcontentloaded', timeout: navTimeoutMs });
   entry.statuses.push({ name: 'returned_to_key_gate_surface', ok: Boolean(appResponse?.ok()), status: appResponse?.status() || 0 });
-  entry.actions.push('entered Key Gate 13th through shared FS27 owner session');
+  entry.actions.push('entered Key Gate 13th through shared gate session');
+}
+
+function gateHeaders(token) {
+  const clean = String(token || '').replace(/^Bearer\s+/i, '').trim();
+  return clean ? {
+    Authorization: `Bearer ${clean}`,
+    'x-free99-gate-session': clean,
+    'x-skye-gate-session': clean
+  } : {};
+}
+
+async function installSharedGateSession(context, token) {
+  const clean = String(token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!clean) return;
+  const host = new URL(baseUrl).hostname;
+  await context.addCookies([
+    { name: 'skye_gate_session', value: clean, domain: host, path: '/', httpOnly: true, secure: true, sameSite: 'Lax' },
+    { name: 'skygate_session', value: clean, domain: host, path: '/', httpOnly: true, secure: true, sameSite: 'Lax' }
+  ]);
+  await context.addInitScript((shared) => {
+    for (const key of ['FREE99_PLATFORM_GATE_SESSION', 'METRAIYUX_GATE_SESSION', 'SKYE_GATE_SESSION']) {
+      sessionStorage.setItem(key, JSON.stringify(shared));
+      localStorage.setItem(key, JSON.stringify(shared));
+    }
+  }, {
+    token: clean,
+    source: 'zero-os-gate-auth',
+    platform_id: 'metraiyux-0s',
+    usage_lane: 'fs27-owner-gate',
+    issued_at: new Date().toISOString()
+  });
 }
 
 async function visibleMetrics(page) {
@@ -547,12 +476,14 @@ async function exerciseKeyGateUi(page, entry) {
   });
 }
 
-async function runViewport(browser, ownerCode, viewport, label, storageState = null) {
+async function runViewport(browser, ownerToken, viewport, label, storageState = null) {
   const context = await browser.newContext({
     viewport,
     ignoreHTTPSErrors: true,
+    extraHTTPHeaders: gateHeaders(ownerToken),
     ...(storageState ? { storageState } : {})
   });
+  await installSharedGateSession(context, ownerToken);
   const page = await context.newPage();
   const entry = {
     label,
@@ -571,7 +502,7 @@ async function runViewport(browser, ownerCode, viewport, label, storageState = n
     entry.statuses.push({ name: 'reused_shared_gate_session', ok: Boolean(response?.ok()), status: response?.status() || 0 });
     entry.actions.push('reused authenticated shared 0S gate session');
   } else {
-    await loginOwner(page, ownerCode, entry);
+    await loginOwner(page, entry);
   }
   await exerciseKeyGateUi(page, entry);
   await scrollProof(page, entry);
@@ -606,9 +537,9 @@ async function main() {
 
     const browser = await chromium.launch({ headless: false, slowMo: Number(process.env.LIVE_BROWSER_SLOWMO || 70) });
     try {
-      const desktop = await runViewport(browser, owner.code, { width: 1440, height: 960 }, 'desktop');
+      const desktop = await runViewport(browser, owner.token, { width: 1440, height: 960 }, 'desktop');
       receipt.entries.push(desktop.entry);
-      const mobile = await runViewport(browser, owner.code, { width: 390, height: 844 }, 'mobile', desktop.storageState);
+      const mobile = await runViewport(browser, owner.token, { width: 390, height: 844 }, 'mobile', desktop.storageState);
       receipt.entries.push(mobile.entry);
     } finally {
       await browser.close();

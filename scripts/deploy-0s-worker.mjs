@@ -111,7 +111,6 @@ const WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES = [
   'client-app-factory/assets/empire',
   'client-app-factory/assets/proof',
   'valley-verified/assets/client-builds',
-  'valley-verified/business',
   'SkyeMusicNexus/artist-storefronts',
   'SkyeMusicNexus/one-music-gh-pages'
 ];

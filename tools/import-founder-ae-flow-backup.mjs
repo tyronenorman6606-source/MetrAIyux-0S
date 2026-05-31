@@ -2,6 +2,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const ROOT = process.cwd();
 const DEFAULT_BACKUP = path.join(ROOT, "Zenith", "AE-FLOW-backup-2026-03-17.json");
@@ -16,28 +17,6 @@ function argValue(name, fallback = "") {
   const index = process.argv.indexOf(name);
   if (index >= 0 && process.argv[index + 1]) return process.argv[index + 1];
   return fallback;
-}
-
-function parseEnv(file) {
-  if (!fs.existsSync(file)) return {};
-  const out = {};
-  for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-    if (!line.trim() || line.trim().startsWith("#")) continue;
-    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-    if (!match) continue;
-    let value = match[2].trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
-    out[match[1]] = value;
-  }
-  return out;
-}
-
-function firstCredential(env, names) {
-  for (const name of names) {
-    const value = String(process.env[name] || env[name] || "").trim();
-    if (value) return { name, value };
-  }
-  return null;
 }
 
 function sha256(bytes) {
@@ -73,7 +52,9 @@ async function postBatch(origin, token, batch, index, total) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-admin-token": token
+      authorization: `Bearer ${token}`,
+      "x-skye-gate-session": token,
+      "x-free99-gate-session": token
     },
     body: JSON.stringify({
       source: "founder-ae-flow-backup-2026-03-17",
@@ -100,18 +81,9 @@ async function main() {
   const origin = argValue("--origin", process.env.AE_FLOW_IMPORT_ORIGIN || DEFAULT_ORIGIN);
   const batchSize = Math.max(1, Math.min(250, Number(argValue("--batch-size", "100")) || 100));
   const dryRun = process.argv.includes("--dry-run");
-  const env = parseEnv(path.join(ROOT, ".env"));
-  const credential = firstCredential(env, [
-    "AE_FLOW_IMPORT_TOKEN",
-    "METRAIYUX_OWNER_ADMIN_CODE",
-    "OWNER_ADMIN_CODE",
-    "FREE99_ADMIN_CODE",
-    "SKYGATEFS27_ADMIN_CODE",
-    "ZERO_OS_ADMIN_CODE",
-    "ADMIN_CODE"
-  ]);
+  const gateAuth = dryRun ? { ok: true, token: "", credential: { key: "dry-run", source: "none" } } : await resolveZeroOsGateAuth({ zeroOsBase: origin });
   if (!fs.existsSync(backupPath)) throw new Error(`Backup file not found: ${backupPath}`);
-  if (!dryRun && !credential?.value) throw new Error("Missing owner credential. Set AE_FLOW_IMPORT_TOKEN or an existing 0S owner/admin code in .env.");
+  if (!dryRun && !gateAuth.token) throw new Error("Missing shared FS27/SkyGate/Free99 gate bearer.");
 
   const raw = fs.readFileSync(backupPath);
   const backup = JSON.parse(raw.toString("utf8"));
@@ -130,14 +102,14 @@ async function main() {
     total_records_seen: records.length,
     batch_size: batchSize,
     batch_count: batches.length,
-    credential_source: credential?.name || "",
+    credential_source: gateAuth.credential?.key || "",
     imported: [],
     totals: { accepted: 0, skipped: 0 }
   };
 
   if (!dryRun) {
     for (let index = 0; index < batches.length; index += 1) {
-      const item = await postBatch(origin, credential.value, batches[index], index, batches.length);
+      const item = await postBatch(origin, gateAuth.token, batches[index], index, batches.length);
       receipt.imported.push(item);
       receipt.totals.accepted += item.accepted;
       receipt.totals.skipped += item.skipped;

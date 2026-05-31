@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = '/workspaces/MetrAIyux-0S';
 const baseUrl = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
@@ -25,44 +26,11 @@ function stamp() {
   return new Date().toISOString().replace(/[:.]/g, '-');
 }
 
-function readRootEnv() {
-  const env = {};
-  const text = fs.readFileSync(path.join(repoRoot, '.env'), 'utf8');
-  for (const raw of text.split(/\r?\n/)) {
-    const match = raw.trim().match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (!match) continue;
-    let value = match[2].trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-    env[match[1]] = value;
-  }
-  return env;
-}
-
-async function fs27AdminBearer(env) {
-  const origin = String(env.SKYGATEFS27_ORIGIN || env.FS27_LIVE_BASE || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev').replace(/\/+$/, '');
-  const candidates = [
-    env.SKYGATEFS13_ADMIN_PASSWORD,
-    env.FS27_ADMIN_PASSWORD,
-    env.ADMIN_PASSWORD,
-    env.QA_ADMIN_PASSWORD,
-    env.PHC_BOOTSTRAP_ADMIN_CODE,
-    env.SKYGATEFS13_WORKER_ADMIN_TOKEN
-  ].filter(Boolean);
-  for (const password of candidates) {
-    for (const loginPath of ['/admin/login', '/api/admin/login']) {
-      const response = await fetch(`${origin}${loginPath}`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ password, code: password })
-      }).catch(() => null);
-      if (!response) continue;
-      const data = await response.json().catch(() => ({}));
-      if (response.ok && data.token) return data.token;
-    }
-  }
-  throw new Error('Could not obtain FS27 admin bearer from root env candidates.');
+async function resolveSharedGateToken() {
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!auth.ok || !token) throw new Error('Could not obtain shared 0S gate bearer.');
+  return token;
 }
 
 async function viewportSnapshot(page) {
@@ -170,7 +138,9 @@ async function runViewport(browser, artifactDir, receipt, token, viewport, devic
   await context.route(`${baseUrl}/**`, (route) => {
     const headers = {
       ...route.request().headers(),
-      authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
+      'x-free99-gate-session': token,
+      'x-skye-gate-session': token
     };
     return route.continue({ headers });
   });
@@ -255,7 +225,7 @@ async function main() {
   if (unauthHome.status !== 302 || unauthHome.headers.get('x-0s-gate') !== 'fs27-required') receipt.failures.push('Unauthenticated homepage did not redirect through FS27 gate.');
   if (unauthEco.status !== 302 || unauthEco.headers.get('x-0s-gate') !== 'fs27-required') receipt.failures.push('Unauthenticated ecosystem did not redirect through FS27 gate.');
 
-  const token = await fs27AdminBearer(readRootEnv());
+  const token = await resolveSharedGateToken();
   const browser = await chromium.launch({ headless: false });
   try {
     for (const run of receipt.viewportRuns) {

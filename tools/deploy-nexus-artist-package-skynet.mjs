@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 function arg(name, fallback = '') {
   const prefix = `--${name}=`;
@@ -68,7 +69,8 @@ const mount = arg('mount', `/musicnexus/${slug}`);
 const workspace = arg('workspace', 'default-workspace');
 const plan = arg('plan', 'free99');
 const publicAccess = flag('public') || String(arg('auth', 'public')).toLowerCase() === 'public';
-const tokenPresent = Boolean(process.env.SKYENET_AUTH || process.env.ZERO_OS_GATE_SESSION);
+const gateAuth = await resolveZeroOsGateAuth().catch((error) => ({ ok: false, token: '', error: error?.message || String(error) }));
+const gateToken = String(gateAuth.token || '').trim();
 
 if (!existsSync(dir)) {
   console.error(`Source folder not found: ${dir}`);
@@ -89,22 +91,22 @@ const baseReceipt = {
   publicAccess,
   fileCount: inventory.files,
   bytes: inventory.bytes,
-  requiredCredential: 'SKYENET_AUTH or ZERO_OS_GATE_SESSION'
+  requiredCredential: 'shared FS27/SkyGate/Free99 gate bearer'
 };
 
-if (!tokenPresent) {
+if (!gateToken) {
   const receiptPath = await writeReceipt(dir, {
     ...baseReceipt,
     ok: false,
     status: 'blocked_missing_owner_bearer',
     attempted: false,
     notes: [
-      'The local shell does not contain SKYENET_AUTH or ZERO_OS_GATE_SESSION.',
+      gateAuth.error || 'The shared FS27/SkyGate/Free99 gate bearer could not be resolved.',
       'No bearer token was printed or committed.',
-      'Set SKYENET_AUTH to a shared 0S/FS27 owner bearer and rerun this command.'
+      'Authenticate through the canonical 0S/FS27 gate and rerun this command.'
     ]
   });
-  console.error(`SkyeNet deploy blocked: missing SKYENET_AUTH or ZERO_OS_GATE_SESSION. Receipt: ${receiptPath}`);
+  console.error(`SkyeNet deploy blocked: missing shared FS27/SkyGate bearer. Receipt: ${receiptPath}`);
   process.exit(2);
 }
 
@@ -115,7 +117,8 @@ const args = [
   '--workspace', workspace,
   '--plan', plan,
   '--host', host,
-  '--mount', mount
+  '--mount', mount,
+  '--token', gateToken
 ];
 if (publicAccess) args.push('--public');
 

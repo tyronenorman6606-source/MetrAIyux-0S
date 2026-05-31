@@ -4,6 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -31,19 +32,6 @@ const serviceBasePath = '/Marketing-Made-Easy/WebGrowthOperator/services';
 const viewports = [
   { name: 'desktop', width: 1440, height: 980 },
   { name: 'mobile', width: 390, height: 844 }
-];
-
-const ownerKeys = [
-  'FREE99_ADMIN_CODE', 'FREE99_ADMIN_PASSWORD', 'FREE99_GATE_CODE', 'FREE99_GATE_PASSWORD',
-  'FREE99_OWNER_CODE', 'FREE99_OWNER_PASSWORD', 'FREE99_PASSWORD', 'ZERO_OS_GATE_CODE',
-  'ZERO_OS_ADMIN_CODE', 'METRAIYUX_OWNER_ADMIN_CODE', 'FREE99_DEMON_CODE', 'FREE99_DEMON_KEY',
-  'DEMON_ADMIN_CODE', 'DEMON_GATE_CODE', 'DEMON_KEY', 'OWNER_ADMIN_CODE', 'OWNER_ADMIN_PASSWORD',
-  'ADMIN_CODE', 'ADMIN_PASSWORD', 'FS27_ADMIN_CODE', 'FS27_ADMIN_PASSWORD', 'FS27_OWNER_CODE',
-  'FS27_OWNER_PASSWORD', 'SKYE_GATE_ADMIN_CODE', 'SKYE_GATE_ADMIN_PASSWORD', 'SKYGATE_ADMIN_CODE',
-  'SKYGATE_ADMIN_PASSWORD', 'SKYGATEFS27_ADMIN_CODE', 'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD', 'QA_ADMIN_PASSWORD', 'PHC_BOOTSTRAP_ADMIN_CODE',
-  'SITE_OPERATOR_ADMIN_TOKEN', 'METRAIYUX_ADMIN_TOKEN', 'ADMIN_TOKEN',
-  'SKYGATEFS13_WORKER_ADMIN_TOKEN', 'MCP_HTTP_BEARER_TOKEN', 'ZERO_OS_GATE_CREDENTIAL_ENV'
 ];
 
 function relaunchWithXvfbWhenNeeded() {
@@ -102,52 +90,29 @@ function sha12(value) {
 function gateHeaders(token) {
   const clean = String(token || '').replace(/^Bearer\s+/i, '').trim();
   return {
-    authorization: `Bearer ${clean}`,
-    'x-admin-token': clean,
+    Authorization: `Bearer ${clean}`,
     'x-free99-gate-session': clean,
     'x-skye-gate-session': clean
   };
 }
 
 async function ownerSession() {
-  const { env, source } = readEnv();
-  const candidates = [];
-  for (const key of ownerKeys) {
-    if (!(key in env)) continue;
-    const value = resolveEnv(env, env[key]);
-    if (!value || value.startsWith('${')) continue;
-    if (!candidates.some((candidate) => candidate.value === value)) {
-      candidates.push({ value, source: source[key] || key });
-    }
-  }
-
-  const failures = [];
-  for (const candidate of candidates) {
-    const response = await fetch(`${zeroOs}/api/owner/admin-login`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: candidate.value })
-    });
-    const data = await response.json().catch(() => ({}));
-    const token = data.gateToken || data.gateBearerToken || data.token;
-    if (response.ok && token) {
-      return {
-        token,
-        source: candidate.source,
-        candidateHash: sha12(candidate.value),
-        status: response.status
-      };
-    }
-    failures.push({ source: candidate.source, candidateHash: sha12(candidate.value), status: response.status, error: data.error || '' });
-  }
-  throw new Error(`Owner login failed: ${JSON.stringify(failures.slice(0, 8))}`);
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: zeroOs });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!auth.ok || !token) throw new Error('Shared 0S gate session was unavailable.');
+  return {
+    token,
+    source: auth.credential?.source || 'shared-gate',
+    candidateHash: sha12(token),
+    status: auth.response?.status || 0
+  };
 }
 
 async function installSession(context, token) {
   const clean = String(token || '').replace(/^Bearer\s+/i, '').trim();
-  const session = { token: clean, source: 'owner-admin-login', platform_id: 'metraiyux-0s', issued_at: new Date().toISOString() };
+  const session = { token: clean, source: 'zero-os-gate-auth', platform_id: 'metraiyux-0s', issued_at: new Date().toISOString() };
   await context.addInitScript((sessionValue) => {
-    for (const key of ['FREE99_PLATFORM_GATE_SESSION', 'METRAIYUX_GATE_SESSION', 'SKYE_MUSIC_NEXUS_GATE_SESSION']) {
+    for (const key of ['FREE99_PLATFORM_GATE_SESSION', 'METRAIYUX_GATE_SESSION', 'SKYE_GATE_SESSION']) {
       sessionStorage.setItem(key, JSON.stringify(sessionValue));
       localStorage.setItem(key, JSON.stringify(sessionValue));
     }

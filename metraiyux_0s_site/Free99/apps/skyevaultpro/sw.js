@@ -21,7 +21,6 @@ const CDN_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js',
   'https://unpkg.com/lucide@latest',
-  'https://identity.netlify.com/v1/netlify-identity-widget.js',
   'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600&family=Merriweather:wght@400;700&display=swap'
 ];
 

@@ -7,6 +7,7 @@
   <title>skAIxu Code Evaluator Platform App</title>
   <meta name="description" content="Operator console for skAIxu Code Evaluator Platform: audit workspaces, seed data, proof packs, patch bundles, build receipts, and gateway-routed evaluation workflows." />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://kaixugateway13.netlify.app; worker-src 'self'; frame-src 'self';">
+  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <style>
     :root{
       --bg0:#07040f; --bg1:#0d0620; --card:rgba(255,255,255,.06);
@@ -345,12 +346,8 @@
         <div class="card">
           <h2>AI setup (0S/SkyGate controlled)</h2>
           <div class="row">
-            <input id="kaixuKey" type="password" placeholder="0S gate session auto-loaded; fallback only" style="flex:1; min-width: 220px" />
-            <label class="pill" title="Fallback sessions should stay tab-scoped unless you are doing local recovery." style="padding:6px 10px">
-              <input id="rememberKey" type="checkbox" style="height:auto; margin:0; accent-color: var(--gold);" />
-              <span class="tiny muted">Remember fallback</span>
-            </label>
-            <button id="saveKeyBtn" class="btn2" type="button">Attach</button>
+            <span id="kaixuKeyStatus" class="pill" style="padding:6px 10px">Checking shared gate session...</span>
+            <a class="btn2" href="/admin/login.html?return=/Free99/apps/skaixu-code-evaluator/app.html">Open 0S Gate</a>
           </div>
 
           <div class="row">
@@ -556,12 +553,11 @@
           <div class="grid2">
             <div class="card">
               <h2>Upstream auth adapter contract</h2>
-              <div class="tiny muted">This app does not implement auth. Your parent shell can inject identity with <span class="mono">window.SKAI_UPSTREAM_IDENTITY</span> or this JSON bridge while testing.</div>
+              <div class="tiny muted">This app inherits identity from the shared 0S/SkyGate session through <span class="mono">MetrAIyuxGateBridge</span>.</div>
               <div class="hr"></div>
-              <textarea id="identityJson" placeholder='{"tenantId":"demo-tenant","userId":"operator","roles":["owner"]}'></textarea>
+              <textarea id="identityJson" readonly placeholder='{"tenantId":"0s-gate","userId":"operator","roles":["operator"]}'></textarea>
               <div class="row" style="justify-content:space-between">
-                <button id="saveIdentityBtn" class="btn2" type="button">Save identity bridge</button>
-                <button id="clearIdentityBtn" class="danger" type="button">Clear</button>
+                <button id="refreshIdentityBtn" class="btn2" type="button">Refresh gate identity</button>
               </div>
               <div id="identityOut" class="tiny mono scrollBox">(no identity bridge)</div>
             </div>
@@ -1886,69 +1882,21 @@ function clearProject(){
     function gateBridge(){
       return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
     }
-    function readJsonStore(store, key){
-      try { return JSON.parse(store.getItem(key) || "null"); } catch { return null; }
-    }
-    function storedGateSession(){
-      for (const key of ["METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYE_GATE_SESSION","FREE99_PLATFORM_GATE_SESSION","saas_client_session"]) {
-        const parsed = readJsonStore(sessionStorage, key) || readJsonStore(localStorage, key);
-        if (parsed?.token) return parsed;
-        const raw = (sessionStorage.getItem(key) || localStorage.getItem(key) || "").trim();
-        if (raw && raw.length >= 8 && !raw.startsWith("{")) return { token: raw, source: key };
-      }
-      return null;
+    function currentGateSession(){
+      const bridge = gateBridge();
+      return bridge?.requireSession?.({ platformId:"skaixu-code-evaluator", usageLane:"ai-code-evaluation" })
+        || bridge?.current?.()
+        || null;
     }
     function getKaixuKey(){
-      const bridgeSession = gateBridge()?.requireSession?.({ platformId:"skaixu-code-evaluator", usageLane:"ai-code-evaluation" })
-        || gateBridge()?.current?.();
-      const stored = storedGateSession();
-      return (bridgeSession?.token || stored?.token || "").trim();
-    }
-    function setKaixuKey(v, { remember } = {}){
-      const val = (v||"").trim();
-      const session = val ? {
-        token: val,
-        source: "manual-0s-gate-fallback",
-        platform_id: "skaixu-code-evaluator",
-        usage_lane: "ai-code-evaluation",
-        issued_at: new Date().toISOString()
-      } : null;
-      if (session) {
-        sessionStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(session));
-        if (remember) localStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(session));
-        else localStorage.removeItem("METRAIYUX_GATE_SESSION");
-        gateBridge()?.persist?.(session);
-      } else {
-        sessionStorage.removeItem("METRAIYUX_GATE_SESSION");
-      }
+      const bridgeSession = currentGateSession();
+      return (bridgeSession?.token || "").trim();
     }
     function hydrateKey(){
       const k = getKaixuKey();
-      if (k) el("kaixuKey").placeholder = "0S/SkyGate session active";
-      const persisted = !!localStorage.getItem("METRAIYUX_GATE_SESSION");
-      const rememberEl = el("rememberKey");
-      if (rememberEl) rememberEl.checked = persisted;
+      const status = el("kaixuKeyStatus");
+      if (status) status.textContent = k ? "0S/SkyGate session active" : "0S/SkyGate session required";
     }
-
-    // Keep fallback session updated while typing (normal path is 0S/SkyGate auto-load)
-    el("kaixuKey").addEventListener("input", ()=>{
-      const v = el("kaixuKey").value.trim();
-      if (v) setKaixuKey(v, { remember:false });
-      setButtonsEnabled();
-    });
-
-    el("saveKeyBtn").addEventListener("click", ()=>{
-      const k = el("kaixuKey").value.trim();
-      const remember = !!el("rememberKey")?.checked;
-      if (!k){
-        toast("Fallback cleared", "No manual fallback session saved.", "warn");
-        setKaixuKey("", { remember });
-      } else {
-        setKaixuKey(k, { remember });
-        toast("0S fallback attached", remember ? "Saved in localStorage for recovery." : "Saved for this tab only.", remember ? "warn" : "ok");
-      }
-      setButtonsEnabled();
-    });
 
     // Provider/model defaults
 
@@ -2533,17 +2481,27 @@ function clearProject(){
     function readUpstreamIdentity(){
       const injected = window.SKAI_UPSTREAM_IDENTITY;
       if (injected && typeof injected === "object") return injected;
-      try{
-        const raw = localStorage.getItem("SKAI_UPSTREAM_IDENTITY_JSON");
-        return raw ? JSON.parse(raw) : null;
-      }catch{ return null; }
+      const session = currentGateSession();
+      if (!session) return null;
+      const claims = session.claims?.skygate || session.claims || {};
+      const roles = Array.isArray(claims.roles)
+        ? claims.roles
+        : [session.role || claims.role || "operator"].filter(Boolean);
+      return {
+        tenantId: session.workspace_id || claims.tenantId || claims.tenant || session.customer_id || "0s-gate",
+        userId: session.customer_id || claims.sub || claims.userId || session.email || session.actor || "0s-operator",
+        email: session.email || claims.email || "",
+        roles,
+        gateCards: (session.gate_cards || []).map(card => card.id || card.name).filter(Boolean),
+        source: session.source || "MetrAIyuxGateBridge"
+      };
     }
 
     function renderIdentity(){
       state.upstreamIdentity = readUpstreamIdentity();
       const val = state.upstreamIdentity ? JSON.stringify(state.upstreamIdentity, null, 2) : "";
-      if (el("identityJson") && !el("identityJson").value) el("identityJson").value = val;
-      setTextIfPresent("identityOut", state.upstreamIdentity ? val : "(no identity bridge)");
+      if (el("identityJson")) el("identityJson").value = val;
+      setTextIfPresent("identityOut", state.upstreamIdentity ? val : "(no gate session)");
     }
 
     async function getPlatformClient(){
@@ -3785,7 +3743,7 @@ function clearProject(){
         generatedAt: nowISO(),
         authMode:"inherited-upstream-only",
         requiredIdentityShape:{ tenantId:"string", userId:"string", roles:["owner|admin|operator|viewer"], claims:"object" },
-        browserBridge:"window.SKAI_UPSTREAM_IDENTITY or localStorage SKAI_UPSTREAM_IDENTITY_BRIDGE",
+        browserBridge:"MetrAIyuxGateBridge current session",
         apiHeaders:{ "x-skai-upstream-identity":"base64url(JSON identity)", "x-skai-tenant-id":"fallback tenant id", "x-skai-user-id":"fallback user id", "x-skai-roles":"comma roles" },
         endpoints:[
           { method:"GET", path:"/.netlify/functions/platform-workspaces", purpose:"List inherited-tenant workspaces" },
@@ -3961,7 +3919,7 @@ function clearProject(){
         { path:"proof/framework-adapter.json", bytes:new TextEncoder().encode(JSON.stringify(state.backplaneManifest || null, null, 2)) },
         { path:"proof/provider-lifecycle-audit.json", bytes:new TextEncoder().encode(JSON.stringify(state.providerLifecycleAudit || null, null, 2)) },
         { path:"proof/deterministic-task-patch-bundles.json", bytes:new TextEncoder().encode(JSON.stringify(state.deterministicPatchBundles || [], null, 2)) },
-        { path:"proof/upstream-auth-contract.json", bytes:new TextEncoder().encode(JSON.stringify({ note:"Auth is intentionally inherited upstream. Inject window.SKAI_UPSTREAM_IDENTITY or pass identity to server functions before privileged actions.", currentBridge: state.upstreamIdentity || null }, null, 2)) },
+        { path:"proof/upstream-auth-contract.json", bytes:new TextEncoder().encode(JSON.stringify({ note:"Auth is intentionally inherited from the shared 0S/SkyGate session through MetrAIyuxGateBridge.", currentBridge: state.upstreamIdentity || null }, null, 2)) },
       ];
       const blob = await ZipLite.createZip(files, { compress:true });
       const a = document.createElement("a");
@@ -4005,19 +3963,9 @@ function clearProject(){
       el("runTaskReceiptLoopBtn")?.addEventListener("click", runTaskReceiptLoop);
       el("validateSeedsBtn")?.addEventListener("click", ()=>{ state.seedValidation = validateSeedRegistry(); renderDataPanel(); logPlatformEvent("data", `Validated ${state.seedValidation.records} seed record(s)`); toast("Seed validation complete", `${state.seedValidation.records} record(s), ${state.seedValidation.issues.length} warning(s).`, state.seedValidation.issues.length ? "warn" : "ok"); });
       el("materializeSeedBtn")?.addEventListener("click", materializeSeedRegistry);
-      el("saveIdentityBtn")?.addEventListener("click", ()=>{
-        const raw = el("identityJson")?.value || "";
-        try{
-          const obj = raw.trim() ? JSON.parse(raw) : null;
-          if (obj) localStorage.setItem("SKAI_UPSTREAM_IDENTITY_JSON", JSON.stringify(obj));
-          else localStorage.removeItem("SKAI_UPSTREAM_IDENTITY_JSON");
-          renderIdentity(); toast("Identity bridge saved", "Upstream auth adapter JSON stored locally for testing.", "ok");
-        }catch(err){ toast("Invalid identity JSON", String(err.message || err), "err"); }
-      });
-      el("clearIdentityBtn")?.addEventListener("click", ()=>{
-        localStorage.removeItem("SKAI_UPSTREAM_IDENTITY_JSON");
-        if (el("identityJson")) el("identityJson").value = "";
-        renderIdentity(); toast("Identity bridge cleared", "No auth layer was changed.", "warn");
+      el("refreshIdentityBtn")?.addEventListener("click", ()=>{
+        renderIdentity();
+        toast(state.upstreamIdentity ? "Gate identity refreshed" : "Gate session required", state.upstreamIdentity ? "Using shared 0S/SkyGate identity." : "Open the shared gate first.", state.upstreamIdentity ? "ok" : "warn");
       });
       el("seedFolderPick")?.addEventListener("change", async (e)=>{
         const files = [...(e.target.files || [])];

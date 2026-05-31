@@ -7,6 +7,7 @@
   const store = {
     get token() {
       return runtimeAuth.token ||
+        String(gateBridge()?.requireSession?.({ platformId: "skyegatefs27-user-dashboard", usageLane: "user-dashboard" })?.token || gateBridge()?.current?.()?.token || "").trim() ||
         String(
           runtimeConfig.userToken ||
           runtimeConfig.sessionToken ||
@@ -25,6 +26,10 @@
   function clearLegacyUserToken() {
     try { sessionStorage.removeItem("SKYGATE_USER_TOKEN"); } catch {}
     try { localStorage.removeItem("SKYGATE_USER_TOKEN"); } catch {}
+  }
+
+  function gateBridge() {
+    return globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
   }
 
   function apiUrl(path) {
@@ -301,15 +306,14 @@
   });
 
   $("#userLoginBtn")?.addEventListener("click", async () => {
-    const token = ($("#userToken")?.value || "").trim();
-    if (!token) return showToast("Enter a session token or runtime lane grant.", false);
+    const token = String(gateBridge()?.requireSession?.({ platformId: "skyegatefs27-user-dashboard", usageLane: "user-dashboard" })?.token || gateBridge()?.current?.()?.token || "").trim();
+    if (!token) return showToast("Open the shared 0S/SkyGate session first.", false);
     store.token = token;
     store.apiBase = ($("#userApiBase")?.value || "").trim();
     try {
       await loadAll();
       setAuthUI(true);
       showToast("User dashboard ready.", true);
-      $("#userToken").value = "";
     } catch (error) {
       store.token = "";
       showToast(error.message, false);

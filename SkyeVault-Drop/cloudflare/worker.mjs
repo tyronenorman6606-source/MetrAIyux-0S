@@ -18,7 +18,7 @@ import { handler as uploadComplete } from '../netlify/functions/upload-complete.
 import { handler as uploadPartUrl } from '../netlify/functions/upload-part-url.js';
 import { handler as uploadSession } from '../netlify/functions/upload-session.js';
 import { handler as uploadStatus } from '../netlify/functions/upload-status.js';
-import { introspectSkygateBearer } from '../netlify/functions/_lib/security.js';
+import { hasValidFs27BoundOperatorSession, introspectSkygateBearer, introspectZeroOsOwnerBearer } from '../netlify/functions/_lib/security.js';
 import { ADMIN_HTML, SETUP_HTML } from './internal-pages.generated.mjs';
 
 const HANDLERS = {
@@ -78,7 +78,7 @@ const GATE_PROTECTED_FUNCTIONS = new Set([
   'setup-folder-helper'
 ]);
 
-const LOCAL_OPERATOR_FUNCTIONS = new Set(['operator-session', 'operator-logout']);
+const LOCAL_OPERATOR_FUNCTIONS = new Set(['operator-logout']);
 
 function bindEnv(env, request) {
   globalThis.__SKYEVAULT_WORKER_ENV = env || {};
@@ -194,19 +194,31 @@ function gateDeniedResponse(statusCode, error) {
   });
 }
 
-async function requireSkyVaultGateAdmin(request) {
-  const gate = await introspectSkygateBearer(headerOnlyNetlifyEvent(request));
+async function requireSkyVaultGateAdmin(request, options = {}) {
+  const event = headerOnlyNetlifyEvent(request);
+  void options;
+  if (hasValidFs27BoundOperatorSession(event)) return { ok: true };
+
+  let gate = await introspectSkygateBearer(event);
   if (!gate.ok) {
-    return {
-      ok: false,
-      response: gateDeniedResponse(gate.statusCode || 401, gate.error || 'FS27/SkyGate owner-admin bearer is required for SkyeVault mounted admin access.')
-    };
+    const zeroOs = await introspectZeroOsOwnerBearer(event);
+    if (zeroOs.ok) gate = zeroOs;
+    else {
+      return {
+        ok: false,
+        response: gateDeniedResponse(gate.statusCode || zeroOs.statusCode || 401, gate.error || zeroOs.error || 'FS27/SkyGate owner-admin bearer is required for SkyeVault mounted admin access.')
+      };
+    }
   }
   if (!allowsSkyeVaultOwnerAdmin(gate.claims)) {
-    return {
-      ok: false,
-      response: gateDeniedResponse(403, 'FS27/SkyGate bearer is active, but it is not owner/admin scoped for SkyeVault.')
-    };
+    const zeroOs = gate.path === '/api/owner/admin-session' ? gate : await introspectZeroOsOwnerBearer(event);
+    if (zeroOs.ok && allowsSkyeVaultOwnerAdmin(zeroOs.claims)) gate = zeroOs;
+    else {
+      return {
+        ok: false,
+        response: gateDeniedResponse(403, 'FS27/SkyGate bearer is active, but it is not owner/admin scoped for SkyeVault.')
+      };
+    }
   }
   return { ok: true };
 }

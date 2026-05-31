@@ -3,13 +3,9 @@ import {
   dbFirst,
   dbRun,
   json,
-  parseCookie,
   readJson,
-  sha256Hex,
-  signToken,
   slugify,
-  uid,
-  verifyToken
+  uid
 } from './utils.js';
 import {
   buildCustomerDisplayName,
@@ -20,8 +16,7 @@ import {
 } from './customers.js';
 import { buildOrderEvent } from './orders.js';
 import { normalizeReturnRequestInput, returnRecord } from './returns.js';
-import { hashCustomerPassword, verifyCustomerPassword } from './passwords.js';
-import { authSubject, checkAuthLockout, clientIp, recordAuthAttempt, shouldUseSecureCookies } from './security.js';
+import { shouldUseSecureCookies } from './security.js';
 
 export const CUSTOMER_SESSION_COOKIE = 'skye_customer_session';
 const SHARED_GATE_CUSTOMER_PASSWORD_HASH = 'shared-0s-gate-only';
@@ -36,24 +31,6 @@ export function setCustomerSessionCookie(token, maxAge = 60 * 60 * 24 * 30, secu
 
 export function clearCustomerSessionCookie(secure = true) {
   return `${CUSTOMER_SESSION_COOKIE}=; Path=/; HttpOnly${secureCookieAttribute(secure)}; SameSite=Lax; Max-Age=0`;
-}
-
-async function createCustomerSession(env, { customerId, merchantId, email = '', ttlMs = 1000 * 60 * 60 * 24 * 30 }) {
-  const rawToken = await signToken(env.SESSION_SECRET, {
-    sid: uid('custraw'),
-    role: 'customer',
-    customerId,
-    merchantId,
-    email,
-    exp: Date.now() + ttlMs
-  });
-  const tokenHash = await sha256Hex(rawToken);
-  const sessionId = uid('custsess');
-  await dbRun(env, `
-    INSERT INTO customer_sessions (id, customer_id, merchant_id, token_hash, expires_at)
-    VALUES (?, ?, ?, ?, datetime('now', '+30 day'))
-  `, [sessionId, customerId, merchantId, tokenHash]);
-  return rawToken;
 }
 
 function sharedGateHandoffSecret(env) {
@@ -171,67 +148,21 @@ async function getSharedGateCustomerSession(request, env, { merchantSlug = '', m
 }
 
 export async function getCustomerSession(request, env) {
-  const cookies = parseCookie(request.headers.get('cookie') || '');
-  const token = cookies[CUSTOMER_SESSION_COOKIE];
-  if (!token) return null;
-  try {
-    await verifyToken(env.SESSION_SECRET, token);
-  } catch {
-    return null;
-  }
-  const tokenHash = await sha256Hex(token);
-  const row = await dbFirst(env, `
-    SELECT customer_sessions.id,
-           customer_sessions.customer_id,
-           customer_sessions.merchant_id,
-           customer_accounts.email,
-           customer_accounts.first_name,
-           customer_accounts.last_name,
-           customer_accounts.phone,
-           customer_accounts.default_address_json,
-           customer_accounts.marketing_opt_in,
-           customer_accounts.created_at,
-           customer_accounts.updated_at,
-           merchants.slug AS merchant_slug,
-           merchants.brand_name AS merchant_brand_name
-    FROM customer_sessions
-    INNER JOIN customer_accounts ON customer_accounts.id = customer_sessions.customer_id
-    INNER JOIN merchants ON merchants.id = customer_sessions.merchant_id
-    WHERE customer_sessions.token_hash = ?
-      AND datetime(customer_sessions.expires_at) > datetime('now')
-    LIMIT 1
-  `, [tokenHash]);
-  if (!row) return null;
-  const customer = customerRecord(row);
-  customer.merchantName = row.merchant_brand_name || '';
-  return {
-    id: row.id,
-    customerId: row.customer_id,
-    merchantId: row.merchant_id,
-    merchantSlug: row.merchant_slug,
-    email: customer.email,
-    role: 'customer',
-    customer
-  };
+  void request;
+  void env;
+  return null;
 }
 
 function unauthorized(message = 'Unauthorized.') {
   return json({ error: message }, 401);
 }
 
-async function guardCustomerAuthAttempt(request, env, kind, identity = '') {
-  const ip = clientIp(request);
-  const subject = authSubject(kind, identity || 'unknown', ip);
-  const locked = await checkAuthLockout(env, subject);
-  return { ip, subject, locked };
-}
-
-async function recordCustomerAuthFailure(env, guard, kind, identity = '', reason = 'invalid_credentials') {
-  return recordAuthAttempt(env, { subject: guard.subject, kind, identity: String(identity || '').toLowerCase(), ip: guard.ip, success: false, reason });
-}
-
-async function recordCustomerAuthSuccess(env, guard, kind, identity = '') {
-  return recordAuthAttempt(env, { subject: guard.subject, kind, identity: String(identity || '').toLowerCase(), ip: guard.ip, success: true, reason: 'success' });
+function localCustomerPasswordAuthDisabled(request, env) {
+  return json({
+    error: 'SkyeCommerce customer password auth is disabled inside 0S. Use the shared FS27/SkyGate/Free99 gate session.',
+    code: 'local_customer_password_auth_disabled',
+    sharedGateRequired: true
+  }, 410, { 'Set-Cookie': clearCustomerSessionCookie(shouldUseSecureCookies(request, env)) });
 }
 
 async function requireCustomerSession(request, env, merchantSlug = '') {
@@ -239,10 +170,7 @@ async function requireCustomerSession(request, env, merchantSlug = '') {
   if (sharedGate?.error) return { error: sharedGate.error };
   if (sharedGate?.session) return { session: sharedGate.session };
   if (hasSharedGateHandoff(request, env)) return { error: unauthorized('Shared gate customer session could not be reconciled to this store.') };
-  const session = await getCustomerSession(request, env);
-  if (!session || !session.customerId) return { error: unauthorized() };
-  if (merchantSlug && slugify(merchantSlug) !== slugify(session.merchantSlug || '')) return { error: unauthorized('Customer session does not belong to this store.') };
-  return { session };
+  return { error: unauthorized('Shared FS27/SkyGate customer session is required.') };
 }
 
 function customerOrderSummary(row) {
@@ -349,12 +277,7 @@ function savedCartRecord(row) {
 export async function resolveCustomerSessionForMerchant(request, env, merchantId) {
   const sharedGate = await getSharedGateCustomerSession(request, env, { merchantId });
   if (sharedGate?.session) return sharedGate.session.customer;
-  if (hasSharedGateHandoff(request, env)) return null;
-  const session = await getCustomerSession(request, env);
-  if (!session || session.merchantId !== merchantId) return null;
-  const customer = await dbFirst(env, `SELECT *, ? AS merchant_slug FROM customer_accounts WHERE id = ? AND merchant_id = ? LIMIT 1`, [session.merchantSlug || '', session.customerId, merchantId]);
-  if (!customer) return null;
-  return customerRecord(customer);
+  return null;
 }
 
 export async function handleCustomerApi(request, env, url) {
@@ -376,21 +299,7 @@ export async function handleCustomerApi(request, env, url) {
         merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name }
       });
     }
-    if (!body.slug || !body.email || !body.password) return json({ error: 'slug, email, and password are required.' }, 400);
-    const merchant = await dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE slug = ? LIMIT 1`, [slugify(body.slug)]);
-    if (!merchant) return json({ error: 'Store not found.' }, 404);
-    const existing = await dbFirst(env, `SELECT id FROM customer_accounts WHERE merchant_id = ? AND lower(email) = lower(?) LIMIT 1`, [merchant.id, body.email]);
-    if (existing) return json({ error: 'Customer account already exists for this store.' }, 409);
-    const customerId = uid('cus');
-    const passwordHash = await hashCustomerPassword(merchant.id, body.email, body.password);
-    await dbRun(env, `
-      INSERT INTO customer_accounts (
-        id, merchant_id, email, password_hash, first_name, last_name, phone, default_address_json, marketing_opt_in
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [customerId, merchant.id, body.email, passwordHash, body.firstName, body.lastName, body.phone, JSON.stringify(body.defaultAddress || {}), body.marketingOptIn ? 1 : 0]);
-    const token = await createCustomerSession(env, { customerId, merchantId: merchant.id, email: body.email });
-    const record = await dbFirst(env, `SELECT customer_accounts.*, merchants.slug AS merchant_slug FROM customer_accounts INNER JOIN merchants ON merchants.id = customer_accounts.merchant_id WHERE customer_accounts.id = ? LIMIT 1`, [customerId]);
-    return json({ ok: true, customer: customerRecord(record), merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name } }, 201, { 'Set-Cookie': setCustomerSessionCookie(token, 60 * 60 * 24 * 30, shouldUseSecureCookies(request, env)) });
+    return localCustomerPasswordAuthDisabled(request, env);
   }
 
   if (request.method === 'POST' && url.pathname === '/api/customers/login') {
@@ -409,33 +318,7 @@ export async function handleCustomerApi(request, env, url) {
         merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name }
       });
     }
-    if (!body.slug || !body.email || !body.password) return json({ error: 'slug, email, and password are required.' }, 400);
-    const identity = `${slugify(body.slug)}:${String(body.email || '').trim().toLowerCase()}`;
-    const guard = await guardCustomerAuthAttempt(request, env, 'customer_login', identity);
-    if (guard.locked) return guard.locked;
-    const merchant = await dbFirst(env, `SELECT id, slug, brand_name FROM merchants WHERE slug = ? LIMIT 1`, [slugify(body.slug)]);
-    if (!merchant) {
-      await recordCustomerAuthFailure(env, guard, 'customer_login', identity, 'merchant_not_found');
-      return json({ error: 'Store not found.' }, 404);
-    }
-    const customer = await dbFirst(env, `SELECT * FROM customer_accounts WHERE merchant_id = ? AND lower(email) = lower(?) LIMIT 1`, [merchant.id, body.email]);
-    if (!customer) {
-      await recordCustomerAuthFailure(env, guard, 'customer_login', identity, 'customer_not_found');
-      return unauthorized('Invalid customer credentials.');
-    }
-    const passwordOk = await verifyCustomerPassword(merchant.id, customer.email, body.password, customer.password_hash);
-    if (!passwordOk) {
-      await recordCustomerAuthFailure(env, guard, 'customer_login', identity, 'bad_password');
-      return unauthorized('Invalid customer credentials.');
-    }
-    await recordCustomerAuthSuccess(env, guard, 'customer_login', identity);
-    if (!String(customer.password_hash || '').startsWith('pbkdf2_sha256$')) {
-      const upgradedHash = await hashCustomerPassword(merchant.id, customer.email, body.password);
-      await dbRun(env, `UPDATE customer_accounts SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND merchant_id = ?`, [upgradedHash, customer.id, merchant.id]);
-    }
-    const token = await createCustomerSession(env, { customerId: customer.id, merchantId: merchant.id, email: customer.email });
-    const record = await dbFirst(env, `SELECT customer_accounts.*, merchants.slug AS merchant_slug FROM customer_accounts INNER JOIN merchants ON merchants.id = customer_accounts.merchant_id WHERE customer_accounts.id = ? LIMIT 1`, [customer.id]);
-    return json({ ok: true, customer: customerRecord(record), merchant: { id: merchant.id, slug: merchant.slug, brandName: merchant.brand_name } }, 200, { 'Set-Cookie': setCustomerSessionCookie(token, 60 * 60 * 24 * 30, shouldUseSecureCookies(request, env)) });
+    return localCustomerPasswordAuthDisabled(request, env);
   }
   if (request.method === 'POST' && url.pathname === '/api/customers/logout') {
     return json({ ok: true }, 200, { 'Set-Cookie': clearCustomerSessionCookie(shouldUseSecureCookies(request, env)) });
@@ -447,10 +330,7 @@ export async function handleCustomerApi(request, env, url) {
     if (sharedGate?.error) return sharedGate.error;
     if (sharedGate?.session) return json({ ok: true, sharedGate: true, customer: sharedGate.session.customer, merchantSlug: sharedGate.session.merchantSlug, merchantName: sharedGate.session.customer.merchantName || '' });
     if (hasSharedGateHandoff(request, env)) return json({ ok: false, sharedGate: true, customer: null, merchantSlug: slugify(slug) || '' });
-    const session = await getCustomerSession(request, env);
-    if (!session) return json({ ok: false, customer: null, merchantSlug: slugify(slug) || '' });
-    if (slug && slugify(slug) !== slugify(session.merchantSlug || '')) return json({ ok: false, customer: null, merchantSlug: slugify(slug) });
-    return json({ ok: true, customer: session.customer, merchantSlug: session.merchantSlug, merchantName: session.customer.merchantName || '' });
+    return json({ ok: false, customer: null, merchantSlug: slugify(slug) || '', sharedGateRequired: true });
   }
 
   if (request.method === 'PUT' && url.pathname === '/api/customers/profile') {

@@ -106,7 +106,6 @@ async function rateLimitIdentity(request) {
   const auth = request.headers.get('authorization') || '';
   if (auth) return `auth:${await sha256Hex(auth)}`;
   if (cookies.skye_session) return `session:${await sha256Hex(cookies.skye_session)}`;
-  if (cookies.skye_customer_session) return `customer:${await sha256Hex(cookies.skye_customer_session)}`;
   return `ip:${clientIp(request)}`;
 }
 

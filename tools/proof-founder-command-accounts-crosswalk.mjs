@@ -2,16 +2,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { webcrypto } from 'node:crypto';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 const siteWorker = (await import('../metraiyux_0s_site/cloudflare/worker.js')).default;
 
 const OWNER_CODE = 'owner-code';
-const AUTH_HEADERS = {
-  authorization: `Bearer ${OWNER_CODE}`,
-  'x-admin-token': OWNER_CODE,
-  'x-free99-admin-code': OWNER_CODE
-};
 const SITE_ROOT = path.resolve('metraiyux_0s_site');
 const OUT_DIR = path.resolve('test-artifacts/founder-command-accounts-crosswalk');
 const LATEST = path.join(OUT_DIR, 'founder-command-accounts-crosswalk-smoke-stress-latest.json');
@@ -36,6 +32,22 @@ function req(pathname, { method = 'GET', headers = {}, body } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined
   });
+}
+
+function workerFetchImpl(e, c) {
+  return async (url, init = {}) => {
+    const target = new URL(url, 'https://metraiyux.example');
+    return siteWorker.fetch(new Request(`https://metraiyux.example${target.pathname}${target.search}`, init), e, c);
+  };
+}
+
+function sharedGateHeaders(token) {
+  return {
+    accept: 'application/json',
+    authorization: `Bearer ${token}`,
+    'x-free99-gate-session': token,
+    'x-skye-gate-session': token
+  };
 }
 
 function kvStub() {
@@ -122,12 +134,19 @@ async function main() {
   const e = env();
   const c = ctx();
   const blocked = await fetchJson(e, c, '/api/founder-command/accounts?limit=5');
-  const accounts = await fetchJson(e, c, '/api/founder-command/accounts?limit=1000', { headers: AUTH_HEADERS });
-  const bob = await fetchJson(e, c, '/api/founder-command/accounts/founder-client:bobs-smoke-shop-litchfield-park', { headers: AUTH_HEADERS });
-  const sources = await fetchJson(e, c, '/api/founder-command/crosswalk/sources', { headers: AUTH_HEADERS });
+  const gateAuth = await resolveZeroOsGateAuth({
+    zeroOsBase: 'https://metraiyux.example',
+    env: e,
+    fetchImpl: workerFetchImpl(e, c)
+  });
+  if (!gateAuth.token) throw new Error(gateAuth.response?.body?.error || gateAuth.response?.error || 'Shared FS27/SkyGate helper did not return a bearer.');
+  const authHeaders = sharedGateHeaders(gateAuth.token);
+  const accounts = await fetchJson(e, c, '/api/founder-command/accounts?limit=1000', { headers: authHeaders });
+  const bob = await fetchJson(e, c, '/api/founder-command/accounts/founder-client:bobs-smoke-shop-litchfield-park', { headers: authHeaders });
+  const sources = await fetchJson(e, c, '/api/founder-command/crosswalk/sources', { headers: authHeaders });
   const upsert = await fetchJson(e, c, '/api/founder-command/accounts/upsert', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: {
       client_account_id: 'founder-client:proof-company',
       display_name: 'Proof Company',
@@ -139,7 +158,7 @@ async function main() {
   });
   const op = await fetchJson(e, c, '/api/founder-command/accounts/founder-client:proof-company/operations', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: {
       lane: 'sales-crm',
       priority: 'high',
@@ -148,7 +167,7 @@ async function main() {
   });
   const backfillPlan = await fetchJson(e, c, '/api/founder-command/accounts/backfill', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: { limit: 25 }
   });
   const samples = [];
@@ -156,7 +175,7 @@ async function main() {
     const route = i % 3 === 0
       ? '/api/founder-command/accounts?limit=25'
       : (i % 3 === 1 ? '/api/founder-command/crosswalk/sources' : '/api/founder-command/accounts/founder-client:bobs-smoke-shop-litchfield-park');
-    samples.push(await fetchJson(e, c, route, { headers: AUTH_HEADERS }));
+    samples.push(await fetchJson(e, c, route, { headers: authHeaders }));
   }
   const durations = samples.map((item) => item.elapsedMs).sort((a, b) => a - b);
   const receipt = {

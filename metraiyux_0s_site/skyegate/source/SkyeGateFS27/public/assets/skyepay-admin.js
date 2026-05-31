@@ -24,9 +24,18 @@
     $("#ledgerToast").textContent = message;
   }
 
+  function bridgeSession() {
+    const bridge = globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
+    return bridge?.requireSession?.({ platformId: "skyepay-admin", usageLane: "skyepay-ledger" }) || bridge?.current?.() || null;
+  }
+
   async function adminJson(path, options = {}) {
-    const token = auth.gateToken || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
+    const token = auth.gateToken || bridgeSession()?.token || "";
     const headers = {
+      ...(globalThis.MetrAIyuxGateBridge?.headers?.({
+        "x-skye-platform": "skyepay-admin",
+        "x-skye-usage-lane": "skyepay-ledger"
+      }) || {}),
       authorization: `Bearer ${token}`,
       "x-skye-gate-session": token,
       ...(options.body ? { "content-type": "application/json" } : {})
@@ -150,12 +159,11 @@
   }
 
   $("#loginBtn")?.addEventListener("click", async () => {
-    auth.gateToken = ($("#adminPassword").value || "").trim() || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
+    auth.gateToken = bridgeSession()?.token || "";
     if (!auth.gateToken) {
       $("#ledgerToast").textContent = "Open the shared FS27/SkyGate session.";
       return;
     }
-    globalThis.MetrAIyuxGateBridge?.persist?.({ token: auth.gateToken, source: "skyepay-admin" }, { silent: true });
     $("#loginPanel").hidden = true;
     $("#ledgerPanel").hidden = false;
     try {

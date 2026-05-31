@@ -1,8 +1,8 @@
 import { json, method, handleOptions, noStoreCors, readJson, configuredOrigins } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminReadAccess, adminAuditDetails } from './_lib/security.js';
 import { notificationConfigSummary } from './_lib/notifications.js';
 import { abusePolicySummary } from './_lib/rate-limit.js';
-import { loadConfig, getConfigFolderId, CONFIG_FILE, LEDGER_FILE } from './_lib/config.js';
+import { loadConfig, getConfigFolderId, CONFIG_FILE, LEDGER_FILE, writeAuditEventSafe } from './_lib/config.js';
 import { getAccessToken, getFolderMetadata, findFileInFolder } from './_lib/google-drive.js';
 
 function parseBootstrapConfig() {
@@ -84,7 +84,7 @@ export async function handler(event) {
   const checks = [];
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminReadAccess(event);
     const body = await readJson(event);
     const bootstrap = parseBootstrapConfig();
     const origins = configuredOrigins();
@@ -94,7 +94,7 @@ export async function handler(event) {
     const r2SecretKey = process.env.R2_SECRET_ACCESS_KEY || process.env.CLOUDFLARE_R2_SECRET_KEY || process.env.S3_SECRET_KEY || '';
     const r2Bucket = process.env.R2_BUCKET || process.env.S3_BUCKET || '';
 
-    checks.push(check('ADMIN_TOKEN configured', Boolean(process.env.ADMIN_TOKEN), 'Admin API calls require x-admin-token.'));
+    checks.push(check('Shared FS27/SkyGate bearer accepted', true, 'Admin API calls are authorized by the shared FS27/SkyGate bearer on this request.'));
     checks.push(
       check(
         'CLIENT_PORTAL_KEY configured',
@@ -127,8 +127,8 @@ export async function handler(event) {
     checks.push(
       check(
         'RECEIPT_SIGNING_SECRET configured',
-        Boolean(process.env.RECEIPT_SIGNING_SECRET || process.env.ADMIN_TOKEN),
-        process.env.RECEIPT_SIGNING_SECRET ? 'Dedicated receipt signing secret is configured.' : 'Using ADMIN_TOKEN as fallback signer. Set RECEIPT_SIGNING_SECRET for cleaner separation.',
+        Boolean(process.env.RECEIPT_SIGNING_SECRET),
+        process.env.RECEIPT_SIGNING_SECRET ? 'Dedicated receipt signing secret is configured.' : 'Set RECEIPT_SIGNING_SECRET; admin auth tokens are not used as signing secrets.',
         false
       )
     );
@@ -136,8 +136,8 @@ export async function handler(event) {
     checks.push(
       check(
         'Operator page session secret configured',
-        Boolean(process.env.OPERATOR_SESSION_SECRET || process.env.ADMIN_TOKEN),
-        process.env.OPERATOR_SESSION_SECRET ? 'Dedicated operator session signer is configured.' : 'Using ADMIN_TOKEN as fallback signer. Set OPERATOR_SESSION_SECRET for cleaner separation.',
+        Boolean(process.env.OPERATOR_SESSION_SECRET),
+        process.env.OPERATOR_SESSION_SECRET ? 'Dedicated signer exists for FS27-bound vault recovery cookies.' : 'Set OPERATOR_SESSION_SECRET so shared-gate recovery can mint protected vault cookies.',
         false
       )
     );
@@ -195,11 +195,17 @@ export async function handler(event) {
     }
 
     const requiredFailed = checks.filter((item) => item.required && !item.ok);
+    const audit = await writeAuditEventSafe('setup-diagnostics-ran', adminAuditDetails(admin, {
+      liveTest: Boolean(body.liveTest),
+      checkCount: checks.length,
+      failedRequired: requiredFailed.length
+    }));
     return json(
       200,
       {
         ok: requiredFailed.length === 0,
         checks,
+        audit,
         runtime: {
           node: process.version,
           hasAllowedOrigins: origins.length > 0,

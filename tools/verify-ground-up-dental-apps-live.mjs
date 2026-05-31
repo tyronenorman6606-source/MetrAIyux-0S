@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const ROOT = "/workspaces/MetrAIyux-0S";
 const PROD = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev";
@@ -16,30 +17,6 @@ const viewports = [{name:"desktop",width:1440,height:950},{name:"mobile",width:3
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const runDir = path.join(ROOT, "test-artifacts", "live-browser-verifier", `${stamp}-ground-up-dental-apps-live`);
 fs.mkdirSync(runDir, { recursive: true });
-
-function readOwnerAdminCode() {
-  const envKeys = ["FREE99_ADMIN_CODE", "OWNER_ADMIN_CODE", "METRAIYUX_OWNER_ADMIN_CODE"];
-  for (const key of envKeys) {
-    const value = String(process.env[key] || "").trim();
-    if (value) return value;
-  }
-  const envPath = path.join(ROOT, ".env");
-  if (fs.existsSync(envPath)) {
-    const text = fs.readFileSync(envPath, "utf8");
-    for (const key of envKeys) {
-      const match = text.match(new RegExp(`^${key}=(.*)$`, "m"));
-      const value = match?.[1]?.trim().replace(/^['"]|['"]$/g, "");
-      if (value) return value;
-    }
-  }
-  const adminRef = path.join(ROOT, "ADMIN_REFERENCE.md");
-  if (fs.existsSync(adminRef)) {
-    const text = fs.readFileSync(adminRef, "utf8");
-    const match = text.match(/Current value[\s\S]*?```\s*([^`\s]+)\s*```/);
-    if (match?.[1]) return match[1].trim();
-  }
-  return "";
-}
 
 async function releaseIntro(page, actions) {
   const intro = page.locator("[data-app-intro]").first();
@@ -177,8 +154,13 @@ async function checkPage(client, target, viewport, authHeaders = {}) {
   }
 }
 
-const ownerAdminCode = readOwnerAdminCode();
-const authHeaders = ownerAdminCode ? { "x-free99-admin-code": ownerAdminCode } : {};
+const ownerGateAuth = await resolveZeroOsGateAuth({ zeroOsBase: PROD });
+const ownerGateToken = String(ownerGateAuth.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+const authHeaders = ownerGateToken ? {
+  authorization: `Bearer ${ownerGateToken}`,
+  "x-free99-gate-session": ownerGateToken,
+  "x-skye-gate-session": ownerGateToken
+} : {};
 const results = [];
 for (const c of clients.filter(client => !onlyClient || client[1] === onlyClient)) {
   const [, slug, valleySlug] = c;
@@ -188,7 +170,7 @@ for (const c of clients.filter(client => !onlyClient || client[1] === onlyClient
   for (const target of targets) for (const viewport of viewports) results.push(await checkPage(c, target, viewport, authHeaders));
 }
 const failures = results.filter(r => !r.ok).map(r => `${r.viewport.name} ${r.slug} ${r.target.route}: ${[...r.errors, ...r.failedRequests.map(f => f.url)].join("; ")}`);
-const report = { ok: failures.length === 0, generatedAt: new Date().toISOString(), browser: "chromium headed via Playwright", auth: ownerAdminCode ? "owner-gate-header-present-secret-redacted" : "none", runDir, clients, routes, failures, results };
+const report = { ok: failures.length === 0, generatedAt: new Date().toISOString(), browser: "chromium headed via Playwright", auth: ownerGateToken ? "shared-gate-bearer-present-secret-redacted" : "none", runDir, clients, routes, failures, results };
 const reportPath = path.join(runDir, "live-browser-verification-report.json");
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 fs.writeFileSync(path.join(ROOT, "test-artifacts", "ground-up-dental-apps-live-browser-report.json"), JSON.stringify(report, null, 2));

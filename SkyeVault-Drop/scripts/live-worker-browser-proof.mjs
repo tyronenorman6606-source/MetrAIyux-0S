@@ -2,6 +2,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from '../../tools/lib/zero-os-gate-auth.mjs';
 
 const baseUrl = process.env.BASE_URL || 'https://skyevault-drop.graylondonskyes.workers.dev';
 const artifactRoot = path.resolve(process.cwd(), '..', 'test-artifacts', 'skyevault');
@@ -26,7 +27,8 @@ async function loadEnvFile(file) {
 await loadEnvFile(path.resolve(process.cwd(), 'env.txt'));
 await loadEnvFile(path.resolve(process.cwd(), '..', 'env.txt'));
 
-const adminToken = process.env.ADMIN_TOKEN || '';
+const gateAuth = await resolveZeroOsGateAuth({ envFiles: [path.resolve(process.cwd(), 'env.txt'), path.resolve(process.cwd(), '..', 'env.txt'), path.resolve(process.cwd(), '..', '.env')] }).catch(() => ({ ok: false, token: '' }));
+const adminToken = gateAuth.ok ? gateAuth.token : '';
 const portalKey = process.env.CLIENT_PORTAL_KEY || process.env.SKYEVAULT_PORTAL_KEY || '';
 
 if (!portalKey) throw new Error('CLIENT_PORTAL_KEY is required for live browser proof.');
@@ -204,11 +206,10 @@ await check('repo restore copy explains encrypted archive unlock flow', async ()
   return { status: response.status(), hasRestoreFlow: true };
 });
 
-await check('operator session opens admin vault browser', async () => {
-  if (!adminToken) return { skipped: true, reason: 'ADMIN_TOKEN is not present in local env.txt; public headed proof still ran.' };
+await check('shared gate opens admin vault browser', async () => {
+  if (!adminToken) return { skipped: true, reason: 'Shared FS27/SkyGate bearer is not present; public headed proof still ran.' };
   await page.setViewportSize({ width: 1440, height: 1000 });
-  const login = await page.request.post(`${baseUrl}/api/operator-session`, { data: { token: adminToken } });
-  if (!login.ok()) throw new Error(`operator-session returned ${login.status()}: ${await login.text()}`);
+  await page.setExtraHTTPHeaders({ authorization: `Bearer ${adminToken}`, 'x-skye-gate-session': adminToken });
   await page.goto(`${baseUrl}/admin.html`, { waitUntil: 'networkidle' });
   await page.locator('#ledgerPanel').waitFor({ state: 'visible', timeout: 10000 });
   await page.locator('#vaultSearch').waitFor({ state: 'visible', timeout: 10000 });
@@ -221,9 +222,9 @@ await check('operator session opens admin vault browser', async () => {
 
 let firstEntry = null;
 await check('admin ledger API exposes vault files', async () => {
-  if (!adminToken) return { skipped: true, reason: 'ADMIN_TOKEN is not present in local env.txt.' };
+  if (!adminToken) return { skipped: true, reason: 'Shared FS27/SkyGate bearer is not present.' };
   const response = await page.request.get(`${baseUrl}/api/admin-config?ledger=true&sessions=true&events=true`, {
-    headers: { 'x-admin-token': adminToken }
+    headers: { authorization: `Bearer ${adminToken}`, 'x-skye-gate-session': adminToken }
   });
   if (!response.ok()) throw new Error(`admin-config returned ${response.status()}: ${await response.text()}`);
   const data = await response.json();
@@ -234,10 +235,10 @@ await check('admin ledger API exposes vault files', async () => {
 });
 
 await check('admin can create a download link for a vault file', async () => {
-  if (!adminToken) return { skipped: true, reason: 'ADMIN_TOKEN is not present in local env.txt.' };
+  if (!adminToken) return { skipped: true, reason: 'Shared FS27/SkyGate bearer is not present.' };
   if (!firstEntry?.id) throw new Error('No receipt ID available for admin download proof.');
   const response = await page.request.post(`${baseUrl}/api/admin-vault-download`, {
-    headers: { 'x-admin-token': adminToken },
+    headers: { authorization: `Bearer ${adminToken}`, 'x-skye-gate-session': adminToken },
     data: { receiptId: firstEntry.id }
   });
   if (!response.ok()) throw new Error(`admin-vault-download returned ${response.status()}: ${await response.text()}`);
@@ -247,7 +248,7 @@ await check('admin can create a download link for a vault file', async () => {
 });
 
 await check('client can list their own vault files', async () => {
-  if (!adminToken) return { skipped: true, reason: 'ADMIN_TOKEN is not present in local env.txt, so no client email was fetched from admin ledger.' };
+  if (!adminToken) return { skipped: true, reason: 'Shared FS27/SkyGate bearer is not present, so no client email was fetched from admin ledger.' };
   if (!firstEntry?.clientEmail) throw new Error('No client email available for client vault proof.');
   const response = await page.request.post(`${baseUrl}/api/client-vault`, {
     data: {

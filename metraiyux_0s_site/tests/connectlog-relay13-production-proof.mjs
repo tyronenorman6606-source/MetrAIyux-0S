@@ -1,7 +1,7 @@
-import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from '../../tools/lib/zero-os-gate-auth.mjs';
 
 const root = path.resolve(process.cwd());
 const require = createRequire(import.meta.url);
@@ -9,24 +9,9 @@ const WebSocketCtor = globalThis.WebSocket || require('ws');
 const reportPath = path.join(root, 'test-artifacts', 'connectlog-relay13-production-proof.json');
 const origin = (process.env.RELAY13_ORIGIN || 'https://relay13-core.graylondonskyes.workers.dev').replace(/\/$/, '');
 
-function parseEnv(file) {
-  if (!fs.existsSync(file)) return {};
-  const out = {};
-  for (const raw of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) continue;
-    const match = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (!match) continue;
-    let value = match[2].trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
-    out[match[1]] = value;
-  }
-  return out;
-}
-
-const rootEnv = parseEnv(path.join(root, '.env'));
-const adminToken = process.env.PLATFORM_ADMIN_TOKEN || rootEnv.PLATFORM_ADMIN_TOKEN || rootEnv.SKYGATEFS13_WORKER_ADMIN_TOKEN || '';
-if (!adminToken || adminToken.length < 32) throw new Error('Missing usable PLATFORM_ADMIN_TOKEN/SKYGATEFS13_WORKER_ADMIN_TOKEN.');
+const gateAuth = await resolveZeroOsGateAuth();
+const adminToken = gateAuth.token || '';
+if (!adminToken || adminToken.length < 32) throw new Error('Missing usable shared FS27/SkyGate/Free99 gate bearer.');
 
 const checks = [];
 const startedAt = new Date().toISOString();

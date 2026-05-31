@@ -18,9 +18,18 @@ function setStatus(el, msg, kind = "") {
       : "var(--muted)";
 }
 
-function getToken() { return localStorage.getItem("SMV_TOKEN") || ""; }
-function setToken(token) { localStorage.setItem("SMV_TOKEN", token); }
-function clearToken() { localStorage.removeItem("SMV_TOKEN"); }
+function getToken() {
+  try { return window.MetrAIyuxGateBridge?.current?.()?.token || ""; } catch { return ""; }
+}
+function setToken(token) {
+  const clean = String(token || "").trim();
+  if (!clean) return;
+  try { window.MetrAIyuxGateBridge?.persist?.({ token: clean, source: "skyesol-company-public", platform_id: "skyesol" }, { silent: true }); } catch {}
+}
+function clearToken() {
+  localStorage.removeItem("SMV_TOKEN");
+  sessionStorage.removeItem("SMV_TOKEN");
+}
 
 function getHandle() { return localStorage.getItem("SMV_HANDLE") || ""; }
 function setHandle(handle) { localStorage.setItem("SMV_HANDLE", handle); }
@@ -70,7 +79,8 @@ function fmtDate(iso) {
 function requireAuthOrRedirect() {
   const token = getToken();
   if (!token) {
-    location.href = "/login.html";
+    const next = `${location.pathname}${location.search}${location.hash}`;
+    location.href = `/admin/login.html?return=${encodeURIComponent(next)}`;
     return false;
   }
   return true;

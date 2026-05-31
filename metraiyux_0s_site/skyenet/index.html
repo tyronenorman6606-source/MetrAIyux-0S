@@ -46,13 +46,9 @@
     <section id="authPanel" class="operator-panel auth-panel" hidden>
       <div>
         <h2>Shared Gate Session</h2>
-        <p>Use the same FS27/SkyGate/Free99 owner session. SkyeNet does not have a separate admin password.</p>
+        <p>Use the same FS27/SkyGate/Free99 owner session. SkyeNet reads the canonical gate bridge only.</p>
       </div>
-      <label>
-        <span>Session token</span>
-        <input id="manualToken" type="password" autocomplete="current-password" placeholder="Paste a shared gate session">
-      </label>
-      <button id="saveTokenButton" type="button">Use Session</button>
+      <button id="saveTokenButton" type="button">Use Current Gate Session</button>
       <a class="button-link" href="../admin/login.html?return=/skyenet/index.html">Owner Login</a>
     </section>
 
@@ -245,6 +241,7 @@
     </section>
   </main>
 
+  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script src="./skyenet.js" type="module"></script>
 </body>
 </html>

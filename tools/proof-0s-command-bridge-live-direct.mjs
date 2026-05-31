@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -55,27 +56,16 @@ function localSecretCandidates() {
 
 function gateHeaders(token) {
   return {
-    authorization: `Bearer ${token}`,
-    'x-admin-token': token,
+    Authorization: `Bearer ${token}`,
     'x-free99-gate-session': token,
-    'x-skye-gate-session': token,
-    'x-skygate-session': token
+    'x-skye-gate-session': token
   };
 }
 
 async function resolveOwnerGate() {
-  for (const candidate of localSecretCandidates()) {
-    const response = await fetchBounded(`${baseUrl}/api/owner/admin-login`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: candidate.value })
-    }).catch(() => null);
-    if (!response) continue;
-    const data = await response.json().catch(() => ({}));
-    const token = String(data.gateToken || data.gateBearerToken || data.token || '').replace(/^Bearer\s+/i, '').trim();
-    if (response.ok && token) return { token, sourceKey: candidate.key };
-  }
-  throw new Error('No local owner/admin candidate unlocked the shared 0S gate.');
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  if (!auth.ok || !auth.token) throw new Error('No shared 0S gate session was available.');
+  return { token: String(auth.token || '').replace(/^Bearer\s+/i, '').trim(), sourceKey: auth.credential?.key || 'shared-gate' };
 }
 
 class CookieJar {

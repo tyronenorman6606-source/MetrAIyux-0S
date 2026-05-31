@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const generatedAt = new Date().toISOString();
@@ -45,19 +46,6 @@ const pages = [
 const viewports = [
   { name: 'desktop', width: 1440, height: 980 },
   { name: 'mobile', width: 390, height: 844 }
-];
-
-const ownerKeys = [
-  'FREE99_ADMIN_CODE', 'FREE99_ADMIN_PASSWORD', 'FREE99_GATE_CODE', 'FREE99_GATE_PASSWORD',
-  'FREE99_OWNER_CODE', 'FREE99_OWNER_PASSWORD', 'FREE99_PASSWORD', 'ZERO_OS_GATE_CODE',
-  'ZERO_OS_ADMIN_CODE', 'METRAIYUX_OWNER_ADMIN_CODE', 'FREE99_DEMON_CODE', 'FREE99_DEMON_KEY',
-  'DEMON_ADMIN_CODE', 'DEMON_GATE_CODE', 'DEMON_KEY', 'OWNER_ADMIN_CODE', 'OWNER_ADMIN_PASSWORD',
-  'ADMIN_CODE', 'ADMIN_PASSWORD', 'FS27_ADMIN_CODE', 'FS27_ADMIN_PASSWORD', 'FS27_OWNER_CODE',
-  'FS27_OWNER_PASSWORD', 'SKYE_GATE_ADMIN_CODE', 'SKYE_GATE_ADMIN_PASSWORD', 'SKYGATE_ADMIN_CODE',
-  'SKYGATE_ADMIN_PASSWORD', 'SKYGATEFS27_ADMIN_CODE', 'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD', 'QA_ADMIN_PASSWORD', 'PHC_BOOTSTRAP_ADMIN_CODE',
-  'SITE_OPERATOR_ADMIN_TOKEN', 'METRAIYUX_ADMIN_TOKEN', 'ADMIN_TOKEN',
-  'SKYGATEFS13_WORKER_ADMIN_TOKEN', 'MCP_HTTP_BEARER_TOKEN', 'ZERO_OS_GATE_CREDENTIAL_ENV'
 ];
 
 function unquote(value) {
@@ -104,41 +92,15 @@ function resolveEnv(env, value, seen = new Set()) {
 }
 
 async function ownerSession() {
-  const { env, source } = readEnv();
-  const candidates = [];
-  for (const key of ownerKeys) {
-    if (!(key in env)) continue;
-    const value = resolveEnv(env, env[key]);
-    if (!value || value.startsWith('${')) continue;
-    if (!candidates.some((candidate) => candidate.value === value)) {
-      candidates.push({ value, source: source[key] || key });
-    }
-  }
-
-  const failures = [];
-  for (const candidate of candidates) {
-    const response = await fetch(`https://${domains.zeroOs}/api/owner/admin-login`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: candidate.value })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok && data.token) {
-      return {
-        token: data.token,
-        source: candidate.source,
-        tokenHash: sha12(candidate.value),
-        status: response.status
-      };
-    }
-    failures.push({
-      source: candidate.source,
-      tokenHash: sha12(candidate.value),
-      status: response.status,
-      error: data.error || ''
-    });
-  }
-  throw new Error(`Owner login failed: ${JSON.stringify(failures.slice(0, 8))}`);
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: `https://${domains.zeroOs}` });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  if (!auth.ok || !token) throw new Error('Shared 0S gate session was unavailable.');
+  return {
+    token,
+    source: auth.credential?.source || 'shared-gate',
+    tokenHash: sha12(token),
+    status: auth.response?.status || 0
+  };
 }
 
 async function viewportMetrics(page) {
@@ -401,6 +363,11 @@ try {
     for (const target of pages) {
       const context = await browser.newContext({ viewport, ignoreHTTPSErrors: true });
       if (target.auth) {
+        await context.setExtraHTTPHeaders({
+          Authorization: `Bearer ${session.token}`,
+          'x-free99-gate-session': session.token,
+          'x-skye-gate-session': session.token
+        });
         await context.addCookies(['metraiyux_admin_session', 'skye_gate_session', 'skygate_session'].map((name) => ({
           name,
           value: session.token,

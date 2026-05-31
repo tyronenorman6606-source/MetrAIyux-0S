@@ -4,6 +4,7 @@ import http from "node:http";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { chromium } from "playwright";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const repoRoot = "/workspaces/MetrAIyux-0S";
 const siteRoot = path.join(repoRoot, "metraiyux_0s_site");
@@ -21,114 +22,14 @@ const appRoutes = {
   skyepics: "/Free99/apps/skyepics/dist/index.html"
 };
 
-const secretKeys = [
-  "FREE99_ADMIN_CODE",
-  "FREE99_ADMIN_PASSWORD",
-  "FREE99_GATE_CODE",
-  "FREE99_GATE_PASSWORD",
-  "OWNER_ADMIN_CODE",
-  "OWNER_ADMIN_PASSWORD",
-  "ADMIN_CODE",
-  "ADMIN_PASSWORD",
-  "FS27_ADMIN_CODE",
-  "FS27_ADMIN_PASSWORD",
-  "SKYGATEFS27_ADMIN_CODE",
-  "SKYGATEFS27_ADMIN_PASSWORD",
-  "SITE_OPERATOR_ADMIN_TOKEN",
-  "METRAIYUX_ADMIN_TOKEN",
-  "ADMIN_TOKEN"
-];
-
 let baseUrl = productionBaseUrl;
-let adminCode = "";
 let adminBearerToken = "";
 
-function readText(file) {
-  try {
-    return fs.readFileSync(file, "utf8");
-  } catch {
-    return "";
-  }
-}
-
-function unquote(value) {
-  let clean = String(value || "").trim().replace(/^export\s+/, "").trim();
-  while ((clean.startsWith("\"") && clean.endsWith("\"")) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1).trim();
-  }
-  return clean;
-}
-
-function envFromText(text, key) {
-  for (const line of String(text || "").split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const normalized = trimmed.startsWith("export ") ? trimmed.slice(7).trim() : trimmed;
-    if (normalized.startsWith(`${key}=`)) return unquote(normalized.slice(key.length + 1));
-    if (normalized.startsWith(`${key}:`)) return unquote(normalized.slice(key.length + 1));
-  }
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = String(text || "").match(new RegExp(`${escaped}\\s*[:=]\\s*["']?([^"'\\s]+)`, "i"));
-  return match ? unquote(match[1]) : "";
-}
-
-function adminReferenceCodeCandidates(text) {
-  const candidates = [];
-  for (const line of String(text || "").split(/\r?\n/)) {
-    if (!/owner admin code|same owner admin code|admin code/i.test(line)) continue;
-    for (const match of line.matchAll(/`([^`]+)`/g)) {
-      const value = unquote(match[1]);
-      if (!value || value.startsWith("/") || value.startsWith("http") || value.includes("<") || value.includes(" ")) continue;
-      candidates.push(value);
-    }
-  }
-  const seen = new Set();
-  return candidates.filter((value) => {
-    if (seen.has(value)) return false;
-    seen.add(value);
-    return true;
-  });
-}
-
-function adminSecretCandidates() {
-  const texts = [
-    readText(path.join(repoRoot, ".env")),
-    readText(path.join(repoRoot, "ADMIN_REFERENCE.md")),
-    readText(path.join(repoRoot, "metraiyux_0s_site", "skyegate", "source", "SkyeGateFS27", ".env"))
-  ];
-  const candidates = [];
-  for (const key of secretKeys) {
-    const direct = unquote(process.env[key] || "");
-    if (direct) candidates.push(direct);
-    for (const text of texts) {
-      const value = envFromText(text, key);
-      if (value) candidates.push(value);
-    }
-  }
-  candidates.push(...adminReferenceCodeCandidates(texts[1]));
-  const seen = new Set();
-  return candidates.filter((value) => {
-    const clean = unquote(value);
-    if (!clean || clean.length < 4 || clean.length > 180 || clean.includes("<") || clean.includes("$")) return false;
-    if (seen.has(clean)) return false;
-    seen.add(clean);
-    return true;
-  });
-}
-
 async function resolveLiveGateCredential() {
-  for (const candidate of adminSecretCandidates()) {
-    const response = await fetch(urlFor("/api/owner/admin-login"), {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code: candidate })
-    }).catch(() => null);
-    if (!response?.ok) continue;
-    const data = await response.json().catch(() => ({}));
-    const token = String(data.gateToken || data.gateBearerToken || data.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
-    if (token) return { code: candidate, token };
-  }
-  return { code: "", token: "" };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = String(auth.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  if (!auth.ok || !token) return { token: "" };
+  return { token };
 }
 
 function cleanFailure(error) {
@@ -696,7 +597,6 @@ async function main() {
     baseUrl = `http://127.0.0.1:${address.port}`;
   } else {
     const credential = await resolveLiveGateCredential();
-    adminCode = credential.code;
     adminBearerToken = credential.token;
   }
 
@@ -720,7 +620,7 @@ async function main() {
   };
 
   if (isProduction) {
-    if (!adminCode || !adminBearerToken) report.failures.push("Missing shared owner gate credential in env or ADMIN_REFERENCE.md.");
+    if (!adminBearerToken) report.failures.push("Missing shared owner gate session.");
     if (!report.failures.length) {
       for (const route of Object.values(appRoutes)) report.unauthGate.push(await checkUnauthGate(route));
     }

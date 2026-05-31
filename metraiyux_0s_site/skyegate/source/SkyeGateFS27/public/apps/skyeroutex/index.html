@@ -52,11 +52,10 @@
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Owner/Admin Code</h3>
-          <p>Use the existing 0S/Free99 owner admin credential. This form exchanges it with the 0S gate and stores only the returned bearer in this browser tab.</p>
-          <input id="owner-code" type="password" autocomplete="current-password" placeholder="0S owner/admin code" />
+          <h3>Owner Gate</h3>
+          <p>Use the shared FS27/SkyGate owner session. This dashboard does not store a separate SkyeRouteX bearer.</p>
           <div class="actions">
-            <button id="login-btn" type="button">Unlock dashboard</button>
+            <button id="login-btn" type="button">Use Current Gate Session</button>
             <button id="refresh-btn" type="button">Refresh</button>
           </div>
           <p class="meta" id="status-text">Waiting for owner session.</p>
@@ -87,6 +86,7 @@
     </section>
   </main>
 
+  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script src="./skyeroutex-gate-dashboard.js"></script>
 </body>
 </html>

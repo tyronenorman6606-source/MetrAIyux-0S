@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { chromium } from "playwright";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const repoRoot = "/workspaces/MetrAIyux-0S";
 const baseUrl = (process.env.PROOF_BASE_URL || "https://metraiyux-0s-full-system.graylondonskyes.workers.dev").replace(/\/+$/, "");
@@ -14,139 +15,12 @@ const stressCycles = Number(process.env.PROOF_STRESS_CYCLES || 3);
 const slowMo = Number(process.env.LIVE_BROWSER_SLOWMO || 70);
 const ownerEmail = process.env.PROOF_OWNER_EMAIL || "owner-proof@metraiyux.local";
 
-const secretKeys = [
-  "FREE99_ADMIN_CODE",
-  "FREE99_ADMIN_PASSWORD",
-  "FREE99_GATE_CODE",
-  "FREE99_GATE_PASSWORD",
-  "OWNER_ADMIN_CODE",
-  "OWNER_ADMIN_PASSWORD",
-  "ADMIN_CODE",
-  "ADMIN_PASSWORD",
-  "FS27_ADMIN_CODE",
-  "FS27_ADMIN_PASSWORD",
-  "SKYGATEFS27_ADMIN_CODE",
-  "SKYGATEFS27_ADMIN_PASSWORD",
-  "SITE_OPERATOR_ADMIN_TOKEN",
-  "METRAIYUX_ADMIN_TOKEN",
-  "ADMIN_TOKEN"
-];
-
-function readText(file) {
-  try {
-    return fs.readFileSync(file, "utf8");
-  } catch {
-    return "";
-  }
-}
-
-function unquote(value) {
-  let clean = String(value || "").trim();
-  clean = clean.replace(/^export\s+/, "").trim();
-  while ((clean.startsWith("\"") && clean.endsWith("\"")) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1).trim();
-  }
-  return clean;
-}
-
-function envFromText(text, key) {
-  for (const line of String(text || "").split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-    const normalized = trimmed.startsWith("export ") ? trimmed.slice(7).trim() : trimmed;
-    if (normalized.startsWith(`${key}=`)) return unquote(normalized.slice(key.length + 1));
-    if (normalized.startsWith(`${key}:`)) return unquote(normalized.slice(key.length + 1));
-  }
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = String(text || "").match(new RegExp(`${escaped}\\s*[:=]\\s*["']?([^"'\\s]+)`, "i"));
-  return match ? unquote(match[1]) : "";
-}
-
-function firstSecret(keys) {
-  const texts = [
-    readText(path.join(repoRoot, ".env")),
-    readText(path.join(repoRoot, "ADMIN_REFERENCE.md")),
-    readText(path.join(repoRoot, "metraiyux_0s_site", "skyegate", "source", "SkyeGateFS27", ".env"))
-  ];
-  for (const key of keys) {
-    const direct = unquote(process.env[key] || "");
-    if (direct) return direct;
-    for (const text of texts) {
-      const value = envFromText(text, key);
-      if (value) return value;
-    }
-  }
-  for (const value of adminReferenceCodeCandidates(texts[1])) {
-    if (value) return value;
-  }
-  return "";
-}
-
-let adminCode = "";
 let adminBearerToken = "";
 
-function adminReferenceCodeCandidates(text) {
-  const candidates = [];
-  for (const line of String(text || "").split(/\r?\n/)) {
-    if (!/owner admin code|same owner admin code|admin code/i.test(line)) continue;
-    for (const match of line.matchAll(/`([^`]+)`/g)) {
-      const value = unquote(match[1]);
-      if (!value || value.startsWith("/") || value.startsWith("http") || value.includes("<") || value.includes(" ")) continue;
-      candidates.push(value);
-    }
-  }
-  const seen = new Set();
-  const unique = candidates.filter((value) => {
-    if (seen.has(value)) return false;
-    seen.add(value);
-    return true;
-  });
-  return [
-    ...unique.filter((value) => !/^[A-Z0-9_]+$/.test(value)),
-    ...unique.filter((value) => /^[A-Z0-9_]+$/.test(value))
-  ];
-}
-
-function adminSecretCandidates() {
-  const candidates = [];
-  const texts = [
-    readText(path.join(repoRoot, ".env")),
-    readText(path.join(repoRoot, "ADMIN_REFERENCE.md")),
-    readText(path.join(repoRoot, "metraiyux_0s_site", "skyegate", "source", "SkyeGateFS27", ".env"))
-  ];
-  for (const key of secretKeys) {
-    const direct = unquote(process.env[key] || "");
-    if (direct) candidates.push(direct);
-    for (const text of texts) {
-      const value = envFromText(text, key);
-      if (value) candidates.push(value);
-    }
-  }
-  candidates.push(...adminReferenceCodeCandidates(texts[1]));
-  const seen = new Set();
-  return candidates.filter((value) => {
-    const clean = unquote(value);
-    if (!clean || clean.length < 4 || clean.length > 180 || clean.includes("<") || clean.includes("$")) return false;
-    if (seen.has(clean)) return false;
-    seen.add(clean);
-    return true;
-  });
-}
-
 async function resolveLiveGateCredential() {
-  const candidates = adminSecretCandidates();
-  for (const candidate of candidates) {
-    const response = await fetch(urlFor("/api/owner/admin-login"), {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code: candidate })
-    }).catch(() => null);
-    if (!response?.ok) continue;
-    const data = await response.json().catch(() => ({}));
-    const token = String(data.gateToken || data.gateBearerToken || data.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
-    if (token) return { code: candidate, token };
-  }
-  return { code: "", token: "" };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = String(auth.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  return { token, ok: Boolean(auth.ok && token), source: auth.credential?.source || "shared-gate" };
 }
 
 function relaunchWithXvfbWhenNeeded() {
@@ -273,28 +147,35 @@ async function canvasProof(page) {
 }
 
 async function loginOwner(page, returnPath, entry) {
-  if (!adminCode || !adminBearerToken) throw new Error("Missing owner admin gate credential for live proof.");
-  const loginUrl = new URL("/admin/login.html", baseUrl);
-  loginUrl.searchParams.set("return", returnPath);
-  const response = await page.goto(loginUrl.toString(), { waitUntil: "domcontentloaded", timeout: 45000 });
-  pushStatus(entry, "owner_login_page_loaded", Boolean(response?.ok()), { status: response?.status() || 0 });
-  await page.waitForSelector('input[name="code"]', { timeout: 20000 });
-  await page.locator('input[name="code"]').fill(adminCode);
-  const emailInput = page.locator('input[name="email"]');
-  if (await emailInput.count()) await emailInput.fill(ownerEmail);
-  entry.actions.push("filled shared owner gate login form");
+  if (!adminBearerToken) throw new Error("Missing shared owner gate bearer for live proof.");
+  const clean = String(adminBearerToken || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  await page.context().setExtraHTTPHeaders({
+    Authorization: `Bearer ${clean}`,
+    "x-free99-gate-session": clean,
+    "x-skye-gate-session": clean
+  });
+  const host = new URL(baseUrl).hostname;
+  await page.context().addCookies(["skye_gate_session", "skygate_session"].map((name) => ({
+    name,
+    value: clean,
+    domain: host,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "Lax"
+  })));
   await page.evaluate(({ token }) => {
     const shared = {
       token,
-      source: "owner-admin-login",
+      source: "zero-os-gate-auth",
       platform_id: "metraiyux-0s",
       usage_lane: "fs27-owner-gate",
       issued_at: new Date().toISOString()
     };
     sessionStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
     localStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
-  }, { token: adminBearerToken });
-  entry.actions.push("stored shared owner bearer from canonical owner API");
+  }, { token: clean });
+  entry.actions.push("stored shared owner bearer from canonical gate helper");
   const appResponse = await page.goto(urlFor(returnPath), { waitUntil: "domcontentloaded", timeout: 45000 });
   pushStatus(entry, "owner_bearer_navigation", Boolean(appResponse?.ok()), { status: appResponse?.status() || 0 });
   entry.actions.push(`shared 0S gate opened ${returnPath}`);
@@ -654,7 +535,6 @@ async function runViewport(browser, viewport, label, artifactDir, options = {}) 
 async function main() {
   relaunchWithXvfbWhenNeeded();
   const gateCredential = await resolveLiveGateCredential();
-  adminCode = gateCredential.code;
   adminBearerToken = gateCredential.token;
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const artifactDir = path.join(repoRoot, "test-artifacts", "social-batch-factory-production-proof", stamp);
@@ -682,7 +562,7 @@ async function main() {
     failures: [],
     artifactDir
   };
-  if (!adminCode || !adminBearerToken) report.failures.push("Missing shared owner gate credential in env or ADMIN_REFERENCE.md.");
+  if (!adminBearerToken) report.failures.push("Missing shared owner gate bearer.");
   if (!report.failures.length) {
     report.unauthGate.push(await checkUnauthGate(appPath));
     report.unauthGate.push(await checkUnauthGate(free99Path));

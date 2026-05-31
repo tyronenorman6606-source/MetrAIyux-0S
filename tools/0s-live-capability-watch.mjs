@@ -4,6 +4,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const packagePath = path.join(repoRoot, 'package.json');
@@ -799,19 +800,12 @@ function publicReceipt(receipt) {
 }
 
 async function ownerBearer(env) {
-  const direct = env.ZERO_OS_GATE_SESSION || env.ZERO_OS_GATE_BEARER || env.MCP_GATE_SESSION || env.SKYENET_AUTH || '';
-  if (direct) return { token: direct, source: 'shared_gate_bearer_env' };
-  const code = env.FREE99_ADMIN_CODE || env.OWNER_ADMIN_CODE || env.SKYGATE_ADMIN_PASSWORD || env.FS27_ADMIN_PASSWORD || '';
-  if (!code) return { token: '', source: 'missing' };
-  const response = await fetch(`${baseUrl}/api/owner/admin-login`, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({ code })
-  }).catch((error) => ({ error }));
-  if (response.error) return { token: '', source: 'login_failed', error: response.error.message || String(response.error) };
-  const body = await response.json().catch(() => ({}));
-  const token = body.gateBearerToken || body.gateToken || body.token || '';
-  return { token, source: token ? 'owner_admin_code_login' : 'login_no_token' };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl, env });
+  return {
+    token: auth.token || '',
+    source: auth.credential?.source || auth.credential?.key || 'missing',
+    error: auth.response?.body?.error || auth.response?.error || ''
+  };
 }
 
 async function pushSummaryToSkyErrors(receipt, env) {

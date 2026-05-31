@@ -262,7 +262,7 @@ export async function loadLedger(limit = 120) {
 }
 
 function receiptSecret() {
-  return process.env.RECEIPT_SIGNING_SECRET || process.env.ADMIN_TOKEN || 'development-only-receipt-secret';
+  return process.env.RECEIPT_SIGNING_SECRET || process.env.OPERATOR_SESSION_SECRET || 'development-only-receipt-secret';
 }
 
 export function receiptIdFor(sessionId, driveFileId) {

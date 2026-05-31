@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const SOURCE_INDEX_UPLOAD_THRESHOLD = 20000;
 
@@ -33,7 +34,7 @@ function usage() {
 Required:
   --dir <folder> or --zip <bundle.zip>
   --project <project-id>
-  --token <0S gate bearer> or SKYENET_AUTH
+  --token <0S gate bearer> or shared FS27/SkyGate/Free99 root-env credential
 
 Common:
   --api https://skyenet.graylondonskyes.workers.dev/api/skyenet
@@ -247,7 +248,11 @@ async function uploadWithConcurrency(items, concurrency, uploadOne) {
 }
 
 const api = String(arg('api', process.env.SKYENET_API || 'https://skyenet.graylondonskyes.workers.dev/api/skyenet')).replace(/\/+$/, '');
-const token = cleanToken(arg('token', process.env.SKYENET_AUTH || process.env.ZERO_OS_GATE_SESSION || ''));
+const tokenArg = cleanToken(arg('token', ''));
+const resolvedGateAuth = tokenArg
+  ? { ok: true, token: tokenArg, credential: { key: '--token', source: 'cli-shared-gate-bearer' } }
+  : await resolveZeroOsGateAuth().catch((error) => ({ ok: false, token: '', error: error?.message || String(error) }));
+const token = cleanToken(resolvedGateAuth.token || '');
 const dirArg = arg('dir');
 const zipArg = arg('zip');
 const sourceRootArg = arg('source-root', process.env.SKYENET_SOURCE_ROOT || '');
@@ -271,6 +276,7 @@ const uploadSourcePackage = !flag('no-source') && String(process.env.SKYENET_NO_
 const includePublicOriginals = flag('include-public-originals') || /^(1|true|yes)$/i.test(process.env.SKYENET_INCLUDE_PUBLIC_ORIGINALS || '');
 
 if (!token || !projectId || (!dirArg && !zipArg)) {
+  if (!token && resolvedGateAuth?.error) process.stderr.write(`skyenet-deploy: ${resolvedGateAuth.error}\n`);
   console.error(usage());
   process.exit(1);
 }

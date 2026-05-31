@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { inflateSync } from 'node:zlib';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = fs.existsSync('/workspaces/MetrAIyux-0S') ? '/workspaces/MetrAIyux-0S' : process.cwd();
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -13,27 +14,6 @@ const deploymentVersion = process.env.PROOF_DEPLOYMENT_VERSION || 'de2ba575-9ff5
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'live-browser-verifier', `${stamp}-ae-flowpro-single-platform`);
 const reportPath = path.join(artifactDir, 'live-browser-verification-report.json');
-
-const secretKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_GATE_CODE',
-  'OWNER_ADMIN_CODE',
-  'ADMIN_CODE',
-  'FS27_ADMIN_CODE',
-  'FS27_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_CODE',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'QA_ADMIN_PASSWORD',
-  'PHC_BOOTSTRAP_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'FREE99_GATE_PASSWORD',
-  'OWNER_ADMIN_PASSWORD',
-  'ADMIN_PASSWORD',
-  'SITE_OPERATOR_ADMIN_TOKEN',
-  'METRAIYUX_ADMIN_TOKEN',
-  'ADMIN_TOKEN'
-];
 
 function relaunchWithXvfbWhenNeeded() {
   if (process.platform !== 'linux') return;
@@ -47,56 +27,8 @@ function relaunchWithXvfbWhenNeeded() {
   process.exit(child.status ?? 1);
 }
 
-function readText(file) {
-  try { return fs.readFileSync(file, 'utf8'); } catch { return ''; }
-}
-
-function unquote(value) {
-  let clean = String(value || '').trim().replace(/^export\s+/, '').trim();
-  while ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1).trim();
-  }
-  return clean;
-}
-
-function envFromText(text, key) {
-  let found = '';
-  for (const line of String(text || '').split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const normalized = trimmed.startsWith('export ') ? trimmed.slice(7).trim() : trimmed;
-    if (normalized.startsWith(`${key}=`)) found = unquote(normalized.slice(key.length + 1));
-    if (normalized.startsWith(`${key}:`)) found = unquote(normalized.slice(key.length + 1));
-  }
-  return found;
-}
-
-function allSecrets(keys) {
-  const texts = [
-    readText(path.join(repoRoot, '.env')),
-    readText(path.join(repoRoot, 'env.txt')),
-    readText(path.join(repoRoot, 'ADMIN_REFERENCE.md')),
-    readText(path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', '.env'))
-  ];
-  const values = [];
-  for (const key of keys) {
-    const direct = unquote(process.env[key] || '');
-    if (direct) values.push(direct);
-    for (const text of texts) {
-      const value = envFromText(text, key);
-      if (value) values.push(value);
-    }
-  }
-  return [...new Set(values.filter(Boolean))];
-}
-
-const localSecrets = allSecrets(secretKeys);
-
 function redact(value) {
   let text = typeof value === 'string' ? value : JSON.stringify(value || {});
-  for (const secret of localSecrets) {
-    if (secret) text = text.split(secret).join('[redacted]');
-  }
   return text
     .replace(/(Bearer\s+)[A-Za-z0-9._~+/=-]+/g, '$1[redacted]')
     .replace(/(code=)[^&\s)]+/gi, '$1[redacted]');
@@ -357,21 +289,10 @@ async function scrollFullPage(page, entry, labelPrefix) {
 }
 
 async function resolveOwnerGate() {
-  for (const code of localSecrets) {
-    try {
-      const response = await fetch(urlFor('/api/owner/admin-login'), {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ code })
-      });
-      const data = await response.json().catch(() => ({}));
-      const token = cleanToken(data.gateToken || data.gateBearerToken || data.token);
-      if (response.ok && token) return { code, token, source: data.gateToken || data.gateBearerToken ? 'fs27-admin-login' : 'owner-admin-login' };
-    } catch {
-      // Try next owner candidate without printing it.
-    }
-  }
-  throw new Error('No local owner/admin candidate unlocked the shared 0S gate.');
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = cleanToken(auth.token);
+  if (!auth.ok || !token) throw new Error('No shared 0S gate session was available.');
+  return { token, source: auth.credential?.source || 'shared-gate' };
 }
 
 async function installSharedSession(context, token, source) {
@@ -381,48 +302,7 @@ async function installSharedSession(context, token, source) {
       sessionStorage.setItem(key, JSON.stringify(shared));
       localStorage.setItem(key, JSON.stringify(shared));
     }
-    localStorage.setItem('quantumskyes_mcp_owner_token', shared.token);
   }, session);
-}
-
-async function loginOwner(page, owner, entry) {
-  const loginUrl = new URL('/admin/login.html', baseUrl);
-  loginUrl.searchParams.set('return', appPath);
-  const response = await page.goto(loginUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 45000 });
-  entry.statuses.push({ name: 'owner_login_opened', status: response?.status() || 0, ok: Boolean(response?.ok()) });
-  await page.fill('input[name="code"]', owner.code).catch(() => {});
-  const emailInput = page.locator('input[name="email"]');
-  if (await emailInput.count().catch(() => 0)) await emailInput.fill('owner-proof@metraiyux.local').catch(() => {});
-  await page.evaluate(async ({ targetPath, proofCode }) => {
-    const response = await fetch('/api/owner/admin-login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: proofCode })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || `owner login failed (${response.status})`);
-    const clean = String(data.gateToken || data.gateBearerToken || data.token || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
-    if (clean) {
-      const shared = {
-        token: clean,
-        source: data.gateToken || data.gateBearerToken ? 'fs27-admin-login' : 'owner-admin-login',
-        platform_id: 'metraiyux-0s',
-        usage_lane: 'fs27-owner-gate',
-        issued_at: new Date().toISOString()
-      };
-      for (const key of ['FREE99_PLATFORM_GATE_SESSION', 'METRAIYUX_GATE_SESSION', 'SKYE_GATE_SESSION']) {
-        sessionStorage.setItem(key, JSON.stringify(shared));
-        localStorage.setItem(key, JSON.stringify(shared));
-      }
-      localStorage.setItem('quantumskyes_mcp_owner_token', clean);
-    }
-    location.assign(targetPath);
-  }, { targetPath: appPath, proofCode: owner.code });
-  await page.waitForFunction((targetPath) => {
-    return location.pathname === targetPath || location.pathname === `${targetPath}index.html`;
-  }, appPath, { timeout: 45000 });
-  entry.actions.push('logged in through shared owner gate and opened canonical AE FlowPro root');
 }
 
 async function click(page, entry, selector, label) {

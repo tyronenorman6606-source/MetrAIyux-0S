@@ -213,7 +213,8 @@ for (const key of present.filter((item) => secretOnly.has(item))) {
   bulk[key] = merged[key];
 }
 
-const child = spawn("npx", ["wrangler", "secret", "bulk"], {
+const wranglerVersion = process.env.WRANGLER_VERSION || "4.14.0";
+const child = spawn("npx", ["-y", "-p", `wrangler@${wranglerVersion}`, "wrangler", "secret", "bulk"], {
   cwd: skymailRoot,
   env: { ...process.env, ...merged },
   stdio: ["pipe", "pipe", "pipe"],

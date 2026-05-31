@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { chromium } from "playwright";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const repoRoot = "/workspaces/MetrAIyux-0S";
 const origin = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev";
@@ -27,55 +28,21 @@ function slug(value) {
   return String(value || proofLabel).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 90);
 }
 
-function parseEnvCandidates() {
-  const envPath = path.join(repoRoot, ".env");
-  const text = fs.existsSync(envPath) ? fs.readFileSync(envPath, "utf8") : "";
-  const wanted = new Set([
-    "FREE99_ADMIN_CODE",
-    "FREE99_ADMIN_PASSWORD",
-    "OWNER_ADMIN_CODE",
-    "OWNER_ADMIN_PASSWORD",
-    "ADMIN_CODE",
-    "ADMIN_PASSWORD",
-    "QA_ADMIN_PASSWORD",
-    "SITE_OPERATOR_ADMIN_TOKEN",
-    "ADMIN_TOKEN",
-    "MCP_HTTP_BEARER_TOKEN",
-    "SKYGATEFS13_ADMIN_PASSWORD",
-    "SKYGATEFS27_ADMIN_PASSWORD",
-    "FS27_ADMIN_PASSWORD",
-    "SKYGATE_ADMIN_PASSWORD"
-  ]);
-  const candidates = [];
-  for (const line of text.split(/\r?\n/)) {
-    const match = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-    if (!match || !wanted.has(match[1])) continue;
-    let value = match[2].trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
-    if (value && !candidates.some((item) => item.value === value)) candidates.push({ key: match[1], value });
-  }
-  return candidates;
-}
-
 async function loginOwner(context) {
-  const candidates = parseEnvCandidates();
-  for (const candidate of candidates) {
-    const response = await context.request.post(`${origin}/api/owner/admin-login`, {
-      data: { code: candidate.value },
-      headers: { "content-type": "application/json" }
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok() && data.token) {
-      return {
-        credentialKey: candidate.key,
-        token: data.gateToken || data.token,
-        ownerToken: data.token,
-        hasGateToken: Boolean(data.gateToken),
-        expiresAt: data.expiresAt
-      };
-    }
-  }
-  throw new Error(`Could not establish owner session with ${candidates.length} local credential candidates.`);
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: origin });
+  if (!auth.ok || !auth.token) throw new Error("Could not establish shared 0S gate session.");
+  const token = String(auth.token || "").replace(/^Bearer\s+/i, "").trim();
+  await context.setExtraHTTPHeaders({
+    Authorization: `Bearer ${token}`,
+    "x-free99-gate-session": token,
+    "x-skye-gate-session": token
+  });
+  return {
+    credentialKey: auth.credential?.key || "shared-gate",
+    token,
+    hasGateToken: true,
+    expiresAt: auth.response?.body?.expiresAt || null
+  };
 }
 
 function randomProofEmail() {
@@ -373,10 +340,12 @@ async function runViewport(browser, viewport, artifactDir, flow) {
     const clean = String(token || "").replace(/^Bearer\s+/i, "");
     if (!clean) return;
     const shared = { token: clean, source: "live-proof-owner-session", platform_id: "metraiyux-0s", usage_lane: "fs27-owner-gate", issued_at: new Date().toISOString() };
-    sessionStorage.setItem("adminBrainToken", clean);
     sessionStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
     localStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
-    localStorage.setItem("quantumskyes_mcp_owner_token", clean);
+    sessionStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(shared));
+    localStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(shared));
+    sessionStorage.setItem("SKYE_GATE_SESSION", JSON.stringify(shared));
+    localStorage.setItem("SKYE_GATE_SESSION", JSON.stringify(shared));
   }, login.token);
   const page = await context.newPage();
   const check = {

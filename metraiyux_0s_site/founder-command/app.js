@@ -913,12 +913,6 @@
     }
   ];
 
-  const GATE_STORAGE_KEYS = [
-    'METRAIYUX_GATE_SESSION',
-    'SKYGATEFS27_GATE_SESSION',
-    'SKYE_GATE_SESSION'
-  ];
-
   const DEFAULT_FOUNDER = {
     companyName: 'Skyes Over London / MetrAIyux 0S',
     founderName: 'Gray London Skyes',
@@ -1244,20 +1238,7 @@
   function storedGateToken() {
     const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
     const bridgeSession = bridge?.requireSession?.({ platformId: 'founder-command', usageLane: 'founder-command' }) || bridge?.current?.();
-    const bridgeToken = cleanGateToken(bridgeSession?.token || '');
-    if (bridgeToken) return bridgeToken;
-    for (const key of GATE_STORAGE_KEYS) {
-      for (const store of [sessionStorage, localStorage]) {
-        try {
-          const raw = store.getItem(key);
-          if (!raw) continue;
-          const parsed = raw.startsWith('{') ? JSON.parse(raw) : null;
-          const token = cleanGateToken(parsed?.token || parsed?.session || raw);
-          if (token) return token;
-        } catch {}
-      }
-    }
-    return '';
+    return cleanGateToken(bridgeSession?.token || '');
   }
 
   function commandHeaders() {

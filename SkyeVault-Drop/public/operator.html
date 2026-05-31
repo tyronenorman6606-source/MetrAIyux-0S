@@ -14,24 +14,24 @@
         <div class="orb orb-b"></div>
         <div class="brand-mark" aria-hidden="true">OP</div>
         <p class="eyebrow">Emergency operator entry</p>
-        <h1>Use the shared gate first.</h1>
-        <p class="lede">Normal owner/admin access belongs to the shared 0S/FS27/SkyGate/Free99 gate session. This page is only the legacy emergency fallback for internal setup pages when the shared gate is unavailable.</p>
+        <h1>Use the shared gate.</h1>
+        <p class="lede">Owner/admin recovery belongs to the shared 0S/FS27/SkyGate/Free99 gate session. This page mints the protected vault operator cookie from that same gate bearer.</p>
       </section>
 
       <section class="panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Fallback login</p>
-            <h2>Start legacy operator session</h2>
+            <p class="eyebrow">Recovery login</p>
+            <h2>Start FS27-bound operator session</h2>
           </div>
           <a class="admin-link" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html">Owner Login</a>
         </div>
         <form id="operatorForm" class="grid token-grid">
           <label>
-            <span>Legacy emergency token</span>
-            <input id="operatorToken" type="password" autocomplete="current-password" placeholder="Use only if shared gate is unavailable" required />
+            <span>FS27 / SkyGate bearer</span>
+            <input id="operatorToken" type="password" autocomplete="current-password" placeholder="Paste the shared gate bearer" required />
           </label>
-          <button class="primary-btn compact" type="submit">Open fallback pages</button>
+          <button class="primary-btn compact" type="submit">Open protected pages</button>
         </form>
         <div id="operatorStatus" class="status-card hidden" role="status" aria-live="polite"></div>
       </section>

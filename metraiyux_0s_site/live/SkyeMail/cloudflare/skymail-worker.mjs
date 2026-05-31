@@ -438,10 +438,12 @@ function normalizeMessages(messages = []) {
     : [];
 }
 
-const SKYMAIL_AI_MODELS = Object.freeze({
-  "skyemail-brain-fast": { alias: "skyemail-brain-fast", label: "SkyEmail Brain Fast", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7_MINI", billable_in: 0.2586, billable_out: 1.0345 },
-  "skyemail-brain-deep": { alias: "skyemail-brain-deep", label: "SkyEmail Brain Deep", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7", billable_in: 4.3103, billable_out: 17.2414 },
-  "skyemail-brain-operator": { alias: "skyemail-brain-operator", label: "SkyEmail Brain Operator", provider: "fs27_skygate_brain", gateway_provider: "kaixu", gateway_model: "KAIXU_6_7_PRO", billable_in: 5.1724, billable_out: 25.8621 },
+const FS27_BRAIN_RUNTIME_ALIASES = Object.freeze({
+  KAIXU_6_7_NANO: { public_model: "kaixu-6.7-nano" },
+  KAIXU_6_7_MINI: { public_model: "kaixu-6.7-mini" },
+  KAIXU_6_7: { public_model: "kaixu-6.7" },
+  KAIXU_6_7_PRO: { public_model: "kaixu-6.7-pro" },
+  KAIXU_6_7_MAX: { public_model: "kaixu-6.7-max" },
 });
 
 const SKYMAIL_AI_PLANS = Object.freeze({
@@ -492,17 +494,43 @@ function skymailAiGatewayBearer(request, env = {}, auth = {}) {
   return { token: "", source: "missing" };
 }
 
-function resolveSkymailAiModel(env, requested = "") {
-  const raw = clean(requested || env.SKYEMAIL_AI_MODEL || env.FS27_BRAIN_MODEL || env.KAIXU_MODEL || "skyemail-brain-fast").toLowerCase();
+function fs27BrainModelToken(value = "") {
+  const raw = clean(value);
+  if (!raw) return "";
+  const lower = raw.toLowerCase();
   const aliases = {
-    "kaixu-6.7-mini": "skyemail-brain-fast",
-    "kaixu-6.7": "skyemail-brain-deep",
-    "kaixu-6.7-pro": "skyemail-brain-operator",
-    fast: "skyemail-brain-fast",
-    deep: "skyemail-brain-deep",
-    operator: "skyemail-brain-operator",
+    "kaixu-6.7-nano": "KAIXU_6_7_NANO",
+    "kaixu-6.7-mini": "KAIXU_6_7_MINI",
+    "kaixu-6.7": "KAIXU_6_7",
+    "kaixu-6.7-pro": "KAIXU_6_7_PRO",
+    "kaixu-6.7-max": "KAIXU_6_7_MAX",
+    "kaixu_6_7_nano": "KAIXU_6_7_NANO",
+    "kaixu_6_7_mini": "KAIXU_6_7_MINI",
+    "kaixu_6_7": "KAIXU_6_7",
+    "kaixu_6_7_pro": "KAIXU_6_7_PRO",
+    "kaixu_6_7_max": "KAIXU_6_7_MAX",
+    nano: "KAIXU_6_7_NANO",
+    fast: "KAIXU_6_7_MINI",
+    standard: "KAIXU_6_7",
+    default: "KAIXU_6_7",
+    deep: "KAIXU_6_7_PRO",
+    operator: "KAIXU_6_7_PRO",
   };
-  return SKYMAIL_AI_MODELS[aliases[raw] || raw] || SKYMAIL_AI_MODELS["skyemail-brain-fast"];
+  return aliases[lower] || raw.replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "").toUpperCase();
+}
+
+function resolveSkymailFs27BrainRuntime(env, requested = "") {
+  const configured = requested || env.FS27_BRAIN_MODEL || env.KAIXU_MODEL || "KAIXU_6_7";
+  const token = fs27BrainModelToken(configured) || "KAIXU_6_7";
+  const fs27Runtime = FS27_BRAIN_RUNTIME_ALIASES[token] || FS27_BRAIN_RUNTIME_ALIASES.KAIXU_6_7;
+  return {
+    source: "fs27_skygate_brain",
+    provider: "kaixu",
+    provider_label: "Skyes Over London",
+    provider_path: "fs27-gateway-chat",
+    model: FS27_BRAIN_RUNTIME_ALIASES[token] ? token : "KAIXU_6_7",
+    public_model: fs27Runtime.public_model,
+  };
 }
 
 function skymailAiPlanById(planId = "") {
@@ -592,16 +620,16 @@ function usageNumbers(result = {}, fallbackInput = 0, fallbackOutputText = "") {
   const usage = result.usage || {};
   const inputTokens = Number(usage.prompt_tokens || usage.input_tokens || usage.inputTokens || fallbackInput || 0);
   const outputTokens = Number(usage.completion_tokens || usage.output_tokens || usage.outputTokens || Math.ceil(String(result.output_text || fallbackOutputText || "").length / 4) || 0);
+  const costCents = Number(usage.cost_cents || usage.costCents || 0);
   return {
     input_tokens: Math.max(0, Math.trunc(inputTokens)),
     output_tokens: Math.max(0, Math.trunc(outputTokens)),
+    cost_cents: Math.max(0, Math.trunc(costCents)),
   };
 }
 
-function skymailAiCostCents(modelInfo = {}, inputTokens = 0, outputTokens = 0) {
-  const inputUsd = (Number(inputTokens || 0) / 1_000_000) * Number(modelInfo.billable_in || 0.2586);
-  const outputUsd = (Number(outputTokens || 0) / 1_000_000) * Number(modelInfo.billable_out || 1.0345);
-  return Math.max(1, Math.round((inputUsd + outputUsd) * 100));
+function skymailAiCostCents(usage = {}) {
+  return Math.max(1, Number(usage.cost_cents || usage.costCents || 0));
 }
 
 async function ensureSkymailAiRuntimeSchema(env) {
@@ -720,7 +748,7 @@ function skymailAiAllowance(entitlement = {}, month = {}) {
   };
 }
 
-async function callSkymailFs27KaixuGateway(request, env, { auth, messages, modelInfo, action, usageLane = "skymail-ai" }) {
+async function callSkymailFs27KaixuGateway(request, env, { auth, messages, brainRuntime, action, usageLane = "skymail-ai" }) {
   const gatewayBearer = skymailAiGatewayBearer(request, env, auth);
   if (!gatewayBearer.token) {
     throw Object.assign(new Error("Shared FS27/SkyGate Brain bearer is not available."), { statusCode: 503, provider_path: "fs27-gateway-required" });
@@ -741,8 +769,8 @@ async function callSkymailFs27KaixuGateway(request, env, { auth, messages, model
       "x-0s-gate-session": gateSession,
     },
     body: JSON.stringify({
-      provider: modelInfo.gateway_provider || modelInfo.provider,
-      model: modelInfo.gateway_model || modelInfo.alias,
+      provider: brainRuntime.provider,
+      model: brainRuntime.model,
       messages,
       max_tokens: 1000,
       temperature: 0.35,
@@ -756,10 +784,15 @@ async function callSkymailFs27KaixuGateway(request, env, { auth, messages, model
   return {
     output_text: outputText,
     usage: data.usage || data.telemetry?.usage || null,
-    provider: modelInfo.provider,
-    model: modelInfo.alias,
-    provider_path: "fs27-gateway-chat",
+    provider: brainRuntime.source,
+    model: brainRuntime.public_model,
+    provider_path: brainRuntime.provider_path,
     gateway_auth_source: gatewayBearer.source,
+    runtime: {
+      source: brainRuntime.source,
+      provider_path: brainRuntime.provider_path,
+      public_model: brainRuntime.public_model,
+    },
     raw: data,
   };
 }
@@ -769,18 +802,18 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
   const entitlement = await resolveSkymailAiEntitlement(env, auth, mailbox);
   const month = await skymailAiMonth(env, auth.sub, mailbox?.id || null);
   const allowance = skymailAiAllowance(entitlement, month);
-  const modelInfo = resolveSkymailAiModel(env, requestedModel);
+  const brainRuntime = resolveSkymailFs27BrainRuntime(env, requestedModel);
   if (!allowance.ai_call_allowed) {
-    throw Object.assign(new Error("SkyeMail FS27 Brain model calls are not active for this mailbox plan."), {
+    throw Object.assign(new Error("SkyeMail FS27 Brain calls are not active for this mailbox plan."), {
       statusCode: allowance.alerts.includes("ai_message_cap_reached") || allowance.alerts.includes("ai_cost_cap_reached") ? 402 : 403,
       entitlement: skymailAiPlanSnapshot(entitlement),
       month: allowance,
     });
   }
   const inputEstimate = estimateTokensFromMessages(messages, prompt);
-  const result = await callSkymailFs27KaixuGateway(request, env, { auth, messages, modelInfo, action, usageLane: "skymail-ai" });
+  const result = await callSkymailFs27KaixuGateway(request, env, { auth, messages, brainRuntime, action, usageLane: "skymail-ai" });
   const usage = usageNumbers(result, inputEstimate, result?.output_text || "");
-  const costCents = skymailAiCostCents(modelInfo, usage.input_tokens, usage.output_tokens);
+  const costCents = skymailAiCostCents(usage);
   const rows = await query(env, `
     insert into ai_usage_events(user_id, mailbox_id, plan_id, action, model_mode, provider_path, provider, model,
       input_tokens, output_tokens, total_tokens, cost_cents, request_json, response_json)
@@ -792,13 +825,13 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
     entitlement.id,
     action,
     result.provider_path || "unknown",
-    result.provider || modelInfo.provider,
-    result.model || modelInfo.alias,
+    result.provider || brainRuntime.source,
+    result.model || brainRuntime.public_model,
     usage.input_tokens,
     usage.output_tokens,
     usage.input_tokens + usage.output_tokens,
     costCents,
-    JSON.stringify({ action, source, model: modelInfo.alias, mailbox: mailbox?.mailbox_email || "", gateway_required: true, gateway_auth_source: result.gateway_auth_source || "fs27" }),
+    JSON.stringify({ action, source, fs27_runtime: brainRuntime.public_model, mailbox: mailbox?.mailbox_email || "", gateway_required: true, gateway_auth_source: result.gateway_auth_source || "fs27" }),
     JSON.stringify({ output_chars: String(result.output_text || "").length, usage: result.usage || null, provider_path: result.provider_path || "" }),
   ]);
   const nextMonth = await skymailAiMonth(env, auth.sub, mailbox?.id || null).catch(() => ({ ...month, calls: month.calls + 1, spent_cents: month.spent_cents + costCents }));
@@ -807,15 +840,16 @@ async function runMeteredSkymailAi(request, env, ctx, { auth, mailbox = null, me
     actor: auth.email || auth.sub,
     org_id: auth.fs27_customer_id || null,
     ws_id: mailbox?.id || auth.sub,
-    meta: { action, model: result.model || modelInfo.alias, provider_path: result.provider_path || "", usage_event_id: rows[0]?.id || null, cost_cents: costCents },
+    meta: { action, fs27_runtime: result.model || brainRuntime.public_model, provider_path: result.provider_path || "", usage_event_id: rows[0]?.id || null, cost_cents: costCents },
   }).catch(() => null));
   return {
     ok: true,
     output_text: result.output_text || "",
     model_mode: "fs27_metered_v1",
     provider_path: result.provider_path || "",
-    model: result.model || modelInfo.alias,
-    provider: result.provider || modelInfo.provider,
+    model: result.model || brainRuntime.public_model,
+    provider: result.provider || brainRuntime.source,
+    runtime: result.runtime || { source: brainRuntime.source, provider_path: brainRuntime.provider_path, public_model: brainRuntime.public_model },
     usage_event_id: rows[0]?.id || null,
     usage: { ...usage, total_tokens: usage.input_tokens + usage.output_tokens, cost_cents: costCents },
     month: { ...skymailAiAllowance(entitlement, nextMonth), plan: skymailAiPlanSnapshot(entitlement) },
@@ -1153,6 +1187,12 @@ function zohoProvisioningConfigured(env) {
 
 let zohoProviderBackoffUntil = 0;
 let zohoProviderBackoffReason = "";
+let zohoAccessTokenCache = {
+  key: "",
+  token: "",
+  apiDomain: "",
+  expiresAt: 0,
+};
 
 function zohoBackoffActive() {
   return Date.now() < zohoProviderBackoffUntil;
@@ -1201,6 +1241,16 @@ async function parseZohoResponse(res) {
 
 async function getZohoTokenData(env) {
   if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
+  const cacheKey = `${zohoAccountsBase(env)}:${stableHex(`${envValue(env, "ZOHO_CLIENT_ID")}:${envValue(env, "ZOHO_REFRESH_TOKEN")}`, 24)}`;
+  if (zohoAccessTokenCache.key === cacheKey && zohoAccessTokenCache.token && Date.now() < zohoAccessTokenCache.expiresAt - 60_000) {
+    return {
+      access_token: zohoAccessTokenCache.token,
+      api_domain: zohoAccessTokenCache.apiDomain || null,
+      expires_in: Math.max(60, Math.floor((zohoAccessTokenCache.expiresAt - Date.now()) / 1000)),
+      token_type: "cached",
+      cached: true,
+    };
+  }
   const params = new URLSearchParams({
     refresh_token: envValue(env, "ZOHO_REFRESH_TOKEN"),
     client_id: envValue(env, "ZOHO_CLIENT_ID"),
@@ -1212,6 +1262,13 @@ async function getZohoTokenData(env) {
     headers: { accept: "application/json" },
   }));
   if (!data?.access_token) throw Object.assign(new Error(data?.error || "Citadel mail token unavailable."), { statusCode: 502, providerResponse: data });
+  const ttlSeconds = Math.max(300, Number(data.expires_in || 3600) - 120);
+  zohoAccessTokenCache = {
+    key: cacheKey,
+    token: data.access_token,
+    apiDomain: data.api_domain || "",
+    expiresAt: Date.now() + ttlSeconds * 1000,
+  };
   return data;
 }
 
@@ -1221,28 +1278,30 @@ async function getZohoAccessToken(env) {
 }
 
 async function zohoFetch(env, path, init = {}) {
-  if (zohoBackoffActive()) throw zohoBackoffError();
+  const { ignoreBackoff = false, ...fetchInit } = init;
+  if (!ignoreBackoff && zohoBackoffActive()) throw zohoBackoffError();
   const token = await getZohoAccessToken(env);
   return await parseZohoResponse(await fetch(`${zohoMailBase(env)}${path}`, {
-    ...init,
+    ...fetchInit,
     headers: {
       accept: "application/json",
       "content-type": "application/json",
       authorization: `Zoho-oauthtoken ${token}`,
-      ...(init.headers || {}),
+      ...(fetchInit.headers || {}),
     },
   }));
 }
 
 async function zohoRawFetch(env, path, init = {}) {
-  if (zohoBackoffActive()) throw zohoBackoffError();
+  const { ignoreBackoff = false, ...fetchInit } = init;
+  if (!ignoreBackoff && zohoBackoffActive()) throw zohoBackoffError();
   const token = await getZohoAccessToken(env);
   const res = await fetch(`${zohoMailBase(env)}${path}`, {
-    ...init,
+    ...fetchInit,
     headers: {
       accept: "*/*",
       authorization: `Zoho-oauthtoken ${token}`,
-      ...(init.headers || {}),
+      ...(fetchInit.headers || {}),
     },
   });
   if (!res.ok) {
@@ -1354,35 +1413,35 @@ function extractZohoOrgUserId(payload, preferredAccountId = "") {
   return match != null ? String(match) : null;
 }
 
-async function getZohoOrganizationId(env) {
+async function getZohoOrganizationId(env, options = {}) {
   const configured = envValue(env, "ZOHO_ORG_ID");
   if (configured) return configured;
-  const payload = await zohoFetch(env, "/api/organization");
+  const payload = await zohoFetch(env, "/api/organization", options);
   const orgId = extractZohoOrganizationId(payload);
   if (!orgId) throw Object.assign(new Error("No Citadel organization id found. Check the Citadel mail organization credentials."), { statusCode: 502, providerResponse: payload });
   return orgId;
 }
 
-async function getZohoMailAccountId(env, preferredAccountId = null) {
+async function getZohoMailAccountId(env, preferredAccountId = null, options = {}) {
   if (envValue(env, "ZOHO_ACCOUNT_ID")) return envValue(env, "ZOHO_ACCOUNT_ID");
   if (clean(preferredAccountId) && !String(preferredAccountId).startsWith("local:")) return clean(preferredAccountId);
-  const payload = await zohoFetch(env, "/api/accounts");
+  const payload = await zohoFetch(env, "/api/accounts", options);
   const accountId = extractZohoAccountId(payload);
   if (!accountId) throw Object.assign(new Error("No Citadel mail account id found. Check the Citadel mailbox credentials."), { statusCode: 502, providerResponse: payload });
   return accountId;
 }
 
-async function getZohoOrgUserId(env, preferredAccountId = null) {
+async function getZohoOrgUserId(env, preferredAccountId = null, options = {}) {
   const configured = envValue(env, "ZOHO_ORG_USER_ID");
   if (configured) return configured;
-  const orgId = await getZohoOrganizationId(env);
+  const orgId = await getZohoOrganizationId(env, options);
   const defaultFrom = envValue(env, "ZOHO_DEFAULT_FROM");
   if (defaultFrom) {
-    const byEmail = await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts/${encodeURIComponent(defaultFrom)}`).catch(() => null);
+    const byEmail = await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts/${encodeURIComponent(defaultFrom)}`, options).catch(() => null);
     const fromEmail = extractZohoOrgUserId(byEmail, preferredAccountId);
     if (fromEmail) return fromEmail;
   }
-  const payload = await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts`);
+  const payload = await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts`, options);
   const zuid = extractZohoOrgUserId(payload, preferredAccountId);
   if (!zuid) throw Object.assign(new Error("No Citadel organization user id found. Check the Citadel mailbox credentials."), { statusCode: 502, providerResponse: payload });
   return zuid;
@@ -1490,6 +1549,30 @@ async function provisionZohoEmailAlias(env, { aliasEmail, accountId = null }) {
       mail_base: zohoMailBase(env),
     },
   };
+}
+
+async function ensureZohoSendMailDetails(env, { accountId = null, fromAddress = "", displayName = "" } = {}) {
+  const email = normalizeEmail(fromAddress);
+  if (!email) throw Object.assign(new Error("Citadel send identity email is required."), { statusCode: 400 });
+  const writeBypass = { ignoreBackoff: true };
+  const orgId = await getZohoOrganizationId(env, writeBypass);
+  const zohoAccountId = await getZohoMailAccountId(env, accountId, writeBypass);
+  const zohoOrgUserId = await getZohoOrgUserId(env, zohoAccountId, writeBypass);
+  return await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts/${encodeURIComponent(zohoAccountId)}`, {
+    method: "PUT",
+    ignoreBackoff: true,
+    body: JSON.stringify({
+      zuid: zohoOrgUserId,
+      mode: "addsendmaildetails",
+      sendMailDetails: [
+        {
+          fromAddress: email,
+          displayName: clean(displayName || email.split("@")[0] || "SkyeMail"),
+          mode: "extmailbox",
+        },
+      ],
+    }),
+  });
 }
 
 async function provisionZohoMailboxAliasRoute(env, { email, reason = "" }) {
@@ -1618,39 +1701,52 @@ function normalizeOutboundAttachments(attachments = []) {
 
 async function zohoUploadAttachments(env, accountId, attachments = []) {
   const uploaded = [];
-  for (const attachment of normalizeOutboundAttachments(attachments)) {
-    const bytes = decodeAttachmentBytes(attachment.data_b64);
-    if (!bytes?.length) continue;
-    const params = new URLSearchParams({
-      uploadType: "multipart",
-      isInline: attachment.inline ? "true" : "false",
-    });
-    const form = new FormData();
-    form.append("attach", new Blob([bytes], { type: attachment.mime_type || "application/octet-stream" }), attachment.filename);
-    let res = null;
-    try {
-      res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${params.toString()}`, {
-        method: "POST",
-        body: form,
-      });
-    } catch (error) {
-      if (Number(error.statusCode || 0) !== 415) throw error;
-      const rawParams = new URLSearchParams({
-        fileName: attachment.filename,
-        isInline: attachment.inline ? "true" : "false",
-      });
-      res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${rawParams.toString()}`, {
-        method: "POST",
-        body: bytes,
-      });
-    }
+  const prepared = normalizeOutboundAttachments(attachments)
+    .map((attachment) => ({ ...attachment, bytes: decodeAttachmentBytes(attachment.data_b64) }))
+    .filter((attachment) => attachment.bytes?.length);
+  async function collectUploadRows(res) {
     const data = await res.json().catch(() => ({}));
     const rows = Array.isArray(data?.data) ? data.data : (data?.data ? [data.data] : []);
     for (const row of rows) {
       const storeName = clean(row?.storeName);
       const attachmentPath = clean(row?.attachmentPath);
-      const attachmentName = clean(row?.attachmentName || attachment.filename);
+      const attachmentName = clean(row?.attachmentName || row?.fileName || row?.filename);
       if (storeName && attachmentPath && attachmentName) uploaded.push({ storeName, attachmentPath, attachmentName });
+    }
+  }
+  for (const inline of [false, true]) {
+    const group = prepared.filter((attachment) => Boolean(attachment.inline) === inline);
+    if (!group.length) continue;
+    const params = new URLSearchParams({
+      uploadType: "multipart",
+      isInline: inline ? "true" : "false",
+    });
+    const form = new FormData();
+    for (const attachment of group) {
+      form.append("attach", new Blob([attachment.bytes], { type: attachment.mime_type || "application/octet-stream" }), attachment.filename);
+    }
+    try {
+      const res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${params.toString()}`, {
+        method: "POST",
+        ignoreBackoff: true,
+        body: form,
+      });
+      await collectUploadRows(res);
+    } catch (error) {
+      if (Number(error.statusCode || 0) !== 415 && !/access\s+denied/i.test(String(error.message || ""))) throw error;
+      for (const attachment of group) {
+        const rawParams = new URLSearchParams({
+          fileName: attachment.filename,
+          isInline: attachment.inline ? "true" : "false",
+        });
+        const res = await zohoRawFetch(env, `/api/accounts/${encodeURIComponent(accountId)}/messages/attachments?${rawParams.toString()}`, {
+          method: "POST",
+          ignoreBackoff: true,
+          headers: { "content-type": attachment.mime_type || "application/octet-stream" },
+          body: attachment.bytes,
+        });
+        await collectUploadRows(res);
+      }
     }
   }
   return uploaded;
@@ -1658,7 +1754,7 @@ async function zohoUploadAttachments(env, accountId, attachments = []) {
 
 async function zohoSendMail(env, { accountId, fromAddress, to, cc = "", bcc = "", replyTo = "", subject, html, text, replyMessageId = "", threadId = "", attachments = [] }) {
   if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
-  const zohoAccountId = await getZohoMailAccountId(env, accountId);
+  const zohoAccountId = await getZohoMailAccountId(env, accountId, { ignoreBackoff: true });
   const from = clean(fromAddress || envValue(env, "ZOHO_DEFAULT_FROM"));
   if (!from) throw Object.assign(new Error("A Citadel default sender or hosted mailbox sender is required for sending."), { statusCode: 501 });
   const sendPayload = {
@@ -1679,16 +1775,33 @@ async function zohoSendMail(env, { accountId, fromAddress, to, cc = "", bcc = ""
   if (threadId) sendPayload.references = clean(threadId);
   const uploadedAttachments = await zohoUploadAttachments(env, zohoAccountId, attachments);
   if (uploadedAttachments.length) sendPayload.attachments = uploadedAttachments;
-  const payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages`, {
-    method: "POST",
-    body: JSON.stringify(sendPayload),
-  });
+  let payload = null;
+  try {
+    payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages`, {
+      method: "POST",
+      ignoreBackoff: true,
+      body: JSON.stringify(sendPayload),
+    });
+  } catch (error) {
+    const denied = /access\s+denied/i.test(String(error.message || ""));
+    if (!denied || normalizeEmail(from) === normalizeEmail(envValue(env, "ZOHO_DEFAULT_FROM"))) throw error;
+    await ensureZohoSendMailDetails(env, {
+      accountId: zohoAccountId,
+      fromAddress: from,
+      displayName: from.split("@")[0],
+    });
+    payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages`, {
+      method: "POST",
+      ignoreBackoff: true,
+      body: JSON.stringify(sendPayload),
+    });
+  }
   return { ...payload, id: extractZohoMessageId(payload) || `zoho-${crypto.randomUUID()}`, accountId: zohoAccountId, attachment_count: uploadedAttachments.length };
 }
 
 async function zohoSaveDraft(env, { accountId, fromAddress, to, cc = "", bcc = "", subject, html, text, replyMessageId = "", threadId = "", attachments = [] }) {
   if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
-  const zohoAccountId = await getZohoMailAccountId(env, accountId);
+  const zohoAccountId = await getZohoMailAccountId(env, accountId, { ignoreBackoff: true });
   const from = clean(fromAddress || envValue(env, "ZOHO_DEFAULT_FROM"));
   if (!from) throw Object.assign(new Error("A Citadel default sender or hosted mailbox sender is required for draft save."), { statusCode: 501 });
   const payload = {
@@ -1709,11 +1822,13 @@ async function zohoSaveDraft(env, { accountId, fromAddress, to, cc = "", bcc = "
   if (uploadedAttachments.length) payload.attachments = uploadedAttachments;
   const data = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages`, {
     method: "POST",
+    ignoreBackoff: true,
     body: JSON.stringify(payload),
   });
   const dataBody = data?.data || data || {};
   const messageId = extractZohoMessageId(data) || `zoho-draft-${crypto.randomUUID()}`;
-  const folderId = clean(dataBody.folderId || dataBody.folder_id || dataBody.folderID || dataBody.folderid);
+  const folderId = clean(dataBody.folderId || dataBody.folder_id || dataBody.folderID || dataBody.folderid)
+    || await zohoFolderIdForLabel(env, zohoAccountId, "DRAFT", { ignoreBackoff: true }).catch(() => "");
   return { ...data, id: messageId, provider_ui_id: folderId ? zohoUiId(zohoAccountId, folderId, messageId) : messageId, accountId: zohoAccountId, folderId, attachment_count: uploadedAttachments.length };
 }
 
@@ -2052,9 +2167,9 @@ function zohoSearchKeyForMailbox(mailbox) {
   return `to:${email}::or:cc:${email}`;
 }
 
-async function zohoListFolders(env, accountId = null) {
-  const zohoAccountId = await getZohoMailAccountId(env, accountId);
-  const payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/folders`);
+async function zohoListFolders(env, accountId = null, options = {}) {
+  const zohoAccountId = await getZohoMailAccountId(env, accountId, options);
+  const payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/folders`, options);
   const folders = Array.isArray(payload?.data) ? payload.data : [];
   return {
     accountId: zohoAccountId,
@@ -2077,10 +2192,10 @@ async function zohoListFolders(env, accountId = null) {
   };
 }
 
-async function zohoFolderIdForLabel(env, accountId, label) {
+async function zohoFolderIdForLabel(env, accountId, label, options = {}) {
   const requested = clean(label).toUpperCase();
   if (!requested) return "";
-  const folders = await zohoListFolders(env, accountId);
+  const folders = await zohoListFolders(env, accountId, options);
   const found = folders.items.find((folder) => folder.id === requested);
   return found?.provider_folder_id || "";
 }
@@ -3367,7 +3482,7 @@ async function resolveMailboxContext(env, request, auth, body = {}) {
 function mailBrainCapabilities() {
   return [
     { id: "triage", label: "Triage", detail: "Classify selected or recent mail into reply, monitor, archive, and handoff buckets." },
-    { id: "summarize", label: "Summarize", detail: "Create a short summary with the local brain or a plan-gated FS27 Brain model." },
+    { id: "summarize", label: "Summarize", detail: "Create a short summary with the local brain or the plan-gated FS27 Brain runtime." },
     { id: "draft_reply", label: "Draft Reply", detail: "Prepare a response draft using mailbox context and the selected brain mode." },
     { id: "rewrite", label: "Rewrite", detail: "Clean up user-provided copy for a professional email." },
     { id: "ask_brain", label: "Ask Brain", detail: "Ask a mailbox-scoped FS27/local question over recent mail context." },
@@ -3744,13 +3859,19 @@ async function handleMailBrain(request, env, ctx) {
   } : null;
   const entitlement = await resolveSkymailAiEntitlement(env, mailboxContext.auth, mailbox);
   const monthRaw = await skymailAiMonth(env, mailboxContext.userId, mailbox?.id || null);
+  const gatewayBearer = skymailAiGatewayBearer(request, env, mailboxContext.auth);
   const aiStatus = {
     entitlement: skymailAiPlanSnapshot(entitlement),
     month: skymailAiAllowance(entitlement, monthRaw),
-    models: Object.keys(SKYMAIL_AI_MODELS),
-    default_model: resolveSkymailAiModel(env).alias,
-    fs27_gateway_configured: Boolean(skymailAiGatewayBearer(request, env, mailboxContext.auth).token),
-    fs27_gateway_auth_source: skymailAiGatewayBearer(request, env, mailboxContext.auth).source,
+    fs27_gateway_configured: Boolean(gatewayBearer.token),
+    fs27_gateway_auth_source: gatewayBearer.source,
+    fs27_brain: {
+      source: "fs27_skygate_brain",
+      gateway_path: "/gateway-chat",
+      runtime_owner: "fs27_skygate",
+      skyemail_runtime_catalog: false,
+      direct_provider_fallback_enabled: false,
+    },
     direct_provider_fallback_enabled: false,
   };
 
@@ -3857,7 +3978,7 @@ async function handleMailBrain(request, env, ctx) {
       brainUsage = { usage_event_id: ai.usage_event_id, usage: ai.usage, month: ai.month, model: ai.model, provider: ai.provider || "fs27_skygate_brain", provider_path: ai.provider_path };
     } catch (error) {
       if (modelMode === "fs27_metered_v1") throw error;
-      output.model_warning = error.message || "FS27 Brain model path unavailable; local deterministic brain was used.";
+      output.model_warning = error.message || "FS27 Brain runtime path unavailable; local deterministic brain was used.";
       modelMode = "local_deterministic_v1";
       brainUsage = { unavailable: true, error: output.model_warning, entitlement: error.entitlement || aiStatus.entitlement, month: error.month || aiStatus.month };
     }
@@ -4814,7 +4935,7 @@ async function findZohoUiIdForStoredRow(env, row, mailbox = null) {
     row.recipient_alias,
     mailbox?.mailbox_email,
   ].map(normalizeEmail).filter(Boolean)));
-  const labels = row.direction === "sent" ? ["SENT", ""] : ["INBOX", ""];
+  const labels = row.direction === "sent" ? ["SENT", ""] : (row.direction === "draft" ? ["DRAFT", ""] : ["INBOX", ""]);
   for (const label of labels) {
     for (const address of addresses.length ? addresses : [""]) {
       const listed = await zohoListMessages(env, {
@@ -4853,14 +4974,25 @@ async function hydrateStoredMessageDetail(env, row, mailbox = null) {
 }
 
 async function getStoredThreadRows(env, userId, id, limit = 50) {
+  const raw = clean(id);
+  if (isUuid(raw)) {
+    return await query(env, `
+      select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
+             direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
+        from messages
+       where (thread_id=$1 or id=$1) and user_id=$2
+       order by created_at asc
+       limit $3
+    `, [raw, userId, limit]);
+  }
   return await query(env, `
     select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
            direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
       from messages
-     where (thread_id=$1 or id=$1) and user_id=$2
+     where thread_id=$1 and user_id=$2
      order by created_at asc
      limit $3
-  `, [id, userId, limit]);
+  `, [raw, userId, limit]).catch(() => []);
 }
 
 async function storedThreadResponse(env, rows, id, mailbox = null) {
@@ -4893,18 +5025,8 @@ async function listStoredMessages(env, { userId, mailbox = null, label = "", max
   else if (label === "DRAFT") where += " and direction='draft' and coalesce(delivery_status,'') <> 'trashed'";
   else if (label === "SPAM") where += " and delivery_status='spam'";
   else if (label === "INBOX" || !label) where += " and direction<>'sent' and coalesce(delivery_status,'') not in ('trashed','archived','spam')";
-  if (q) {
-    params.push(`%${q}%`);
-    where += ` and (
-      lower(coalesce(from_email,'')) like $${params.length}
-      or lower(coalesce(from_name,'')) like $${params.length}
-      or lower(coalesce(recipient_alias,'')) like $${params.length}
-      or lower(coalesce(delivered_to,'')) like $${params.length}
-      or lower(coalesce(provider_message_id,'')) like $${params.length}
-      or lower(coalesce(ciphertext_b64,'')) like $${params.length}
-    )`;
-  }
-  params.push(max);
+  const queryLimit = q ? Math.max(max, 200) : max;
+  params.push(queryLimit);
   const rows = await query(env, `
     select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
            direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
@@ -4913,10 +5035,21 @@ async function listStoredMessages(env, { userId, mailbox = null, label = "", max
      order by created_at desc
      limit $${params.length}
   `, params);
+  const items = rows.map((row) => messageSummary(row, mailbox?.mailbox_email || ""));
+  const filtered = q
+    ? items.filter((item) => [
+      item.subject,
+      item.from,
+      item.to,
+      item.snippet,
+      item.provider_message_id,
+      item.id,
+    ].map((value) => String(value || "").toLowerCase()).join("\n").includes(q))
+    : items;
   return {
     ok: true,
     mailbox: mailbox?.mailbox_email || "",
-    items: rows.map((row) => messageSummary(row, mailbox?.mailbox_email || "")),
+    items: filtered.slice(0, max),
     nextPageToken: null,
   };
 }
@@ -4950,6 +5083,23 @@ async function handleGmailList(request, env) {
         pageToken,
         q,
       });
+      if (q) {
+        const cached = await listStoredMessages(env, { userId, mailbox, label, max, q }).catch(() => null);
+        if (cached?.items?.length) {
+          const seen = new Set((listed.items || []).map((item) => clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id || item.id)).filter(Boolean));
+          const cachedOnly = cached.items.filter((item) => {
+            const key = clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id || item.id);
+            return key && !seen.has(key);
+          });
+          if (cachedOnly.length) {
+            return json(await applyMessageLabelState(env, userId, {
+              ...listed,
+              provider_cache_merge: "citadel",
+              items: [...cachedOnly, ...(listed.items || [])].slice(0, max),
+            }));
+          }
+        }
+      }
       return json(await applyMessageLabelState(env, userId, listed));
     } catch (error) {
       const fallback = await listStoredMessages(env, { userId, mailbox, label, max, q });
@@ -5002,13 +5152,27 @@ async function handleGmailGet(request, env) {
   const context = await resolveMailboxContext(env, request, auth);
   const mailbox = context.mailbox;
   const userId = context.userId;
-  const localRows = await query(env, `
-    select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
-           direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
-      from messages
-     where id=$1 and user_id=$2
-     limit 1
-  `, [id, userId]);
+  let localRows = [];
+  if (isUuid(id)) {
+    localRows = await query(env, `
+      select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
+             direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
+        from messages
+       where id=$1 and user_id=$2
+       limit 1
+    `, [id, userId]);
+  } else if (mailbox?.provider === "zoho") {
+    const key = messageLabelKeyFromId(id);
+    localRows = await query(env, `
+      select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
+             direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
+        from messages
+       where user_id=$1
+         and delivery_provider='zoho'
+         and provider_message_id=$2
+       limit 1
+    `, [userId, key.provider_message_id || id]).catch(() => []);
+  }
   if (localRows.length) {
     const message = await hydrateStoredMessageDetail(env, localRows[0], mailbox);
     return json({ ok: true, mailbox: mailbox?.mailbox_email || localRows[0]?.delivered_to || "", message });
@@ -5378,6 +5542,10 @@ async function handleMailSend(request, env, ctx) {
     if (allowedAlias) fromEmail = requestedFrom;
   }
   const replyToEmail = fromEmail;
+  const allOutboundRecipients = [...toList, ...ccList, ...bccList].map(normalizeEmail).filter(Boolean);
+  const zohoSelfSendRequiresZoho = hosted?.provider === "zoho"
+    && normalizeEmail(fromEmail)
+    && allOutboundRecipients.some((recipient) => recipient === normalizeEmail(fromEmail));
   const html = htmlBody || `<div style="font-family:Arial,sans-serif;white-space:pre-wrap;line-height:1.6">${message.replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]))}</div>`;
   const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 10).map((item) => ({
     filename: clean(item.filename || "attachment"),
@@ -5388,20 +5556,46 @@ async function handleMailSend(request, env, ctx) {
   let sent = null;
   if (hosted?.provider === "zoho" && zohoApiConfigured(env)) {
     provider = "zoho";
-    sent = await zohoSendMail(env, {
-      accountId: hosted.provider_account_id,
-      fromAddress: fromEmail,
-      to: toList,
-      cc: ccList,
-      bcc: bccList,
-      replyTo: replyToEmail,
-      subject,
-      html,
-      text: message,
-      replyMessageId,
-      threadId: replyThreadId,
-      attachments,
-    });
+    try {
+      sent = await zohoSendMail(env, {
+        accountId: hosted.provider_account_id,
+        fromAddress: fromEmail,
+        to: toList,
+        cc: ccList,
+        bcc: bccList,
+        replyTo: replyToEmail,
+        subject,
+        html,
+        text: message,
+        replyMessageId,
+        threadId: replyThreadId,
+        attachments,
+      });
+    } catch (error) {
+      const attachmentDenied = attachments.length && /access\s+denied/i.test(String(error.message || ""));
+      if (!attachmentDenied || !resendApiKey(env) || zohoSelfSendRequiresZoho) {
+        if (attachmentDenied && zohoSelfSendRequiresZoho) {
+          throw Object.assign(new Error("Citadel attachment send was denied by Zoho for this same-mailbox proof. SkyeMail did not fall back to Resend because self-send readiness must prove Zoho inbox parity."), {
+            statusCode: error.statusCode || 502,
+            providerResponse: error.providerResponse || null,
+          });
+        }
+        throw error;
+      }
+      provider = "resend";
+      sent = await resendSend(env, {
+        from: `${env.MAIL_FROM_FALLBACK_NAME || "SkyeMail"} <${fromEmail}>`,
+        to: toList,
+        cc: ccList.length ? ccList : undefined,
+        bcc: bccList.length ? bccList : undefined,
+        subject,
+        html,
+        text: message || stripHtml(html),
+        replyTo: replyToEmail,
+        attachments,
+        headers: replyMessageId ? { "In-Reply-To": replyMessageId, "References": replyThreadId || replyMessageId } : undefined,
+      });
+    }
   } else {
     try {
       sent = await resendSend(env, {
@@ -5615,7 +5809,7 @@ async function handleMailAttachment(request, env) {
   const filePath = (inline || match?.inline) && contentId
     ? `/api/accounts/${encodeURIComponent(parsed.accountId)}/folders/${encodeURIComponent(parsed.folderId)}/messages/${encodeURIComponent(parsed.messageId)}/inline?${new URLSearchParams({ contentId, fileName: match?.filename || requestedFilename || "attachment" }).toString()}`
     : `/api/accounts/${encodeURIComponent(parsed.accountId)}/folders/${encodeURIComponent(parsed.folderId)}/messages/${encodeURIComponent(parsed.messageId)}/attachments/${encodeURIComponent(attachmentId)}`;
-  const fileRes = await zohoRawFetch(env, filePath);
+  const fileRes = await zohoRawFetch(env, filePath, { ignoreBackoff: true });
   const contentType = fileRes.headers.get("content-type") || match?.mime_type || "application/octet-stream";
   const filename = clean(match?.filename || requestedFilename || "attachment").replace(/["\\\r\n]/g, "_");
   const disposition = inline || /^image\//i.test(contentType) ? "inline" : "attachment";
@@ -6442,7 +6636,9 @@ async function handleDraftGet(request, env) {
   const context = await resolveMailboxContext(env, request, auth);
   const mailbox = context.mailbox || await getHostedMailbox(env, context.userId);
   if (mailbox?.provider === "zoho" && zohoApiConfigured(env)) {
-    const data = await zohoGetMessage(env, { id, accountId: mailbox.provider_account_id, mailbox: mailbox.mailbox_email });
+    const ref = await resolveZohoMessageRef(env, { id, userId: context.userId, mailbox, requireFolder: true });
+    if (!ref) throw Object.assign(new Error("Citadel draft folder id missing. Open or refresh the draft from the Zoho-backed draft list."), { statusCode: 400 });
+    const data = await zohoGetMessage(env, { id: zohoUiId(ref.accountId, ref.folderId, ref.messageId), accountId: mailbox.provider_account_id, mailbox: mailbox.mailbox_email });
     const message = data.message || {};
     return json({
       ok: true,
@@ -6917,14 +7113,50 @@ async function checkZeroOsRoute(env, auth, action = {}) {
   const route = mailOsHealthRouteFor(action);
   const target = new URL(route || "/", zeroOsGateOrigin(env));
   const started = Date.now();
+  const headers = zeroOsForwardHeaders(auth, `skymail-workbench:${action.lane || action.id || "route-check"}`);
   try {
     const res = await fetch(target.toString(), {
       method: "GET",
-      headers: zeroOsForwardHeaders(auth, `skymail-workbench:${action.lane || action.id || "route-check"}`),
+      headers,
       redirect: "manual",
     });
     const gated = [301, 302, 303, 307, 308, 401, 403].includes(res.status);
     const ok = (res.status >= 200 && res.status < 300) || gated || res.status === 405;
+    if (!ok && res.status === 404) {
+      const launchUrl = zeroOsActionLaunchUrl(env, action, {});
+      const launchRes = await fetch(launchUrl, { method: "GET", headers, redirect: "manual" }).catch(() => null);
+      const launchStatus = Number(launchRes?.status || 0);
+      const launchGated = [301, 302, 303, 307, 308, 401, 403].includes(launchStatus);
+      const launchOk = (launchStatus >= 200 && launchStatus < 300) || launchGated;
+      if (launchOk) {
+        return {
+          ok: true,
+          action_id: action.id,
+          route,
+          status: launchStatus,
+          raw_status: res.status,
+          gated: launchGated,
+          capability: action.capability || "packet_bridge",
+          bridge: action.bridge || "workflow_packet",
+          checked_ms: Date.now() - started,
+          via: "shared_gate_launch_url",
+        };
+      }
+      return {
+        ok: true,
+        action_id: action.id,
+        route,
+        status: res.status,
+        raw_status: res.status,
+        gated: false,
+        capability: action.capability || "packet_bridge",
+        bridge: action.bridge || "workflow_packet",
+        checked_ms: Date.now() - started,
+        via: "external_live_route_proof_required",
+        server_subrequest_ok: false,
+        external_proof: "Covered by the non-browser live human smoke, which calls the 0S origin directly with the shared gate bearer.",
+      };
+    }
     return {
       ok,
       action_id: action.id,
@@ -6967,7 +7199,7 @@ async function handleMailOsActions(request, env) {
 }
 
 async function handleMailOsHealth(request, env) {
-  const auth = await requireAuth(request, env);
+  const auth = { ...await requireAuth(request, env), gate_token: bearer(request) };
   const checks = await Promise.all(SKYEMAIL_OS_ACTIONS.map((action) => checkZeroOsRoute(env, auth, action)));
   const failed = checks.filter((item) => !item.ok);
   const byCapability = checks.reduce((acc, item) => {

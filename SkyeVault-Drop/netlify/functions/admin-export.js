@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors } from './_lib/http.js';
-import { requireAdminAccess } from './_lib/security.js';
+import { requireAdminReadAccess } from './_lib/security.js';
 import { loadConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 import { toCsv, flattenLedgerEntry, flattenSession, flattenEvent } from './_lib/exporters.js';
 
@@ -13,7 +13,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    const admin = await requireAdminAccess(event);
+    const admin = await requireAdminReadAccess(event);
     const type = String(event.queryStringParameters?.type || 'ledger').toLowerCase();
     const format = String(event.queryStringParameters?.format || 'json').toLowerCase();
     const { config, source } = await loadConfig();

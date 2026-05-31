@@ -7,10 +7,11 @@
   function nowISO(){ return new Date().toISOString(); }
   function read(){ try{ return JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(_){ return {}; } }
   function write(v){ localStorage.setItem(KEY, JSON.stringify(v)); listeners.slice().forEach(function(fn){ try{ fn(clone(v)); }catch(_){} }); return v; }
-  function authHeaders(){
-    var token = clean(localStorage.getItem('phcSessionToken') || localStorage.getItem('skyeRoutexSessionToken') || '');
-    var headers = { 'content-type':'application/json' };
-    if(token) headers.authorization = 'Bearer ' + token;
+	  function authHeaders(){
+	    var bridge = window.MetrAIyuxGateBridge || window.Free99PlatformGate || null;
+	    var token = clean(bridge && bridge.current ? (bridge.current().token || '') : '');
+	    var headers = { 'content-type':'application/json' };
+	    if(token) headers.authorization = 'Bearer ' + token;
     return headers;
   }
   function localOnly(payload){

@@ -1,6 +1,6 @@
 # FS27 / 0S Auth Contract
 
-Updated: 2026-05-30
+Updated: 2026-05-31
 
 ## Source Of Truth
 
@@ -27,6 +27,10 @@ Free99 is not a second login system. Free99 is a gate-owned plan, entitlement, u
 - No owner lockout recovery path that is outside the FS27/SkyGate recovery lane.
 - No `/api/founder-command/login` minting alias. Owner login minting belongs to `/api/owner/admin-login`.
 
+## Founder Recovery / Backdoor Rule
+
+Founder recovery is allowed and required, but it must land back inside FS27. Recovery codes, owner emergency unlocks, vault/operator recovery, and drive/vault backdoors must mint or reuse an audited FS27/SkyGate session with founder/operator scope. They must not become hidden per-app passwords, raw `ADMIN_TOKEN` lanes, or browser-stored owner tokens.
+
 ## Implementation Anchors
 
 - Main Worker gate enforcement: `metraiyux_0s_site/cloudflare/worker.js`
@@ -50,3 +54,7 @@ Free99 is not a second login system. Free99 is a gate-owned plan, entitlement, u
 - The SkyeRouteX public tour token stays in its own read-only tour storage and no longer overwrites any shared gate session key.
 - Vantacore CRM, RouteX AE Command, SkyeContent, and SkyeSol/kAIxu admin bridge consume the shared gate bridge instead of URL tokens, local admin tokens, app-local client sessions, or kAIxu virtual admin tokens.
 - SkyeNet deploy/proof tooling now uses `tools/lib/zero-os-gate-auth.mjs`, which accepts an existing shared bearer or exchanges owner root-env aliases only through `/api/owner/admin-login`.
+- SkyeCommerce mounted customer auth no longer accepts local `skye_customer_session` cookies or customer password login/register as authority. Shared FS27 gate handoff still creates or reconciles compatibility customer rows, preserving existing customer/store data.
+- SkyeVaultPro hosted profile and backup lanes no longer use Netlify Identity. Hosted sync uses the inherited FS27/Free99 gate session, and the Sovereign Backup add-on is checked as a gate entitlement/card instead of local browser storage.
+- NorthStar/SigninPro browser command surfaces and imported Valley/NorthStar source copies no longer read or write local owner/admin token aliases for owner unlock. They use the shared gate bridge/session handoff.
+- SkyeVault direct admin, diagnostics, setup, and operator routes preserve recovery access as FS27-bound operator sessions with read/write/download scope checks instead of raw token authority.

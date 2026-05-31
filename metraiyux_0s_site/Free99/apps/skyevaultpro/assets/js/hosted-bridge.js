@@ -12,12 +12,31 @@ window.SkyeHosted = (() => {
     priceLabel: '$4.99/mo'
   };
 
+  function gateBridge() {
+    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  }
+
+  function gateSession() {
+    return window.Free99PlatformGate?.requireSession?.()
+      || gateBridge()?.requireSession?.({ platformId: 'skyevaultpro', usageLane: 'skyevaultpro-vault' })
+      || gateBridge()?.current?.()
+      || null;
+  }
+
   function identityAvailable() {
-    return typeof window.netlifyIdentity !== 'undefined';
+    return Boolean(gateSession());
   }
 
   function activeUser() {
-    return window.netlifyIdentity?.currentUser?.() || state.user || null;
+    const session = gateSession();
+    if (!session) return state.user || null;
+    return {
+      sub: session.sub || session.user_id || session.customer_id || session.email || 'fs27-user',
+      email: session.email || session.actor || '',
+      name: session.name || session.actor || session.email || '0S user',
+      role: session.role || '',
+      gateSession: session
+    };
   }
 
   function broadcastIdentity() {
@@ -33,8 +52,16 @@ window.SkyeHosted = (() => {
 
   async function api(path, options = {}) {
     const user = activeUser();
-    const headers = { Accept: 'application/json', ...(options.headers || {}) };
-    if (user?.token?.access_token) headers.Authorization = `Bearer ${user.token.access_token}`;
+    const session = user?.gateSession || gateSession();
+    const bridgeHeaders = window.Free99PlatformGate?.headers?.()
+      || gateBridge()?.headers?.({ 'x-skye-platform': 'skyevaultpro', 'x-skye-usage-lane': 'skyevaultpro-vault' })
+      || {};
+    const headers = { Accept: 'application/json', ...bridgeHeaders, ...(options.headers || {}) };
+    if (session?.token) {
+      headers.Authorization = `Bearer ${session.token}`;
+      headers['x-skye-gate-session'] = session.token;
+      headers['x-0s-gate-session'] = session.token;
+    }
     const config = { ...options, headers };
     if (config.body && typeof config.body === 'object' && !(config.body instanceof Blob) && !(config.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
@@ -58,7 +85,14 @@ window.SkyeHosted = (() => {
     if (!authBox) return;
 
     if (!identityAvailable()) {
-      authBox.innerHTML = `<div class="notice small">Hosted account widget not loaded. The vault still works locally, including folder import/export and disk sync.</div>`;
+      const loginUrl = new URL('/admin/login.html', window.location.origin);
+      loginUrl.searchParams.set('return', window.location.pathname + window.location.search + window.location.hash);
+      authBox.innerHTML = `
+        <div class="button-row">
+          <a class="button" href="${loginUrl.toString()}">Open 0S Gate</a>
+        </div>
+        <div class="notice small" style="margin-top:12px;">Hosted profile sync uses your shared FS27/SkyGate account. The local vault still works without hosted backup.</div>
+      `;
       hostedButtons.forEach((button) => button.disabled = true);
       backupButtons.forEach((button) => button.disabled = true);
       if (badge && !badge.textContent.trim()) badge.textContent = 'Annual thumb drive tier not set yet';
@@ -68,13 +102,10 @@ window.SkyeHosted = (() => {
     if (!user) {
       authBox.innerHTML = `
         <div class="button-row">
-          <button id="hosted-signup-button" class="button" type="button">Sign up</button>
-          <button id="hosted-login-button" class="ghost-button" type="button">Log in</button>
+          <a class="button" href="/admin/login.html">Open 0S Gate</a>
         </div>
         <div class="notice small" style="margin-top:12px;">Shipping profile sync wakes up after sign-in. Vault backup stays off unless the ${BACKUP_ADDON.priceLabel} ${BACKUP_ADDON.label} add-on is active.</div>
       `;
-      document.querySelector('#hosted-signup-button')?.addEventListener('click', () => window.netlifyIdentity.open('signup'));
-      document.querySelector('#hosted-login-button')?.addEventListener('click', () => window.netlifyIdentity.open('login'));
       hostedButtons.forEach((button) => button.disabled = true);
       backupButtons.forEach((button) => button.disabled = true);
       if (badge) badge.textContent = 'Sign in to manage annual thumb-drive details.';
@@ -84,15 +115,19 @@ window.SkyeHosted = (() => {
     authBox.innerHTML = `
       <div class="list-item">
         <div>
-          <strong>${user.user_metadata?.full_name || user.email}</strong>
+          <strong>${user.name || user.email}</strong>
           <p>${user.email}</p>
         </div>
         <div class="actions">
-          <button id="hosted-logout-button" class="ghost-button" type="button">Log out</button>
+          <button id="hosted-refresh-button" class="ghost-button" type="button">Refresh gate</button>
         </div>
       </div>
     `;
-    document.querySelector('#hosted-logout-button')?.addEventListener('click', () => window.netlifyIdentity.logout());
+    document.querySelector('#hosted-refresh-button')?.addEventListener('click', () => {
+      state.user = activeUser();
+      updateAccountUi();
+      loadProfile().catch(() => {});
+    });
     hostedButtons.forEach((button) => button.disabled = false);
     backupButtons.forEach((button) => button.disabled = !backupAddonActive());
     setStatus(backupAddonActive()
@@ -104,15 +139,26 @@ window.SkyeHosted = (() => {
   function backupAddonActive() {
     const direct = window.SkyeVaultProBackupEntitlement || window.SkyeVaultProEntitlements?.backup;
     if (direct?.active || direct === true) return true;
-    const raw = localStorage.getItem('skyevaultpro:backup-addon') || sessionStorage.getItem('skyevaultpro:backup-addon');
-    if (!raw) return false;
-    if (raw === 'active' || raw === 'true') return true;
-    try {
-      const parsed = JSON.parse(raw);
-      return Boolean(parsed?.active || parsed?.status === 'active' || parsed?.plan === BACKUP_ADDON.id);
-    } catch {
-      return false;
-    }
+    const session = gateSession() || {};
+    const role = String(session.role || '').toLowerCase();
+    if (['founder', 'owner', 'admin'].includes(role)) return true;
+    const cards = Array.isArray(session.gate_cards) ? session.gate_cards : [];
+    const entitlements = [
+      ...(Array.isArray(session.entitlements) ? session.entitlements : []),
+      ...(Array.isArray(session.claims?.entitlements) ? session.claims.entitlements : []),
+      ...cards
+    ].map((item) => {
+      if (!item) return '';
+      if (typeof item === 'string') return item;
+      return item.id || item.key || item.scope || item.entitlement || item.plan || item.name || '';
+    }).map((item) => String(item || '').trim().toLowerCase()).filter(Boolean);
+    return [
+      BACKUP_ADDON.id,
+      'skyevaultpro.backup',
+      'skyevaultpro.backup.write',
+      'vault.backup',
+      'sovereign-backup'
+    ].some((key) => entitlements.includes(key));
   }
 
   async function exportSnapshot() {
@@ -223,32 +269,16 @@ window.SkyeHosted = (() => {
   }
 
   function initIdentity() {
-    if (!identityAvailable()) {
-      updateAccountUi();
-      broadcastIdentity();
-      return;
-    }
-
-    window.netlifyIdentity.on('init', (user) => {
-      state.user = user || null;
+    const refresh = () => {
+      state.user = activeUser();
       updateAccountUi();
       if (state.user) loadProfile().catch(() => {});
       broadcastIdentity();
-    });
-    window.netlifyIdentity.on('login', (user) => {
-      state.user = user || null;
-      updateAccountUi();
-      loadProfile().catch(() => {});
-      broadcastIdentity();
-      window.netlifyIdentity.close();
-    });
-    window.netlifyIdentity.on('logout', () => {
-      state.user = null;
-      updateAccountUi();
-      setStatus('Logged out. Local vault still works.', 'warn');
-      broadcastIdentity();
-    });
-    window.netlifyIdentity.init();
+    };
+    window.addEventListener('metraiyux:gate-ready', refresh);
+    window.addEventListener('free99-platform:gate-ready', refresh);
+    window.addEventListener('storage', refresh);
+    refresh();
   }
 
   return {

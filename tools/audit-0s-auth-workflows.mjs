@@ -118,8 +118,8 @@ async function main() {
   }, { assert: (data) => data.active === true || data.ok === true, message: "gate bearer was not active" }));
 
   results.push(await call("SkyeNet status blocks anonymous request", `${config.zeroOsBase}/api/skyenet/status`, {}, { statuses: [401, 403, 302] }));
-  results.push(await call("SkyeNet status accepts shared owner gate", `${config.zeroOsBase}/api/skyenet/status`, {
-    headers: authHeaders(ownerToken),
+  results.push(await call("SkyeNet status accepts shared FS27 gate", `${config.zeroOsBase}/api/skyenet/status`, {
+    headers: authHeaders(gateToken),
   }, { assert: (data) => data.ok === true && data.skynet?.status === "ready", message: "SkyeNet did not report ready" }));
 
   const projectId = `auth-audit-${stamp.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/g, "")}`;
@@ -130,32 +130,32 @@ async function main() {
 
   results.push(await call("SkyeNet workspace upsert accepts shared gate", `${config.zeroOsBase}/api/skyenet/workspace`, {
     method: "POST",
-    headers: authHeaders(ownerToken),
+    headers: authHeaders(gateToken),
     body: { workspace_id: workspaceId, plan_name: "admin-unlocked", display_name: "0S Auth Workflow Audit" },
   }, { assert: (data) => data.ok === true, message: "workspace upsert failed" }));
 
   results.push(await call("SkyeNet deploy init accepts shared gate", `${config.zeroOsBase}/api/skyenet/deploy/init`, {
     method: "POST",
-    headers: authHeaders(ownerToken),
+    headers: authHeaders(gateToken),
     body: { workspace_id: workspaceId, plan_name: "admin-unlocked", project_id: projectId, deployment_id: deploymentId, title: "0S Auth Workflow Audit" },
   }, { assert: (data) => data.ok === true && Boolean(data.skynet?.asset_prefix), message: "deploy init failed" }));
 
   const params = new URLSearchParams({ workspaceId, projectId, deploymentId, path: "index.html" });
   results.push(await call("SkyeNet upload accepts dropped HTML", `${config.zeroOsBase}/api/skyenet/deploy/upload?${params}`, {
     method: "PUT",
-    headers: { ...authHeaders(ownerToken), "content-type": "text/html; charset=utf-8" },
+    headers: { ...authHeaders(gateToken), "content-type": "text/html; charset=utf-8" },
     body: `<!doctype html><meta charset="utf-8"><title>0S Auth Audit</title><h1>${marker}</h1>`,
   }, { assert: (data) => data.ok === true && data.skynet?.path === "index.html", message: "upload failed" }));
 
   results.push(await call("SkyeNet deploy complete writes receipt", `${config.zeroOsBase}/api/skyenet/deploy/complete`, {
     method: "POST",
-    headers: authHeaders(ownerToken),
+    headers: authHeaders(gateToken),
     body: { workspace_id: workspaceId, plan_name: "admin-unlocked", project_id: projectId, deployment_id: deploymentId, files: ["index.html"] },
   }, { assert: (data) => data.ok === true && data.skynet?.files >= 1, message: "deploy complete failed" }));
 
   const route = await call("SkyeNet route register returns live URL", `${config.zeroOsBase}/api/skyenet/deploy/route`, {
     method: "POST",
-    headers: authHeaders(ownerToken),
+    headers: authHeaders(gateToken),
     body: {
       workspace_id: workspaceId,
       plan_name: "admin-unlocked",

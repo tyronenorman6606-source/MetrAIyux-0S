@@ -181,8 +181,6 @@
     const headers = { 'content-type': 'application/json' };
     if (code) {
       headers.authorization = `Bearer ${code}`;
-      headers['x-admin-token'] = code;
-      headers['x-free99-admin-code'] = code;
       headers['x-free99-gate-session'] = code;
       headers['x-skye-gate-session'] = code;
     }

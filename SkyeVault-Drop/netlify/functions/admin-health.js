@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdminAccess } from './_lib/security.js';
+import { requireAdminAccess, adminAuditDetails } from './_lib/security.js';
 import { loadConfig, getConfigFolderId, CONFIG_FILE, LEDGER_FILE, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 import { getAccessToken, getFolderMetadata, createAndTrashHealthcheck, findFileInFolder } from './_lib/google-drive.js';
 import { notificationConfigSummary } from './_lib/notifications.js';
@@ -59,7 +59,7 @@ export async function handler(event) {
     const writeTest = body.writeTest !== false;
     const checks = [];
 
-    checks.push(check('ADMIN_TOKEN configured', Boolean(process.env.ADMIN_TOKEN), process.env.ADMIN_TOKEN ? 'Admin API token exists.' : 'Missing ADMIN_TOKEN.'));
+    checks.push(check('Shared FS27/SkyGate bearer accepted', true, `Admin API authorized through ${admin.type || 'shared-gate'}.`));
     checks.push(check('CLIENT_PORTAL_KEY configured', Boolean(process.env.CLIENT_PORTAL_KEY), process.env.CLIENT_PORTAL_KEY ? 'Client upload code is required.' : 'Portal is open to anyone with the link unless origin/Turnstile controls block it.', 'warning'));
     checks.push(check('ALLOWED_ORIGINS configured', Boolean(process.env.ALLOWED_ORIGINS), process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS : 'No origin allow-list set.', 'warning'));
     checks.push(check('TURNSTILE_SECRET_KEY configured', Boolean(process.env.TURNSTILE_SECRET_KEY), process.env.TURNSTILE_SECRET_KEY ? 'Human verification can be enforced.' : 'Turnstile is off. Use portal code and rate limits at minimum.', 'warning'));
@@ -95,17 +95,12 @@ export async function handler(event) {
     const scanner = scannerConfigSummary();
     const abuse = abusePolicySummary();
     const recentEvents = await loadAuditEvents(20).catch(() => []);
-    const audit = await writeAuditEventSafe('admin-health-ran', {
-      actor: admin.actor,
-      authType: admin.type,
-      workspaceId: admin.workspaceId,
-      customerId: admin.customerId,
-      gateCardId: admin.gateCardId,
+    const audit = await writeAuditEventSafe('admin-health-ran', adminAuditDetails(admin, {
       writeTest,
       checkCount: checks.length,
       destinationCount: destinationResults.length,
       failedDestinations: destinationResults.filter((item) => !item.ok).length
-    });
+    }));
 
     const requiredFailed = checks.filter((item) => item.severity === 'required' && !item.ok).length
       + destinationResults.flatMap((item) => item.checks).filter((item) => item.severity === 'required' && !item.ok).length;

@@ -62,8 +62,8 @@
         </div>
         <div class="vv-brain-context" data-brain-context></div>
         <form class="vv-admin-login" data-admin-login hidden>
-          <label>Admin password or gate token
-            <input data-admin-token name="token" type="password" autocomplete="current-password" placeholder="Paste admin password, operator token, or SkyGate token" />
+          <label>Shared FS27/SkyGate session
+            <input data-admin-token name="token" type="password" autocomplete="current-password" placeholder="Use the shared 0S gate session" />
           </label>
           <div class="vv-admin-login-actions">
             <button type="submit">Unlock admin</button>
@@ -481,26 +481,21 @@
 
   function operatorAuthHeaders() {
     const headers = {};
-    try {
-      const token = sessionStorage.getItem('metraiyux.adminToken')
-        || sessionStorage.getItem('valleyVerified.adminToken')
-        || localStorage.getItem('metraiyux.adminToken')
-        || localStorage.getItem('valleyVerified.adminToken')
-        || '';
-      if (token) {
-        const clean = token.replace(/^Bearer\s+/i, '');
-        headers.authorization = `Bearer ${clean}`;
-        headers['x-admin-token'] = clean;
-      }
-    } catch {}
+    const token = window.MetrAIyuxGateBridge?.current?.()?.token || '';
+    if (token) headers.authorization = `Bearer ${token.replace(/^Bearer\s+/i, '')}`;
     return headers;
   }
 
   function saveAdminToken(token) {
     const clean = token.replace(/^Bearer\s+/i, '');
-    try {
-      sessionStorage.setItem('valleyVerified.adminToken', clean);
-    } catch {}
+    if (!clean) return;
+    window.MetrAIyuxGateBridge?.persist?.({
+      token: clean,
+      source: 'valley-verified-admin-brain',
+      platform_id: 'valley-verified',
+      usage_lane: 'admin-brain',
+      issued_at: new Date().toISOString()
+    }, { silent: true });
   }
 
   async function ownerAdminLogin(password) {
@@ -508,8 +503,13 @@
       const res = await fetch(`${location.origin}/api/owner/admin-login`, {
         method: 'POST',
         credentials: 'same-origin',
-        headers: {'content-type': 'application/json', 'x-admin-token': password.replace(/^Bearer\s+/i, '')},
-        body: JSON.stringify({password})
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${password.replace(/^Bearer\s+/i, '')}`,
+          'x-skye-gate-session': password.replace(/^Bearer\s+/i, ''),
+          'x-free99-gate-session': password.replace(/^Bearer\s+/i, '')
+        },
+        body: JSON.stringify({ gateToken: password })
       });
       const body = await res.json().catch(() => ({}));
       if (res.ok && body.token) return body;

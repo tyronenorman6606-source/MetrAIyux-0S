@@ -8,6 +8,7 @@
   <title>SuperIDE SkyeCalendar · Founder Command</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./partials/superide-calendar-background.css" data-superide-calendar-partial />
+  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script src="/Free99/free99-gate.js" data-platform-id="founder-command-0s-calendar" data-platform-name="SuperIDE SkyeCalendar" data-billing-mode="owner-gated-0s" data-price-label="0S owner-gated SuperIDE calendar" data-app-root="/founder-command/apps/0s-calendar/"></script>
   <style>
     :root { --bg:#060d13; --panel:#09151d; --line:rgba(44,230,255,.32); --text:#edf7ff; --muted:#9bb8c7; --gold:#ffcb47; }
@@ -170,12 +171,6 @@ let reminderAuditLog = [];
 
 function setStatus(t){ statusEl.textContent = t; }
 const SUPERIDE_SKYECALENDAR_STORAGE = 'zeroos.superide.skyecalendar.model.v1';
-const GATE_STORAGE_KEYS = [
-  'METRAIYUX_GATE_SESSION',
-  'SKYGATEFS27_GATE_SESSION',
-  'SKYE_GATE_SESSION',
-  'FS27_GATE_SESSION'
-];
 function setText(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
@@ -194,17 +189,9 @@ function cleanGateToken(value) {
   return token;
 }
 function storedGateToken() {
-  const bridgeToken = window.MetrAIyuxGateBridge?.current?.()?.token || '';
-  if (bridgeToken) return cleanGateToken(bridgeToken);
-  try {
-    for (const key of GATE_STORAGE_KEYS) {
-      const token = cleanGateToken(localStorage.getItem(key) || sessionStorage.getItem(key));
-      if (token) return token;
-    }
-  } catch {
-    return '';
-  }
-  return '';
+  const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
+  const session = bridge?.requireSession?.({ platformId: 'founder-command-0s-calendar', usageLane: 'calendar' }) || bridge?.current?.();
+  return cleanGateToken(session?.token || '');
 }
 function gateHeaders(extra = {}) {
   const token = storedGateToken();

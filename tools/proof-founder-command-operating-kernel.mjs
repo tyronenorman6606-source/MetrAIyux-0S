@@ -2,16 +2,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { webcrypto } from 'node:crypto';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 const siteWorker = (await import('../metraiyux_0s_site/cloudflare/worker.js')).default;
 
 const OWNER_CODE = 'owner-code';
-const AUTH_HEADERS = {
-  authorization: `Bearer ${OWNER_CODE}`,
-  'x-admin-token': OWNER_CODE,
-  'x-free99-admin-code': OWNER_CODE
-};
 const OUT_DIR = path.resolve('test-artifacts/founder-command-operating-kernel');
 const LATEST = path.join(OUT_DIR, 'founder-command-operating-kernel-smoke-stress-latest.json');
 
@@ -35,6 +31,22 @@ function req(pathname, { method = 'GET', headers = {}, body } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined
   });
+}
+
+function workerFetchImpl(e, c) {
+  return async (url, init = {}) => {
+    const target = new URL(url, 'https://metraiyux.example');
+    return siteWorker.fetch(new Request(`https://metraiyux.example${target.pathname}${target.search}`, init), e, c);
+  };
+}
+
+function sharedGateHeaders(token) {
+  return {
+    accept: 'application/json',
+    authorization: `Bearer ${token}`,
+    'x-free99-gate-session': token,
+    'x-skye-gate-session': token
+  };
 }
 
 function kvStub() {
@@ -105,11 +117,18 @@ async function main() {
   const e = env();
   const c = ctx();
   const blocked = await fetchJson(e, c, '/api/founder-command/actions/catalog');
-  const workSystem = await fetchJson(e, c, '/api/founder-command/work-system', { headers: AUTH_HEADERS });
-  const catalog = await fetchJson(e, c, '/api/founder-command/actions/catalog', { headers: AUTH_HEADERS });
+  const gateAuth = await resolveZeroOsGateAuth({
+    zeroOsBase: 'https://metraiyux.example',
+    env: e,
+    fetchImpl: workerFetchImpl(e, c)
+  });
+  if (!gateAuth.token) throw new Error(gateAuth.response?.body?.error || gateAuth.response?.error || 'Shared FS27/SkyGate helper did not return a bearer.');
+  const authHeaders = sharedGateHeaders(gateAuth.token);
+  const workSystem = await fetchJson(e, c, '/api/founder-command/work-system', { headers: authHeaders });
+  const catalog = await fetchJson(e, c, '/api/founder-command/actions/catalog', { headers: authHeaders });
   const plan = await fetchJson(e, c, '/api/founder-command/actions/plan', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: {
       action_id: 'music.brain-daemon.run-now',
       params: { force: true, reason: 'non-browser operating-kernel proof' }
@@ -117,7 +136,7 @@ async function main() {
   });
   const commandBridgeRecord = await fetchJson(e, c, '/api/founder-command/actions/execute', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: {
       action_id: 'command-bridge.event.record',
       params: {
@@ -130,7 +149,7 @@ async function main() {
   });
   const clientEnrollment = await fetchJson(e, c, '/api/founder-command/actions/execute', {
     method: 'POST',
-    headers: AUTH_HEADERS,
+    headers: authHeaders,
     body: {
       action_id: 'client.enrollment.prepare',
       confirm: true,
@@ -145,7 +164,7 @@ async function main() {
   const samples = [];
   for (let i = 0; i < 120; i += 1) {
     const route = i % 2 === 0 ? '/api/founder-command/work-system' : '/api/founder-command/actions/catalog';
-    samples.push(await fetchJson(e, c, route, { headers: AUTH_HEADERS }));
+    samples.push(await fetchJson(e, c, route, { headers: authHeaders }));
   }
   const durations = samples.map((item) => item.elapsedMs).sort((a, b) => a - b);
   const html = await fs.readFile(path.resolve('metraiyux_0s_site/founder-command/index.html'), 'utf8');

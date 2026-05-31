@@ -194,11 +194,19 @@ function gateCredential(req) {
   const cookies = parseCookies(req.headers.cookie || '');
   return bearerCredential(req)
     || headerValue(req, ['x-admin-token', 'x-free99-admin-code', 'x-free99-gate-session', 'x-skye-gate-session', 'x-skygate-session'])
-    || cookies.free99_gate_session
-    || cookies.skye_gate_session
-    || cookies.skygate_session
-    || cookies.owner_admin_session
+    || cookies.METRAIYUX_GATE_SESSION
+    || cookies.SKYGATEFS27_GATE_SESSION
+    || cookies.SKYE_GATE_SESSION
     || '';
+}
+function trustedZeroOsHandoff(req) {
+  const verifiedBy = String(headerValue(req, ['x-0s-gate-verified-by']) || '').trim().toLowerCase();
+  if (verifiedBy !== 'metraiyux-0s-worker') return false;
+  const expected = String(process.env.ZERO_OS_INTERNAL_PROXY_SECRET || process.env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || '').trim();
+  if (!expected) return false;
+  const provided = String(headerValue(req, ['x-0s-internal-proxy-secret']) || '').trim();
+  if (!provided || provided.length !== expected.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
 }
 function isReadOnlyTourCredential(req, credential) {
   const usageLane = String(cleanText(headerValue(req, ['x-skye-usage-lane', 'x-free99-usage-lane', 'x-usage-lane']), 120) || '').toLowerCase();
@@ -239,6 +247,7 @@ function auth(req, db) {
       readonly_demo: true
     };
   }
+  if (!trustedZeroOsHandoff(req)) return null;
   const email = gateEmail(req);
   const role = gateRole(req);
   if (!role) return null;

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const baseUrl = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -13,19 +14,6 @@ const latestPath = path.join(artifactRoot, '0s-production-closure-latest.json');
 const publicPath = path.join(repoRoot, 'metraiyux_0s_site', 'proof', '0s-production-closure.json');
 const localTruthPath = path.join(repoRoot, 'metraiyux_0s_site', 'proof', '0s-truth-ledger.json');
 const deployReceiptPath = path.join(repoRoot, 'test-artifacts', '0s-worker-deploy', 'founder-command-full-worker-deploy-latest.json');
-const credentialKeys = [
-  'ZERO_OS_GATE_SESSION',
-  'MCP_GATE_SESSION',
-  'MCP_HTTP_BEARER_TOKEN',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
 const gatedChecks = [
   { path: '/proof/0s-truth-ledger.json', kind: 'json', marker: 'metraiyux.0s.truth-ledger.v1' },
   { path: '/skyerrors/live-capability-watch.json', kind: 'json', marker: 'metraiyux.0s.live-capability-watch.receipt.v1' },
@@ -47,12 +35,6 @@ const gatedChecks = [
   { path: '/live/skye-split-engine-operator-proof.html', kind: 'html', marker: 'Skye Split Engine' }
 ];
 
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text.replace(/^Bearer\s+/i, '');
-}
-
 function readJson(file, fallback = null) {
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -61,40 +43,10 @@ function readJson(file, fallback = null) {
   }
 }
 
-async function readEnvFile(file) {
-  try {
-    const text = await fsp.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function credentialCandidates() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(repoRoot, file)));
-  return credentialKeys
-    .filter((key) => merged[key])
-    .map((key) => ({ key, value: unquote(merged[key]) }))
-    .filter((item) => item.value);
-}
-
 function gateHeaders(token, extra = {}) {
   return {
     accept: 'application/json,text/html',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token,
     'x-skygate-session': token,
@@ -124,25 +76,8 @@ async function fetchText(pathname, init = {}) {
 }
 
 async function resolveGateToken() {
-  for (const candidate of await credentialCandidates()) {
-    if (/SESSION|TOKEN|BEARER/i.test(candidate.key)) {
-      const probe = await fetchText('/api/admin/connectors/status', { headers: gateHeaders(candidate.value) }).catch(() => null);
-      if (probe?.ok) return { token: candidate.value, source_key: candidate.key, mode: 'bearer' };
-      continue;
-    }
-    for (const route of ['/api/owner/admin-login', '/api/owner/admin-login']) {
-      const response = await fetch(`${baseUrl}${route}`, {
-        method: 'POST',
-        headers: { accept: 'application/json', 'content-type': 'application/json' },
-        body: JSON.stringify({ code: candidate.value })
-      }).catch(() => null);
-      if (!response) continue;
-      const body = await response.json().catch(() => ({}));
-      const token = unquote(body.gateBearerToken || body.gateToken || body.token || body.session || '');
-      if (response.ok && token) return { token, source_key: candidate.key, mode: route };
-    }
-  }
-  return null;
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  return auth.token ? { token: auth.token, source_key: auth.credential?.key || 'shared-fs27-gate', mode: auth.credential?.source || 'shared-gate-helper' } : null;
 }
 
 function redirectOk(result) {

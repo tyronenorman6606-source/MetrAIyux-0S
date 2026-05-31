@@ -159,22 +159,49 @@ function renderVaultSummary(entries = state.ledger) {
   }
 }
 
+function stripBearer(value) {
+  return String(value || '').replace(/^Bearer\s+/i, '').trim();
+}
+
+function storedGateBearer() {
+  const keys = [
+    'METRAIYUX_GATE_SESSION',
+    'SKYGATEFS27_GATE_SESSION',
+    'SKYE_GATE_SESSION',
+    'metraiyux_admin_session',
+    'metraiyux_gate_session',
+    'skye_gate_session',
+    'skygate_session',
+    'skyegate_session',
+    'free99_gate_session',
+    'zero_os_gate_session'
+  ];
+  for (const store of [sessionStorage, localStorage]) {
+    for (const key of keys) {
+      try {
+        const token = stripBearer(store.getItem(key));
+        if (token) return token;
+      } catch (_error) {}
+    }
+  }
+  return '';
+}
+
 function skygateBearer() {
-  return sessionStorage.getItem('adminBrainToken') || window.MetrAIyuxGateBridge?.current?.()?.token || '';
+  return stripBearer(window.MetrAIyuxGateBridge?.current?.()?.token) || storedGateBearer();
 }
 
 function adminAuthHeaders(extra = {}) {
-  const token = adminToken.value.trim() || localStorage.getItem('cdv-admin-token') || '';
-  const bearer = skygateBearer();
+  const bearer = stripBearer(adminToken.value.trim()) || skygateBearer();
   const headers = { ...extra };
   if (bearer) {
     headers.authorization = `Bearer ${bearer}`;
+    headers['x-admin-token'] = bearer;
+    headers['x-free99-admin-code'] = bearer;
     headers['x-free99-gate-session'] = bearer;
     headers['x-skye-gate-session'] = bearer;
     headers['x-skye-platform'] = 'metraiyux-0s-admin';
     headers['x-skye-usage-lane'] = 'skyevault-admin-dashboard';
-  } else if (token) {
-    headers['x-admin-token'] = token;
   }
   return headers;
 }
@@ -536,7 +563,6 @@ async function replayNotification(receiptId, sendClientReceipt = false) {
 }
 
 async function loadDashboard() {
-  if (adminToken.value.trim()) localStorage.setItem('cdv-admin-token', adminToken.value.trim());
   const data = await api('/api/admin-config?ledger=true&sessions=true&events=true');
   state.config = data.config;
   state.ledger = data.ledger?.entries || [];
@@ -725,13 +751,9 @@ if (vaultClearFilters) {
 if (logoutButton) {
   logoutButton.addEventListener('click', async () => {
     await fetch('/api/operator-logout', { method: 'POST' }).catch(() => null);
-    localStorage.removeItem('cdv-admin-token');
     window.location.href = '/operator.html?return=/admin.html';
   });
 }
-
-const savedToken = localStorage.getItem('cdv-admin-token');
-if (savedToken) adminToken.value = savedToken;
 
 loadDashboard().catch((error) => {
   showStatus(error.message || 'Could not load the admin dashboard.', 'error');

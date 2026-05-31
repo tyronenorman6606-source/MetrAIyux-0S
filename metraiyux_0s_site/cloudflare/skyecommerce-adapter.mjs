@@ -150,7 +150,11 @@ function actorWorkspaceId(auth) {
 function appRequest(request, url, env, auth) {
   const target = new URL(request.url);
   target.pathname = mountedSuffix(url.pathname);
-  const headers = new Headers(request.headers);
+  const headers = new Headers();
+  const accept = request.headers.get('accept');
+  const contentType = request.headers.get('content-type');
+  if (accept) headers.set('accept', accept);
+  if (contentType) headers.set('content-type', contentType);
   const secret = gateHandoffSecret(env);
   if (secret) headers.set('x-skyecommerce-gate-handoff', secret);
   headers.set('x-skyecommerce-gate-email', actorEmail(auth, env));

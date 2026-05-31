@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Optional real-browser E2E harness. Install @playwright/test and run against a local/live URL:
 //   npm i -D @playwright/test && npx playwright install chromium
-//   BASE_URL=http://localhost:8888 ADMIN_TOKEN=... CLIENT_PORTAL_KEY=... npm run e2e:browser
+//   BASE_URL=http://localhost:8888 ZERO_OS_GATE_SESSION=... CLIENT_PORTAL_KEY=... npm run e2e:browser
 
 const baseUrl = process.env.BASE_URL || process.env.URL || 'http://localhost:8888';
-const adminToken = process.env.ADMIN_TOKEN || 'local-admin-token';
+const gateToken = process.env.ZERO_OS_GATE_SESSION || process.env.SKYEVAULT_GATE_BEARER || process.env.SKYENET_AUTH || '';
 const portalKey = process.env.CLIENT_PORTAL_KEY || 'local-client-code';
 
 async function main() {
@@ -50,11 +50,11 @@ async function main() {
     }
   });
 
-  await assert('operator session can be created with ADMIN_TOKEN', async () => {
+  await assert('local operator session endpoint is retired', async () => {
     const response = await page.request.post(`${baseUrl}/api/operator-session`, {
-      data: { token: adminToken }
+      data: { token: gateToken || 'shared-gate-required' }
     });
-    if (!response.ok()) throw new Error(`operator-session returned ${response.status()}: ${await response.text()}`);
+    if (![404, 410].includes(response.status())) throw new Error(`operator-session should be retired, got ${response.status()}: ${await response.text()}`);
   });
 
   await assert('portal status endpoint rejects missing portal key', async () => {

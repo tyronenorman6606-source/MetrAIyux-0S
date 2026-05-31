@@ -42,22 +42,8 @@
     const month = ai?.month || {};
     const status = month.ai_call_allowed ? "FS27 Brain ready" : "local-only until SkyPay entitlement/gateway is active";
     const remaining = month.calls_remaining === null || month.calls_remaining === undefined ? "unlimited" : String(month.calls_remaining);
-    node.textContent = `${status}. Plan: ${plan.name || plan.id || "SkyEmail Brain"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}.`;
-    const modelSelect = el("brainModel");
-    if(modelSelect && Array.isArray(ai?.models) && ai.models.length){
-      const current = modelSelect.value || ai.default_model || ai.models[0];
-      modelSelect.innerHTML = ai.models.map((item)=>`<option value="${safe(item)}">${safe(formatModelLabel(item))}</option>`).join("");
-      modelSelect.value = ai.models.includes(current) ? current : (ai.default_model || ai.models[0]);
-    }
-  }
-
-  function formatModelLabel(model){
-    const labels = {
-      "skyemail-brain-fast": "SkyEmail Brain Fast",
-      "skyemail-brain-deep": "SkyEmail Brain Deep",
-      "skyemail-brain-operator": "SkyEmail Brain Operator"
-    };
-    return labels[model] || String(model || "").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const lane = ai?.fs27_brain?.gateway_path || "/gateway-chat";
+    node.textContent = `${status}. Plan: ${plan.name || plan.id || "FS27 Brain"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}. Runtime: FS27/SkyGate Brain via ${lane}.`;
   }
 
   async function renderPlans(){
@@ -146,7 +132,6 @@
       prompt,
       source: "skymail-brain-page",
       model_mode: el("brainMode")?.value || "fs27_metered_v1",
-      model: el("brainModel")?.value || "skyemail-brain-fast",
       to: el("brainTo")?.value || "",
       subject: el("brainSubject")?.value || "",
       message: prompt,

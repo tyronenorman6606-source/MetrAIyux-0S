@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdminAccess } from './_lib/security.js';
+import { requireAdminAccess, requireAdminReadAccess } from './_lib/security.js';
 import { loadConfig, saveConfig, loadLedger, loadSessionManifests, loadAuditEvents, writeAuditEventSafe } from './_lib/config.js';
 
 function dashboardLimit(defaultValue = 40, maxValue = 80) {
@@ -14,9 +14,8 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    const admin = await requireAdminAccess(event);
-
     if (event.httpMethod === 'GET') {
+      const admin = await requireAdminReadAccess(event);
       const includeLedger = event.queryStringParameters?.ledger === 'true';
       const includeSessions = event.queryStringParameters?.sessions === 'true';
       const includeEvents = event.queryStringParameters?.events === 'true';
@@ -40,6 +39,7 @@ export async function handler(event) {
       return json(200, { ok: true, actor: admin, source, configFileId, warning, config, ledger, sessions, events }, noStoreCors(event));
     }
 
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event);
     const result = await saveConfig(body.config || body, admin.actor || 'admin');
     const audit = await writeAuditEventSafe('admin-config-saved', {

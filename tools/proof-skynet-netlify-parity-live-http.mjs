@@ -453,9 +453,10 @@ async function main() {
         '--host', host,
         '--mount', mount,
         '--public',
-        '--concurrency', '4'
+        '--concurrency', '4',
+        '--token', token
       ], {
-        env: { ...process.env, SKYENET_AUTH: token },
+        env: process.env,
         token
       });
       const deployJson = parseLastJson(deploy.stdout);

@@ -808,7 +808,8 @@
   }
 
   function storedOwnerToken() {
-    try { return localStorage.getItem('quantumskyes_mcp_owner_token') || ''; } catch (error) { return ''; }
+    const session = window.MetrAIyuxGateBridge?.current?.() || window.Free99PlatformGate?.requireSession?.() || {};
+    return session.token || '';
   }
 
 

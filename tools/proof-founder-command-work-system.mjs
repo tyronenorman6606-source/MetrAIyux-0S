@@ -8,9 +8,9 @@ const siteWorker = (await import('../metraiyux_0s_site/cloudflare/worker.js')).d
 
 const OWNER_CODE = 'owner-code';
 const AUTH_HEADERS = {
-  authorization: `Bearer ${OWNER_CODE}`,
-  'x-admin-token': OWNER_CODE,
-  'x-free99-admin-code': OWNER_CODE
+  Authorization: `Bearer ${OWNER_CODE}`,
+  'x-free99-gate-session': OWNER_CODE,
+  'x-skye-gate-session': OWNER_CODE
 };
 const OUT_DIR = path.resolve('test-artifacts/founder-command-work-system');
 const LATEST = path.join(OUT_DIR, 'founder-command-work-system-smoke-stress-latest.json');

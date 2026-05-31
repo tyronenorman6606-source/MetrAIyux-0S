@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess, adminAuditDetails } from './_lib/security.js';
 import { loadConfig, loadLedger, loadSessionManifests, loadAuditEvents, getConfigFolderId, writeAuditEventSafe } from './_lib/config.js';
 import { createJsonFile } from './_lib/google-drive.js';
 
@@ -13,7 +13,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    requireAdmin(event);
+    const admin = await requireAdminAccess(event);
     const body = await readJson(event).catch(() => ({}));
     const includeEvents = body.includeEvents !== false;
     const includeSessions = body.includeSessions !== false;
@@ -41,13 +41,13 @@ export async function handler(event) {
     };
     const name = `skye-upload-vault-backup-${createdAt.replace(/[:.]/g, '-')}.json`;
     const saved = await createJsonFile(backupFolderId(), name, backup);
-    const audit = await writeAuditEventSafe('admin-backup-created', {
+    const audit = await writeAuditEventSafe('admin-backup-created', adminAuditDetails(admin, {
       backupFileId: saved.id,
       backupFileName: saved.name,
       ledgerEntries: ledger.entries.length,
       sessions: sessions.length,
       events: events.length
-    });
+    }));
     return json(200, { ok: true, backup: { name, saved, counts: backup.counts }, audit }, noStoreCors(event));
   } catch (error) {
     return json(error.statusCode || 500, { ok: false, error: error.message, google: error.google || undefined }, noStoreCors(event));

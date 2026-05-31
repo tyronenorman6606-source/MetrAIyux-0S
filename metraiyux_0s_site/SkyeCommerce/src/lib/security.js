@@ -74,7 +74,7 @@ export async function enforceCsrf(request, env, url) {
   if (env.CSRF_ENFORCEMENT === 'false') return null;
   if (isCsrfExemptPath(url.pathname, request.method)) return null;
   const cookies = parseCookie(request.headers.get('cookie') || '');
-  const hasBrowserSession = Boolean(cookies.skye_session || cookies.skye_customer_session);
+  const hasBrowserSession = Boolean(cookies.skye_session);
   const hasBearer = /^Bearer\s+/i.test(request.headers.get('authorization') || '');
   if (!hasBrowserSession || hasBearer) return null;
   const cookieToken = cookies[CSRF_COOKIE] || '';
@@ -142,7 +142,6 @@ export function normalizeIdempotencyKey(value = '') {
 export async function idempotencyScopeForRequest(request, env) {
   const cookies = parseCookie(request.headers.get('cookie') || '');
   if (cookies.skye_session) return `session:${await sha256Hex(cookies.skye_session)}`;
-  if (cookies.skye_customer_session) return `customer:${await sha256Hex(cookies.skye_customer_session)}`;
   const auth = request.headers.get('authorization') || '';
   if (auth) return `auth:${await sha256Hex(auth)}`;
   return `ip:${clientIp(request)}`;

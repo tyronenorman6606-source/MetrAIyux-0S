@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = '/workspaces/MetrAIyux-0S';
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -10,24 +11,7 @@ const originUrl = (process.env.PROOF_DOCXMAX_ORIGIN || 'https://sovereigndocs-do
 const docxPath = '/Free99/apps/sovereigndocs/skye-docx-max/app/index.html';
 const landingPath = '/Free99/apps/sovereigndocs/skye-docx-max/index.html';
 const changelogPath = '/changelog';
-const adminCode = firstEnv([
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'FREE99_GATE_CODE',
-  'FREE99_GATE_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'ADMIN_CODE',
-  'ADMIN_PASSWORD'
-]);
-
-function firstEnv(keys) {
-  for (const key of keys) {
-    const value = String(process.env[key] || '').trim();
-    if (value) return value;
-  }
-  return '';
-}
+let adminGateToken = '';
 
 function relaunchWithXvfbWhenNeeded() {
   if (process.platform !== 'linux') return;
@@ -112,37 +96,41 @@ function isMountedDocxUrl(href) {
 }
 
 async function loginOwner(page, returnPath, entry) {
-  if (!adminCode) throw new Error('Owner admin code env var is required for live proof.');
-  const loginUrl = new URL('/admin/login.html', baseUrl);
-  loginUrl.searchParams.set('return', returnPath);
-  const response = await page.goto(loginUrl.toString(), { waitUntil: 'domcontentloaded', timeout: 45000 });
-  entry.statuses.push({ name: 'admin_login_opened', status: response?.status() || 0, ok: Boolean(response?.ok()) });
-  await page.fill('input[name="code"]', adminCode);
-  await page.evaluate(async ({ targetPath, proofCode }) => {
-    const response = await fetch('/api/owner/admin-login', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ code: proofCode })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || `owner login failed (${response.status})`);
-    const clean = String(data.gateToken || data.gateBearerToken || data.token || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
-    if (clean) {
-      const shared = {
-        token: clean,
-        source: data.gateToken || data.gateBearerToken ? 'fs27-admin-login' : 'owner-admin-login',
-        platform_id: 'metraiyux-0s',
-        usage_lane: 'fs27-owner-gate',
-        issued_at: new Date().toISOString()
-      };
-      sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-      localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
-    }
-    location.assign(targetPath);
-  }, { targetPath: returnPath, proofCode: adminCode });
+  if (!adminGateToken) throw new Error('Shared owner gate bearer is required for live proof.');
+  const clean = String(adminGateToken || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+  await page.context().setExtraHTTPHeaders({
+    Authorization: `Bearer ${clean}`,
+    'x-free99-gate-session': clean,
+    'x-skye-gate-session': clean
+  });
+  const host = new URL(baseUrl).hostname;
+  await page.context().addCookies(['skye_gate_session', 'skygate_session'].map((name) => ({
+    name,
+    value: clean,
+    domain: host,
+    path: '/',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Lax'
+  })));
+  await page.addInitScript((token) => {
+    const shared = {
+      token,
+      source: 'zero-os-gate-auth',
+      platform_id: 'metraiyux-0s',
+      usage_lane: 'fs27-owner-gate',
+      issued_at: new Date().toISOString()
+    };
+    sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
+    localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
+    sessionStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
+    localStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
+    sessionStorage.setItem('SKYE_GATE_SESSION', JSON.stringify(shared));
+    localStorage.setItem('SKYE_GATE_SESSION', JSON.stringify(shared));
+  }, clean);
+  await page.goto(`${baseUrl}${returnPath}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
   await page.waitForURL(url => url.pathname === returnPath || url.pathname === returnPath.replace(/\/index\.html$/, '/'), { timeout: 30000 });
-  entry.actions.push(`unlocked shared owner session and opened ${returnPath}`);
+  entry.actions.push(`opened ${returnPath} with shared owner gate bearer`);
 }
 
 async function directOriginChecks(browser, artifactDir, report) {
@@ -280,6 +268,9 @@ async function changelogChecks(browser, artifactDir, report) {
 
 async function main() {
   relaunchWithXvfbWhenNeeded();
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  adminGateToken = String(auth.token || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+  if (!auth.ok || !adminGateToken) throw new Error('Shared owner gate bearer is required for live proof.');
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
   const artifactDir = path.join(repoRoot, 'test-artifacts/sovereigndocs-docxmax-lean-live', stamp);
   fs.mkdirSync(artifactDir, { recursive: true });

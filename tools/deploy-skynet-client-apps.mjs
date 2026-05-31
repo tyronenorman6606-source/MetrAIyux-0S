@@ -293,9 +293,9 @@ function sourceRootFor(candidate) {
 }
 
 function runDeploy(candidate, token, concurrency) {
-  const result = spawnSync('node', deployArgs(candidate, concurrency), {
+  const result = spawnSync('node', [...deployArgs(candidate, concurrency), '--token', token], {
     cwd: repoRoot,
-    env: { ...process.env, SKYENET_AUTH: token },
+    env: process.env,
     encoding: 'utf8',
     maxBuffer: 24 * 1024 * 1024
   });

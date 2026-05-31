@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const baseUrl = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -14,66 +15,16 @@ const perAppProofPath = path.join(repoRoot, 'test-artifacts', '0s-per-app-operat
 const osJsPath = path.join(repoRoot, 'metraiyux_0s_site', '0s', 'os.js');
 const closureManifestPath = path.join(repoRoot, 'metraiyux_0s_site', 'data', '0s-closure-workflows.json');
 const deployScriptPath = path.join(repoRoot, 'scripts', 'deploy-0s-worker.mjs');
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-const bearerKeys = [
-  'ZERO_OS_GATE_SESSION',
-  'MCP_GATE_SESSION',
-  'MCP_HTTP_BEARER_TOKEN',
-  'QUANTUMSKYES_MCP_TOKEN',
-  'SKYENET_AUTH'
-];
-
 const maxAppsArg = process.argv.find((arg) => arg.startsWith('--max-apps='));
 const maxApps = maxAppsArg ? Number(maxAppsArg.split('=')[1]) || 0 : 0;
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
 
 function read(file) {
   return fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
 }
 
-async function readEnvFile(file) {
-  try {
-    const text = await fsp.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
 async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of bearerKeys) {
-    if (merged[key]) return { key, value: String(merged[key]).replace(/^Bearer\s+/i, ''), kind: 'bearer' };
-  }
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key], kind: 'code' };
-  }
-  return { key: '', value: '', kind: '' };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  return { key: auth.credential?.key || 'shared-fs27-gate', value: auth.token || '', kind: 'bearer' };
 }
 
 async function fetchAny(url, init = {}) {
@@ -712,7 +663,6 @@ async function main() {
     ? {
       accept: 'text/html,application/json,*/*;q=0.8',
       authorization: `Bearer ${token}`,
-      'x-admin-token': token,
       'x-free99-gate-session': token,
       'x-skye-gate-session': token
     }

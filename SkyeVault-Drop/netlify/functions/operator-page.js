@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hasValidOperatorSession } from './_lib/security.js';
+import { hasValidFs27BoundOperatorSession, requireAdminAccess } from './_lib/security.js';
 
 const functionDir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_CANDIDATES = [
@@ -51,8 +51,13 @@ export async function handler(event) {
   const relativeFile = PAGES[page];
   const returnTo = page === 'setup' ? '/setup.html' : '/admin.html';
   if (!relativeFile) return html(404, '<!doctype html><title>Not found</title><h1>Operator page not found</h1>');
-  if (!hasValidOperatorSession(event)) {
-    return redirect(`/operator.html?return=${encodeURIComponent(returnTo)}`);
+  if (!hasValidFs27BoundOperatorSession(event)) {
+    try {
+      await requireAdminAccess(event);
+    } catch {
+      const origin = process.env.METRAIYUX_0S_ORIGIN || process.env.ZERO_OS_ORIGIN || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+      return redirect(`${String(origin).replace(/\/+$/, '')}/admin/login.html?return=${encodeURIComponent(returnTo)}`);
+    }
   }
   try {
     for (const root of ROOT_CANDIDATES) {

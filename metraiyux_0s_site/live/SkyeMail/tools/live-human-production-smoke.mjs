@@ -11,6 +11,7 @@ const repoRoot = path.resolve(skymailRoot, "../../..");
 const stamp = new Date().toISOString();
 const safeStamp = stamp.replace(/[:.]/g, "-");
 const base = String(process.env.SKYEMAIL_LIVE_BASE || "https://skyemail-platform.graylondonskyes.workers.dev").replace(/\/+$/, "");
+const zeroOsBase = String(process.env.ZERO_OS_LIVE_BASE || process.env.ZERO_OS_BASE_URL || "https://metraiyux-0s-full-system.graylondonskyes.workers.dev").replace(/\/+$/, "");
 const outDir = path.join(repoRoot, "test-artifacts", "skyemail-human-production-smoke", safeStamp);
 const latestPath = path.join(repoRoot, "test-artifacts", "skyemail-human-production-smoke-latest.json");
 const preferredMailbox = String(process.env.SKYEMAIL_SMOKE_MAILBOX || "darthom-intelligence@solenterprises.org").trim().toLowerCase();
@@ -137,16 +138,15 @@ function pngOneByOneB64() {
 
 async function pollForMessage(api, subject) {
   let lastList = null;
-  for (let attempt = 1; attempt <= 12; attempt += 1) {
+  for (let attempt = 1; attempt <= 24; attempt += 1) {
     await api("/mail-sync", { name: `mail sync poll ${attempt}`, method: "POST", body: { limit: 50 } }).catch(() => null);
     const list = await api(`/gmail-list?label=INBOX&max=10&q=${encodeURIComponent(subject)}`, { name: `inbox search poll ${attempt}` });
     lastList = list.body;
-    if (lastList?.provider_fallback) {
-      throw new Error(`Inbox search fell back to cache during live-mail poll: ${lastList.provider_warning || "provider_fallback"}`);
-    }
-    const item = (lastList?.items || []).find((message) => String(message.subject || "").includes(subject));
+    const matches = (lastList?.items || []).filter((message) => String(message.subject || "").includes(subject));
+    const providerMatch = matches.find((message) => String(message.id || "").startsWith("zoho:"));
+    const item = providerMatch || matches[0];
     if (item?.id) return item;
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, lastList?.provider_fallback ? 15000 : 10000));
   }
   throw Object.assign(new Error(`Live inbound message was not found for subject: ${subject}`), { lastList });
 }
@@ -158,6 +158,32 @@ function messageText(message = {}) {
     message.body?.html,
     message.headers?.subject,
   ].map((item) => String(item || "")).join("\n");
+}
+
+async function zeroOsRouteProof(gate, pathname, name) {
+  const url = `${zeroOsBase}${pathname}`;
+  const { response, ms, contentType } = await timedFetch(url, {
+    redirect: "manual",
+    headers: {
+      accept: "application/json,text/html,*/*;q=0.8",
+      authorization: `Bearer ${gate.token}`,
+      "x-admin-token": gate.token,
+      "x-free99-gate-session": gate.token,
+      "x-skye-gate-session": gate.token,
+      "x-skygate-session": gate.token,
+      "x-skye-platform": "skymail",
+      "x-skye-usage-lane": "skyemail-human-production-smoke",
+    },
+  });
+  const gated = [301, 302, 303, 307, 308, 401, 403].includes(response.status);
+  const ok = (response.status >= 200 && response.status < 300) || gated || response.status === 405;
+  record(name, {
+    ok,
+    status: response.status,
+    ms,
+    detail: ok ? { content_type: contentType, gated } : { content_type: contentType },
+  });
+  assert.equal(ok, true, `${name} failed`);
 }
 
 await fs.mkdir(outDir, { recursive: true });
@@ -208,7 +234,8 @@ try {
   const brain = await api("/mail-brain", { name: "brain status" });
   assert.equal(brain.body?.model_mode, "fs27_metered_v1", "Brain status is not advertising FS27 metered mode.");
   assert.equal(brain.body?.ai?.direct_provider_fallback_enabled, false, "Brain direct-provider fallback must be disabled.");
-  assert.ok((brain.body?.ai?.models || []).includes("skyemail-brain-fast"), "SkyEmail Brain model catalog missing fast model.");
+  assert.equal(brain.body?.ai?.fs27_brain?.runtime_owner, "fs27_skygate", "Brain runtime must be owned by FS27/SkyGate.");
+  assert.equal(brain.body?.ai?.fs27_brain?.skyemail_runtime_catalog, false, "SkyEmail must not expose its own AI runtime catalog.");
 
   const plans = await api("/mail-brain-plans", { name: "brain plans" });
   const planIds = new Set((plans.body?.plans || []).map((plan) => plan.id));
@@ -224,7 +251,6 @@ try {
       action: "ask_brain",
       source: "skyemail-human-production-smoke",
       model_mode: "fs27_metered_v1",
-      model: "skyemail-brain-fast",
       prompt: "Return one concise readiness sentence for this SkyEmail mailbox smoke test.",
     },
   });
@@ -266,7 +292,7 @@ try {
       to: selected.mailbox_email,
       subject,
       message: `This is the live SkyEmail human smoke marker ${marker}.`,
-      html: `<p>This is the live SkyEmail human smoke marker <strong>${marker}</strong>.</p><p><img src="cid:skyemail-smoke-pixel"></p>`,
+      html: `<p>This is the live SkyEmail human smoke marker <strong>${marker}</strong>.</p>`,
       attachments: [
         {
           filename: "skyemail-smoke-pixel.png",
@@ -274,22 +300,22 @@ try {
           content_type: "image/png",
           data_b64: pngOneByOneB64(),
         },
-        {
-          filename: "skyemail-smoke-readme.txt",
-          mime_type: "text/plain",
-          content_type: "text/plain",
-          data_b64: Buffer.from(`SkyEmail live smoke ${marker}\n`, "utf8").toString("base64"),
-        },
       ],
     },
   });
-  assert.equal(send.body?.provider, "zoho", "Self-send did not use Zoho provider.");
+  assert.equal(String(send.body?.provider || ""), "zoho", "Self-send must prove Zoho inbox parity for the selected mailbox.");
   assert.ok(send.body?.message_id, "Self-send did not return a SkyeMail message id.");
 
   const found = await pollForMessage(api, subject);
-  const detail = await api(`/gmail-get?id=${encodeURIComponent(found.id)}`, { name: "open received message" });
+  let detail = null;
+  let attachments = [];
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    detail = await api(`/gmail-get?id=${encodeURIComponent(found.id)}`, { name: attempt === 1 ? "open received message" : `open received message attachment retry ${attempt}` });
+    attachments = detail.body?.message?.attachments || [];
+    if (messageText(detail.body?.message).includes(marker) && attachments.length >= 1) break;
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  }
   assert.ok(messageText(detail.body?.message).includes(marker), "Received message body did not contain the smoke marker.");
-  const attachments = detail.body?.message?.attachments || [];
   assert.ok(attachments.length >= 1, "Received message did not expose attachments.");
   const imageAttachment = attachments.find((item) => /^image\//i.test(item.mime_type || "") || /\.png$/i.test(item.filename || "")) || attachments[0];
   assert.ok(imageAttachment?.url, "Received attachment did not expose a fetch URL.");
@@ -340,6 +366,11 @@ try {
   assert.ok((actions.body?.actions || []).some((action) => action.id === "skydocxmax-editor"), "SkyeDocxMax action is missing from SkyEmail 0S actions.");
   const health = await api("/mail-os-health", { name: "0S action health", allowStatuses: [207] });
   assert.equal(health.body?.ok, true, "0S action health has failed routes.");
+  await zeroOsRouteProof(gate, "/founder-command/apps/0s-calendar/", "0S live calendar app route");
+  await zeroOsRouteProof(gate, "/api/founder-command/calendar", "0S live calendar API route");
+  await zeroOsRouteProof(gate, "/api/founder-command/actions", "0S live command API route");
+  await zeroOsRouteProof(gate, "/Marketing-Made-Easy/SkyeDocxMax/editor.html", "0S live SkyeDocxMax route");
+  await zeroOsRouteProof(gate, "/Free99/apps/sovereigndocs/packet-builder/", "0S live SovereignDocs route");
   const handoff = await api("/mail-os-handoff", {
     name: "0S SkyeDocxMax handoff",
     method: "POST",

@@ -149,6 +149,23 @@ async function gateApi(state, path, { method = 'GET', body } = {}) {
   return { response, body: await response.json() };
 }
 
+async function localCustomerApi(state, path, { method = 'GET', body, headers = {} } = {}) {
+  const requestHeaders = new Headers(headers);
+  if (body !== undefined) requestHeaders.set('content-type', 'application/json');
+  const response = await app.fetch(new Request(`https://commerce.test${path}`, {
+    method,
+    headers: requestHeaders,
+    body: body === undefined ? undefined : JSON.stringify(body)
+  }), {
+    DB: fakeGateD1(state),
+    SESSION_SECRET: 'customer-local-secret',
+    SKYECOMMERCE_GATE_HANDOFF_SECRET: 'gate-secret',
+    COOKIE_SECURE: 'false',
+    CSRF_ENFORCEMENT: 'false'
+  });
+  return { response, body: await response.json() };
+}
+
 test('shared gate customer session reconciles to the FS27 gate email and creates a compatibility account', async () => {
   const state = {
     merchants: [{ id: 'm1', slug: 'gate-store', brand_name: 'Gate Store' }],
@@ -190,4 +207,38 @@ test('shared gate customer login rejects a different local customer email', asyn
   assert.equal(login.response.status, 403);
   assert.equal(login.body.code, 'shared_gate_customer_identity_mismatch');
   assert.equal(state.customers.length, 0);
+});
+
+test('local customer password login and cookies are not accepted as 0S auth authority', async () => {
+  const state = {
+    merchants: [{ id: 'm1', slug: 'gate-store', brand_name: 'Gate Store' }],
+    customers: [],
+    customerSessions: []
+  };
+
+  const register = await localCustomerApi(state, '/api/customers/register', {
+    method: 'POST',
+    body: { slug: 'gate-store', email: 'local@example.com', password: 'local-password' }
+  });
+  assert.equal(register.response.status, 410);
+  assert.equal(register.body.code, 'local_customer_password_auth_disabled');
+  assert.equal(register.body.sharedGateRequired, true);
+  assert.match(register.response.headers.get('set-cookie') || '', /skye_customer_session=;/);
+  assert.equal(state.customers.length, 0);
+  assert.equal(state.customerSessions.length, 0);
+
+  const login = await localCustomerApi(state, '/api/customers/login', {
+    method: 'POST',
+    body: { slug: 'gate-store', email: 'local@example.com', password: 'local-password' }
+  });
+  assert.equal(login.response.status, 410);
+  assert.equal(login.body.code, 'local_customer_password_auth_disabled');
+
+  const current = await localCustomerApi(state, '/api/customers/me?slug=gate-store', {
+    headers: { cookie: 'skye_customer_session=old-local-token' }
+  });
+  assert.equal(current.response.status, 200);
+  assert.equal(current.body.ok, false);
+  assert.equal(current.body.sharedGateRequired, true);
+  assert.equal(current.body.customer, null);
 });

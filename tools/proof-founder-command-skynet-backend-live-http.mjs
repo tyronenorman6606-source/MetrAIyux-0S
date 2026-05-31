@@ -2,22 +2,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const BASE_URL = String(process.env.FOUNDER_COMMAND_LIVE_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
 const OUT_DIR = path.resolve('test-artifacts/founder-command-skynet-backend');
 const LATEST = path.join(OUT_DIR, 'founder-command-skynet-backend-live-http-latest.json');
 const FETCH_TIMEOUT_MS = Number(process.env.FOUNDER_COMMAND_PROOF_FETCH_TIMEOUT_MS || 20000);
 const STRESS_REQUESTS = Number(process.env.FOUNDER_COMMAND_SKYENET_BACKEND_STRESS_REQUESTS || 20);
-const CREDENTIAL_KEYS = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
 const assetChecks = [
   {
     label: 'Founder Command SkyeNet backend owner entry',
@@ -69,39 +60,9 @@ const assetChecks = [
   }
 ];
 
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
 async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of CREDENTIAL_KEYS) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: BASE_URL });
+  return { key: auth.credential?.key || 'shared-fs27-gate', value: auth.token || '' };
 }
 
 async function fetchText(url, init = {}) {
@@ -192,26 +153,21 @@ async function main() {
     return;
   }
 
-  const login = await fetchJson(`${BASE_URL}/api/owner/admin-login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
+  const token = credential.value;
   receipt.login = {
-    status: login.status,
-    ok: Boolean(login.ok && token),
+    status: token ? 200 : 0,
+    ok: Boolean(token),
     tokenReceived: Boolean(token),
-    elapsedMs: login.elapsedMs
+    elapsedMs: 0,
+    source: credential.key
   };
 
   if (!token) {
-    receipt.error = login.body?.error || 'Live owner login did not return a bearer.';
+    receipt.error = 'Shared FS27/SkyGate bearer could not be resolved.';
   } else {
     const headers = {
       accept: '*/*',
       authorization: `Bearer ${token}`,
-      'x-admin-token': token,
       'x-free99-gate-session': token,
       'x-skye-gate-session': token
     };

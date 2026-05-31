@@ -116,7 +116,13 @@
     if (!response.ok) throw new Error(payload.error || `Owner unlock failed with HTTP ${response.status}`);
     remember(payload);
     try {
-      if (payload.token) localStorage.setItem('quantumskyes_mcp_owner_token', payload.token);
+      if (payload.token) window.MetrAIyuxGateBridge?.persist?.({
+        token: payload.token,
+        source: 'signinpro-owner-unlock',
+        platform_id: 'signinpro-northstar',
+        usage_lane: '0s-gate-owner-session',
+        issued_at: new Date().toISOString()
+      }, { silent: true });
     } catch (error) {}
     return Object.assign({ authenticated: true, owner: true }, payload);
   }

@@ -8,7 +8,7 @@ What changed:
 
 - Added a real authenticated `/mail-brain` runtime with local brain, FS27 metered mode, AI entitlement checks, usage events, and reply monitors.
 - Added `/mail-brain-plans`, `/mail-brain-checkout`, and `/mail-brain-claim` so paid mailbox AI plans can create and claim SkyPay entitlements through the shared FS27/SkyGate lane.
-- Added SkyeMail Brain UI controls for model mode, FS27 Brain model selection, paid plan checkout, explicit Send + Monitor, and reply monitor history.
+- Added SkyeMail Brain UI controls for FS27 Brain runtime mode, paid plan checkout, explicit Send + Monitor, and reply monitor history.
 - Added database tables for `skymail.ai_entitlements`, `skymail.ai_usage_events`, and `skymail.brain_monitors`.
 - Updated the shared Brain compatibility client to forward the active 0S bearer and selected mailbox header.
 

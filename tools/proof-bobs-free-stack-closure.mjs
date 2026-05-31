@@ -4,6 +4,7 @@ import fssync from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { spawnSync } from 'node:child_process';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const zeroOsBase = String(process.env.ZERO_OS_LIVE_BASE || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -11,15 +12,6 @@ const bobBase = String(process.env.BOBS_APP_BASE || 'https://skyenet.graylondons
 const marketingBase = String(process.env.METRAIYUX_MARKETING_BASE || 'https://metraiyux-0s-marketing.pages.dev').replace(/\/+$/, '');
 const artifactRoot = path.join(repoRoot, 'test-artifacts', 'bobs-free-stack-closure');
 const latestPath = path.join(artifactRoot, 'bobs-free-stack-closure-latest.json');
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
 
 const ownerRecipients = [
   'grayskyes@solenterprises.org',
@@ -43,41 +35,6 @@ const bob = {
   publicContactEmail: 'MediaOverLondon@solenterprises.org',
   publicContactPhone: '1-(800)-484-4783'
 };
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function liveCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
 
 async function fetchAny(url, init = {}) {
   const started = performance.now();
@@ -153,7 +110,6 @@ function authHeaders(token, extra = {}) {
   return {
     accept: 'application/json',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token,
     ...extra
@@ -349,38 +305,42 @@ async function main() {
     if (!entry.ok) receipt.failures.push(`Public check failed: ${target.label} (${target.url})`);
   }
 
-  const credential = await liveCredential();
-  receipt.credentialSource = credential.key || 'missing';
-  if (!credential.value) {
-    receipt.failures.push('No owner credential found in process env, .env, or env.txt.');
+  const gateAuth = await resolveZeroOsGateAuth({ zeroOsBase });
+  receipt.credentialSource = gateAuth.credential?.key || gateAuth.credential?.source || 'missing';
+  if (!gateAuth.token) {
+    receipt.login = {
+      status: gateAuth.response?.status || 0,
+      ok: false,
+      tokenReceived: false,
+      via: gateAuth.response?.via || gateAuth.credential?.source || '',
+      elapsedMs: Number(Number(gateAuth.response?.elapsedMs || 0).toFixed(2))
+    };
+    receipt.failures.push(gateAuth.response?.body?.error || gateAuth.response?.error || 'Shared FS27/SkyGate helper did not return a bearer.');
     const paths = await writeReceipt(receipt);
     console.log(JSON.stringify({ ok: false, receipt: path.relative(repoRoot, paths.latest), failures: receipt.failures }, null, 2));
     process.exitCode = 1;
     return;
   }
 
-  const login = await fetchJson(`${zeroOsBase}/api/owner/admin-login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  const token = login.body?.gateBearerToken || login.body?.gateToken || login.body?.token || '';
-  receipt.authChecks.push(check('Owner shared-gate login returns bearer', Boolean(login.okJson && token), {
-    status: login.status,
+  const token = gateAuth.token;
+  receipt.login = {
+    status: gateAuth.response?.status || 0,
+    ok: Boolean(gateAuth.ok && token),
     tokenReceived: Boolean(token),
-    elapsedMs: login.elapsedMs
+    via: gateAuth.response?.via || gateAuth.credential?.source || '',
+    elapsedMs: Number(Number(gateAuth.response?.elapsedMs || 0).toFixed(2))
+  };
+  receipt.authChecks.push(check('Shared FS27/SkyGate helper returns bearer', Boolean(gateAuth.ok && token), {
+    status: receipt.login.status,
+    tokenReceived: Boolean(token),
+    via: receipt.login.via,
+    elapsedMs: receipt.login.elapsedMs
   }));
-  if (!token) receipt.failures.push(login.body?.error || 'Owner shared-gate login did not return a bearer token.');
+  if (!token) receipt.failures.push('Shared FS27/SkyGate helper did not return a bearer token.');
 
   if (token) {
     const headers = authHeaders(token);
-    const htmlHeaders = {
-      accept: 'text/html,application/json,*/*;q=0.8',
-      authorization: `Bearer ${token}`,
-      'x-admin-token': token,
-      'x-free99-gate-session': token,
-      'x-skye-gate-session': token
-    };
+    const htmlHeaders = authHeaders(token, { accept: 'text/html,application/json,*/*;q=0.8' });
 
     const unauth0s = await fetchAny(`${zeroOsBase}/0s/index.html`);
     const auth0s = await fetchAny(`${zeroOsBase}/0s/index.html`, { headers: htmlHeaders, redirect: 'follow' });

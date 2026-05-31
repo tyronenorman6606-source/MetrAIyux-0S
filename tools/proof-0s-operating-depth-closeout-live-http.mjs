@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const baseUrl = String(process.env.ZERO_OS_LIVE_BASE || process.env.ZERO_OS_LIVE_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -20,19 +21,6 @@ const behaviorFields = [
   'receipt_readback',
   'stress',
   'founder_command_visible'
-];
-
-const credentialKeys = [
-  'ZERO_OS_GATE_SESSION',
-  'MCP_GATE_SESSION',
-  'MCP_HTTP_BEARER_TOKEN',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
 ];
 
 const providerSecretKeys = [
@@ -246,7 +234,6 @@ function gateHeaders(token, extra = {}) {
   return {
     accept: 'application/json,text/html,*/*;q=0.8',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token,
     'x-skygate-session': token,
@@ -310,28 +297,9 @@ function summarizeFetch(result, extra = {}) {
   };
 }
 
-async function resolveGateToken(env) {
-  const candidates = credentialKeys
-    .filter((key) => env[key])
-    .map((key) => ({ key, value: unquote(env[key]) }))
-    .filter((item) => item.value);
-  for (const candidate of candidates) {
-    if (/SESSION|TOKEN|BEARER/i.test(candidate.key)) {
-      const probe = await fetchText('/api/admin/connectors/status', { headers: gateHeaders(candidate.value) });
-      if (probe.ok) return { token: candidate.value, source_key: candidate.key, mode: 'bearer' };
-      continue;
-    }
-    for (const route of ['/api/owner/admin-login', '/api/owner/admin-login']) {
-      const response = await fetchAbsolute(`${baseUrl}${route}`, {
-        method: 'POST',
-        headers: { accept: 'application/json', 'content-type': 'application/json' },
-        body: JSON.stringify({ code: candidate.value })
-      });
-      const token = unquote(response.body?.gateBearerToken || response.body?.gateToken || response.body?.token || response.body?.session || '');
-      if (response.ok && token) return { token, source_key: candidate.key, mode: route };
-    }
-  }
-  return null;
+async function resolveGateToken() {
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  return auth.token ? { token: auth.token, source_key: auth.credential?.key || 'shared-fs27-gate', mode: auth.credential?.source || 'shared-gate-helper' } : null;
 }
 
 function redirectOrDeny(result) {

@@ -243,6 +243,26 @@ test('SEC-04 gates the site-operator ledger behind FS27 operator auth', async ()
   assert.equal(data.events[0].id, 'evt_1');
 });
 
+test('SEC-04 gates site-operator ledger trailing slash and prefix paths', async () => {
+  for (const path of ['/api/site-operator/ledger/', '/api/site-operator/ledger/export']) {
+    const kv = new MemoryKV();
+    await kv.put('evt_nested', JSON.stringify({id:'evt_nested', type:'test'}));
+
+    const blocked = await siteWorker.fetch(req(path), siteEnv({SITE_EVENTS_KV:kv}), ctx());
+    assert.equal(blocked.status, 401, path);
+
+    const allowed = await siteWorker.fetch(
+      req(path, {token:'fs27-owner-token'}),
+      siteEnvWithFs27({SITE_EVENTS_KV:kv}),
+      ctx()
+    );
+    assert.equal(allowed.status, 200, path);
+    const data = await allowed.json();
+    assert.equal(data.ok, true, path);
+    assert.equal(data.events.some((item) => item.id === 'evt_nested'), true, path);
+  }
+});
+
 test('SEC-05 blocks unauthenticated crown/nexus/sentinel/omega proxy mutations at the 0S edge', async () => {
   const protectedPaths = [
     ['/api/crown/task', 'CROWN_WORKER'],
@@ -264,6 +284,33 @@ test('SEC-05 blocks unauthenticated crown/nexus/sentinel/omega proxy mutations a
     const res = await siteWorker.fetch(req(path, {method:'POST', body:{title:'blocked'}}), e, ctx());
     assert.equal(res.status, 401, path);
     assert.equal(reached, false, `${binding} should not receive unauthenticated mutation`);
+  }
+});
+
+test('SEC-05 blocks broad public GET/HEAD proxy bypasses before helper workers', async () => {
+  const protectedReads = [
+    ['/api/admin/status', 'ADMIN_WORKER'],
+    ['/api/crown/status', 'CROWN_WORKER'],
+    ['/api/nexus/status', 'NEXUS_WORKER'],
+    ['/api/sentinel/status', 'SENTINEL_WORKER'],
+    ['/api/omega/status', 'OMEGA_WORKER']
+  ];
+
+  for (const method of ['GET', 'HEAD']) {
+    for (const [path, binding] of protectedReads) {
+      let reached = false;
+      const e = siteEnv({
+        [binding]: {
+          async fetch() {
+            reached = true;
+            return Response.json({ok:true, reached:true});
+          }
+        }
+      });
+      const res = await siteWorker.fetch(req(path, {method}), e, ctx());
+      assert.equal(res.status, 401, `${method} ${path}`);
+      assert.equal(reached, false, `${binding} should not receive unauthenticated ${method} ${path}`);
+    }
   }
 });
 
@@ -295,6 +342,155 @@ test('SEC-05 gates protected proxy reads and allows FS27-authenticated proxy mut
     {method:'GET', path:'/api/crown/status'},
     {method:'POST', path:'/api/crown/task'}
   ]);
+});
+
+test('SEC-05 strips raw admin password/code headers from Worker forwarding', async () => {
+  const fs27Calls = [];
+  const fs27Binding = {
+    async fetch(request) {
+      const url = new URL(request.url);
+      fs27Calls.push({path:url.pathname, headers:request.headers});
+      if (url.pathname === '/auth-introspect') {
+        const body = await request.json().catch(() => ({}));
+        return Response.json({
+          active:Boolean(body.token),
+          ok:Boolean(body.token),
+          sub:'fs27-owner-test',
+          email:'owner@example.com',
+          role:'owner',
+          scope:'admin.read admin.write gateway.invoke'
+        });
+      }
+      return Response.json({ok:true, forwarded:true});
+    }
+  };
+
+  const skynet = await siteWorker.fetch(
+    req('/api/skyenet/status', {
+      token:'fs27-owner-token',
+      headers:{
+        'x-admin-password':'raw-password',
+        'x-admin-token':'raw-admin-token',
+        'x-free99-admin-code':'raw-free99-code'
+      }
+    }),
+    siteEnv({SKYGATEFS27_WORKER:fs27Binding}),
+    ctx()
+  );
+  assert.equal(skynet.status, 200);
+  const skynetForward = fs27Calls.find((call) => call.path === '/deploy/status');
+  assert.ok(skynetForward);
+  assert.equal(skynetForward.headers.has('x-admin-password'), false);
+  assert.equal(skynetForward.headers.has('x-admin-token'), false);
+  assert.equal(skynetForward.headers.has('x-free99-admin-code'), false);
+  assert.equal(skynetForward.headers.get('authorization'), 'Bearer fs27-owner-token');
+
+  let proxiedHeaders = null;
+  const proxy = await siteWorker.fetch(
+    req('/api/crown/status', {
+      token:'fs27-owner-token',
+      headers:{
+        'x-admin-password':'raw-password',
+        'x-admin-token':'raw-admin-token',
+        'x-free99-admin-code':'raw-free99-code'
+      }
+    }),
+    siteEnvWithFs27({
+      CROWN_WORKER: {
+        async fetch(request) {
+          proxiedHeaders = request.headers;
+          return Response.json({ok:true, proxied:true});
+        }
+      }
+    }),
+    ctx()
+  );
+  assert.equal(proxy.status, 200);
+  assert.ok(proxiedHeaders);
+  assert.equal(proxiedHeaders.has('x-admin-password'), false);
+  assert.equal(proxiedHeaders.has('x-admin-token'), false);
+  assert.equal(proxiedHeaders.has('x-free99-admin-code'), false);
+  assert.equal(proxiedHeaders.get('x-skye-gate-session'), 'fs27-owner-token');
+});
+
+test('SEC-05 Relay13 proxy does not stamp gate reads as operator admin upstream', async () => {
+  const calls = [];
+  const relay13Binding = {
+    async fetch(request) {
+      calls.push({
+        method: request.method,
+        path: new URL(request.url).pathname,
+        headers: request.headers
+      });
+      return Response.json({ ok: true, relay13: true });
+    }
+  };
+  const e = siteEnvWithFs27({
+    RELAY13_WORKER: relay13Binding,
+    ZERO_OS_INTERNAL_PROXY_SECRET: 'internal-proxy-secret',
+    RELAY13_API_KEY: 'r13_founder_service_key'
+  });
+
+  const read = await siteWorker.fetch(req('/api/relay13/v1/conversations?workspace_id=ws_demo', {
+    token: 'fs27-owner-token',
+    headers: { 'x-relay13-api-key': 'r13_scoped_read_key' }
+  }), e, ctx());
+  assert.equal(read.status, 200);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].method, 'GET');
+  assert.equal(calls[0].path, '/api/v1/conversations');
+  assert.equal(calls[0].headers.get('x-relay13-api-key'), 'r13_scoped_read_key');
+  assert.equal(calls[0].headers.has('x-0s-shared-gate'), false);
+  assert.equal(calls[0].headers.has('x-0s-internal-proxy-secret'), false);
+  assert.equal(calls[0].headers.get('authorization'), 'Bearer fs27-owner-token');
+
+  const write = await siteWorker.fetch(req('/api/relay13/v1/conversations', {
+    method: 'POST',
+    token: 'fs27-owner-token',
+    body: { workspace_id: 'ws_demo' }
+  }), e, ctx());
+  assert.equal(write.status, 200);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].method, 'POST');
+  assert.equal(calls[1].headers.get('x-0s-shared-gate'), 'operator');
+  assert.equal(calls[1].headers.get('x-0s-internal-proxy-secret'), 'internal-proxy-secret');
+  assert.equal(calls[1].headers.get('x-relay13-api-key'), 'r13_founder_service_key');
+});
+
+test('SEC-05 private SkyeNet surfaces fail closed instead of falling through to assets', async () => {
+  let assetReached = false;
+  const e = siteEnv({
+    ASSETS: {
+      async fetch(request) {
+        assetReached = true;
+        return new Response(`asset:${new URL(request.url).pathname}`, {status:200});
+      }
+    }
+  });
+  const html = await siteWorker.fetch(
+    req('/skyenet/founder-command/', {headers:{accept:'text/html'}}),
+    e,
+    ctx()
+  );
+  assert.equal(html.status, 302);
+  assert.match(html.headers.get('location') || '', /\/admin\/login\.html\?return=/);
+  assert.equal(assetReached, false);
+
+  const legacy = await siteWorker.fetch(
+    req('/skyenet/founder-command/site-data.json', {
+      headers:{
+        accept:'application/json',
+        authorization:'Bearer legacy-admin-code',
+        'x-admin-token':'legacy-admin-code'
+      }
+    }),
+    siteEnv({ADMIN_TOKEN:'legacy-admin-code'}),
+    ctx()
+  );
+  assert.equal(legacy.status, 503);
+  const body = await legacy.json();
+  assert.equal(body.code, 'fs27_required');
+  assert.equal(body.local_shared_gate_code, 'disabled');
 });
 
 test('SEC-05 confirms admin worker mutations reject missing auth', async () => {
@@ -465,6 +661,91 @@ test('SEC-06 direct omega and kAIxu workers require FS27 instead of open or loca
     ctx()
   );
   assert.equal(kaixuDisabledAuthBlocked.status, 503);
+});
+
+test('SEC-06 keeps RouteX local login/signup disabled behind the shared gate', async () => {
+  const e = siteEnvWithFs27({ROUTEX_KV:new MemoryKV()});
+  const signup = await siteWorker.fetch(
+    req('/api/routex/auth/signup', {
+      method:'POST',
+      token:'fs27-owner-token',
+      body:{email:'driver@example.com', password:'LocalPassword123!', role:'contractor'}
+    }),
+    e,
+    ctx()
+  );
+  assert.equal(signup.status, 410);
+  const signupBody = await signup.json();
+  assert.equal(signupBody.productionGate, true);
+  assert.equal(signupBody.sharedAuth, true);
+  assert.match(signupBody.error, /app-local signup has been removed/i);
+
+  const login = await siteWorker.fetch(
+    req('/api/skyeroutex/auth/login', {
+      method:'POST',
+      token:'fs27-owner-token',
+      body:{email:'driver@example.com', password:'LocalPassword123!'}
+    }),
+    e,
+    ctx()
+  );
+  assert.equal(login.status, 410);
+  const loginBody = await login.json();
+  assert.equal(loginBody.productionGate, true);
+  assert.equal(loginBody.sharedAuth, true);
+  assert.match(loginBody.error, /app-local login has been removed/i);
+});
+
+test('SEC-06 keeps SkyeCommerce mounted customer password/session behind the shared FS27 gate', async () => {
+  const payload = {slug:'demo-store', email:'buyer@example.com', password:'LocalPassword123!'};
+  const localCookieLogin = await siteWorker.fetch(
+    req('/SkyeCommerce/api/customers/login', {
+      method:'POST',
+      headers:{cookie:'skye_customer_session=local-customer-session'},
+      body:payload
+    }),
+    siteEnv(),
+    ctx()
+  );
+  assert.equal(localCookieLogin.status, 401);
+  assert.equal(localCookieLogin.headers.has('set-cookie'), false);
+  assert.match(await localCookieLogin.text(), /0S gate protected surface \/SkyeCommerce\/api\/customers\/login/);
+
+  const legacyAdminTokenLogin = await siteWorker.fetch(
+    req('/SkyeCommerce/api/customers/login', {
+      method:'POST',
+      headers:{
+        cookie:'skye_customer_session=local-customer-session',
+        authorization:'Bearer legacy-admin-code',
+        'x-admin-token':'legacy-admin-code'
+      },
+      body:payload
+    }),
+    siteEnv({ADMIN_TOKEN:'legacy-admin-code'}),
+    ctx()
+  );
+  assert.equal(legacyAdminTokenLogin.status, 503);
+  assert.equal(legacyAdminTokenLogin.headers.has('set-cookie'), false);
+  const legacyBody = await legacyAdminTokenLogin.json();
+  assert.equal(legacyBody.code, 'fs27_required');
+  assert.equal(legacyBody.local_shared_gate_code, 'disabled');
+});
+
+test('SEC-06 rejects SkyeMusicNexus ADMIN_TOKEN without FS27 gate authority', async () => {
+  const res = await siteWorker.fetch(
+    req('/api/skymusicnexus/music-assets?action=list', {
+      headers:{
+        authorization:'Bearer legacy-music-admin',
+        'x-admin-token':'legacy-music-admin'
+      }
+    }),
+    siteEnv({SKYMUSICNEXUS_KV:new MemoryKV(), ADMIN_TOKEN:'legacy-music-admin'}),
+    ctx()
+  );
+  assert.equal(res.status, 503);
+  const body = await res.json();
+  assert.equal(body.code, 'fs27_required');
+  assert.equal(body.local_shared_gate_code, 'disabled');
 });
 
 test('SEC-07 rate-limits public SaaS signup by source IP', async () => {

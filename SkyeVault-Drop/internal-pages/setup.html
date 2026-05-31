@@ -25,7 +25,7 @@
         <div class="trust-row">
           <span>Baby-step checklist</span>
           <span>Env generator</span>
-          <span>Protected operator session</span>
+          <span>FS27-bound recovery</span>
           <span>Live diagnostics</span>
         </div>
         <div class="button-row setup-nav-row">
@@ -132,8 +132,12 @@
             <input id="customOrigin" placeholder="https://uploads.yourdomain.com" autocomplete="off" />
           </label>
           <label>
-            <span>ADMIN_TOKEN</span>
-            <input id="adminTokenValue" type="text" autocomplete="off" placeholder="Generate or paste a long random token" />
+            <span>OPERATOR_SESSION_SECRET</span>
+            <input id="operatorSessionSecretValue" type="text" autocomplete="off" placeholder="Generate a long cookie-signing secret" />
+          </label>
+          <label>
+            <span>RECEIPT_SIGNING_SECRET</span>
+            <input id="receiptSigningSecretValue" type="text" autocomplete="off" placeholder="Generate a separate receipt-signing secret" />
           </label>
           <label>
             <span>CLIENT_PORTAL_KEY</span>
@@ -383,8 +387,8 @@
             <input id="diagnosticOrigin" placeholder="https://your-site.netlify.app" autocomplete="off" />
           </label>
           <label>
-            <span>Optional admin token override</span>
-            <input id="diagnosticToken" type="password" placeholder="Blank uses protected operator session" autocomplete="off" />
+            <span>Optional FS27 / SkyGate bearer</span>
+            <input id="diagnosticToken" type="password" placeholder="Blank uses current protected operator session" autocomplete="off" />
           </label>
         </div>
         <label class="check-row live-test-row">

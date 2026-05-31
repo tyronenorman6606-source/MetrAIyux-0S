@@ -103,7 +103,9 @@ export default `<!doctype html>
       return raw.replace(/^Bearer\\s+/i, '').trim();
     }
     function gateToken() {
-      const keys = ['FREE99_PLATFORM_GATE_SESSION','FREE99_PLATFORM_GATE_SESSION_MARKETING_MADE_EASY','FREE99_PLATFORM_GATE_SESSION_SKYEROUTEX','skye_gate_session','skygate_session','skyegate_session','metraiyux_admin_session'];
+      const bridgeToken = window.MetrAIyuxGateBridge?.current?.()?.token || '';
+      if (bridgeToken) return tokenFromValue(bridgeToken);
+      const keys = ['METRAIYUX_GATE_SESSION','SKYGATEFS27_GATE_SESSION','SKYE_GATE_SESSION'];
       for (const store of [window.sessionStorage, window.localStorage]) {
         try {
           for (const key of keys) {

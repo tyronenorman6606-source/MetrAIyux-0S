@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { chromium } from "playwright";
+import { resolveZeroOsGateAuth } from "./lib/zero-os-gate-auth.mjs";
 
 const repoRoot = "/workspaces/MetrAIyux-0S";
 const baseUrl = (process.env.PROOF_BASE_URL || "https://metraiyux-0s-full-system.graylondonskyes.workers.dev").replace(/\/+$/, "");
@@ -14,33 +15,9 @@ const free99HubPath = "/Free99/index.html";
 const free99ProofPath = "/proof/free99-platform-intake-receipt.html";
 const changelogPath = "/changelog/index.html";
 const deploymentVersion = process.env.PROOF_DEPLOYMENT_VERSION || "24217541-2cea-484a-a6e6-230be4104f90";
-const adminCode = firstEnv([
-  "FREE99_ADMIN_CODE",
-  "FREE99_ADMIN_PASSWORD",
-  "FREE99_GATE_CODE",
-  "FREE99_GATE_PASSWORD",
-  "OWNER_ADMIN_CODE",
-  "OWNER_ADMIN_PASSWORD",
-  "ADMIN_CODE",
-  "ADMIN_PASSWORD",
-  "FS27_ADMIN_CODE",
-  "FS27_ADMIN_PASSWORD",
-  "SKYGATEFS27_ADMIN_CODE",
-  "SKYGATEFS27_ADMIN_PASSWORD",
-  "SITE_OPERATOR_ADMIN_TOKEN",
-  "METRAIYUX_ADMIN_TOKEN",
-  "ADMIN_TOKEN"
-]);
+let adminGateToken = "";
 const adminEmail = process.env.PROOF_OWNER_EMAIL || "owner-proof@metraiyux.local";
 const sourceImage = path.join(repoRoot, "metraiyux_0s_site", "assets", "metraiyux-0s-emblem-transparent.png");
-
-function firstEnv(keys) {
-  for (const key of keys) {
-    const value = String(process.env[key] || "").trim();
-    if (value) return value;
-  }
-  return "";
-}
 
 function relaunchWithXvfbWhenNeeded() {
   if (process.platform !== "linux") return;
@@ -99,17 +76,40 @@ async function observePage(page, entry) {
 }
 
 async function loginOwner(page, returnPath, entry) {
-  const loginUrl = new URL("/admin/login.html", baseUrl);
-  loginUrl.searchParams.set("return", returnPath);
-  const response = await page.goto(loginUrl.toString(), { waitUntil: "domcontentloaded", timeout: 45000 });
-  entry.actions.push("opened owner admin login");
-  entry.statuses.push({ name: "admin_login_status", status: response?.status() || 0, ok: Boolean(response?.ok()) });
-  await page.fill('input[name="code"]', adminCode);
-  const emailInput = page.locator('input[name="email"]');
-  if (await emailInput.count()) await emailInput.fill(adminEmail);
-  entry.actions.push((await emailInput.count()) ? "filled owner admin code and email" : "filled owner admin code");
-  await page.click('button[type="submit"]');
-  entry.actions.push("submitted owner admin login");
+  if (!adminGateToken) throw new Error("Missing shared owner gate bearer for live proof.");
+  const clean = String(adminGateToken || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  await page.context().setExtraHTTPHeaders({
+    Authorization: `Bearer ${clean}`,
+    "x-free99-gate-session": clean,
+    "x-skye-gate-session": clean
+  });
+  const host = new URL(baseUrl).hostname;
+  await page.context().addCookies(["skye_gate_session", "skygate_session"].map((name) => ({
+    name,
+    value: clean,
+    domain: host,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "Lax"
+  })));
+  await page.addInitScript((token) => {
+    const shared = {
+      token,
+      source: "zero-os-gate-auth",
+      platform_id: "metraiyux-0s",
+      usage_lane: "fs27-owner-gate",
+      issued_at: new Date().toISOString()
+    };
+    sessionStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
+    localStorage.setItem("FREE99_PLATFORM_GATE_SESSION", JSON.stringify(shared));
+    sessionStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(shared));
+    localStorage.setItem("METRAIYUX_GATE_SESSION", JSON.stringify(shared));
+    sessionStorage.setItem("SKYE_GATE_SESSION", JSON.stringify(shared));
+    localStorage.setItem("SKYE_GATE_SESSION", JSON.stringify(shared));
+  }, clean);
+  const response = await page.goto(urlFor(returnPath), { waitUntil: "domcontentloaded", timeout: 45000 });
+  entry.statuses.push({ name: "shared_gate_navigation", status: response?.status() || 0, ok: Boolean(response?.ok()) });
   await waitForPath(page, returnPath);
   entry.actions.push(`gate redirected to ${returnPath}`);
 }
@@ -331,7 +331,9 @@ async function checkUnauthGate() {
 
 async function main() {
   relaunchWithXvfbWhenNeeded();
-  if (!adminCode) throw new Error("Missing owner admin code env var for live gate proof.");
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  adminGateToken = String(auth.token || "").replace(/^Bearer(?:\s+|$)/i, "").trim();
+  if (!auth.ok || !adminGateToken) throw new Error("Missing shared owner gate bearer for live gate proof.");
   if (!fs.existsSync(sourceImage)) throw new Error(`Missing proof image: ${sourceImage}`);
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");

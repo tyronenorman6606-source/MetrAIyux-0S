@@ -4,6 +4,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { webcrypto } from 'node:crypto';
 import worker from '../metraiyux_0s_site/cloudflare/worker.js';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
@@ -13,23 +14,6 @@ const artifactDir = path.join(repoRoot, 'test-artifacts', 'free99-signinpro-demo
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const receiptPath = path.join(artifactDir, `${stamp}.json`);
 const latestPath = path.join(artifactDir, 'free99-signinpro-demo-live-latest.json');
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-const bearerKeys = [
-  'ZERO_OS_GATE_SESSION',
-  'MCP_GATE_SESSION',
-  'MCP_HTTP_BEARER_TOKEN',
-  'QUANTUMSKYES_MCP_TOKEN',
-  'SKYENET_AUTH'
-];
-
 class MemoryKv {
   constructor() {
     this.items = new Map();
@@ -72,42 +56,9 @@ function makeCtx() {
   };
 }
 
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fsp.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
 async function liveCredential() {
-  const envFiles = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of envFiles) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of bearerKeys) {
-    if (merged[key]) return { key, value: String(merged[key]).replace(/^Bearer\s+/i, ''), kind: 'bearer' };
-  }
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key], kind: 'code' };
-  }
-  return { key: '', value: '', kind: '' };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: origin });
+  return { key: auth.credential?.key || 'shared-fs27-gate', value: auth.token || '', kind: 'bearer' };
 }
 
 async function workerCall(env, input, init = {}) {
@@ -208,15 +159,18 @@ function makeLocalEnv() {
 async function localProof() {
   const checks = [];
   const env = makeLocalEnv();
+  const localGateToken = 'fs27.admin.token';
   const ownerHeaders = {
     'content-type': 'application/json',
-    'x-free99-admin-code': env.FREE99_ADMIN_CODE
+    authorization: `Bearer ${localGateToken}`,
+    'x-free99-gate-session': localGateToken,
+    'x-skye-gate-session': localGateToken
   };
   const gateHeaders = {
     accept: 'application/json',
-    'x-free99-admin-code': env.FREE99_ADMIN_CODE,
-    'x-free99-gate-session': env.FREE99_ADMIN_CODE,
-    'x-skye-gate-session': env.FREE99_ADMIN_CODE
+    authorization: `Bearer ${localGateToken}`,
+    'x-free99-gate-session': localGateToken,
+    'x-skye-gate-session': localGateToken
   };
 
   const initialRotate = await workerCall(env, '/api/free99/demo-code/approve-rotation', {
@@ -458,7 +412,6 @@ async function liveProof() {
   const authHeaders = {
     accept: 'text/html,application/json,*/*;q=0.8',
     authorization: `Bearer ${token}`,
-    'x-admin-token': token,
     'x-free99-gate-session': token,
     'x-skye-gate-session': token
   };

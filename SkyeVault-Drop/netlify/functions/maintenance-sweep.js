@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdmin } from './_lib/security.js';
+import { requireAdminAccess, adminAuditDetails } from './_lib/security.js';
 import { loadSessionManifests, updateSessionManifestStatus, writeAuditEventSafe, writeMaintenanceReport } from './_lib/config.js';
 
 function ageHours(iso) {
@@ -24,8 +24,9 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    if (event.httpMethod === 'POST') requireAdmin(event);
-    else if (process.env.MAINTENANCE_ALLOW_UNAUTHENTICATED_SCHEDULE !== 'true') requireAdmin(event);
+    let admin = null;
+    if (event.httpMethod === 'POST') admin = await requireAdminAccess(event);
+    else if (process.env.MAINTENANCE_ALLOW_UNAUTHENTICATED_SCHEDULE !== 'true') admin = await requireAdminAccess(event);
 
     const body = event.httpMethod === 'POST' ? await readJson(event) : {};
     const staleHours = Number(body.staleHours || defaultStaleHours());
@@ -73,14 +74,14 @@ export async function handler(event) {
 
     let report = null;
     if (!dryRun) report = await writeMaintenanceReport(summary).catch((error) => ({ ok: false, error: error.message }));
-    const audit = await writeAuditEventSafe('maintenance-sweep-ran', {
+    const audit = await writeAuditEventSafe('maintenance-sweep-ran', adminAuditDetails(admin || { type: 'scheduled-maintenance', actor: 'scheduled-maintenance' }, {
       dryRun,
       staleHours,
       scanned: summary.scanned,
       staleFound: summary.staleFound,
       staleUpdated: summary.staleUpdated,
       reportFileId: report?.saved?.id || null
-    });
+    }));
 
     return json(200, { ok: true, summary, report, audit }, noStoreCors(event));
   } catch (error) {

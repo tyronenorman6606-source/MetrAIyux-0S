@@ -1,5 +1,5 @@
 import { json, method, handleOptions, noStoreCors, readJson } from './_lib/http.js';
-import { requireAdminAccess, cleanText, safeFileName } from './_lib/security.js';
+import { requireVaultDownloadAccess, cleanText, safeFileName } from './_lib/security.js';
 import { loadLedger, writeAuditEventSafe } from './_lib/config.js';
 import { createDownloadUrl, getDriveFileMetadata } from './_lib/google-drive.js';
 
@@ -42,7 +42,7 @@ export async function handler(event) {
   if (wrongMethod) return wrongMethod;
 
   try {
-    const admin = await requireAdminAccess(event);
+    const admin = await requireVaultDownloadAccess(event);
     const body = await readJson(event);
     const receiptId = cleanText(body.receiptId, 120);
     if (!receiptId) fail('Receipt ID is required.');

@@ -21,6 +21,23 @@ function lineNumber(source, index) {
   return source.slice(0, index).split(/\r?\n/).length;
 }
 
+function functionBlock(source, signature) {
+  const start = source.indexOf(signature);
+  if (start < 0) return '';
+  const open = source.indexOf('{', start);
+  if (open < 0) return '';
+  let depth = 0;
+  for (let index = open; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '{') depth += 1;
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return source.slice(start, index + 1);
+    }
+  }
+  return source.slice(start);
+}
+
 function check(name, ok, detail = {}, severity = 'blocker') {
   checks.push({ name, ok: Boolean(ok), severity, ...detail });
 }
@@ -66,6 +83,110 @@ function packageScriptFindings() {
   return findings;
 }
 
+function listFiles(root, options = {}) {
+  const start = path.join(repoRoot, root);
+  if (!fs.existsSync(start)) return [];
+  const out = [];
+  const skippedDirs = new Set([
+    '.git',
+    '.wrangler',
+    '.cache',
+    '.next',
+    'coverage',
+    'dist',
+    'build',
+    'node_modules',
+    'test-artifacts'
+  ]);
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const abs = path.join(dir, entry.name);
+      const file = rel(abs);
+      if (entry.isDirectory()) {
+        if (skippedDirs.has(entry.name) || options.excludeDir?.(file)) continue;
+        walk(abs);
+        continue;
+      }
+      if (options.include && !options.include(file)) continue;
+      out.push(file);
+    }
+  }
+  walk(start);
+  return out.sort();
+}
+
+function packageToolScriptMap() {
+  const pkg = JSON.parse(read('package.json'));
+  const map = new Map();
+  for (const [scriptName, command] of Object.entries(pkg.scripts || {})) {
+    for (const match of String(command).matchAll(/(?:^|[\s;&|])node\s+(tools\/[^\s'"`;&|]+\.mjs)\b/g)) {
+      const file = match[1];
+      if (!map.has(file)) map.set(file, []);
+      map.get(file).push(scriptName);
+    }
+  }
+  return map;
+}
+
+function scanFileLines(files, patterns, options = {}) {
+  const findings = [];
+  for (const file of files) {
+    const source = read(file);
+    const lines = source.split(/\r?\n/);
+    lines.forEach((line, index) => {
+      if (options.allowLine?.(line, file, index + 1)) return;
+      for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        const match = pattern.exec(line);
+        if (!match) continue;
+        findings.push({
+          file,
+          line: index + 1,
+          match: String(match[0]).slice(0, 180),
+          scripts: options.scriptMap?.get(file) || undefined
+        });
+        break;
+      }
+    });
+  }
+  return findings;
+}
+
+function proofLikeToolFiles() {
+  return listFiles('tools', {
+    include(file) {
+      if (!/\.(?:mjs|js)$/.test(file)) return false;
+      if ([
+        'tools/0s-auth-spine-guard.mjs',
+        'tools/browser-proof-disabled.mjs',
+        'tools/lib/zero-os-gate-auth.mjs'
+      ].includes(file)) return false;
+      return /(^|\/)(?:proof|live|stress|verify|audit-0s-live|0s-live|0s-production|0s-operating).*\.mjs$/.test(file);
+    }
+  });
+}
+
+function browserAuthRegressionFiles() {
+  const roots = [
+    'metraiyux_0s_site/admin',
+    'metraiyux_0s_site/northstar',
+    'metraiyux_0s_site/valley-verified',
+    'metraiyux_0s_site/_platform-sources/valley-verified',
+    'metraiyux_0s_site/_platform-sources/glendale-northstar-valley-verified-v6-final',
+    'metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/js',
+    'metraiyux_0s_site/live/SkyeMail/assets',
+    'metraiyux_0s_site/live/SkyeMail/cf-assets/assets'
+  ];
+  const files = roots.flatMap((root) => listFiles(root, {
+    include(file) {
+      if (!/\.(?:js|mjs|html)$/.test(file)) return false;
+      if (/MCP_TOOLING_RECEIPT|\.receipt\.|receipt|proof/i.test(file)) return false;
+      return true;
+    }
+  }));
+  return [...new Set(files)].sort();
+}
+
 const ownerWrapper = 'tools/skyevault-owner-git-origin.mjs';
 const mainWorker = 'metraiyux_0s_site/cloudflare/worker.js';
 const mainWorkerSource = read(mainWorker);
@@ -73,6 +194,20 @@ const routexServer = 'metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/src/
 const routexIndex = 'metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/index.html';
 const skyeVaultWorker = 'SkyeVault-Drop/cloudflare/worker.mjs';
 const skyeVaultProvision = 'SkyeVault-Drop/netlify/functions/provision-workspace.js';
+const skyeVaultSecurity = 'SkyeVault-Drop/netlify/functions/_lib/security.js';
+const skyeVaultOperatorSession = 'SkyeVault-Drop/netlify/functions/operator-session.js';
+const skyeVaultOperatorPage = 'SkyeVault-Drop/netlify/functions/operator-page.js';
+const skyeVaultDirectAdminFunctions = [
+  'SkyeVault-Drop/netlify/functions/setup-folder-helper.js',
+  'SkyeVault-Drop/netlify/functions/admin-notification-test.js',
+  'SkyeVault-Drop/netlify/functions/maintenance-sweep.js',
+  'SkyeVault-Drop/netlify/functions/admin-notification-replay.js',
+  'SkyeVault-Drop/netlify/functions/admin-drive-test.js',
+  'SkyeVault-Drop/netlify/functions/admin-backup.js',
+  'SkyeVault-Drop/netlify/functions/setup-diagnostics.js',
+  'SkyeVault-Drop/netlify/functions/admin-health.js'
+];
+const skyeVaultLiveSmoke = 'SkyeVault-Drop/scripts/live-drive-smoke.mjs';
 const codeStudioClaims = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/lib/claims.mjs';
 const codeStudioServer = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/http-server.mjs';
 const codeStudioEngine = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/platform-engine.mjs';
@@ -106,6 +241,12 @@ const skyeContentApp = 'metraiyux_0s_site/skye-content-repurposer-local/public/a
 const rootGateBridge = 'metraiyux_0s_site/assets/js/0s-gate-card-bridge.js';
 const free99Gate = 'metraiyux_0s_site/Free99/free99-gate.js';
 const routexFree99Gate = 'metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/assets/free99-gate.js';
+const skyeVaultProHostedBridge = 'metraiyux_0s_site/Free99/apps/skyevaultpro/assets/js/hosted-bridge.js';
+const skyeVaultProDrivePage = 'metraiyux_0s_site/Free99/apps/skyevaultpro/drive/index.html';
+const skyeVaultProServiceWorker = 'metraiyux_0s_site/Free99/apps/skyevaultpro/sw.js';
+const skyeVaultProFs27Auth = 'metraiyux_0s_site/Free99/apps/skyevaultpro/netlify/functions/_lib/fs27-auth.mjs';
+const skyeVaultProProfile = 'metraiyux_0s_site/Free99/apps/skyevaultpro/netlify/functions/vault-profile.mjs';
+const skyeVaultProBackup = 'metraiyux_0s_site/Free99/apps/skyevaultpro/netlify/functions/vault-backup.mjs';
 const skyeSplitGate = 'metraiyux_0s_site/SkyeSplitEngine/gate-session.js';
 const skyeProfitGate = 'metraiyux_0s_site/SkyeProfitConsole/gate-session.js';
 const skyeMusicGate = 'metraiyux_0s_site/SkyeMusicNexus/gate-session.js';
@@ -121,12 +262,39 @@ const valleyBrain = 'metraiyux_0s_site/valley-verified/assets/valley-brain.js';
 const valleyAdminConsole = 'metraiyux_0s_site/valley-verified/assets/admin-console.js';
 const founderCommandApp = 'metraiyux_0s_site/founder-command/app.js';
 const skynetConsole = 'metraiyux_0s_site/skyenet/skyenet.js';
+const platformSkynetConsole = 'platform/skyenet/public/assets/skyenet.js';
 const fs27PublicApp = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/public/assets/app.js';
 const fs27SourceApp = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/assets/app.js';
+const fs27ContactIntakePages = [
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/contact-intake-admin.html',
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/public/contact-intake-admin.html',
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/admin/contact-intake-dashboard.html',
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/public/admin/contact-intake-dashboard.html'
+];
+const fs27SkyepayAdminFiles = [
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/assets/skyepay-admin.js',
+  'metraiyux_0s_site/skyegate/source/SkyeGateFS27/public/assets/skyepay-admin.js'
+];
 const aeCommandApp = 'metraiyux_0s_site/ae-command/ae-command.js';
 const clientAppFactoryApp = 'metraiyux_0s_site/client-app-factory/assets/app.js';
+const fadeMastersBooking = 'metraiyux_0s_site/client-app-factory/client-apps/fade-masters-phx/fade-booking.js';
 const skyeMailSkygate = 'metraiyux_0s_site/live/SkyeMail/netlify/functions/_skygate.js';
 const divisionalGate = 'metraiyux_0s_site/DeVisional Riftx/platform/fs27-gate.js';
+const founderCalendar = 'metraiyux_0s_site/founder-command/apps/0s-calendar/index.html';
+const saasSkyemerit = 'metraiyux_0s_site/saas/skyemerit.html';
+const skyeContentServerRuntime = 'metraiyux_0s_site/skye-content-repurposer-local/server.js';
+const contractorPacketGeneratedPage = 'metraiyux_0s_site/cloudflare/generated-contractor-packet-inbox-page.mjs';
+const skyeSolKaixuGate = 'metraiyux_0s_site/skyenet-drops/skyesol-company-public/js/kaixu-gate.js';
+const skyeSolKaixuAppPages = [
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeArchive/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeCollab/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeDrive/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeFlow/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeLedger/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeOps/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeSheets/index.html',
+  'metraiyux_0s_site/skyenet-drops/skyesol-company-public/SkyeSlides/index.html'
+];
 const adminLoginPage = 'metraiyux_0s_site/admin/login.html';
 const generatedAdminLoginPage = 'metraiyux_0s_site/cloudflare/generated-admin-login-page.mjs';
 const gateSignupPage = 'metraiyux_0s_site/gate/signup/index.html';
@@ -169,6 +337,21 @@ const adminBrowserAuthFiles = [
   'metraiyux_0s_site/northstar/assets/workspace-client.js',
   'metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/js/skygate-client.js',
   'metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/app.js'
+];
+const packageToolScripts = packageToolScriptMap();
+const allProofLikeToolFiles = proofLikeToolFiles();
+const activeProofLikeToolFiles = allProofLikeToolFiles.filter((file) => packageToolScripts.has(file));
+const rawProofToolAuthPatterns = [
+  /['"`]x-admin-token['"`]\s*:/,
+  /['"`]x-free99-admin-code['"`]\s*:/,
+  /\b(?:OWNER_ADMIN_PASSWORD|FS27_ADMIN_PASSWORD|SKYGATEFS27_ADMIN_PASSWORD|SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN)\b/,
+  /\/api\/founder-command\/login/
+];
+const localOwnerTokenAuthPatterns = [
+  /\b(?:localStorage|sessionStorage)\.setItem\(\s*['"`](?:adminBrainToken|quantumskyes_mcp_owner_token|metraiyux\.founderCommand\.token|metraiyux\.adminToken|valleyVerified\.adminToken)['"`]/,
+  /\b(?:localStorage|sessionStorage)\.getItem\(\s*['"`](?:adminBrainToken|quantumskyes_mcp_owner_token|metraiyux\.founderCommand\.token|metraiyux\.adminToken|valleyVerified\.adminToken)['"`]/,
+  /headers\[['"`]x-admin-token['"`]\]\s*=/,
+  /['"`]x-admin-token['"`]\s*:\s*(?:password|clean|token)\b/
 ];
 check('Owner Git origin wrapper obtains shared gate auth', contains(ownerWrapper, [
   /async function ownerAuth\(/,
@@ -228,16 +411,58 @@ check('Main Worker owner credential fallback does not scan generic app admin tok
   file: mainWorker
 });
 
-check('Main Worker SkyeMusic gate does not accept raw ADMIN_TOKEN authority', !/async function requireMusicGate[\s\S]*?(?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN)[\s\S]*?\n}/.test(mainWorkerSource)
-  && !/via:\s*['"]admin_token['"]/.test(mainWorkerSource), {
+check('Main Worker SkyeMusic gate does not accept raw ADMIN_TOKEN authority', (() => {
+  const block = functionBlock(mainWorkerSource, 'async function requireMusicGate');
+  return /introspectSkygate\(request, env\)/.test(block)
+    && /Legacy admin tokens are not accepted/.test(block)
+    && !/(?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN|x-admin-token|x-free99-admin-code|via:\s*['"]admin_token['"])/.test(block);
+})(), {
   file: mainWorker
 });
 
-check('Main Worker protected proxy APIs do not have a broad public GET/HEAD bypass', !/!MUTATING_METHODS\.has\(method\)[\s\S]{0,240}PROXIES\.some\(\(\[prefix\]\)[\s\S]{0,160}url\.pathname\.startsWith\(prefix\)/.test(mainWorkerSource), {
+check('Main Worker protected proxy APIs do not have a broad public GET/HEAD bypass', (() => {
+  const block = functionBlock(mainWorkerSource, 'function isPublicZeroOsApiLane');
+  return /PUBLIC_PROXY_INTAKE_PATHS\.has\(url\.pathname\)/.test(block)
+    && /\/api\/skyeroutex\/tour-token/.test(block)
+    && !/PROXIES|startsWith\(prefix\)|!MUTATING_METHODS|GET\/HEAD|GET'\]\.includes/.test(block);
+})(), {
   file: mainWorker
 });
 
-check('Main Worker site-operator ledger requires operator auth', /url\.pathname === '\/api\/site-operator\/ledger'[\s\S]{0,260}requireOperatorAuth\(request, env, 'site operator ledger'\)/.test(mainWorkerSource), {
+check('Main Worker site-operator ledger requires operator auth including trailing slash/prefix paths', /function\s+isSiteOperatorLedgerPath\(pathname = ''\)[\s\S]{0,160}\/\^\\\/api\\\/site-operator\\\/ledger\(\?:\\\/\|\$\)\/i/.test(mainWorkerSource)
+  && /isSiteOperatorLedgerPath\(url\.pathname\)[\s\S]{0,180}requireOperatorAuth\(request, env, 'site operator ledger'\)/.test(mainWorkerSource), {
+  file: mainWorker
+});
+
+check('Main Worker RouteX local login and signup stay disabled on mounted 0S routes', (() => {
+  const block = functionBlock(mainWorkerSource, 'async function routexHandleRoute');
+  return /path === '\/auth\/signup'[\s\S]{0,220}SkyeRouteX app-local signup has been removed[\s\S]{0,80}, 410\)/.test(block)
+    && /path === '\/auth\/login'[\s\S]{0,220}SkyeRouteX app-local login has been removed[\s\S]{0,80}, 410\)/.test(block)
+    && /Mounted production auth is shared FS27\/SkyGate\/Free99/.test(block);
+})(), {
+  file: mainWorker
+});
+
+check('Main Worker private SkyeNet surfaces fail closed through shared FS27 gate', (() => {
+  const block = functionBlock(mainWorkerSource, 'async function handleSkyeNetPublishedSurfaceRoute');
+  return /function isPrivateSkyeNetSurfacePath\(pathname\)/.test(mainWorkerSource)
+    && /const privateSurface = isPrivateSkyeNetSurfacePath\(url\.pathname\)/.test(block)
+    && /requireGateAuth\(request, env, 'Private SkyeNet surface'\)/.test(block)
+    && /zeroOsGateLoginRedirect\(url\)/.test(block)
+    && /fs27_binding_required/.test(block)
+    && !/env\.ASSETS\.fetch/.test(block);
+})(), {
+  file: mainWorker
+});
+
+check('Main Worker forwarding does not pass raw admin password/code headers or env admin fallbacks upstream', (() => {
+  const skynetForward = functionBlock(mainWorkerSource, 'function skynetForwardHeaders');
+  const proxyForward = functionBlock(mainWorkerSource, 'async function proxyApi');
+  const forwarding = `${skynetForward}\n${proxyForward}`;
+  return /x-skye-gate-session/.test(forwarding)
+    && /x-free99-gate-session/.test(forwarding)
+    && !/(?:x-admin-password|x-admin-token|x-free99-admin-code|OWNER_ADMIN_PASSWORD|FS27_ADMIN_PASSWORD|SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN)/.test(forwarding);
+})(), {
   file: mainWorker
 });
 
@@ -299,6 +524,8 @@ check('SkyeVault mounted Worker gates admin/provisioning lanes through FS27', co
   /GATE_PROTECTED_FUNCTIONS/,
   /introspectSkygateBearer/,
   /requireSkyVaultGateAdmin/,
+  /hasValidFs27BoundOperatorSession/,
+  /const LOCAL_OPERATOR_FUNCTIONS = new Set\(\['operator-logout'\]\)/,
   /SkyeVault local operator sessions are disabled on the mounted 0S surface/
 ]), { file: skyeVaultWorker });
 
@@ -308,6 +535,32 @@ check('SkyeVault provisioning requires FS27 scoped bearer instead of provisionin
     && /introspectSkygateBearer/.test(source)
     && !/SKYEVAULT_PROVISIONING_SECRET|PROVISIONING_SHARED_SECRET|constantTimeEqual/.test(source);
 })(), { file: skyeVaultProvision });
+
+check('SkyeVault direct Netlify admin helpers require FS27/SkyGate and keep FS27-bound operator recovery', (() => {
+  const security = read(skyeVaultSecurity);
+  const operatorSession = read(skyeVaultOperatorSession);
+  const operatorPage = read(skyeVaultOperatorPage);
+  const directFunctions = skyeVaultDirectAdminFunctions.map((file) => `\n/* ${file} */\n${read(file)}`).join('\n');
+  const cookieBlock = security.match(/const GATE_COOKIE_NAMES = \[[\s\S]*?\];/)?.[0] || '';
+  return /requireAdminAccess/.test(directFunctions)
+    && /requireAdminAccess/.test(operatorSession)
+    && /createOperatorSessionCookie/.test(operatorSession)
+    && /hasValidFs27BoundOperatorSession/.test(operatorPage)
+    && /operatorClaims && !operatorClaims\.legacy/.test(security)
+    && /SkyeVault admin access requires the shared FS27\/SkyGate bearer/.test(security)
+    && /fs27-bound-operator-session/.test(security)
+    && /METRAIYUX_GATE_SESSION/.test(cookieBlock)
+    && /SKYGATEFS27_GATE_SESSION/.test(cookieBlock)
+    && !/legacy-admin-token|Admin token, protected operator session|process\.env\.ADMIN_TOKEN \|\||return publicAdminActor\('shared-0s-gate'/.test(security)
+    && !/requireAdmin\(event\)|x-admin-token|ADMIN_TOKEN configured|Admin API token exists/.test(directFunctions);
+})(), { files: [skyeVaultSecurity, skyeVaultOperatorSession, skyeVaultOperatorPage, ...skyeVaultDirectAdminFunctions] });
+
+check('SkyeVault live smoke tooling resolves shared gate auth instead of ADMIN_TOKEN', (() => {
+  const source = read(skyeVaultLiveSmoke);
+  return /resolveZeroOsGateAuth/.test(source)
+    && /x-skye-gate-session/.test(source)
+    && !/requiredEnv\(['"]ADMIN_TOKEN['"]\)|process\.env\.ADMIN_TOKEN|x-admin-token/.test(source);
+})(), { file: skyeVaultLiveSmoke });
 
 check('CodeStudio platform routes require FS27 or signed upstream claims by default', contains(codeStudioClaims, [
   /CODESTUDIO_ALLOW_UNSIGNED_DEV_CLAIMS/,
@@ -368,6 +621,27 @@ check('SkyeCommerce mount only enters through main Worker gate handoff', (() => 
     && !/SKYECOMMERCE_GATE_HANDOFF_SECRET[\s\S]{0,120}(?:FREE99_ADMIN_CODE|ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN)/.test(source);
 })(), { file: skyeCommerceAdapter });
 
+check('SkyeCommerce mounted 0S customer lane strips local cookies and keeps password/session auth disabled', (() => {
+  const adapter = read(skyeCommerceAdapter);
+  const customerApi = read(skyeCommerceCustomers);
+  const handlerBlock = adapter.slice(adapter.indexOf('export async function handleSkyeCommerceRoute'));
+  const appRequestBlock = functionBlock(adapter, 'function appRequest');
+  const getCustomerSessionBlock = functionBlock(customerApi, 'export async function getCustomerSession');
+  const requireCustomerSessionBlock = functionBlock(customerApi, 'async function requireCustomerSession');
+  return /helpers\.requireGateAuth\(request, env, 'SkyeCommerce shared 0S gate'\)/.test(handlerBlock)
+    && /const headers = new Headers\(\);/.test(appRequestBlock)
+    && /x-skyecommerce-gate-handoff/.test(appRequestBlock)
+    && /x-skyecommerce-gate-email/.test(appRequestBlock)
+    && /x-skyecommerce-gate-sub/.test(appRequestBlock)
+    && /x-skyecommerce-mounted-base/.test(appRequestBlock)
+    && !/new Headers\(request\.headers\)|headers\.set\(['"`](?:cookie|authorization|x-admin-token|x-free99-admin-code|x-skye-session)|request\.headers\.get\(['"`](?:cookie|authorization|x-admin-token|x-free99-admin-code|x-skye-session)|skye_customer_session|CUSTOMER_SESSION_COOKIE/.test(appRequestBlock)
+    && /void request;[\s\S]{0,80}void env;[\s\S]{0,80}return null;/.test(getCustomerSessionBlock)
+    && /getSharedGateCustomerSession\(request, env/.test(requireCustomerSessionBlock)
+    && /local_customer_password_auth_disabled/.test(customerApi)
+    && /sharedGateRequired:\s*true/.test(customerApi)
+    && !/function\s+createCustomerSession|createCustomerSession\(/.test(customerApi);
+})(), { files: [skyeCommerceAdapter, skyeCommerceCustomers] });
+
 check('Mounted helper adapters fail closed when FS27 auth helper is missing', (() => {
   const tenant = read(tenantBackbone);
   const knowledge = read(companyKnowledge);
@@ -412,6 +686,15 @@ check('Relay13 admin/operator routes require FS27 by default instead of platform
     && /const gate = await introspectRelay13AdminToken\(tokenValue, this\.env\)/.test(source)
     && !/RELAY13_ALLOW_LEGACY_PLATFORM_ADMIN_TOKEN|platformAdminTokens|isPlatformAdmin|explicit-legacy-platform-admin-token/.test(source);
 })(), { file: relay13Worker });
+
+check('Main Worker Relay13 proxy only forwards operator proxy credentials on operator-gated routes', (() => {
+  const source = read(mainWorker);
+  const block = (source.match(/if \(mount\.id === 'relay13'\) \{[\s\S]*?\n  \}/g) || [])
+    .find((candidate) => candidate.includes('incomingApiKey') && candidate.includes('founderRelay13AdminCredential')) || '';
+  return /incomingHeaders\.get\('x-relay13-api-key'\)/.test(block)
+    && /edgeAuthPolicy === 'operator' \? founderRelay13AdminCredential\(env\) : ''/.test(block)
+    && /edgeAuthPolicy === 'operator' \? founderRelay13ApiCredential\(env\) : ''/.test(block);
+})(), { file: mainWorker });
 
 check('Main Worker Valley publish execution uses FS27 operator auth instead of VALLEY_PUBLISH_ADMIN_TOKEN', (() => {
   const source = read(mainWorker);
@@ -473,6 +756,30 @@ check('Free99 browser gates use the shared bridge and keep SkyeRouteX tour token
     && !/const storageKey|readJson|saas_client_session|FREE99_PLATFORM_GATE_SESSION|SKYGATE_USER_TOKEN|__KAIXU_RUNTIME__|sessionStorage\.setItem\(storageKey/.test(source));
 })(), { files: [free99Gate, routexFree99Gate] });
 
+check('SkyeVaultPro hosted account and backup lanes use FS27 gate sessions instead of Netlify Identity', (() => {
+  const bridge = read(skyeVaultProHostedBridge);
+  const drive = read(skyeVaultProDrivePage);
+  const worker = read(skyeVaultProServiceWorker);
+  const fs27 = read(skyeVaultProFs27Auth);
+  const profile = read(skyeVaultProProfile);
+  const backup = read(skyeVaultProBackup);
+  const combined = [bridge, drive, worker, fs27, profile, backup].join('\n');
+  return /MetrAIyuxGateBridge/.test(bridge)
+    && /Free99PlatformGate/.test(bridge)
+    && /requireFs27User/.test(profile)
+    && /requireFs27User/.test(backup)
+    && /identityKeysForUser/.test(fs27)
+    && /primaryIdentityKey/.test(profile)
+    && /primaryIdentityKey/.test(backup)
+    && /migrated_from_user_id/.test(profile)
+    && /migrated_from_user_id/.test(backup)
+    && /hasVaultBackupEntitlement/.test(backup)
+    && /skyevaultpro-sovereign-backup/.test(bridge)
+    && /skyevaultpro-sovereign-backup/.test(fs27)
+    && !/netlifyIdentity|identity\.netlify\.com|\/\.netlify\/identity|context\?\.netlify|netlify\?\.user/.test(combined)
+    && !/localStorage\.getItem\(['"]skyevaultpro:backup-addon|sessionStorage\.getItem\(['"]skyevaultpro:backup-addon/.test(bridge);
+})(), { files: [skyeVaultProHostedBridge, skyeVaultProDrivePage, skyeVaultProServiceWorker, skyeVaultProFs27Auth, skyeVaultProProfile, skyeVaultProBackup] });
+
 check('SkyeSplit and SkyeProfit browser gates have no manual, URL, client-session, or local-admin auth path', (() => {
   const sources = [read(skyeSplitGate), read(skyeProfitGate)];
   return sources.every((source) => /MetrAIyuxGateBridge/.test(source)
@@ -529,6 +836,57 @@ check('Founder, SkyeNet, AE, and client-factory browsers use canonical gate alia
     && !/(?:FREE99_PLATFORM_GATE_SESSION|SKYGATE_USER_TOKEN|SKYGATE_SESSION_TOKEN|adminBrainToken|adminSecuritySession|saas_client_session|kaixu_virtual_key|KAIXU_VIRTUAL_KEY|x-admin-token|x-free99-admin-code)/.test(combined);
 })(), { files: [founderCommandApp, skynetConsole, fs27PublicApp, fs27SourceApp, aeCommandApp, clientAppFactoryApp] });
 
+check('Standalone SkyeNet console reads and stores only shared FS27 gate sessions', (() => {
+  const source = read(platformSkynetConsole);
+  return /MetrAIyuxGateBridge/.test(source)
+    && /METRAIYUX_GATE_SESSION/.test(source)
+    && /SKYGATEFS27_GATE_SESSION/.test(source)
+    && !/adminBrainToken|quantumskyes_mcp_owner_token|metraiyux_0s_gate_session|skye_gate_session|skygate_session/.test(source);
+})(), { file: platformSkynetConsole });
+
+check('FS27 contact intake and SkyePay admin browsers use shared gate sessions, not password headers', (() => {
+  const combined = [...fs27ContactIntakePages, ...fs27SkyepayAdminFiles].map((file) => `\n/* ${file} */\n${read(file)}`).join('\n');
+  return /MetrAIyuxGateBridge/.test(combined)
+    && /x-skye-gate-session/.test(combined)
+    && !/x-admin-password|FS27_CONTACT_INTAKE_ADMIN_TOKEN|localStorage\.getItem\(tokenKey\)|localStorage\.setItem\(tokenKey\)|admin password/i.test(combined);
+})(), { files: [...fs27ContactIntakePages, ...fs27SkyepayAdminFiles] });
+
+check('SkyeSol kAIxu app pages use FS27 gate sessions instead of virtual local keys', (() => {
+  const gate = read(skyeSolKaixuGate);
+  const pages = skyeSolKaixuAppPages.map((file) => `\n/* ${file} */\n${read(file)}`).join('\n');
+  return /KaixuSession\?\.getToken/.test(gate)
+    && /SkyeStandaloneSession\?\.getToken/.test(gate)
+    && /MetrAIyuxGateBridge\?\.current/.test(gate)
+    && /kaixu-session\.js/.test(pages)
+    && /FS27_GATE_SESSION/.test(pages)
+    && !/kaixu_virtual_key|KAIXU_VIRTUAL_KEY|localStorage\.getItem\(['"]kaixu_virtual_key['"]\)|localStorage\.setItem\(['"]kaixu_virtual_key['"]\)|Provide Kaixu key|Key required\.|Key stored\./.test(gate + pages);
+})(), { files: [skyeSolKaixuGate, ...skyeSolKaixuAppPages] });
+
+check('Calendar, Skyemerit, and Fade Masters client lane use canonical gate sessions only', (() => {
+  const combined = [founderCalendar, saasSkyemerit, fadeMastersBooking].map((file) => `\n/* ${file} */\n${read(file)}`).join('\n');
+  return /MetrAIyuxGateBridge/.test(combined)
+    && /METRAIYUX_GATE_SESSION/.test(combined)
+    && /SKYGATEFS27_GATE_SESSION/.test(combined)
+    && !/FREE99_PLATFORM_GATE_SESSION|SKYGATE_USER_TOKEN|SKYGATE_SESSION_TOKEN|saas_client_session|adminBrainToken|metraiyux\.founderCommand\.token|x-admin-token|x-free99-admin-code/.test(combined);
+})(), { files: [founderCalendar, saasSkyemerit, fadeMastersBooking] });
+
+check('Generated contractor packet inbox uses canonical shared gate sessions only', (() => {
+  const source = read(contractorPacketGeneratedPage);
+  return /MetrAIyuxGateBridge/.test(source)
+    && /METRAIYUX_GATE_SESSION/.test(source)
+    && /SKYGATEFS27_GATE_SESSION/.test(source)
+    && !/FREE99_PLATFORM_GATE_SESSION|skye_gate_session|skygate_session|skyegate_session|metraiyux_admin_session|x-admin-token|x-free99-admin-code/.test(source);
+})(), { file: contractorPacketGeneratedPage });
+
+check('SkyeContent server runtime accepts canonical gate cookies only', (() => {
+  const source = read(skyeContentServerRuntime);
+  const gateBlock = source.match(/function getGateTokens\(req, _url\) \{[\s\S]*?\n}/)?.[0] || '';
+  return /METRAIYUX_GATE_SESSION/.test(gateBlock)
+    && /SKYGATEFS27_GATE_SESSION/.test(gateBlock)
+    && /SKYE_GATE_SESSION/.test(gateBlock)
+    && !/FREE99_PLATFORM_GATE_SESSION|skye_gate_session|skygate_session|free99_gate_session/.test(gateBlock);
+})(), { file: skyeContentServerRuntime });
+
 check('SkyeMail Netlify gate helper extracts only shared FS27 session aliases', (() => {
   const source = read(skyeMailSkygate);
   return /METRAIYUX_GATE_SESSION/.test(source)
@@ -554,6 +912,51 @@ check('Tooling resolves deploy/auth through the shared FS27 gate helper', (() =>
     && /exchange-only aliases/.test(source)
     && !/\/api\/founder-command\/login/.test(source);
 })(), { file: zeroOsGateAuthHelper });
+
+const proofToolAuthFindings = scanFileLines(allProofLikeToolFiles, rawProofToolAuthPatterns, {
+  scriptMap: packageToolScripts
+});
+const activeProofToolAuthFindings = proofToolAuthFindings.filter((finding) => finding.scripts?.length);
+const oldProofToolAuthFindings = proofToolAuthFindings.filter((finding) => !finding.scripts?.length);
+check('Active proof/live package tooling does not use broad raw admin-token or password auth', activeProofToolAuthFindings.length === 0, {
+  files: activeProofLikeToolFiles,
+  findings: activeProofToolAuthFindings.slice(0, 80),
+  totalFindings: activeProofToolAuthFindings.length
+});
+check('Old proof/live tooling has no remaining raw admin-token or password inventory', oldProofToolAuthFindings.length === 0, {
+  files: allProofLikeToolFiles,
+  findings: oldProofToolAuthFindings.slice(0, 80),
+  totalFindings: oldProofToolAuthFindings.length
+}, 'warning');
+
+const proofToolLocalTokenFindings = scanFileLines(allProofLikeToolFiles, localOwnerTokenAuthPatterns, {
+  scriptMap: packageToolScripts,
+  allowLine(line) {
+    return /\.removeItem\(/.test(line);
+  }
+});
+const activeProofToolLocalTokenFindings = proofToolLocalTokenFindings.filter((finding) => finding.scripts?.length);
+const oldProofToolLocalTokenFindings = proofToolLocalTokenFindings.filter((finding) => !finding.scripts?.length);
+check('Active proof/live package tooling does not seed adminBrainToken or local owner-token storage', activeProofToolLocalTokenFindings.length === 0, {
+  files: activeProofLikeToolFiles,
+  findings: activeProofToolLocalTokenFindings.slice(0, 80),
+  totalFindings: activeProofToolLocalTokenFindings.length
+});
+check('Old proof/live tooling has no remaining adminBrainToken or local owner-token inventory', oldProofToolLocalTokenFindings.length === 0, {
+  files: allProofLikeToolFiles,
+  findings: oldProofToolLocalTokenFindings.slice(0, 80),
+  totalFindings: oldProofToolLocalTokenFindings.length
+}, 'warning');
+
+const browserAuthRegressionFindings = scanFileLines(browserAuthRegressionFiles(), localOwnerTokenAuthPatterns, {
+  allowLine(line) {
+    return /\.removeItem\(/.test(line);
+  }
+});
+check('Browser/admin/source surfaces do not read or write adminBrainToken or local owner-token auth aliases', browserAuthRegressionFindings.length === 0, {
+  findings: browserAuthRegressionFindings.slice(0, 80),
+  totalFindings: browserAuthRegressionFindings.length
+});
 
 check('SkyeNet deploy tools no longer use founder-command login or local owner password scans', (() => {
   return skynetDeployToolFiles.every((file) => {

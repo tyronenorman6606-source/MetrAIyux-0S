@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = '/workspaces/MetrAIyux-0S';
 const baseUrl = (process.env.PROOF_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
@@ -13,108 +14,8 @@ const receiptPath = path.join(artifactRoot, `${runId}-live-browser-proof.json`);
 
 fs.mkdirSync(screenshotRoot, { recursive: true });
 
-const secretKeys = [
-  'SKYEVAULT_ONE_AUTH_LAST_PROVEN_SESSION_ID',
-  'ZERO_OS_BEARER',
-  'MCP_GATE_SESSION',
-  'QUANTUMSKYES_MCP_TOKEN',
-  'FREE99_PLATFORM_GATE_SESSION',
-  'SKYEVAULT_LAST_REPO_SESSION_ID',
-  'FREE99_ADMIN_CODE',
-  'FREE99_GATE_CODE',
-  'OWNER_ADMIN_CODE',
-  'ADMIN_CODE',
-  'FS27_ADMIN_CODE',
-  'FS27_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_CODE',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS13_ADMIN_PASSWORD',
-  'QA_ADMIN_PASSWORD',
-  'PHC_BOOTSTRAP_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'FREE99_GATE_PASSWORD',
-  'OWNER_ADMIN_PASSWORD',
-  'ADMIN_PASSWORD',
-  'SITE_OPERATOR_ADMIN_TOKEN',
-  'METRAIYUX_ADMIN_TOKEN',
-  'ADMIN_TOKEN',
-  'SKYGATEFS13_WORKER_ADMIN_TOKEN',
-  'SKYGATEFS13_WORKER_APP_TOKEN',
-  'SOL_STAFFING_OPERATOR_TOKEN_LOCAL'
-];
-
 function log(message) {
   console.log(`[skyesol-proof] ${message}`);
-}
-
-function readText(file) {
-  try {
-    return fs.readFileSync(file, 'utf8');
-  } catch {
-    return '';
-  }
-}
-
-function unquote(value) {
-  let clean = String(value || '').trim().replace(/^export\s+/, '').trim();
-  while ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
-    clean = clean.slice(1, -1).trim();
-  }
-  return clean;
-}
-
-function parseEnv(text) {
-  const env = {};
-  for (const raw of String(text || '').split(/\r?\n/)) {
-    const trimmed = raw.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const normalized = trimmed.startsWith('export ') ? trimmed.slice(7).trim() : trimmed;
-    const match = normalized.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (match) env[match[1]] = unquote(match[2]);
-  }
-  return env;
-}
-
-function mergedEnv() {
-  const texts = [
-    readText(path.join(repoRoot, '.env')),
-    readText(path.join(repoRoot, 'ADMIN_REFERENCE.md')),
-    readText(path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', '.env'))
-  ];
-  return Object.assign({}, ...texts.map(parseEnv), process.env);
-}
-
-function expandCandidate(value) {
-  const out = [];
-  const clean = unquote(value);
-  if (!clean) return out;
-  out.push(clean.replace(/^Bearer\s+/i, '').trim());
-  try {
-    const parsed = JSON.parse(clean);
-    for (const key of ['token', 'gateToken', 'gateBearerToken', 'bearer', 'session', 'adminToken', 'ownerToken']) {
-      if (parsed && typeof parsed[key] === 'string' && parsed[key].trim()) {
-        out.push(parsed[key].trim().replace(/^Bearer\s+/i, ''));
-      }
-    }
-  } catch {
-    // Plain secret candidate.
-  }
-  return out.filter(Boolean);
-}
-
-function credentialCandidates() {
-  const env = mergedEnv();
-  const values = [];
-  const source = new Map();
-  for (const key of secretKeys) {
-    for (const value of expandCandidate(env[key])) {
-      if (!source.has(value)) {
-        source.set(value, key);
-        values.push(value);
-      }
-    }
-  }
-  return { values, source };
 }
 
 function urlFor(route) {
@@ -141,25 +42,11 @@ function authHeaders(token, extra = {}) {
 }
 
 async function resolveOwnerSession(receipt) {
-  const { values, source } = credentialCandidates();
-  for (const candidate of values) {
-    const sourceKey = source.get(candidate) || 'unknown';
-    try {
-      const response = await fetchJson('/api/owner/admin-login', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ code: candidate }),
-        timeoutMs: 20000
-      });
-      receipt.credential.attempts.push({ sourceKey, status: response.status, ok: response.ok && Boolean(response.data?.token) });
-      if (response.ok && response.data?.token) {
-        return { token: response.data.token, sourceKey, method: 'owner-admin-login' };
-      }
-    } catch (error) {
-      receipt.credential.attempts.push({ sourceKey, ok: false, error: String(error?.message || error).slice(0, 160) });
-    }
-  }
-  throw new Error('No local shared owner credential unlocked /api/owner/admin-login.');
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase: baseUrl });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  receipt.credential.attempts.push({ sourceKey: auth.credential?.source || 'shared-gate', status: auth.response?.status || 0, ok: Boolean(auth.ok && token) });
+  if (!auth.ok || !token) throw new Error('Shared 0S gate session was unavailable.');
+  return { token, sourceKey: auth.credential?.key || 'shared-gate', method: 'zero-os-gate-auth' };
 }
 
 function cleanFailure(error) {
@@ -245,9 +132,12 @@ async function prepareContext(browser, token, viewport) {
       usage_lane: 'company-knowledge',
       issued_at: new Date().toISOString()
     };
-    sessionStorage.setItem('adminBrainToken', sessionToken);
     sessionStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
     localStorage.setItem('FREE99_PLATFORM_GATE_SESSION', JSON.stringify(shared));
+    sessionStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
+    localStorage.setItem('METRAIYUX_GATE_SESSION', JSON.stringify(shared));
+    sessionStorage.setItem('SKYE_GATE_SESSION', JSON.stringify(shared));
+    localStorage.setItem('SKYE_GATE_SESSION', JSON.stringify(shared));
   }, token);
   return context;
 }

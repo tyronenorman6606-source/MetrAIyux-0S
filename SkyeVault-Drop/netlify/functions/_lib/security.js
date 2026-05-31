@@ -36,7 +36,7 @@ export function parseCookies(event) {
 }
 
 function operatorSecret() {
-  return process.env.OPERATOR_SESSION_SECRET || process.env.ADMIN_TOKEN || '';
+  return process.env.OPERATOR_SESSION_SECRET || '';
 }
 
 function operatorSessionHours() {
@@ -51,9 +51,41 @@ function hmac(payload) {
   return crypto.createHmac('sha256', secret).update(payload).digest('hex');
 }
 
-export function createOperatorSessionCookie(event = null) {
+function encodeSessionPayload(value = {}) {
+  return Buffer.from(JSON.stringify(value)).toString('base64url');
+}
+
+function decodeSessionPayload(value = '') {
+  try {
+    return JSON.parse(Buffer.from(String(value || ''), 'base64url').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function operatorSessionClaimsFromActor(admin = {}, issuedAt = Date.now()) {
+  const expiresAt = issuedAt + operatorSessionHours() * 60 * 60 * 1000;
+  return {
+    v: 2,
+    iat: issuedAt,
+    exp: expiresAt,
+    actor: cleanText(admin.actor || admin.email || admin.subject || 'skyevault-owner', 180),
+    sub: cleanText(admin.subject || admin.actor || admin.email || 'skyevault-owner', 180),
+    email: cleanText(admin.email || '', 180).toLowerCase(),
+    role: cleanText(admin.role || 'owner', 80).toLowerCase(),
+    auth_type: cleanText(admin.type || 'fs27-skygate', 80),
+    customer_id: safeId(admin.customerId || ''),
+    workspace_id: safeId(admin.workspaceId || ''),
+    session_id: cleanText(admin.sessionId || '', 160),
+    api_key_id: cleanText(admin.apiKeyId || '', 160),
+    gate_card_id: cleanText(admin.gateCardId || '', 160),
+    scope: scopeList(admin.scopes || ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin'])
+  };
+}
+
+export function createOperatorSessionCookie(event = null, admin = {}) {
   const issuedAt = Date.now();
-  const payload = `v1.${issuedAt}`;
+  const payload = `v2.${encodeSessionPayload(operatorSessionClaimsFromActor(admin, issuedAt))}`;
   const signature = hmac(payload);
   const token = `${payload}.${signature}`;
   const maxAge = Math.floor(operatorSessionHours() * 60 * 60);
@@ -72,16 +104,52 @@ export function clearOperatorSessionCookie() {
   return 'cdv_operator=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure';
 }
 
-export function hasValidOperatorSession(event) {
+export function operatorSessionClaims(event) {
   const token = parseCookies(event).cdv_operator || '';
-  const [version, issuedAtRaw, signature] = token.split('.');
-  if (version !== 'v1' || !issuedAtRaw || !signature) return false;
-  const issuedAt = Number(issuedAtRaw);
-  if (!Number.isFinite(issuedAt) || issuedAt <= 0) return false;
-  const maxAgeMs = operatorSessionHours() * 60 * 60 * 1000;
-  if (Date.now() - issuedAt > maxAgeMs) return false;
-  const expected = hmac(`v1.${issuedAtRaw}`);
-  return constantTimeEqual(signature, expected);
+  const [version, payloadRaw, signature] = token.split('.');
+  if (!version || !payloadRaw || !signature) return null;
+
+  if (version === 'v2') {
+    const expected = hmac(`v2.${payloadRaw}`);
+    if (!constantTimeEqual(signature, expected)) return null;
+    const claims = decodeSessionPayload(payloadRaw);
+    if (!claims || claims.v !== 2) return null;
+    const expiresAt = Number(claims.exp || 0);
+    if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return null;
+    return claims;
+  }
+
+  if (version === 'v1') {
+    const issuedAt = Number(payloadRaw);
+    if (!Number.isFinite(issuedAt) || issuedAt <= 0) return null;
+    const maxAgeMs = operatorSessionHours() * 60 * 60 * 1000;
+    if (Date.now() - issuedAt > maxAgeMs) return null;
+    const expected = hmac(`v1.${payloadRaw}`);
+    if (!constantTimeEqual(signature, expected)) return null;
+    return {
+      v: 1,
+      iat: issuedAt,
+      exp: issuedAt + maxAgeMs,
+      actor: 'skyevault-fs27-bound-operator-session',
+      sub: 'skyevault-fs27-bound-operator-session',
+      role: 'owner',
+      auth_type: 'fs27-bound-operator-session',
+      scope: ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin'],
+      legacy: true
+    };
+  }
+
+  return null;
+}
+
+export function hasValidOperatorSession(event) {
+  return Boolean(operatorSessionClaims(event));
+}
+
+export function hasValidFs27BoundOperatorSession(event) {
+  const claims = operatorSessionClaims(event);
+  if (!claims || claims.legacy) return false;
+  return claims.v === 2 && Boolean(claims.auth_type);
 }
 
 export function assertAllowedOrigin(event) {
@@ -141,6 +209,9 @@ function stripBearer(value) {
 }
 
 const GATE_COOKIE_NAMES = [
+  'METRAIYUX_GATE_SESSION',
+  'SKYGATEFS27_GATE_SESSION',
+  'SKYE_GATE_SESSION',
   'metraiyux_admin_session',
   'skye_gate_session',
   'skygate_session',
@@ -166,6 +237,8 @@ function gateCredentialCandidates(event) {
 function bearerToken(event) {
   const cookies = parseCookies(event);
   const raw = getHeader(event, 'authorization')
+    || getHeader(event, 'x-admin-token')
+    || getHeader(event, 'x-free99-admin-code')
     || getHeader(event, 'x-skye-gate-session')
     || getHeader(event, 'x-skygate-session')
     || getHeader(event, 'x-free99-gate-session')
@@ -298,21 +371,51 @@ function emailAllowlist() {
   ).split(',').map((email) => email.trim().toLowerCase()).filter(Boolean);
 }
 
-function allowsSkyeVaultAdmin(claims = {}) {
-  if (!claims.active && !claims.ok) return false;
-  const role = String(claims.role || claims.user?.role || '').toLowerCase();
-  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
-  const email = String(claims.email || claims.username || claims.user?.email || '').toLowerCase();
+function actorRole(claims = {}) {
+  return String(claims.role || claims.user?.role || '').toLowerCase();
+}
+
+function actorScopes(claims = {}) {
+  return new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
+}
+
+function actorEmail(claims = {}) {
+  return String(claims.email || claims.username || claims.user?.email || '').toLowerCase();
+}
+
+function isPrivilegedRole(role) {
+  return ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role);
+}
+
+function isAllowlistedEmail(email) {
   const allowedEmails = emailAllowlist();
-  return ['founder', 'owner', 'admin', 'deployer', 'operator'].includes(role)
+  return allowedEmails.length > 0 && allowedEmails.includes(email);
+}
+
+function allowsSkyeVaultAdminWrite(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = actorRole(claims);
+  const scopes = actorScopes(claims);
+  const email = actorEmail(claims);
+  return isPrivilegedRole(role)
     || scopes.has('admin.write')
-    || scopes.has('admin.read')
     || scopes.has('keys.write')
     || scopes.has('gateway.invoke')
     || scopes.has('skyevault.admin')
     || scopes.has('vault.admin')
-    || scopes.has('vault.download')
-    || (allowedEmails.length > 0 && allowedEmails.includes(email));
+    || isAllowlistedEmail(email);
+}
+
+function allowsSkyeVaultAdminRead(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const scopes = actorScopes(claims);
+  return allowsSkyeVaultAdminWrite(claims) || scopes.has('admin.read');
+}
+
+function allowsSkyeVaultDownload(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const scopes = actorScopes(claims);
+  return allowsSkyeVaultAdminRead(claims) || scopes.has('vault.download');
 }
 
 function publicAdminActor(type, claims = {}) {
@@ -411,34 +514,26 @@ export async function introspectZeroOsOwnerBearer(event) {
 
 export function requireAdmin(event) {
   assertAllowedOrigin(event);
-  const configured = process.env.ADMIN_TOKEN;
-  if (!configured) {
-    const error = new Error('ADMIN_TOKEN is not configured.');
-    error.statusCode = 500;
-    throw error;
-  }
-  const provided = getHeader(event, 'x-admin-token');
-  const headerOk = provided ? constantTimeEqual(provided, configured) : false;
-  const sessionOk = hasValidOperatorSession(event);
-  if (!headerOk && !sessionOk) {
-    const error = new Error('Admin token or protected operator session is invalid or missing.');
-    error.statusCode = 401;
-    throw error;
-  }
+  const error = new Error('SkyeVault admin access requires the shared FS27/SkyGate bearer via requireAdminAccess.');
+  error.statusCode = 503;
+  throw error;
 }
 
-export async function requireAdminAccess(event) {
-  assertAllowedOrigin(event);
-  if (sharedGateCredentialFromEvent(event)) {
-    return publicAdminActor('shared-0s-gate', {
-      active: true,
-      ok: true,
-      role: 'owner',
-      sub: 'shared-0s-gate',
-      scope: ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin']
-    });
-  }
+function accessAllowedForLevel(claims, level) {
+  if (level === 'download') return allowsSkyeVaultDownload(claims);
+  if (level === 'read') return allowsSkyeVaultAdminRead(claims);
+  return allowsSkyeVaultAdminWrite(claims);
+}
 
+function accessErrorForLevel(level) {
+  if (level === 'download') return 'Shared gate bearer is active, but it is not vault-download-scoped for SkyeVault.';
+  if (level === 'read') return 'Shared gate bearer is active, but it is not admin-read-scoped for SkyeVault.';
+  return 'Shared gate bearer is active, but it is not admin-write-scoped for SkyeVault.';
+}
+
+export async function requireAdminAccess(event, options = {}) {
+  assertAllowedOrigin(event);
+  const level = options.level || 'write';
   const bearer = bearerToken(event);
   if (bearer) {
     let gate = await introspectSkygateBearer(event);
@@ -451,12 +546,12 @@ export async function requireAdminAccess(event) {
         throw error;
       }
     }
-    if (!allowsSkyeVaultAdmin(gate.claims)) {
+    if (!accessAllowedForLevel(gate.claims, level)) {
       const zeroOs = gate.path === '/api/owner/admin-session' ? gate : await introspectZeroOsOwnerBearer(event);
-      if (zeroOs.ok && allowsSkyeVaultAdmin(zeroOs.claims)) {
+      if (zeroOs.ok && accessAllowedForLevel(zeroOs.claims, level)) {
         gate = zeroOs;
       } else {
-        const error = new Error('Shared gate bearer is active, but it is not admin-scoped for SkyeVault.');
+        const error = new Error(accessErrorForLevel(level));
         error.statusCode = 403;
         throw error;
       }
@@ -464,18 +559,49 @@ export async function requireAdminAccess(event) {
     return publicAdminActor(gate.path === '/api/owner/admin-session' ? 'zero-os-owner-session' : 'fs27-skygate', gate.claims);
   }
 
-  const configured = process.env.ADMIN_TOKEN;
-  const provided = getHeader(event, 'x-admin-token');
-  if (configured && provided && constantTimeEqual(provided, configured)) {
-    return publicAdminActor('legacy-admin-token', { role: 'admin', sub: 'legacy-admin-token' });
-  }
-  if (hasValidOperatorSession(event)) {
-    return publicAdminActor('operator-session', { role: 'admin', sub: 'operator-session' });
+  const operatorClaims = operatorSessionClaims(event);
+  if (operatorClaims && !operatorClaims.legacy && accessAllowedForLevel({ ...operatorClaims, active: true, ok: true }, level)) {
+    return publicAdminActor('fs27-bound-operator-session', {
+      active: true,
+      ok: true,
+      role: operatorClaims.role || 'owner',
+      email: operatorClaims.email || '',
+      sub: operatorClaims.sub || operatorClaims.actor || 'skyevault-fs27-bound-operator-session',
+      customer_id: operatorClaims.customer_id || '',
+      workspace_id: operatorClaims.workspace_id || '',
+      session_id: operatorClaims.session_id || '',
+      api_key_id: operatorClaims.api_key_id || '',
+      gate_card_id: operatorClaims.gate_card_id || '',
+      scope: operatorClaims.scope || ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', 'skyevault.admin']
+    });
   }
 
-  const error = new Error('Admin token, protected operator session, or FS27 admin bearer is invalid or missing.');
+  const error = new Error('Shared FS27/SkyGate admin bearer is invalid or missing.');
   error.statusCode = 401;
   throw error;
+}
+
+export function requireAdminReadAccess(event) {
+  return requireAdminAccess(event, { level: 'read' });
+}
+
+export function requireVaultDownloadAccess(event) {
+  return requireAdminAccess(event, { level: 'download' });
+}
+
+export function adminAuditDetails(admin = {}, extra = {}) {
+  return {
+    actor: admin.actor || '',
+    authType: admin.type || '',
+    subject: admin.subject || '',
+    email: admin.email || '',
+    workspaceId: admin.workspaceId || '',
+    customerId: admin.customerId || '',
+    gateCardId: admin.gateCardId || '',
+    sessionId: admin.sessionId || '',
+    apiKeyId: admin.apiKeyId || '',
+    ...extra
+  };
 }
 
 export function requirePortalKey(event, body = {}) {
@@ -541,15 +667,6 @@ export async function resolvePortalAccess(event, body = {}) {
   assertAllowedOrigin(event);
   const adminMaterial = gateCredentialCandidates(event);
   if (adminMaterial.length) {
-    const sharedGateToken = sharedGateCredentialFromEvent(event);
-    if (matchesSharedGateCredential(sharedGateToken)) {
-      recordPortalKeySuccess(event);
-      return ownerAdminPortalAccess(body, publicAdminActor('shared-0s-gate', {
-        role: 'owner',
-        sub: 'shared-0s-gate',
-        scope: ['skyevault.admin', 'gateway.invoke']
-      }));
-    }
     try {
       const admin = await requireAdminAccess(event);
       recordPortalKeySuccess(event);

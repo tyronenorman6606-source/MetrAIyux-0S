@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = process.cwd();
 const artifactRoot = path.resolve('test-artifacts/bobs-skynet-deploy');
@@ -11,51 +12,6 @@ const zeroOsBase = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev
 const skynetBase = 'https://skyenet.graylondonskyes.workers.dev';
 const marketingBase = 'https://metraiyux-0s-marketing.pages.dev';
 const skyVaultBase = 'https://skyevault-drop.graylondonskyes.workers.dev';
-
-const credentialKeys = [
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
-];
-
-function unquote(value = '') {
-  const text = String(value || '').trim();
-  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) return text.slice(1, -1);
-  return text;
-}
-
-async function readEnvFile(file) {
-  try {
-    const text = await fs.readFile(file, 'utf8');
-    const values = {};
-    for (const line of text.split(/\r?\n/)) {
-      const match = line.match(/^(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)$/);
-      if (match) values[match[1]] = unquote(match[2]);
-    }
-    return values;
-  } catch {
-    return {};
-  }
-}
-
-async function ownerCredential() {
-  const files = [
-    process.env.ROOT_ENV_FILE,
-    process.env.METRAIYUX_ROOT_ENV,
-    '.env',
-    'env.txt'
-  ].filter(Boolean);
-  const merged = { ...process.env };
-  for (const file of files) Object.assign(merged, await readEnvFile(path.resolve(file)));
-  for (const key of credentialKeys) {
-    if (merged[key]) return { key, value: merged[key] };
-  }
-  return { key: '', value: '' };
-}
 
 async function fetchAny(url, init = {}) {
   const started = performance.now();
@@ -76,17 +32,14 @@ async function fetchAny(url, init = {}) {
 }
 
 async function login() {
-  const credential = await ownerCredential();
-  if (!credential.value) return { credential_source: '', token: '', status: 0, ok: false };
-  const response = await fetchAny(`${zeroOsBase}/api/owner/admin-login`, {
-    method: 'POST',
-    headers: { accept: 'application/json', 'content-type': 'application/json' },
-    body: JSON.stringify({ code: credential.value })
-  });
-  let body = {};
-  try { body = JSON.parse(response.text || '{}'); } catch {}
-  const token = body.gateBearerToken || body.gateToken || body.token || '';
-  return { credential_source: credential.key, token, status: response.status, ok: Boolean(token) };
+  const auth = await resolveZeroOsGateAuth({ zeroOsBase });
+  const token = String(auth.token || '').replace(/^Bearer\s+/i, '').trim();
+  return {
+    credential_source: auth.credential?.key || '',
+    token,
+    status: auth.response?.status || 0,
+    ok: Boolean(auth.ok && token)
+  };
 }
 
 function hasAll(text, needles) {
