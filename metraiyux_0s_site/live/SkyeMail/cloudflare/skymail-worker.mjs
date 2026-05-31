@@ -7774,9 +7774,13 @@ async function serveStatic(request, env) {
     });
   }
   if (pathname === "/") {
-    const indexRequest = new Request(new URL("/home.html", url.origin), request);
+    const indexRequest = new Request(new URL("/__skyemail_root", url.origin), request);
     const indexRes = await env.ASSETS.fetch(indexRequest);
-    if (indexRes.status !== 404) return indexRes;
+    if (indexRes.status !== 404) {
+      const headers = new Headers(indexRes.headers);
+      headers.set("content-type", "text/html; charset=utf-8");
+      return new Response(indexRes.body, { status: indexRes.status, headers });
+    }
     return null;
   }
   const htmlPage = pathname.match(/^\/([a-z0-9-]+)\.html$/i);

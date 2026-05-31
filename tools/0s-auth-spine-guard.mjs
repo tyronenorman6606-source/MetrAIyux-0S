@@ -217,7 +217,14 @@ check('Main Worker paid-lane proof mode requires FS27/SkyGate authority', !/func
   file: mainWorker
 });
 
-check('Main Worker owner credential fallback does not scan generic app admin tokens', !/const OWNER_ADMIN_CREDENTIAL_ENV_KEYS = \[[\s\S]*?(?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN|SKYGATEFS13_WORKER_ADMIN_TOKEN|MCP_HTTP_BEARER_TOKEN)[\s\S]*?\];/.test(mainWorkerSource), {
+check('Main Worker owner credential fallback does not scan generic app admin tokens', (() => {
+  const ownerBlock = mainWorkerSource.match(/const OWNER_ADMIN_CREDENTIAL_ENV_KEYS = \[[\s\S]*?\];/)?.[0] || '';
+  const retiredBlock = mainWorkerSource.match(/const RETIRED_LOCAL_AUTH_CREDENTIAL_ENV_KEYS = \[[\s\S]*?\];/)?.[0] || '';
+  return !/['"](?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN|SKYGATEFS13_WORKER_ADMIN_TOKEN|MCP_HTTP_BEARER_TOKEN)['"]/.test(ownerBlock)
+    && /['"]ADMIN_TOKEN['"]/.test(retiredBlock)
+    && /retiredLocalAuthCredentialValues/.test(mainWorkerSource)
+    && /localSharedGateFallbackDisabledResponse\(label\)/.test(mainWorkerSource);
+})(), {
   file: mainWorker
 });
 

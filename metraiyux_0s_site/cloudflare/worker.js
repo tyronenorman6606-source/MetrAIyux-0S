@@ -600,6 +600,13 @@ const OWNER_ADMIN_CREDENTIAL_ENV_KEYS = [
   'QA_ADMIN_PASSWORD',
   'PHC_BOOTSTRAP_ADMIN_CODE'
 ];
+const RETIRED_LOCAL_AUTH_CREDENTIAL_ENV_KEYS = [
+  'SITE_OPERATOR_ADMIN_TOKEN',
+  'METRAIYUX_ADMIN_TOKEN',
+  'ADMIN_TOKEN',
+  'SKYGATEFS13_WORKER_ADMIN_TOKEN',
+  'MCP_HTTP_BEARER_TOKEN'
+];
 const FREE99_DEMO_CREDENTIAL_ENV_KEYS = [
   'FREE99_SIGNINPRO_DEMO_CODE',
   'SIGNINPRO_DEMO_CODE',
@@ -646,6 +653,9 @@ function ownerAdminSecrets(env) {
 }
 function ownerAdminAcceptedCodes(env) {
   return uniqueCredentials(ownerAdminCredentialValues(env));
+}
+function retiredLocalAuthCredentialValues(env) {
+  return uniqueCredentials(credentialValuesForKeys(env, RETIRED_LOCAL_AUTH_CREDENTIAL_ENV_KEYS));
 }
 function presentedGateCredentials(request) {
   return uniqueCredentials([
@@ -2712,6 +2722,10 @@ async function requireOperatorAuth(request, env, label = 'operator mutation'){
   const token = bearer(request);
   const presented = presentedGateCredentials(request);
   const expected = ownerAdminAcceptedCodes(env);
+  const retiredLocal = retiredLocalAuthCredentialValues(env);
+  if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch && retiredLocal.length && presented.some(value => retiredLocal.includes(value))) {
+    return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
+  }
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
       return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
@@ -2747,6 +2761,10 @@ async function requireGateAuth(request, env, label = 'gated route'){
   const token = bearer(request);
   const presented = presentedGateCredentials(request);
   const expected = ownerAdminAcceptedCodes(env);
+  const retiredLocal = retiredLocalAuthCredentialValues(env);
+  if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch && retiredLocal.length && presented.some(value => retiredLocal.includes(value))) {
+    return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
+  }
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
       return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
