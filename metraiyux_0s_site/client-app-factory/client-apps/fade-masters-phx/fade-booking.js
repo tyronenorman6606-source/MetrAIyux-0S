@@ -7,14 +7,9 @@
   const NORTHSTAR_APP_URL = `${NORTHSTAR_OS_ORIGIN}/northstar/index.html?workspace=${SIGNINPRO_WORKSPACE_SLUG}&client=${SIGNINPRO_WORKSPACE_SLUG}`;
   const NORTHSTAR_API_BASE = `${NORTHSTAR_OS_ORIGIN}/api/northstar`;
   const SHARED_GATE_KEYS = [
-    'FREE99_PLATFORM_GATE_SESSION',
     'METRAIYUX_GATE_SESSION',
     'SKYGATEFS27_GATE_SESSION',
-    'SKYGATE_USER_TOKEN',
-    'SKYE_GATE_SESSION',
-    'quantumskyes_mcp_owner_token',
-    'metraiyux.founderCommand.token',
-    'adminBrainToken'
+    'SKYE_GATE_SESSION'
   ];
   let northStarCsrfToken = '';
   const services = [
@@ -170,11 +165,13 @@
   }
 
   function readSharedGateToken() {
+    const bridgeToken = cleanToken(window.MetrAIyuxGateBridge?.current?.()?.token || window.Free99PlatformGate?.requireSession?.()?.token || '');
+    if (bridgeToken) return bridgeToken;
     for (const key of SHARED_GATE_KEYS) {
       const token = readTokenFromStorage(sessionStorage, key) || readTokenFromStorage(localStorage, key);
       if (token) return token;
     }
-    return cleanToken(window.MetrAIyuxGateBridge?.current?.()?.token || window.Free99PlatformGate?.requireSession?.()?.token || '');
+    return '';
   }
 
   async function northStarApi(path, options = {}) {

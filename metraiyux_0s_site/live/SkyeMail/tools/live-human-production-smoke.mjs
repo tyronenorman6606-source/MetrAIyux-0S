@@ -51,6 +51,7 @@ function record(name, result = {}) {
     detail: result.detail || null,
   };
   receipt.checks.push(item);
+  console.error(`[skyemail-smoke] ${item.ok ? "ok" : "fail"} ${name} status=${item.status} ms=${item.ms}`);
   return item;
 }
 

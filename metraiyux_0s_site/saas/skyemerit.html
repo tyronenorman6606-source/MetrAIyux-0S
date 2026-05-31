@@ -82,8 +82,15 @@
   <script>
     const money = (cents) => "$" + (Math.round(cents) / 100).toLocaleString("en-US", {maximumFractionDigits:2});
     function gateHeaders() {
-      const keys = ["FREE99_PLATFORM_GATE_SESSION","METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYGATE_USER_TOKEN","SKYE_GATE_SESSION","adminBrainToken"];
+      const keys = ["METRAIYUX_GATE_SESSION","SKYGATEFS27_GATE_SESSION","SKYE_GATE_SESSION"];
       const headers = {accept:"application/json"};
+      const bridgeToken = window.MetrAIyuxGateBridge?.current?.()?.token || "";
+      if (bridgeToken) {
+        headers.authorization = `Bearer ${bridgeToken}`;
+        headers["x-free99-gate-session"] = bridgeToken;
+        headers["x-skye-gate-session"] = bridgeToken;
+        return headers;
+      }
       for (const key of keys) {
         const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
         if (!raw) continue;

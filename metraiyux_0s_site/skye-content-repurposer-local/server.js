@@ -865,11 +865,9 @@ function getGateTokens(req, _url) {
     headerValue(req, 'x-free99-gate-session'),
     headerValue(req, 'x-0s-gate-session'),
     headerValue(req, 'x-skygate-session'),
-    tokenFromCookie(cookieValue(req, 'free99_gate_session')),
-    tokenFromCookie(cookieValue(req, 'skye_gate_session')),
-    tokenFromCookie(cookieValue(req, 'skygate_session')),
-    tokenFromCookie(cookieValue(req, 'FREE99_PLATFORM_GATE_SESSION')),
-    tokenFromCookie(cookieValue(req, 'METRAIYUX_GATE_SESSION'))
+    tokenFromCookie(cookieValue(req, 'METRAIYUX_GATE_SESSION')),
+    tokenFromCookie(cookieValue(req, 'SKYGATEFS27_GATE_SESSION')),
+    tokenFromCookie(cookieValue(req, 'SKYE_GATE_SESSION'))
   ];
   return [...new Set(candidates.map((value) => String(value || '').trim()).filter(Boolean))];
 }

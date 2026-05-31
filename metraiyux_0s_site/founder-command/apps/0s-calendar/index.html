@@ -171,11 +171,10 @@ let reminderAuditLog = [];
 function setStatus(t){ statusEl.textContent = t; }
 const SUPERIDE_SKYECALENDAR_STORAGE = 'zeroos.superide.skyecalendar.model.v1';
 const GATE_STORAGE_KEYS = [
-  'FREE99_PLATFORM_GATE_SESSION',
   'METRAIYUX_GATE_SESSION',
+  'SKYGATEFS27_GATE_SESSION',
   'SKYE_GATE_SESSION',
-  'FS27_GATE_SESSION',
-  'NORTHSTAR_GATE_SESSION'
+  'FS27_GATE_SESSION'
 ];
 function setText(id, text) {
   const el = document.getElementById(id);
@@ -195,6 +194,8 @@ function cleanGateToken(value) {
   return token;
 }
 function storedGateToken() {
+  const bridgeToken = window.MetrAIyuxGateBridge?.current?.()?.token || '';
+  if (bridgeToken) return cleanGateToken(bridgeToken);
   try {
     for (const key of GATE_STORAGE_KEYS) {
       const token = cleanGateToken(localStorage.getItem(key) || sessionStorage.getItem(key));
@@ -211,9 +212,7 @@ function gateHeaders(extra = {}) {
     ...(token ? {
       Authorization: 'Bearer ' + token,
       'x-free99-gate-session': token,
-      'x-skye-gate-session': token,
-      'x-free99-admin-code': token,
-      'x-admin-token': token
+      'x-skye-gate-session': token
     } : {}),
     ...extra
   };

@@ -1,7 +1,7 @@
 (function () {
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-  const auth = { adminPassword: "" };
+  const auth = { gateToken: "" };
 
   function money(cents) {
     return "$" + (Math.round(Number(cents || 0)) / 100).toLocaleString("en-US", {
@@ -25,8 +25,10 @@
   }
 
   async function adminJson(path, options = {}) {
+    const token = auth.gateToken || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
     const headers = {
-      "x-admin-password": auth.adminPassword,
+      authorization: `Bearer ${token}`,
+      "x-skye-gate-session": token,
       ...(options.body ? { "content-type": "application/json" } : {})
     };
     const res = await fetch(path, { ...options, headers });
@@ -148,11 +150,12 @@
   }
 
   $("#loginBtn")?.addEventListener("click", async () => {
-    auth.adminPassword = ($("#adminPassword").value || "").trim();
-    if (!auth.adminPassword) {
-      $("#ledgerToast").textContent = "Enter the admin password.";
+    auth.gateToken = ($("#adminPassword").value || "").trim() || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
+    if (!auth.gateToken) {
+      $("#ledgerToast").textContent = "Open the shared FS27/SkyGate session.";
       return;
     }
+    globalThis.MetrAIyuxGateBridge?.persist?.({ token: auth.gateToken, source: "skyepay-admin" }, { silent: true });
     $("#loginPanel").hidden = true;
     $("#ledgerPanel").hidden = false;
     try {
@@ -160,7 +163,7 @@
     } catch (error) {
       $("#loginPanel").hidden = false;
       $("#ledgerPanel").hidden = true;
-      auth.adminPassword = "";
+      auth.gateToken = "";
       alert(error.message || "Could not open SkyePay ledger.");
     }
   });
