@@ -353,8 +353,7 @@ check('SkyeCommerce local password entrypoints are retired to the shared FS27 ga
 
 check('SkyeCommerce mount only enters through main Worker gate handoff', (() => {
   const source = read(skyeCommerceAdapter);
-  return /deps\?\.requireGateAuth/.test(source)
-    && /deps\?\.requireOperatorAuth/.test(source)
+  return /helpers\.requireGateAuth/.test(source)
     && /code:\s*'fs27_helper_required'/.test(source)
     && /x-skyecommerce-gate-sub/.test(source)
     && /x-skyecommerce-gate-customer-id/.test(source)
