@@ -52,7 +52,7 @@ function extractGateCredentialFromHeaders(headers = {}) {
     if (value) return value;
   }
   const cookies = parseCookies(headerValue(headers, 'cookie'));
-  for (const name of ['FREE99_PLATFORM_GATE_SESSION', 'METRAIYUX_GATE_SESSION', 'SKYGATEFS27_GATE_SESSION', 'SKYE_GATE_SESSION', 'owner_admin_session']) {
+  for (const name of ['METRAIYUX_GATE_SESSION', 'SKYGATEFS27_GATE_SESSION', 'SKYE_GATE_SESSION', 'owner_admin_session']) {
     const raw = cookies[name];
     if (!raw) continue;
     try {

@@ -77,6 +77,11 @@ const codeStudioClaims = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/
 const codeStudioServer = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/http-server.mjs';
 const codeStudioEngine = 'metraiyux_0s_site/Free99/apps/kaixu-codestudio/server/platform-engine.mjs';
 const skyeCommerceCustomers = 'metraiyux_0s_site/SkyeCommerce/src/lib/customer-api.js';
+const skyeCommerceApp = 'metraiyux_0s_site/SkyeCommerce/src/index.js';
+const skyeCommerceAdapter = 'metraiyux_0s_site/cloudflare/skyecommerce-adapter.mjs';
+const skyeCommerceGateMigration = 'metraiyux_0s_site/SkyeCommerce/migrations/0031_shared_gate_identity_links.sql';
+const tenantBackbone = 'metraiyux_0s_site/cloudflare/tenant-backbone.mjs';
+const companyKnowledge = 'metraiyux_0s_site/cloudflare/company-knowledge.mjs';
 const fs27Admin = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/admin.js';
 const fs27AdminLogin = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/admin-login.js';
 const signinproLib = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/signinpro.js';
@@ -114,6 +119,14 @@ const skyeSolWelcome = 'metraiyux_0s_site/skyenet-drops/skyesol-company-public/w
 const skyeSolKaixuAdminBridge = 'metraiyux_0s_site/skyenet-drops/skyesol-company-public/js/kaixu-admin-bridge.js';
 const valleyBrain = 'metraiyux_0s_site/valley-verified/assets/valley-brain.js';
 const valleyAdminConsole = 'metraiyux_0s_site/valley-verified/assets/admin-console.js';
+const founderCommandApp = 'metraiyux_0s_site/founder-command/app.js';
+const skynetConsole = 'metraiyux_0s_site/skyenet/skyenet.js';
+const fs27PublicApp = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/public/assets/app.js';
+const fs27SourceApp = 'metraiyux_0s_site/skyegate/source/SkyeGateFS27/assets/app.js';
+const aeCommandApp = 'metraiyux_0s_site/ae-command/ae-command.js';
+const clientAppFactoryApp = 'metraiyux_0s_site/client-app-factory/assets/app.js';
+const skyeMailSkygate = 'metraiyux_0s_site/live/SkyeMail/netlify/functions/_skygate.js';
+const divisionalGate = 'metraiyux_0s_site/DeVisional Riftx/platform/fs27-gate.js';
 const adminLoginPage = 'metraiyux_0s_site/admin/login.html';
 const generatedAdminLoginPage = 'metraiyux_0s_site/cloudflare/generated-admin-login-page.mjs';
 const gateSignupPage = 'metraiyux_0s_site/gate/signup/index.html';
@@ -195,11 +208,21 @@ check('Docs do not present static Git token as normal owner login', staleDocs.le
 const packageFindings = packageScriptFindings();
 check('Package scripts do not default to static SkyeVault Git auth', packageFindings.length === 0, { findings: packageFindings });
 
-check('Main Worker does not authorize production routes with local shared gate-code fallback', !/via:\s*['"]local-shared-gate-code['"]/.test(mainWorkerSource), {
+check('Main Worker does not authorize production routes with local shared gate-code fallback', !/via:\s*['"]local-shared-gate-code['"]|dev-local-shared-gate-code|local-shared-gate-code/.test(mainWorkerSource)
+  && /function\s+explicitLocalSharedGateFallbackAllowed\(env = \{\}\)\s*\{\s*return false;\s*\}/.test(mainWorkerSource), {
   file: mainWorker
 });
 
 check('Main Worker paid-lane proof mode requires FS27/SkyGate authority', !/function\s+paidLaneProofModeAllowed[\s\S]*?via:\s*['"]local-shared-gate-code['"][\s\S]*?\n}/.test(mainWorkerSource), {
+  file: mainWorker
+});
+
+check('Main Worker owner credential fallback does not scan generic app admin tokens', !/const OWNER_ADMIN_CREDENTIAL_ENV_KEYS = \[[\s\S]*?(?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN|SKYGATEFS13_WORKER_ADMIN_TOKEN|MCP_HTTP_BEARER_TOKEN)[\s\S]*?\];/.test(mainWorkerSource), {
+  file: mainWorker
+});
+
+check('Main Worker SkyeMusic gate does not accept raw ADMIN_TOKEN authority', !/async function requireMusicGate[\s\S]*?(?:SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN)[\s\S]*?\n}/.test(mainWorkerSource)
+  && !/via:\s*['"]admin_token['"]/.test(mainWorkerSource), {
   file: mainWorker
 });
 
@@ -307,6 +330,48 @@ check('SkyeCommerce mounted customer auth reconciles to FS27 gate without issuin
     && sharedGateBlocks.every(block => !/createCustomerSession|Set-Cookie/.test(block));
 })(), { file: skyeCommerceCustomers });
 
+check('SkyeCommerce owner/operator access is linked to FS27 without deleting local merchant data', (() => {
+  const source = read(skyeCommerceApp);
+  const migration = read(skyeCommerceGateMigration);
+  const getSessionBlock = source.match(/async function getSession\(request, env\) \{[\s\S]*?\n}/)?.[0] || '';
+  return /CREATE TABLE IF NOT EXISTS shared_gate_identity_links/.test(source)
+    && /upsertSharedGateIdentityLink\(env, row, actor\)/.test(source)
+    && /fs27_sub TEXT NOT NULL DEFAULT ''/.test(migration)
+    && /local_merchant_email TEXT NOT NULL DEFAULT ''/.test(migration)
+    && /if \(sharedGateSession\) return sharedGateSession;\s*return null;/.test(getSessionBlock)
+    && !/request\.headers\.get\(['"]cookie['"]\)|dbFirst\(env,\s*`SELECT \* FROM sessions|getCookie\(request/.test(getSessionBlock);
+})(), { files: [skyeCommerceApp, skyeCommerceGateMigration] });
+
+check('SkyeCommerce local password entrypoints are retired to the shared FS27 gate', (() => {
+  const source = read(skyeCommerceApp);
+  return /\/api\/merchant\/register[\s\S]{0,180}shared_gate_required/.test(source)
+    && /\/api\/auth\/login[\s\S]{0,180}shared_gate_required/.test(source)
+    && /\/api\/staff\/login[\s\S]{0,180}shared_gate_required/.test(source)
+    && /\/api\/staff\/invitations\/accept[\s\S]{0,220}shared_gate_required/.test(source)
+    && /const passwordHash = '';\s*await dbRun\(env, `INSERT INTO staff_members/.test(source);
+})(), { file: skyeCommerceApp });
+
+check('SkyeCommerce mount only enters through main Worker gate handoff', (() => {
+  const source = read(skyeCommerceAdapter);
+  return /deps\?\.requireGateAuth/.test(source)
+    && /deps\?\.requireOperatorAuth/.test(source)
+    && /code:\s*'fs27_helper_required'/.test(source)
+    && /x-skyecommerce-gate-sub/.test(source)
+    && /x-skyecommerce-gate-customer-id/.test(source)
+    && /x-skyecommerce-gate-workspace-id/.test(source)
+    && !/SKYECOMMERCE_GATE_HANDOFF_SECRET[\s\S]{0,120}(?:FREE99_ADMIN_CODE|ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN)/.test(source);
+})(), { file: skyeCommerceAdapter });
+
+check('Mounted helper adapters fail closed when FS27 auth helper is missing', (() => {
+  const tenant = read(tenantBackbone);
+  const knowledge = read(companyKnowledge);
+  const commerce = read(skyeCommerceAdapter);
+  return /fs27_helper_required/.test(tenant)
+    && /fs27_helper_required/.test(knowledge)
+    && /fs27_helper_required/.test(commerce)
+    && !/local-test|return \{ ok:\s*true,\s*role:\s*'admin'|return \{ ok:\s*true,\s*user:/.test(`${tenant}\n${knowledge}\n${commerce}`);
+})(), { files: [tenantBackbone, companyKnowledge, skyeCommerceAdapter] });
+
 check('Direct site-operator helper gates mutations and ledger through FS27 or 0S internal proxy', contains(siteOperatorWorker, [
   /authorized\(request, env\)/,
   /introspectFs27Token/,
@@ -336,9 +401,10 @@ check('Relay13 admin/operator routes require FS27 by default instead of platform
   const source = read(relay13Worker);
   return /async function requireAdmin\(request, env\)/.test(source)
     && /introspectRelay13AdminToken/.test(source)
-    && /RELAY13_ALLOW_LEGACY_PLATFORM_ADMIN_TOKEN/.test(source)
+    && /sharedProxyAuth\(request, env\)/.test(source)
     && /Canonical FS27\/SkyGate session is required for Relay13 admin access/.test(source)
-    && /const gate = await introspectRelay13AdminToken\(tokenValue, this\.env\)/.test(source);
+    && /const gate = await introspectRelay13AdminToken\(tokenValue, this\.env\)/.test(source)
+    && !/RELAY13_ALLOW_LEGACY_PLATFORM_ADMIN_TOKEN|platformAdminTokens|isPlatformAdmin|explicit-legacy-platform-admin-token/.test(source);
 })(), { file: relay13Worker });
 
 check('Main Worker Valley publish execution uses FS27 operator auth instead of VALLEY_PUBLISH_ADMIN_TOKEN', (() => {
@@ -449,6 +515,30 @@ check('Valley admin browser lanes use the shared gate bridge instead of stored a
     && !/ownerAdminLogin|saveAdminToken|x-admin-token|localStorage\.getItem\('metraiyux\.adminToken'|localStorage\.getItem\('valleyVerified\.adminToken'/.test(brain)
     && !/fs27_gate_token|x-admin-token/.test(admin);
 })(), { files: [valleyBrain, valleyAdminConsole] });
+
+check('Founder, SkyeNet, AE, and client-factory browsers use canonical gate aliases only', (() => {
+  const files = [founderCommandApp, skynetConsole, fs27PublicApp, fs27SourceApp, aeCommandApp, clientAppFactoryApp];
+  const combined = files.map((file) => `\n/* ${file} */\n${read(file)}`).join('\n');
+  return /MetrAIyuxGateBridge|METRAIYUX_GATE_SESSION|SKYGATEFS27_GATE_SESSION/.test(combined)
+    && !/(?:FREE99_PLATFORM_GATE_SESSION|SKYGATE_USER_TOKEN|SKYGATE_SESSION_TOKEN|adminBrainToken|adminSecuritySession|saas_client_session|kaixu_virtual_key|KAIXU_VIRTUAL_KEY|x-admin-token|x-free99-admin-code)/.test(combined);
+})(), { files: [founderCommandApp, skynetConsole, fs27PublicApp, fs27SourceApp, aeCommandApp, clientAppFactoryApp] });
+
+check('SkyeMail Netlify gate helper extracts only shared FS27 session aliases', (() => {
+  const source = read(skyeMailSkygate);
+  return /METRAIYUX_GATE_SESSION/.test(source)
+    && /SKYGATEFS27_GATE_SESSION/.test(source)
+    && /SKYE_GATE_SESSION/.test(source)
+    && !/FREE99_PLATFORM_GATE_SESSION|SKYGATE_USER_TOKEN|SKYGATE_SESSION_TOKEN|x-admin-token|x-free99-admin-code/.test(source);
+})(), { file: skyeMailSkygate });
+
+check('DeVisional copied FS27 gate helper no longer reads legacy Free99 platform browser storage', (() => {
+  const source = read(divisionalGate);
+  const cookieLoop = source.match(/for \(const name of \[[\s\S]*?\]\) \{/)?.[0] || '';
+  return /introspectGateCredential/.test(source)
+    && /FS27_AUTH_INTROSPECT_URL/.test(source)
+    && !/FREE99_PLATFORM_GATE_SESSION/.test(cookieLoop)
+    && !/SITE_OPERATOR_ADMIN_TOKEN|METRAIYUX_ADMIN_TOKEN|ADMIN_TOKEN/.test(source);
+})(), { file: divisionalGate });
 
 check('Tooling resolves deploy/auth through the shared FS27 gate helper', (() => {
   const source = read(zeroOsGateAuthHelper);

@@ -3368,12 +3368,7 @@ export function listSkyePayPlatformRoutes() {
 
 export function getSkyePayOffer(id) {
   const key = safeText(id, 100);
-  const aliases = {
-    "relay13-ai-response-starter": "skyemail-ai-response-starter",
-    "relay13-ai-response-plus": "skyemail-ai-response-plus",
-    "relay13-managed-ai-inbox": "skyemail-managed-ai-inbox"
-  };
-  return SKYPAY_OFFERS.find((offer) => offer.id === (aliases[key] || key)) || null;
+  return SKYPAY_OFFERS.find((offer) => offer.id === key) || null;
 }
 
 export function buildSkyCartOffer({ offer, addOnOffer }) {

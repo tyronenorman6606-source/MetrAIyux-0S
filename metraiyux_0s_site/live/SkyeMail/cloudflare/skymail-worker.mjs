@@ -472,13 +472,13 @@ async function skygateRequest(env, path, init = {}) {
 
 function skymailAiGatewayToken(env = {}) {
   return clean(
-    env.SKYEMAIL_KAIXU_GATEWAY_TOKEN
+    env.FS27_AI_GATEWAY_TOKEN
+    || env.SKYGATE_AI_GATEWAY_TOKEN
+    || env.SKYEMAIL_KAIXU_GATEWAY_TOKEN
     || env.SKYMAIL_KAIXU_GATEWAY_TOKEN
     || env.KAIXU_GATEWAY_TOKEN
     || env.KAIXU_GATEWAY_SUBKEY
     || env.KAIXU_GATEWAY_KEY
-    || env.FS27_AI_GATEWAY_TOKEN
-    || env.SKYGATE_AI_GATEWAY_TOKEN
     || env.KAIXU_ADMIN_KEY
     || ""
   );
@@ -515,9 +515,6 @@ function skymailAiPlanById(planId = "") {
     business: "skyemail-ai-response-plus",
     managed: "skyemail-managed-ai-inbox",
     "managed-ai-inbox": "skyemail-managed-ai-inbox",
-    "relay13-ai-response-starter": "skyemail-ai-response-starter",
-    "relay13-ai-response-plus": "skyemail-ai-response-plus",
-    "relay13-managed-ai-inbox": "skyemail-managed-ai-inbox",
     owner: "owner_operator",
     founder: "owner_operator",
     operator: "owner_operator",
