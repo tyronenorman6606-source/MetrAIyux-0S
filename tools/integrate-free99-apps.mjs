@@ -40,7 +40,7 @@ const apps = [
     source: "sovereigndocs-recovered-v20/sovereigndocs",
     entry: "index.html",
     billing: "paid_pending_sku",
-    price: "Plans: Starter/Growth/Pro/Enterprise; legal review uses SkyePay / Stripe checkout",
+    price: "Plans: Starter/Growth/Pro/Enterprise; legal review uses SkyePay checkout",
     summary: "Document workflow platform with export quotas, template library, partner review, and paid plans."
   },
   {

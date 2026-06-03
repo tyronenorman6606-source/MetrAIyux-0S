@@ -49,6 +49,51 @@ function generatedAt(data = {}) {
   return data.generated_at || data.generatedAt || data.checked_at || data.checkedAt || '';
 }
 
+function runSourceStress({
+  requiredReadable = [],
+  currentSummary = {},
+  valuationText = '',
+  proofMap = '',
+  iterations = 25
+} = {}) {
+  const failures = [];
+  let sourceReads = 0;
+  let jsonParses = 0;
+  let textReads = 0;
+  for (let iteration = 0; iteration < iterations; iteration += 1) {
+    for (const key of requiredReadable) {
+      const relativePath = sources[key];
+      const absolutePath = path.join(repoRoot, relativePath);
+      try {
+        const text = fs.readFileSync(absolutePath, 'utf8');
+        sourceReads += 1;
+        if (/\.json$/i.test(relativePath)) {
+          JSON.parse(text);
+          jsonParses += 1;
+        } else {
+          textReads += 1;
+        }
+      } catch (error) {
+        failures.push(`${key} iteration ${iteration + 1}: ${error?.message || String(error)}`);
+      }
+    }
+    const truthCountsStillPresent = [
+      String(currentSummary.total ?? ''),
+      String(currentSummary.built ?? ''),
+      String(currentSummary.partial ?? '')
+    ].filter(Boolean).every((value) => valuationText.includes(value) || proofMap.includes(value));
+    if (!truthCountsStillPresent) failures.push(`truth count alignment failed on iteration ${iteration + 1}`);
+  }
+  return {
+    ok: failures.length === 0,
+    iterations,
+    source_reads: sourceReads,
+    json_parses: jsonParses,
+    text_reads: textReads,
+    failures: failures.slice(0, 20)
+  };
+}
+
 async function main() {
   const sourceStats = Object.fromEntries(Object.entries(sources).map(([key, value]) => [key, stat(value)]));
   const truth = readJson(sources.truth_ledger);
@@ -91,8 +136,9 @@ async function main() {
   ].filter(Boolean);
 
   const aligned = staleSignals.length === 0;
+  const stress = runSourceStress({ requiredReadable, currentSummary, valuationText, proofMap });
   const receipt = {
-    ok: missing.length === 0 && aligned,
+    ok: missing.length === 0 && aligned && stress.ok,
     schema: 'metraiyux.0s.valuation-deck-alignment.v1',
     generated_at: new Date().toISOString(),
     no_browser_proof_run: true,
@@ -109,9 +155,22 @@ async function main() {
       behavior_red: matrixSummary.red ?? null
     },
     live_capability_watch_summary: watchSummary,
+    stress,
+    checks: [
+      {
+        id: 'valuation-source-repeat-read-stress',
+        label: 'Valuation source repeat-read stress',
+        ok: stress.ok,
+        iterations: stress.iterations,
+        source_reads: stress.source_reads
+      }
+    ],
     stale_signals: staleSignals,
     next_build_step: 'Regenerate valuation/deck public claims from the latest truth ledger, operating matrix, Worker deploy receipt, and live capability watch before using them as investor/customer proof.',
-    failures: missing.map((key) => `${key} missing: ${sources[key]}`)
+    failures: [
+      ...missing.map((key) => `${key} missing: ${sources[key]}`),
+      ...stress.failures
+    ]
   };
 
   await fsp.mkdir(path.dirname(stampedPath), { recursive: true });

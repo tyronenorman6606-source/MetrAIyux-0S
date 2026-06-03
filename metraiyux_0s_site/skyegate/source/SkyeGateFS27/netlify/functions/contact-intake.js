@@ -585,7 +585,7 @@ async function handleSubmit(req, cors, context) {
     status: stored.status,
     lane: stored.lane,
     qaLane: stored.kind === "review" ? "fs27_0s_review_qa" : "fs27_admin_contact_triage",
-    admin_system: "SkyeGateFS27 contact intake",
+    admin_system: "SkyeGate FS27 contact intake",
     relay_status: stored.relay_status,
     backup_email_status: stored.backup_email_status,
     fallback_mailto: backup.fallback_url || fallbackMailto(stored),

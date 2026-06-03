@@ -16,7 +16,16 @@ const DEPLOY_API_MAP = new Map([
   ['/source-file', '/deploy/source-file'],
   ['/source-search', '/deploy/source-search'],
   ['/source-download', '/deploy/source-download'],
+  ['/source-codebases', '/deploy/source-codebases'],
   ['/source-transfer', '/deploy/source-transfer'],
+  ['/functions-upload', '/deploy/functions-upload'],
+  ['/functions-complete', '/deploy/functions-complete'],
+  ['/functions-status', '/deploy/functions-status'],
+  ['/forms-policy', '/deploy/forms-policy'],
+  ['/forms-inbox', '/deploy/forms-inbox'],
+  ['/forms-submission', '/deploy/forms-submission'],
+  ['/forms-file', '/deploy/forms-file'],
+  ['/forms-notify', '/deploy/forms-notify'],
   ['/receipts', '/deploy/receipts'],
   ['/routes', '/deploy/routes'],
   ['/observability', '/deploy/observability'],
@@ -212,6 +221,24 @@ function consoleResponse() {
       </section>
       <section class="dashboard-grid" aria-live="polite">
         <section class="status-panel wide">
+          <h2>Functions and env grants</h2>
+          <form id="functionFilterForm" class="deploy-form">
+            <label><span>Workspace</span><input name="workspace_id" placeholder="workspace"></label>
+            <label><span>Project</span><input name="project_id" placeholder="project" required></label>
+            <label><span>Deployment</span><input name="deployment_id" placeholder="deployment" required></label>
+            <button type="submit">Load grants</button>
+          </form>
+          <p id="functionStatus" class="mini-status">Waiting for a function deployment.</p>
+          <div id="functionList" class="list-panel">No function grants loaded.</div>
+        </section>
+        <section class="status-panel wide">
+          <h2>Rollback</h2>
+          <p id="rollbackStatus" class="mini-status">Choose Rollback route on a deployment row to switch the live route.</p>
+          <pre id="rollbackResult">No rollback requested.</pre>
+        </section>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel wide">
           <h2>Environment variables</h2>
           <p class="mini-status">Project env values are stored behind the shared gate and only show redacted previews in the console.</p>
           <form id="envForm" class="token-panel env-form">
@@ -232,6 +259,26 @@ function consoleResponse() {
           <h2>Source custody</h2>
           <p class="mini-status">New CLI deploys can upload a private full project source package separately from public assets. Source downloads prefer that private package and never serve it from public routes.</p>
           <pre>npm run skyenet:deploy -- --dir dist --source-root . --project my-app --workspace my-company --host skyenet.my-company --mount / --url-mode subdomain --public</pre>
+        </section>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel wide">
+          <h2>Forms inbox</h2>
+          <form id="formsFilterForm" class="deploy-form">
+            <label><span>Workspace</span><input name="workspace_id" placeholder="workspace"></label>
+            <label><span>Project</span><input name="project_id" placeholder="project" required></label>
+            <label><span>Deployment</span><input name="deployment_id" placeholder="deployment" required></label>
+            <label><span>Form</span><input name="form_name" placeholder="contact"></label>
+            <label><span>Spam</span><select name="spam"><option value="">All</option><option value="clean">Clean</option><option value="spam">Spam</option></select></label>
+            <label><span>Status</span><select name="status"><option value="">All</option><option value="new">New</option><option value="read">Read</option><option value="archived">Archived</option><option value="resolved">Resolved</option></select></label>
+            <button type="submit">Load forms</button>
+          </form>
+          <p id="formsStatus" class="mini-status">Waiting for a project and deployment.</p>
+          <div id="formsInboxList" class="list-panel">No forms loaded.</div>
+        </section>
+        <section class="status-panel wide">
+          <h2>Submission</h2>
+          <pre id="formsDetail">Select a submission.</pre>
         </section>
       </section>
       <section class="status-panel" aria-live="polite">

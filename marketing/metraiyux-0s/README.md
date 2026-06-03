@@ -12,7 +12,7 @@ Marketing assets for MetrAIyux 0S. All copy is written to be human-voiced, speci
 | `white-label.html` | White label program page — for agencies and resellers |
 | `media-over-london.html` | Media Over London hub — visual spectacle marketing, artist universes, floating media galleries, and content-engine offers |
 | `skyenet.html` | SkyeNet deploy lane — public-safe explanation of SkyeNet Edge hosting, shared 0S gate, route registration, managed functions, observability, Free99 cost caps, SkyeNet Functions controlled preview, and SkyePay-backed paid product lanes |
-| `skye-music-nexus/nexus-marketing-hub.html` | SkyeMusicNexus marketing hub — artist stores, drops, SkyePay/Stripe tracking, 13% fee policy, payout review, legal onboarding lanes, and blog engine |
+| `skye-music-nexus/nexus-marketing-hub.html` | SkyeMusicNexus marketing hub — artist stores, drops, SkyePay settlement tracking, 13% fee policy, payout review, legal onboarding lanes, and blog engine |
 | `skye-music-nexus/founders-nexus-field-guide.html` | Longform founder guide — end-to-end Nexus walkthrough, DAW beta boundary, SovereignDocs connection, 0S lanes, Media Over London, SkyePay, and company contact routing |
 | `proof.html` | Live proof report — includes kAIxu 6.7, SkyeVault Git remote, and SkySecure FS27 Vault proof rollups |
 | `proof-ecology.html` | Generated proof ecology — searchable public ledger compiled from local proof artifacts |

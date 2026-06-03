@@ -132,7 +132,21 @@ const statements = [
   `alter table skyepay_orders alter column provisioning_status set default 'waiting_for_payment';`,
   `create index if not exists skyepay_orders_customer_idx on skyepay_orders(customer_id, created_at desc);`,
   `create index if not exists skyepay_orders_status_idx on skyepay_orders(approval_status, owner_status, provisioning_status, created_at desc);`,
-  `create index if not exists skyepay_orders_stripe_customer_idx on skyepay_orders(stripe_customer_id);`
+  `create index if not exists skyepay_orders_stripe_customer_idx on skyepay_orders(stripe_customer_id);`,
+  `create table if not exists skyepay_refunds (
+    id text primary key,
+    skyepay_order_id text not null references skyepay_orders(id) on delete cascade,
+    stripe_refund_id text not null unique,
+    stripe_payment_intent_id text,
+    amount_cents integer not null default 0,
+    currency text not null default 'usd',
+    status text not null default 'succeeded',
+    reason text not null default 'requested_by_customer',
+    metadata jsonb not null default '{}'::jsonb,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+  );`,
+  `create index if not exists skyepay_refunds_order_idx on skyepay_refunds(skyepay_order_id, created_at desc);`
 ];
 
 for (const statement of statements) {

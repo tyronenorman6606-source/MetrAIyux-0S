@@ -102,7 +102,6 @@ function intakeFields(config, body, portalAccess = {}) {
 function scopedLimit(configValue, accessValue) {
   const configNumber = Number(configValue);
   const accessNumber = Number(accessValue);
-  if (Number.isFinite(configNumber) && Number.isFinite(accessNumber) && accessNumber > 0) return Math.min(configNumber, accessNumber);
   if (Number.isFinite(accessNumber) && accessNumber > 0) return accessNumber;
   return configNumber;
 }

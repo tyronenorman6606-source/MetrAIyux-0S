@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../../assets/platform.css" />
   <script defer src="../../assets/platform.js"></script>
 </head>
-<body data-app-id="SkyeMail" data-page="command" data-suite-base="../../" data-root-base="../../standalone/">
+<body data-app-id="SkyeMail" data-page="command" data-suite-base="../../" data-root-base="../../../">
   <div class="platform-shell">
     <header class="platform-topbar">
       <div>
@@ -19,7 +19,7 @@
       </div>
       <div class="platform-topbar-actions">
         <a class="platform-button ghost" href="../../index.html">Platform Hub</a>
-        <a class="platform-button" href="../../standalone/dashboard.html" target="_blank" rel="noreferrer">Open Standalone Inbox</a>
+        <a class="platform-button" href="../../../dashboard.html" target="_blank" rel="noreferrer">Open Standalone Inbox</a>
       </div>
     </header>
 
@@ -74,7 +74,7 @@
             <span id="commandStatusText">Use Inbox for live triage and Compose for outbound work.</span>
           </div>
           <div class="quick-link-row" style="margin-top: 14px;">
-            <a class="platform-button ghost" id="commandOpenLink" href="../../standalone/dashboard.html" target="_blank" rel="noreferrer">Open Current Surface</a>
+            <a class="platform-button ghost" id="commandOpenLink" href="../../../dashboard.html" target="_blank" rel="noreferrer">Open Current Surface</a>
           </div>
           <div class="panel-heading" style="margin-top: 20px;">
             <span class="eyebrow">Live Delivery Events</span>
@@ -88,7 +88,7 @@
             <span class="eyebrow">Embedded Standalone Surface</span>
             <h2 id="commandFrameLabel">SkyeMail Inbox</h2>
           </div>
-          <iframe id="commandFrame" class="embed-frame" title="SkyeMail command frame" src="../../standalone/dashboard.html"></iframe>
+          <iframe id="commandFrame" class="embed-frame" title="SkyeMail command frame" src="../../../dashboard.html"></iframe>
         </section>
       </section>
 
@@ -141,7 +141,7 @@
         monitoring: { path: "monitoring.html", label: "SkyeMail Monitoring" },
         settings: { path: "settings.html", label: "SkyeMail Settings" },
         onboarding: { path: "onboarding.html", label: "SkyeMail Onboarding" },
-        keys: { path: "keys.html", label: "SkyeMail Citadel Keys" },
+        keys: { path: "keys.html", label: "SkyeMail Keys backed by Citadel Database and SkyeNet" },
       };
 
       function composeHref() {

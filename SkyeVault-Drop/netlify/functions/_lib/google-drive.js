@@ -306,6 +306,71 @@ export async function findFileInFolder(folderId, name) {
   };
 }
 
+export async function headObjectByKey(key) {
+  const objectKeyValue = normalizePrefix(key);
+  if (!objectKeyValue) {
+    const error = new Error('R2 object key is required.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const response = await r2Request('HEAD', objectKeyValue);
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    const error = new Error(parseS3Error(text, `R2 object lookup failed with ${response.status}.`));
+    error.statusCode = response.status;
+    throw error;
+  }
+  return {
+    id: objectKeyValue,
+    key: objectKeyValue,
+    name: objectKeyValue.split('/').pop() || objectKeyValue,
+    mimeType: response.headers.get('content-type') || 'application/octet-stream',
+    size: Number(response.headers.get('content-length') || 0),
+    modifiedTime: response.headers.get('last-modified') || '',
+    createdTime: response.headers.get('last-modified') || '',
+    etag: (response.headers.get('etag') || '').replace(/^"|"$/g, ''),
+    provider: 'cloudflare-r2'
+  };
+}
+
+export async function putObjectByKey(key, body, options = {}) {
+  const objectKeyValue = normalizePrefix(key);
+  if (!objectKeyValue) {
+    const error = new Error('R2 object key is required.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const headers = {
+    'content-type': options.contentType || options.mimeType || 'application/octet-stream'
+  };
+  const metadata = options.metadata && typeof options.metadata === 'object' ? options.metadata : {};
+  for (const [rawKey, rawValue] of Object.entries(metadata)) {
+    const metaKey = String(rawKey || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_.-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    if (!metaKey) continue;
+    headers[`x-amz-meta-${metaKey}`] = appPropertyValue(rawValue, 900);
+  }
+  const response = await r2Request('PUT', objectKeyValue, { headers, body });
+  const text = await response.text().catch(() => '');
+  if (!response.ok) {
+    const error = new Error(parseS3Error(text, `Could not write R2 object ${objectKeyValue}.`));
+    error.statusCode = response.status;
+    throw error;
+  }
+  return {
+    id: objectKeyValue,
+    key: objectKeyValue,
+    name: objectKeyValue.split('/').pop() || objectKeyValue,
+    size: Buffer.isBuffer(body) || body instanceof Uint8Array ? body.byteLength : Buffer.byteLength(String(body || '')),
+    mimeType: headers['content-type'],
+    etag: (response.headers.get('etag') || '').replace(/^"|"$/g, ''),
+    provider: 'cloudflare-r2'
+  };
+}
+
 export async function listJsonFilesByPrefix(folderId, prefix, pageSize = 100) {
   const keyPrefix = objectKey(folderId, prefix);
   const query = new URLSearchParams({

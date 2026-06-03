@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeMail Became the 0S Money Lane | DevodeRator</title>
+  <meta name="description" content="Gray London Skyes records the June 1 SkyeMail, SkyePay, Relay13 sales-registry closure, SkyePay settlement parity, SaaS telemetry, customer thank-you, and 0S integration proof pass.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-06-01-skyemail-skyepay-0s-money-lane.html">SkyeMail</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">June 1, 2026 · SkyeMail · SkyePay · settlement parity · Citadel Database · SkyeNet · 0S integrations</p>
+    <h1>SkyeMail had to stop being an email page and become a money lane.</h1>
+    <p class="lede">
+      Today was the pass where SkyeMail stopped being judged by whether it could show a mailbox shell and started being judged by whether a real business owner could buy, enter, send, receive, explore the 0S, understand the next step, and avoid paying for something vague.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        The rule is simple now: if SkyeMail is the front door to the 0S, the proof has to follow the customer from mailbox to money to workspace to receipts.
+      </blockquote>
+
+      <h2>The naming got corrected.</h2>
+      <p>
+        Some surfaces were calling the product <em>SkyeMail Citadel</em>, which made the backing layer sound like the product name. I kept the part that mattered and corrected the shape: the customer-facing name is SkyeMail, and the architecture line is <strong>SkyeMail backed by Citadel Database and SkyeNet</strong>. That line now shows up across the SaaS/pricing/workspace copy where buyers need to understand the sovereign stack without seeing raw provider talk.
+      </p>
+      <p>
+        I also removed the bad posture around "SkyeMail Vault" and old Cloudflare/Neon style backing language from the buyer-facing SaaS pages touched in this pass. The platform story is Citadel Database, SkyeNet, SkyeGate FS27, SkyePay, and the 0S. It should sound like the system it actually is.
+      </p>
+
+      <h2>The mailbox proof is not cosmetic.</h2>
+      <p>
+        The live SkyeMail human-production smoke receipt used the selected mailbox <code>darthom-intelligence@solenterprises.org</code> and walked real platform behavior: public pages, FS27 session binding, selected mailbox binding, contact sync into the 0S, game ledger, Brain plans, paid Brain automation calls, SkyePay checkout, self-send with an image attachment, inbox sync, read/search, attachment fetch, thread open, star/unstar, trash/restore, drafts, 0S actions, mail OS health, calendar, SkyeDocxMax, SovereignDocs vault return, CRM command bridge, AE Flow contact/journal, SaaS action events, SkyeCommerce orders/analytics, PWA Factory, and telemetry.
+      </p>
+      <div class="receipt-box">
+        <strong>SkyeMail production proof</strong>
+        <ul>
+          <li>Human-production smoke: <code>61 passed / 0 failed</code>.</li>
+          <li>Selected mailbox: <code>darthom-intelligence@solenterprises.org</code>.</li>
+          <li>Provisioned mailbox count in that receipt: <code>28</code>.</li>
+          <li>Receipt: <code>test-artifacts/skyemail-human-production-smoke/2026-06-01T09-45-43-489Z/receipt.json</code>.</li>
+          <li>Route compatibility: <code>test-artifacts/skyemail-cloudflare-route-compat-latest.json</code>, generated <code>2026-06-01T09:45:44.447Z</code>.</li>
+          <li>Live production stress: <code>test-artifacts/skyemail-live-production-stress-latest.json</code>, generated <code>2026-06-01T09:45:15.585Z</code>.</li>
+        </ul>
+      </div>
+
+      <h2>The 0S integrations are the point.</h2>
+      <p>
+        SkyeMail is not supposed to be a lonely inbox. It is supposed to get a business owner into the 0S. This pass moved the integration proof away from "link exists" and toward routed behavior. The bridge points CRM actions to AE FlowPro instead of dead standalone pages. Legacy suite dashboard URLs redirect to the real SkyeMail routes instead of leaving customers at a 404. The OS action proof covers calendar, SkyeDocxMax, SovereignDocs, command bridge, CRM journal/contact flow, SkyeCommerce, PWA Factory, and telemetry.
+      </p>
+      <p>
+        This matters commercially. A free or low-cost business mailbox is useful by itself, but the larger value is that the owner discovers the tools around it: documents, commerce, payments, CRM, apps, campaign lanes, analytics, and AI-assisted operating work. The email product becomes a calm entry point into the bigger platform instead of another disconnected login.
+      </p>
+
+      <h2>Customer thanks became a real ledger, not confetti copy.</h2>
+      <p>
+        I added customer thank-you events to the SaaS adapter and visual data kit. Signups, SkyePay handoffs, SkyeMerit events, and usage actions can now produce receipt-backed thank-you rows. The customer data surfaces render a thank-you ledger, route health, and flow proof panels, and the visual kit stores a throttled usage thank-you event after live visuals load.
+      </p>
+      <div class="receipt-box">
+        <strong>Customer celebration proof</strong>
+        <ul>
+          <li>Live SaaS thank-you proof: <code>test-artifacts/saas-live-customer-thanks/saas-live-customer-thanks-latest.json</code>.</li>
+          <li>Created test workspace: <code>ws_skyemail-live-thanks-2026-06-01t09-34-42-498z_1r02cxb</code>.</li>
+          <li>Signup, workspace create, action event, and customer visuals all returned live success.</li>
+          <li>The customer visuals read back <code>customer_thanks</code> with <code>3</code> rows.</li>
+          <li>The KPI set now includes <code>Thank-yous</code>, plus route count <code>6</code> and flow count <code>4</code>.</li>
+        </ul>
+      </div>
+
+      <h2>The money lane got audited like a buyer could actually pay.</h2>
+      <p>
+        The most important commercial correction was the SkyePay side. It is not enough for a product to appear in a catalog. The buyer needs a price, a checkout handoff, a fulfillment state, a delivery surface, and a next step. I added a live buyer-fulfillment proof that reads every public SkyePay offer and fails if a customer could pay into ambiguity.
+      </p>
+      <p>
+        That proof now checks the live public catalog for missing fulfillment fields, mismatched self-serve versus operator-review state, banned provider/demo language, missing lookup keys, unclear delivery surfaces, and SkyeMail mailbox activation rules. The follow-up capacity pass corrected the most important detail: Starter, Business, and Operator mailbox offers are not framed as instant public auto-provision products while mailbox capacity is constrained. They are sellable SkyeMail capacity-approval orders.
+      </p>
+      <div class="receipt-box">
+        <strong>SkyePay buyer truth proof and settlement proof</strong>
+        <ul>
+          <li>Buyer fulfillment truth: <code>153</code> live public offers, <code>0</code> failures.</li>
+          <li>Receipt: <code>test-artifacts/skyepay-readiness/skyepay-buyer-fulfillment-truth-latest.json</code>.</li>
+          <li>Fulfillment split: <code>140</code> operator review, <code>5</code> paid access, <code>1</code> operator triage, <code>3</code> SkyeMail mailbox, <code>4</code> SkyeVault Agent.</li>
+          <li>Customer readiness: <code>test-artifacts/skyepay-readiness/skyepay-customer-readiness-latest.json</code>, <code>153</code> offers, <code>0</code> failures.</li>
+          <li>Live catalog checkout: <code>test-artifacts/skyepay-live-nonbrowser/skyepay-live-catalog-checkout-latest.json</code>, <code>153</code> checked offers, <code>0</code> failures.</li>
+          <li>Self-serve access: <code>test-artifacts/skyepay-live-nonbrowser/skyepay-self-serve-live-access-latest.json</code>, <code>9</code> checked offers, <code>0</code> failures.</li>
+          <li>SkyePay settlement catalog parity: <code>test-artifacts/stripe-sync/skyepay-full-catalog-parity-latest.json</code>, <code>173</code> inspected prices, failure count <code>0</code>.</li>
+          <li>Public contract proof: <code>test-artifacts/skyepay-live-nonbrowser/skyepay-live-public-contract-latest.json</code>, public copy and API surfaces green.</li>
+        </ul>
+      </div>
+      <div class="receipt-box">
+        <strong>Capacity-safe mailbox selling proof</strong>
+        <ul>
+          <li>FS27/SkyePay redeploy: <code>018ba537-c1a4-418c-a803-3029fb77bcd7</code>.</li>
+          <li>Primary SkyeMail mailbox plans capacity-gated: <code>3</code>.</li>
+          <li>Generated proof aliases deleted from Zoho: <code>4</code>.</li>
+          <li>SkyeMail DB rows repaired after false provider success: <code>4</code>.</li>
+          <li>Real-user readiness after cleanup: <code>22</code> checks, <code>0</code> warnings, <code>0</code> failures.</li>
+          <li>Receipts: <code>test-artifacts/skyepay-readiness/fs27-worker-deploy-2026-06-01T13-24-46-240Z.json</code>, <code>test-artifacts/skyemail-zoho-alias-capacity/2026-06-01T13-28-13-450Z/receipt.json</code>, <code>test-artifacts/skyemail-zoho-alias-capacity/2026-06-01T13-28-24-741Z/receipt.json</code>, and <code>test-artifacts/0s-real-user-readiness/2026-06-01T13-28-35-319Z/receipt.json</code>.</li>
+        </ul>
+      </div>
+
+      <h2>The later sales-registry gap got closed instead of hidden.</h2>
+      <p>
+        After the first SkyePay proof, I ran the harder question: are approved sales-registry products actually present in the SkyePay settlement lane, or do some of them only exist as internal intent? That check found the exact kind of gap that can turn into customer confusion: Relay13 AI response plans were approved in the sales registry, but the source SkyePay catalog had not fully caught up.
+      </p>
+      <p>
+        I closed that by adding real SkyePay offers for <code>relay13-ai-response-starter</code>, <code>relay13-ai-response-plus</code>, and <code>relay13-managed-ai-inbox</code>, syncing their lookup keys into the live settlement catalog, and adding a proof that fails when an approved fixed-price sales offer has no matching SkyePay lane.
+      </p>
+      <div class="receipt-box">
+        <strong>Sales registry money-lane proof</strong>
+        <ul>
+          <li>Source SkyePay catalog: <code>153</code> offers after the Relay13 AI closure.</li>
+          <li>Approved fixed-price sales offers checked: <code>41</code>.</li>
+          <li>Direct-money platform mappings checked: <code>12</code>.</li>
+          <li>Failure count: <code>0</code>.</li>
+          <li>SkyePay settlement parity: <code>173</code> inspected prices, <code>0</code> failed prices.</li>
+          <li>Receipt: <code>test-artifacts/skyepay-readiness/skyepay-sales-registry-money-lane-latest.json</code>.</li>
+        </ul>
+      </div>
+      <p>
+        The honest deployment boundary moved after the FS27 redeploy: the public SkyePay catalog now reflects the same 153-offer state as source, sales registry, and settlement parity, and the mailbox offers no longer overpromise instant fulfillment. The important diligence move is that the live checkout/status path also writes through Citadel D1, so a buyer-facing payment session has a current order-ledger path instead of a stalled database bootstrap.
+      </p>
+
+      <h2>What this changes about valuation.</h2>
+      <p>
+        I am not using this pass to invent ARR. Zero revenue is still a real valuation boundary. What changed is sellability evidence: the mailbox front door, the payment catalog, the fulfillment contract, the proof receipts, the thank-you telemetry, and the 0S integration story are now tighter. That strengthens the engineering replacement and operator-readiness side of the valuation because it turns more of the repo into buyer-facing product behavior.
+      </p>
+      <p>
+        The highest-signal commercial proof is not just that 153 live products exist. It is that the live catalog, checkout proof, self-serve proof, settlement parity proof, sales-registry proof, and fulfillment-truth proof are being forced to agree on what a buyer is purchasing and how access is supposed to happen after payment. In this pass, agreement meant reducing self-serve from 12 to 9 instead of letting three mailbox products pretend to be instantly fulfilled.
+      </p>
+
+      <h2>The honest boundary.</h2>
+      <p>
+        Browser verification remains owner-handled under the current repo policy, so I am not claiming a fresh Codex-run browser proof for this pass. The evidence here is non-browser production proof: live HTTP, API, route compatibility, stress, checkout, settlement parity, alias-capacity cleanup, and receipt-backed SaaS visual data. That is strong evidence for the tested lanes, but the full 0S universe still needs continuing app-specific closure. The latest whole-0S route/gate matrix is green across 108/108 mounted apps, while app behavior depth is 32 green and 76 yellow. SkyeMail core and the SkyePay catalog/money path are much stronger in this pass; the entire 0S stays a larger ongoing audit until every app-specific behavior row has the same level of proof.
+      </p>
+
+      <blockquote>
+        The win today is that SkyeMail looks less like an isolated app and more like the entry product it was supposed to be: inbox, payment, workspace, proof, gratitude, and a path into the rest of the 0S.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · build receipts, proof journals, and sovereign infrastructure notes.</footer>
+</body>
+</html>

@@ -62,8 +62,8 @@ for (const rel of requiredFiles) {
 const read = (rel) => readFileSync(path.join(root, rel), "utf8");
 
 const rootIndex = read("index.html");
-if (!rootIndex.includes("SkyEmail Brain ready")) {
-  throw new Error("Root marketing surface no longer declares the FS27-backed SkyEmail Brain lane.");
+if (!rootIndex.includes("SkyeMail Brain ready")) {
+  throw new Error("Root marketing surface no longer declares the FS27-backed SkyeMail Brain lane.");
 }
 
 const dashboard = read("dashboard.html");
@@ -116,7 +116,7 @@ const loginPage = read("login.html");
 for (const needle of [
   "Continue with 0S Gate",
   "/auth-fs27-session",
-  "Open the 0S Gate first."
+  "Open the 0S Gate first"
 ]) {
   if (!loginPage.includes(needle)) {
     throw new Error(`Expected FS27 login marker missing from login.html: ${needle}`);
@@ -168,7 +168,7 @@ for (const needle of [
   "zohoGetMessage",
 ]) {
   if (!mailboxProvider.includes(needle)) {
-    throw new Error(`Expected Citadel/SkyeNet adapter marker missing from _mailbox-provider.js: ${needle}`);
+    throw new Error(`Expected Citadel Database and SkyeNet adapter marker missing from _mailbox-provider.js: ${needle}`);
   }
 }
 
@@ -212,9 +212,10 @@ for (const needle of [
 
 const monitoringJs = read("assets/monitoring-page.js");
 for (const needle of [
-  "/resend-health",
-  "/resend-events-list?limit=100",
-  "Provider setup ready",
+  "/mail-routing-health",
+  "/mail-routing-events?limit=100",
+  "/mail-routing-webhook-events?limit=50",
+  "Mail routing setup ready",
 ]) {
   if (!monitoringJs.includes(needle)) {
     throw new Error(`Expected monitoring API marker missing from assets/monitoring-page.js: ${needle}`);
@@ -391,7 +392,7 @@ console.log(JSON.stringify({
     "Root standalone pages exist",
     "Suite shell and app mounts exist",
     "Standalone Functions contract files exist",
-    "Citadel/SkyeNet adapter and inbox bridge markers exist without removing Stalwart, Resend, Gmail, or external-webhook lanes",
+    "Citadel Database and SkyeNet adapter and inbox bridge markers exist without removing Stalwart, Resend, Gmail, or external-webhook lanes",
     "Provider-required frontend mode fails loud when deployed backend functions are missing",
     "Inbox shell exposes same-folder mail handoff archive controls",
     "Mail runtime module and store exist for same-folder packet archiving",

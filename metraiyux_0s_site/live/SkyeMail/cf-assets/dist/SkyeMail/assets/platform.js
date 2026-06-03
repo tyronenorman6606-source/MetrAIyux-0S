@@ -12,6 +12,7 @@
   const launchDraftKey = "skymail.platform.launchDraft";
   const bridgeKey = "skymail.platform.intent.bridge";
   const liveDeliveryState = { status: "pending", items: [], error: "" };
+  let storageProtocol = null;
   const initialState = {
     handoffs: [],
     drafts: [],
@@ -76,20 +77,32 @@
     ];
   }
 
-  async function fetchSkyeMailApi(path) {
+  async function fetchSkyeMailApi(path, options = {}) {
     const token = readGateToken();
     if (!token) {
       const error = new Error("Shared 0S Gate session required for live delivery telemetry.");
       error.status = 401;
       throw error;
     }
-    const headers = { accept: "application/json", Authorization: `Bearer ${token}` };
+    const hasBody = options.body !== undefined;
+    const headers = {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(hasBody ? { "content-type": "application/json" } : {}),
+      ...(options.headers || {}),
+    };
     const mailbox = activeMailboxEmail();
     if (mailbox) headers["x-skymail-mailbox-email"] = mailbox;
     let lastError = null;
     for (const candidate of apiCandidates(path)) {
       try {
-        const response = await fetch(candidate, { headers, credentials: "include", cache: "no-store" });
+        const response = await fetch(candidate, {
+          method: options.method || (hasBody ? "POST" : "GET"),
+          headers,
+          credentials: "include",
+          cache: "no-store",
+          body: hasBody ? JSON.stringify(options.body) : undefined,
+        });
         const text = await response.text();
         let data = null;
         try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text || `HTTP ${response.status}` }; }
@@ -105,10 +118,41 @@
     throw lastError || new Error("Live delivery telemetry API unavailable.");
   }
 
+  async function createLiveHandoff(actionId, context, label) {
+    return await fetchSkyeMailApi("/mail-os-handoff", {
+      method: "POST",
+      body: {
+        action_id: actionId,
+        label,
+        context: {
+          mailbox: activeMailboxEmail(),
+          subject: context.subject || context.title || "",
+          to: context.to || "",
+          from: context.from || "",
+          snippet: context.text || context.summary || context.note || "",
+          source: context.source || "skyemail-suite",
+          channel: context.channel || "suite",
+        },
+      },
+    });
+  }
+
+  async function saveLiveDraft(draft) {
+    return await fetchSkyeMailApi("/gmail-draft-save", {
+      method: "POST",
+      body: {
+        to: draft.to,
+        subject: draft.subject,
+        text: draft.text,
+        html: `<p>${escapeHtml(draft.text || "").replace(/\n/g, "<br>")}</p>`,
+      },
+    });
+  }
+
   function liveDeliveryEmptyText() {
     if (liveDeliveryState.status === "pending") return "Loading real delivery events from the SkyeMail API.";
-    if (liveDeliveryState.status === "unauthenticated") return "Sign in through the shared 0S Gate to load live delivery events. Local suite queues are staged handoffs, not delivery proof.";
-    if (liveDeliveryState.status === "error") return `${liveDeliveryState.error || "Live delivery telemetry is unavailable."} Local suite queues are staged handoffs, not delivery proof.`;
+    if (liveDeliveryState.status === "unauthenticated") return "Sign in through the shared 0S Gate to load live delivery events.";
+    if (liveDeliveryState.status === "error") return liveDeliveryState.error || "Live delivery telemetry is unavailable.";
     return "No live delivery events are stored for this mailbox yet.";
   }
 
@@ -122,7 +166,7 @@
   }
 
   function setLiveTelemetryStatus(text) {
-    const node = document.getElementById("mailCitadelStatus");
+    const node = document.getElementById("mailSkyeMailStatus");
     if (node) node.textContent = text;
   }
 
@@ -331,12 +375,12 @@
       <div class="status-strip">
         <span class="platform-kicker">Standalone runtime</span>
         <span class="mini-card runtime-pill">Workspace <strong>${escapeHtml(wsId)}</strong></span>
-        <span class="mini-card runtime-pill" id="mailSyncStatus">Local state ready</span>
-        <span class="mini-card runtime-pill" id="mailCitadelStatus">Live telemetry checking</span>
+        <span class="mini-card runtime-pill" id="mailSyncStatus">Live runtime ready</span>
+        <span class="mini-card runtime-pill" id="mailSkyeMailStatus">Live telemetry checking</span>
       </div>
       <div class="button-row">
-        <button class="platform-button ghost" id="mailPushCitadelBtn" type="button">Export Suite State</button>
-        <button class="platform-button ghost" id="mailOpenCitadelBtn" type="button">Open Citadel</button>
+        <button class="platform-button ghost" id="mailPushSkyeMailBtn" type="button">Export Workspace State</button>
+        <button class="platform-button ghost" id="mailOpenSkyeMailKeysBtn" type="button">Open SkyeMail Keys</button>
       </div>
     `;
     if (topbar && topbar.nextSibling) shell.insertBefore(bar, topbar.nextSibling);
@@ -357,12 +401,12 @@
     }
 
     async function load() {
-      setStatus("Local state ready");
+      setStatus("Live runtime ready");
       setCitadelStatus("Live telemetry checking");
       render();
       return {
         ok: true,
-        localOnly: true,
+        suiteMirror: true,
         model: {
           state: clone(state),
           deliveries: loadDeliveries(),
@@ -372,8 +416,8 @@
 
     async function save() {
       saveState();
-      setStatus("Saved locally");
-      return { ok: true, localOnly: true };
+      setStatus("Saved in suite mirror");
+      return { ok: true, suiteMirror: true };
     }
 
     function debouncedSave() {
@@ -385,9 +429,9 @@
 
     function configure() {
       syncStatusEl = document.getElementById("mailSyncStatus");
-      citadelStatusEl = document.getElementById("mailCitadelStatus");
-      const exportBtn = document.getElementById("mailPushCitadelBtn");
-      const openBtn = document.getElementById("mailOpenCitadelBtn");
+      citadelStatusEl = document.getElementById("mailSkyeMailStatus");
+      const exportBtn = document.getElementById("mailPushSkyeMailBtn");
+      const openBtn = document.getElementById("mailOpenSkyeMailKeysBtn");
       if (exportBtn && !exportBtn.dataset.bound) {
         exportBtn.dataset.bound = "1";
         exportBtn.addEventListener("click", () => {
@@ -494,8 +538,23 @@
       const text = document.getElementById("mailBody")?.value.trim() || "";
       const channel = document.getElementById("mailChannel")?.value.trim() || "";
       const source = document.getElementById("mailSource")?.value.trim() || "compose studio";
-      persistDraft({ to, subject, text, channel, source });
-      rememberHandoff({ title: subject, excerpt: text, source, channel: channel || "compose" });
+      persistDraft({ to, subject, text, channel, source, status: "saving-live" });
+      rememberHandoff({ title: subject, excerpt: text, source, channel: channel || "compose", status: "saving-live" });
+      fetchSkyeMailApi("/gmail-draft-save", {
+        method: "POST",
+        body: {
+          to,
+          subject,
+          text,
+          html: `<p>${escapeHtml(text).replace(/\n/g, "<br>")}</p>`,
+        },
+      }).then((data) => {
+        persistDraft({ to, subject, text, channel, source, status: "provider-draft-saved", provider_draft_id: data?.draft?.id || data?.draft?.draft_id || "" });
+        storageProtocol?.setStatus?.("Provider draft saved");
+      }).catch((error) => {
+        persistDraft({ to, subject, text, channel, source, status: `provider-save-failed: ${error.message || "error"}` });
+        storageProtocol?.setStatus?.("Provider draft save failed");
+      });
       return;
     }
 
@@ -514,7 +573,16 @@
       const title = document.getElementById("campaignName")?.value.trim() || "Mail campaign";
       const audience = document.getElementById("campaignAudience")?.value.trim() || "priority-segment";
       const summary = document.getElementById("campaignSummary")?.value.trim() || "";
-      persistCampaign({ title, audience, summary });
+      persistCampaign({ title, audience, summary, status: "recording-live" });
+      createLiveHandoff("saas-customer-command", { title, subject:title, text:`${audience}\n\n${summary}`.trim(), channel:"campaigns", source:"skyemail-suite-campaign" }, "Suite campaign command")
+        .then(() => {
+          persistCampaign({ title, audience, summary, status: "recorded-in-saas" });
+          storageProtocol?.setStatus?.("Campaign recorded in 0S");
+        })
+        .catch((error) => {
+          persistCampaign({ title, audience, summary, status: `0s-record-failed: ${error.message || "error"}` });
+          storageProtocol?.setStatus?.("Campaign 0S record failed");
+        });
       return;
     }
 
@@ -537,7 +605,16 @@
       const title = document.getElementById("opsTitle")?.value.trim() || "Mail ops note";
       const note = document.getElementById("opsNote")?.value.trim() || "";
       const status = document.getElementById("opsStatus")?.value.trim() || "watch";
-      persistOpsNote({ title, note, status });
+      persistOpsNote({ title, note, status: "recording-live", lane_status: status });
+      createLiveHandoff("founder-command-bridge", { title, subject:title, text:note, channel:"ops", source:"skyemail-suite-ops" }, "Suite ops command")
+        .then(() => {
+          persistOpsNote({ title, note, status: "recorded-in-command", lane_status: status });
+          storageProtocol?.setStatus?.("Ops note recorded in 0S");
+        })
+        .catch((error) => {
+          persistOpsNote({ title, note, status: `0s-record-failed: ${error.message || "error"}`, lane_status: status });
+          storageProtocol?.setStatus?.("Ops note 0S record failed");
+        });
       return;
     }
 

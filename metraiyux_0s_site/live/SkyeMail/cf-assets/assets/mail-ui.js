@@ -99,6 +99,7 @@ window.SMV = (function(){
       daily:{ date, counters:{}, claimed:{} },
       streak:{ lastDate:'', count:0 },
       badges:[],
+      celebrations:[],
       timeline:[],
       lastActionAt:{}
     };
@@ -113,6 +114,7 @@ window.SMV = (function(){
     next.daily.claimed = next.daily.claimed && typeof next.daily.claimed === 'object' ? next.daily.claimed : {};
     next.streak = next.streak && typeof next.streak === 'object' ? next.streak : { lastDate:'', count:0 };
     next.badges = Array.isArray(next.badges) ? next.badges : [];
+    next.celebrations = Array.isArray(next.celebrations) ? next.celebrations.slice(0, 16) : [];
     next.timeline = Array.isArray(next.timeline) ? next.timeline.slice(0, 20) : [];
     next.lastActionAt = next.lastActionAt && typeof next.lastActionAt === 'object' ? next.lastActionAt : {};
     const date = todayKey();
@@ -133,6 +135,31 @@ window.SMV = (function(){
     next.updatedAt = new Date().toISOString();
     try{ localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(next)); }catch(_err){}
     return next;
+  }
+
+  function queueGameLedger(action, meta = {}, result = {}){
+    if(typeof apiFetch !== 'function') return;
+    const events = Array.isArray(result.events) ? result.events : [];
+    const hasReceipt = Boolean(meta.receiptId || meta.receipt_id || meta.id || meta.message_id || meta.order_id || meta.session_id);
+    if(!events.length && !hasReceipt && !result.celebration) return;
+    const eventKey = result.eventKey || meta.eventKey || meta.key || `${todayKey()}:${action}:${meta.id || meta.message_id || meta.order_id || meta.session_id || Date.now()}`;
+    const payload = {
+      action,
+      event_key:eventKey,
+      xp:Number(result.xp || 0),
+      badge_ids:Array.isArray(result.badges) ? result.badges : [],
+      level:Number(result.level || 0),
+      mailbox:activeMailboxEmail(),
+      meta:{
+        ...meta,
+        events,
+        celebration:result.celebration || null,
+        receipt_backed:Boolean(hasReceipt || result.celebration?.receiptBacked)
+      }
+    };
+    setTimeout(()=> {
+      apiFetch('/mail-game-event', { method:'POST', body:JSON.stringify(payload) }).catch(()=> {});
+    }, 0);
   }
 
   function countGame(state, action){
@@ -201,6 +228,7 @@ window.SMV = (function(){
     const badgeRows = state.badges.length
       ? state.badges.slice(-4).map((id)=> GAME_BADGES.find((badge)=> badge.id === id)?.label || id).map((label)=>`<span class="game-badge">${safe(label)}</span>`).join('')
       : '<span class="game-badge muted">No badges yet</span>';
+    const latestThanks = state.celebrations?.[0];
     return `
       <div class="rail-title">Mailbox Game</div>
       <div class="game-rank">
@@ -210,18 +238,20 @@ window.SMV = (function(){
       <div class="game-meter" aria-hidden="true"><i style="width:${level.progress}%"></i></div>
       <div class="game-split"><span>Streak</span><b>${Number(state.streak?.count || 0)} day${Number(state.streak?.count || 0) === 1 ? '' : 's'}</b></div>
       <div class="game-quests">${questRows}</div>
-      <div class="game-badges">${badgeRows}</div>`;
+      <div class="game-badges">${badgeRows}</div>
+      ${latestThanks ? `<div class="game-thanks"><b>Thank you</b><span>${safe(latestThanks.message)}</span></div>` : ''}`;
   }
 
   function gameBoardHtml(){
     const { state, level } = gameSummary();
     const latest = (state.timeline || []).slice(0, 3).map((event)=>`<div class="game-feed-row"><span>${safe(event.label || event.type || 'Progress')}</span><b>${event.xp ? `+${event.xp} XP` : ''}</b></div>`).join('') || '<div class="game-feed-row"><span>No progress events yet.</span><b></b></div>';
     const handled = cleanupCount(state);
+    const latestThanks = state.celebrations?.[0];
     return `
       <div class="toolbar">
         <div>
           <h2 style="margin:0 0 4px">Mailbox Game Board</h2>
-          <div class="mini">Progress reacts to real inbox, compose, contacts, settings, proof, and cleanup actions.</div>
+          <div class="mini">Progress reacts to real inbox, compose, contacts, settings, proof, purchases, 0S handoffs, and cleanup actions.</div>
         </div>
         <div class="badge">Lv ${level.number} • ${state.xp} XP</div>
       </div>
@@ -230,6 +260,7 @@ window.SMV = (function(){
         <div class="stat"><b>${handled}</b><span class="mini">messages handled</span></div>
         <div class="stat"><b>${state.badges.length}</b><span class="mini">badges unlocked</span></div>
       </div>
+      ${latestThanks ? `<div class="notice"><b>Thank you</b><br><span class="mini">${safe(latestThanks.message)} Receipt: ${safe(latestThanks.receiptId)}</span></div>` : ''}
       <div class="game-feed">${latest}</div>`;
   }
 
@@ -254,9 +285,71 @@ window.SMV = (function(){
       toast.classList.remove('active');
       setTimeout(()=> toast.remove(), 360);
     }, 2600);
+	  }
+
+  function receiptIdFrom(value){
+    if(!value) return '';
+    if(typeof value === 'string') return value.trim();
+    return String(value.receiptId || value.receipt_id || value.id || value.message_id || value.order_id || value.session_id || value.provider_message_id || '').trim();
   }
 
-  function mountGameBoard(activeId, pageName){
+  function celebrationKey(detail){
+    return `${detail.surfaceId}:${detail.receiptId}:${detail.triggerType}`;
+  }
+
+  function persistCelebration(detail){
+    const state = loadGameState();
+    const key = celebrationKey(detail);
+    if(!key || (state.celebrations || []).some((item)=> item.key === key)) return state;
+    const entry = {
+      key,
+      at:new Date().toISOString(),
+      surfaceId:detail.surfaceId,
+      receiptId:detail.receiptId,
+      triggerType:detail.triggerType,
+      message:detail.message,
+      receiptBacked:true
+    };
+    state.celebrations = [entry, ...(state.celebrations || [])].slice(0, 16);
+    pushGameEvent(state, { type:'celebration', label:detail.message, xp:0 });
+    saveGameState(state);
+    queueGameLedger('celebration', {
+      receiptId:detail.receiptId,
+      triggerType:detail.triggerType,
+      surfaceId:detail.surfaceId
+    }, {
+      xp:0,
+      celebration:entry,
+      eventKey:`celebration:${entry.key}`,
+      events:[{ type:'celebration', label:detail.message, xp:0 }]
+    });
+    return state;
+  }
+
+  function celebrateReceipt(payload = {}){
+    const receiptId = receiptIdFrom(payload.receiptId || payload.receipt_id || payload.receipt || payload);
+    const detail = {
+      surfaceId: payload.surfaceId || payload.surface_id || 'skyemail',
+      receiptId,
+      triggerType: payload.triggerType || payload.trigger_type || 'workflow-complete',
+      intensity: payload.intensity || 'standard',
+      receiptBacked: true,
+      message: payload.message || 'Thank you. Your SkyeMail progress was saved to a real receipt.'
+    };
+    if(!detail.surfaceId || !detail.receiptId) return false;
+    const key = `zero-os-celebration:${detail.surfaceId}:${detail.receiptId}:${detail.triggerType}`;
+    try{
+      if(sessionStorage.getItem(key) === '1') return false;
+      sessionStorage.setItem(key, '1');
+    }catch(_err){}
+    persistCelebration(detail);
+    window.dispatchEvent(new CustomEvent('0s:celebration', { detail }));
+    if(!window.ZeroOsCelebrationLayer) showGameToast([{ label:detail.message, xp:0 }]);
+    renderGameSurfaces();
+    return true;
+  }
+
+	  function mountGameBoard(activeId, pageName){
     const main = document.querySelector('main.main');
     if(!main || document.querySelector('[data-game-board]')) return;
     const isDashboard = activeId === 'dashboard' && String(pageName || document.body.dataset.pageName || '').toLowerCase() === 'inbox';
@@ -287,6 +380,7 @@ window.SMV = (function(){
     const alreadyDaily = def.dailyOnce && state.daily.claimed[dailyKey];
     let xp = 0;
     const events = [];
+    const unlockedBadges = [];
 
     if(!onCooldown && !alreadyDaily){
       xp += Number(def.xp || 0) + Math.max(0, amount - 1) * Number(def.extraXp || 0);
@@ -309,6 +403,7 @@ window.SMV = (function(){
       if(state.badges.includes(badge.id)) return;
       if(badge.test(state)){
         state.badges.push(badge.id);
+        unlockedBadges.push(badge.id);
         xp += badge.xp;
         events.push({ type:'badge', label:`Badge unlocked: ${badge.label}`, xp:badge.xp });
       }
@@ -316,12 +411,27 @@ window.SMV = (function(){
 
     if(xp) state.xp += xp;
     const afterLevel = currentGameLevel(state.xp).number;
-    if(afterLevel > beforeLevel){
-      const level = currentGameLevel(state.xp);
-      events.push({ type:'level', label:`Level up: ${level.name}`, xp:0 });
-    }
-    events.forEach((event)=> pushGameEvent(state, event));
+	    if(afterLevel > beforeLevel){
+	      const level = currentGameLevel(state.xp);
+	      events.push({ type:'level', label:`Level up: ${level.name}`, xp:0 });
+	    }
+	    if(options.celebrate && (meta.receiptId || meta.id || meta.message_id || meta.order_id || meta.session_id)){
+	      celebrateReceipt({
+	        receiptId:meta.receiptId || meta.id || meta.message_id || meta.order_id || meta.session_id,
+	        triggerType:options.triggerType || 'workflow-complete',
+	        intensity:options.intensity || 'quiet',
+	        message:options.message || `${def.label} saved. Thank you for building with SkyeMail.`
+	      });
+	    }
+	    events.forEach((event)=> pushGameEvent(state, event));
     saveGameState(state);
+    queueGameLedger(action, meta, {
+      xp,
+      events,
+      badges:unlockedBadges,
+      level:afterLevel,
+      eventKey:`${todayKey()}:${action}:${meta.id || meta.key || state.counters[action] || now}`
+    });
     renderGameSurfaces();
     if(!options.silent) showGameToast(events);
     return state;
@@ -458,13 +568,13 @@ window.SMV = (function(){
   function renderTopbar(activeId, pageName, pageHint, status = null){
     const top = document.querySelector('#pageTopbar');
     if(!top) return;
-    const runtimeHint = 'Citadel/SkyeNet sovereign mail core';
+    const runtimeHint = 'Citadel Database and SkyeNet sovereign mail core';
     top.innerHTML = `
       <div class="topbar">
         <div class="nav">
           <div class="brand">
             <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
-            <div class="name"><b>SkyeMail Citadel</b><span>${safe(pageName || 'Mail command center')} • ${safe(pageHint || runtimeHint)} • ${safe(runtimeHint)}</span></div>
+            <div class="name"><b>SkyeMail backed by Citadel Database and SkyeNet</b><span>${safe(pageName || 'Mail command center')} • ${safe(pageHint || runtimeHint)} • ${safe(runtimeHint)}</span></div>
           </div>
           <div class="navlinks">
             ${mailboxSwitcherHtml(status, 'topbar')}
@@ -600,9 +710,10 @@ window.SMV = (function(){
     connectGoogle,
     disconnectGoogle,
     enableWatch,
-    withBoot,
-    trackGame,
-    gameSummary,
+	    withBoot,
+	    trackGame,
+	    celebrateReceipt,
+	    gameSummary,
     renderGameSurfaces,
     emailOnly,
     nameFromAddress,

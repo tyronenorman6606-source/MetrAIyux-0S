@@ -88,14 +88,31 @@
       "/audits/",
       "/brain/",
       "/client-app-factory/",
+      "/docs/",
+      "/downloads/",
+      "/founder-command/",
       "/Free99/",
+      "/gate/",
+      "/governance/",
+      "/live/",
       "/Marketing-Made-Easy/",
+      "/northstar/",
+      "/operator/",
+      "/pricing/",
       "/proof/",
+      "/sales/",
+      "/signin-pro/",
+      "/signinpro/",
+      "/skyegate/",
+      "/skyenet/",
+      "/skyerrors/",
       "/SkyeMediaCenter/",
       "/SkyeMusicNexus/",
       "/SkyeProfitConsole/",
       "/SkyeRouteX/",
-      "/SkyeSplitEngine/"
+      "/SkyeSplitEngine/",
+      "/valley-verified/",
+      "/walkthroughs/"
     ];
     if (!text.startsWith("/") || text.startsWith("//") || text.startsWith(scopedRoot) || absoluteRoots.some((root) => text.startsWith(root))) return value;
     return scopedRoot + text.replace(/^\/+/, "");

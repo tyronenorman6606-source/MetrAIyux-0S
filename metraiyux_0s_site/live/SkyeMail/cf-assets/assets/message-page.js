@@ -8,6 +8,22 @@
   const id = params.get('id') || '';
   function note(msg, kind=''){ setStatus(statusEl, msg, kind); }
   function arr(value){ return Array.isArray(value) ? value : []; }
+  function disableLink(selector, title){
+    const el = qs(selector);
+    if(!el) return;
+    el.removeAttribute('href');
+    el.setAttribute('aria-disabled', 'true');
+    el.setAttribute('tabindex', '-1');
+    if(title) el.title = title;
+  }
+  function enableLink(selector, href){
+    const el = qs(selector);
+    if(!el) return;
+    el.href = href;
+    el.removeAttribute('aria-disabled');
+    el.removeAttribute('tabindex');
+    el.removeAttribute('title');
+  }
   function attachmentUrl(m, a){
     const fallback = `/gmail-attachment?id=${encodeURIComponent(m.id)}&attachmentId=${encodeURIComponent(a.attachment_id || '')}&filename=${encodeURIComponent(a.filename || 'attachment')}${a.inline ? '&inline=1' : ''}`;
     return runtime.apiUrl(a.url || fallback);
@@ -24,7 +40,15 @@
       return `<a class="attachment" href="${safe(url)}" target="_blank" rel="noopener">${preview}<span class="attachment-meta">${safe(a.filename || 'attachment')} • ${safe(a.mime_type || 'file')}</span></a>`;
     }).join('')}</div>`;
   }
-  if(!id){ contentEl.innerHTML = '<div class="empty">Message id missing.</div>'; return; }
+  if(!id){
+    disableLink('#replyBtn', 'Message id required before replying.');
+    disableLink('#threadBtn', 'Message id required before opening the thread.');
+    const docxBtn = qs('#docxBtn');
+    if(docxBtn) docxBtn.disabled = true;
+    contentEl.innerHTML = '<div class="empty">Message id missing.</div>';
+    note('Message id missing.', 'danger');
+    return;
+  }
   try{
     const data = await apiFetch(`/gmail-get?id=${encodeURIComponent(id)}`);
     const m = data.message;
@@ -32,13 +56,13 @@
     qs('#metaFrom').textContent = m.headers.from || '';
     qs('#metaTo').textContent = m.headers.to || '';
     qs('#metaDate').textContent = fmtDate(m.internal_date || m.headers.date || '');
-    qs('#replyBtn').href = runtime.href('compose.html', {
+    enableLink('#replyBtn', runtime.href('compose.html', {
       to: SMV.emailOnly(m.headers.from || ''),
       subject: /^Re:/i.test(m.headers.subject||'') ? m.headers.subject : `Re: ${m.headers.subject || ''}`,
       reply_message_id: m.id,
       reply_thread_id: m.thread_id || '',
-    });
-    qs('#threadBtn').href = runtime.href('thread.html', { id: m.thread_id || m.id });
+    }));
+    enableLink('#threadBtn', runtime.href('thread.html', { id: m.thread_id || m.id }));
     const osContext = {
       mailbox: window.SMVRuntime?.getActiveMailbox?.() || data.mailbox || '',
       messageId: m.id,
@@ -61,7 +85,10 @@
       mailbox: osContext.mailbox
     });
     const docxBtn = qs('#docxBtn');
-    if(docxBtn) docxBtn.onclick = ()=> window.SMVZeroOs?.openSkyeDocx(osContext);
+    if(docxBtn){
+      docxBtn.disabled = false;
+      docxBtn.onclick = ()=> window.SMVZeroOs?.openSkyeDocx(osContext);
+    }
     contentEl.innerHTML = `
       <div class="chiprow">
         ${arr(m.labels).map((label)=>`<span class="chip">${safe(label)}</span>`).join('')}

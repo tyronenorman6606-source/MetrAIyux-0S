@@ -377,7 +377,7 @@ const SOVEREIGN_STACK = {
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret,x-kaixu-install-id,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret"
+  "Access-Control-Allow-Headers": "Content-Type,Authorization,x-saas-event-secret,x-kaixu-install-id,x-kaixu-app,x-kaixu-build,x-kaixu-request-id,x-0s-shared-gate,x-0s-internal-proxy-secret,x-0s-gate-session,x-free99-gate-session,x-skye-gate-session,x-skygate-session,x-fs27-token"
 };
 
 const json = (data, status = 200) => new Response(JSON.stringify(data, null, 2), {
@@ -521,9 +521,26 @@ function sharedGateProxyAuth(req, env) {
     && String(req.headers.get("x-0s-internal-proxy-secret") || "").trim() === secret;
 }
 
-function auth(req, env) {
+function presentedGateToken(req) {
+  return [
+    (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim(),
+    req.headers.get("x-0s-gate-session"),
+    req.headers.get("x-free99-gate-session"),
+    req.headers.get("x-skye-gate-session"),
+    req.headers.get("x-skygate-session"),
+    req.headers.get("x-fs27-token")
+  ].map((value) => String(value || "").replace(/^Bearer\s+/i, "").trim()).find(Boolean) || "";
+}
+
+async function auth(req, env) {
   if (sharedGateProxyAuth(req, env)) return true;
-  return false;
+  const token = presentedGateToken(req);
+  if (!token) return false;
+  const result = await sdkAuth(new Request(req.url, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` }
+  }), env);
+  return result.ok === true;
 }
 
 function providerRuntimeEnv(env) {
@@ -1436,14 +1453,14 @@ export default {
       }
 
       if (path === "/api/saas/skyemerit/issue" && req.method === "POST") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
         const b = await body(req);
         const pack = await issueSkyeMeritPack(env, b, b.source || "owner_dashboard");
         return json({ ok: true, pack, skyemerit: pack, catalog: publicSkyeMeritCatalog() });
       }
 
       if (path === "/api/saas/customer-visuals") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspaceId = url.searchParams.get("workspace_id") || url.searchParams.get("workspace") || "";
         const visuals = await buildCustomerVisuals(env, workspaceId);
         if (visuals.ok === false) return json(visuals, visuals.error === "workspace_id_required" ? 400 : 404);
@@ -1456,7 +1473,7 @@ export default {
         if (eventSecret) {
           const got = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "") || req.headers.get("x-saas-event-secret") || "";
           if (got !== eventSecret) return json({ ok: false, error: "unauthorized_action_event" }, 401);
-        } else if (!auth(req, env)) {
+        } else if (!await auth(req, env)) {
           return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         }
         const b = await body(req);
@@ -1473,7 +1490,7 @@ export default {
       }
 
       if (path === "/api/saas/client-preview") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const clientId = String(url.searchParams.get("client") || url.searchParams.get("workspace") || url.searchParams.get("workspace_id") || "").trim();
         if (!clientId) return json({ ok: false, error: "client_or_workspace_required" }, 400);
         const workspace = await loadWorkspaceByIdOrSlug(env, clientId);
@@ -1482,7 +1499,7 @@ export default {
       }
 
       if (path === "/api/saas/client-workspace/claim" && req.method === "POST") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const workspaceId = String(b.workspace_id || b.workspace || b.client_id || "").trim();
         if (!workspaceId) return json({ ok: false, error: "workspace_id_required" }, 400);
@@ -1517,7 +1534,7 @@ export default {
       }
 
       if (path === "/api/saas/workspaces" && req.method === "POST") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const workspace_id = String(b.workspace_id || "").trim() || id("ws");
         const slug = slugify(b.workspace_slug || b.company_name || b.slug || workspace_id);
@@ -1548,7 +1565,7 @@ export default {
       }
 
       if (path === "/api/saas/skymail/status") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1563,7 +1580,7 @@ export default {
       }
 
       if (path === "/api/saas/key-card") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1578,7 +1595,7 @@ export default {
       }
 
       if (path === "/api/saas/workspace-stack") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const workspace_id = url.searchParams.get("workspace_id") || "";
         if (!workspace_id) return json({ ok: false, error: "workspace_id_required" }, 400);
         if (env.SAAS_DB) {
@@ -1597,7 +1614,7 @@ export default {
       }
 
       if (path === "/api/saas/billing/checkout-session" && req.method === "POST") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const plan_id = normalizePlanId(b.plan_id, "starter-command");
         const plan = PLANS[plan_id];
@@ -1823,7 +1840,7 @@ export default {
       }
 
       if (path === "/api/saas/customer-command" && req.method === "POST") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized_shared_gate_required" }, 401);
         const b = await body(req);
         const cmd_id = id("cmd");
         const omega = omegaScan(b.command_text || b.command || "");
@@ -1846,7 +1863,7 @@ export default {
       }
 
       if (path === "/api/saas/ledger") {
-        if (!auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
+        if (!await auth(req, env)) return json({ ok: false, error: "unauthorized" }, 401);
         if (!env.SAAS_DB) {
           if (!env.SAAS_KV) return json({ ok: false, error: "SAAS_KV_not_bound" }, 500);
           const list = await env.SAAS_KV.list({ prefix: "audit:", limit: 100 });

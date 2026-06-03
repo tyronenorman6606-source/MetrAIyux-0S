@@ -46,7 +46,7 @@ export default wrap(async (req) => {
       sessionKind: "password_reset",
       scope: ["auth.password.reset"],
       ttlSeconds: resetSessionTtlSeconds(),
-      title: "SkyeGateFS27 forced password reset",
+      title: "SkyeGate FS27 forced password reset",
       meta: { flow: "login_password_reset_required" },
       issuer
     });
@@ -88,7 +88,7 @@ export default wrap(async (req) => {
     customerId: user.primary_customer_id,
     apiKeyId,
     scope: ["openid", "profile", "email", "offline_access", "gateway.read", "keys.read", "billing.read"],
-    title: "SkyeGateFS27 primary session",
+    title: "SkyeGate FS27 primary session",
     meta: { flow: "login" },
     issuer
   });

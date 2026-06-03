@@ -371,7 +371,7 @@
       id: 'core-skyedocxmax',
       name: 'SkyeDocxMax',
       category: 'docs',
-      href: '/Marketing-Made-Easy/SkyeDocxMax/editor.html',
+      href: '/Marketing-Made-Easy/SkyeDocxMax/editor',
       mode: 'embed',
       notes: 'Main document editor used by SovereignDocs and the SkyeVault document bridge.'
     },
@@ -1527,11 +1527,13 @@
     }
 
     const account = data.founder_account || {};
+    const backupGate = account.backup_gate || {};
     if ($('companyOpsFounderGrid')) {
       const rows = [
         {label:'Founder', kind:account.legal_entity, value:account.founder, href:account.command_surface},
         {label:'Workspace', kind:account.plan, value:account.workspace_id, href:account.command_surface},
         {label:'Access', kind:account.access, value:account.auth_mode, href:account.owner_admin_login},
+        {label:'Backup Gate', kind:backupGate.status || 'FS27 recovery', value:backupGate.owner_email || 'Gate-owned recovery', href:backupGate.proof_receipt || account.owner_admin_login},
         {label:'Work System API', kind:'owner API', value:data.routes?.work_system, href:data.routes?.work_system}
       ];
       $('companyOpsFounderGrid').innerHTML = rows.map((row) => `
@@ -3876,14 +3878,72 @@
     renderCalendarList(data);
   }
 
-  async function refreshSkyEmail() {
-    const data = await commandApi('/api/founder-command/skyemail');
-    $('skyEmailState').textContent = data.record?.mailbox_email || 'Not provisioned';
-    $('skyEmailInput').placeholder = data.default_email || 'metraiyux-0s@solenterprises.org';
-    showJson('skyEmailOutput', data.record || { configured: false, default_email: data.default_email, origin: data.origin });
-  }
+	  async function refreshSkyEmail() {
+	    const data = await commandApi('/api/founder-command/skyemail');
+	    $('skyEmailState').textContent = data.record?.mailbox_email || 'Not provisioned';
+	    $('skyEmailInput').placeholder = data.default_email || 'metraiyux-0s@solenterprises.org';
+	    showJson('skyEmailOutput', data.record || { configured: false, default_email: data.default_email, origin: data.origin });
+	  }
 
-  function renderPocketSkyEmail(data = {}) {
+	  function renderSkyEmailInventory(inventory = {}, custody = {}) {
+	    const mailboxes = Array.isArray(inventory.mailboxes) ? inventory.mailboxes : [];
+	    const represented = new Map((custody.represented_mailboxes || []).map((item) => [String(item.mailbox_email || '').toLowerCase(), item]));
+	    const missing = new Set((custody.missing_mailboxes || []).map((item) => String(item || '').toLowerCase()));
+	    if ($('skyEmailInventoryCount')) $('skyEmailInventoryCount').textContent = String(inventory.counts?.total ?? inventory.count ?? mailboxes.length);
+	    if ($('skyEmailCustodyCount')) $('skyEmailCustodyCount').textContent = String(custody.provider_represented ?? represented.size ?? 0);
+	    if ($('skyEmailCustodyMissing')) $('skyEmailCustodyMissing').textContent = String(custody.provider_missing ?? missing.size ?? 0);
+	    const list = $('skyEmailInventoryList');
+	    if (!list) return;
+	    list.innerHTML = mailboxes.map((mailbox) => {
+	      const email = String(mailbox.mailbox_email || '');
+	      const key = email.toLowerCase();
+	      const link = represented.get(key);
+	      const isMissing = missing.has(key) || !link;
+	      const dashboard = mailbox.login?.mailbox_dashboard_url || mailbox.login?.skyemail_session_handoff || '/live/SkyeMail/session-handoff.html?next=dashboard.html&from=founder-command';
+	      return `
+	        <article class="route-card">
+	          <strong>${escapeHtml(email || mailbox.id || 'Mailbox')}</strong>
+	          <span>${escapeHtml([mailbox.provider || 'provider', mailbox.status || mailbox.provisioning_status || 'status', `${mailbox.inbox_unread || 0} unread`].filter(Boolean).join(' | '))}</span>
+	          <span>${escapeHtml(isMissing ? 'Custody missing' : `Custody linked: ${link.client_account_id || 'account'}`)}</span>
+	          <div class="tool-row">
+	            <a class="button secondary" href="${escapeAttr(dashboard)}" target="_blank" rel="noopener">Open</a>
+	          </div>
+	        </article>
+	      `;
+	    }).join('') || '<div class="empty-state">No hosted SkyeMail mailboxes returned by the provider inventory.</div>';
+	  }
+
+	  async function refreshSkyEmailInventory() {
+	    if (!$('skyEmailInventoryOutput')) return null;
+	    showJson('skyEmailInventoryOutput', 'Loading live SkyeMail provider inventory and Founder Command custody...');
+	    const [mail, accounts] = await Promise.all([
+	      commandApi('/api/founder-command/skyemail?include_inventory=1'),
+	      commandApi('/api/founder-command/accounts?limit=1000')
+	    ]);
+	    const inventory = mail.inventory || {};
+	    const custody = accounts.skyemail_custody || {};
+	    renderSkyEmailInventory(inventory, custody);
+	    showJson('skyEmailInventoryOutput', {
+	      inventory_count: inventory.counts?.total ?? inventory.count ?? 0,
+	      custody,
+	      credential_policy: mail.credential_policy || inventory.credential_policy || ''
+	    });
+	    return { mail, accounts };
+	  }
+
+	  async function syncSkyEmailCustody() {
+	    showJson('skyEmailInventoryOutput', 'Syncing SkyeMail provider mailboxes into Founder Command custody...');
+	    const body = await commandApi('/api/founder-command/skyemail/mailboxes/backfill', {
+	      method: 'POST',
+	      body: { confirm: true, limit: 500 }
+	    });
+	    showJson('skyEmailInventoryOutput', body);
+	    await refreshSkyEmailInventory();
+	    await refreshCompanyOps();
+	    return body;
+	  }
+
+	  function renderPocketSkyEmail(data = {}) {
     const summary = data.summary || {};
     const mailbox = summary.mailbox || summary.status?.mailbox || {};
     const counts = summary.counts || {};
@@ -5180,9 +5240,11 @@
       event.preventDefault();
       await createSkyEmailHandoff('provision');
     });
-    $('createMainSkyEmailWorkspaceBtn').addEventListener('click', () => createSkyEmailHandoff('main-0s'));
-    $('refreshSkyEmailHandoffsBtn').addEventListener('click', refreshSkyEmailHandoffs);
-    $('skyEmailHandoffList').addEventListener('click', async (event) => {
+	    $('createMainSkyEmailWorkspaceBtn').addEventListener('click', () => createSkyEmailHandoff('main-0s'));
+	    $('refreshSkyEmailHandoffsBtn').addEventListener('click', refreshSkyEmailHandoffs);
+	    $('refreshSkyEmailInventoryBtn').addEventListener('click', refreshSkyEmailInventory);
+	    $('syncSkyEmailCustodyBtn').addEventListener('click', syncSkyEmailCustody);
+	    $('skyEmailHandoffList').addEventListener('click', async (event) => {
       const button = event.target.closest('button');
       if (!button) return;
       const openId = button.dataset.handoffOpen;
@@ -5412,7 +5474,7 @@
     const allowedViews = ['command', 'operations', 'core', 'calendar', 'mailboxes', 'clients', 'indexing', 'assets', 'songs', 'repo-vault', 'repo', 'skyenet', 'projects', 'founder', 'templates', 'blocks', 'backup'];
     setView(allowedViews.includes(requestedView) ? requestedView : 'command');
     await refreshCommandStatus();
-    await Promise.allSettled([refreshCompanyOps(), refreshFounderActions(), refreshCalendar(), refreshSkyEmail(), refreshSkyEmailPocket(), refreshSkyEmailHandoffs(), refreshRepoVault()]);
+	    await Promise.allSettled([refreshCompanyOps(), refreshFounderActions(), refreshCalendar(), refreshSkyEmail(), refreshSkyEmailPocket(), refreshSkyEmailInventory(), refreshSkyEmailHandoffs(), refreshRepoVault()]);
     setStatus(`Ready. Real repo assets, song vault copies, safe repo memory, and client packs are loaded.${pwaRegistration.ok ? ' PWA service worker registered.' : ''}`);
   }
 

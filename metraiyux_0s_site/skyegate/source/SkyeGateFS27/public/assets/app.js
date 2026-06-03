@@ -840,7 +840,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
       "FS27 client provisioning receipt",
       `Login email: ${provision?.credentials?.email || email}`,
       `Communication email: ${provision?.customer?.communication_email || communication_email || email}`,
-      `SkyEmail: ${provision?.customer?.skyemail || skyemail || "(not set)"}`,
+      `SkyeMail: ${provision?.customer?.skyemail || skyemail || "(not set)"}`,
       `Temporary password: ${provision?.credentials?.temporary_password || "(existing password left unchanged)"}`,
       `Force password reset: ${provision?.credentials?.password_reset_required ? "yes" : "no"}`,
       `Notification email: ${provision?.notification?.delivered ? "sent" : `not delivered (${provision?.notification?.mode || "unknown"})`}`,
@@ -1085,10 +1085,10 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
           : "brain gate: local bridge only";
     }
     $("#sfBrainText") && ($("#sfBrainText").textContent = brain.connected
-      ? `SkyeGateFS27 is reading the separate station brain at ${brain.url}${brain.endpoint || ""}.`
+      ? `SkyeGate FS27 is reading the separate station brain at ${brain.url}${brain.endpoint || ""}.`
       : brain.configured
         ? (brain.error || "Configured station brain did not answer. Local station metrics remain available.")
-        : "SkyeGateFS27 is reading the local station bridge. Set SKYEFUEL_STATION_BRAIN_URL when the separate Cloudflare brain is ready.");
+        : "SkyeGate FS27 is reading the local station bridge. Set SKYEFUEL_STATION_BRAIN_URL when the separate Cloudflare brain is ready.");
 
     const products = $("#sfProducts");
     if (products) {
@@ -1276,7 +1276,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     if (mode) mode.textContent = "runtime";
     const summaryEl = $("#localPlatformBoardSummary");
     if (summaryEl) {
-      summaryEl.textContent = `Local review board is active. ${numberFmt((board?.items || []).length)} platform surfaces can move through a persisted SkyeGateFS27 operator queue.`;
+      summaryEl.textContent = `Local review board is active. ${numberFmt((board?.items || []).length)} platform surfaces can move through a persisted SkyeGate FS27 operator queue.`;
     }
 
     const tbody = $("#localPlatformBoardTable tbody");
@@ -1313,7 +1313,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     if (mode) mode.textContent = "runtime";
     const summaryEl = $("#localPlatformExecutionSummary");
     if (summaryEl) {
-      summaryEl.textContent = `Execution board is active. ${numberFmt((board?.items || []).length)} platform surfaces have persisted post-review execution state inside SkyeGateFS27.`;
+      summaryEl.textContent = `Execution board is active. ${numberFmt((board?.items || []).length)} platform surfaces have persisted post-review execution state inside SkyeGate FS27.`;
     }
 
     const tbody = $("#localPlatformExecutionTable tbody");
@@ -1350,7 +1350,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
     if (mode) mode.textContent = "runtime";
     const summaryEl = $("#localPlatformDispatchSummary");
     if (summaryEl) {
-      summaryEl.textContent = `Dispatch board is active. ${numberFmt((board?.items || []).length)} platform surfaces have persisted downstream release state inside SkyeGateFS27.`;
+      summaryEl.textContent = `Dispatch board is active. ${numberFmt((board?.items || []).length)} platform surfaces have persisted downstream release state inside SkyeGate FS27.`;
     }
 
     const tbody = $("#localPlatformDispatchTable tbody");
@@ -1432,7 +1432,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
         status: nextStatus,
         owner: latest.review?.owner || "Local Operator",
         checkpoint: nextStatus === "dispatched" ? "handoff released" : `advanced to ${nextStatus}`,
-        notes: latest.review?.notes || "Advanced from the SkyeGateFS27 local platform board."
+        notes: latest.review?.notes || "Advanced from the SkyeGate FS27 local platform board."
       }
     });
     await loadLocalPlatformBoard();
@@ -1452,7 +1452,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
         status: nextStatus,
         owner: latest.execution?.owner || latest.review?.owner || "Local Operator",
         checkpoint: nextStatus === "completed" ? "execution complete" : `execution ${nextStatus}`,
-        notes: latest.execution?.notes || "Queued from the SkyeGateFS27 local execution board."
+        notes: latest.execution?.notes || "Queued from the SkyeGate FS27 local execution board."
       }
     });
     await loadLocalPlatformBoard();
@@ -1472,7 +1472,7 @@ function mountPricedModelPicker(textareaSel, providersInputSel) {
         status: nextStatus,
         owner: latest.dispatch?.owner || latest.execution?.owner || latest.review?.owner || "Local Operator",
         checkpoint: nextStatus === "delivered" ? "downstream handoff delivered" : `dispatch ${nextStatus}`,
-        notes: latest.dispatch?.notes || "Queued from the SkyeGateFS27 local dispatch board."
+        notes: latest.dispatch?.notes || "Queued from the SkyeGate FS27 local dispatch board."
       }
     });
     await loadLocalPlatformBoard();

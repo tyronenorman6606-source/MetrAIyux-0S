@@ -1,5 +1,5 @@
 (async function(){
-  const boot = await SMV.withBoot('drafts', 'Drafts', 'Saved SkyeMail drafts inside the Zoho-backed mail lane');
+  const boot = await SMV.withBoot('drafts', 'Drafts', 'Saved SkyeMail drafts inside the production mail lane');
   if(!boot) return;
   const runtime = window.SMVRuntime || { href: (value) => value };
   const statusEl = qs('#statusText');

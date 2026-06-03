@@ -155,6 +155,11 @@
   }
 
   $('headline').addEventListener('input', () => { $('slug').value = slugify($('headline').value); });
+  $('blogForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    buildPreview();
+    saveDraft();
+  });
   $('buildPreview').addEventListener('click', buildPreview);
   $('exportPackage').addEventListener('click', buildPackage);
   $('saveDraft').addEventListener('click', saveDraft);

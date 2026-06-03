@@ -2,7 +2,7 @@ const DEFAULT_REPO_TRIAL_DAYS = 7;
 export const REPO_STRIPE_CATALOG_SOURCE = "metraiyux_0s_site/brain/sales-offer-registry.json";
 
 const RAW_REPO_STRIPE_PRODUCTS = [
-  ["skygate-lane-maintenance-monthly","SkyeGateFS27 Lane Maintenance","$249/month per lane",24900,"usd","recurring","skygatefs27_lane_maintenance_monthly","skygate","SkyePay infrastructure",310,"approved","FS27 approved","SkyeGateFS27","skyesol_current_public_site/SkyeSol/skyesol-main/Services/Lane-Vault!/index.html","naomi-sterling-brain","Optional monthly lane maintenance for updates, small tweaks, and support.",["updates","small tweaks","lane support"]],
+  ["skygate-lane-maintenance-monthly","SkyeGate FS27 Lane Maintenance","$249/month per lane",24900,"usd","recurring","skygatefs27_lane_maintenance_monthly","skygate","SkyePay infrastructure",310,"approved","FS27 approved","SkyeGate FS27","skyesol_current_public_site/SkyeSol/skyesol-main/Services/Lane-Vault!/index.html","naomi-sterling-brain","Optional monthly lane maintenance for updates, small tweaks, and support.",["updates","small tweaks","lane support"]],
   ["kaixu-starter-monthly","kAIxU Starter","$249/month",24900,"usd","recurring","kaixu_starter_monthly","kaixu","kAIxU platform",351,"approved","kAIxU approved","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu/pricing.html","orion-hayes-brain","Platform access for independent operators needing projects, keys, and usage visibility.",["up to 3 projects","up to 5 keys","1 seat","usage dashboard","key rotation","basic limits"]],
   ["kaixu-team-monthly","kAIxU Team","$799/month",79900,"usd","recurring","kaixu_team_monthly","kaixu","kAIxU platform",352,"approved","kAIxU approved","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu/pricing.html","orion-hayes-brain","Platform access for teams shipping products.",["up to 15 projects","up to 50 keys","5 seats","usage alerts","role-based access","project limits"]],
   ["kaixu-scale-monthly","kAIxU Scale","$1,890/month",189000,"usd","recurring","kaixu_scale_monthly","kaixu","kAIxU platform",353,"approved","kAIxU approved","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu","skyesol_current_public_site/SkyeSol/skyesol-main/kAIxu/pricing.html","orion-hayes-brain","Platform access for multi-client operations.",["up to 60 projects","up to 250 keys","20 seats","audit exports","advanced limits","priority support lane"]],
@@ -91,7 +91,7 @@ function normalizeRepoProduct(row) {
     plan_name: slugPlanName(id),
     title: productName,
     family,
-    description: salesUse || "Approved checkout product from the repo Stripe catalog.",
+    description: salesUse || "Approved checkout product from the repo SkyePay settlement catalog.",
     currency,
     mode: recurring ? "subscription" : "payment",
     lookup_keys: [lookupKey],

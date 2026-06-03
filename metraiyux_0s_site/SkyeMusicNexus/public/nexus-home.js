@@ -1,10 +1,11 @@
 (() => {
+  const PUBLIC_ORIGIN = 'https://skye-music-nexus.pages.dev';
   const WORKER_ORIGIN = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
   const DEFAULT_ART = './assets/skye-music-nexus-logo.png';
   const ROOT = new URL('./', location.href);
   const CATALOG_FILE = new URL('./public/data/playlists.json', ROOT);
-  const APPS_FILE = new URL('./artist-storefronts/artist-apps/artist-apps.json', ROOT);
-  const COLLECTIVE_FILE = new URL('./artist-storefronts/gray-skyes-collective/collective.json', ROOT);
+  const APPS_FILE = new URL('/artist-storefronts/artist-apps/artist-apps.json', PUBLIC_ORIGIN);
+  const COLLECTIVE_FILE = new URL('/artist-storefronts/gray-skyes-collective/collective.json', PUBLIC_ORIGIN);
   const PLAYER_LIBRARY_KEY = 'skymusicnexus.playerLibrary.v1';
 
   const state = {
@@ -87,15 +88,35 @@
     }
   }
 
+  function publicArtistStorefrontUrl(value, baseFile = ROOT) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const url = new URL(raw, baseFile);
+      const publicPath = url.pathname
+        .replace(/^\/SkyeMusicNexus\/artist-storefronts(?=\/|$)/i, '/artist-storefronts')
+        .replace(/^\/SkyeMusicNexus\/public\/artist-storefronts(?=\/|$)/i, '/artist-storefronts')
+        .replace(/^\/public\/artist-storefronts(?=\/|$)/i, '/artist-storefronts')
+        .replace(/^\/public\/\.\.\/artist-storefronts(?=\/|$)/i, '/artist-storefronts');
+      if (publicPath.startsWith('/artist-storefronts/') && /\.(?:png|jpe?g|webp|gif|avif|svg)(?:$|\?)/i.test(publicPath)) return DEFAULT_ART;
+      if (publicPath.startsWith('/artist-storefronts/')) return `${PUBLIC_ORIGIN}${publicPath}${url.search}${url.hash}`;
+      if (publicPath === '/artist-storefronts') return `${PUBLIC_ORIGIN}/artist-storefronts/${url.search}${url.hash}`;
+    } catch {}
+    return '';
+  }
+
   function resolveFrom(value, baseFile = ROOT) {
     const raw = String(value || '').trim();
     if (!raw) return DEFAULT_ART;
-    if (/^(?:https?:|data:|blob:|mailto:|tel:)/i.test(raw)) return raw;
+    if (/^(?:data:|blob:|mailto:|tel:)/i.test(raw)) return raw;
+    const publicArtist = publicArtistStorefrontUrl(raw, baseFile);
+    if (publicArtist) return publicArtist;
+    if (/^https?:/i.test(raw)) return raw;
     if (raw.startsWith('/')) return raw;
-    if (raw.startsWith('../artist-storefronts/')) return new URL(raw.replace(/^\.\.\//, './'), ROOT).href;
-    if (/^\.\/(?:public|artist-storefronts|assets)\//.test(raw)) return new URL(raw, ROOT).href;
+    if (/^\.\/(?:public|assets)\//.test(raw)) return new URL(raw, ROOT).href;
     try {
-      return new URL(raw, baseFile).href;
+      const resolved = new URL(raw, baseFile);
+      return publicArtistStorefrontUrl(resolved.href, baseFile) || resolved.href;
     } catch {
       return raw || DEFAULT_ART;
     }
@@ -185,8 +206,8 @@
         artistId: app.artistId || current.artistId || '',
         name: app.stageName || app.name || current.name || slug,
         image: app.portrait ? resolveFrom(app.portrait, APPS_FILE) : current.image || DEFAULT_ART,
-        storefront: app.storefront ? resolveFrom(app.storefront, APPS_FILE) : current.storefront || `./artist-storefronts/${slug}/`,
-        app: app.href ? resolveFrom(app.href, APPS_FILE) : current.app || `./artist-storefronts/${slug}/app.html`,
+        storefront: app.storefront ? resolveFrom(app.storefront, APPS_FILE) : current.storefront || resolveFrom(`./artist-storefronts/${slug}/`, ROOT),
+        app: app.href ? resolveFrom(app.href, APPS_FILE) : current.app || resolveFrom(`./artist-storefronts/${slug}/app.html`, ROOT),
         genres: app.genres || current.genres || [],
         role: current.role || '',
         trackIds: current.trackIds || [],
@@ -203,9 +224,9 @@
         artistId: artist.artistId || current.artistId || '',
         name: artist.artistName || artist.name || current.name || slug,
         image: artist.artistImage ? resolveFrom(artist.artistImage, CATALOG_FILE) : current.image || DEFAULT_ART,
-        storefront: artist.storefrontUrl ? resolveFrom(artist.storefrontUrl, CATALOG_FILE) : current.storefront || `./artist-storefronts/${slug}/`,
-        productRoom: artist.productRoomUrl ? resolveFrom(artist.productRoomUrl, CATALOG_FILE) : `./artist-storefronts/${slug}/products/`,
-        app: current.app || `./artist-storefronts/${slug}/app.html`,
+        storefront: artist.storefrontUrl ? resolveFrom(artist.storefrontUrl, CATALOG_FILE) : current.storefront || resolveFrom(`./artist-storefronts/${slug}/`, ROOT),
+        productRoom: artist.productRoomUrl ? resolveFrom(artist.productRoomUrl, CATALOG_FILE) : resolveFrom(`./artist-storefronts/${slug}/products/`, ROOT),
+        app: current.app || resolveFrom(`./artist-storefronts/${slug}/app.html`, ROOT),
         genres: artist.genres || current.genres || [],
         trackIds: unique([...(current.trackIds || []), ...(artist.trackIds || [])]),
         score: artist.score || 0,
@@ -222,7 +243,7 @@
         name: current.name || track.artistName || slug,
         image: current.image || resolveFrom(track.artistImage || track.coverImage, CATALOG_FILE),
         storefront: current.storefront || resolveFrom(track.storeUrl || `./artist-storefronts/${slug}/`, CATALOG_FILE),
-        app: current.app || `./artist-storefronts/${slug}/app.html`,
+        app: current.app || resolveFrom(`./artist-storefronts/${slug}/app.html`, ROOT),
         genres: unique([...(current.genres || []), track.genre, ...(track.genres || []).slice(0, 2)]),
         role: current.role || '',
         trackIds: unique([...(current.trackIds || []), track.trackId]),
@@ -448,7 +469,7 @@
     el.artistStreams.textContent = fmt(stats.nexusStreams || 0);
     el.artistTracks.textContent = fmt(tracks.length);
     el.artistSeconds.textContent = fmt(stats.listenSeconds || 0);
-    el.selectedArtistStore.href = artist.storefront || './artist-storefronts/';
+    el.selectedArtistStore.href = artist.storefront || resolveFrom('./artist-storefronts/', ROOT);
     el.selectedArtistStats.href = `./public/artist-dashboard.html?artist=${encodeURIComponent(artist.slug || artist.artistId || '')}`;
   }
 

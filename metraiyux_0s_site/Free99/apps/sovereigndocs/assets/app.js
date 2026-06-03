@@ -25,7 +25,7 @@ function appPath(value){
   return `${SD_APP_ROOT}${clean}`;
 }
 function canonicalSkyeDocxMaxEditorUrl(params={}){
-  const url = new URL('/Marketing-Made-Easy/SkyeDocxMax/editor.html', location.origin);
+  const url = new URL('/Marketing-Made-Easy/SkyeDocxMax/editor', location.origin);
   url.searchParams.set('source', 'sovereigndocs');
   url.searchParams.set('ws_id', 'sovereigndocs');
   url.searchParams.set('returnTo', appPath('vault/'));
@@ -55,7 +55,7 @@ const SD_BRAND = Object.freeze({
   marker: 'SKYESOVERLONDON_BACKING_NOTICE',
   backingNotice: "Powered and workflow-backed by Skye's Over London LC through MetrAIyux 0S.",
   boundary: "Operational backing means document automation, vault/export tooling, workflow routing, and optional paid legal-review routing. It is not financing, legal advice, an attorney-client relationship, a filing/submission guarantee, a business outcome guarantee, or responsibility for the company's performance, approvals, compliance, or use of the documents.",
-  legalReview: 'Legal review is optional and paid up front through the SkyePay/Stripe legal-review lane before partner routing.'
+  legalReview: 'Legal review is optional and paid up front through the SkyePay legal-review lane before partner routing.'
 });
 function absoluteAppPath(value){
   try { return new URL(appPath(value), location.href).href; } catch { return appPath(value); }

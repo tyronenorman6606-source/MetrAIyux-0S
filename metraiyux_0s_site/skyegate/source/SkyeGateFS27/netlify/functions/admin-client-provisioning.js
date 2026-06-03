@@ -214,7 +214,7 @@ async function maybeProvisionVaultWorkspace(body, { customer, user, req }) {
   const baseUrl = vaultBaseUrl();
   const bearer = await provisioningBearer(req);
   if (!baseUrl || !bearer.token) {
-    return { requested: true, ok: false, error: "SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared FS27/SkyGate bearer or admin login env." };
+    return { requested: true, ok: false, error: "SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared SkyeGate FS27 bearer or admin login env." };
   }
   const gateBearer = bearer.token.replace(/^Bearer\s+/i, "");
   const companyName = clean(body.company_name || body.companyName || body.client_name || body.clientName || customer.email, 180);

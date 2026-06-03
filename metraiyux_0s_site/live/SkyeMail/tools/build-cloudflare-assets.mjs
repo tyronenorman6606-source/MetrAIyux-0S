@@ -83,6 +83,7 @@ for (const page of pages) {
   if (!fs.existsSync(source)) continue;
   copyHtmlPage(source, path.join(out, `${page}.html`));
   copyHtmlPage(source, path.join(out, page, "index.html"), { rootRelativeAssets: true });
+  if (page === "founder") copyHtmlPage(source, path.join(out, "__skyemail_founder"));
 }
 
 copyDir(path.join(root, "assets"), path.join(out, "assets"));

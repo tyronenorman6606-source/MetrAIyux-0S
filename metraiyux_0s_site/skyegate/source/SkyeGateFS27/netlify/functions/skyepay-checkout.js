@@ -7,6 +7,7 @@ import {
   cleanRequestToken,
   resolveSkyePayReturnOrigin,
   resolveSkyePayReturnUrl,
+  skyePayCustomerFulfillment,
   skyePayHeaders
 } from "./_lib/skyepaySecurity.js";
 import {
@@ -34,13 +35,43 @@ import {
 } from "./_lib/legalAcceptance.js";
 import { sendSkyePayOrderToRelay13 } from "./_lib/relay13Bridge.js";
 import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
+import { matchesOwnerRecoveryCredential, resolveAdminAuthority } from "./_lib/admin.js";
 
-function allowDryRun(req) {
+function proofModeToken(req) {
+  const auth = req.headers.get("authorization") || req.headers.get("Authorization") || "";
+  if (auth.startsWith("Bearer ")) return auth.slice(7).trim();
+  return [
+    "x-admin-token",
+    "x-free99-admin-code",
+    "x-free99-gate-session",
+    "x-skye-gate-session",
+    "x-0s-gate-session"
+  ].map((name) => req.headers.get(name)).find(Boolean) || "";
+}
+
+export async function allowDryRun(req) {
   const url = new URL(req.url);
   const host = url.hostname;
   if (["localhost", "127.0.0.1", "::1"].includes(host)) return true;
   if (host === "skyegatefs27.internal" && req.headers.get("x-skypay-proof-mode") === "1") return true;
-  return String(process.env.SKYPAY_ALLOW_PUBLIC_DRY_RUN || "").toLowerCase() === "true";
+  if (String(process.env.SKYPAY_ALLOW_PUBLIC_DRY_RUN || "").toLowerCase() === "true") return true;
+  if (req.headers.get("x-skypay-proof-mode") !== "1") return false;
+
+  const token = proofModeToken(req);
+  if (matchesOwnerRecoveryCredential(token)) return true;
+
+  const authority = await resolveAdminAuthority(req).catch(() => null);
+  return ["founder", "owner", "admin"].includes(String(authority?.role || "").toLowerCase());
+}
+
+export async function allowOwnerOnlySkyeMeritFreeCheckout(req) {
+  if (req.headers.get("x-skypay-proof-mode") !== "1") return false;
+
+  const token = proofModeToken(req);
+  if (matchesOwnerRecoveryCredential(token)) return true;
+
+  const authority = await resolveAdminAuthority(req).catch(() => null);
+  return ["founder", "owner", "admin"].includes(String(authority?.role || "").toLowerCase());
 }
 
 function sessionReturnUrls(req, origin, client, offer, body = {}) {
@@ -151,6 +182,10 @@ function scheduleBackground(promise, context) {
   }
 }
 
+function orderLedgerPreflightEnabled() {
+  return String(process.env.SKYPAY_REQUIRE_ORDER_LEDGER_READY || "true").toLowerCase() !== "false";
+}
+
 export default wrap(async (req, _cors, context) => {
   const headers = skyePayHeaders(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers });
@@ -213,7 +248,7 @@ export default wrap(async (req, _cors, context) => {
 
   const origin = resolveSkyePayReturnOrigin(req);
   if (body.dry_run) {
-    if (!allowDryRun(req)) return json(403, { error: "Dry-run checkout is disabled on this host" }, headers);
+    if (!await allowDryRun(req)) return json(403, { error: "Dry-run checkout is disabled on this host" }, headers);
     const demo = makeDemoSession({ client, offer, body: bodyWithSkyCart, origin });
     await audit("system", "SKYEPAY_DRY_RUN_CHECKOUT", `client:${client.slug}`, {
       offer_id: offer.id,
@@ -221,6 +256,18 @@ export default wrap(async (req, _cors, context) => {
       customer_email: body.customer_email
     });
     return json(200, demo, headers);
+  }
+
+  if (orderLedgerPreflightEnabled()) {
+    try {
+      await q("select 1 as ok");
+    } catch (error) {
+      return json(503, {
+        error: "SkyePay order ledger is temporarily unavailable; checkout was not created.",
+        code: "SKYEPAY_ORDER_LEDGER_UNAVAILABLE",
+        detail: cleanRequestToken(error?.code || error?.message || "database_unavailable", 180)
+      }, headers);
+    }
   }
 
   const orderId = makeOrderId(bodyWithSkyCart);
@@ -248,6 +295,26 @@ export default wrap(async (req, _cors, context) => {
   if (skyeMeritCheckout?.applied
     && skyeMeritCheckout.allow_free_checkout === true
     && Number(skyeMeritCheckout.adjusted_due_cents || 0) === 0) {
+    if (!await allowOwnerOnlySkyeMeritFreeCheckout(req)) {
+      await audit("system", "SKYEPAY_SKYEMERIT_FREE_CHECKOUT_DENIED", `skyepay:${orderId}`, {
+        client_slug: client.slug,
+        offer_id: offer.id,
+        skyemerit_code: skyeMeritCheckout.code || skyeMeritCheckout.requested_code || "",
+        skyemerit_pack_id: skyeMeritCheckout.pack_id || "",
+        adjusted_due_cents: skyeMeritCheckout.adjusted_due_cents || 0
+      });
+      return json(403, {
+        error: "Owner authorization is required for zero-balance SkyeMerit checkout.",
+        code: "SKYEMERIT_FREE_CHECKOUT_REQUIRES_OWNER_AUTH",
+        skyemerit: {
+          applied: skyeMeritCheckout.applied,
+          code: skyeMeritCheckout.code || skyeMeritCheckout.requested_code || "",
+          pack_id: skyeMeritCheckout.pack_id || "",
+          adjusted_due_cents: skyeMeritCheckout.adjusted_due_cents || 0
+        }
+      }, headers);
+    }
+
     const session = {
       id: `skypay_zero_${crypto.randomUUID()}`,
       mode: offer.mode || "payment",
@@ -286,6 +353,7 @@ export default wrap(async (req, _cors, context) => {
       approval_status: order?.approval_status || (offer.owner_approval_required === true ? "paid_pending_owner_approval" : "auto_unlock_after_confirmed_payment"),
       owner_approval_required: offer.owner_approval_required === true,
       activation_path: offer.activation_path || null,
+      fulfillment: skyePayCustomerFulfillment(offer, order),
       trial_days: trialDays,
       zero_upfront_trial: trialDays > 0,
       skyemerit: skyeMeritCheckout,
@@ -347,9 +415,9 @@ export default wrap(async (req, _cors, context) => {
       error: runtimeReceipt?.error || runtime.response?.error || "stripe_checkout_runtime_failed"
     });
     return json(runtime.status || 502, {
-      error: "Stripe checkout provider runtime failed",
-      code: "STRIPE_PROVIDER_RUNTIME_FAILED",
-      provider_runtime: publicProviderRuntime(runtimeReceipt)
+      error: "Secure checkout provider failed. No payment was created; please try again or contact SkyePay support with the reference below.",
+      code: "SKYEPAY_CHECKOUT_PROVIDER_FAILED",
+      support_reference: runtimeReceipt?.id || orderId
     }, headers);
   }
   const providerResult = runtimeReceipt?.provider_result || {};
@@ -414,6 +482,7 @@ export default wrap(async (req, _cors, context) => {
     approval_status: order?.approval_status || "checkout_created",
     owner_approval_required: offer.owner_approval_required === true,
     activation_path: offer.activation_path || null,
+    fulfillment: skyePayCustomerFulfillment(offer, order),
     trial_days: trialDays,
     zero_upfront_trial: trialDays > 0,
     skyemerit: skyeMeritCheckout,

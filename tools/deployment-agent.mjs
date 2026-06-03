@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { envWithModernNodeForWrangler } from './lib/wrangler-version-guard.mjs';
 import { spawnSync } from 'node:child_process';
 
 const repoRoot = process.cwd();
@@ -227,12 +228,12 @@ function safeOutput(value, candidate) {
 }
 
 function putWorkerSecret({ worker, name, value, candidate }) {
-  const env = {
+  const env = envWithModernNodeForWrangler({
     ...process.env,
     CLOUDFLARE_API_TOKEN: candidate.token,
     CLOUDFLARE_ACCOUNT_ID: candidate.account
-  };
-  const result = spawnSync('npx', ['wrangler@4.14.0', 'secret', 'put', name, '--name', worker], {
+  });
+  const result = spawnSync('npx', ['-y', '-p', 'wrangler@4.95.0', 'wrangler', 'secret', 'put', name, '--name', worker], {
     cwd: repoRoot,
     env,
     input: `${value}\n`,
@@ -287,7 +288,23 @@ async function smokeDevooderator() {
   const urls = [
     {
       url: 'https://devooderator.pages.dev/',
-      contains: ['blog/2026-05-30-0s-honest-repair-report.html']
+      contains: ['blog/2026-05-31-skyevault-agent-platform-lane.html']
+    },
+    {
+      url: 'https://devooderator.pages.dev/blog/2026-05-31-skyevault-agent-platform-lane.html',
+      contains: [
+        'SkyeVault Agent had to become a real product lane',
+        '5cb4ceb88b12b5af06684deed401179dcca6c7cbdd3101a3ef2c38223a7518aa',
+        'The $13 auto-install lane is real now',
+        'test-artifacts/skyevault-agent-auto-install/latest.json',
+        'test-artifacts/skyevault-agent-auto-install/2026-05-31T21-03-07-066Z.json',
+        'test-artifacts/skyevault-agent-sales-readiness/latest.json',
+        'test-artifacts/skyevault-agent-sales-readiness/2026-05-31T22-44-15-311Z.json',
+        'test-artifacts/skyevault-agent-live-browser/latest.json',
+        'test-artifacts/skyevault-agent-live-browser/2026-05-31T22-32-41-667Z.json',
+        'test-artifacts/skyevault-agent-live-http/2026-05-31T12-27-52-516Z.json',
+        '2026-05-31T21-07-21-331Z-worker-deploy.json'
+      ]
     },
     {
       url: 'https://devooderator.pages.dev/blog/2026-05-30-0s-honest-repair-report.html',
@@ -334,6 +351,7 @@ async function smokeDevooderator() {
     {
       url: 'https://devooderator.pages.dev/sitemap.xml',
       contains: [
+        'blog/2026-05-31-skyevault-agent-platform-lane',
         'blog/2026-05-30-0s-honest-repair-report',
         'blog/2026-05-29-0s-production-closure-gate-repair',
         'blog/2026-05-27-bobs-skynet-sovereign-client-app',

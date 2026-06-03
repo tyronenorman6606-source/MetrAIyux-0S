@@ -23,7 +23,7 @@ SkyeNet can ship today without waiting for a private server.
 
 SkyeNet Edge is the always-on release lane. It handles static drops, shared-gate deploy control, host/path routing, managed SkyeNet functions, observability receipts, and Free99 cost guardrails. If the private server is offline, SkyeNet Edge still serves the static surfaces and the approved managed function routes.
 
-SkyeNet Functions is the Netlify-compatible function lane. The repo now has a converter and signed SkyeNet-owned proof runtime for `netlify/functions/*`, `/.netlify/functions/<name>`, and the `handler(event, context)` return shape. For release, uploaded function bundles can be accepted, converted, inspected, signed, staged, and executed in the controlled v1 runtime for trusted or owner-approved bundles with timeout, memory, body, env, and default-deny egress guardrails. Unlimited live execution of untrusted customer code should wait for the SkyeNet isolated runtime proof.
+SkyeNet Functions is the Netlify-compatible function lane. The repo now has deploy CLI intake for `netlify/functions/*`, `functions/*`, and `skyenet/functions/*`, OS-jailed install/build for dependency-backed function bundles, local helper/import bundling, bundle upload, server-signed customer manifests after storage verification, and active invocation at `/.netlify/functions/<name>` / `/.skyenet/functions/<name>` through the Dynamic Worker runtime. This is production-ready for managed/owner-approved JS/ESM function bundles with timeout, body, env, scheduled/background metadata, build receipts, receipt, and default-deny egress guardrails. The console exposes per-function env grant inspection and rollback route controls. Unlimited hostile-code execution still waits for the isolated runtime and admission-control lanes.
 
 SkyeNet Sovereign Runtime is the owned execution capacity. It can run on a low-cost VPS, a dedicated server, or future 0S-owned Kubernetes. This is where arbitrary customer-uploaded functions belong after admission checks, CPU and memory caps, secret isolation, egress policy, abuse controls, and billing cutoffs are live.
 
@@ -52,7 +52,7 @@ Cloudflare-native under SkyeNet/0S today or directly feasible:
 - 0S shell, admin, route manifest, and shared FS27/SkyGate/Free99 gate.
 - SkyeNet Deploy static drops, route registry, observability, and internal cost model.
 - SkyeNet managed functions owned by the platform.
-- SkyeNet Functions signed bundle intake and controlled runtime v1 proof for approved Netlify-compatible functions.
+- SkyeNet Functions signed bundle intake, deploy CLI bundling, server-signed customer upload activation, and Dynamic Worker invocation for approved Netlify-compatible functions.
 - CitadelDB Edge D1 mirror rows, write receipts, status, catch-up queue, and dual-write receipts.
 - Relay13 realtime rooms, D1 persistence, and Durable Object coordination.
 - SkyePay checkout/webhook lanes and payment proof ledgers.

@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { webcrypto } from 'node:crypto';
+import { createHmac, webcrypto } from 'node:crypto';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 
 const { handleSkyeNetDeployRequest } = await import('../cloudflare/skynet-deploy-api.mjs');
+const FUNCTION_SIGNING_KEY = 'unit-test-skynet-function-signing-key';
 
 function authHeaders(extra = {}) {
   return {
@@ -32,17 +33,21 @@ function mockEnv() {
         const bytes = stored.value instanceof Uint8Array
           ? stored.value
           : Buffer.from(await new Response(stored.value).arrayBuffer());
-        return { key, size: bytes.byteLength, uploaded: new Date() };
+        return { key, size: bytes.byteLength, uploaded: new Date(), customMetadata: stored.options?.customMetadata || {} };
       },
-      async get(key) {
+      async get(key, options = {}) {
         const stored = objects.get(key);
         if (!stored) return null;
-        const bytes = stored.value instanceof Uint8Array
+        const fullBytes = stored.value instanceof Uint8Array
           ? stored.value
           : Buffer.from(await new Response(stored.value).arrayBuffer());
+        const range = options?.range;
+        const bytes = range && Number.isFinite(range.offset) && Number.isFinite(range.length)
+          ? fullBytes.slice(Math.max(0, Number(range.offset)), Math.max(0, Number(range.offset)) + Math.max(0, Number(range.length)))
+          : fullBytes;
         return {
           key,
-          size: bytes.byteLength,
+          size: fullBytes.byteLength,
           uploaded: new Date(),
           body: new Response(bytes).body,
           async arrayBuffer() { return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength); },
@@ -59,6 +64,37 @@ function mockEnv() {
             .filter((key) => key.startsWith(prefix))
             .slice(0, limit)
             .map((key) => ({ key, size: 1, uploaded: new Date() }))
+        };
+      }
+    },
+    SKYENET_FUNCTION_BUNDLE_SIGNING_KEY: FUNCTION_SIGNING_KEY,
+    SKYENET_FUNCTION_LOADER: {
+      async get(id, factory) {
+        const code = await factory();
+        return {
+          id,
+          code,
+          getEntrypoint() {
+            return {
+              async fetch(request) {
+                return Response.json({
+                  ok: true,
+                  runtime: 'mock-dynamic-worker',
+                  worker_id: id,
+                  method: request.method,
+                  body: ['GET', 'HEAD'].includes(request.method) ? '' : await request.text(),
+                  module_count: Object.keys(code.modules || {}).length,
+                  global_outbound_null: code.globalOutbound === null
+                }, {
+                  status: 201,
+                  headers: {
+                    'x-skyenet-function': 'hello',
+                    'content-type': 'application/json; charset=utf-8'
+                  }
+                });
+              }
+            };
+          }
         };
       }
     },
@@ -91,6 +127,85 @@ function mockEnv() {
       }
     }
   };
+}
+
+async function sha256Text(text) {
+  const bytes = new TextEncoder().encode(String(text));
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function testTarHeader(name, size) {
+  const header = Buffer.alloc(512);
+  const cleanName = String(name || '').replace(/^\/+/, '');
+  header.write(cleanName.slice(0, 100), 0, 100, 'utf8');
+  header.write('0000644\0', 100, 8, 'ascii');
+  header.write('0000000\0', 108, 8, 'ascii');
+  header.write('0000000\0', 116, 8, 'ascii');
+  header.write(size.toString(8).padStart(11, '0') + '\0', 124, 12, 'ascii');
+  header.write('00000000000\0', 136, 12, 'ascii');
+  header.fill(32, 148, 156);
+  header.write('0', 156, 1, 'ascii');
+  header.write('ustar\0', 257, 6, 'ascii');
+  header.write('00', 263, 2, 'ascii');
+  let sum = 0;
+  for (const byte of header) sum += byte;
+  header.write(sum.toString(8).padStart(6, '0') + '\0 ', 148, 8, 'ascii');
+  return header;
+}
+
+function testTar(files) {
+  const chunks = [];
+  for (const [name, text] of files) {
+    const body = Buffer.from(text);
+    chunks.push(testTarHeader(name, body.byteLength), body);
+    const remainder = body.byteLength % 512;
+    if (remainder) chunks.push(Buffer.alloc(512 - remainder));
+  }
+  chunks.push(Buffer.alloc(1024));
+  return Buffer.concat(chunks);
+}
+
+function signFunctionManifest(manifest, key = FUNCTION_SIGNING_KEY) {
+  const clone = { ...manifest };
+  delete clone.signature;
+  return {
+    alg: 'HS256',
+    key_hint: createHmac('sha256', key).update('hint').digest('hex').slice(0, 12),
+    value: createHmac('sha256', key).update(JSON.stringify(clone)).digest('hex')
+  };
+}
+
+async function signedFunctionManifest({ source, projectId = 'sovereign-docs', deploymentId = 'dep_test_001', envGrants = [] }) {
+  const manifest = {
+    schema: 'skyenet.functions.bundle.v1',
+    bundle_id: `skybun_${projectId}_${deploymentId}`,
+    generated_at: '2026-05-31T00:00:00.000Z',
+    tenant_id: 'unit-test-tenant',
+    function_count: 1,
+    functions: [{
+      name: 'hello',
+      source_path: 'netlify/functions/hello.mjs',
+      bundle_path: 'functions/hello.mjs',
+      runtime: 'node',
+      adapter: 'netlify.handler.v1',
+      sha256: await sha256Text(source),
+      routes: ['/.netlify/functions/hello', '/.skyenet/functions/hello'],
+      limits: {
+        timeout_ms: 10000,
+        memory_mb: 128,
+        max_body_bytes: 1048576,
+        egress: 'deny-by-default',
+        env_grants: envGrants
+      }
+    }],
+    runtime_contract: {
+      entry: 'handler(event, context)',
+      isolation: 'cloudflare-dynamic-worker-v1'
+    }
+  };
+  manifest.signature = signFunctionManifest(manifest);
+  return manifest;
 }
 
 test('SkyeNet deploy API initializes, uploads, completes, and routes a path-mounted app', async () => {
@@ -234,6 +349,72 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
   assert.equal(sourceSearchBody.mode, 'path-and-small-text-content');
   assert.ok(sourceSearchBody.results.some((result) => result.path === 'netlify/functions/hello.mjs' && result.match === 'content'));
 
+  const functionSource = 'export async function handler(event){return {statusCode:201,headers:{"content-type":"application/json"},body:JSON.stringify({ok:true,method:event.httpMethod})};}';
+  const functionUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=sovereign-docs&deployment_id=dep_test_001&plan_name=skyenet-functions-managed&path=functions/hello.mjs',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/javascript; charset=utf-8' }),
+      body: functionSource
+    }
+  ), context);
+  assert.equal(functionUpload.status, 200);
+  const functionUploadBody = await functionUpload.json();
+  assert.equal(functionUploadBody.function_bundle.status, 'uploading');
+  assert.equal(functionUploadBody.function_bundle.public_asset_exposure, false);
+
+  const manifest = await signedFunctionManifest({ source: functionSource, envGrants: ['API_TOKEN', 'DATABASE_URL'] });
+  const manifestUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=sovereign-docs&deployment_id=dep_test_001&path=manifest.json',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/json; charset=utf-8' }),
+      body: JSON.stringify(manifest)
+    }
+  ), context);
+  assert.equal(manifestUpload.status, 200);
+
+  const buildReceiptUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=sovereign-docs&deployment_id=dep_test_001&path=build-receipt.json',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/json; charset=utf-8' }),
+      body: JSON.stringify({ ok: true, isolation: { mode: 'linux-user-mount-pid-chroot' } })
+    }
+  ), context);
+  assert.equal(buildReceiptUpload.status, 200);
+
+  const functionsComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/functions-complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      workspace_id: 'customer-31',
+      project_id: 'sovereign-docs',
+      deployment_id: 'dep_test_001',
+      plan_name: 'skyenet-functions-managed'
+    })
+  }), context);
+  assert.equal(functionsComplete.status, 200);
+  const functionsCompleteBody = await functionsComplete.json();
+  assert.equal(functionsCompleteBody.function_bundle.status, 'active');
+  assert.equal(functionsCompleteBody.function_bundle.function_count, 1);
+  assert.equal(functionsCompleteBody.function_bundle.runtime_policy.isolation, 'cloudflare-dynamic-worker-v1');
+  assert.equal(functionsCompleteBody.function_bundle.runtime_policy.global_outbound, null);
+  assert.equal(functionsCompleteBody.function_bundle.signed, true);
+  assert.equal(functionsCompleteBody.function_bundle.storage_verified, true);
+  assert.match(functionsCompleteBody.function_bundle.build_receipt_key, /build-receipt\.json$/);
+  assert.ok(env.objects.has('function-bundles/customer-31/workspace-customer-31/project-sovereign-docs/deployment-dep_test_001/.skyenet/functions-manifest.json'));
+
+  const functionsStatus = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/functions-status?workspace_id=customer-31&project_id=sovereign-docs&deployment_id=dep_test_001',
+    { method: 'GET', headers: authHeaders() }
+  ), context);
+  assert.equal(functionsStatus.status, 200);
+  const functionsStatusBody = await functionsStatus.json();
+  assert.equal(functionsStatusBody.function_bundle.status, 'active');
+  assert.equal(functionsStatusBody.function_bundle.functions[0].name, 'hello');
+  assert.deepEqual(functionsStatusBody.function_bundle.functions[0].limits.env_grants, ['API_TOKEN', 'DATABASE_URL']);
+
   const route = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/route', {
     method: 'POST',
     headers: authHeaders(),
@@ -268,7 +449,9 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
   assert.equal(statusBody.capabilities.private_source_tree_api, true);
   assert.equal(statusBody.capabilities.private_source_file_api, true);
   assert.equal(statusBody.capabilities.env_variable_registry, true);
-  assert.equal(statusBody.capabilities.arbitrary_uploaded_serverless_functions, false);
+  assert.equal(statusBody.capabilities.functions_enabled_for_workspace, true);
+  assert.equal(statusBody.capabilities.uploaded_function_dynamic_worker_invocation, true);
+  assert.equal(statusBody.capabilities.arbitrary_uploaded_serverless_functions, true);
   assert.equal(statusBody.requested_deployment.manifest.complete.files.length, 2);
 
   const routes = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/routes?host=skynet.example.com', {
@@ -313,6 +496,10 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
   assert.equal(dashboardBody.deployments[0].source_custody.private_full_project_package, true);
   assert.equal(dashboardBody.deployments[0].source_custody.private_source_file_count, 2);
   assert.equal(dashboardBody.deployments[0].source_custody.ide_readable_codebase, true);
+  assert.equal(dashboardBody.deployments[0].functions.active, true);
+  assert.equal(dashboardBody.deployments[0].functions.function_count, 1);
+  assert.equal(dashboardBody.deployments[0].functions.signed, true);
+  assert.equal(dashboardBody.deployments[0].functions.storage_verified, true);
 
   const envSave = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/env', {
     method: 'POST',
@@ -418,6 +605,68 @@ test('SkyeNet deploy API initializes, uploads, completes, and routes a path-moun
     assert.match(storedTarText, /\.skyenet\/source-manifest\.json/);
     assert.match(storedTarText, /export async function handler/);
   }
+
+  const missingRollback = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/rollback', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      route_key: routeBody.key,
+      project_id: 'sovereign-docs',
+      deployment_id: 'dep_missing_rollback'
+    })
+  }), context);
+  assert.equal(missingRollback.status, 404);
+  assert.equal((await missingRollback.json()).code, 'ROLLBACK_DEPLOYMENT_NOT_FOUND');
+
+  const rollbackInit = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/init', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      project_id: 'sovereign-docs',
+      deployment_id: 'dep_test_002',
+      title: 'Sovereign Docs Rollback Target'
+    })
+  }), context);
+  assert.equal(rollbackInit.status, 200);
+  const rollbackUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/upload?projectId=sovereign-docs&deploymentId=dep_test_002&path=/index.html',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/html; charset=utf-8' }),
+      body: '<!doctype html><title>Sovereign Docs rollback target</title>'
+    }
+  ), context);
+  assert.equal(rollbackUpload.status, 200);
+  const rollbackComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      project_id: 'sovereign-docs',
+      deployment_id: 'dep_test_002',
+      files: ['index.html']
+    })
+  }), context);
+  assert.equal(rollbackComplete.status, 200);
+
+  const rollback = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/rollback', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      route_key: routeBody.key,
+      project_id: 'sovereign-docs',
+      deployment_id: 'dep_test_002',
+      asset_prefix: 'deployments/forged-prefix/should-not-win'
+    })
+  }), context);
+  assert.equal(rollback.status, 200);
+  const rollbackBody = await rollback.json();
+  assert.equal(rollbackBody.route.active_deployment_id, 'dep_test_002');
+  assert.equal(rollbackBody.route.asset_prefix, 'deployments/sovereign-docs/dep_test_002');
+  assert.equal(rollbackBody.target_deployment.storage_verified, true);
+  assert.equal(rollbackBody.target_deployment.storage_checked_count, 1);
+  const savedRollbackRoute = JSON.parse(env.routes.get(routeBody.key).value);
+  assert.equal(savedRollbackRoute.active_deployment_id, 'dep_test_002');
+  assert.equal(savedRollbackRoute.asset_prefix, 'deployments/sovereign-docs/dep_test_002');
 });
 
 test('SkyeNet deploy API refuses unverified complete and route records', async () => {
@@ -490,6 +739,215 @@ test('SkyeNet deploy API refuses unverified complete and route records', async (
     })
   }), context);
   assert.equal(readyRoute.status, 200);
+});
+
+test('SkyeNet uploaded functions require approved plan, signed manifest, and matching storage hash', async () => {
+  const env = mockEnv();
+  const context = { env };
+  const projectId = 'functions-denial';
+  const deploymentId = 'dep_functions_denial';
+  const functionSource = 'export async function handler(){return {statusCode:200,body:"ok"};}';
+
+  const freeUpload = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&path=functions/hello.mjs`,
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/javascript; charset=utf-8' }),
+      body: functionSource
+    }
+  ), context);
+  assert.equal(freeUpload.status, 402);
+  assert.equal((await freeUpload.json()).code, 'SKYENET_FUNCTIONS_PLAN_REQUIRED');
+
+  const upload = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&plan_name=skyenet-functions-managed&path=functions/hello.mjs`,
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'text/javascript; charset=utf-8' }),
+      body: functionSource
+    }
+  ), context);
+  assert.equal(upload.status, 200);
+
+  const unsignedManifest = await signedFunctionManifest({ source: functionSource, projectId, deploymentId });
+  delete unsignedManifest.signature;
+  assert.equal((await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&path=manifest.json`,
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/json; charset=utf-8' }),
+      body: JSON.stringify(unsignedManifest)
+    }
+  ), context)).status, 200);
+  const unsignedComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/functions-complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      workspace_id: 'customer-31',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      plan_name: 'skyenet-functions-managed'
+    })
+  }), context);
+  assert.equal(unsignedComplete.status, 403);
+  assert.equal((await unsignedComplete.json()).code, 'FUNCTION_BUNDLE_UNSIGNED');
+
+  const serverSignedComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/functions-complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      workspace_id: 'customer-31',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      plan_name: 'skyenet-functions-managed',
+      server_sign_manifest: true,
+      customer_upload: true
+    })
+  }), context);
+  assert.equal(serverSignedComplete.status, 200);
+  const serverSignedBody = await serverSignedComplete.json();
+  assert.equal(serverSignedBody.function_bundle.status, 'active');
+  assert.equal(serverSignedBody.function_bundle.signed, true);
+  assert.equal(serverSignedBody.function_bundle.signature.server_signed, true);
+  assert.ok(env.objects.has(`function-bundles/customer-31/workspace-customer-31/project-${projectId}/deployment-${deploymentId}/.skyenet/functions-manifest.json`));
+
+  const mismatchedManifest = await signedFunctionManifest({ source: `${functionSource}\n// changed`, projectId, deploymentId });
+  assert.equal((await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&path=manifest.json`,
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/json; charset=utf-8' }),
+      body: JSON.stringify(mismatchedManifest)
+    }
+  ), context)).status, 200);
+  const mismatchComplete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/functions-complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      workspace_id: 'customer-31',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      plan_name: 'skyenet-functions-managed'
+    })
+  }), context);
+  assert.equal(mismatchComplete.status, 409);
+  const mismatchBody = await mismatchComplete.json();
+  assert.equal(mismatchBody.code, 'FUNCTION_BUNDLE_STORAGE_MISMATCH');
+  assert.equal(mismatchBody.hash_mismatches[0].path, 'functions/hello.mjs');
+});
+
+test('SkyeNet uploaded functions preserve scheduled and background deploy metadata', async () => {
+  const env = mockEnv();
+  const context = { env };
+  const projectId = 'functions-modes';
+  const deploymentId = 'dep_functions_modes';
+  const sources = {
+    'functions/hello.mjs': 'export async function handler(){return {statusCode:200,body:"hello"};}',
+    'functions/job-background.mjs': 'export async function handler(){return {statusCode:202,body:"queued"};}',
+    'functions/tick.mjs': 'export const config={schedule:"*/15 * * * *"}; export async function handler(){return {statusCode:200,body:"tick"};}'
+  };
+
+  for (const [bundlePath, source] of Object.entries(sources)) {
+    const upload = await handleSkyeNetDeployRequest(new Request(
+      `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&plan_name=skyenet-functions-managed&path=${bundlePath}`,
+      {
+        method: 'PUT',
+        headers: authHeaders({ 'content-type': 'text/javascript; charset=utf-8' }),
+        body: source
+      }
+    ), context);
+    assert.equal(upload.status, 200);
+  }
+
+  const manifest = {
+    schema: 'skyenet.functions.bundle.v1',
+    bundle_id: 'skybun_functions_modes',
+    generated_at: '2026-05-31T00:00:00.000Z',
+    tenant_id: 'unit-test-tenant',
+    function_count: 3,
+    background_function_count: 1,
+    scheduled_function_count: 1,
+    schedules: [{
+      function_name: 'tick',
+      cron: '*/15 * * * *',
+      timezone: 'UTC',
+      route: '/.skyenet/scheduled/tick'
+    }],
+    functions: [
+      {
+        name: 'hello',
+        source_path: 'netlify/functions/hello.mjs',
+        bundle_path: 'functions/hello.mjs',
+        sha256: await sha256Text(sources['functions/hello.mjs']),
+        routes: ['/.netlify/functions/hello', '/.skyenet/functions/hello'],
+        limits: { timeout_ms: 10000, memory_mb: 128, max_body_bytes: 1048576, egress: 'deny-by-default', env_grants: [] }
+      },
+      {
+        name: 'job-background',
+        source_path: 'netlify/functions/job-background.mjs',
+        bundle_path: 'functions/job-background.mjs',
+        invocation_mode: 'background',
+        background: true,
+        sha256: await sha256Text(sources['functions/job-background.mjs']),
+        routes: ['/.netlify/functions/job-background', '/.skyenet/functions/job-background'],
+        limits: { timeout_ms: 10000, memory_mb: 128, max_body_bytes: 1048576, egress: 'deny-by-default', env_grants: [] }
+      },
+      {
+        name: 'tick',
+        source_path: 'netlify/functions/tick.mjs',
+        bundle_path: 'functions/tick.mjs',
+        invocation_mode: 'scheduled',
+        schedule: { cron: '*/15 * * * *', timezone: 'UTC', source: 'netlify-function-config' },
+        sha256: await sha256Text(sources['functions/tick.mjs']),
+        routes: ['/.netlify/functions/tick', '/.skyenet/functions/tick', '/.skyenet/scheduled/tick'],
+        limits: { timeout_ms: 10000, memory_mb: 128, max_body_bytes: 1048576, egress: 'deny-by-default', env_grants: [] }
+      }
+    ],
+    runtime_contract: {
+      entry: 'handler(event, context)',
+      invocation_modes: ['request', 'background', 'scheduled'],
+      isolation: 'cloudflare-dynamic-worker-v1'
+    }
+  };
+  manifest.signature = signFunctionManifest(manifest);
+
+  const manifestUpload = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-upload?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}&path=manifest.json`,
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/json; charset=utf-8' }),
+      body: JSON.stringify(manifest)
+    }
+  ), context);
+  assert.equal(manifestUpload.status, 200);
+
+  const complete = await handleSkyeNetDeployRequest(new Request('https://fs27.example.com/deploy/functions-complete', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({
+      workspace_id: 'customer-31',
+      project_id: projectId,
+      deployment_id: deploymentId,
+      plan_name: 'skyenet-functions-managed'
+    })
+  }), context);
+  assert.equal(complete.status, 200);
+  const body = await complete.json();
+  assert.equal(body.function_bundle.function_count, 3);
+  assert.equal(body.function_bundle.background_function_count, 1);
+  assert.equal(body.function_bundle.scheduled_function_count, 1);
+  assert.equal(body.function_bundle.functions.find((fn) => fn.name === 'job-background').invocation_mode, 'background');
+  assert.equal(body.function_bundle.functions.find((fn) => fn.name === 'tick').schedule.cron, '*/15 * * * *');
+
+  const status = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/functions-status?workspace_id=customer-31&project_id=${projectId}&deployment_id=${deploymentId}`,
+    { method: 'GET', headers: authHeaders() }
+  ), context);
+  assert.equal(status.status, 200);
+  const statusBody = await status.json();
+  assert.equal(statusBody.function_bundle.background_function_count, 1);
+  assert.equal(statusBody.function_bundle.scheduled_function_count, 1);
+  assert.equal(statusBody.function_bundle.schedules[0].route, '/.skyenet/scheduled/tick');
 });
 
 test('SkyeNet deploy API rejects source/runtime asset paths', async () => {
@@ -605,6 +1063,29 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   const archiveBody = await archive.json();
   assert.equal(archiveBody.source_archive.filename, 'large-source.tar.zst');
   assert.match(archiveBody.source_archive.key, /\.skyenet\/archive\/large-source\.tar\.zst$/);
+  assert.equal(archiveBody.source_archive.hash_verified, true);
+  assert.equal(archiveBody.source_archive.hash_verification_status, 'verified');
+
+  const badArchiveLink = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-archive-link',
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        project_id: 'large-source',
+        deployment_id: 'dep_large_index',
+        key: archiveBody.source_archive.key,
+        filename: archiveBody.source_archive.filename,
+        bytes: archiveBody.source_archive.bytes,
+        sha256: '0'.repeat(64),
+        content_type: archiveBody.source_archive.content_type,
+        recovery_receipt: 'test-artifacts/netlify-quantumskyes-drive-handoff/handoff-summary.json'
+      })
+    }
+  ), context);
+  assert.equal(badArchiveLink.status, 409);
+  const badArchiveLinkBody = await badArchiveLink.json();
+  assert.equal(badArchiveLinkBody.code, 'SOURCE_ARCHIVE_SHA_MISMATCH');
 
   const archiveLink = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-archive-link',
@@ -627,6 +1108,8 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   const archiveLinkBody = await archiveLink.json();
   assert.equal(archiveLinkBody.source_archive.key, archiveBody.source_archive.key);
   assert.equal(archiveLinkBody.source_archive.bytes, 20);
+  assert.equal(archiveLinkBody.source_archive.hash_verified, true);
+  assert.equal(archiveLinkBody.source_archive.hash_verification_status, 'verified');
 
   const download = await handleSkyeNetDeployRequest(new Request(
     'https://fs27.example.com/deploy/source-download?project_id=large-source&deployment_id=dep_large_index',
@@ -634,6 +1117,7 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   ), context);
   assert.equal(download.status, 200);
   assert.equal(download.headers.get('x-skynet-source-download'), 'stored-archive');
+  assert.equal(download.headers.get('x-skynet-source-archive-hash-verified'), 'true');
   assert.equal(download.headers.get('content-disposition'), 'attachment; filename="large-source.tar.zst"');
   assert.equal(await download.text(), 'stored-archive-bytes');
 
@@ -668,6 +1152,104 @@ test('SkyeNet source-complete stores large source indexes outside the inline dep
   assert.equal(transferBody.storage.stored_archive_reused, true);
   assert.equal(transferBody.storage.filename, 'large-source.tar.zst');
   assert.ok(env.objects.has(transferBody.storage.key));
+});
+
+test('SkyeNet source archive link marks oversized externally stored archives unverified instead of trusting supplied SHA', async () => {
+  const env = mockEnv();
+  env.SKYENET_SOURCE_ARCHIVE_SERVER_VERIFY_BYTES = '8';
+  const context = { env };
+  const projectId = 'archive-integrity';
+  const deploymentId = 'dep_external_archive';
+  const payload = 'external-large-archive-body';
+  const sha256 = await sha256Text(payload);
+  const key = `source-packages/customer-31/workspace-customer-31/project-${projectId}/deployment-${deploymentId}/.skyenet/archive/external.tar`;
+  env.objects.set(key, {
+    value: payload,
+    options: {
+      httpMetadata: { contentType: 'application/x-tar' },
+      customMetadata: { schema: 'external.unverified.archive' }
+    }
+  });
+
+  const archiveLink = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-archive-link',
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        project_id: projectId,
+        deployment_id: deploymentId,
+        key,
+        filename: 'external.tar',
+        bytes: payload.length,
+        sha256,
+        content_type: 'application/x-tar',
+        recovery_receipt: 'test-artifacts/external-archive-recovery.json'
+      })
+    }
+  ), context);
+  assert.equal(archiveLink.status, 200);
+  const archiveLinkBody = await archiveLink.json();
+  assert.equal(archiveLinkBody.source_archive.sha256, sha256);
+  assert.equal(archiveLinkBody.source_archive.hash_verified, false);
+  assert.equal(archiveLinkBody.source_archive.hash_verification_status, 'unverified-too-large-for-sync-hash');
+  assert.match(archiveLinkBody.source_archive.hash_verification_skipped_reason, /source-archive-exceeds-server-side-sync-hash-limit-8/);
+
+  const download = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/source-download?project_id=${projectId}&deployment_id=${deploymentId}`,
+    { method: 'GET', headers: authHeaders() }
+  ), context);
+  assert.equal(download.status, 200);
+  assert.equal(download.headers.get('x-skynet-source-archive-hash-verified'), 'false');
+  assert.equal(download.headers.get('x-skynet-source-archive-hash-status'), 'unverified-too-large-for-sync-hash');
+  assert.equal(await download.text(), payload);
+});
+
+test('SkyeNet source-file lazily reads an indexed file from a stored plain tar archive', async () => {
+  const env = mockEnv();
+  const context = { env };
+  const sourcePath = 'src/archive-only.txt';
+  const sourceText = 'This file only exists inside the source archive.\n';
+
+  const indexUpload = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-index?project_id=archive-lazy&deployment_id=dep_archive_lazy',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/x-ndjson; charset=utf-8' }),
+      body: `${JSON.stringify({ path: sourcePath, size: sourceText.length, content_type: 'text/plain; charset=utf-8' })}\n`
+    }
+  ), context);
+  assert.equal(indexUpload.status, 200);
+
+  const archiveBytes = testTar([[sourcePath, sourceText]]);
+  const archive = await handleSkyeNetDeployRequest(new Request(
+    'https://fs27.example.com/deploy/source-archive?project_id=archive-lazy&deployment_id=dep_archive_lazy&filename=source.tar',
+    {
+      method: 'PUT',
+      headers: authHeaders({ 'content-type': 'application/x-tar' }),
+      body: archiveBytes
+    }
+  ), context);
+  assert.equal(archive.status, 200);
+
+  const file = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/source-file?project_id=archive-lazy&deployment_id=dep_archive_lazy&path=${sourcePath}`,
+    { method: 'GET', headers: authHeaders() }
+  ), context);
+  assert.equal(file.status, 200);
+  const body = await file.json();
+  assert.equal(body.path, sourcePath);
+  assert.equal(body.text, sourceText);
+  assert.equal(body.archive_lazy_read.materialized_file_object, false);
+  assert.match(body.archive_lazy_read.archive_key, /\.skyenet\/archive\/source\.tar$/);
+
+  const raw = await handleSkyeNetDeployRequest(new Request(
+    `https://fs27.example.com/deploy/source-file?project_id=archive-lazy&deployment_id=dep_archive_lazy&path=${sourcePath}&format=raw`,
+    { method: 'GET', headers: authHeaders() }
+  ), context);
+  assert.equal(raw.status, 200);
+  assert.equal(raw.headers.get('x-skynet-source-file-mode'), 'archive-lazy-range');
+  assert.equal(await raw.text(), sourceText);
 });
 
 test('SkyeNet private source uploads accept dependency trees and do not stop at the inline file cap', async () => {

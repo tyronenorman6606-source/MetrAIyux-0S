@@ -2,6 +2,7 @@ import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync,
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
+import { assertWranglerVersionSupportsConfig, envWithModernNodeForWrangler } from '../tools/lib/wrangler-version-guard.mjs';
 
 const DEFAULT_WORKSPACE_ROOT = '/workspaces/MetrAIyux-0S';
 const REPO_ROOT = process.env.METRAIYUX_REPO_ROOT || (existsSync(DEFAULT_WORKSPACE_ROOT) ? DEFAULT_WORKSPACE_ROOT : process.cwd());
@@ -48,9 +49,11 @@ const WORKER_ASSET_DIR_INCLUDES = [
   'citadeldb',
   'client-app-factory',
   'connectlog-v7.7-relay13-operator-proof',
+  'conversion',
   'downloads/skyevault-agent',
   'founder-command',
   'gate',
+  'governance',
   'HouseOperations',
   'key-gate-13th',
   'northstar',
@@ -103,7 +106,8 @@ const WORKER_ASSET_DIR_INCLUDES = [
   'Free99/apps/doctor-ops-personal-vault',
   'Free99/apps/documorph',
   'Free99/apps/skyearcade',
-  'Free99/apps/kaixu-storefront'
+  'Free99/apps/kaixu-storefront',
+  'Free99/apps/still2vid-forge'
 ];
 
 const WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES = [
@@ -117,10 +121,22 @@ const WORKER_PUBLIC_CLIENT_SURFACE_SKIP_PREFIXES = [
 
 const MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_PREFIXES = [
   'SkyeMusicNexus/artist-storefronts/gray-skyes-collective/releases',
-  'SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine'
+  'SkyeMusicNexus/artist-storefronts/gray-skyes/drops/everything-movie-twin-engine',
+  'SkyeMusicNexus/artist-storefronts/gray-skyes/drops/founder-static'
 ];
 
-const MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_FILES = new Set(loadMusicNexusPublicCatalogFiles());
+const MUSIC_NEXUS_WORKER_PUBLIC_SUPPORT_FILES = [
+  'SkyeMusicNexus/artist-storefronts/index.html',
+  'SkyeMusicNexus/artist-storefronts/artist-storefronts.css',
+  'SkyeMusicNexus/artist-storefronts/artist-apps/artist-apps.json',
+  'SkyeMusicNexus/artist-storefronts/gray-skyes-collective/collective.json',
+  'SkyeMusicNexus/artist-storefronts/NexusArtistPrimePackage/assets/mcp-implementation/mcp-effects.css'
+];
+
+const MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_FILES = new Set([
+  ...loadMusicNexusPublicCatalogFiles(),
+  ...MUSIC_NEXUS_WORKER_PUBLIC_SUPPORT_FILES
+]);
 
 const WORKER_ASSET_FILE_INCLUDES = [
   'index.html',
@@ -132,6 +148,8 @@ const WORKER_ASSET_FILE_INCLUDES = [
   'Free99/demo.html',
   'Free99/free99-gate.js',
   'Free99/app-manifest.json',
+  'audits/0S_SURFACE_STATUS.json',
+  'audits/0S_SURFACE_FUNCTIONALITY_AUDIT_2026-05-19.md',
   'live/SkyeMail/index.html',
   'live/skye-content-forge-publisher.html',
   'live/connectlog-relay13-operator-proof.html',
@@ -143,16 +161,45 @@ const WORKER_ASSET_FILE_INCLUDES = [
   'live/skyeroutex-workforce-command.html',
   'live/skyeprofitconsole-profit-console.html',
   'live/skye-split-engine-operator-proof.html',
+  'live/skyemusicnexus-neofront.html',
   'Marketing-Made-Easy/index.html',
+  'Marketing-Made-Easy/DEEP_SCAN_SUMMARY.md',
+  'brand/naming-lab.html',
   'skyegate/index.html',
+  'crown-os/index.html',
+  'walkthroughs/index.html',
+  'brain/automation-brain.json',
+  'brain/persona-brains.json',
   'brain/live-surface-registry.json',
   'brain/skyevault-vault-map.json',
+  'SkyeCommerce/public/docs/index.html',
   'proof/0s-truth-ledger.json',
   'proof/0s-truth-ledger.md',
   'proof/0s-production-closure.json',
+  'proof/proof-center.html',
+  'proof/free99-platform-intake-receipt.html',
+  'proof/marketing-made-easy-deep-scan-receipt.html',
+  'proof/skyeprofitconsole-expansion-receipt.html',
+  'proof/skyesplitengine-expansion-receipt.html',
+  'proof/skyemediacenter-expansion-receipt.html',
+  'proof/skyemusicnexus-expansion-receipt.html',
+  'proof/houseoperations-skyebox-expansion-receipt.html',
+  'proof/connectlog-relay13-expansion-receipt.html',
+  'proof/skyeroutex-expansion-receipt.html',
+  'proof/skyevault-autosync-proof.json',
+  'proof/skyevault-autosync-proof-log.json',
+  'proof/skyevault-autosync-proof.html',
+  'proof/repo-vault-project-manifest.json',
+  'docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md',
+  'SkyeRouteX/workforce-command-v0.4.0/docs/API_REFERENCE.md',
+  'SkyeRouteX/workforce-command-v0.4.0/proof/provider-env-audit-2026-05-21.md',
+  'SkyeRouteX/workforce-command-v0.4.0/proof/routex-ae-workforce-lane-latest.json',
+  'SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-live-production-stress-latest.json',
+  'SkyeRouteX/workforce-command-v0.4.0/proof/skyeroutex-mounted-worker-stress-latest.json',
   'data/skyenet-client-route-index.json',
   'SkyeMusicNexus/public/data/playlists.json',
   'SkyeMusicNexus/public/data/ad-placements.json',
+  'valley-verified/data/businesses-lite.json',
   'valley-verified/data/businesses.json',
   'valley-verified/data/owner-crm-index.json',
   'valley-verified/data/ae-work-orders.json',
@@ -266,7 +313,7 @@ function loadMusicNexusPublicCatalogFiles() {
 
 function isMusicNexusWorkerPublicAllowed(rel) {
   return MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_FILES.has(rel)
-    || MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_PREFIXES.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`));
+    || MUSIC_NEXUS_WORKER_PUBLIC_ALLOW_PREFIXES.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`) || prefix.startsWith(`${rel}/`));
 }
 
 function shouldSkipAssetPath(fullPath) {
@@ -393,9 +440,8 @@ function stageWorkerSourcePackage() {
 }
 
 function copyRepoVaultProjectManifest() {
-  if (!DEPLOY_PROOF_ASSETS) return;
   const sourceDir = path.join(SITE_ROOT, 'proof', 'repo-vault-project-manifest');
-  const includeChunks = ['1', 'true', 'yes', 'on'].includes(String(process.env.ZERO_OS_DEPLOY_PROJECT_MANIFEST_CHUNKS || '').toLowerCase());
+  const includeChunks = !['0', 'false', 'no', 'off'].includes(String(process.env.ZERO_OS_DEPLOY_PROJECT_MANIFEST_CHUNKS || '1').toLowerCase());
   if (includeChunks && existsSync(sourceDir)) {
     const destDir = path.join(WORKER_ASSET_STAGE, 'proof', 'repo-vault-project-manifest');
     mkdirSync(path.dirname(destDir), { recursive: true });
@@ -414,6 +460,7 @@ function stageWorkerAssets() {
   copyTopLevelRuntimeFiles();
   for (const relativePath of WORKER_ASSET_DIR_INCLUDES) copyAssetEntry(relativePath);
   for (const relativePath of WORKER_ASSET_FILE_INCLUDES) copyExplicitAssetFile(relativePath);
+  for (const relativePath of MUSIC_NEXUS_WORKER_PUBLIC_SUPPORT_FILES) copyExplicitAssetFile(relativePath);
   copyRepoVaultProjectManifest();
 
   const fileCount = countFiles(WORKER_ASSET_STAGE);
@@ -690,10 +737,20 @@ if (process.argv.includes('--stage-only')) {
   process.exit(0);
 }
 
-const wranglerVersion = process.env.WRANGLER_VERSION || '4.14.0';
+const wranglerVersion = process.env.WRANGLER_VERSION || '4.95.0';
+try {
+  assertWranglerVersionSupportsConfig({
+    configFile: deployConfig,
+    wranglerVersion,
+    commandLabel: '0s worker deploy'
+  });
+} catch (error) {
+  console.error(error?.message || String(error));
+  process.exit(1);
+}
 const result = spawnSync('npx', ['-y', '-p', `wrangler@${wranglerVersion}`, 'wrangler', 'deploy', '--config', deployConfig], {
   cwd: REPO_ROOT,
-  env: await resolveCloudflareEnv(),
+  env: envWithModernNodeForWrangler(await resolveCloudflareEnv()),
   encoding: 'utf8',
   maxBuffer: 1024 * 1024 * 32
 });

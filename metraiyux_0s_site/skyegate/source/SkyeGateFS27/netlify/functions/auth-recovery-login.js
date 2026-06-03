@@ -40,7 +40,7 @@ export default wrap(async (req) => {
     customerId: user.primary_customer_id,
     apiKeyId,
     scope: ["openid", "profile", "email", "offline_access", "gateway.read", "keys.read", "billing.read"],
-    title: "SkyeGateFS27 recovery-code session",
+    title: "SkyeGate FS27 recovery-code session",
     meta: { flow: "recovery_login", gate_id: gateId, credential_id: consumed.credential.id },
     issuer
   });

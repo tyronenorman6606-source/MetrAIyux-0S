@@ -1,0 +1,16 @@
+[Unit]
+Description=Reape0r autonomous cloud repo mirror
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/skyevault-agent
+EnvironmentFile=%h/.config/skyevault-agent/skyevault-agent.env
+ExecStart=/usr/bin/env node %h/.local/share/skyevault-agent/bin/skyevault-agent.mjs watch --interval-seconds=${SKYEVAULT_AGENT_INTERVAL_SECONDS} --upload
+Restart=always
+RestartSec=15
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

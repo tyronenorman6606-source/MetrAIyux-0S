@@ -4007,25 +4007,47 @@
   function wireFeedActions() {
     document.addEventListener('click', async (event) => {
       const button = event.target.closest('[data-feed-action]');
-      if (!button) return;
-      const feedAction = button.dataset.feedAction;
-      if (feedAction === 'comment') {
-        const card = button.closest('[data-feed-post]');
-        const input = card && card.querySelector('.feed-comment-form input[name="body"]');
-        if (input) input.focus();
+      if (button) {
+        const feedAction = button.dataset.feedAction;
+        if (feedAction === 'comment') {
+          const card = button.closest('[data-feed-post]');
+          const input = card && card.querySelector('.feed-comment-form input[name="body"]');
+          if (input) input.focus();
+          return;
+        }
+        try {
+          const targetId = button.dataset.feedTarget;
+          const artistId = button.dataset.feedArtist || state.lastArtistId || currentSkyeArtistId();
+          await callFunction('music-social', {
+            method: 'POST',
+            body: { action: 'feed-action', feedAction, targetId, artistId },
+          });
+          toast(`${feedAction} saved.`);
+          await refreshRecords({ quiet: true });
+        } catch (err) {
+          toast(err.message, 'error');
+        }
         return;
       }
-      try {
-        const targetId = button.dataset.feedTarget;
-        const artistId = button.dataset.feedArtist || state.lastArtistId || currentSkyeArtistId();
-        await callFunction('music-social', {
-          method: 'POST',
-          body: { action: 'feed-action', feedAction, targetId, artistId },
+
+      const modeButton = event.target.closest('[data-feed-mode]');
+      if (modeButton) {
+        const mode = modeButton.dataset.feedMode || 'for-you';
+        const buttons = Array.from(document.querySelectorAll('[data-feed-mode]'));
+        buttons.forEach((button) => {
+          const active = button === modeButton;
+          button.classList.toggle('secondary', active);
+          button.classList.toggle('ghost', !active);
+          button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
-        toast(`${feedAction} saved.`);
-        await refreshRecords({ quiet: true });
-      } catch (err) {
-        toast(err.message, 'error');
+        document.body.dataset.feedMode = mode;
+        const summary = $('#socialSummary');
+        if (summary) {
+          summary.dataset.activeFeedMode = mode;
+          summary.setAttribute('aria-live', 'polite');
+        }
+        toast(`Feed filter: ${mode.replace(/-/g, ' ')}`);
+        return;
       }
     });
 

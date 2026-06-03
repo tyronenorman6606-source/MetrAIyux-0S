@@ -1,10 +1,11 @@
 {
   "ok": true,
   "schema": "skyevault.agent.release-manifest.v1",
-  "generatedAt": "2026-05-31T04:30:14.756Z",
+  "generatedAt": "2026-06-02T12:19:33.814Z",
   "package": {
     "name": "@metraiyux/skyevault-agent",
-    "version": "0.2.0",
+    "version": "0.2.4",
+    "product": "Reape0r: the Autonomous Cloud Repo Mirror",
     "bin": {
       "skyevault-agent": "bin/skyevault-agent.mjs"
     },
@@ -13,23 +14,83 @@
     }
   },
   "release": {
-    "id": "v0.2.0",
-    "archiveName": "skyevault-agent-0.2.0.tar.gz",
-    "archivePath": "metraiyux_0s_site/downloads/skyevault-agent/releases/v0.2.0/skyevault-agent-0.2.0.tar.gz",
-    "archiveUrl": "/downloads/skyevault-agent/releases/v0.2.0/skyevault-agent-0.2.0.tar.gz",
+    "id": "v0.2.4",
+    "archiveName": "skyevault-agent-0.2.4.tar.gz",
+    "archivePath": "metraiyux_0s_site/downloads/skyevault-agent/releases/v0.2.4/skyevault-agent-0.2.4.tar.gz",
+    "archiveUrl": "/downloads/skyevault-agent/releases/v0.2.4/skyevault-agent-0.2.4.tar.gz",
     "latestArchiveUrl": "/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz",
-    "bytes": 10022,
-    "sha256": "2079a83c925b85be29a52a0f170c8d6741752ccab18f4d454f013fea702ff91c",
-    "latestSha256": "2079a83c925b85be29a52a0f170c8d6741752ccab18f4d454f013fea702ff91c"
+    "bytes": 20384,
+    "sha256": "9132eb12341546b77a25370fbd667b034f12a459af365aff7d51e006a6a3a372",
+    "latestSha256": "9132eb12341546b77a25370fbd667b034f12a459af365aff7d51e006a6a3a372",
+    "reproducible": true
   },
   "skyepay": {
     "offers": [
       "skyevault-starter-access",
       "skyevault-pro-access",
-      "skyevault-command-access"
+      "skyevault-command-access",
+      "skyevault-auto-install-addon"
     ],
     "storeUrl": "https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&offer=skyevault-pro-access",
-    "activationPath": "/skye-vault-os/agent/"
+    "activationPath": "/skye-vault-os/agent/",
+    "plans": [
+      {
+        "id": "skyevault-starter-access",
+        "title": "Reape0r Starter Access",
+        "price": "$49/month",
+        "quota": {
+          "workspaces": 1,
+          "storage": "1 GB",
+          "filesPerMonth": 250,
+          "rpm": 30,
+          "rpd": 500,
+          "devices": 1,
+          "monthlyCap": "$50"
+        }
+      },
+      {
+        "id": "skyevault-pro-access",
+        "title": "Reape0r Pro Access",
+        "price": "$149/month",
+        "quota": {
+          "workspaces": 3,
+          "storage": "25 GB",
+          "filesPerMonth": 1500,
+          "rpm": 90,
+          "rpd": 2500,
+          "devices": 3,
+          "monthlyCap": "$150"
+        }
+      },
+      {
+        "id": "skyevault-command-access",
+        "title": "Reape0r Command Access",
+        "price": "$499/month",
+        "quota": {
+          "workspaces": 10,
+          "storage": "100 GB",
+          "filesPerMonth": 10000,
+          "rpm": 240,
+          "rpd": 10000,
+          "devices": 10,
+          "monthlyCap": "$500"
+        }
+      },
+      {
+        "id": "skyevault-auto-install-addon",
+        "title": "Reape0r Auto-Install Add-On",
+        "price": "$13 one time",
+        "quota": {
+          "machines": 1,
+          "requiresExistingPlan": true,
+          "includes": [
+            "env file written 0600",
+            "first current mirror receipt",
+            "watcher service attempt"
+          ]
+        }
+      }
+    ]
   },
   "auth": {
     "model": "SkyePay workspace portal key for buyer uploads; optional shared 0S/FS27/SkyGate bearer for owner/admin lanes",
@@ -42,18 +103,43 @@
   "files": [
     {
       "path": "bin/skyevault-agent.mjs",
-      "bytes": 36650,
-      "sha256": "0603e18e1850f8e2f41542e1c7e5f7d429581a1cf2ed27ea62b7f1f183886b79"
+      "bytes": 71152,
+      "sha256": "5c6cfbaa5c402f41d4c695110aeba1b9d0924c5e582f0b6c0a12233519bd3514"
+    },
+    {
+      "path": "install.sh",
+      "bytes": 3366,
+      "sha256": "19a116f625d3c0e746529dbfc23078cdad42a3841d9cff4bd361deb41291cf1d"
     },
     {
       "path": "package.json",
-      "bytes": 519,
-      "sha256": "75811a884d5a880f107e36e5220f2f6ecac5529dcd142c74d6ce27e0eaef8a65"
+      "bytes": 572,
+      "sha256": "766b26480cc15c15ef1b4e61b22c8c02b0131c515d90d74eddc15fef4056528f"
     },
     {
       "path": "README.md",
-      "bytes": 2597,
-      "sha256": "69bf034e56cd78ac8ad6e13a3b23fbfa7895891a2362df5a84025e289f45bef3"
+      "bytes": 3336,
+      "sha256": "fa79ec3e8b605699ed48763b43411e6984f4224ba807eeb0850dd3385ab78690"
+    },
+    {
+      "path": "RUNBOOK.md",
+      "bytes": 3386,
+      "sha256": "d31867ef7eca14e15b61a5366a5b516f8739ae0991687e49877d291cba76fcf3"
+    },
+    {
+      "path": "templates/com.skyevault.reape0r.plist",
+      "bytes": 825,
+      "sha256": "23f2a58d3b8e0daa572c467fc02b17d0ac12266bc3b6340a7d567dd55aaea7b4"
+    },
+    {
+      "path": "templates/skyevault-agent.env.example",
+      "bytes": 744,
+      "sha256": "2bb285ca42a8cfa8061fcdd0737ed1309cb41afc509227d695741dbb26250c05"
+    },
+    {
+      "path": "templates/skyevault-agent.service",
+      "bytes": 486,
+      "sha256": "96f77c41eac402acffc9101b3198a2e93319a5ab4e4f736f5302545ad7057204"
     }
   ]
 }

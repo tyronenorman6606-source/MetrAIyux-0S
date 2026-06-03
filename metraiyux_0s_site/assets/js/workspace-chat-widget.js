@@ -599,7 +599,8 @@
   function apiUrl(path) {
     const base = String(config.apiBase || "").trim();
     if (!base) return "";
-    return new URL(path, base.endsWith("/") ? base : `${base}/`).toString();
+    const baseUrl = new URL(base.endsWith("/") ? base : `${base}/`, location.origin);
+    return new URL(path, baseUrl).toString();
   }
 
   function routeOptions() {
@@ -648,7 +649,8 @@
     if (!url) throw new Error("apiBase missing");
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: gateHeaders(),
       body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error(`Relay13 returned ${response.status}`);

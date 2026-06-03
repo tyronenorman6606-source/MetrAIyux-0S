@@ -188,5 +188,7 @@ export function loadLocalEnv({ root, repoRoot = path.resolve(root, "..") }) {
   const metraiyux0sLiveBase = firstPresent("METRAIYUX_0S_LIVE_BASE", "METRAIYUX_0S_FULL_SYSTEM_URL");
   setIfMissing("METRAIYUX_0S_LIVE_BASE", metraiyux0sLiveBase);
 
+  setIfMissing("SKYGATE_SKIP_SCHEMA_BOOTSTRAP", "true");
+
   return loaded;
 }

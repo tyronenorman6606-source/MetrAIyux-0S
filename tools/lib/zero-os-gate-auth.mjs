@@ -4,14 +4,20 @@ import path from 'node:path';
 const DIRECT_GATE_BEARER_KEYS = [
   'SKYENET_AUTH',
   'ZERO_OS_GATE_SESSION',
+  'ZERO_OS_OWNER_SESSION',
   'ZERO_OS_GATE_BEARER',
+  'METRAIYUX_OWNER_GATE_SESSION',
   'MCP_GATE_SESSION',
   'FS27_ADMIN_BEARER',
   'SKYGATEFS27_GATE_SESSION',
+  'SKYGATE_SESSION_TOKEN',
   'SKYE_GATE_SESSION',
   'SKYEVAULT_GATE_BEARER',
   'SKYEVAULT_GATE_SESSION',
-  'FREE99_GATE_SESSION'
+  'SKYEVAULT_ONE_AUTH_BEARER',
+  'FREE99_GATE_SESSION',
+  'QUANTUMSKYES_MCP_TOKEN',
+  'QUANTUMSKYES_MCP_TOKEN_OR_GATE_SESSION'
 ];
 
 // Legacy root-env labels are exchange-only aliases. They never become a
@@ -20,13 +26,34 @@ const OWNER_GATE_EXCHANGE_KEYS = [
   'ZERO_OS_GATE_CODE',
   'FREE99_ADMIN_CODE',
   'FREE99_ADMIN_PASSWORD',
+  'FREE99_GATE_CODE',
+  'FREE99_GATE_PASSWORD',
+  'FREE99_OWNER_CODE',
+  'FREE99_OWNER_PASSWORD',
   'OWNER_ADMIN_CODE',
   'OWNER_ADMIN_PASSWORD',
+  'ZERO_OS_ADMIN_CODE',
+  'ZERO_OS_OWNER_CODE',
+  'METRAIYUX_OWNER_ADMIN_CODE',
   'METRAIYUX_ADMIN_CODE',
+  'SKYGATE_ADMIN_CODE',
   'SKYGATE_ADMIN_PASSWORD',
+  'SKYGATE_OWNER_CODE',
+  'SKYGATE_OWNER_PASSWORD',
+  'SKYGATEFS27_ADMIN_CODE',
   'SKYGATEFS27_ADMIN_PASSWORD',
-  'FS27_ADMIN_PASSWORD'
+  'SKYGATEFS27_OWNER_CODE',
+  'SKYGATEFS27_OWNER_PASSWORD',
+  'SKYE_GATE_ADMIN_CODE',
+  'SKYE_GATE_ADMIN_PASSWORD',
+  'SKYE_GATE_OWNER_CODE',
+  'SKYE_GATE_OWNER_PASSWORD',
+  'FS27_ADMIN_CODE',
+  'FS27_ADMIN_PASSWORD',
+  'FS27_OWNER_CODE',
+  'FS27_OWNER_PASSWORD'
 ];
+const DEFAULT_GATE_AUTH_TIMEOUT_MS = 15000;
 
 function clean(value = '') {
   const text = String(value || '').trim();
@@ -78,6 +105,8 @@ function responseStatus(result) {
 
 async function postOwnerAdminLogin(fetchImpl, zeroOsBase, credential) {
   const token = cleanBearer(credential.value);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Number(process.env.ZERO_OS_GATE_AUTH_TIMEOUT_MS || DEFAULT_GATE_AUTH_TIMEOUT_MS));
   const result = await fetchImpl(`${zeroOsBase}/api/owner/admin-login`, {
     method: 'POST',
     headers: {
@@ -94,8 +123,9 @@ async function postOwnerAdminLogin(fetchImpl, zeroOsBase, credential) {
       password: credential.value,
       gateToken: credential.value,
       free99Code: credential.value
-    })
-  });
+    }),
+    signal: controller.signal
+  }).finally(() => clearTimeout(timer));
 
   if (typeof result?.text === 'function') {
     const text = await result.text().catch(() => '');

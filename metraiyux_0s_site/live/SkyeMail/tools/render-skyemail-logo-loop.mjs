@@ -250,7 +250,7 @@ const stageHtml = `<!doctype html>
     <div class="satellite proof"><img src="${assetUrl("merser-proof-ledger.svg")}" alt=""></div>
     <div class="core"><img src="${assetUrl("merser-mail-glyph.svg")}" alt=""></div>
     <img class="brand-ghost" src="${assetUrl("skyes-over-london-deity-logo.png")}" alt="">
-    <div class="wordmark"><img src="${assetUrl("metraiyux-0s-emblem-transparent.png")}" alt=""><div><strong>SkyeMail</strong><span>Citadel/SkyeNet transmission loop</span></div></div>
+    <div class="wordmark"><img src="${assetUrl("metraiyux-0s-emblem-transparent.png")}" alt=""><div><strong>SkyeMail</strong><span>Citadel Database and SkyeNet transmission loop</span></div></div>
   </div>
 </body>
 </html>`;

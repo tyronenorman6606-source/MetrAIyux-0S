@@ -152,6 +152,17 @@ function functionEnv({ name, grants = {}, record = {} }) {
   };
 }
 
+function functionContext({ name, manifest = {}, triggerKind = 'request' }) {
+  return {
+    functionName: name,
+    runtime: 'skyenet-functions-v0',
+    bundleId: manifest.bundle_id || null,
+    tenantId: manifest.tenant_id || null,
+    triggerKind,
+    requestId: crypto.randomUUID?.() || `${Date.now()}`
+  };
+}
+
 function mergeResponseHeaders(result = {}) {
   const headers = new Headers(result.headers || {});
   for (const [key, values] of Object.entries(result.multiValueHeaders || {})) {
@@ -160,7 +171,7 @@ function mergeResponseHeaders(result = {}) {
   return headers;
 }
 
-export async function invokeFunction({ bundleDir, name, request, timeoutMs = 10000, maxBodyBytes = 1048576, signingKey = '', requireSignature = false, envGrants = {}, egress = 'deny' }) {
+export async function invokeFunction({ bundleDir, name, request, timeoutMs = 10000, maxBodyBytes = 1048576, signingKey = '', requireSignature = false, envGrants = {}, egress = 'deny', triggerKind = 'request', backgroundJobsDir = '' }) {
   const loaded = await loadManifest(bundleDir);
   try {
     verifyManifestSignature(loaded.manifest, signingKey, { required: requireSignature });
@@ -174,6 +185,12 @@ export async function invokeFunction({ bundleDir, name, request, timeoutMs = 100
   if (!record) {
     return new Response(JSON.stringify({ ok: false, error: 'Function not found', name }), {
       status: 404,
+      headers: { 'content-type': 'application/json; charset=utf-8' }
+    });
+  }
+  if (triggerKind === 'scheduled' && record.invocation_mode !== 'scheduled') {
+    return new Response(JSON.stringify({ ok: false, error: 'Function is not declared as scheduled', name }), {
+      status: 409,
       headers: { 'content-type': 'application/json; charset=utf-8' }
     });
   }
@@ -191,6 +208,7 @@ export async function invokeFunction({ bundleDir, name, request, timeoutMs = 100
   }
   const effectiveTimeout = Number(timeoutMs || record.limits?.timeout_ms || 10000);
   const memoryMb = Math.max(32, Math.min(Number(record.limits?.memory_mb || 128), 512));
+  const context = functionContext({ name, manifest: loaded.manifest, triggerKind });
   const child = spawn(process.execPath, [`--max-old-space-size=${memoryMb}`, RUNTIME_SCRIPT, 'run-child'], {
     stdio: ['pipe', 'pipe', 'pipe'],
     cwd: path.resolve(bundleDir),
@@ -209,13 +227,47 @@ export async function invokeFunction({ bundleDir, name, request, timeoutMs = 100
       egress: egress === 'allow' || record.limits?.egress === 'allow' ? 'allow' : 'deny'
     },
     context: {
-      functionName: name,
-      runtime: 'skyenet-functions-v0',
-      bundleId: loaded.manifest.bundle_id || null,
-      tenantId: loaded.manifest.tenant_id || null,
-      requestId: crypto.randomUUID?.() || `${Date.now()}`
+      ...context
     }
   }));
+
+  if (triggerKind === 'request' && record.invocation_mode === 'background') {
+    const jobId = `skybg_${crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex')}`;
+    const jobsDir = backgroundJobsDir ? path.resolve(backgroundJobsDir) : path.join(path.resolve(bundleDir), '.skyenet-background-jobs');
+    child.on('close', async (code, signal) => {
+      clearTimeout(timer);
+      const timedOut = signal === 'SIGKILL';
+      const resultText = Buffer.concat(stdout).toString('utf8');
+      let result = null;
+      try { result = resultText ? JSON.parse(resultText) : null; } catch { result = { raw: resultText }; }
+      await fs.mkdir(jobsDir, { recursive: true }).catch(() => null);
+      await fs.writeFile(path.join(jobsDir, `${jobId}.json`), JSON.stringify({
+        schema: 'skyenet.functions.background_job.v1',
+        job_id: jobId,
+        function_name: name,
+        bundle_id: loaded.manifest.bundle_id || '',
+        status: timedOut ? 'timed_out' : (code === 0 ? 'completed' : 'failed'),
+        exit_code: code,
+        signal,
+        result,
+        stderr: Buffer.concat(stderr).toString('utf8').slice(0, 2000),
+        completed_at: new Date().toISOString()
+      }, null, 2)).catch(() => null);
+    });
+    return new Response(JSON.stringify({
+      ok: true,
+      accepted: true,
+      mode: 'background',
+      job_id: jobId,
+      receipt_path: path.join(jobsDir, `${jobId}.json`)
+    }), {
+      status: 202,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'x-skynet-background-job': jobId
+      }
+    });
+  }
 
   const exit = await new Promise((resolve) => child.on('close', (code, signal) => resolve({ code, signal })));
   clearTimeout(timer);
@@ -235,18 +287,22 @@ export async function invokeFunction({ bundleDir, name, request, timeoutMs = 100
   const result = JSON.parse(Buffer.concat(stdout).toString('utf8') || '{}');
   const headers = mergeResponseHeaders(result);
   if (!headers.has('content-type')) headers.set('content-type', 'text/plain; charset=utf-8');
+  if (triggerKind === 'scheduled') headers.set('x-skynet-scheduled-function', name);
   const body = result.isBase64Encoded ? Buffer.from(result.body || '', 'base64') : result.body || '';
   return new Response(body, { status: result.statusCode || 200, headers });
 }
 
-function functionNameForPath(pathname) {
-  for (const prefix of ['/.netlify/functions/', '/.skyenet/functions/']) {
-    if (pathname.startsWith(prefix)) return pathname.slice(prefix.length).split('/')[0];
+function functionRouteForPath(pathname) {
+  if (pathname.startsWith('/.skyenet/scheduled/')) {
+    return { name: pathname.slice('/.skyenet/scheduled/'.length).split('/')[0], triggerKind: 'scheduled' };
   }
-  return '';
+  for (const prefix of ['/.netlify/functions/', '/.skyenet/functions/']) {
+    if (pathname.startsWith(prefix)) return { name: pathname.slice(prefix.length).split('/')[0], triggerKind: 'request' };
+  }
+  return { name: '', triggerKind: 'request' };
 }
 
-export function createServer({ bundleDir, timeoutMs = 10000, maxBodyBytes = 1048576, signingKey = process.env.SKYENET_FUNCTION_BUNDLE_SIGNING_KEY || '', requireSignature = false, runtimeToken = process.env.SKYENET_FUNCTION_RUNTIME_TOKEN || '', envGrants = {}, egress = 'deny' }) {
+export function createServer({ bundleDir, timeoutMs = 10000, maxBodyBytes = 1048576, signingKey = process.env.SKYENET_FUNCTION_BUNDLE_SIGNING_KEY || '', requireSignature = false, runtimeToken = process.env.SKYENET_FUNCTION_RUNTIME_TOKEN || '', envGrants = {}, egress = 'deny', backgroundJobsDir = '' }) {
   return http.createServer(async (incoming, outgoing) => {
     try {
       if (runtimeToken && incoming.headers['x-skyenet-runtime-token'] !== runtimeToken) {
@@ -255,7 +311,7 @@ export function createServer({ bundleDir, timeoutMs = 10000, maxBodyBytes = 1048
         return;
       }
       const url = new URL(incoming.url || '/', `http://${incoming.headers.host || '127.0.0.1'}`);
-      const name = functionNameForPath(url.pathname);
+      const { name, triggerKind } = functionRouteForPath(url.pathname);
       if (!name) {
         outgoing.writeHead(404, { 'content-type': 'application/json; charset=utf-8' });
         outgoing.end(JSON.stringify({ ok: false, error: 'SkyeNet function route not found' }));
@@ -267,7 +323,7 @@ export function createServer({ bundleDir, timeoutMs = 10000, maxBodyBytes = 1048
         body: ['GET', 'HEAD'].includes(incoming.method || 'GET') ? undefined : incoming,
         duplex: 'half'
       });
-      const response = await invokeFunction({ bundleDir, name, request, timeoutMs, maxBodyBytes, signingKey, requireSignature, envGrants, egress });
+      const response = await invokeFunction({ bundleDir, name, request, timeoutMs, maxBodyBytes, signingKey, requireSignature, envGrants, egress, triggerKind, backgroundJobsDir });
       outgoing.writeHead(response.status, Object.fromEntries(response.headers.entries()));
       const body = await response.arrayBuffer();
       outgoing.end(Buffer.from(body));

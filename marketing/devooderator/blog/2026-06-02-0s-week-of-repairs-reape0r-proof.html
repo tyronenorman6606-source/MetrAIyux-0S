@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The 0S Week of Repairs and Reape0r Proof | DevodeRator</title>
+  <meta name="description" content="A longform public proof narrative covering the recent 0S repairs, shared auth correction, SkyePay lane, Reape0r mutable current mirror, CLI installer, DevodeRator docs, and customer proof standard.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="2026-06-02-reape0r-cli-install-guide.html">Reape0r CLI</a>
+        <a href="2026-06-02-reape0r-demon-in-my-machine.html">Demon in my Machine</a>
+        <a class="active" href="2026-06-02-0s-week-of-repairs-reape0r-proof.html">Week Proof</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">June 2, 2026 - 0S proof ledger - Reape0r - shared auth - SkyePay - vault custody - customer readiness</p>
+    <h1>This week turned the 0S from a stack of power into a product that has to answer cleanly.</h1>
+    <p class="lede">
+      The last week has been about pressure. Auth pressure. Vault pressure. Payment pressure. Customer proof pressure. The point was not to make a prettier story. The point was to force the system to behave like a company asset: shared identity, gated access, clear install paths, receipts, restore lanes, and product surfaces that line up with what is actually built.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        A real platform is not the number of features it claims. It is the number of things a customer can do without the owner having to explain around broken edges.
+      </blockquote>
+
+      <h2>The biggest correction: shared 0S auth has to stay shared.</h2>
+      <p>
+        The 0S cannot become a mess of little side passwords. Every mounted app needs to respect the shared FS27, SkyGate, Free99 lane. Owner access must come through the same gate. Client access must come through the same source of truth. That has been one of the most important cleanup points because a powerful platform becomes fragile fast when every app invents its own login story.
+      </p>
+      <p>
+        The practical effect is simple: Reape0r does not get a secret founder password floating outside the 0S. The buyer lane is SkyePay plus workspace provisioning. The owner lane is the shared gate. Surfaces inside the 0S should redirect unauthenticated users and render for authenticated users. That is the level of consistency the product has to keep.
+      </p>
+
+      <details open>
+        <summary>What this fixed for users</summary>
+        <ul>
+          <li>One account story instead of app-specific founder/admin passwords.</li>
+          <li>Paid package access tied to SkyePay and workspace entitlement.</li>
+          <li>Owner/admin access tied to the shared 0S gate.</li>
+          <li>Mounted 0S surfaces staying default-deny unless the gate allows them.</li>
+        </ul>
+      </details>
+
+      <h2>The vault story had to become plain English.</h2>
+      <p>
+        The most important Reape0r correction is the mutable current mirror. For a while, the backup story could sound like "there is a base and then there are deltas." That may be a valid internal concept in some systems, but it is not the user experience this product needs. A customer does not want to download a pile and manually reason about what combines with what. A customer wants the current repaired codebase.
+      </p>
+      <p>
+        The current Reape0r lane is now framed as one encrypted mutable current mirror. The daemon scans, detects changes, updates changed encrypted objects, refreshes the current manifest, and writes the restore kit. The customer-facing language is direct: one current mirror, current receipts, restore from the current receipt.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Reape0r product facts</strong>
+        <ul>
+          <li>Product name: Reape0r: the Autonomous Cloud Repo Mirror.</li>
+          <li>Default model: mutable current mirror.</li>
+          <li>Default customer command: <code>sync --upload</code>, not legacy delta mode.</li>
+          <li>Auto-install: $13 one-time helper lane for one machine bootstrap.</li>
+          <li>Customer CLI output: human-readable by default, JSON available with <code>--json</code>.</li>
+          <li>Restore: from a current receipt into a repaired repo folder.</li>
+        </ul>
+      </div>
+
+      <h2>SkyePay became the commercial lane that matters here.</h2>
+      <p>
+        The Reape0r sale has to be tied to SkyePay. That means the buyer page, offer catalog, checkout handoff, return session, package lock, entitlement status, and install center all have to agree. It also means copy should not confuse buyers with internal payment-provider names when the product lane they experience is SkyePay.
+      </p>
+      <p>
+        The current offer set is simple enough to explain: Starter, Pro, Command, and Auto-Install Add-On. The quotas are also visible: 1 GB, 25 GB, 100 GB, then the one-time install helper. The storage numbers are company plan choices. They are not Cloudflare's hard object-storage ceiling. That distinction matters because the product should be priced around support, proof, convenience, and margin, not around pretending Cloudflare's backing storage is tiny.
+      </p>
+
+      <details>
+        <summary>Plan snapshot</summary>
+        <ul>
+          <li>Starter - $49/month - 1 workspace - 1 GB - 250 files/month.</li>
+          <li>Pro - $149/month - 3 workspaces - 25 GB - 1,500 files/month.</li>
+          <li>Command - $499/month - 10 workspaces - 100 GB - 10,000 files/month.</li>
+          <li>Auto-Install Add-On - $13 one time - one machine bootstrap on an existing plan.</li>
+        </ul>
+      </details>
+
+      <h2>The installer had to act like something a stranger can use.</h2>
+      <p>
+        A founder can tolerate rough edges longer than a customer can. A customer who pays for an agent download needs the path to be obvious: download, extract, doctor, init, sync, watch, status, verify, restore. If the customer pays for auto-install, the script has to do real work: write the env file at private permissions, configure the repo, run doctor, run the first current sync, and attempt the watcher service.
+      </p>
+      <p>
+        The CLI now speaks in the terminal by default. That matters because the proof cannot live only in JSON files a normal buyer will never open. The terminal should show the receipt, restore kit, current manifest, upload state, and next commands. That is the product's bedside manner.
+      </p>
+
+      <pre><code>node bin/skyevault-agent.mjs doctor
+node bin/skyevault-agent.mjs init --workspace="$SKYEVAULT_WORKSPACE_ID" --repo="$PWD" --vault-url="$SKYEVAULT_DROP_URL"
+node bin/skyevault-agent.mjs sync --upload
+node bin/skyevault-agent.mjs status
+node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload
+node bin/skyevault-agent.mjs restore --receipt=/path/to/current-receipt.json --out=/tmp/repaired-repo</code></pre>
+
+      <h2>DevodeRator became the public memory for the work.</h2>
+      <p>
+        The DevodeRator site is not just a blog for vibes. It is the public proof journal. It translates the work into customer-safe language: what the product does, what the commands are, what the receipts mean, what changed over the week, and where the live surfaces are. It should be longform because the product is not a toy. It should be interactive because people need to expand exactly the part they care about: commands, quotas, proof, restore, or story.
+      </p>
+      <p>
+        The three Reape0r posts are now designed as a field-guide bundle. The CLI guide is the user manual. The Demon in my Machine post is the founder story. This week-in-repairs post is the proof narrative that ties the 0S, SkyePay, shared auth, Drive, Vault, and installer surfaces together.
+      </p>
+
+      <div class="receipt-box">
+        <strong>New public Reape0r reading lane</strong>
+        <ul>
+          <li><a href="2026-06-02-reape0r-cli-install-guide.html">Reape0r CLI install guide</a></li>
+          <li><a href="2026-06-02-reape0r-demon-in-my-machine.html">Reape0r is the Demon in my Machine</a></li>
+          <li><a href="2026-06-02-0s-week-of-repairs-reape0r-proof.html">The 0S week of repairs and Reape0r proof</a></li>
+        </ul>
+      </div>
+
+      <h2>Drive and 0S surfaces had to stop feeling disconnected.</h2>
+      <p>
+        Reape0r belongs inside the Drive and Vault story. A codebase is a working asset, not a loose side download. The Drive surface now needs to point users into the Reape0r install center and the field guides. The admin command center needs to talk about current mirror receipts, not old delta language. The account workspace surface needs to make the install and proof lane visible. The buyer page needs to match the same product story.
+      </p>
+      <p>
+        That is what "not disconnected" means in practice. The customer should not have to infer that a blog post, a checkout page, a package manifest, and a Drive surface all refer to the same product. The surfaces should say Reape0r, link to Reape0r, and explain the same mutable current mirror.
+      </p>
+
+      <details>
+        <summary>Surface loop</summary>
+        <ul>
+          <li>FS27 buyer page sends customers into SkyePay and the install center.</li>
+          <li>0S install center exposes package download, manifest, manual commands, auto-install commands, and field guides.</li>
+          <li>SkyeVaultPro Drive points codebase users to Reape0r instead of treating repo custody as a local file-only feature.</li>
+          <li>Account workspace points to install and proof surfaces.</li>
+          <li>DevodeRator carries the public field guides and longform proof narrative.</li>
+        </ul>
+      </details>
+
+      <h2>The proof standard going forward.</h2>
+      <p>
+        A release pass for this lane should prove local package syntax, deterministic archive packaging, installer behavior, auto-install behavior from the shipped archive, mutable current seed, mutable current update, verify, restore, portal-key upload, no secret leakage, live buyer surfaces, live package manifest, live package checksum, and live stress reads. A small status code is not enough. The proof has to simulate the customer path.
+      </p>
+      <p>
+        Browser verification is owner-handled under the current repository policy unless the owner explicitly re-enables it for a task. That does not make the proof weak. It means non-browser proof has to be serious: static checks, builds, package extraction, CLI command runs, authenticated HTTP checks, live API smoke, and stress receipts. When browser proof is re-enabled, the same lane should be checked by acting like a human buyer too.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Release proof checklist</strong>
+        <ul>
+          <li>Package receipt: deterministic archive and SHA.</li>
+          <li>Platform proof: CLI, current mirror, verify, restore, upload mock.</li>
+          <li>Auto-install proof: shipped tarball install, private env file, first current mirror, restore.</li>
+          <li>Sales readiness proof: live buyer page, SkyePay return, locked/unlocked package flow, downloaded package command round trip, stress.</li>
+          <li>Owner mirror receipt: actual repo current mirror refreshed after the release edits.</li>
+        </ul>
+      </div>
+
+      <h2>What this week really improved.</h2>
+      <p>
+        This week improved the operating spine more than any single page can show. The auth story got pulled back toward one shared gate. The SkyePay story got aligned with the products people actually buy. Reape0r got its name, its CLI voice, its current mirror story, its auto-install proof, and its customer surfaces. DevodeRator got the public education lane. The Drive and 0S surfaces started pointing to the same product. The valuation source can now reference a clearer sellable repo custody lane.
+      </p>
+      <p>
+        The work is still serious. A repo mirror product has to earn trust every release. But the direction is now clean: sell the agent, install the agent, run the current mirror, show the receipts, restore the codebase, and keep the whole thing under the shared 0S identity and SkyePay access lane.
+      </p>
+
+      <blockquote>
+        The product is not "we have a backup somewhere." The product is "the customer can recover their working repo from a proof-backed, encrypted, mutable current mirror."
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator - Gray London Skyes - 0S proof journals, Reape0r field guides, and customer-safe architecture notes.</footer>
+</body>
+</html>

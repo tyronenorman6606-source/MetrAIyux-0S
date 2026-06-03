@@ -9,7 +9,7 @@ import { q } from "./_lib/db.js";
 const PLATFORM_CATALOG = [
   {
     app_id: "skyegatefs27",
-    title: "SkyeGateFS27",
+    title: "SkyeGate FS27",
     description: "Parent auth, billing, vendor, push, and monitoring control plane.",
     visibility: "admin",
     storage_mode: "server-state",
@@ -50,7 +50,7 @@ const PLATFORM_CATALOG = [
   {
     app_id: "superidev3-8",
     title: "SuperIDEv3.8",
-    description: "Primary app surface currently bridged into SkyeGateFS27 auth and parent audit.",
+    description: "Primary app surface currently bridged into SkyeGate FS27 auth and parent audit.",
     visibility: "operator",
     storage_mode: "hybrid-bridge",
     launch_url: "/Platforms-Apps-Infrastructure/"
@@ -66,7 +66,7 @@ const PLATFORM_CATALOG = [
   {
     app_id: "0s-auth-sdk",
     title: "0s Auth SDK",
-    description: "Compatibility client reduced toward a SkyeGateFS27 login bridge.",
+    description: "Compatibility client reduced toward a SkyeGate FS27 login bridge.",
     visibility: "bridge",
     storage_mode: "client-bridge",
     launch_url: null
@@ -154,7 +154,7 @@ function summarizePlatform(platform, ops) {
   if (platform.app_id === "skyebox-authenticator") return "SkyeBox stays local-first for authenticator secrets; FS27 owns PIN/recovery identity and should not claim managed TOTP custody until a separate custody service exists.";
   if (platform.app_id === "citadeldb-sovereign") return "Database lane selection, migration, verification, and cutover should be visible in FS27 as platform mirror events.";
   if (platform.app_id === "skyevault-sovereign") return "Vault storage, repo/package, proof export, file count, and key-card events should be visible in FS27.";
-  if (platform.app_id === "skyehands-runtime-control") return "Runtime shell can target SkyeGateFS27 through aliased env vars and mirror audit events upward.";
+  if (platform.app_id === "skyehands-runtime-control") return "Runtime shell can target SkyeGate FS27 through aliased env vars and mirror audit events upward.";
   if (platform.app_id === "0s-auth-sdk") return "Client-side compatibility lane points at gate login but still needs fuller runtime/env adoption.";
   if (platform.app_id === "skymail-standalone") return "Mailboxes, key events, approval-sensitive sends, and mailbox provisioning should mirror into FS27.";
   if (platform.app_id === "marketing-made-easy") return "Growth-suite activity can mirror scan, AE handoff, brand, launch, document, web-creation, market-intelligence, and kAIxU brand events into FS27 when configured.";

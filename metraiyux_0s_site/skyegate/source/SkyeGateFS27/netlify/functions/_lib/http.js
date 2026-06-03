@@ -10,7 +10,7 @@ export function buildCors(req) {
   ];
 
   // IMPORTANT: keep this list aligned with whatever headers your apps send.
-  const allowHeaders = "authorization, content-type, x-kaixu-install-id, x-kaixu-request-id, x-kaixu-app, x-kaixu-build, x-admin-password, x-vantacore-tenant, x-skye-gate-session, x-skygate-session, x-fs27-session, x-0s-gate-session, x-0s-gate-cards, x-skye-gate-cards, x-0s-gate-card-count, x-0s-actor, x-0s-role, x-0s-email, x-0s-customer-id, x-0s-workspace-id, x-0s-client-id, x-skye-gate-source, x-metraiyux-session-source, x-skye-platform, x-0s-platform, x-kaixu-platform, x-skye-usage-lane, x-free99-billing-mode, x-skysecure-write-secret, x-kaixu-error-token, x-kaixu-mode, x-content-sha1, x-setup-secret, x-kaixu-job-secret, x-job-worker-secret, x-fs27-event-secret, x-platform-event-secret, x-csrf-token, x-operator-token";
+  const allowHeaders = "authorization, content-type, x-kaixu-install-id, x-kaixu-request-id, x-kaixu-app, x-kaixu-build, x-admin-password, x-vantacore-tenant, x-skye-gate-session, x-skygate-session, x-fs27-session, x-0s-gate-session, x-0s-gate-cards, x-skye-gate-cards, x-0s-gate-card-count, x-0s-actor, x-0s-role, x-0s-email, x-0s-customer-id, x-0s-workspace-id, x-0s-client-id, x-skye-gate-source, x-metraiyux-session-source, x-skye-platform, x-0s-platform, x-kaixu-platform, x-skye-usage-lane, x-free99-billing-mode, x-skysecure-write-secret, x-kaixu-error-token, x-kaixu-mode, x-content-sha1, x-setup-secret, x-kaixu-job-secret, x-job-worker-secret, x-fs27-event-secret, x-platform-event-secret, x-skygate-app-spine-secret, x-skygate-mirror-secret, x-skygate-event-mirror-secret, x-csrf-token, x-operator-token";
   const allowMethods = "GET,POST,PUT,PATCH,DELETE,OPTIONS";
 
   const base = {

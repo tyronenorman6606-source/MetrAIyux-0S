@@ -586,7 +586,7 @@ export async function requireOperatorBearer(req) {
     }
   }
   if (!boolEnv(process.env.SIGNINPRO_ALLOW_LEGACY_OPERATOR_TOKEN)) {
-    const error = new Error("FS27/SkyGate operator session is required for NorthStar provisioning.");
+    const error = new Error("SkyeGate FS27 operator session is required for NorthStar provisioning.");
     error.status = token ? 403 : 401;
     error.code = "SIGNINPRO_FS27_OPERATOR_REQUIRED";
     throw error;

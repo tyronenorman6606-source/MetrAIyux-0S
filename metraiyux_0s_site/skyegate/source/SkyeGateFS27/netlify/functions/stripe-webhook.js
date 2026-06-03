@@ -11,6 +11,19 @@ import {
   markVaultProvisioningResult,
   provisionVaultWorkspaceForOrder
 } from "./_lib/skyepayVaultProvisioning.js";
+import {
+  isSkyeMailMailboxOrder,
+  markSkyeMailProvisioningFailure,
+  markSkyeMailProvisioningNeedsInput,
+  markSkyeMailProvisioningResult,
+  provisionSkyeMailMailboxForOrder
+} from "./_lib/skyepaySkyeMailProvisioning.js";
+import {
+  isSkyeCommerceOrder,
+  markSkyeCommercePaymentDeliveryFailure,
+  markSkyeCommercePaymentDeliveryResult,
+  notifySkyeCommercePaymentComplete
+} from "./_lib/skyepaySkyeCommerceProvisioning.js";
 
 function sessionCanMoveToOwnerApproval(session) {
   const paymentStatus = String(session?.payment_status || "").toLowerCase();
@@ -105,10 +118,19 @@ const defaultSkyePayWebhookDeps = {
   audit,
   autoUnlockSkyePayOrder,
   holdSkyePayForPayment,
+  isSkyeCommerceOrder,
+  isSkyeMailMailboxOrder,
   isVaultProvisioningOrder,
+  markSkyeCommercePaymentDeliveryFailure,
+  markSkyeCommercePaymentDeliveryResult,
+  markSkyeMailProvisioningFailure,
+  markSkyeMailProvisioningNeedsInput,
+  markSkyeMailProvisioningResult,
   markVaultProvisioningFailure,
   markVaultProvisioningResult,
   mirrorStripeWebhookProviderRuntime,
+  notifySkyeCommercePaymentComplete,
+  provisionSkyeMailMailboxForOrder,
   provisionVaultWorkspaceForOrder,
   sessionCanMoveToOwnerApproval,
   upsertSkyePayOrderFromSession
@@ -139,6 +161,46 @@ export async function handleSkyePayCheckoutCompletion(event, deps = {}) {
         error: error.message
       });
       delivery = "vault_failed";
+    }
+  } else if (d.isSkyeMailMailboxOrder(order)) {
+    delivery = "skyemail_mailbox";
+    try {
+      const result = await d.provisionSkyeMailMailboxForOrder(order, { action: "provision", source: event.type });
+      if (result.skipped && result.reason === "mailbox_claim_required") {
+        await d.markSkyeMailProvisioningNeedsInput(order.id, result);
+        delivery = "skyemail_mailbox_claim_required";
+      } else if (result.ok && !result.skipped) {
+        await d.markSkyeMailProvisioningResult(order.id, result);
+      }
+    } catch (error) {
+      await d.markSkyeMailProvisioningFailure(order.id, error);
+      await d.audit("system", "SKYEPAY_SKYEMAIL_MAILBOX_PROVISIONING_FAILED", `skyepay:${order?.id || session.id}`, {
+        event_type: event.type,
+        error: error.message
+      });
+      delivery = "skyemail_failed";
+    }
+  } else if (d.isSkyeCommerceOrder(order)) {
+    delivery = "skyecommerce_order";
+    try {
+      const result = await d.notifySkyeCommercePaymentComplete(order, session, {
+        event,
+        eventId: event?.id || "",
+        eventType: event.type
+      });
+      if (result.ok && !result.skipped) {
+        await d.markSkyeCommercePaymentDeliveryResult(order.id, result);
+      } else {
+        await d.markSkyeCommercePaymentDeliveryFailure(order.id, result);
+        delivery = "skyecommerce_webhook_pending";
+      }
+    } catch (error) {
+      await d.markSkyeCommercePaymentDeliveryFailure(order.id, error);
+      await d.audit("system", "SKYEPAY_SKYECOMMERCE_PAYMENT_WEBHOOK_FAILED", `skyepay:${order?.id || session.id}`, {
+        event_type: event.type,
+        error: error.message
+      });
+      delivery = "skyecommerce_webhook_failed";
     }
   } else {
     delivery = "standard_unlock";
@@ -283,6 +345,34 @@ export default wrap(async (req) => {
             action,
             error: error.message
           });
+        }
+      } else if (order && isSkyeMailMailboxOrder(order)) {
+        const status = String(subscription.status || "").toLowerCase();
+        if (["active", "trialing"].includes(status)) {
+          try {
+            const result = await provisionSkyeMailMailboxForOrder({
+              ...order,
+              payment_status: subscription.status || order.payment_status
+            }, { action: "provision", source: event.type });
+            if (result.skipped && result.reason === "mailbox_claim_required") await markSkyeMailProvisioningNeedsInput(order.id, result);
+            if (result.ok && !result.skipped) await markSkyeMailProvisioningResult(order.id, result);
+          } catch (error) {
+            await markSkyeMailProvisioningFailure(order.id, error);
+            await audit("system", "SKYEPAY_SKYEMAIL_MAILBOX_PROVISIONING_FAILED", `skyepay:${order.id}`, {
+              event_type: event.type,
+              error: error.message
+            });
+          }
+        }
+        if (event.type === "customer.subscription.deleted" || ["canceled", "cancelled", "unpaid", "incomplete_expired"].includes(status)) {
+          await q(
+            `update skyepay_orders
+             set provisioning_status=case when provisioning_status='void' then provisioning_status else 'subscription_inactive' end,
+                 metadata=metadata || $2::jsonb,
+                 updated_at=now()
+             where id=$1`,
+            [order.id, JSON.stringify({ subscription_inactive_at: new Date().toISOString(), subscription_status: subscription.status || null })]
+          );
         }
       } else if (order) {
         const status = String(subscription.status || "").toLowerCase();

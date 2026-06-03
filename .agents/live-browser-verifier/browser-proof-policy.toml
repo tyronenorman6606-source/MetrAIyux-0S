@@ -11,6 +11,80 @@ playwright_may_run = false
 disabled_by_owner_admin = true
 replacement_gate = "deploy + static validation + API smoke + authenticated HTTP stress; owner performs live browser verification manually."
 
+[non_browser_proof]
+required = true
+mode = "aggressive-static-api-http-stress"
+status_code_only_allowed = false
+plain_200_counts_as_pass = false
+text_presence_only_allowed = false
+single_route_smoke_allowed = false
+must_assert_auth_boundary = true
+must_assert_expected_content_marker = true
+must_assert_wired_controls_or_api_effects = true
+must_assert_negative_or_denied_states = true
+must_assert_receipt_artifact = true
+must_exercise_mutation_readback_when_surface_has_forms = true
+must_exercise_download_export_copy_or_save_when_present = true
+must_exercise_payment_or_entitlement_boundary_when_present = true
+must_record_failed_controls = true
+minimum_assertions_per_route = 4
+minimum_distinct_routes_per_surface = 3
+minimum_control_or_api_effects_per_surface = 5
+minimum_negative_cases_per_surface = 2
+minimum_stress_requests_per_surface = 24
+minimum_stress_concurrency = 4
+rerun_after_every_code_change = true
+receipt_required = true
+receipt_must_include_assertions = true
+receipt_must_include_control_inventory = true
+receipt_must_include_mutation_readbacks = true
+receipt_must_include_negative_cases = true
+receipt_must_include_failures = true
+failure_rule = "Any unwired button, dead form, missing API effect, auth bypass, missing readback, failed asset, or status-only route check fails the proof even when HTTP status is 200."
+
+[repo_wide_mounted_surface_gate]
+required = true
+applies_to = "every app, platform, sub-platform, proof asset, and mounted HTML/JSON surface under metraiyux_0s_site"
+single_200_route_pass_forbidden = true
+family_receipt_without_per_app_control_inventory_forbidden = true
+source_marker_without_control_wiring_forbidden = true
+route_auth_without_human_flow_forbidden = true
+must_inventory_links = true
+must_inventory_buttons = true
+must_inventory_forms = true
+must_inventory_inputs = true
+must_inventory_tabs_menus_toggles = true
+must_inventory_download_export_copy_save_controls = true
+must_inventory_fetch_and_form_api_targets = true
+must_fail_unwired_enabled_buttons = true
+must_fail_empty_href_ctas = true
+must_fail_forms_without_action_or_submit_handler = true
+must_fail_fetch_targets_without_live_or_static_contract = true
+must_prove_disabled_controls_are_intentionally_disabled = true
+must_prove_no_mutation_boundary_for_read_only_surfaces = true
+must_prove_mutation_readback_for_stateful_surfaces = true
+must_include_source_file_hash = true
+must_include_authenticated_and_unauthenticated_route_evidence = true
+must_include_stress_basis = true
+accepted_no_browser_evidence = [
+  "static source control inventory",
+  "authenticated and unauthenticated HTTP route proof",
+  "API request plus readback receipt",
+  "negative/denied-state HTTP proof",
+  "source hash and mounted app manifest mapping",
+  "stress receipt with concurrency and request counts"
+]
+failure_rule = "A mounted app cannot be marked deep-closed until every enabled control is inventoried and either wired to a route/API/action, proven intentionally disabled, or proven not applicable by the app's declared read-only/local/provider boundary."
+
+[repo_wide_action_receipts]
+required = true
+latest_control_receipt = "test-artifacts/0s-mounted-app-control-proof/0s-mounted-app-control-proof-latest.json"
+latest_per_app_receipt = "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json"
+latest_deep_closure_receipt = "test-artifacts/0s-app-deep-closure/0s-app-deep-closure-latest.json"
+latest_matrix_receipt = "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json"
+truth_ledger_must_consume_latest = true
+production_closure_must_fail_when_any_required_receipt_fails = true
+
 [human_interaction]
 click_primary_navigation = true
 click_primary_ctas = true

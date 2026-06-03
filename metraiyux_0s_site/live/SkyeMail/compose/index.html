@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="assets/app.js"></script>
-  <script defer src="assets/mail-ui.js"></script>
-  <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Compose — SkyeMail Citadel</title>
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <script defer src="/assets/os-bridge.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Compose — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Compose" data-page-hint="Send, draft, alias, and attachment lane">
 <div class="wrap">
@@ -38,20 +39,26 @@
               <input id="attachInput" type="file" multiple />
             </div>
             <div>
-              <label>Queued files</label>
+              <label>Command Bridged files</label>
               <div id="attachmentList" class="attachment-stack"><div class="mini">No attachments queued.</div></div>
             </div>
           </div>
           <input id="draft_id" type="hidden" />
           <input id="thread_id" type="hidden" />
           <input id="reply_message_id" type="hidden" />
-          <div class="btnrow"><button class="btn gold" id="sendBtn" type="button">Send Email</button><button class="btn" id="saveDraftBtn" type="button">Save Draft</button><button class="btn ok" id="signatureBtn" type="button">Insert Signature</button></div>
+          <div class="btnrow"><button class="btn gold" id="sendBtn" type="button">Send Email</button><button class="btn" id="saveDraftBtn" type="button">Save Draft</button><button class="btn ok" id="signatureBtn" type="button">Insert Signature</button><button class="btn" id="docxComposeBtn" type="button">Open SkyeDocxMax</button><a class="btn" id="workbenchComposeBtn" href="workspace.html">0S Workbench</a></div>
           <div class="mini" id="statusText" style="margin-top:12px">Waiting for compose state…</div>
         </section>
         <aside class="card">
           <div class="kicker">Quick Contacts</div>
           <div class="notice">Tap a saved or synced contact to add them to the recipient line.</div>
           <div class="btnrow" id="contactsQuick"></div>
+          <div class="hr"></div>
+          <div class="kicker">0S Compose</div>
+          <div class="btnrow">
+            <button class="btn small gold" id="docxComposeSideBtn" type="button">SkyeDocxMax</button>
+            <button class="btn small" id="packetComposeBtn" type="button">Archive Packet</button>
+          </div>
         </aside>
       </section>
 
@@ -59,6 +66,6 @@
   </div>
   <div id="appFooter"></div>
 </div>
-<script defer src="assets/compose-page.js"></script>
+<script defer src="/assets/compose-page.js"></script>
 </body>
 </html>

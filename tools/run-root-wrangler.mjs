@@ -2,8 +2,9 @@ import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
+import { assertWranglerVersionSupportsConfig, configPathFromWranglerArgs, envWithModernNodeForWrangler } from './lib/wrangler-version-guard.mjs';
 
-const wranglerVersion = process.env.WRANGLER_VERSION || '4.14.0';
+const wranglerVersion = process.env.WRANGLER_VERSION || '4.95.0';
 const requestedEnvFile = process.env.ROOT_ENV_FILE || process.env.METRAIYUX_ROOT_ENV || '.env';
 
 function resolveEnvFile(requested) {
@@ -114,13 +115,27 @@ function preferredTokenProbes(args) {
 }
 
 function workerNameFromArgs(args) {
-  const configIndex = args.findIndex((arg) => arg === '--config' || arg === '-c');
-  const configPath = configIndex >= 0 ? args[configIndex + 1] : 'wrangler.toml';
+  const configPath = configPathFromWranglerArgs(args, process.cwd());
   if (!configPath) return '';
-  const resolved = path.resolve(process.cwd(), configPath);
-  if (!fs.existsSync(resolved)) return '';
-  const match = fs.readFileSync(resolved, 'utf8').match(/^\s*name\s*=\s*"([^"]+)"/m);
+  if (!fs.existsSync(configPath)) return '';
+  const match = fs.readFileSync(configPath, 'utf8').match(/^\s*name\s*=\s*"([^"]+)"/m);
   return match?.[1] || '';
+}
+
+function commandUsesConfigCwd(args) {
+  return args.includes('--config') || args.includes('-c');
+}
+
+export function wranglerCwdAndArgs(args, cwd = process.cwd()) {
+  if (!commandUsesConfigCwd(args)) return { cwd, args };
+  const configIndex = args.findIndex((arg) => arg === '--config' || arg === '-c');
+  if (configIndex < 0 || !args[configIndex + 1]) return { cwd, args };
+
+  const configFile = configPathFromWranglerArgs(args, cwd);
+  const deployCwd = path.dirname(configFile);
+  const nextArgs = [...args];
+  nextArgs[configIndex + 1] = path.basename(configFile);
+  return { cwd: deployCwd, args: nextArgs };
 }
 
 async function chooseCloudflareToken(accountId, args) {
@@ -153,10 +168,25 @@ async function chooseCloudflareToken(accountId, args) {
 const accountFromRows = rows.find((row) => /^(METRAIYUX_0S_)?CLOUDFLARE_ACCOUNT_ID$/i.test(row.key) || /^CF_ACCOUNT_ID$/i.test(row.key))?.value || '';
 const accountId = rootEnv.METRAIYUX_0S_CLOUDFLARE_ACCOUNT_ID || rootEnv.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID || accountFromRows;
 const wranglerArgs = process.argv.slice(2);
+const wranglerProcess = wranglerCwdAndArgs(wranglerArgs, process.cwd());
+const guardedLoaderCommand = wranglerArgs[0] === 'deploy'
+  || (wranglerArgs[0] === 'versions' && wranglerArgs[1] === 'upload');
+if (guardedLoaderCommand) {
+  try {
+    assertWranglerVersionSupportsConfig({
+      configFile: configPathFromWranglerArgs(wranglerArgs, process.cwd()),
+      wranglerVersion,
+      commandLabel: `run-root-wrangler ${wranglerArgs.slice(0, 2).join(' ')}`
+    });
+  } catch (error) {
+    console.error(error?.message || String(error));
+    process.exit(1);
+  }
+}
 const selected = await chooseCloudflareToken(accountId, wranglerArgs);
 const gateAuth = await resolveZeroOsGateAuth({ env: { ...rootEnv, ...process.env } });
 const gateBearer = gateAuth.token || '';
-const childEnv = {
+const childEnv = envWithModernNodeForWrangler({
   ...process.env,
   ...rootEnv,
   CLOUDFLARE_ACCOUNT_ID: accountId,
@@ -167,7 +197,7 @@ const childEnv = {
   NO_COLOR: process.env.NO_COLOR || '1',
   WRANGLER_SEND_METRICS: process.env.WRANGLER_SEND_METRICS || 'false',
   CI: process.env.CI || '1'
-};
+});
 
 if (!childEnv.CLOUDFLARE_ACCOUNT_ID || !childEnv.CLOUDFLARE_API_TOKEN) {
   console.error('Missing Cloudflare account/token after root env load.');
@@ -176,8 +206,8 @@ if (!childEnv.CLOUDFLARE_ACCOUNT_ID || !childEnv.CLOUDFLARE_API_TOKEN) {
 
 console.error(`run-root-wrangler: using ${selected.label}`);
 
-const args = ['-y', '-p', `wrangler@${wranglerVersion}`, 'wrangler', ...wranglerArgs];
-const child = spawn('npx', args, { env: childEnv, stdio: 'inherit' });
+const args = ['-y', '-p', `wrangler@${wranglerVersion}`, 'wrangler', ...wranglerProcess.args];
+const child = spawn('npx', args, { cwd: wranglerProcess.cwd, env: childEnv, stdio: 'inherit' });
 child.on('exit', (code, signal) => {
   if (signal) {
     console.error(`wrangler exited via ${signal}`);

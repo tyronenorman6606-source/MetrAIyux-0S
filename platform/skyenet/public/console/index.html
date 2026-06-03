@@ -68,6 +68,24 @@
       </section>
       <section class="dashboard-grid" aria-live="polite">
         <section class="status-panel wide">
+          <h2>Functions and env grants</h2>
+          <form id="functionFilterForm" class="deploy-form">
+            <label><span>Workspace</span><input name="workspace_id" placeholder="workspace"></label>
+            <label><span>Project</span><input name="project_id" placeholder="project" required></label>
+            <label><span>Deployment</span><input name="deployment_id" placeholder="deployment" required></label>
+            <button type="submit">Load grants</button>
+          </form>
+          <p id="functionStatus" class="mini-status">Waiting for a function deployment.</p>
+          <div id="functionList" class="list-panel">No function grants loaded.</div>
+        </section>
+        <section class="status-panel wide">
+          <h2>Rollback</h2>
+          <p id="rollbackStatus" class="mini-status">Choose Rollback route on a deployment row to switch the live route.</p>
+          <pre id="rollbackResult">No rollback requested.</pre>
+        </section>
+      </section>
+      <section class="dashboard-grid" aria-live="polite">
+        <section class="status-panel wide">
           <h2>Environment variables</h2>
           <p class="mini-status">Project env values are stored behind the shared gate and only show redacted previews in the console.</p>
           <form id="envForm" class="token-panel env-form">

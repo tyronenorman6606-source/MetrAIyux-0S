@@ -4,6 +4,8 @@
 
 const ROTATION_PIN_KEYS = ['FREE99_ROTATION_CODE', 'ROTATION_PIN', 'ROTATION_CODE', 'FREE99_ADMIN_CODE'];
 const CF_API = 'https://api.cloudflare.com/client/v4';
+const ROTATION_SESSION_COOKIE = 'skye_rotation_session';
+const ROTATION_SESSION_TTL_SECONDS = 60 * 60;
 
 function html(body, status = 200) {
   return new Response(body, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex, nofollow' } });
@@ -37,23 +39,174 @@ function cookieValue(request, name) {
 function presentedCode(request, body = {}) {
   return [
     body.code, body.pin, body.password,
-    bearer(request),
-    cookieValue(request, 'skye_rotation_session'),
-    cookieValue(request, 'metraiyux_admin_session'),
-    cookieValue(request, 'skye_gate_session'),
   ].map(v => String(v || '').trim()).find(v => v) || '';
 }
-function setSessionCookie(pin) {
-  return `skye_rotation_session=${encodeURIComponent(pin)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600`;
+function base64UrlEncode(value) {
+  let binary = '';
+  const bytes = value instanceof Uint8Array ? value : new TextEncoder().encode(String(value || ''));
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+function base64UrlDecodeJson(value) {
+  const padded = String(value || '').replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(String(value || '').length / 4) * 4, '=');
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+async function hmac(env, payload) {
+  const secret = String(env.ROTATION_SESSION_SECRET || env.SKYE_ROTATION_SESSION_SECRET || rotationPin(env) || '').trim();
+  if (!secret) return '';
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
+  return base64UrlEncode(new Uint8Array(signature));
+}
+async function setSessionCookie(env, claims = {}) {
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    v: 2,
+    iat: now,
+    exp: now + ROTATION_SESSION_TTL_SECONDS,
+    sub: String(claims.sub || claims.user_id || claims.email || 'fs27-owner'),
+    email: String(claims.email || claims.username || ''),
+    role: String(claims.role || 'owner'),
+    scope: claims.scope || claims.scopes || '',
+    gate_card_id: String(claims.gate_card_id || claims.gate_card?.id || ''),
+    nonce: crypto.randomUUID ? crypto.randomUUID() : `${now}-${Math.random().toString(36).slice(2)}`
+  };
+  const encoded = base64UrlEncode(JSON.stringify(payload));
+  const sig = await hmac(env, encoded);
+  return `${ROTATION_SESSION_COOKIE}=v2.${encoded}.${sig}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${ROTATION_SESSION_TTL_SECONDS}`;
 }
 function clearSessionCookie() {
-  return `skye_rotation_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+  return `${ROTATION_SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }
 function authPassed(request, env, body = {}) {
   const pin = rotationPin(env);
   if (!pin) return false;
   const code = presentedCode(request, body);
   return code === pin;
+}
+function fs27Origin(env) {
+  return String(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN || 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev').replace(/\/+$/, '');
+}
+function zeroOsOrigin(env) {
+  return String(env.METRAIYUX_0S_ORIGIN || env.ZERO_OS_BASE_URL || 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev').replace(/\/+$/, '');
+}
+function gateToken(request, body = {}) {
+  return [
+    body.gateToken, body.gate_token, body.session, body.token,
+    bearer(request),
+    request.headers.get('x-skye-gate-session'),
+    request.headers.get('x-skygate-session'),
+    request.headers.get('x-fs27-session'),
+    request.headers.get('x-0s-gate-session'),
+    cookieValue(request, 'METRAIYUX_GATE_SESSION'),
+    cookieValue(request, 'SKYGATEFS27_GATE_SESSION'),
+    cookieValue(request, 'SKYE_GATE_SESSION'),
+    cookieValue(request, 'metraiyux_admin_session'),
+    cookieValue(request, 'skye_gate_session')
+  ].map(v => String(v || '').replace(/^Bearer\s+/i, '').trim()).find(Boolean) || '';
+}
+function scopeList(scope) {
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope || '').split(/\s+/).filter(Boolean);
+}
+function isOwnerScoped(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = String(claims.role || claims.user?.role || '').toLowerCase();
+  const scopes = new Set(scopeList(claims.scope || claims.scopes || claims.user?.scope).map(scope => scope.toLowerCase()));
+  return ['founder', 'owner', 'admin', 'operator'].includes(role)
+    || scopes.has('admin.write')
+    || scopes.has('keys.write')
+    || scopes.has('gateway.invoke')
+    || scopes.has('0s.owner')
+    || scopes.has('secret.rotate');
+}
+async function introspectFs27(env, token) {
+  const origin = fs27Origin(env);
+  const paths = ['/auth-introspect', '/auth/introspect', '/.netlify/functions/auth-introspect'];
+  let last = null;
+  for (const path of paths) {
+    try {
+      const res = await fetch(`${origin}${path}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json().catch(() => ({ active: false }));
+      last = { status: res.status, data };
+      if (res.status === 404) continue;
+      if (res.ok && isOwnerScoped(data)) return { ok: true, claims: data, path };
+      return { ok: false, status: res.ok ? 403 : res.status, error: data.error || 'FS27 bearer is not owner/admin scoped.', claims: data };
+    } catch (error) {
+      last = { status: 0, error: error.message };
+    }
+  }
+  return { ok: false, status: last?.status || 401, error: last?.error || 'FS27 introspection failed.', claims: last?.data || null };
+}
+async function introspectZeroOs(env, token) {
+  try {
+    const res = await fetch(`${zeroOsOrigin(env)}/api/owner/admin-session`, {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        authorization: `Bearer ${token}`,
+        'x-skye-gate-session': token,
+        'x-free99-gate-session': token
+      }
+    });
+    const data = await res.json().catch(() => ({ ok: false }));
+    const user = data.user || data.session?.user || data.identity || {};
+    const claims = {
+      active: res.ok && (data.ok === true || data.authenticated === true),
+      ok: res.ok && (data.ok === true || data.authenticated === true),
+      role: data.role || user.role || 'owner',
+      email: data.email || user.email || '',
+      sub: data.subject || user.id || user.sub || user.email || 'zero-os-owner',
+      scope: ['admin.read', 'admin.write', 'keys.write', 'gateway.invoke', '0s.owner']
+    };
+    return isOwnerScoped(claims)
+      ? { ok: true, claims, path: '/api/owner/admin-session' }
+      : { ok: false, status: res.ok ? 403 : res.status, error: data.error || '0S owner session is not active.', claims };
+  } catch (error) {
+    return { ok: false, status: 401, error: error.message || '0S owner session check failed.' };
+  }
+}
+async function requireGateOwner(env, token) {
+  if (!token) return { ok: false, status: 401, error: 'FS27/SkyGate owner bearer required.' };
+  const fs27 = await introspectFs27(env, token);
+  if (fs27.ok) return fs27;
+  const zeroOs = await introspectZeroOs(env, token);
+  if (zeroOs.ok) return zeroOs;
+  return { ok: false, status: fs27.status || zeroOs.status || 401, error: fs27.error || zeroOs.error || 'Owner bearer rejected.' };
+}
+async function readRotationSession(request, env) {
+  const token = cookieValue(request, ROTATION_SESSION_COOKIE);
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3 || parts[0] !== 'v2') return null;
+  const expected = await hmac(env, parts[1]);
+  if (!expected || expected !== parts[2]) return null;
+  const claims = base64UrlDecodeJson(parts[1]);
+  if (!claims?.exp || Number(claims.exp) <= Math.floor(Date.now() / 1000)) return null;
+  if (!isOwnerScoped({ ...claims, active: true, ok: true })) return null;
+  return claims;
+}
+async function requireRotationAccess(request, env, body = {}) {
+  if (!authPassed(request, env, body)) {
+    return { ok: false, status: 401, error: 'Invalid rotation PIN.' };
+  }
+  const cookieClaims = await readRotationSession(request, env).catch(() => null);
+  if (cookieClaims) return { ok: true, claims: cookieClaims, via: 'fs27-bound-rotation-session' };
+  const gate = await requireGateOwner(env, gateToken(request, body));
+  if (!gate.ok) return gate;
+  return { ok: true, claims: gate.claims, via: gate.path || 'fs27-owner-bearer' };
 }
 
 async function listWorkerSecrets(env, workerName) {
@@ -177,6 +330,9 @@ const UI_HTML = `<!doctype html>
     <p>Enter the rotation surface PIN to unlock. This is separate from the main gate password.</p>
     <div class="panel">
       <form id="login-form">
+        <label>0S / FS27 Gate Session
+          <input type="password" name="gateToken" autocomplete="current-password" placeholder="Paste current owner gate bearer">
+        </label>
         <label>Rotation Surface PIN
           <input type="password" name="code" autocomplete="current-password" placeholder="Rotation PIN" required>
         </label>
@@ -279,8 +435,9 @@ const UI_HTML = `<!doctype html>
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const code = e.target.code.value;
-    setStatus('login-status', 'Checking PIN...', '');
-    const { res, data } = await api('/api/auth', { code });
+    const gateToken = e.target.gateToken.value;
+    setStatus('login-status', 'Checking FS27 owner session and PIN...', '');
+    const { res, data } = await api('/api/auth', { code, gateToken });
     if (!res.ok) { setStatus('login-status', data.error || 'Invalid PIN.', 'bad'); return; }
     sessionPin = code;
     document.getElementById('login-view').style.display = 'none';
@@ -370,9 +527,17 @@ export default {
     let body = {};
     try { body = await request.json(); } catch {}
 
-    // Verify the rotation PIN on every API call
-    if (!authPassed(request, env, body)) {
-      return json({ ok: false, error: 'Invalid rotation PIN.' }, 401);
+    if (url.pathname === '/api/logout') {
+      const res = new Response(JSON.stringify({ ok: true }), {
+        headers: { 'content-type': 'application/json', 'set-cookie': clearSessionCookie(), 'cache-control': 'no-store' }
+      });
+      return res;
+    }
+
+    // Verify the FS27/SkyGate owner lane and the rotation PIN on every API call.
+    const access = await requireRotationAccess(request, env, body);
+    if (!access.ok) {
+      return json({ ok: false, error: access.error || 'FS27 owner session and rotation PIN are required.' }, access.status || 401);
     }
 
     // Verify Cloudflare API credentials are set
@@ -382,7 +547,7 @@ export default {
     if (url.pathname === '/api/auth') {
       const configured = Boolean(cfToken && cfAccount);
       const res = new Response(JSON.stringify({ ok: true, configured, workers }), {
-        headers: { 'content-type': 'application/json', 'set-cookie': setSessionCookie(String(body.code || '')), 'cache-control': 'no-store' }
+        headers: { 'content-type': 'application/json', 'set-cookie': await setSessionCookie(env, access.claims), 'cache-control': 'no-store' }
       });
       return res;
     }
@@ -427,13 +592,6 @@ export default {
       } catch (e) {
         return json({ ok: false, error: e.message }, 500);
       }
-    }
-
-    if (url.pathname === '/api/logout') {
-      const res = new Response(JSON.stringify({ ok: true }), {
-        headers: { 'content-type': 'application/json', 'set-cookie': clearSessionCookie(), 'cache-control': 'no-store' }
-      });
-      return res;
     }
 
     return json({ ok: false, error: 'Unknown rotation API route' }, 404);

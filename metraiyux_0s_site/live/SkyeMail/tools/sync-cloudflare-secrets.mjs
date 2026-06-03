@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { envWithModernNodeForWrangler } from "../../../../tools/lib/wrangler-version-guard.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const skymailRoot = path.resolve(__dirname, "..");
@@ -213,10 +214,10 @@ for (const key of present.filter((item) => secretOnly.has(item))) {
   bulk[key] = merged[key];
 }
 
-const wranglerVersion = process.env.WRANGLER_VERSION || "4.14.0";
+const wranglerVersion = process.env.WRANGLER_VERSION || "4.95.0";
 const child = spawn("npx", ["-y", "-p", `wrangler@${wranglerVersion}`, "wrangler", "secret", "bulk"], {
   cwd: skymailRoot,
-  env: { ...process.env, ...merged },
+  env: envWithModernNodeForWrangler({ ...process.env, ...merged }),
   stdio: ["pipe", "pipe", "pipe"],
 });
 

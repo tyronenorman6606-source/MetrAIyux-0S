@@ -4,10 +4,10 @@
   const TELEMETRY_ENDPOINT = `${WORKER_ORIGIN}/api/skymusicnexus/music-drops`;
   const TELEMETRY_CONTENT_TYPE = 'text/plain;charset=UTF-8';
   const CATALOG_URLS = [
-    `${PUBLIC_ORIGIN}/public/data/playlists.json`,
     '/SkyeMusicNexus/public/data/playlists.json',
     './data/playlists.json',
     '../public/data/playlists.json',
+    `${PUBLIC_ORIGIN}/public/data/playlists.json`,
   ];
   const STREAM_KEY = 'skymusicnexus.streamLedger.v1';
   const LIBRARY_KEY = 'skymusicnexus.playerLibrary.v1';
@@ -160,6 +160,29 @@
     }
   }
 
+  function publicArtistStorefrontUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const url = new URL(raw, `${PUBLIC_ORIGIN}/public/`);
+      const publicPath = url.pathname
+        .replace(/^\/SkyeMusicNexus\/artist-storefronts(?=\/|$)/i, '/artist-storefronts')
+        .replace(/^\/SkyeMusicNexus\/public\/artist-storefronts(?=\/|$)/i, '/artist-storefronts')
+        .replace(/^\/public\/artist-storefronts(?=\/|$)/i, '/artist-storefronts');
+      if (publicPath.startsWith('/artist-storefronts/')) return `${PUBLIC_ORIGIN}${publicPath}${url.search}${url.hash}`;
+      if (publicPath === '/artist-storefronts') return `${PUBLIC_ORIGIN}/artist-storefronts/${url.search}${url.hash}`;
+    } catch {}
+    return '';
+  }
+
+  function catalogImageUrl(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return `${PUBLIC_ORIGIN}/assets/og-card.svg`;
+    const artistAsset = publicArtistStorefrontUrl(raw);
+    if (artistAsset && /\.(?:png|jpe?g|webp|gif|avif|svg)(?:$|\?)/i.test(new URL(artistAsset).pathname)) return `${PUBLIC_ORIGIN}/assets/og-card.svg`;
+    return normalizeUrl(raw);
+  }
+
   function normalizeMusicPath(value) {
     let path = String(value || '');
     try {
@@ -265,7 +288,7 @@
   }
 
   function firstExistingImage(track) {
-    return track?.coverImage || track?.artistImage || `${PUBLIC_ORIGIN}/assets/og-card.svg`;
+    return catalogImageUrl(track?.coverImage || track?.artistImage || '');
   }
 
   function formatTime(value) {

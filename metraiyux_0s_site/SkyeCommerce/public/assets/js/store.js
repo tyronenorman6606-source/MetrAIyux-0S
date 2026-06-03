@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       Object.assign(payload, legalAcceptancePayload(event.target, 'skyecommerce-public-order'));
       const data = await window.SKYECOM.api('/api/orders', { method: 'POST', body: JSON.stringify(payload) });
       if (data.paymentSession?.checkoutUrl) {
-        window.SKYECOM.status('store-status', `Order ${data.orderNumber} created. Redirecting to ${data.paymentSession.provider} checkout.`, 'good');
+        window.SKYECOM.status('store-status', `Order ${data.orderNumber} created. Redirecting to SkyePay checkout.`, 'good');
         window.location.href = data.paymentSession.checkoutUrl;
         return;
       }

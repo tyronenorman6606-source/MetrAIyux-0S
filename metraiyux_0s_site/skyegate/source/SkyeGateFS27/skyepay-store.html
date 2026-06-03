@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyePay Store | SkyeGateFS27</title>
-  <meta name="description" content="The public SkyePay ecosystem store for zero-up-front trials, repo-approved Stripe offers, usage cards, vault access, and owner-approved paid activation." />
+  <title>SkyePay Store | SkyeGate FS27</title>
+  <meta name="description" content="The public SkyePay ecosystem store for zero-up-front trials, repo-approved SkyePay offers, usage cards, vault access, and owner-approved paid activation." />
   <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html" />
   <link rel="stylesheet" href="assets/skyepay.css" />
   <script type="importmap">
@@ -20,7 +20,7 @@
 
   <header class="pay-nav">
     <a class="pay-brand neon-magnetic" href="skyepay.html" aria-label="Back to SkyePay">
-      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGate FS27" />
       <span>SkyePay Store</span>
     </a>
     <nav>
@@ -37,7 +37,7 @@
       <div class="store-hero-copy">
         <p class="eyebrow">Public ecosystem store</p>
         <h1><span class="neon-gradient-text text-effects">Buy the lane.</span> Keep the gate record.</h1>
-        <p class="lead">I built <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> so clients can start a free trial, buy usage cards, subscribe to vault access, or route into the repo-approved Stripe catalog without card data touching FS27. The full 0S feature atlas is linked before checkout so buyers can inspect the app lanes, proof, valuation, and activation boundary.</p>
+        <p class="lead">I built <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyePay</span> so clients can start a free trial, buy usage cards, subscribe to vault access, or route into the repo-approved SkyePay catalog without card data touching FS27. The full 0S feature atlas is linked before checkout so buyers can inspect the app lanes, proof, valuation, and activation boundary.</p>
         <p><a class="primary-action neon-magnetic" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html">Inspect full 0S feature atlas</a></p>
       </div>
       <aside class="store-command-panel" aria-labelledby="storeCheckoutTitle">
@@ -45,6 +45,7 @@
         <h2 id="storeCheckoutTitle">Choose an offer</h2>
         <p id="selectedOfferSummary">The public catalog is loading from the SkyePay API.</p>
         <div class="selected-policy" id="selectedPolicy"></div>
+        <div class="selected-fulfillment" id="selectedFulfillment"></div>
         <form id="storeCheckoutForm" class="pay-form compact-form">
           <label>
             Buyer name
@@ -54,11 +55,25 @@
             Receipt email
             <input name="customer_email" type="email" autocomplete="email" placeholder="owner@company.com" required />
           </label>
-          <label>
-            Company
-            <input name="company_name" autocomplete="organization" placeholder="Company name" />
-          </label>
-          <label class="legal-acceptance">
+	          <label>
+	            Company
+	            <input name="company_name" autocomplete="organization" placeholder="Company name" />
+	          </label>
+	          <div id="storeSkyemailMailboxClaim" class="skyemail-mailbox-claim" hidden>
+	            <div>
+	              <span class="mini-label">SkyeMail mailbox</span>
+	              <strong id="storeSkyemailMailboxPreview">mailbox@solenterprises.org</strong>
+	            </div>
+	            <label>
+	              Mailbox name
+	              <input name="mailbox_local_part" autocomplete="off" placeholder="info" />
+	            </label>
+	            <label>
+	              Domain
+	              <input name="mailbox_domain" autocomplete="off" value="solenterprises.org" />
+	            </label>
+	          </div>
+	          <label class="legal-acceptance">
             <input name="legal_acceptance" type="checkbox" required />
             <span>
               I agree to the Legal Skyes transaction terms, payment/refund policy, in-house arbitration/dispute committee, privacy policy, MetrAIyux 0S terms, and the proof/valuation no-guarantee boundary.
@@ -73,7 +88,7 @@
             </span>
           </label>
           <button class="primary-action neon-magnetic" type="submit" id="storeCheckoutBtn">Open secure checkout</button>
-          <p class="fine-print">The store is public. Purchase handoff requires buyer identity and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe Checkout</span>; activation follows the offer policy after Stripe confirms the transaction.</p>
+          <p class="fine-print">The store is public. Purchase handoff requires buyer identity and <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">secure checkout</span>; activation follows the offer policy after payment confirms.</p>
         </form>
         <div class="status-panel" id="storeStatusPanel" hidden>
           <p class="eyebrow">Store status</p>
@@ -105,7 +120,7 @@
           <p class="eyebrow">SkyePay catalog</p>
           <h2 id="catalogTitle">Apps, vault access, usage cards, and approved build lanes.</h2>
         </div>
-        <span class="live-badge" id="storeClientBadge">Stripe backed</span>
+        <span class="live-badge" id="storeClientBadge">SkyePay live</span>
       </div>
       <div id="storeCatalog" class="store-groups" aria-live="polite"></div>
     </section>

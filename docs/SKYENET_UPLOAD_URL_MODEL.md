@@ -52,6 +52,16 @@ The standalone SkyeNet Worker also exposes the same gate-backed API shape:
 https://skyenet.graylondonskyes.workers.dev/api/skyenet/*
 ```
 
+Forms owner workflows use the same shared-gate API shape:
+
+```text
+GET/POST/PATCH /api/skyenet/forms-policy
+GET /api/skyenet/forms-inbox
+GET/PATCH /api/skyenet/forms-submission
+GET /api/skyenet/forms-file
+POST /api/skyenet/forms-notify
+```
+
 ## Upload Flow
 
 The standalone console at `/console` supports a real build drop. The 0S-mounted console can still proxy the same control lane for internal operator work, but standalone SkyeNet is the public deploy target.
@@ -206,7 +216,7 @@ Owner/admin sessions are different: the 0S proxy forwards an explicit owner/admi
 
 ## Function Boundary In Plain English
 
-Managed SkyeNet functions are the safe lane today. They require an approved paid/owner plan, a manifest, a signature, redacted runtime bindings instead of raw customer secrets, timeout/body/memory/subrequest/egress caps, invocation receipts, an abuse kill switch, and billing guards before scale.
+Managed SkyeNet functions are the safe lane today. They require an approved paid/owner plan, a manifest, a signature, redacted runtime bindings instead of raw customer secrets, timeout/body/memory/subrequest/egress caps, invocation receipts, an abuse kill switch, and billing guards before scale. Customer-uploaded JS/ESM Netlify-compatible functions now enter through this lane: the deploy CLI bundles helper imports, uploads bundle files, and FS27 server-signs the manifest only after storage hash verification.
 
 Sovereign isolated functions means a harder future lane for arbitrary code from customers we do not fully trust. The customer uploads code, but it runs inside a per-tenant sandbox such as an isolate pool, rootless container, or microVM on SkyeNet-owned runtime capacity. That sandbox gets its own filesystem/process boundary, CPU and memory limits, network rules, secret broker, logs, billing meter, and kill switch. The point is not the word "sovereign"; the point is that hostile or messy customer code cannot share the same trusted Worker/global runtime as the platform itself.
 
@@ -215,10 +225,11 @@ Current truth:
 - `functions_enabled` is false by default.
 - `managed_functions_enabled` is true only on paid or owner-approved plans.
 - Function bundles require manifest and signature.
+- Customer uploads can use `server_sign_manifest` / `customer_upload`; unsigned completion without that flag remains rejected.
 - Raw customer secrets are not exposed directly to runtime code.
 - Timeout, memory, body, request/subrequest, and egress caps are part of the runtime contract.
 - Invocation logs/receipts, workspace kill switch, and billing guard are required before scale.
-- Unrestricted arbitrary customer-uploaded functions stay reserved for the isolated runtime phase.
+- Unrestricted hostile-code execution, scheduled/background functions, native dependency build/install, and first-class rollback UI stay reserved for the isolated runtime, jailed builder, and deployment-history phases.
 
 ## What Is Sellable Today
 
@@ -242,12 +253,13 @@ Sell today:
 - Netlify-style source download for gated account recovery. When a private source package exists, downloads return the full project package; otherwise they fall back to deployed public files.
 - Fallback origin proxying.
 - Managed first-party SkyeNet functions.
-- Netlify-compatible function bundle intake and conversion in controlled preview.
+- Netlify-compatible JS/ESM function bundle intake, CLI bundling, server-signed activation, and Dynamic Worker invocation for managed/owner-approved workspaces.
 - Observability and cost receipts behind the owner/admin dashboards.
 
 Do not sell as unlimited yet:
 
-- Arbitrary untrusted customer-uploaded serverless execution without the isolated SkyeNet Functions runtime.
+- Unrestricted hostile-code serverless execution without the isolated SkyeNet Functions runtime.
+- Scheduled/background functions, jailed native dependency build/install, and first-class function rollback UI.
 - Uncapped Free99 bandwidth/storage/functions.
 - Raw private-server claims without the SkyeNet Sovereign Runtime proof lane.
 
@@ -258,11 +270,11 @@ SkyeNet is connected to the actual repo builder ecosystem:
 - `https://skyenet.graylondonskyes.workers.dev/console` is the standalone deploy/account console.
 - `/api/skyenet/*` is the shared-gate SkyeNet deploy API shape on standalone SkyeNet and the 0S proxy.
 - `platform/skyenet/worker.js` owns the standalone SkyeNet Worker surface.
-- `metraiyux_0s_site/skyegate/source/SkyeGateFS27/cloudflare/skynet-deploy-api.mjs` owns init/upload/complete/route/status/routes/env/source-upload/source-complete/observability/cost/source-download.
+- `metraiyux_0s_site/skyegate/source/SkyeGateFS27/cloudflare/skynet-deploy-api.mjs` owns init/upload/complete/route/status/routes/env/source-upload/source-complete/observability/cost/source-download and Forms owner workflow APIs.
 - `tools/skyenet-deploy.mjs` deploys folders or zip bundles to standalone SkyeNet by default.
 - `tools/proof-skynet-source-download-live-http.mjs` proves dashboard/source-download parity without browser proof.
-- `tools/skyenet-functions-convert.mjs` and `tools/skyenet-functions-runtime.mjs` prove Netlify-style function bundle conversion locally.
-- `npm run 0s:skyenet:proof`, `npm run 0s:skyenet:functions-proof`, and `npm run 0s:skyenet:live-production-stress` are the current proof commands.
+- `tools/skyenet-functions-convert.mjs` bundles Netlify-style functions for upload; `tools/skyenet-functions-runtime.mjs` proves the local compatibility runtime.
+- `npm run 0s:skyenet:proof`, `npm run 0s:skyenet:functions-proof`, `npm run skyenet:netlify-parity:proof`, and `npm run skyenet:netlify-parity:stress` are the current proof commands.
 
 Public posting and pricing handoff:
 

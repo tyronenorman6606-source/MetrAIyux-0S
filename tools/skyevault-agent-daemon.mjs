@@ -87,9 +87,27 @@ function start() {
     return;
   }
 
-  const envFile = argValue('--env-file', process.env.SKYEVAULT_AUTOSYNC_ENV_FILE || 'env.txt');
-  const mode = argValue('--mode', process.env.SKYEVAULT_AUTOSYNC_MODE || 'git+full');
+  const envFile = argValue('--env-file', process.env.SKYEVAULT_AUTOSYNC_ENV_FILE || '.env');
+  const mode = argValue('--mode', process.env.SKYEVAULT_AUTOSYNC_MODE || 'mirror');
   const interval = argValue('--interval-seconds', process.env.SKYEVAULT_AUTOSYNC_INTERVAL_SECONDS || '600');
+  const fullCheckpoint = args.includes('--full-checkpoint');
+  const noAdditiveBaseline = args.includes('--no-additive-baseline') || fullCheckpoint;
+  const skipGitOrigin = args.includes('--skip-git-origin');
+  const passthroughFlags = [
+    '--deep-scan',
+    '--scan-generated',
+    '--skip-delta',
+    '--full-checkpoint',
+    '--skip-git-origin',
+    '--force',
+    '--no-additive-baseline',
+    '--no-mirror-upload',
+    '--keep-local-objects',
+    '--skip-generated',
+    '--full-current-index',
+    '--force-full-index',
+    '--adopt-existing-base'
+  ];
   const childArgs = [
     'run',
     'vault:autosync',
@@ -97,10 +115,13 @@ function start() {
     `--env-file=${envFile}`,
     `--mode=${mode}`,
     `--interval-seconds=${interval}`,
-    '--skip-map'
+    '--skip-map',
+    '--skip-delta',
+    '--full-current-index'
   ];
-  if (args.includes('--deep-scan')) childArgs.push('--deep-scan');
-  if (args.includes('--scan-generated')) childArgs.push('--scan-generated');
+  for (const flagName of passthroughFlags) {
+    if (args.includes(flagName) && !childArgs.includes(flagName)) childArgs.push(flagName);
+  }
 
   const log = fs.openSync(logFile, 'a', 0o600);
   fs.writeSync(log, `\n[agent-daemon] ${new Date().toISOString()} starting mode=${mode} interval=${interval}s envFile=${envFile}\n`);
@@ -112,9 +133,9 @@ function start() {
       ...process.env,
       SKYEVAULT_AUTOSYNC_FULL_ARCHIVE_FORMAT: process.env.SKYEVAULT_AUTOSYNC_FULL_ARCHIVE_FORMAT || 'tar.zst',
       SKYEVAULT_AUTOSYNC_FULL_DIRECT_R2: process.env.SKYEVAULT_AUTOSYNC_FULL_DIRECT_R2 || '1',
-      SKYEVAULT_AUTOSYNC_ADDITIVE_BASELINE: process.env.SKYEVAULT_AUTOSYNC_ADDITIVE_BASELINE || '1',
-      SKYEVAULT_AUTOSYNC_FULL_CHECKPOINT: process.env.SKYEVAULT_AUTOSYNC_FULL_CHECKPOINT || '0',
-      SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC: process.env.SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC || '1',
+      SKYEVAULT_AUTOSYNC_ADDITIVE_BASELINE: noAdditiveBaseline ? '0' : (process.env.SKYEVAULT_AUTOSYNC_ADDITIVE_BASELINE || '0'),
+      SKYEVAULT_AUTOSYNC_FULL_CHECKPOINT: fullCheckpoint ? '1' : (process.env.SKYEVAULT_AUTOSYNC_FULL_CHECKPOINT || '0'),
+      SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC: skipGitOrigin ? '0' : (process.env.SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC || '1'),
       SKYEVAULT_FULL_REPO_STREAM_UPLOAD_CONCURRENCY: process.env.SKYEVAULT_FULL_REPO_STREAM_UPLOAD_CONCURRENCY || '8',
       SKYEVAULT_FULL_REPO_LITERAL: '1',
       SKYEVAULT_FULL_REPO_ALL_BYTES: '1',

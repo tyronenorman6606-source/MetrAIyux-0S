@@ -1,8 +1,14 @@
 # Stripe Product Price Catalog
 
-Updated: 2026-05-17
+Updated: 2026-06-01
 
-This is the repo-wide sales and Stripe source-of-truth. Use this file when creating products, prices, Payment Links, checkout sessions, quote templates, and brain sales guidance.
+Current sellable source of truth: the live SkyePay FS27 catalog and strict Stripe parity receipt.
+
+- Catalog code: `metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js`
+- Strict parity receipt: `test-artifacts/stripe-sync/skyepay-full-catalog-parity-latest.json`
+- Buyer-link receipt: `test-artifacts/skyepay-readiness/skyepay-public-buy-link-proof-latest.json`
+
+This file is an operator reference for historical Stripe sync guidance and manual catalog review. Do not use a row here to sell, quote, or sync a product unless the same offer is active in the live SkyePay catalog and the latest strict Stripe parity receipt proves every lookup key. Rows marked `approved_pending_sync` are not buyer-facing until the live catalog and parity receipt say they are.
 
 Canonical rule: do not turn every dollar amount in the repo into a Stripe price. Valuations, operating cost estimates, financing examples, monthly spend caps, model-cost inputs, and placeholder proposal pages are not checkout products unless they are explicitly listed here as `Create in Stripe`.
 

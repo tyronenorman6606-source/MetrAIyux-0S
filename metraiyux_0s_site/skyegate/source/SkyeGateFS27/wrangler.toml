@@ -1,6 +1,6 @@
 name = "skyegatefs27-citadeldb"
 main = "cloudflare/worker.mjs"
-compatibility_date = "2026-05-15"
+compatibility_date = "2026-05-30"
 compatibility_flags = ["nodejs_compat"]
 keep_vars = true
 workers_dev = true
@@ -10,6 +10,15 @@ RELAY13_0S_API_BASE_URL = "https://metraiyux-0s-full-system.graylondonskyes.work
 CONTACT_INTAKE_0S_ORIGIN = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev"
 CONTACT_INTAKE_RELAY13_WORKSPACE = "connectlog-main"
 FS27_RUNTIME_DIRECT_ARCHIVE = "sync"
+SKYPAY_ORDER_LEDGER_DRIVER = "d1"
+SKYGATE_SKIP_SCHEMA_BOOTSTRAP = "true"
+SKYGATE_DB_QUERY_TIMEOUT_MS = "8000"
+SKYPAY_STRIPE_LOOKUP_TIMEOUT_MS = "8000"
+SKYPAY_PROVIDER_FETCH_TIMEOUT_MS = "20000"
+ZERO_OS_PROVIDER_FETCH_TIMEOUT_MS = "20000"
+
+[triggers]
+crons = ["* * * * *"]
 
 [[services]]
 binding = "RELAY13_WORKER"
@@ -45,6 +54,9 @@ bucket_name = "zero-os-deploy-artifacts"
 [[r2_buckets]]
 binding = "SKYENET_SOURCE_TRANSFER_BUCKET"
 bucket_name = "zero-os-deploy-artifacts"
+
+[[worker_loaders]]
+binding = "SKYENET_FUNCTION_LOADER"
 
 [[kv_namespaces]]
 binding = "ROUTING_KV"

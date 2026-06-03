@@ -1,10 +1,10 @@
-# SkyEmail Citadel/SkyeNet Mail Lane
+# SkyeMail backed by Citadel Database and SkyeNet
 
-Citadel/SkyeNet is the product identity and operating lane for SkyEmail mail. Internal compatibility adapters do not replace the sovereign mail-server framing.
+SkyeMail is the product identity. Citadel Database and SkyeNet are the backing data and route lanes for SkyeMail mail. Internal compatibility adapters do not replace the sovereign mail-server framing.
 
 ## Current Live Status
 
-As of 2026-05-24, the deployed SkyeMail runtime uses the Citadel/SkyeNet lane for the live mailbox proof path.
+As of 2026-05-24, the deployed SkyeMail runtime uses the Citadel Database and SkyeNet lane for the live mailbox proof path.
 
 - Public Worker: `https://skyemail-platform.graylondonskyes.workers.dev/`
 - Public proof: `https://skyemail-platform.graylondonskyes.workers.dev/live-proof`
@@ -12,11 +12,11 @@ As of 2026-05-24, the deployed SkyeMail runtime uses the Citadel/SkyeNet lane fo
 - Latest run id: `codex-20260524-zoho-live-final`
 - Proof mode: `citadel-skynet-send-and-inbox-read`
 
-The live proof sends two messages through Citadel/SkyeNet and confirms the sovereign inbox can read them back. Secrets, OAuth tokens, private keys, and raw mailbox credentials are not published.
+The live proof sends two messages through Citadel Database and SkyeNet and confirms the sovereign inbox can read them back. Secrets, OAuth tokens, private keys, and raw mailbox credentials are not published.
 
 ## What Zoho Replaces
 
-When `MAILBOX_PROVIDER=zoho`, SkyEmail provisions hosted mailbox accounts through Zoho Mail Admin APIs instead of requiring a self-hosted Stalwart/Mailu/Postal server on a VPS.
+When `MAILBOX_PROVIDER=zoho`, SkyeMail provisions hosted mailbox accounts through the compatibility mail adapter instead of requiring a self-hosted Stalwart/Mailu/Postal server on a VPS.
 
 That means the Hetzner-style mailbox-server layer is optional for this lane. You still need:
 
@@ -71,7 +71,7 @@ Use the matching data center base URLs for the Zoho account, for example `.com`,
 - `/.netlify/functions/mailbox-domains` reports `provider: "zoho"` and `provider_configured.zohoReady`.
 - `/.netlify/functions/mailbox-provision` creates a Zoho organization account for the requested mailbox when Zoho env and domain setup are complete.
 - `/.netlify/functions/mail-send` sends through Zoho for mailboxes whose stored provider is `zoho`.
-- The existing inbox endpoints (`gmail-list`, `gmail-labels`, `gmail-get`, and `gmail-thread-get`) read from the Citadel/SkyeNet lane for sovereign mailboxes, while Gmail remains available for compatibility accounts.
+- The existing inbox endpoints (`gmail-list`, `gmail-labels`, `gmail-get`, and `gmail-thread-get`) read from the Citadel Database and SkyeNet lane for sovereign mailboxes, while Gmail remains available for compatibility accounts.
 - If Zoho is not configured, the existing local proof and Resend fallback behavior remains available where the current app already uses it.
 
 ## OAuth Scope Notes
@@ -87,7 +87,7 @@ Exact scope names and availability can depend on Zoho region, plan, and admin pe
 
 ## Scale Path
 
-Do not delete Stalwart or the external provisioner lane. Zoho is the managed provider lane for avoiding mailbox-server hosting now. Stalwart remains the later direct-control mailbox-server lane if SkyEmail needs IMAP/JMAP/SMTP ownership, storage control, tenant isolation, or provider independence at larger scale.
+Do not delete Stalwart or the external provisioner lane. Zoho is the managed provider lane for avoiding mailbox-server hosting now. Stalwart remains the later direct-control mailbox-server lane if SkyeMail needs IMAP/JMAP/SMTP ownership, storage control, tenant isolation, or provider independence at larger scale.
 
 ## Official Setup References
 

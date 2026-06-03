@@ -5,13 +5,22 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-const VERSION = '0.2.0';
+const VERSION = '0.2.4';
+const PRODUCT_NAME = 'Reape0r';
+const PRODUCT_TITLE = 'Reape0r: the Autonomous Cloud Repo Mirror';
 const args = process.argv.slice(2);
-const command = args.find((arg) => !arg.startsWith('--')) || 'status';
+const COMMANDS = ['help', 'version', 'init', 'auto-install', 'status', 'snapshot', 'sync', 'watch', 'verify', 'restore', 'doctor'];
+const command = parseCommand(args);
 const jsonMode = args.includes('--json');
 const homeDir = os.homedir();
-const agentRoot = path.join(homeDir, '.skyevault-agent');
+const agentRoot = path.resolve(process.env.SKYEVAULT_AGENT_STATE_DIR || path.join(homeDir, '.skyevault-agent'));
 const configPath = path.join(agentRoot, 'config.json');
+
+function parseCommand(input) {
+  if (input.includes('--help') || input.includes('-h')) return 'help';
+  if (input.includes('--version') || input.includes('-v')) return 'version';
+  return input.find((arg) => !arg.startsWith('-')) || 'status';
+}
 
 function argValue(name, fallback = '') {
   const prefix = `${name}=`;
@@ -40,10 +49,188 @@ function readJson(file, fallback = null) {
   }
 }
 
+function terminalColor(value, code) {
+  if (!process.stdout.isTTY || process.env.NO_COLOR) return value;
+  return `\u001b[${code}m${value}\u001b[0m`;
+}
+
+function terminalLink(label, target) {
+  const clean = String(target || '').trim();
+  if (!clean) return '';
+  const isUrl = /^https?:\/\//i.test(clean);
+  const href = isUrl ? clean : `file://${path.resolve(clean)}`;
+  const visible = terminalColor(label, '34;1');
+  if (!process.stdout.isTTY) return `${label}: ${clean}`;
+  return `\u001b]8;;${href}\u001b\\${visible}\u001b]8;;\u001b\\ (${clean})`;
+}
+
+function humanBytes(value) {
+  const size = Number(value || 0);
+  if (!size) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const index = Math.min(units.length - 1, Math.floor(Math.log(size) / Math.log(1024)));
+  return `${(size / (1024 ** index)).toFixed(index ? 2 : 0)} ${units[index]}`;
+}
+
+function addLine(lines, label, value) {
+  if (value === undefined || value === null || value === '') return;
+  lines.push(`${label}: ${value}`);
+}
+
+function addLink(lines, label, target) {
+  const linked = terminalLink(label, target);
+  if (linked) lines.push(`- ${linked}`);
+}
+
+function humanizePayload(payload, status = 0) {
+  if (!payload || typeof payload !== 'object') return String(payload ?? '');
+  const ok = payload.ok !== false && status === 0;
+  const latest = payload.latest && typeof payload.latest === 'object' ? payload.latest : null;
+  const lines = [
+    terminalColor(PRODUCT_TITLE, ok ? '36;1' : '31;1'),
+    `Status: ${terminalColor(ok ? 'OK' : 'NEEDS ATTENTION', ok ? '32;1' : '31;1')}`
+  ];
+  addLine(lines, 'Version', payload.version || VERSION);
+  addLine(lines, 'Workspace', payload.workspaceId);
+  addLine(lines, 'Repo', payload.repoPath);
+  addLine(lines, 'Model', payload.model || payload.custodyModel);
+  addLine(lines, 'Action', payload.action);
+  addLine(lines, 'Files', payload.fileCount);
+  addLine(lines, 'Bytes', payload.totalBytes ? humanBytes(payload.totalBytes) : '');
+  addLine(lines, 'Changed', payload.changedFileCount);
+  addLine(lines, 'Deleted', payload.tombstoneCount);
+  addLine(lines, 'Digest', payload.manifestDigest || payload.finalManifestDigest);
+
+  if (payload.upload) {
+    const uploadState = payload.upload.ok
+      ? `uploaded ${payload.upload.uploaded ?? payload.upload.completedParts ?? 1}`
+      : payload.upload.skipped
+        ? `skipped: ${payload.upload.reason || 'not requested'}`
+        : `failed: ${payload.upload.error || payload.upload.reason || 'unknown'}`;
+    addLine(lines, 'Upload', uploadState);
+  }
+
+  if (payload.firstSync) {
+    addLine(lines, 'First sync', payload.firstSync.ok ? `${payload.firstSync.kind || 'sync'} complete` : `failed: ${payload.firstSync.stderrTail || payload.firstSync.reason || 'unknown'}`);
+    const serviceMode = payload.service?.mode || 'none';
+    const serviceState = payload.service?.started
+      ? `${serviceMode} started`
+      : `${serviceMode} not started${payload.service?.reason ? ` (${payload.service.reason})` : ''}`;
+    addLine(lines, 'Watcher service', serviceState);
+  }
+
+  if (latest) {
+    addLine(lines, 'Latest mirror', latest.kind || latest.model || latest.action);
+    addLine(lines, 'Latest action', latest.action);
+    addLine(lines, 'Latest files', latest.fileCount);
+    addLine(lines, 'Latest bytes', latest.totalBytes ? humanBytes(latest.totalBytes) : '');
+    addLine(lines, 'Latest changed', latest.changedFileCount);
+    addLine(lines, 'Latest tombstones', latest.tombstoneCount);
+    addLine(lines, 'Latest digest', latest.manifestDigest || latest.finalManifestDigest);
+    if (latest.upload) {
+      const latestUploadState = latest.upload.ok
+        ? `uploaded ${latest.upload.uploaded ?? latest.upload.completedParts ?? 1}`
+        : latest.upload.skipped
+          ? `skipped: ${latest.upload.reason || 'not requested'}`
+          : `failed: ${latest.upload.error || latest.upload.reason || 'unknown'}`;
+      addLine(lines, 'Latest upload', latestUploadState);
+    }
+  }
+
+  if (payload.verifiedFiles !== undefined) addLine(lines, 'Verified files', payload.verifiedFiles);
+  if (payload.failedFiles !== undefined) addLine(lines, 'Failed files', payload.failedFiles);
+  if (payload.restoredFiles !== undefined) addLine(lines, 'Restored files', payload.restoredFiles);
+  if (payload.out) addLine(lines, 'Restore output', payload.out);
+  if (payload.error) addLine(lines, 'Error', payload.error);
+
+  const links = [];
+  addLink(links, 'Receipt', payload.receiptPath);
+  addLink(links, 'Latest receipt', latest?.receiptPath);
+  addLink(links, 'Restore kit', payload.restoreKitPath || payload.currentRestoreKitPath);
+  addLink(links, 'Latest restore kit', latest?.restoreKitPath || latest?.currentRestoreKitPath);
+  addLink(links, 'Current manifest', payload.currentManifestPath);
+  addLink(links, 'Latest manifest', latest?.currentManifestPath);
+  addLink(links, 'Config', payload.configPath);
+  addLink(links, 'Env file', payload.envFile);
+  addLink(links, 'Vault API', payload.vaultUrl || payload.upload?.vaultApi);
+  if (links.length) lines.push('', terminalColor('Links', '34;1'), ...links);
+
+  const next = payload.next || {};
+  const commands = [next.status, next.watch, next.restore].filter(Boolean);
+  if (commands.length) {
+    lines.push('', terminalColor('Next commands', '33;1'));
+    for (const commandText of commands) lines.push(commandText);
+  }
+
+  if (payload.warning) lines.push('', `Note: ${payload.warning}`);
+  if (!ok && !payload.error) lines.push('', 'Run again with --json for the full machine receipt.');
+  return `${lines.join('\n')}\n`;
+}
+
 function respond(payload, status = 0) {
-  if (jsonMode || typeof payload !== 'string') console.log(JSON.stringify(payload, null, 2));
-  else console.log(payload);
+  if (jsonMode) console.log(JSON.stringify(payload, null, 2));
+  else if (typeof payload === 'string') console.log(payload);
+  else console.log(humanizePayload(payload, status));
   process.exitCode = status;
+}
+
+function helpCommand() {
+  const text = `${PRODUCT_TITLE} ${VERSION}
+
+Usage:
+  node bin/skyevault-agent.mjs <command> [options]
+
+Commands:
+  doctor    Check local Node, tar, git, config, and required environment.
+  init      Save workspace, repo path, SkyeVault URL, and env variable names.
+  auto-install
+            Write the env file, configure the repo, run doctor, run first sync,
+            and optionally install the background watcher service.
+  status    Show current workspace config and last known custody state.
+  snapshot  Legacy: create an encrypted full repo custody artifact.
+  sync      Update one mutable encrypted current mirror. No delta packs by default.
+  watch     Run sync on an interval so the vault stays current.
+  verify    Decrypt and inspect a receipt-backed artifact without restoring it.
+  restore   Restore from a mutable current receipt, or from legacy full/delta receipts.
+
+Common options:
+  --repo=/path/to/repo
+  --workspace=<workspace-id>
+  --vault-url=https://your-skyevault-origin
+  --upload
+  --json
+  --skip-deps
+  --passphrase-env=SKYEVAULT_AGENT_PASSPHRASE
+  --portal-key-env=SKYEVAULT_PORTAL_KEY
+  --bearer-env=SKYEVAULT_GATE_BEARER
+  --env-file=~/.config/skyevault-agent/skyevault-agent.env
+  --service=auto|none|systemd|launchd
+  --no-first-sync
+  --no-upload
+
+Buyer upload auth:
+  SKYEVAULT_PORTAL_KEY is the paid workspace upload key.
+  SKYEVAULT_GATE_BEARER is optional and only adds the shared 0S/FS27/SkyGate bearer lane.
+
+Restore example:
+  node bin/skyevault-agent.mjs restore --receipt=/path/current-receipt.json --out=/tmp/restored-repo`;
+
+  respond(jsonMode ? {
+    ok: true,
+    schema: 'skyevault.agent.help.v1',
+    version: VERSION,
+    commands: COMMANDS,
+    product: PRODUCT_TITLE,
+    text
+  } : text);
+}
+
+function versionCommand() {
+  respond(jsonMode ? {
+    ok: true,
+    schema: 'skyevault.agent.version.v1',
+    version: VERSION
+  } : VERSION);
 }
 
 function cleanSlug(value, fallback = 'workspace') {
@@ -57,6 +244,57 @@ function cleanSlug(value, fallback = 'workspace') {
 
 function loadConfig() {
   return readJson(configPath, {});
+}
+
+function truthy(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  return !['0', 'false', 'no', 'off'].includes(String(value).trim().toLowerCase());
+}
+
+function shellSingleQuote(value) {
+  return `'${String(value || '').replace(/'/g, `'\\''`)}'`;
+}
+
+function envFilePath() {
+  return path.resolve(argValue(
+    '--env-file',
+    process.env.SKYEVAULT_AGENT_ENV_FILE || path.join(homeDir, '.config', 'skyevault-agent', 'skyevault-agent.env')
+  ));
+}
+
+function buildConfig({
+  workspaceId = cleanSlug(argValue('--workspace', process.env.SKYEVAULT_WORKSPACE_ID || 'customer-workspace')),
+  repoPath = path.resolve(argValue('--repo', process.env.SKYEVAULT_REPO_PATH || process.cwd())),
+  vaultUrl = String(argValue('--vault-url', process.env.SKYEVAULT_DROP_URL || 'https://skyevault-drop.graylondonskyes.workers.dev')).replace(/\/+$/, ''),
+  intervalSeconds = Number(argValue('--interval-seconds', process.env.SKYEVAULT_AGENT_INTERVAL_SECONDS || '600')) || 600,
+  createdAt = new Date().toISOString()
+} = {}) {
+  return {
+    schema: 'skyevault.agent.config.v1',
+    version: VERSION,
+    workspaceId: cleanSlug(workspaceId),
+    repoPath: path.resolve(repoPath),
+    vaultUrl,
+    intervalSeconds,
+    portalKeyEnv: argValue('--portal-key-env', 'SKYEVAULT_PORTAL_KEY'),
+    bearerEnv: argValue('--bearer-env', 'SKYEVAULT_GATE_BEARER'),
+    passphraseEnv: argValue('--passphrase-env', 'SKYEVAULT_AGENT_PASSPHRASE'),
+    custodyModel: 'mutable-current-mirror',
+    literalRepoDefault: true,
+    createdAt,
+    product: PRODUCT_TITLE,
+    note: 'Bearer tokens and passphrases are read from environment variables and are not stored here.'
+  };
+}
+
+function safeCommandResult(name, result) {
+  return {
+    name,
+    ok: result.status === 0,
+    status: result.status,
+    stdoutTail: String(result.stdout || '').slice(-1200),
+    stderrTail: String(result.stderr || '').slice(-1200)
+  };
 }
 
 function gitValue(repoPath, gitArgs, fallback = '') {
@@ -249,25 +487,257 @@ async function encryptFile(input, output, passphrase) {
 }
 
 function initCommand() {
-  const workspaceId = cleanSlug(argValue('--workspace', process.env.SKYEVAULT_WORKSPACE_ID || 'customer-workspace'));
-  const repoPath = path.resolve(argValue('--repo', process.cwd()));
-  const vaultUrl = String(argValue('--vault-url', process.env.SKYEVAULT_DROP_URL || 'https://skyevault-drop.graylondonskyes.workers.dev')).replace(/\/+$/, '');
-  const config = {
-    schema: 'skyevault.agent.config.v1',
+  const config = buildConfig();
+  writeJson(configPath, config);
+  respond({
+    ok: true,
+    action: 'configured',
+    product: PRODUCT_TITLE,
     version: VERSION,
+    workspaceId: config.workspaceId,
+    repoPath: config.repoPath,
+    vaultUrl: config.vaultUrl,
+    model: config.custodyModel,
+    configPath,
+    config,
+    next: {
+      status: 'node bin/skyevault-agent.mjs status',
+      watch: `node bin/skyevault-agent.mjs watch --interval-seconds=${config.intervalSeconds} --upload`,
+      restore: 'node bin/skyevault-agent.mjs restore --receipt=/path/to/current-receipt.json --out=/path/to/repaired-repo'
+    }
+  });
+}
+
+function writeAgentEnvFile(file, values) {
+  const rows = [
+    '# Reape0r environment.',
+    '# Generated by Reape0r auto-install. Keep this file outside Git.',
+    `SKYEVAULT_DROP_URL=${shellSingleQuote(values.SKYEVAULT_DROP_URL)}`,
+    `SKYEVAULT_WORKSPACE_ID=${shellSingleQuote(values.SKYEVAULT_WORKSPACE_ID)}`,
+    `SKYEVAULT_REPO_PATH=${shellSingleQuote(values.SKYEVAULT_REPO_PATH)}`,
+    `SKYEVAULT_PORTAL_KEY=${shellSingleQuote(values.SKYEVAULT_PORTAL_KEY)}`,
+    `SKYEVAULT_AGENT_PASSPHRASE=${shellSingleQuote(values.SKYEVAULT_AGENT_PASSPHRASE)}`,
+    `SKYEVAULT_GATE_BEARER=${shellSingleQuote(values.SKYEVAULT_GATE_BEARER)}`,
+    `SKYEVAULT_AGENT_INTERVAL_SECONDS=${shellSingleQuote(values.SKYEVAULT_AGENT_INTERVAL_SECONDS)}`,
+    'SKYEVAULT_AGENT_CUSTODY_MODEL=mutable-current-mirror'
+  ];
+  fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(file, `${rows.join('\n')}\n`, { mode: 0o600 });
+  try { fs.chmodSync(file, 0o600); } catch {}
+}
+
+function installSystemdService({ installDir, envFile, intervalSeconds, dryRun }) {
+  const serviceDir = path.join(homeDir, '.config', 'systemd', 'user');
+  const servicePath = path.join(serviceDir, 'skyevault-agent.service');
+  const serviceBody = `[Unit]
+Description=Reape0r autonomous cloud repo mirror
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=${installDir}
+EnvironmentFile=${envFile}
+ExecStart=/usr/bin/env node ${path.join(installDir, 'bin', 'skyevault-agent.mjs')} watch --interval-seconds=${intervalSeconds} --upload
+Restart=always
+RestartSec=15
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
+`;
+  fs.mkdirSync(serviceDir, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(servicePath, serviceBody, { mode: 0o600 });
+  if (dryRun) return { ok: true, mode: 'systemd', servicePath, started: false, dryRun: true };
+  const reload = spawnSync('systemctl', ['--user', 'daemon-reload'], { encoding: 'utf8' });
+  const enable = reload.status === 0
+    ? spawnSync('systemctl', ['--user', 'enable', '--now', 'skyevault-agent.service'], { encoding: 'utf8' })
+    : { status: 1, stdout: '', stderr: 'daemon-reload failed' };
+  return {
+    ok: reload.status === 0 && enable.status === 0,
+    mode: 'systemd',
+    servicePath,
+    started: reload.status === 0 && enable.status === 0,
+    reload: safeCommandResult('systemctl --user daemon-reload', reload),
+    enable: safeCommandResult('systemctl --user enable --now skyevault-agent.service', enable)
+  };
+}
+
+function installLaunchdService({ installDir, envFile, intervalSeconds, dryRun }) {
+  const launchDir = path.join(homeDir, 'Library', 'LaunchAgents');
+  const plistPath = path.join(launchDir, 'com.skyevault.reape0r.plist');
+  const plist = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.skyevault.reape0r</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>bash</string>
+    <string>-lc</string>
+    <string>set -a; . "${envFile}"; set +a; node "${path.join(installDir, 'bin', 'skyevault-agent.mjs')}" watch --interval-seconds="${intervalSeconds}" --upload</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/reape0r.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/reape0r.err.log</string>
+</dict>
+</plist>
+`;
+  fs.mkdirSync(launchDir, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(plistPath, plist, { mode: 0o600 });
+  if (dryRun) return { ok: true, mode: 'launchd', servicePath: plistPath, started: false, dryRun: true };
+  const unload = spawnSync('launchctl', ['unload', plistPath], { encoding: 'utf8' });
+  const load = spawnSync('launchctl', ['load', '-w', plistPath], { encoding: 'utf8' });
+  return {
+    ok: load.status === 0,
+    mode: 'launchd',
+    servicePath: plistPath,
+    started: load.status === 0,
+    unload: safeCommandResult('launchctl unload', unload),
+    load: safeCommandResult('launchctl load -w', load)
+  };
+}
+
+function installWatcherService({ mode, installDir, envFile, intervalSeconds, dryRun }) {
+  const requested = String(mode || 'auto').toLowerCase();
+  if (requested === 'none' || requested === 'off') return { ok: true, mode: 'none', skipped: true, reason: 'service_disabled' };
+  if (requested === 'systemd' || (requested === 'auto' && process.platform === 'linux')) {
+    const probe = spawnSync('systemctl', ['--user', '--version'], { encoding: 'utf8' });
+    if (probe.status === 0) return installSystemdService({ installDir, envFile, intervalSeconds, dryRun });
+    if (requested === 'systemd') {
+      return { ok: false, mode: 'systemd', skipped: false, reason: 'systemctl_user_unavailable', probe: safeCommandResult('systemctl --user --version', probe) };
+    }
+  }
+  if (requested === 'launchd' || (requested === 'auto' && process.platform === 'darwin')) {
+    const probe = spawnSync('launchctl', ['version'], { encoding: 'utf8' });
+    if (probe.status === 0 || process.platform === 'darwin') return installLaunchdService({ installDir, envFile, intervalSeconds, dryRun });
+    if (requested === 'launchd') {
+      return { ok: false, mode: 'launchd', skipped: false, reason: 'launchctl_unavailable', probe: safeCommandResult('launchctl version', probe) };
+    }
+  }
+  return { ok: true, mode: requested, skipped: true, reason: 'no_supported_user_service_manager_detected' };
+}
+
+function parseJsonMaybe(value) {
+  try { return JSON.parse(String(value || '')); } catch { return null; }
+}
+
+async function autoInstallCommand() {
+  const workspaceId = cleanSlug(argValue('--workspace', process.env.SKYEVAULT_WORKSPACE_ID || 'customer-workspace'));
+  const repoPath = path.resolve(argValue('--repo', process.env.SKYEVAULT_REPO_PATH || process.cwd()));
+  const vaultUrl = String(argValue('--vault-url', process.env.SKYEVAULT_DROP_URL || 'https://skyevault-drop.graylondonskyes.workers.dev')).replace(/\/+$/, '');
+  const intervalSeconds = Number(argValue('--interval-seconds', process.env.SKYEVAULT_AGENT_INTERVAL_SECONDS || '600')) || 600;
+  const envFile = envFilePath();
+  const installDir = path.resolve(argValue('--install-dir', process.env.SKYEVAULT_AGENT_INSTALL_DIR || path.resolve(new URL('..', import.meta.url).pathname)));
+  const serviceMode = argValue('--service', process.env.SKYEVAULT_AGENT_SERVICE_MODE || 'auto');
+  const runFirstSync = !flag('--no-first-sync') && truthy(process.env.SKYEVAULT_AGENT_RUN_FIRST_SYNC, true);
+  const upload = !flag('--no-upload') && truthy(process.env.SKYEVAULT_AGENT_UPLOAD, true);
+  const dryRunService = flag('--dry-run-service') || truthy(process.env.SKYEVAULT_AGENT_DRY_RUN_SERVICE, false);
+  const portalKey = String(argValue('--portal-key', process.env.SKYEVAULT_PORTAL_KEY || '') || '');
+  const bearer = String(argValue('--gate-bearer', process.env.SKYEVAULT_GATE_BEARER || '') || '');
+  let passphrase = String(argValue('--passphrase', process.env.SKYEVAULT_AGENT_PASSPHRASE || '') || '');
+  const generatedPassphrase = !passphrase;
+  if (!passphrase) passphrase = crypto.randomBytes(36).toString('base64url');
+
+  if (!fs.existsSync(repoPath) || !fs.statSync(repoPath).isDirectory()) {
+    throw new Error(`Repo path does not exist or is not a directory: ${repoPath}`);
+  }
+
+  const envValues = {
+    SKYEVAULT_DROP_URL: vaultUrl,
+    SKYEVAULT_WORKSPACE_ID: workspaceId,
+    SKYEVAULT_REPO_PATH: repoPath,
+    SKYEVAULT_PORTAL_KEY: portalKey,
+    SKYEVAULT_AGENT_PASSPHRASE: passphrase,
+    SKYEVAULT_GATE_BEARER: bearer,
+    SKYEVAULT_AGENT_INTERVAL_SECONDS: String(intervalSeconds)
+  };
+  writeAgentEnvFile(envFile, envValues);
+  Object.assign(process.env, envValues, { SKYEVAULT_AGENT_ENV_FILE: envFile });
+
+  const config = buildConfig({ workspaceId, repoPath, vaultUrl, intervalSeconds });
+  writeJson(configPath, config);
+
+  const childEnv = { ...process.env, ...envValues, SKYEVAULT_AGENT_ENV_FILE: envFile };
+  const cliPath = new URL(import.meta.url).pathname;
+  const doctor = safeCommandResult('doctor', spawnSync(process.execPath, [cliPath, 'doctor', '--json'], {
+    cwd: repoPath,
+    env: childEnv,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 20
+  }));
+
+  let firstSync = { ok: true, skipped: true, reason: 'first_sync_disabled' };
+  if (runFirstSync) {
+    const syncArgs = [cliPath, 'sync', `--workspace=${workspaceId}`, `--repo=${repoPath}`, '--json'];
+    if (upload) syncArgs.push('--upload');
+    if (flag('--skip-deps')) syncArgs.push('--skip-deps');
+    if (flag('--fast-scan')) syncArgs.push('--fast-scan');
+    const result = spawnSync(process.execPath, syncArgs, {
+      cwd: repoPath,
+      env: childEnv,
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024 * 20
+    });
+    const parsed = parseJsonMaybe(result.stdout);
+    firstSync = {
+      ...safeCommandResult(`sync${upload ? ' --upload' : ''}`, result),
+      kind: parsed?.kind || '',
+      model: parsed?.model || '',
+      receiptPath: parsed?.receiptPath || '',
+      restoreKitPath: parsed?.restoreKitPath || '',
+      artifactBytes: parsed?.artifact?.bytes || 0,
+      upload: parsed?.upload ? { ok: parsed.upload.ok === true, skipped: parsed.upload.skipped === true, reason: parsed.upload.reason || '', fileSize: parsed.upload.fileSize || 0 } : null
+    };
+  }
+
+  const service = installWatcherService({
+    mode: serviceMode,
+    installDir,
+    envFile,
+    intervalSeconds,
+    dryRun: dryRunService
+  });
+
+  const receipt = {
+    ok: doctor.ok && firstSync.ok && service.ok,
+    schema: 'skyevault.agent.auto-install-receipt.v1',
+    product: PRODUCT_TITLE,
+    version: VERSION,
+    installedAt: new Date().toISOString(),
     workspaceId,
     repoPath,
     vaultUrl,
-    intervalSeconds: Number(argValue('--interval-seconds', '600')) || 600,
-    portalKeyEnv: argValue('--portal-key-env', 'SKYEVAULT_PORTAL_KEY'),
-    bearerEnv: argValue('--bearer-env', 'SKYEVAULT_GATE_BEARER'),
-    passphraseEnv: argValue('--passphrase-env', 'SKYEVAULT_AGENT_PASSPHRASE'),
-    literalRepoDefault: true,
-    createdAt: new Date().toISOString(),
-    note: 'Bearer tokens and passphrases are read from environment variables and are not stored here.'
+    configPath,
+    envFile,
+    installDir,
+    permissions: { envFileMode: '0600', configMode: '0600' },
+    secrets: {
+      portalKeyStored: Boolean(portalKey),
+      bearerStored: Boolean(bearer),
+      passphraseStored: true,
+      passphraseGenerated: generatedPassphrase,
+      rawSecretsPrinted: false
+    },
+      firstSync,
+    service,
+    next: {
+      status: `node ${cliPath} status`,
+      watch: `set -a; . ${shellSingleQuote(envFile)}; set +a; node ${cliPath} watch --interval-seconds=${intervalSeconds} --upload`,
+      restore: firstSync.receiptPath ? `node ${cliPath} restore --receipt=${firstSync.receiptPath} --out=/path/to/repaired-repo` : ''
+    },
+    warning: generatedPassphrase ? 'A local unlock passphrase was generated and written to the env file. Store it somewhere the repo itself cannot lose.' : 'The provided unlock passphrase was written to the env file.'
   };
-  writeJson(configPath, config);
-  respond({ ok: true, action: 'configured', configPath, config: { ...config, repoPath } });
+  const receiptPath = path.join(agentRoot, 'auto-install-receipt.json');
+  writeJson(receiptPath, receipt);
+  respond({ ...receipt, receiptPath }, receipt.ok ? 0 : 1);
 }
 
 function latestReceipt(workspaceId) {
@@ -340,10 +810,12 @@ async function uploadEncryptedArtifact(config, receipt, artifactPath, artifactSh
   const body = {
     clientName: config.clientName || receipt.workspaceId,
     clientEmail: config.clientEmail || '',
-    projectName: `${receipt.repoName} SkyeVault Agent ${receipt.kind === 'delta' ? 'Delta' : 'Snapshot'}`,
+    projectName: `${receipt.repoName} ${PRODUCT_NAME} ${receipt.kind === 'current-object' ? 'Current Object' : receipt.kind === 'delta' ? 'Delta' : 'Snapshot'}`,
     clientReference: `skyevault-agent:${receipt.workspaceId}:${receipt.stamp}`,
-    assetType: `SkyeVault Agent encrypted repo ${receipt.kind === 'delta' ? 'delta' : 'snapshot'}`,
-    notes: 'Encrypted repo custody artifact generated by the paid SkyeVault Agent.',
+    assetType: `${PRODUCT_NAME} encrypted repo ${receipt.kind === 'current-object' ? 'current object' : receipt.kind === 'delta' ? 'delta' : 'snapshot'}`,
+    notes: receipt.kind === 'current-object'
+      ? `Encrypted mutable current mirror object generated by ${PRODUCT_TITLE}.`
+      : `Encrypted repo custody artifact generated by ${PRODUCT_TITLE}.`,
     clientRequestId: `skyevault-agent-${receipt.stamp}`,
     submissionId: `skyevault-agent-${receipt.workspaceId}-${receipt.stamp}`,
     workspaceId: receipt.workspaceId,
@@ -356,7 +828,7 @@ async function uploadEncryptedArtifact(config, receipt, artifactPath, artifactSh
     mimeType: 'application/octet-stream',
     fileFingerprint: {
       algorithm: 'SHA-256',
-      mode: receipt.kind === 'delta' ? 'delta' : 'full',
+      mode: receipt.kind === 'current-object' ? 'current' : receipt.kind === 'delta' ? 'delta' : 'full',
       value: artifactSha256,
       bytesHashed: stat.size,
       generatedAt: new Date().toISOString()
@@ -567,6 +1039,285 @@ function compareManifest(previousManifest, currentManifest) {
   return { changed, deleted };
 }
 
+function currentRoot(workspaceId) {
+  return path.join(workspaceRoot(workspaceId), 'current');
+}
+
+function currentObjectsRoot(workspaceId) {
+  return path.join(currentRoot(workspaceId), 'objects');
+}
+
+function currentManifestPath(workspaceId) {
+  return path.join(currentRoot(workspaceId), 'manifest.json');
+}
+
+function currentRestoreKitPath(workspaceId) {
+  return path.join(currentRoot(workspaceId), 'CURRENT_REPO_BACKUP.json');
+}
+
+function currentObjectRel(file) {
+  const sha = String(file.sha256 || crypto.createHash('sha256').update(`${file.path}:${file.bytes}:${file.mtimeMs}`).digest('hex'));
+  const pathSha = crypto.createHash('sha256').update(String(file.path || '')).digest('hex');
+  return `objects/${pathSha.slice(0, 2)}/${pathSha}-${sha}.enc`;
+}
+
+function mutablePassphraseForRun(workspaceId) {
+  const envName = argValue('--passphrase-env', 'SKYEVAULT_AGENT_PASSPHRASE');
+  const fromEnv = String(process.env[envName] || '').trim();
+  if (fromEnv) return { value: fromEnv, source: `env:${envName}`, envName, generated: false };
+  const unlockPath = path.join(currentRoot(workspaceId), 'unlock.local.json');
+  const existing = readJson(unlockPath, null);
+  if (existing?.passphrase) {
+    return { value: String(existing.passphrase), source: `local:${unlockPath}`, envName, generated: true, unlockPath };
+  }
+  const generated = crypto.randomBytes(36).toString('base64url');
+  fs.mkdirSync(path.dirname(unlockPath), { recursive: true, mode: 0o700 });
+  writeJson(unlockPath, {
+    schema: 'skyevault.agent.current-local-unlock.v1',
+    generatedAt: new Date().toISOString(),
+    passphrase: generated,
+    warning: 'Private mutable current mirror unlock material. Keep outside Git and do not share.'
+  });
+  return { value: generated, source: `local:${unlockPath}`, envName, generated: true, unlockPath };
+}
+
+async function encryptCurrentObject(source, target, passphrase) {
+  fs.mkdirSync(path.dirname(target), { recursive: true, mode: 0o700 });
+  return await encryptFile(source, target, passphrase);
+}
+
+function currentEntryByPath(manifest) {
+  return new Map((manifest?.files || []).map((file) => [file.path, file]));
+}
+
+function currentObjectPath(workspaceId, objectRel) {
+  return path.join(currentRoot(workspaceId), safeRelPath(objectRel));
+}
+
+function cleanupCurrentObjects(workspaceId, keepObjectRels) {
+  const objectsRoot = currentObjectsRoot(workspaceId);
+  if (!fs.existsSync(objectsRoot)) return { deleted: 0 };
+  let deleted = 0;
+  const keep = new Set(keepObjectRels);
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const file = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(file);
+        try { fs.rmdirSync(file); } catch {}
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const rel = path.relative(currentRoot(workspaceId), file).split(path.sep).join('/');
+      if (!keep.has(rel)) {
+        fs.rmSync(file, { force: true });
+        deleted += 1;
+      }
+    }
+  }
+  walk(objectsRoot);
+  return { deleted };
+}
+
+async function uploadCurrentMirrorObjects(config, receipt, uploadItems = []) {
+  if (!flag('--upload')) return { ok: false, skipped: true, reason: 'upload_not_requested', mode: 'mutable-current-object-upserts' };
+  const uploads = [];
+  let failed = 0;
+  let authMode = '';
+  for (const item of uploadItems) {
+    try {
+      const sha = await sha256File(item.objectPath);
+      const uploadReceipt = await uploadEncryptedArtifact(config, {
+        ...receipt,
+        kind: 'current-object',
+        fileCount: 1,
+        changedFileCount: 1,
+        objectPath: item.path
+      }, item.objectPath, sha);
+      if (!uploadReceipt.ok) {
+        failed += 1;
+        uploads.push({ path: item.path, objectRel: item.objectRel, ok: false, skipped: uploadReceipt.skipped || false, reason: uploadReceipt.reason || 'upload_failed' });
+        continue;
+      }
+      authMode ||= uploadReceipt.authMode || '';
+      uploads.push({ path: item.path, objectRel: item.objectRel, ok: true, receiptId: uploadReceipt.receiptId || '', fileSize: uploadReceipt.fileSize || 0 });
+    } catch (error) {
+      failed += 1;
+      uploads.push({ path: item.path, objectRel: item.objectRel, ok: false, error: error.message });
+    }
+  }
+  return {
+    ok: failed === 0,
+    mode: 'mutable-current-object-upserts',
+    authMode,
+    uploaded: uploads.filter((item) => item.ok).length,
+    failed,
+    items: uploads.slice(0, 200),
+    truncated: uploads.length > 200
+  };
+}
+
+async function currentSyncCommand() {
+  const config = loadConfig();
+  const workspaceId = cleanSlug(argValue('--workspace', config.workspaceId || 'customer-workspace'));
+  const repoPath = path.resolve(argValue('--repo', config.repoPath || process.cwd()));
+  const skipDeps = flag('--skip-deps');
+  const includeHashes = true;
+  const stamp = nowStamp();
+  const root = currentRoot(workspaceId);
+  fs.mkdirSync(root, { recursive: true, mode: 0o700 });
+  const previous = readJson(currentManifestPath(workspaceId), { files: [] });
+  const currentScanned = collectManifest(repoPath, root, skipDeps, includeHashes);
+  const currentDigest = manifestDigest(currentScanned);
+  const priorByPath = currentEntryByPath(previous);
+  const { changed, deleted } = compareManifest(previous, currentScanned);
+  const { branch, head, dirtyEntries, repoName } = repoMeta(repoPath);
+  const passphrase = mutablePassphraseForRun(workspaceId);
+  const files = [];
+  const uploadItems = [];
+
+  if (flag('--dry-run')) {
+    respond({
+      ok: true,
+      dryRun: true,
+      schema: 'skyevault.agent.current-sync-preview.v1',
+      model: 'mutable-current-mirror',
+      workspaceId,
+      repoPath,
+      repoName,
+      branch,
+      head,
+      dirtyEntries,
+      fileCount: currentScanned.files.length,
+      totalBytes: currentScanned.totalBytes,
+      changedFileCount: changed.length,
+      tombstoneCount: deleted.length,
+      manifestDigest: currentDigest
+    });
+    return;
+  }
+
+  const changedPaths = new Set(changed.map((file) => file.path));
+  for (const file of currentScanned.files) {
+    const prior = priorByPath.get(file.path);
+    const shouldReuse = prior
+      && !changedPaths.has(file.path)
+      && prior.objectRel
+      && fs.existsSync(currentObjectPath(workspaceId, prior.objectRel));
+    if (shouldReuse) {
+      files.push({ ...file, objectRel: prior.objectRel, crypto: prior.crypto });
+      continue;
+    }
+    const objectRel = currentObjectRel(file);
+    const objectPath = currentObjectPath(workspaceId, objectRel);
+    const cryptoMeta = await encryptCurrentObject(safeJoin(repoPath, file.path), objectPath, passphrase);
+    const encryptedSha256 = await sha256File(objectPath);
+    files.push({
+      ...file,
+      objectRel,
+      encryptedBytes: fs.statSync(objectPath).size,
+      encryptedSha256,
+      crypto: cryptoMeta
+    });
+    uploadItems.push({ path: file.path, objectRel, objectPath });
+  }
+
+  files.sort((a, b) => a.path.localeCompare(b.path));
+  const keepObjects = files.map((file) => file.objectRel).filter(Boolean);
+  const cleanup = cleanupCurrentObjects(workspaceId, keepObjects);
+  const generatedAt = new Date().toISOString();
+  const manifest = {
+    schema: 'skyevault.agent.current-manifest.v1',
+    generatedAt,
+    version: VERSION,
+    model: 'mutable-current-mirror',
+    workspaceId,
+    repoPath,
+    repoName,
+    branch,
+    head,
+    dirtyEntries,
+    literalRepo: !skipDeps,
+    scanMode: 'sha256',
+    digest: currentDigest,
+    fileCount: files.length,
+    totalBytes: currentScanned.totalBytes,
+    skipped: currentScanned.skipped,
+    files
+  };
+  writeJson(currentManifestPath(workspaceId), manifest);
+
+  const receipt = {
+    ok: true,
+    schema: 'skyevault.agent.current-repo-receipt.v1',
+    version: VERSION,
+    kind: 'current',
+    model: 'mutable-current-mirror',
+    action: previous?.digest ? (changed.length || deleted.length ? 'update-current' : 'noop') : 'seed-current',
+    stamp,
+    generatedAt,
+    workspaceId,
+    repoPath,
+    repoName,
+    branch,
+    head,
+    dirtyEntries,
+    literalRepo: !skipDeps,
+    scanMode: 'sha256',
+    manifestDigest: currentDigest,
+    previousManifestDigest: previous?.digest || '',
+    changedFileCount: changed.length,
+    tombstoneCount: deleted.length,
+    fileCount: files.length,
+    totalBytes: currentScanned.totalBytes,
+    currentManifestPath: currentManifestPath(workspaceId),
+    currentRestoreKitPath: currentRestoreKitPath(workspaceId),
+    cleanup,
+    upload: { ok: false, skipped: true, reason: 'upload_not_requested' },
+    unlock: passphrase.generated
+      ? { mode: 'generated-local-file', path: passphrase.unlockPath || path.join(currentRoot(workspaceId), 'unlock.local.json') }
+      : { mode: 'environment', env: passphrase.envName }
+  };
+
+  receipt.upload = await uploadCurrentMirrorObjects(config, receipt, uploadItems);
+  if (receipt.upload.ok === false && !receipt.upload.skipped) receipt.ok = false;
+  const restoreKit = {
+    ok: true,
+    schema: 'skyevault.agent.mutable-current-restore-kit.v1',
+    createdAt: new Date().toISOString(),
+    model: 'mutable-current-mirror',
+    workspaceId,
+    repoPath,
+    repoName,
+    digest: currentDigest,
+    manifestPath: currentManifestPath(workspaceId),
+    receiptPath: '',
+    unlock: receipt.unlock,
+    restoreCommand: `node bin/skyevault-agent.mjs restore --receipt=${path.join(root, 'current-receipt.json')} --out=/path/to/repaired-repo`
+  };
+  writeJson(currentRestoreKitPath(workspaceId), restoreKit);
+  const receiptPath = path.join(root, 'current-receipt.json');
+  writeJson(receiptPath, { ...receipt, restoreKitPath: currentRestoreKitPath(workspaceId) });
+  restoreKit.receiptPath = receiptPath;
+  writeJson(currentRestoreKitPath(workspaceId), restoreKit);
+  writeJson(path.join(workspaceRoot(workspaceId), 'latest.json'), { ...receipt, receiptPath, restoreKitPath: currentRestoreKitPath(workspaceId) });
+  saveState(workspaceId, {
+    schema: 'skyevault.agent.workspace-state.v1',
+    updatedAt: receipt.generatedAt,
+    workspaceId,
+    repoPath,
+    repoName,
+    custodyModel: 'mutable-current-mirror',
+    latestReceiptPath: receiptPath,
+    latestCurrentReceiptPath: receiptPath,
+    latestManifestPath: currentManifestPath(workspaceId),
+    latestManifestDigest: currentDigest,
+    latestKind: 'current',
+    currentRestoreKitPath: currentRestoreKitPath(workspaceId)
+  });
+  respond({ ...receipt, receiptPath, restoreKitPath: currentRestoreKitPath(workspaceId) }, receipt.ok ? 0 : 1);
+}
+
 function copyDeltaFiles(repoPath, stageFilesRoot, changed) {
   for (const file of changed) {
     const source = safeJoin(repoPath, file.path);
@@ -577,6 +1328,10 @@ function copyDeltaFiles(repoPath, stageFilesRoot, changed) {
 }
 
 async function syncCommand() {
+  if (!flag('--legacy-delta')) {
+    await currentSyncCommand();
+    return;
+  }
   const config = loadConfig();
   const workspaceId = cleanSlug(argValue('--workspace', config.workspaceId || 'customer-workspace'));
   const repoPath = path.resolve(argValue('--repo', config.repoPath || process.cwd()));
@@ -708,17 +1463,24 @@ async function watchCommand() {
   const upload = flag('--upload');
   const stopAfter = Number(argValue('--runs', '0')) || 0;
   let count = 0;
-  process.stdout.write(JSON.stringify({
-    ok: true,
-    event: 'watch_started',
-    version: VERSION,
-    intervalSeconds,
-    upload
-  }) + '\n');
+  if (jsonMode) {
+    process.stdout.write(JSON.stringify({
+      ok: true,
+      event: 'watch_started',
+      product: PRODUCT_TITLE,
+      version: VERSION,
+      intervalSeconds,
+      upload
+    }) + '\n');
+  } else {
+    process.stdout.write(`${terminalColor(PRODUCT_TITLE, '36;1')}\nWatch started: every ${intervalSeconds}s${upload ? ' with upload enabled' : ''}.\n\n`);
+  }
   while (!stopAfter || count < stopAfter) {
     count += 1;
-    const childArgs = [flag('--full-every-run') ? 'snapshot' : 'sync', '--json'];
+    const childArgs = [flag('--full-every-run') ? 'snapshot' : 'sync'];
+    if (jsonMode) childArgs.push('--json');
     if (upload) childArgs.push('--upload');
+    if (flag('--legacy-delta')) childArgs.push('--legacy-delta');
     for (const name of ['--workspace', '--repo', '--out', '--passphrase-env']) {
       const value = argValue(name);
       if (value) childArgs.push(`${name}=${value}`);
@@ -790,6 +1552,44 @@ async function decryptReceiptToTar(receipt, tempRoot) {
 async function verifyCommand() {
   const receiptPath = receiptPathFromArgs();
   const receipt = readJson(receiptPath, null);
+  if (receipt?.kind === 'current' || receipt?.schema === 'skyevault.agent.current-repo-receipt.v1') {
+    const manifest = readJson(receipt.currentManifestPath || '', null);
+    if (!manifest?.files) throw new Error(`Current manifest not found: ${receipt.currentManifestPath || ''}`);
+    let verifiedFiles = 0;
+    let failedFiles = 0;
+    const passphrase = passphraseForReceipt(receipt);
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'skyevault-agent-current-verify-'));
+    try {
+      for (const file of manifest.files || []) {
+        const objectPath = currentObjectPath(receipt.workspaceId, file.objectRel || '');
+        const plainPath = path.join(tempRoot, `${verifiedFiles}.plain`);
+        try {
+          await decryptFile(objectPath, plainPath, file.crypto || {}, passphrase);
+          const sha = await sha256File(plainPath);
+          if (file.sha256 && sha !== file.sha256) failedFiles += 1;
+          else verifiedFiles += 1;
+        } catch {
+          failedFiles += 1;
+        } finally {
+          fs.rmSync(plainPath, { force: true });
+        }
+      }
+      respond({
+        ok: failedFiles === 0,
+        schema: 'skyevault.agent.current-verify-receipt.v1',
+        version: VERSION,
+        checkedAt: new Date().toISOString(),
+        receiptPath,
+        kind: 'current',
+        manifestDigest: receipt.manifestDigest || manifest.digest || null,
+        verifiedFiles,
+        failedFiles
+      }, failedFiles === 0 ? 0 : 1);
+      return;
+    } finally {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
+    }
+  }
   if (!receipt?.artifact?.path) throw new Error(`Invalid receipt: ${receiptPath}`);
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'skyevault-agent-verify-'));
   try {
@@ -849,6 +1649,34 @@ function applyDeltaFolder(deltaRoot, restoreRoot) {
 async function restoreCommand() {
   const receiptPath = receiptPathFromArgs();
   const receipt = readJson(receiptPath, null);
+  if (receipt?.kind === 'current' || receipt?.schema === 'skyevault.agent.current-repo-receipt.v1') {
+    const out = argValue('--out');
+    if (!out) throw new Error('Restore output folder is required. Pass --out=/path/to/restore.');
+    const restoreRoot = ensureRestoreRoot(out);
+    const manifest = readJson(receipt.currentManifestPath || '', null);
+    if (!manifest?.files) throw new Error(`Current manifest not found: ${receipt.currentManifestPath || ''}`);
+    const passphrase = passphraseForReceipt(receipt);
+    let restoredFiles = 0;
+    for (const file of manifest.files || []) {
+      const objectPath = currentObjectPath(receipt.workspaceId, file.objectRel || '');
+      const target = safeJoin(restoreRoot, file.path);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      await decryptFile(objectPath, target, file.crypto || {}, passphrase);
+      restoredFiles += 1;
+    }
+    respond({
+      ok: true,
+      schema: 'skyevault.agent.current-restore-receipt.v1',
+      version: VERSION,
+      restoredAt: new Date().toISOString(),
+      receiptPath,
+      out: restoreRoot,
+      baseKind: 'current',
+      restoredFiles,
+      finalManifestDigest: receipt.manifestDigest || manifest.digest || null
+    });
+    return;
+  }
   if (!receipt?.artifact?.path) throw new Error(`Invalid receipt: ${receiptPath}`);
   if (receipt.kind === 'delta') throw new Error('Restore must start from a full/baseline receipt. Pass deltas with --delta-receipts=a.json,b.json.');
   const out = argValue('--out');
@@ -911,7 +1739,10 @@ function doctorCommand() {
 }
 
 try {
-  if (command === 'init') initCommand();
+  if (command === 'help') helpCommand();
+  else if (command === 'version') versionCommand();
+  else if (command === 'init') initCommand();
+  else if (command === 'auto-install') await autoInstallCommand();
   else if (command === 'status') statusCommand();
   else if (command === 'snapshot') await snapshotCommand();
   else if (command === 'sync') await syncCommand();
@@ -919,7 +1750,7 @@ try {
   else if (command === 'verify') await verifyCommand();
   else if (command === 'restore') await restoreCommand();
   else if (command === 'doctor') doctorCommand();
-  else respond({ ok: false, error: `Unknown command: ${command}`, commands: ['init', 'status', 'snapshot', 'sync', 'watch', 'verify', 'restore', 'doctor'] }, 2);
+  else respond({ ok: false, error: `Unknown command: ${command}`, commands: COMMANDS }, 2);
 } catch (error) {
   respond({ ok: false, error: error.message, stack: flag('--debug') ? error.stack : undefined }, 1);
 }

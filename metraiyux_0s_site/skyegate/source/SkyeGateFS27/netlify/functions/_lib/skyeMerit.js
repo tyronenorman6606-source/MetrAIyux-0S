@@ -54,7 +54,7 @@ export const SKYEMERIT_RULES = [
     minimum_payable_cents: 0,
     allow_free_checkout: true,
     customer_label: "Owner-issued zero-balance unlimited QA merit",
-    guardrail: "Owner QA only. It can zero a checkout, but it does not bypass FS27/SkyGate auth, owner approval, quota guards, or abuse controls."
+    guardrail: "Owner QA only. It can zero a checkout, but it does not bypass SkyeGate FS27 auth, owner approval, quota guards, or abuse controls."
   },
   {
     id: "skyemusicnexus-launch-landing-2000",
@@ -209,7 +209,22 @@ export function getSkyeMeritRule(code) {
   return SKYEMERIT_RULES.find((rule) => rule.code === normalized || rule.id.toUpperCase() === normalized) || null;
 }
 
-export function publicSkyeMeritCatalog() {
+function publicSkyeMeritRules({ includeOwnerQa = false } = {}) {
+  return SKYEMERIT_RULES.filter((rule) => {
+    if (includeOwnerQa) return true;
+    if (rule.family === "owner_qa_unlimited") return false;
+    if (rule.allow_free_checkout === true) return false;
+    return true;
+  });
+}
+
+function publicSkyeMeritPacks({ includeOwnerQa = false } = {}) {
+  return SKYEMERIT_PACKS.filter((pack) => includeOwnerQa || pack.audience !== "owner_qa_unlimited");
+}
+
+export function publicSkyeMeritCatalog({ includeOwnerQa = false } = {}) {
+  const rules = publicSkyeMeritRules({ includeOwnerQa });
+  const packs = publicSkyeMeritPacks({ includeOwnerQa });
   return {
     ok: true,
     product: "SkyeMerit",
@@ -218,14 +233,15 @@ export function publicSkyeMeritCatalog() {
     first_time_pack_id: SKYEMERIT_FIRST_TIME_PACK_ID,
     first_time_kaixu_credit_cents: SKYEMERIT_KAIXU_CREDIT_CENTS,
     gate_required: true,
-    stripe_stack_rule: "SkyeMerit disables Stripe promotion-code stacking when a merit is applied.",
+    stripe_stack_rule: "SkyeMerit disables external promotion-code stacking when a merit is applied through SkyePay.",
     stack_policy: {
       default_minimum_payable_cents: SKYEMERIT_MIN_PAYABLE_CENTS,
       owner_free_checkout_override_required: true,
+      owner_free_checkout_codes_public: false,
       skycart_add_on_code: SKYEMERIT_CART_ADD_ON_CODE,
-      note: "SkyeMerit can stack for approved incentive lanes, but premium, unlimited, provider-heavy, or quoted offers cannot be made free unless the owner explicitly marks that rule/checkout as free."
+      note: "SkyeMerit can stack for approved incentive lanes, but premium, unlimited, provider-heavy, or quoted offers cannot be made free unless an owner-authenticated checkout explicitly uses a private owner-only rule."
     },
-    rules: SKYEMERIT_RULES.map((rule) => ({
+    rules: rules.map((rule) => ({
       id: rule.id,
       code: rule.code,
       pack_id: rule.pack_id,
@@ -246,7 +262,7 @@ export function publicSkyeMeritCatalog() {
       customer_label: rule.customer_label,
       guardrail: rule.guardrail
     })),
-    packs: SKYEMERIT_PACKS.map((pack) => ({ ...pack }))
+    packs: packs.map((pack) => ({ ...pack }))
   };
 }
 

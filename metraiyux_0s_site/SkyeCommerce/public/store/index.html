@@ -60,7 +60,8 @@
           <label>Shipping code<input name="shippingCode" value="standard"></label>
           <label>Discount code<input name="discountCode" placeholder="SAVE10"></label>
           <div id="cart-lines" class="list"></div>
-          <label>Payment provider<select name="paymentProvider"><option value="skyepay">SkyePay</option><option value="stripe">Stripe direct</option><option value="paypal">PayPal direct</option></select></label>
+          <input type="hidden" name="paymentProvider" value="skyepay">
+          <div class="status-box good">Checkout runs through SkyePay so the order, receipt, and merchant ledger stay synced.</div>
           <label class="legal-acceptance" style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-items:start">
             <input name="legal_acceptance" type="checkbox" required style="width:18px;margin-top:4px">
             <span>I agree to the Legal Skyes transaction terms, payment/refund policy, privacy policy, in-house dispute committee, neutral external arbitration boundary where applicable, MetrAIyux 0S terms, proof/valuation no-guarantee boundary, and truthful-review/non-waiver boundary.

@@ -387,6 +387,29 @@ function renderDeployments(dashboard) {
         'data-deployment-id': deployment.deployment_id || ''
       }
     });
+    const functionsButton = el('button', {
+      text: 'Function grants',
+      attrs: {
+        type: 'button',
+        'data-function-action': 'load',
+        'data-workspace-id': deployment.workspace_id || dashboard.workspace?.workspace_id || '',
+        'data-project-id': deployment.project_id || '',
+        'data-deployment-id': deployment.deployment_id || ''
+      }
+    });
+    if (!deployment.functions?.function_count) functionsButton.disabled = true;
+    const rollbackButton = el('button', {
+      text: 'Rollback route',
+      attrs: {
+        type: 'button',
+        'data-rollback-deployment': deployment.deployment_id || '',
+        'data-workspace-id': deployment.workspace_id || dashboard.workspace?.workspace_id || '',
+        'data-project-id': deployment.project_id || '',
+        'data-route-key': deployment.route_key || '',
+        'data-live-url': deployment.live_url || ''
+      }
+    });
+    if (!deployment.route_key) rollbackButton.disabled = true;
     return el('article', { className: 'list-item' }, [
       el('div', {}, [
         el('span', { text: text(deployment.status, 'deployment') }),
@@ -395,9 +418,12 @@ function renderDeployments(dashboard) {
         el('small', { text: privateSource
           ? `Private source package: ${deployment.source_custody?.private_source_file_count || 0} files - ${bytes(deployment.source_custody?.private_source_total_bytes)}`
           : 'Private source package not recorded; download falls back to public deployed files.' }),
+        deployment.functions?.function_count
+          ? el('small', { text: `Functions: ${deployment.functions.function_count} - ${deployment.functions.signed ? 'signed' : 'unsigned'} - ${deployment.functions.storage_verified ? 'storage verified' : 'storage pending'}` })
+          : el('small', { text: 'No active function bundle recorded.' }),
         deployment.live_url ? el('a', { text: deployment.live_url, attrs: { href: deployment.live_url } }) : el('small', { text: 'No live URL recorded' })
       ]),
-      el('div', { className: 'item-actions' }, [button, transferSelect, transferButton])
+      el('div', { className: 'item-actions' }, [button, transferSelect, transferButton, functionsButton, rollbackButton])
     ]);
   }));
 }
@@ -435,6 +461,281 @@ function renderReceipts(dashboard) {
     el('strong', { text: text(receipt.project_id || receipt.id, 'SkyeNet event') }),
     el('small', { text: dateLabel(receipt.created_at) || text(receipt.deployment_id, '') })
   ])));
+}
+
+function syncFunctionDefaults(dashboard = null) {
+  const form = document.querySelector('#functionFilterForm');
+  if (!form) return;
+  const params = new URLSearchParams(window.location.search);
+  const firstFunctionDeployment = Array.isArray(dashboard?.deployments)
+    ? dashboard.deployments.find((deployment) => deployment.functions?.function_count)
+    : null;
+  const firstDeployment = firstFunctionDeployment || (Array.isArray(dashboard?.deployments) ? dashboard.deployments[0] : null);
+  const workspace = params.get('workspace_id') || params.get('workspace') || firstDeployment?.workspace_id || dashboard?.workspace?.workspace_id || document.querySelector('#deployForm [name="workspace_id"]')?.value || '';
+  const project = params.get('project_id') || firstDeployment?.project_id || document.querySelector('#deployForm [name="project_id"]')?.value || '';
+  const deployment = params.get('deployment_id') || firstDeployment?.deployment_id || '';
+  if (form.elements.workspace_id && !form.elements.workspace_id.value) form.elements.workspace_id.value = workspace;
+  if (form.elements.project_id && !form.elements.project_id.value) form.elements.project_id.value = project;
+  if (form.elements.deployment_id && !form.elements.deployment_id.value) form.elements.deployment_id.value = deployment;
+}
+
+function functionQuery(form = document.querySelector('#functionFilterForm')) {
+  const query = new URLSearchParams();
+  if (!form) return query;
+  for (const [key, value] of new FormData(form).entries()) {
+    const clean = text(value);
+    if (clean) query.set(key, clean);
+  }
+  return query;
+}
+
+function renderFunctionStatus(data = {}, envData = {}) {
+  const node = document.querySelector('#functionList');
+  if (!node) return;
+  const bundle = data.function_bundle || null;
+  const functions = Array.isArray(bundle?.functions) ? bundle.functions : [];
+  const envRecords = Array.isArray(envData.env) ? envData.env : [];
+  const envKeys = new Set(envRecords.map((record) => record.key).filter(Boolean));
+  setMessage('#functionStatus', bundle
+    ? `${functions.length || bundle.function_count || 0} functions loaded. Runtime ${data.runtime_configured ? 'configured' : 'not configured'}.`
+    : 'No function bundle recorded for this deployment.');
+  if (!bundle || !functions.length) {
+    node.replaceChildren(el('p', { text: 'No active uploaded functions found for this deployment.' }));
+    return;
+  }
+  const header = el('article', { className: 'list-item compact' }, [
+    el('span', { text: text(bundle.status, 'bundle') }),
+    el('strong', { text: text(bundle.bundle_id, 'function bundle') }),
+    el('small', { text: `${bundle.signed ? 'Signed' : 'Unsigned'} - ${bundle.storage_verified ? 'Storage verified' : 'Storage pending'} - ${bundle.public_asset_exposure === false ? 'Private bundle storage' : 'Storage exposure needs review'}` }),
+    el('small', { text: `Policy: ${text(bundle.runtime_policy?.env, 'deny-by-default')} env, ${text(bundle.runtime_policy?.egress, 'deny')} egress` })
+  ]);
+  const rows = functions.map((fn) => {
+    const grants = Array.isArray(fn.limits?.env_grants) ? fn.limits.env_grants : [];
+    const missing = grants.filter((key) => !envKeys.has(key));
+    const ungranted = envRecords.map((record) => record.key).filter((key) => key && !grants.includes(key));
+    return el('article', { className: 'list-item' }, [
+      el('div', {}, [
+        el('span', { text: fn.name || 'function' }),
+        el('strong', { text: fn.bundle_path || 'functions/<name>.mjs' }),
+        el('small', { text: `Routes: ${(fn.routes || []).join(', ') || 'none recorded'}` }),
+        el('small', { text: `Granted env: ${grants.length ? grants.join(', ') : 'none'}` }),
+        missing.length ? el('small', { text: `Grant missing from registry: ${missing.join(', ')}` }) : el('small', { text: 'All granted env keys are present in the registry.' }),
+        ungranted.length ? el('small', { text: `Registered but not granted here: ${ungranted.slice(0, 8).join(', ')}` }) : el('small', { text: 'No extra registered env keys for this project.' })
+      ])
+    ]);
+  });
+  node.replaceChildren(header, ...rows);
+}
+
+async function refreshFunctionStatus(token = storedToken()) {
+  const form = document.querySelector('#functionFilterForm');
+  if (!form) return null;
+  if (!token) {
+    setMessage('#functionStatus', 'Paste a shared gate session first.');
+    return null;
+  }
+  syncFunctionDefaults();
+  const query = functionQuery(form);
+  if (!query.get('project_id') || !query.get('deployment_id')) {
+    setMessage('#functionStatus', 'Project and deployment are required.');
+    return null;
+  }
+  setMessage('#functionStatus', 'Loading function env grants...');
+  const envParams = new URLSearchParams();
+  if (query.get('workspace_id')) envParams.set('workspace_id', query.get('workspace_id'));
+  envParams.set('project_id', query.get('project_id'));
+  const [status, envData] = await Promise.all([
+    apiJson(`/api/skyenet/functions-status?${query.toString()}`, token),
+    apiJson(`/api/skyenet/env?${envParams.toString()}`, token).catch(() => ({ env: [] }))
+  ]);
+  renderFunctionStatus(status, envData);
+  return status;
+}
+
+function setFunctionFormFromButton(button) {
+  const form = document.querySelector('#functionFilterForm');
+  if (!form) return;
+  if (form.elements.workspace_id) form.elements.workspace_id.value = button.dataset.workspaceId || form.elements.workspace_id.value || '';
+  if (form.elements.project_id) form.elements.project_id.value = button.dataset.projectId || form.elements.project_id.value || '';
+  if (form.elements.deployment_id) form.elements.deployment_id.value = button.dataset.deploymentId || form.elements.deployment_id.value || '';
+}
+
+async function rollbackDeployment(button, token = storedToken()) {
+  if (!token) throw new Error('A shared gate session is required before rollback.');
+  const deploymentId = button.dataset.rollbackDeployment || '';
+  const projectId = button.dataset.projectId || '';
+  if (!deploymentId || !projectId) throw new Error('Project and deployment are required for rollback.');
+  const ok = window.confirm(`Switch the live route back to ${projectId}/${deploymentId}?`);
+  if (!ok) return null;
+  setMessage('#rollbackStatus', 'Switching live route...');
+  const result = await apiRequest('/api/skyenet/rollback', token, {
+    method: 'POST',
+    body: {
+      workspace_id: button.dataset.workspaceId || undefined,
+      project_id: projectId,
+      deployment_id: deploymentId,
+      route_key: button.dataset.routeKey || undefined
+    }
+  });
+  const output = document.querySelector('#rollbackResult');
+  if (output) output.textContent = JSON.stringify(result, null, 2);
+  setMessage('#rollbackStatus', `Rollback active for ${projectId}/${deploymentId}.`);
+  await renderDashboard(token).catch(() => null);
+  return result;
+}
+
+function syncFormsDefaults(dashboard = null) {
+  const form = document.querySelector('#formsFilterForm');
+  if (!form) return;
+  const params = new URLSearchParams(window.location.search);
+  const firstDeployment = Array.isArray(dashboard?.deployments) ? dashboard.deployments[0] : null;
+  const workspace = params.get('workspace_id') || params.get('workspace') || firstDeployment?.workspace_id || dashboard?.workspace?.workspace_id || document.querySelector('#deployForm [name="workspace_id"]')?.value || '';
+  const project = params.get('project_id') || firstDeployment?.project_id || document.querySelector('#deployForm [name="project_id"]')?.value || '';
+  const deployment = params.get('deployment_id') || firstDeployment?.deployment_id || '';
+  if (form.elements.workspace_id && !form.elements.workspace_id.value) form.elements.workspace_id.value = workspace;
+  if (form.elements.project_id && !form.elements.project_id.value) form.elements.project_id.value = project;
+  if (form.elements.deployment_id && !form.elements.deployment_id.value) form.elements.deployment_id.value = deployment;
+}
+
+function formsQuery(form = document.querySelector('#formsFilterForm')) {
+  const query = new URLSearchParams();
+  if (!form) return query;
+  for (const [key, value] of new FormData(form).entries()) {
+    const clean = text(value);
+    if (clean) query.set(key, clean);
+  }
+  if (!query.has('limit')) query.set('limit', '50');
+  return query;
+}
+
+function renderFormsInbox(data = {}) {
+  const node = document.querySelector('#formsInboxList');
+  if (!node) return;
+  const submissions = Array.isArray(data.submissions) ? data.submissions : [];
+  const counts = data.counts || {};
+  setMessage('#formsStatus', `${counts.total || submissions.length || 0} submissions loaded.`);
+  if (!submissions.length) {
+    node.replaceChildren(el('p', { text: 'No submissions found for this deployment.' }));
+    return;
+  }
+  node.replaceChildren(...submissions.map((submission) => el('article', { className: 'list-item' }, [
+    el('div', {}, [
+      el('span', { text: submission.spam_detected ? 'Spam' : text(submission.status, 'new') }),
+      el('strong', { text: `${text(submission.form_name, 'form')} / ${text(submission.submission_id, 'submission')}` }),
+      el('small', { text: `${dateLabel(submission.received_at) || 'No date'} - ${submission.file_count || 0} files - ${submission.notification_status || 'notification pending'}` }),
+      el('small', { text: (submission.spam_reasons || []).join(', ') || 'clean' })
+    ]),
+    el('div', { className: 'item-actions' }, [
+      el('button', { text: 'Open', attrs: { type: 'button', 'data-form-action': 'open', 'data-receipt-key': submission.key || '' } }),
+      el('button', { text: 'Read', attrs: { type: 'button', 'data-form-action': 'read', 'data-receipt-key': submission.key || '' } }),
+      el('button', { text: 'Notify', attrs: { type: 'button', 'data-form-action': 'notify', 'data-receipt-key': submission.key || '' } })
+    ])
+  ])));
+}
+
+function renderFormsDetail(data = {}) {
+  const detail = document.querySelector('#formsDetail');
+  if (!detail) return;
+  detail.textContent = JSON.stringify(data, null, 2);
+  const submission = data.submission || data;
+  const files = Array.isArray(submission.files) ? submission.files : [];
+  const panel = document.querySelector('#formsInboxList');
+  if (!panel || !files.length) return;
+  const actions = el('article', { className: 'list-item compact' }, [
+    el('span', { text: 'Private files' }),
+    el('strong', { text: `${files.length} stored attachment${files.length === 1 ? '' : 's'}` }),
+    el('div', { className: 'item-actions' }, files.slice(0, 6).map((file) => el('button', {
+      text: file.name || 'Download',
+      attrs: {
+        type: 'button',
+        'data-form-action': 'download-file',
+        'data-file-key': file.key || '',
+        'data-file-name': file.name || 'form-upload'
+      }
+    })))
+  ]);
+  panel.prepend(actions);
+}
+
+async function refreshFormsInbox(token = storedToken()) {
+  const form = document.querySelector('#formsFilterForm');
+  if (!form) return null;
+  if (!token) {
+    setMessage('#formsStatus', 'Paste a shared gate session first.');
+    return null;
+  }
+  syncFormsDefaults();
+  const query = formsQuery(form);
+  if (!query.get('project_id') || !query.get('deployment_id')) {
+    setMessage('#formsStatus', 'Project and deployment are required.');
+    return null;
+  }
+  setMessage('#formsStatus', 'Loading form submissions...');
+  const data = await apiJson(`/api/skyenet/forms-inbox?${query.toString()}`, token);
+  renderFormsInbox(data);
+  return data;
+}
+
+async function openFormSubmission(receiptKey, token = storedToken()) {
+  const query = formsQuery();
+  query.set('receipt_key', receiptKey);
+  const data = await apiJson(`/api/skyenet/forms-submission?${query.toString()}`, token);
+  renderFormsDetail(data);
+  return data;
+}
+
+async function updateFormSubmission(receiptKey, token = storedToken()) {
+  const query = formsQuery();
+  const result = await apiRequest('/api/skyenet/forms-submission', token, {
+    method: 'PATCH',
+    body: {
+      workspace_id: query.get('workspace_id') || undefined,
+      project_id: query.get('project_id'),
+      deployment_id: query.get('deployment_id'),
+      receipt_key: receiptKey,
+      status: 'read',
+      spam_status: 'not_spam',
+      note: 'Marked read from SkyeNet console'
+    }
+  });
+  renderFormsDetail(result);
+  await refreshFormsInbox(token);
+  return result;
+}
+
+async function notifyFormSubmission(receiptKey, token = storedToken()) {
+  const query = formsQuery();
+  const result = await apiRequest('/api/skyenet/forms-notify', token, {
+    method: 'POST',
+    body: {
+      workspace_id: query.get('workspace_id') || undefined,
+      project_id: query.get('project_id'),
+      deployment_id: query.get('deployment_id'),
+      receipt_key: receiptKey
+    }
+  });
+  renderFormsDetail(result);
+  await refreshFormsInbox(token);
+  return result;
+}
+
+async function downloadFormFile(fileKey, filename, token = storedToken()) {
+  const query = formsQuery();
+  query.set('file_key', fileKey);
+  const response = await fetch(`/api/skyenet/forms-file?${query.toString()}`, { headers: authHeaders(token) });
+  if (!response.ok) {
+    const detail = await response.json().catch(async () => ({ error: await response.text().catch(() => '') }));
+    throw new Error(detail.error || detail.code || `Form file download failed with HTTP ${response.status}`);
+  }
+  const blob = await response.blob();
+  const anchor = document.createElement('a');
+  anchor.href = URL.createObjectURL(blob);
+  anchor.download = downloadNameFromDisposition(response.headers.get('content-disposition'), filename || 'form-upload');
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(anchor.href), 1000);
+  setMessage('#formsStatus', `Downloaded ${anchor.download}.`);
 }
 
 function selectedEnvProject() {
@@ -540,6 +841,8 @@ async function renderDashboard(token = storedToken()) {
     setMessage('#routeList', 'Waiting for gate session.');
     setMessage('#receiptList', 'Waiting for gate session.');
     setMessage('#exportStatus', 'Paste a shared gate session before exporting customer data.');
+    setMessage('#functionStatus', 'Paste a shared gate session before loading function grants.');
+    setMessage('#rollbackStatus', 'Paste a shared gate session before rollback.');
     return null;
   }
   const dashboard = await apiJson(`/api/skyenet/dashboard${workspaceQuery()}`, token);
@@ -547,6 +850,8 @@ async function renderDashboard(token = storedToken()) {
   renderDeployments(dashboard);
   renderRoutes(dashboard);
   renderReceipts(dashboard);
+  syncFunctionDefaults(dashboard);
+  syncFormsDefaults(dashboard);
   return dashboard;
 }
 
@@ -686,8 +991,12 @@ async function transferSource(button, token) {
 
 async function refresh(token = storedToken()) {
   syncExportDefaults();
+  syncFunctionDefaults();
+  syncFormsDefaults();
   if (document.querySelector('#exportStatus') && token) setMessage('#exportStatus', 'Ready to request a customer export.');
   await Promise.allSettled([renderStatus(token), renderDashboard(token), refreshEnvVars(token), refreshSupportProfile()]);
+  await refreshFunctionStatus(token).catch((error) => setMessage('#functionStatus', error.message));
+  await refreshFormsInbox(token).catch((error) => setMessage('#formsStatus', error.message));
 }
 
 const form = document.querySelector('#tokenForm');
@@ -778,6 +1087,87 @@ if (deployForm) {
     }
   });
 }
+
+const functionFilterForm = document.querySelector('#functionFilterForm');
+if (functionFilterForm) {
+  syncFunctionDefaults();
+  functionFilterForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = functionFilterForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      await refreshFunctionStatus(storedToken());
+    } catch (error) {
+      setMessage('#functionStatus', error.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-function-action]');
+  if (!button) return;
+  event.preventDefault();
+  button.disabled = true;
+  try {
+    setFunctionFormFromButton(button);
+    await refreshFunctionStatus(storedToken());
+  } catch (error) {
+    setMessage('#functionStatus', error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-rollback-deployment]');
+  if (!button) return;
+  event.preventDefault();
+  button.disabled = true;
+  try {
+    await rollbackDeployment(button, storedToken());
+  } catch (error) {
+    setMessage('#rollbackStatus', error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+const formsFilterForm = document.querySelector('#formsFilterForm');
+if (formsFilterForm) {
+  syncFormsDefaults();
+  formsFilterForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = formsFilterForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      await refreshFormsInbox(storedToken());
+    } catch (error) {
+      setMessage('#formsStatus', error.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+document.addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-form-action]');
+  if (!button) return;
+  event.preventDefault();
+  const action = button.dataset.formAction;
+  button.disabled = true;
+  try {
+    if (action === 'open') await openFormSubmission(button.dataset.receiptKey || '');
+    if (action === 'read') await updateFormSubmission(button.dataset.receiptKey || '');
+    if (action === 'notify') await notifyFormSubmission(button.dataset.receiptKey || '');
+    if (action === 'download-file') await downloadFormFile(button.dataset.fileKey || '', button.dataset.fileName || 'form-upload');
+  } catch (error) {
+    setMessage('#formsStatus', error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
 
 document.addEventListener('click', async (event) => {
   const button = event.target.closest('[data-source-download]');

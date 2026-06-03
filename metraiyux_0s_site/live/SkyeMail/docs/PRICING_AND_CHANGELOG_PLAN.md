@@ -19,7 +19,7 @@ Launch mailbox status: free.
 
 SkyeMail can be used for FS27 gate-card onboarding and proof-lane mailbox work without charging the user during the launch/proof period.
 
-Billing status: mailbox access is still launch-free. The SkyeMail Brain now has FS27/SkyPay checkout create + claim routes for paid FS27 Brain response plans.
+Billing status: mailbox access is still launch-free. The SkyeMail Brain now has SkyeGate FS27/SkyePay checkout create + claim routes for paid SkyeGate FS27 Brain response plans.
 
 ## Public Pages
 
@@ -30,12 +30,12 @@ Billing status: mailbox access is still launch-free. The SkyeMail Brain now has 
 
 ## Active Billing Hooks
 
-Paid Brain AI plan state runs through SkyGate FS27 first:
+Paid Brain AI plan state runs through SkyeGate FS27 first:
 
 1. FS27 owns customer identity, customer ID, gate card, and billing state.
 2. SkyeMail reads plan state from FS27/session claims or a signed billing status endpoint.
 3. SkyeMail stores plan snapshot on workspace records for audit history.
-4. Mailbox AI usage, send-and-monitor behavior, and managed inbox features key off the FS27/SkyPay entitlement state.
+4. Mailbox AI usage, send-and-monitor behavior, and managed inbox features key off the SkyeGate FS27/SkyePay entitlement state.
 5. Failed billing never deletes mail. It should pause upgrades, sending, aliases, or AI usage according to policy.
 
 ## Planned Tiers
@@ -71,7 +71,7 @@ Operator:
 
 AI Brain Starter / Plus / Managed:
 
-- SkyPay checkout create and claim routes.
+- SkyePay checkout create and claim routes.
 - FS27 metered Brain calls.
 - Usage events stored in `skymail.ai_usage_events`.
 - Active entitlements stored in `skymail.ai_entitlements`.

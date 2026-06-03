@@ -20,8 +20,8 @@
 <body>
   <main class="handoff-card">
     <div class="badge">Shared 0S Gate Session</div>
-    <h1>Opening SkyeMail Citadel.</h1>
-    <p>The gate session is being accepted once, then SkyeMail will open the selected inbox under the shared FS27/SkyGate owner lane.</p>
+    <h1>Opening SkyeMail backed by Citadel Database and SkyeNet.</h1>
+    <p>The gate session is being accepted once, then SkyeMail will open the selected inbox under the shared SkyeGate FS27 owner lane.</p>
     <div class="handoff-claim" id="claimText">Reading gate return...</div>
     <div class="handoff-status" id="status">Waiting for the 0S bearer...</div>
   </main>
@@ -59,7 +59,7 @@
     try{
       const params = mergedParams();
       const token = pick(params, ['fs27_token','gate_session','skygate_session','skye_gate_session','free99_gate_session','session','token','bearer']) || getToken();
-      if(!token) throw new Error('Missing 0S/SkyGate bearer. Open SkyeMail from the 0S Gate again so the app return includes the session.');
+      if(!token) throw new Error('Missing 0S/SkyeGate bearer. Open SkyeMail from the 0S Gate again so the app return includes the session.');
       const mailboxEmail = pick(params, ['mailbox_email','mailbox','selected_mailbox','email']).toLowerCase();
       const claim = {
         source: pick(params, ['source']) || 'skymail-session-handoff',

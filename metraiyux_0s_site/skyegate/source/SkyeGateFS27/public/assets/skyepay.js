@@ -56,6 +56,39 @@ function createLenisRuntime(options) {
     $("#statusText").textContent = text;
   }
 
+  function flashThanks(message) {
+    const existing = document.querySelector("[data-skyepay-thanks]");
+    if (existing) existing.remove();
+    const note = document.createElement("div");
+    note.dataset.skyepayThanks = "true";
+    note.setAttribute("role", "status");
+    note.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:9999;max-width:340px;padding:14px 16px;border-radius:12px;background:#071b1f;color:#f8fbf6;border:1px solid rgba(212,175,55,.55);box-shadow:0 18px 50px rgba(0,0,0,.25);font-weight:800;";
+    note.textContent = message;
+    document.body.appendChild(note);
+    window.setTimeout(() => note.remove(), 5200);
+  }
+
+  function celebrateSkyePayReceipt(payload = {}) {
+    const receiptId = String(payload.receiptId || payload.receipt_id || payload.order_id || payload.session_id || "").trim();
+    if (!receiptId) return false;
+    const detail = {
+      surfaceId: "skyepay",
+      receiptId,
+      triggerType: payload.triggerType || "owner-thank-you",
+      intensity: payload.intensity || "standard",
+      receiptBacked: true,
+      message: payload.message || "Thank you. SkyePay saved the paid receipt and activation state."
+    };
+    const key = `zero-os-celebration:${detail.surfaceId}:${detail.receiptId}:${detail.triggerType}`;
+    try {
+      if (sessionStorage.getItem(key) === "1") return false;
+      sessionStorage.setItem(key, "1");
+    } catch (_err) {}
+    window.dispatchEvent(new CustomEvent("0s:celebration", { detail }));
+    if (!window.ZeroOsCelebrationLayer) flashThanks(detail.message);
+    return true;
+  }
+
   function legalAcceptancePayload(form, source) {
     const accepted = Boolean(form.legal_acceptance?.checked);
     return {
@@ -108,9 +141,9 @@ function createLenisRuntime(options) {
     return selected;
   }
 
-  function bestMeritForOffer(offer) {
-    const subtotal = Number(offer?.skyemerit?.discountable_cents || 0);
-    const rules = state.skyemerit?.rules || [];
+	  function bestMeritForOffer(offer) {
+	    const subtotal = Number(offer?.skyemerit?.discountable_cents || 0);
+	    const rules = state.skyemerit?.rules || [];
     const selectedCode = selectedMeritCodeForOffer(offer) || "none";
     if (selectedCode === "none" || subtotal <= 0) return null;
     const candidates = rules
@@ -118,13 +151,106 @@ function createLenisRuntime(options) {
       .map((rule) => calculateMerit(rule, subtotal, offer))
       .filter(Boolean)
       .sort((a, b) => b.discount_cents - a.discount_cents);
-    return candidates[0] || null;
-  }
+	    return candidates[0] || null;
+	  }
 
-  function renderSkyeMeritPreview() {
-    const panel = $("#skyemeritPreview");
-    if (!panel) return;
-    const offer = state.offers.find((item) => item.id === state.selectedOfferId) || state.offers[0];
+	  function selectedOffer() {
+	    return state.offers.find((item) => item.id === state.selectedOfferId) || state.offers[0] || null;
+	  }
+
+	  function isSkyeMailMailboxOffer(offer) {
+	    return Boolean(offer?.gate_policy?.skyemail_mailbox) || [
+	      "skyemail-starter-mailbox",
+	      "skyemail-business-mailbox",
+	      "skyemail-operator-mailbox"
+	    ].includes(String(offer?.id || ""));
+	  }
+
+	  function normalizeMailboxLocalPart(value) {
+	    return String(value || "")
+	      .trim()
+	      .toLowerCase()
+	      .replace(/[^a-z0-9._-]+/g, "-")
+	      .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+	      .slice(0, 64);
+	  }
+
+	  function normalizeMailboxDomain(value) {
+	    return String(value || "")
+	      .trim()
+	      .toLowerCase()
+	      .replace(/[^a-z0-9.-]+/g, "")
+	      .replace(/^-+|-+$/g, "")
+	      .slice(0, 120);
+	  }
+
+	  function mailboxSeed() {
+	    const form = $("#skypayForm");
+	    return normalizeMailboxLocalPart(
+	      params.get("mailbox_local_part")
+	        || params.get("local_part")
+	        || form?.company_name?.value
+	        || form?.customer_name?.value
+	        || form?.customer_email?.value?.split("@")[0]
+	        || "info"
+	    );
+	  }
+
+	  function syncMailboxPreview() {
+	    const form = $("#skypayForm");
+	    const preview = $("#skyemailMailboxPreview");
+	    if (!form || !preview) return;
+	    const local = normalizeMailboxLocalPart(form.mailbox_local_part?.value || "");
+	    const domain = normalizeMailboxDomain(form.mailbox_domain?.value || "");
+	    preview.textContent = local && domain ? `${local}@${domain}` : "mailbox address required";
+	  }
+
+	  function renderSkyeMailMailboxClaim() {
+	    const panel = $("#skyemailMailboxClaim");
+	    const form = $("#skypayForm");
+	    if (!panel || !form) return;
+	    const offer = selectedOffer();
+	    const active = isSkyeMailMailboxOffer(offer);
+	    panel.hidden = !active;
+	    if (form.mailbox_local_part) form.mailbox_local_part.required = active;
+	    if (form.mailbox_domain) form.mailbox_domain.required = active;
+	    if (!active) return;
+
+	    const requestedEmail = params.get("mailbox_email") || params.get("mailbox") || params.get("skyemail") || "";
+	    const [requestedLocal = "", requestedDomain = ""] = requestedEmail.includes("@") ? requestedEmail.split("@") : ["", ""];
+	    if (form.mailbox_domain && !form.mailbox_domain.value) {
+	      form.mailbox_domain.value = normalizeMailboxDomain(params.get("mailbox_domain") || params.get("domain") || requestedDomain || "solenterprises.org");
+	    }
+	    if (form.mailbox_local_part && !form.mailbox_local_part.value) {
+	      form.mailbox_local_part.value = normalizeMailboxLocalPart(requestedLocal || mailboxSeed());
+	      form.mailbox_local_part.dataset.autofilled = "true";
+	    }
+	    if (form.mailbox_local_part && !form.mailbox_local_part.dataset.bound) {
+	      form.mailbox_local_part.dataset.bound = "true";
+	      form.mailbox_local_part.addEventListener("input", () => {
+	        form.mailbox_local_part.dataset.autofilled = "false";
+	        syncMailboxPreview();
+	      });
+	    }
+	    if (form.mailbox_domain && !form.mailbox_domain.dataset.bound) {
+	      form.mailbox_domain.dataset.bound = "true";
+	      form.mailbox_domain.addEventListener("input", syncMailboxPreview);
+	    }
+	    [form.company_name, form.customer_name, form.customer_email].forEach((input) => {
+	      if (!input || input.dataset.mailboxSeedBound) return;
+	      input.dataset.mailboxSeedBound = "true";
+	      input.addEventListener("input", () => {
+	        if (form.mailbox_local_part?.dataset.autofilled === "true") form.mailbox_local_part.value = mailboxSeed();
+	        syncMailboxPreview();
+	      });
+	    });
+	    syncMailboxPreview();
+	  }
+
+	  function renderSkyeMeritPreview() {
+	    const panel = $("#skyemeritPreview");
+	    if (!panel) return;
+	    const offer = selectedOffer();
     const merit = bestMeritForOffer(offer);
     if (!offer) {
       panel.textContent = "Choose an offer to preview SkyeMerit.";
@@ -139,7 +265,7 @@ function createLenisRuntime(options) {
     }
     panel.innerHTML = `
       <strong>${escapeHtml(merit.title)}</strong>
-      <span>${escapeHtml(merit.code)} lowers eligible checkout spend by ${money(merit.discount_cents)}. Customer pays ${money(merit.payable_cents)} on the eligible charge. Stripe promo-code stacking turns off when this applies.</span>
+      <span>${escapeHtml(merit.code)} lowers eligible checkout spend by ${money(merit.discount_cents)}. Customer pays ${money(merit.payable_cents)} on the eligible charge. Processor promo-code stacking turns off when this applies.</span>
     `;
   }
 
@@ -233,7 +359,7 @@ function createLenisRuntime(options) {
     $("#trialDays").textContent = `${state.client.free_trial_days || 7} days`;
     $("#clientSpecial").textContent = isBobLane()
       ? "No payment today. Try the preview for one week. If it feels useful, we can continue with a first-six-month discount; if not, no pressure."
-      : state.client.special_offer || "Free preview first. Confirmed Stripe payment waits for owner-approved activation.";
+      : state.client.special_offer || "Free preview first. Confirmed SkyePay payment waits for owner-approved activation.";
     $("#includedUsage").innerHTML = (state.client.included_usage || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
     renderContact();
     if (state.dryRun) $("#proofModeBadge").textContent = "Proof mode";
@@ -422,10 +548,11 @@ function createLenisRuntime(options) {
           <p>${escapeHtml(offerPrice(offer))}. After the free week, confirmed SkyePay checkout waits for owner-approved activation.</p>
           <small class="offer-meta">${offerMeta(offer)}</small>
         </div>
-      `;
-      $("#checkoutBtn").textContent = "Start Bob's free tester week";
-      renderSkyeMeritPreview();
-      return;
+	      `;
+	      $("#checkoutBtn").textContent = "Start Bob's free tester week";
+	      renderSkyeMailMailboxClaim();
+	      renderSkyeMeritPreview();
+	      return;
     }
     wrap.classList.remove("bob-offer-summary");
     wrap.innerHTML = state.offers.map((offer) => `
@@ -442,15 +569,17 @@ function createLenisRuntime(options) {
     $$(".offer-option").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.selectedOfferId = btn.dataset.offerId;
-        state.skyCartAddOnOfferId = "";
-        $$(".offer-option").forEach((node) => node.setAttribute("aria-pressed", String(node === btn)));
-        renderSkyCartUpsell();
-        renderSkyeMeritPreview();
-      });
-    });
-    renderSkyCartUpsell();
-    renderSkyeMeritPreview();
-  }
+	        state.skyCartAddOnOfferId = "";
+	        $$(".offer-option").forEach((node) => node.setAttribute("aria-pressed", String(node === btn)));
+	        renderSkyeMailMailboxClaim();
+	        renderSkyCartUpsell();
+	        renderSkyeMeritPreview();
+	      });
+	    });
+	    renderSkyeMailMailboxClaim();
+	    renderSkyCartUpsell();
+	    renderSkyeMeritPreview();
+	  }
 
   async function loadCatalog() {
     const data = await fetchJson(`/.netlify/functions/skyepay-offers?client=${encodeURIComponent(state.clientSlug)}`);
@@ -473,9 +602,9 @@ function createLenisRuntime(options) {
       isBobLane() ? "SkyePay is preparing Bob's free preview handoff." : "SkyePay is sending the approved offer through FS27."
     );
 
-    const payload = {
-      client_slug: state.clientSlug,
-      offer_id: state.selectedOfferId,
+	    const payload = {
+	      client_slug: state.clientSlug,
+	      offer_id: state.selectedOfferId,
       customer_name: form.customer_name.value,
       customer_email: form.customer_email.value,
       company_name: form.company_name.value || state.client?.company_name || "",
@@ -486,9 +615,23 @@ function createLenisRuntime(options) {
       skyemerit_apply: state.skyCartAddOnOfferId ? true : $("#skyemeritCode")?.value !== "none",
       skyecart_add_on_accepted: Boolean(state.skyCartAddOnOfferId),
       skyecart_add_on_offer_id: state.skyCartAddOnOfferId,
-      ...legalAcceptancePayload(form, "skyepay-gateway")
-    };
-    payload.idempotency_key = requestToken(payload);
+	      ...legalAcceptancePayload(form, "skyepay-gateway")
+	    };
+	    if (isSkyeMailMailboxOffer(selectedOffer())) {
+	      const localPart = normalizeMailboxLocalPart(form.mailbox_local_part?.value || "");
+	      const domain = normalizeMailboxDomain(form.mailbox_domain?.value || "");
+	      if (!/^[a-z0-9][a-z0-9._-]{1,62}[a-z0-9]$/.test(localPart) || !/^[a-z0-9][a-z0-9.-]*\.[a-z0-9-]{2,}$/.test(domain)) {
+	        button.disabled = false;
+	        button.textContent = isBobLane() ? "Start Bob's free tester week" : "Start secure trial";
+	        setStatus("Mailbox address required", "Choose the exact SkyeMail address to provision after payment.");
+	        form.mailbox_local_part?.focus();
+	        return;
+	      }
+	      payload.mailbox_local_part = localPart;
+	      payload.mailbox_domain = domain;
+	      payload.mailbox_email = `${localPart}@${domain}`;
+	    }
+	    payload.idempotency_key = requestToken(payload);
 
     try {
       const data = await fetchJson("/.netlify/functions/skyepay-checkout", {
@@ -526,20 +669,40 @@ function createLenisRuntime(options) {
     }
     try {
       const data = await fetchJson(`/.netlify/functions/skyepay-status?${query.toString()}`);
-      const order = data.order || {};
-      const approvalState = String(order.approval_status || order.owner_status || order.provisioning_status || "").toLowerCase();
-      const waitingForOwner = approvalState.includes("owner_approval") || approvalState.includes("pending_owner");
-      if (order.provisioning_status === "workspace_unlocked") {
-        setStatus("Workspace unlocked", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status}.`);
+	      const order = data.order || {};
+	      const mailbox = order.skyemail_mailbox || {};
+	      const fulfillment = order.fulfillment || {};
+	      const nextStep = fulfillment.customer_next_step ? ` ${fulfillment.customer_next_step}` : "";
+	      const mailboxLabel = mailbox.mailbox_email || [mailbox.local_part, mailbox.domain].filter(Boolean).join("@") || "requested mailbox";
+	      const mailboxReady = mailbox.inbox_ready ? " Inbox ready." : "";
+	      const approvalState = String(order.approval_status || order.owner_status || order.provisioning_status || "").toLowerCase();
+	      const waitingForOwner = approvalState.includes("owner_approval") || approvalState.includes("pending_owner");
+	      if (String(order.provisioning_status || "").startsWith("skyemail_mailbox_provisioned")) {
+	        setStatus("Mailbox provisioned", `Payment state: ${order.payment_status || "received"}. SkyeMail mailbox: ${mailboxLabel}. Mailbox state: ${mailbox.mailbox_status || order.provisioning_status}.${mailboxReady}${nextStep}`);
+	      } else if (order.provisioning_status === "skyemail_mailbox_claim_required") {
+	        setStatus("Mailbox claim needed", `Payment was recorded, but SkyeMail needs the exact mailbox address before provisioning. Claim state: ${mailbox.claim_reason || "mailbox claim required"}.${nextStep}`);
+	      } else if (order.provisioning_status === "skyemail_mailbox_provisioning_failed") {
+	        setStatus("Mailbox provisioning needs attention", `Payment was recorded, but SkyeMail could not finish mailbox provisioning. ${mailbox.error?.message || "The ledger has the failure receipt."}${nextStep}`);
+	      } else if (order.provisioning_status === "workspace_unlocked") {
+	        setStatus("Workspace unlocked", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status}.${nextStep}`);
       } else if (waitingForOwner) {
-        setStatus("Pending owner approval", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.`);
+        setStatus("Pending operator review", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.${nextStep}`);
       } else if (data.dry_run) {
-        setStatus("Preview recorded", `Payment state: ${order.payment_status || "demo_not_charged"}. Workspace state: ${order.provisioning_status || "demo_not_unlocked"}.`);
-      } else {
-        setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.`);
+        setStatus("Preview recorded", `Payment state: ${order.payment_status || "demo_not_charged"}. Workspace state: ${order.provisioning_status || "demo_not_unlocked"}.${nextStep}`);
+	      } else {
+	        setStatus("Payment confirmed", `Payment state: ${order.payment_status || "received"}. Workspace state: ${order.provisioning_status || "waiting_for_owner_approval"}.${nextStep}`);
+	      }
+      const paidOrUnlocked = !data.dry_run && /paid|complete|completed|active|trialing|received|unlocked|provisioned/i.test(`${order.payment_status || ""} ${order.provisioning_status || ""}`);
+      if (paidOrUnlocked) {
+        celebrateSkyePayReceipt({
+          receiptId: order.id || order.order_id || data.order_id || sessionId,
+          message: String(order.provisioning_status || "").startsWith("skyemail_mailbox")
+            ? `Thank you. SkyePay recorded your purchase and SkyeMail is moving ${mailboxLabel} through activation.`
+            : "Thank you. SkyePay recorded your purchase and the 0S activation receipt is live."
+        });
       }
-    } catch (error) {
-      setStatus("Checkout returned", "Stripe returned to SkyePay. The webhook may still be writing the paid status and owner approval state.");
+	    } catch (error) {
+      setStatus("Checkout returned", "SkyePay returned from secure checkout. The webhook may still be writing the paid status and owner approval state.");
     }
   }
 

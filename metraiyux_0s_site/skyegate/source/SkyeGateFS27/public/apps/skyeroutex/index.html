@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeRouteX Gate Dashboard | SkyeGateFS27</title>
+  <title>SkyeRouteX Gate Dashboard | SkyeGate FS27</title>
   <meta name="description" content="FS27 gate-owned auth, onboarding, and readiness dashboard for SkyeRouteX Workforce Command." />
   <style>
     :root{--bg:#070812;--panel:rgba(255,255,255,.075);--panel2:rgba(255,255,255,.11);--line:rgba(255,255,255,.16);--text:#f8fbff;--muted:#b8c2d8;--gold:#ffd45a;--cyan:#4dd9ff;--ok:#66f2a5;--bad:#ff6a83}
@@ -30,7 +30,7 @@
 </head>
 <body>
   <header class="nav">
-    <div class="brand">SkyeGateFS27 <span>RouteX</span></div>
+    <div class="brand">SkyeGate FS27 <span>RouteX</span></div>
     <a href="/dashboard.html">Gate Home</a>
     <a href="/admin/platform-routex-events">RouteX Events</a>
     <a href="/admin/platform-events?app_id=metraiyux-0s">All 0S Events</a>
@@ -52,10 +52,11 @@
       </div>
       <div class="grid two">
         <div class="card">
-          <h3>Owner Gate</h3>
-          <p>Use the shared FS27/SkyGate owner session. This dashboard does not store a separate SkyeRouteX bearer.</p>
+          <h3>Owner/Admin Code</h3>
+          <p>Use the existing 0S/Free99 owner admin credential. This form exchanges it with the 0S gate and stores only the returned bearer in this browser tab.</p>
+          <input id="owner-code" type="password" autocomplete="current-password" placeholder="0S owner/admin code" />
           <div class="actions">
-            <button id="login-btn" type="button">Use Current Gate Session</button>
+            <button id="login-btn" type="button">Unlock dashboard</button>
             <button id="refresh-btn" type="button">Refresh</button>
           </div>
           <p class="meta" id="status-text">Waiting for owner session.</p>
@@ -86,7 +87,6 @@
     </section>
   </main>
 
-  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script src="./skyeroutex-gate-dashboard.js"></script>
 </body>
 </html>

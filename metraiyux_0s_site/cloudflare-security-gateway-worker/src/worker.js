@@ -41,7 +41,7 @@ async function skygateRequest(env,path,init={}){
 async function introspectGate(token,env,{operator=false}={}){
   if(!fs27Configured(env)) return {ok:false,status:503,code:'fs27_required',error:'Canonical FS27/SkyGate session is required.'};
   if(!token) return {ok:false,status:401,error:'Missing FS27/SkyGate bearer.'};
-  for(const path of ['/auth-introspect','/auth/introspect','/.netlify/functions/auth-introspect']){
+  for(const path of ['/auth-introspect','/auth/introspect','/.netlify/functions/auth-introspect','/api/skygate/auth-introspect']){
     const res=await skygateRequest(env,path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token})});
     if(res.status===404) continue;
     const data=await res.json().catch(()=>({active:false,error:'Invalid FS27/SkyGate response'}));
@@ -51,18 +51,70 @@ async function introspectGate(token,env,{operator=false}={}){
   }
   return {ok:false,status:404,error:'FS27/SkyGate introspection endpoint was not found.'};
 }
+function tokenFromExchange(data){
+  return String(data?.gateBearerToken||data?.gateToken||data?.session?.token||data?.token||data?.access_token||'').replace(/^Bearer\s+/i,'').trim();
+}
+async function exchangeLegacyCredential(credential,env,{operator=false,envName='legacy'}={}){
+  if(!fs27Configured(env)) return {ok:false,status:503,code:'fs27_required',error:'Canonical FS27/SkyGate session is required.'};
+  if(!credential) return {ok:false,status:401,error:'Missing legacy exchange credential.'};
+  const paths=operator
+    ? ['/admin/login','/.netlify/functions/admin-login','/api/owner/admin-login']
+    : ['/session/token','/.netlify/functions/session-token','/auth/exchange','/auth-exchange','/.netlify/functions/auth-exchange'];
+  let last={ok:false,status:404,error:'FS27/SkyGate exchange endpoint was not found.'};
+  for(const path of paths){
+    const res=await skygateRequest(env,path,{
+      method:'POST',
+      headers:{'content-type':'application/json','authorization':`Bearer ${credential}`},
+      body:JSON.stringify({
+        token:credential,
+        code:credential,
+        password:credential,
+        credential,
+        legacy_env:envName,
+        source:'0meg4kai-security-gateway'
+      })
+    });
+    if(res.status===404||res.status===405) continue;
+    const data=await res.json().catch(()=>({error:'Invalid FS27/SkyGate exchange response'}));
+    const exchanged=tokenFromExchange(data);
+    if(!res.ok||!exchanged){
+      last={ok:false,status:res.status,error:data.error||'FS27/SkyGate legacy credential exchange failed.',skygate:data};
+      continue;
+    }
+    const gate=await introspectGate(exchanged,env,{operator});
+    if(!gate.ok) return gate;
+    return {...gate,via:`${gate.via}-legacy-exchange`,exchange:{env:envName,path}};
+  }
+  return last;
+}
+function legacyBearer(req,env,{flag,envName}){
+  const token=bearer(req);
+  const expected=String(env?.[envName]||'').trim();
+  if(!boolEnv(env?.[flag])||!expected||token!==expected) return '';
+  return token;
+}
 async function adminAuth(req,env){
   if(sharedProxyAuth(req,env)) return {ok:true,via:'0s-internal-proxy'};
   const token=gateTokens(req)[0];
-  if(token) return introspectGate(token,env,{operator:true});
-  if(boolEnv(env.OMEGA_ALLOW_LEGACY_ADMIN_TOKEN)&&env.ADMIN_TOKEN&&bearer(req)===env.ADMIN_TOKEN) return {ok:true,via:'explicit-legacy-admin-token'};
+  if(token){
+    const gate=await introspectGate(token,env,{operator:true});
+    if(gate.ok) return gate;
+    const legacy=legacyBearer(req,env,{flag:'OMEGA_ALLOW_LEGACY_ADMIN_TOKEN',envName:'ADMIN_TOKEN'});
+    if(legacy) return exchangeLegacyCredential(legacy,env,{operator:true,envName:'ADMIN_TOKEN'});
+    return gate;
+  }
   return {ok:false,status:401,error:'FS27/SkyGate operator session required.'};
 }
 async function customerAuth(req,env){
   if(sharedProxyAuth(req,env)) return {ok:true,via:'0s-internal-proxy'};
   const token=gateTokens(req)[0];
-  if(token) return introspectGate(token,env);
-  if(boolEnv(env.OMEGA_ALLOW_LEGACY_CUSTOMER_TOKEN)&&env.CUSTOMER_COMMAND_TOKEN&&bearer(req)===env.CUSTOMER_COMMAND_TOKEN) return {ok:true,via:'explicit-legacy-customer-token'};
+  if(token){
+    const gate=await introspectGate(token,env);
+    if(gate.ok) return gate;
+    const legacy=legacyBearer(req,env,{flag:'OMEGA_ALLOW_LEGACY_CUSTOMER_TOKEN',envName:'CUSTOMER_COMMAND_TOKEN'});
+    if(legacy) return exchangeLegacyCredential(legacy,env,{envName:'CUSTOMER_COMMAND_TOKEN'});
+    return gate;
+  }
   return {ok:false,status:401,error:'FS27/SkyGate customer session required.'};
 }
 function scan(command,payload={}){

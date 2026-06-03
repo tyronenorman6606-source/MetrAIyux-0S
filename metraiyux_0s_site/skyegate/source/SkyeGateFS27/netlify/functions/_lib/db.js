@@ -14,8 +14,177 @@ import { neon } from "@netlify/neon";
 
 let _sql = null;
 let _schemaPromise = null;
+let _d1SchemaPromise = null;
 const DB_SEARCH_PATH = "public,jobping,skymail,neon_auth";
 const SCHEMA_BATCH_SIZE = 24;
+
+function dbTimeoutMs() {
+  const ms = Number(process.env.SKYGATE_DB_QUERY_TIMEOUT_MS || process.env.ZERO_OS_DB_QUERY_TIMEOUT_MS || 8000);
+  if (!Number.isFinite(ms) || ms <= 0) return 8000;
+  return Math.max(1000, Math.min(55000, Math.round(ms)));
+}
+
+function timeoutError(label, timeoutMs) {
+  const err = new Error(`${label} timed out after ${timeoutMs}ms`);
+  err.code = "DB_QUERY_TIMEOUT";
+  err.status = 503;
+  return err;
+}
+
+async function withDbTimeout(promise, label = "Database query") {
+  const timeoutMs = dbTimeoutMs();
+  let timer = null;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(timeoutError(label, timeoutMs)), timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+    promise.catch(() => {});
+  }
+}
+
+function d1Binding() {
+  const env = globalThis.__SKYGATE_FS27_ENV || {};
+  return env.RUNTIME_ROLLUP_DB || env.CITADEL_DB || env.CITADEL_DATABASE || null;
+}
+
+function useD1ForQuery(text = "") {
+  const driver = String(process.env.SKYPAY_ORDER_LEDGER_DRIVER || "").toLowerCase();
+  if (driver !== "d1") return false;
+  if (!d1Binding()?.prepare) return false;
+  return /\b(skyepay_orders|skyepay_refunds|audit_events)\b/i.test(text) || /^\s*select\s+1\s+as\s+ok\s*;?\s*$/i.test(text);
+}
+
+async function ensureD1Schema() {
+  const db = d1Binding();
+  if (!db?.prepare) throw Object.assign(new Error("Citadel D1 binding is unavailable"), { code: "D1_NOT_CONFIGURED", status: 503 });
+  if (_d1SchemaPromise) return _d1SchemaPromise;
+  _d1SchemaPromise = (async () => {
+    const statements = [
+      `create table if not exists audit_events (
+        id integer primary key autoincrement,
+        actor text not null,
+        action text not null,
+        target text,
+        meta text not null default '{}',
+        created_at text not null default (datetime('now'))
+      )`,
+      `create index if not exists audit_events_created_idx on audit_events(created_at desc)`,
+      `create table if not exists skyepay_orders (
+        id text primary key,
+        client_slug text not null,
+        workspace_slug text,
+        customer_id integer,
+        customer_email text,
+        customer_name text,
+        company_name text,
+        offer_id text not null,
+        offer_snapshot text not null default '{}',
+        amount_setup_cents integer not null default 0,
+        amount_recurring_cents integer not null default 0,
+        currency text not null default 'usd',
+        checkout_mode text not null default 'payment',
+        stripe_session_id text unique,
+        stripe_customer_id text,
+        stripe_subscription_id text,
+        payment_intent_id text,
+        payment_status text not null default 'created',
+        approval_status text not null default 'checkout_created',
+        owner_status text not null default 'waiting_for_checkout',
+        provisioning_status text not null default 'waiting_for_payment',
+        source text not null default 'skypay',
+        success_url text,
+        cancel_url text,
+        metadata text not null default '{}',
+        paid_at text,
+        approved_at text,
+        provisioned_at text,
+        created_at text not null default (datetime('now')),
+        updated_at text not null default (datetime('now'))
+      )`,
+      `create index if not exists skyepay_orders_client_idx on skyepay_orders(client_slug, created_at desc)`,
+      `create index if not exists skyepay_orders_customer_idx on skyepay_orders(customer_id, created_at desc)`,
+      `create index if not exists skyepay_orders_status_idx on skyepay_orders(approval_status, owner_status, provisioning_status, created_at desc)`,
+      `create index if not exists skyepay_orders_stripe_customer_idx on skyepay_orders(stripe_customer_id)`,
+      `create table if not exists skyepay_refunds (
+        id text primary key,
+        skyepay_order_id text not null,
+        stripe_refund_id text not null unique,
+        stripe_payment_intent_id text,
+        amount_cents integer not null default 0,
+        currency text not null default 'usd',
+        status text not null default 'succeeded',
+        reason text not null default 'requested_by_customer',
+        metadata text not null default '{}',
+        created_at text not null default (datetime('now')),
+        updated_at text not null default (datetime('now'))
+      )`,
+      `create index if not exists skyepay_refunds_order_idx on skyepay_refunds(skyepay_order_id, created_at desc)`
+    ];
+    for (const statement of statements) await db.prepare(statement).run();
+  })();
+  return _d1SchemaPromise;
+}
+
+function normalizeD1Sql(text = "") {
+  return String(text || "")
+    .replace(/metadata\s*=\s*metadata\s*\|\|\s*(\$\d+::jsonb)/gi, "metadata=json_patch(coalesce(metadata, '{}'), $1)")
+    .replace(/metadata\s*=\s*skyepay_orders\.metadata\s*\|\|\s*excluded\.metadata/gi, "metadata=json_patch(coalesce(skyepay_orders.metadata, '{}'), coalesce(excluded.metadata, '{}'))")
+    .replace(/'{}'::jsonb/gi, "'{}'")
+    .replace(/::jsonb/gi, "")
+    .replace(/::text/gi, "")
+    .replace(/::int/gi, "")
+    .replace(/\bnow\(\)/gi, "datetime('now')")
+    .replace(/\btimestamptz\b/gi, "text")
+    .replace(/\bbigserial\b/gi, "integer")
+    .replace(/\bserial\b/gi, "integer");
+}
+
+function bindD1Sql(text = "", params = []) {
+  const bound = [];
+  const sql = normalizeD1Sql(text).replace(/\$(\d+)/g, (_match, rawIndex) => {
+    bound.push(params[Number(rawIndex) - 1]);
+    return "?";
+  });
+  return { sql, params: bound };
+}
+
+function parseJsonField(value) {
+  if (value && typeof value === "string") {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return {};
+    }
+  }
+  return value && typeof value === "object" ? value : {};
+}
+
+function normalizeD1Row(row = {}) {
+  if (!row || typeof row !== "object") return row;
+  return {
+    ...row,
+    offer_snapshot: parseJsonField(row.offer_snapshot),
+    metadata: parseJsonField(row.metadata),
+    meta: parseJsonField(row.meta)
+  };
+}
+
+async function qD1(text, params = []) {
+  await ensureD1Schema();
+  const db = d1Binding();
+  const { sql, params: bound } = bindD1Sql(text, params);
+  const result = await withDbTimeout(
+    bound.length ? db.prepare(sql).bind(...bound).all() : db.prepare(sql).all(),
+    "Citadel D1 query"
+  );
+  const rows = Array.isArray(result?.results) ? result.results.map(normalizeD1Row) : [];
+  return { rows, rowCount: rows.length || Number(result?.meta?.changes || 0) || 0 };
+}
 
 function getSql() {
   if (_sql) return _sql;
@@ -59,6 +228,7 @@ async function ensureSchema() {
   _schemaPromise = (async () => {
     const statements = [
       `create extension if not exists pgcrypto;`,
+      `create schema if not exists skymail;`,
       `create table if not exists customers (
         id bigserial primary key,
         email text not null unique,
@@ -1019,6 +1189,197 @@ async function ensureSchema() {
       );`,
       `create index if not exists voice_usage_monthly_customer_idx on voice_usage_monthly(customer_id, month);`,
 
+      // --- Unified FS27 app auth spine ---
+      `create table if not exists gate_app_surfaces (
+        app_id text primary key,
+        display_name text not null,
+        category text not null default 'mounted-app',
+        auth_mode text not null default 'fs27-gate-owned',
+        default_plan text not null default 'free99',
+        status text not null default 'active',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );`,
+      `create table if not exists gate_login_surfaces (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        surface_slug text not null,
+        display_name text,
+        login_url text,
+        handoff_url text,
+        auth_target text not null default 'fs27',
+        status text not null default 'active',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique(app_id, surface_slug)
+      );`,
+      `create table if not exists gate_app_workspaces (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        fs27_workspace_id uuid references workspaces(id) on delete set null,
+        fs27_customer_id bigint references customers(id) on delete set null,
+        owner_user_id uuid references users(id) on delete set null,
+        local_workspace_id text not null,
+        local_workspace_kind text not null default 'workspace',
+        workspace_slug text,
+        workspace_name text,
+        tier text not null default 'free99',
+        plan_name text not null default 'free99-gate-owned',
+        status text not null default 'active',
+        entitlements jsonb not null default '{}'::jsonb,
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        unique(app_id, local_workspace_id)
+      );`,
+      `create index if not exists gate_app_workspaces_customer_idx on gate_app_workspaces(fs27_customer_id, app_id, last_seen_at desc);`,
+      `create index if not exists gate_app_workspaces_fs27_workspace_idx on gate_app_workspaces(fs27_workspace_id, app_id);`,
+      `create index if not exists gate_app_workspaces_owner_idx on gate_app_workspaces(owner_user_id, app_id);`,
+      `create table if not exists gate_app_users (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        fs27_user_id uuid references users(id) on delete set null,
+        fs27_customer_id bigint references customers(id) on delete set null,
+        fs27_workspace_id uuid references workspaces(id) on delete set null,
+        gate_app_workspace_id uuid references gate_app_workspaces(id) on delete set null,
+        local_user_id text not null,
+        local_user_kind text not null default 'user',
+        email text,
+        app_role text not null default 'user',
+        status text not null default 'active',
+        local_auth_status text not null default 'fs27-linked',
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        unique(app_id, local_user_id)
+      );`,
+      `create index if not exists gate_app_users_email_idx on gate_app_users(app_id, lower(email));`,
+      `create index if not exists gate_app_users_fs27_user_idx on gate_app_users(fs27_user_id, app_id, last_seen_at desc);`,
+      `create index if not exists gate_app_users_customer_idx on gate_app_users(fs27_customer_id, app_id, last_seen_at desc);`,
+      `create index if not exists gate_app_users_workspace_idx on gate_app_users(gate_app_workspace_id, app_id);`,
+      `create table if not exists gate_app_entitlements (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        subject_kind text not null,
+        subject_id text not null,
+        fs27_customer_id bigint references customers(id) on delete set null,
+        fs27_user_id uuid references users(id) on delete set null,
+        fs27_workspace_id uuid references workspaces(id) on delete set null,
+        gate_app_workspace_id uuid references gate_app_workspaces(id) on delete set null,
+        entitlement_key text not null,
+        plan_name text not null default 'free99-gate-owned',
+        tier text not null default 'free99',
+        status text not null default 'active',
+        limits jsonb not null default '{}'::jsonb,
+        metadata jsonb not null default '{}'::jsonb,
+        starts_at timestamptz not null default now(),
+        ends_at timestamptz,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique(app_id, subject_kind, subject_id, entitlement_key)
+      );`,
+      `create index if not exists gate_app_entitlements_customer_idx on gate_app_entitlements(fs27_customer_id, app_id, status);`,
+      `create index if not exists gate_app_entitlements_user_idx on gate_app_entitlements(fs27_user_id, app_id, status);`,
+      `create index if not exists gate_app_entitlements_workspace_idx on gate_app_entitlements(gate_app_workspace_id, app_id, status);`,
+      `create table if not exists gate_auth_migration_records (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        local_auth_kind text not null default 'legacy-local-auth',
+        local_user_id text,
+        local_workspace_id text,
+        email text,
+        fs27_user_id uuid references users(id) on delete set null,
+        fs27_customer_id bigint references customers(id) on delete set null,
+        action text not null default 'linked_to_fs27',
+        status text not null default 'preserved',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now()
+      );`,
+      `create index if not exists gate_auth_migration_records_app_created_idx on gate_auth_migration_records(app_id, created_at desc);`,
+      `create index if not exists gate_auth_migration_records_email_idx on gate_auth_migration_records(app_id, lower(email));`,
+      `create table if not exists gate_owner_recovery_paths (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        path_key text not null,
+        recovery_kind text not null default 'owner-break-glass',
+        owner_user_id uuid references users(id) on delete set null,
+        status text not null default 'active',
+        scope text[] not null default '{}'::text[],
+        credential_hash text,
+        metadata jsonb not null default '{}'::jsonb,
+        expires_at timestamptz,
+        used_at timestamptz,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique(app_id, path_key)
+      );`,
+      `create index if not exists gate_owner_recovery_paths_owner_idx on gate_owner_recovery_paths(owner_user_id, status, updated_at desc);`,
+      `create table if not exists gate_service_credentials (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        service_name text not null,
+        credential_hash text not null,
+        credential_last4 text,
+        scope text[] not null default '{}'::text[],
+        status text not null default 'active',
+        metadata jsonb not null default '{}'::jsonb,
+        rotated_at timestamptz,
+        expires_at timestamptz,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique(app_id, service_name, credential_hash)
+      );`,
+      `create index if not exists gate_service_credentials_app_idx on gate_service_credentials(app_id, service_name, status);`,
+      `create table if not exists gate_app_data_mirrors (
+        id uuid primary key default gen_random_uuid(),
+        app_id text not null references gate_app_surfaces(app_id) on delete cascade,
+        entity_type text not null,
+        local_entity_id text not null,
+        fs27_customer_id bigint references customers(id) on delete set null,
+        fs27_user_id uuid references users(id) on delete set null,
+        gate_app_workspace_id uuid references gate_app_workspaces(id) on delete set null,
+        content_hash text,
+        status text not null default 'mirrored',
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        unique(app_id, entity_type, local_entity_id)
+      );`,
+      `create index if not exists gate_app_data_mirrors_workspace_idx on gate_app_data_mirrors(gate_app_workspace_id, entity_type, last_seen_at desc);`,
+      `create index if not exists gate_app_data_mirrors_user_idx on gate_app_data_mirrors(fs27_user_id, app_id, entity_type, last_seen_at desc);`,
+      `create table if not exists skymail.gate_user_links (
+        fs27_user_id uuid references public.users(id) on delete set null,
+        fs27_customer_id bigint references public.customers(id) on delete set null,
+        fs27_gate_card_id text,
+        skymail_user_id uuid,
+        skymail_id text,
+        workspace_id text,
+        email text not null,
+        handle text,
+        local_auth_status text not null default 'fs27-linked',
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        primary key(email)
+      );`,
+      `create index if not exists skymail_gate_user_links_fs27_user_idx on skymail.gate_user_links(fs27_user_id, last_seen_at desc);`,
+      `create index if not exists skymail_gate_user_links_workspace_idx on skymail.gate_user_links(workspace_id, last_seen_at desc);`,
+      `create table if not exists skymail.gate_mailbox_links (
+        skymail_id text primary key,
+        fs27_user_id uuid references public.users(id) on delete set null,
+        fs27_customer_id bigint references public.customers(id) on delete set null,
+        fs27_gate_card_id text,
+        workspace_id text,
+        mailbox_email text,
+        mailbox_kind text not null default 'hosted',
+        status text not null default 'active',
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now()
+      );`,
+
 ];
 
     for (const batch of chunkQueries(statements)) {
@@ -1035,7 +1396,8 @@ async function ensureSchema() {
  * - supports $1, $2 placeholders + params array via sql.query(...)
  */
 export async function q(text, params = []) {
+  if (useD1ForQuery(text)) return qD1(text, params);
   await ensureSchema();
-  const [rows] = await runQueriesWithSearchPath([{ text, params }]);
+  const [rows] = await withDbTimeout(runQueriesWithSearchPath([{ text, params }]));
   return { rows: rows || [], rowCount: Array.isArray(rows) ? rows.length : 0 };
 }

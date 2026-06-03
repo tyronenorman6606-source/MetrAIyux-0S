@@ -5,7 +5,13 @@
   const SESSION_KEYS = [
     "METRAIYUX_GATE_SESSION",
     "SKYGATEFS27_GATE_SESSION",
-    "SKYE_GATE_SESSION"
+    "SKYE_GATE_SESSION",
+    "ZERO_OS_GATE_SESSION",
+    "metraiyux_gate_session",
+    "skye_gate_session",
+    "skygate_session",
+    "free99_gate_session",
+    "zero_os_gate_session"
   ];
   const LEGACY_SESSION_KEYS = [
     ...SESSION_KEYS,
@@ -21,6 +27,10 @@
   const EVENT_KEY = "metraiyux.gate.events.v1";
   const MAX_EVENTS = 160;
   const LIVE_EVENT_ENDPOINT = "/api/0s-command-bridge/events";
+  const LIVE_EVENT_DEDUPE_MS = 15000;
+  const LIVE_EVENT_MAX_IN_FLIGHT = 4;
+  const liveEventDedupes = new Map();
+  let liveEventInFlight = 0;
 
   const clean = (value) => String(value == null ? "" : value).trim();
   const safeToken = (value) => clean(value).replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 8192);
@@ -325,6 +335,42 @@
     }
   }
 
+  function liveEventKey(event) {
+    const detail = event?.detail || {};
+    return [
+      event?.type || "gate_event",
+      event?.platform_id || "",
+      event?.usage_lane || "",
+      event?.source || "",
+      detail.source || "",
+      detail.entity_id || detail.entityId || "",
+      detail.action_id || detail.actionId || "",
+      detail.control_id || detail.controlId || "",
+      detail.workspace_id || detail.workspaceId || "",
+      detail.client_id || detail.clientId || ""
+    ].join("|");
+  }
+
+  function liveQueueState(event, session) {
+    if (!session || !tokenLooksValid(session.token)) {
+      return { post: false, status: "local_only_missing_gate_session" };
+    }
+    if (liveEventInFlight >= LIVE_EVENT_MAX_IN_FLIGHT) {
+      return { post: false, status: "local_recorded_live_backpressure" };
+    }
+    const now = Date.now();
+    const key = liveEventKey(event);
+    const last = liveEventDedupes.get(key) || 0;
+    if (now - last < LIVE_EVENT_DEDUPE_MS) {
+      return { post: false, status: "local_recorded_live_deduped" };
+    }
+    liveEventDedupes.set(key, now);
+    liveEventDedupes.forEach((at, dedupeKey) => {
+      if (now - at > LIVE_EVENT_DEDUPE_MS * 8) liveEventDedupes.delete(dedupeKey);
+    });
+    return { post: true, status: "queued_live_write" };
+  }
+
   function record(type, detail = {}, session = current()) {
     const event = {
       id: `gateevt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
@@ -335,18 +381,24 @@
       actor: detail.actor || session?.actor || "0s-operator",
       source: detail.source || session?.source || "0s-gate-card-bridge",
       live_endpoint: LIVE_EVENT_ENDPOINT,
-      live_status: session ? "queued_live_write" : "missing_gate_session",
+      live_status: "queued_live_write",
       detail
     };
+    const queueState = liveQueueState(event, session);
+    event.live_status = queueState.status;
     const events = readEvents().concat(event).slice(-MAX_EVENTS);
     writeStore(localStorage, EVENT_KEY, JSON.stringify(events));
     document.dispatchEvent(new CustomEvent("metraiyux:gate-event", { detail: event }));
+    if (!queueState.post) return event;
+    liveEventInFlight += 1;
     sendLiveEvent(event).then((result) => {
       const currentEvents = readEvents();
       const nextEvents = currentEvents.map((item) => item?.id === event.id
         ? { ...item, live_status: result?.ok ? "posted" : "live_write_failed", live_result: result }
         : item);
       writeStore(localStorage, EVENT_KEY, JSON.stringify(nextEvents));
+    }).finally(() => {
+      liveEventInFlight = Math.max(0, liveEventInFlight - 1);
     });
     return event;
   }

@@ -3,14 +3,14 @@
   "name": "SkyePay API",
   "version": "1.0.0",
   "owner": "Skyes Over London LC",
-  "gateway": "SkyeGateFS27",
+  "gateway": "SkyeGate FS27",
   "public_origin": "https://skyesol.netlify.app",
   "openapi": "/openapi/skyepay.openapi.json",
   "sdk": "/assets/skyepay-client.js",
   "docs": "/skyepay-api.html",
   "store": "/skyepay-store.html",
-  "repo_stripe_catalog": {
-    "source": "metraiyux_0s_site/brain/sales-offer-registry.json",
+  "catalog_integrity": {
+    "source": "0S sales registry",
     "imported_checkout_offers": 50,
     "checkout_rule": "approved and approved_floor fixed-amount offers only"
   },
@@ -32,12 +32,12 @@
     }
   },
   "security": {
-    "card_data": "Stripe Checkout only",
+    "card_data": "secure hosted checkout only",
     "cors": "same-origin or SKYPAY_ALLOWED_ORIGINS",
     "activation": "owner-approved offers stay paid_pending_owner_approval until an authenticated FS27 admin approves and unlocks them",
     "idempotency": "send idempotency_key on checkout creation",
     "free_trials": "subscription offers can start with trial_period_days and $0 due today",
-    "stripe_lookup_keys": "checkout prefers dashboard Stripe Price lookup keys, then falls back to metadata-preserving price_data",
+    "price_lookup_keys": "checkout prefers dashboard price lookup keys, then falls back to metadata-preserving price_data",
     "gate_policy": "approved orders write caps, default rate limits, device policy, model/provider allowlists, and vault limits into FS27 customer policy"
   },
   "example_checkout_body": {

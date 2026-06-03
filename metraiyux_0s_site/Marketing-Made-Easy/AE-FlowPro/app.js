@@ -1864,6 +1864,31 @@ Aggressive | 0.50 | 0.25`,
       return lines.join("\\n");
     }
 
+    function currentDealDraft(){
+      const accountId = $("dealAccountSelect").value;
+      const acct = (APP.state.accounts||[]).find(a => a.id === accountId) || {};
+      const preset = getPresetByName($("dealPreset").value);
+      const depPct = Number($("dealDepositPct").value);
+      const setupTotal = dealItems.reduce((s,it)=> s + (Number(it.setup)||0), 0);
+      const monthlyTotal = dealItems.reduce((s,it)=> s + (Number(it.monthly)||0), 0);
+      return {
+        name: ($("dealName").value || "").trim() || "Custom Package",
+        account_name: acct.business_name || "Unassigned account",
+        account_email: acct.business_email || "",
+        ae_name: acct.ae_name || "",
+        stage: $("dealStage").value,
+        deposit_pct: Number.isFinite(depPct) ? depPct : APP.state.settings.depositPct,
+        preset_name: preset.name,
+        ae_deposit_pct: preset.aeDepositPct,
+        ae_monthly_pct: preset.aeMonthlyPct,
+        setup_total: setupTotal,
+        monthly_total: monthlyTotal,
+        deposit_due: setupTotal * (Number.isFinite(depPct) ? depPct : APP.state.settings.depositPct),
+        notes: ($("dealNotes").value || "").trim(),
+        items: dealItems.map(it => ({ name: it.name, setup: Number(it.setup)||0, monthly: Number(it.monthly)||0 }))
+      };
+    }
+
     function renderDeals(){
       populateDealAccountSelect();
       populatePresets();
@@ -3513,6 +3538,7 @@ Aggressive | 0.50 | 0.25`;
 
       document.getElementById("saveDealBtn").addEventListener("click", saveDeal);
       document.getElementById("resetDealBtn").addEventListener("click", resetDeal);
+      document.getElementById("copyDealSummaryBtn").addEventListener("click", () => copyText(buildDealSummary(currentDealDraft())));
 
       document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
       document.getElementById("resetSettingsBtn").addEventListener("click", resetSettings);

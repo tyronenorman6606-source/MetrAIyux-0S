@@ -19,8 +19,8 @@
     "e2e:browser": "node ../tools/browser-proof-disabled.mjs --lane=skyevault-drop-browser-e2e",
     "exports:audit": "node scripts/closure-audit.mjs",
     "cloudflare:build": "node scripts/build-cloudflare-internal-pages.mjs",
-    "cloudflare:check": "npm run cloudflare:build && node --check cloudflare/worker.mjs && ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.14.0 node ../tools/run-root-wrangler.mjs deploy --dry-run --outdir /tmp/skyevault-wrangler-dry-run",
-    "cloudflare:deploy": "npm run cloudflare:build && ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.14.0 node ../tools/run-root-wrangler.mjs deploy"
+    "cloudflare:check": "npm run cloudflare:build && node --check cloudflare/worker.mjs && ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.95.0 node ../tools/run-root-wrangler.mjs deploy --dry-run --outdir /tmp/skyevault-wrangler-dry-run",
+    "cloudflare:deploy": "npm run cloudflare:build && ROOT_ENV_FILE=../.env WRANGLER_VERSION=4.95.0 node ../tools/run-root-wrangler.mjs deploy"
   },
   "engines": {
     "node": ">=18.18.0"

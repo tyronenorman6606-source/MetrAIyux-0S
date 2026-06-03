@@ -1,76 +1,86 @@
 {
   "schema": "skyevault.autosync-public-proof.v1",
-  "generatedAt": "2026-05-29T16:29:54.182Z",
+  "generatedAt": "2026-05-31T20:13:21.899Z",
   "repo": {
     "name": "MetrAIyux-0S",
     "root": "local-dev-workspace",
     "rootHash": "68d628eb2112",
     "branch": "main",
-    "shortHead": "6336a975e",
+    "shortHead": "a4e336eb8",
     "upstream": "origin/main",
-    "ahead": 13,
+    "ahead": 0,
     "behind": 0
   },
   "currentStatus": {
     "ok": true,
-    "checkedAt": "2026-05-29T16:29:54.020Z",
-    "dirty": false,
+    "checkedAt": "2026-05-31T20:13:21.776Z",
+    "dirty": true,
     "statusCounts": {
-      "modified": 0,
-      "deleted": 0,
-      "untracked": 0
+      "modified": 417,
+      "deleted": 1406,
+      "untracked": 63
     },
-    "digest": "5ea2960f5186756d46853d223c1e5ddedf32bb033314b6423f05eee8022f3e94",
-    "scanMode": "fast",
-    "scannedFiles": 45,
-    "localOnlyCriticalCount": 45,
-    "secretLikeTotal": 11
+    "digest": "b123c172264024442e5e2920ddb4291f2408e277a6fe13f16997111e8d4753dc",
+    "scanMode": "status-fast",
+    "scannedFiles": 533,
+    "localOnlyCriticalCount": 0,
+    "secretLikeTotal": 14
   },
-  "latestSuccess": null,
+  "latestSuccess": {
+    "ok": true,
+    "completedAt": "2026-05-31T20:03:59.284Z",
+    "startedAt": "2026-05-31T20:03:12.736Z",
+    "mode": "git+full",
+    "digest": "822939229d0b7c7c83ad5acc8c8eb5c3fb6201bfe7c83f104c3b8696453a7928",
+    "plannedModes": [
+      "git",
+      "full"
+    ],
+    "statusCounts": {
+      "modified": 416,
+      "deleted": 1406,
+      "untracked": 63
+    },
+    "durationMs": 0
+  },
   "latestUpload": {
-    "receiptId": "cdv_f4973647019072d97eb62f11",
-    "artifactBytes": 15660995840,
-    "artifactSha256": "a02e131bef14a87d965a6e8cfb201dfab0130a37e7f0613f4373ce08658c85ca",
+    "receiptId": "cdv_1cf38e5689280e988baf684e",
+    "artifactBytes": 17323174736,
+    "artifactSha256": "9ad319fd784a06ce458a6e04b73f67dd0c4f684ef31a36bef335a30e9da0b0e6",
     "recoveryUrl": "https://skyevault-drop.graylondonskyes.workers.dev/#client-vault",
     "downloadUrlAvailable": false,
     "controlUploadStatus": "uploaded",
-    "controlReceiptId": "cdv_654dcc3550c042e62d041617",
+    "controlReceiptId": "cdv_509b88a877b464c28b63d596",
     "controlDownloadUrlAvailable": false,
-    "controlBytes": 61737,
+    "controlBytes": 66673,
     "ledgerEntryCount": 121
   },
   "latestDeltaJournal": {
     "ok": true,
     "action": "delta-packed",
-    "completedAt": "2026-05-29T15:54:48.922Z",
-    "digest": "4c839a292c403fc0bbf33a1879c7ad1d0480987c69287c3ae7726182767af7ff",
+    "completedAt": "2026-05-31T20:03:35.936Z",
+    "digest": "42a3ca56a9320102b2d357a0222bc01bbb3735f58023e8ac3c197b7e39b17711",
     "branch": "main",
-    "shortHead": "6336a975e",
-    "changedFileCount": 7,
+    "shortHead": "a4e336eb8",
+    "changedFileCount": 23,
     "tombstoneCount": 0,
     "skippedCount": 0,
-    "packBytes": 775626,
-    "packSha256": "33e795e454789f90e436d5636517bae6082939ccae117b203e2e81f3e33be6d8",
-    "uploadReceiptId": "cdv_0a80fdb535ae11328deb6f09",
+    "packBytes": 4865714,
+    "packSha256": "781b3058524fe10e41e1952e24a18c94dbc40006acacbbff524e12d39f567aae",
+    "uploadReceiptId": "cdv_3895ecf6dd552f8049475178",
     "uploadReceiptAvailable": true,
     "downloadUrlAvailable": true
   },
   "daemon": {
     "watchPid": null,
     "watchRunning": false,
-    "activeLock": {
-      "pid": 24929,
-      "running": true,
-      "command": "watch",
-      "startedAt": "2026-05-29T15:54:34.728Z",
-      "host": "penguin"
-    },
-    "lastDaemonLine": "[autosync-daemon] 2026-05-29T11:59:06Z"
+    "activeLock": null,
+    "lastDaemonLine": ""
   },
   "parity": {
-    "latestSuccessExists": false,
+    "latestSuccessExists": true,
     "currentDigestMatchesLatestSuccess": false,
-    "nextDaemonTickRequired": false,
+    "nextDaemonTickRequired": true,
     "intervalSeconds": 600,
     "fastDeltaJournalEnabled": true
   },
@@ -103,7 +113,7 @@
     "publicProofBoundary": "This file publishes counts, digests, receipt IDs, and status only; it never publishes bearer tokens, passphrases, peppers, file bodies, or signed download URLs."
   },
   "notifications": {
-    "enabled": false,
+    "enabled": true,
     "throttleMinutes": 10,
     "settingsPath": ".skyevault-out/autosync-notify-settings.json",
     "lastResult": {
@@ -111,7 +121,7 @@
       "skipped": true,
       "status": null,
       "id": "",
-      "reason": "notifications disabled",
+      "reason": "notification not requested for this proof publish",
       "toCount": 0,
       "dryRun": false
     }
@@ -120,10 +130,10 @@
     "ok": true,
     "status": 0,
     "outputPath": "metraiyux_0s_site/proof/repo-vault-project-manifest.json",
-    "safe_browser_entry_count": 125600,
-    "private_entry_count": 44,
-    "skipped_entry_count": 53377,
-    "directory_count": 79603,
+    "safe_browser_entry_count": 63118,
+    "private_entry_count": 53,
+    "skipped_entry_count": 39444,
+    "directory_count": 55236,
     "error": ""
   }
 }

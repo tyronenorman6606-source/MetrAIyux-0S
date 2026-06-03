@@ -3,7 +3,7 @@
   "info": {
     "title": "SkyePay API",
     "version": "1.0.0",
-    "description": "SkyePay is the SkyeGateFS27 payment gateway for public offers, zero-up-front subscription trials, Stripe Checkout creation, safe public order status, owner approval, vault access policy, and workspace activation."
+    "description": "SkyePay is the SkyeGate FS27 payment gateway for public offers, zero-up-front subscription trials, secure checkout creation, safe public order status, owner approval, vault access policy, and workspace activation."
   },
   "servers": [
     {
@@ -42,8 +42,8 @@
     "/skyepay/checkout": {
       "post": {
         "operationId": "createSkyePayCheckout",
-        "summary": "Create a Stripe Checkout Session through SkyePay.",
-        "description": "Card data stays in Stripe Checkout. FS27 records the order and keeps activation pending until owner approval.",
+        "summary": "Create a secure checkout session through SkyePay.",
+        "description": "Card data stays in the hosted checkout lane. FS27 records the order and keeps activation pending until owner approval. SkyeMail mailbox offers require a mailbox claim using mailbox_local_part plus mailbox_domain, or mailbox_email.",
         "requestBody": {
           "required": true,
           "content": {
@@ -63,7 +63,7 @@
           },
           "400": { "description": "Invalid request" },
           "403": { "description": "Dry-run disabled or origin rejected by browser CORS" },
-          "501": { "description": "Stripe is not configured" }
+          "501": { "description": "Payment runtime is not configured" }
         }
       }
     },
@@ -107,9 +107,9 @@
           "ok": { "type": "boolean" },
           "product": { "type": "string", "const": "SkyePay" },
           "gate": { "type": "string" },
-          "stripe_backed": { "type": "boolean" },
+          "skypay_live": { "type": "boolean" },
           "owner_approval_required": { "type": "boolean" },
-          "repo_stripe_catalog": {
+          "catalog_integrity": {
             "type": "object",
             "properties": {
               "source": { "type": "string" },
@@ -149,6 +149,7 @@
           "brain_owner": { "type": ["string", "null"] },
           "rate_limits": { "type": ["object", "null"] },
           "gate_policy": { "type": ["object", "null"] },
+          "fulfillment": { "$ref": "#/components/schemas/FulfillmentContract" },
           "currency": { "type": "string" },
           "mode": { "type": "string", "enum": ["payment", "subscription"] },
           "owner_approval_required": { "type": "boolean" }
@@ -163,6 +164,19 @@
           "customer_name": { "type": "string" },
           "customer_email": { "type": "string", "format": "email" },
           "company_name": { "type": "string" },
+          "mailbox_local_part": {
+            "type": "string",
+            "description": "Optional for general offers. Required with mailbox_domain for SkyeMail mailbox offers when mailbox_email is not provided."
+          },
+          "mailbox_domain": {
+            "type": "string",
+            "description": "Optional for general offers. Required with mailbox_local_part for SkyeMail mailbox offers when mailbox_email is not provided."
+          },
+          "mailbox_email": {
+            "type": "string",
+            "format": "email",
+            "description": "Optional for general offers. Required by SkyeMail mailbox offers unless mailbox_local_part and mailbox_domain are provided."
+          },
           "idempotency_key": { "type": "string" },
           "dry_run": { "type": "boolean", "description": "Local proof only unless SKYPAY_ALLOW_PUBLIC_DRY_RUN is enabled." }
         }
@@ -179,6 +193,7 @@
           "approval_status": { "type": "string" },
           "owner_approval_required": { "type": "boolean" },
           "activation_path": { "type": ["string", "null"] },
+          "fulfillment": { "$ref": "#/components/schemas/FulfillmentContract" },
           "client": { "type": "object" }
         }
       },
@@ -200,9 +215,44 @@
               "owner_status": { "type": "string" },
               "provisioning_status": { "type": "string" },
               "offer": { "type": ["object", "null"] },
+              "fulfillment": { "$ref": "#/components/schemas/FulfillmentContract" },
+              "skyemail_mailbox": { "$ref": "#/components/schemas/SkyeMailMailboxStatus" },
               "customer_hint": { "type": "string" }
             }
           }
+        }
+      },
+      "FulfillmentContract": {
+        "type": ["object", "null"],
+        "properties": {
+          "type": { "type": "string" },
+          "activation_path": { "type": ["string", "null"] },
+          "activation_label": { "type": "string" },
+          "owner_review_required": { "type": "boolean" },
+          "self_serve_after_payment": { "type": "boolean" },
+          "access_state": { "type": "string" },
+          "delivery_surface": { "type": "string" },
+          "customer_next_step": { "type": "string" },
+          "support_email": { "type": "string", "format": "email" },
+          "support_note": { "type": "string" }
+        }
+      },
+      "SkyeMailMailboxStatus": {
+        "type": ["object", "null"],
+        "properties": {
+          "type": { "type": "string", "const": "skyemail-mailbox" },
+          "mailbox_email": { "type": ["string", "null"], "format": "email" },
+          "local_part": { "type": ["string", "null"] },
+          "domain": { "type": ["string", "null"] },
+          "mailbox_id": { "type": ["string", "null"] },
+          "mailbox_status": { "type": ["string", "null"] },
+          "provisioning_status": { "type": ["string", "null"] },
+          "inbox_ready": { "type": "boolean" },
+          "key_state_active": { "type": "boolean" },
+          "needs_customer_mailbox_claim": { "type": "boolean" },
+          "claim_reason": { "type": ["string", "null"] },
+          "error": { "type": ["object", "null"] },
+          "provisioned_at": { "type": ["string", "null"] }
         }
       }
     }

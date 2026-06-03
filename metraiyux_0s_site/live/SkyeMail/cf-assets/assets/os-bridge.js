@@ -1,7 +1,7 @@
 (function(){
   const ZERO_OS_ORIGIN = "https://metraiyux-0s-full-system.graylondonskyes.workers.dev";
   const SKYEMAIL_ORIGIN = "https://skyemail-platform.graylondonskyes.workers.dev";
-  const DOCX_PATH = "/Marketing-Made-Easy/SkyeDocxMax/editor.html";
+  const DOCX_PATH = "/Marketing-Made-Easy/SkyeDocxMax/editor";
 
   const ACTIONS = [
     { id:"skydocxmax-editor", group:"Documents", panel:"docs", label:"SkyeDocxMax Editor", path:DOCX_PATH, lane:"document-compose", capability:"verified_gated_app", bridge:"fragment_handoff", embed:false, summary:"Draft or edit selected mail as a SkyeDocxMax document.", talksTo:["SkyeMail context","SkyeDocxMax importer","shared 0S gate"] },
@@ -9,8 +9,13 @@
     { id:"sovereigndocs-review-studio", group:"Documents", panel:"docs", label:"Document Review", path:"/Free99/apps/sovereigndocs/review-studio/", lane:"document-review", capability:"verified_gated_app", bridge:"workflow_packet", embed:false, summary:"Queue a message, draft, or attachment for lifecycle review.", talksTo:["SkyeMail workflow packets","SovereignDocs review","shared 0S gate"] },
     { id:"founder-calendar", group:"Schedule", panel:"calendar", label:"0S Calendar", path:"/founder-command/apps/0s-calendar/", apiRoute:"/api/founder-command/calendar", lane:"calendar-follow-up", capability:"live_api", bridge:"direct_api", embed:false, summary:"List and create Founder Calendar events from mail context.", talksTo:["SkyeMail context","Founder Calendar API","Google Calendar provider when configured"] },
     { id:"founder-command-bridge", group:"Command", panel:"automation", label:"Founder Command", path:"/founder-command/apps/0s-command-bridge/", apiRoute:"/api/founder-command/actions", lane:"founder-command", capability:"live_api", bridge:"direct_api", embed:false, summary:"Promote mail into allowlisted Founder Command actions and receipts.", talksTo:["SkyeMail workflow packets","Founder Command actions","0S Command Bridge"] },
-    { id:"crm-pipeline", group:"CRM", panel:"crm", label:"CRM Pipeline", path:"/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/pipeline-tracker.html", apiRoute:"/api/founder-command/actions", apiAction:"command-bridge.event.record", lane:"crm-intake", capability:"packet_bridge", bridge:"command_bridge_event", embed:false, summary:"Record sender or thread context as a 0S Command Bridge CRM event.", talksTo:["SkyeMail workflow packets","0S Command Bridge","AE CRM surface"] },
-    { id:"crm-follow-up", group:"CRM", panel:"crm", label:"CRM Follow-Up", path:"/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/follow-up.html", apiRoute:"/api/founder-command/actions", apiAction:"command-bridge.event.record", lane:"sales-follow-up", capability:"packet_bridge", bridge:"command_bridge_event", embed:false, summary:"Queue reply work and client follow-up from a selected thread.", talksTo:["SkyeMail workflow packets","0S Command Bridge","AE follow-up surface"] },
+    { id:"crm-pipeline", group:"CRM", panel:"crm", label:"CRM Pipeline", path:"/Marketing-Made-Easy/AE-FlowPro/#deals", apiRoute:"/api/founder-command/actions", apiAction:"command-bridge.event.record", lane:"crm-intake", capability:"live_api", bridge:"command_bridge_event", embed:false, summary:"Record sender or thread context as a live 0S Command Bridge CRM event.", talksTo:["SkyeMail workflow packets","0S Command Bridge","AE FlowPro CRM"] },
+    { id:"crm-follow-up", group:"CRM", panel:"crm", label:"CRM Follow-Up", path:"/Marketing-Made-Easy/AE-FlowPro/#accounts", apiRoute:"/api/founder-command/actions", apiAction:"command-bridge.event.record", lane:"sales-follow-up", capability:"live_api", bridge:"command_bridge_event", embed:false, summary:"Queue reply work and client follow-up through the live 0S Command Bridge.", talksTo:["SkyeMail workflow packets","0S Command Bridge","AE FlowPro follow-up"] },
+    { id:"ae-flow-contact-capture", group:"CRM", panel:"crm", label:"AE Flow Contact Capture", path:"/Marketing-Made-Easy/AE-FlowPro/", apiRoute:"/api/founder-command/ae-flow/capture", lane:"crm-contact-sync", capability:"live_api", bridge:"direct_api", embed:false, summary:"Persist sender/customer contact context into the founder AE FlowPro CRM store.", talksTo:["SkyeMail contacts","AE FlowPro private CRM","Citadel mirror ledger"] },
+    { id:"ae-flow-workflow-journal", group:"CRM", panel:"crm", label:"AE Flow Journal", path:"/Marketing-Made-Easy/AE-FlowPro/", apiRoute:"/api/founder-command/ae-flow/runtime/journal", lane:"crm-journal", capability:"live_api", bridge:"direct_api", embed:false, summary:"Write selected email context into the AE FlowPro runtime journal for workspace visibility.", talksTo:["SkyeMail thread context","AE FlowPro runtime journal","Citadel mirror ledger"] },
+    { id:"saas-customer-command", group:"Command", panel:"automation", label:"SaaS Customer Command", path:"/saas/customer-dashboard.html", apiRoute:"/api/saas/action-event", lane:"customer-workspace-command", capability:"live_api", bridge:"direct_api", embed:false, summary:"Persist a mail-derived customer/workspace command event into the SaaS layer.", talksTo:["SkyeMail context","SaaS workspace ledger","0S Command Bridge"] },
+    { id:"skyecommerce-orders", group:"Commerce", panel:"commerce", label:"SkyeCommerce Orders", path:"/SkyeCommerce/merchant/index.html#orders", apiRoute:"/SkyeCommerce/api/orders", lane:"commerce-order-desk", capability:"live_api", bridge:"direct_api", embed:false, summary:"Read live SkyeCommerce order state from mailbox context.", talksTo:["SkyeMail customer messages","SkyeCommerce orders","shared 0S gate"] },
+    { id:"skyecommerce-analytics", group:"Commerce", panel:"commerce", label:"Commerce Analytics", path:"/SkyeCommerce/merchant/index.html#analytics", apiRoute:"/SkyeCommerce/api/analytics/summary", lane:"commerce-analytics", capability:"live_api", bridge:"direct_api", embed:false, summary:"Load live SkyeCommerce analytics so email context can move into store operations.", talksTo:["SkyeMail context","SkyeCommerce analytics","shared 0S gate"] },
     { id:"profit-console", group:"Finance", panel:"finance", label:"Profit Console", path:"/live/skyeprofitconsole-profit-console.html", lane:"finance-review", capability:"verified_gated_app", bridge:"workflow_packet", embed:false, summary:"Move pricing, invoice, or revenue terms into finance review.", talksTo:["SkyeMail workflow packets","SkyeProfitConsole","shared 0S gate"] },
     { id:"split-engine", group:"Finance", panel:"finance", label:"Split Engine", path:"/live/skye-split-engine-operator-proof.html", lane:"profit-split", capability:"verified_gated_app", bridge:"workflow_packet", embed:false, summary:"Route payout or revenue-share terms into split review.", talksTo:["SkyeMail workflow packets","SkyeSplitEngine","shared 0S gate"] },
     { id:"audit-ledger", group:"Legal", panel:"legal", label:"Audit Ledger", path:"/Free99/apps/sovereigndocs/audit-ledger/", lane:"audit-evidence", capability:"verified_gated_app", bridge:"workflow_packet", embed:false, summary:"Preserve selected message context as audit evidence.", talksTo:["SkyeMail workflow packets","SovereignDocs audit ledger","shared 0S gate"] },
@@ -259,6 +264,26 @@
     return zeroOsFetch("/api/0s/automation/status", { lane:"0s-automation-status" });
   }
 
+  async function aeFlowContactCapture(context = {}){
+    return archiveHandoff("ae-flow-contact-capture", context, { label:"AE Flow contact capture" });
+  }
+
+  async function aeFlowJournal(context = {}){
+    return archiveHandoff("ae-flow-workflow-journal", context, { label:"AE Flow journal" });
+  }
+
+  async function saasActionEvent(context = {}){
+    return archiveHandoff("saas-customer-command", context, { label:"SaaS customer command" });
+  }
+
+  async function commerceOrders(context = {}){
+    return archiveHandoff("skyecommerce-orders", context, { label:"SkyeCommerce orders" });
+  }
+
+  async function commerceAnalytics(context = {}){
+    return archiveHandoff("skyecommerce-analytics", context, { label:"SkyeCommerce analytics" });
+  }
+
   async function recordCommandEvent(context = {}, detail = {}){
     const summary = clean(detail.summary || context.subject || "SkyeMail workbench event");
     return zeroOsFetch("/api/founder-command/actions/execute", {
@@ -355,6 +380,11 @@
     founderStatus,
     founderActions,
     automationStatus,
+    aeFlowContactCapture,
+    aeFlowJournal,
+    saasActionEvent,
+    commerceOrders,
+    commerceAnalytics,
     recordCommandEvent,
     analyzePwaFromMail,
     mountPocket

@@ -167,8 +167,31 @@ async function main() {
   checks.push(saasSignup.check);
 
   const customerId = saasSignup.data?.customer_id || "";
-  const workspaceCreate = await call("SaaS workspace provisions SkyeMail/Citadel/SkyeNet lanes", bases.saas, "/api/saas/workspaces", {
+  const fs27Signup = await call("FS27 gate signup creates real user session", bases.fs27, "/.netlify/functions/auth-signup", {
     method: "POST",
+    body: {
+      email,
+      password,
+      display_name: "GRAYSCAPE467 Readiness User",
+      plan_name: "unlimited-command",
+      communication_email: email
+    }
+  }, (data) => Boolean(data?.session?.token && data?.gate_card?.customer_id));
+  checks.push(fs27Signup.check);
+  const fs27Token = fs27Signup.data?.session?.token || "";
+  const sharedGateHeaders = fs27Token ? authHeaders(fs27Token) : {};
+
+  if (fs27Token) {
+    const introspect = await call("FS27 introspection validates new user token", bases.fs27, "/.netlify/functions/auth-introspect", {
+      method: "POST",
+      body: { token: fs27Token }
+    }, (data) => data?.active === true && data?.email === email);
+    checks.push(introspect.check);
+  }
+
+  const workspaceCreate = await call("SaaS workspace provisions SkyeMail/Citadel/SkyeNet lanes", bases.zeroOs, "/api/saas/workspaces", {
+    method: "POST",
+    headers: sharedGateHeaders,
     body: {
       customer_id: customerId,
       company_name: companyName,
@@ -187,8 +210,9 @@ async function main() {
   checks.push(workspaceCreate.check);
 
   const workspaceId = workspaceCreate.data?.workspace_id || "";
-  const checkout = await call("SaaS billing returns zero-balance checkout", bases.saas, "/api/saas/billing/checkout-session", {
+  const checkout = await call("SaaS billing returns zero-balance checkout", bases.zeroOs, "/api/saas/billing/checkout-session", {
     method: "POST",
+    headers: sharedGateHeaders,
     body: {
       customer_id: customerId,
       workspace_id: workspaceId,
@@ -202,33 +226,17 @@ async function main() {
   checks.push(checkout.check);
 
   if (workspaceId) {
-    const status = await call("SaaS SkyeMail status has mailbox row", bases.saas, `/api/saas/skymail/status?workspace_id=${encodeURIComponent(workspaceId)}`, {}, (data) => data?.ok === true && Array.isArray(data?.rows));
+    const status = await call("SaaS SkyeMail status has mailbox row", bases.zeroOs, `/api/saas/skymail/status?workspace_id=${encodeURIComponent(workspaceId)}`, {
+      headers: sharedGateHeaders
+    }, (data) => data?.ok === true && Array.isArray(data?.rows));
     checks.push(status.check);
-    const keyCard = await call("SaaS key-card lookup returns rows", bases.saas, `/api/saas/key-card?workspace_id=${encodeURIComponent(workspaceId)}`, {}, (data) => data?.ok === true && Array.isArray(data?.rows));
+    const keyCard = await call("SaaS key-card lookup returns rows", bases.zeroOs, `/api/saas/key-card?workspace_id=${encodeURIComponent(workspaceId)}`, {
+      headers: sharedGateHeaders
+    }, (data) => data?.ok === true && Array.isArray(data?.rows));
     checks.push(keyCard.check);
   }
 
-  const fs27Signup = await call("FS27 gate signup creates real user session", bases.fs27, "/.netlify/functions/auth-signup", {
-    method: "POST",
-    body: {
-      email,
-      password,
-      display_name: "GRAYSCAPE467 Readiness User",
-      plan_name: "unlimited-command",
-      communication_email: email,
-      skyemail: workspaceCreate.data?.skymail?.mailbox?.mailbox_email || ""
-    }
-  }, (data) => Boolean(data?.session?.token && data?.gate_card?.customer_id));
-  checks.push(fs27Signup.check);
-  const fs27Token = fs27Signup.data?.session?.token || "";
-
   if (fs27Token) {
-    const introspect = await call("FS27 introspection validates new user token", bases.fs27, "/.netlify/functions/auth-introspect", {
-      method: "POST",
-      body: { token: fs27Token }
-    }, (data) => data?.active === true && data?.email === email);
-    checks.push(introspect.check);
-
     const skynetStatus = await call("0S SkyeNet status accepts new gate user", bases.zeroOs, "/api/skyenet/status", {
       headers: authHeaders(fs27Token)
     }, (data) => data?.ok === true && data?.skynet?.ok === true);
@@ -321,7 +329,7 @@ async function main() {
     method: "POST",
     headers: fs27Token ? authHeaders(fs27Token) : {},
     body: {
-      mailbox_email: workspaceCreate.data?.skymail?.mailbox?.mailbox_email || "",
+      mailbox_email: workspaceCreate.data?.skymail?.ok === true ? (workspaceCreate.data?.skymail?.mailbox?.mailbox_email || "") : "",
       rsa_public_key_pem: publicKeyPem,
       vault_wrap_json: { alg: "proof-wrap", created_at: new Date().toISOString(), source: "0s-real-user-readiness" }
     }
@@ -335,7 +343,9 @@ async function main() {
     }, (data) => data?.ok === true && Array.isArray(data?.domains) && data.domains.length > 0);
     checks.push(domains.check);
     const primaryDomain = domains.data?.primary_domain || domains.data?.domains?.[0] || "solenterprises.org";
-    const provisionedMailboxEmail = workspaceCreate.data?.skymail?.mailbox?.mailbox_email || "";
+    const provisionedMailboxEmail = workspaceCreate.data?.skymail?.ok === true
+      ? (workspaceCreate.data?.skymail?.mailbox?.mailbox_email || "")
+      : "";
     const [provisionedLocal, provisionedDomain] = provisionedMailboxEmail.includes("@") ? provisionedMailboxEmail.split("@") : ["", ""];
     const localPart = (provisionedLocal || handle).slice(0, 48);
     const mailboxDomain = provisionedDomain || primaryDomain;

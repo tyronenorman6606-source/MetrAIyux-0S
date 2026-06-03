@@ -444,6 +444,22 @@
         });
       });
     });
+
+    document.querySelectorAll('.mail-folder[data-relay-folder]').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.relayMailboxFilter = button.dataset.relayFolder || 'inbox';
+        document.querySelectorAll('.mail-folder[data-relay-folder]').forEach((peer) => {
+          const isActive = peer === button;
+          peer.classList.toggle('active', isActive);
+          peer.setAttribute('aria-pressed', String(isActive));
+        });
+        if (els.relayConnectionStatus) {
+          const label = button.textContent.replace(/\s+/g, ' ').trim();
+          els.relayConnectionStatus.textContent = `Relay13 folder selected: ${label}`;
+        }
+        renderRelayThreads();
+      });
+    });
   }
 
   function openDatabase() {

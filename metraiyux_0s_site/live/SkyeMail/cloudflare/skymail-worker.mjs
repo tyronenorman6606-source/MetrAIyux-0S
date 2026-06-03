@@ -76,6 +76,51 @@ function stableHex(value, length = 16) {
   return `${first}${second}`.slice(0, length);
 }
 
+const SKYE_MEMORY_CACHE = globalThis.__SKYEMAIL_MEMORY_CACHE__ || new Map();
+globalThis.__SKYEMAIL_MEMORY_CACHE__ = SKYE_MEMORY_CACHE;
+
+function cacheGet(key) {
+  const item = SKYE_MEMORY_CACHE.get(key);
+  if (!item) return null;
+  if (item.expires_at && item.expires_at <= Date.now()) {
+    SKYE_MEMORY_CACHE.delete(key);
+    return null;
+  }
+  return item.value;
+}
+
+function cacheSet(key, value, ttlMs = 30000) {
+  SKYE_MEMORY_CACHE.set(key, { value, expires_at: Date.now() + Math.max(1000, ttlMs) });
+  if (SKYE_MEMORY_CACHE.size > 500) {
+    for (const staleKey of SKYE_MEMORY_CACHE.keys()) {
+      SKYE_MEMORY_CACHE.delete(staleKey);
+      if (SKYE_MEMORY_CACHE.size <= 400) break;
+    }
+  }
+  return value;
+}
+
+async function cachedPromise(key, ttlMs, producer) {
+  const cached = cacheGet(key);
+  if (cached) return cached;
+  const promise = Promise.resolve().then(producer);
+  cacheSet(key, promise, ttlMs);
+  try {
+    const value = await promise;
+    cacheSet(key, value, ttlMs);
+    return value;
+  } catch (error) {
+    SKYE_MEMORY_CACHE.delete(key);
+    throw error;
+  }
+}
+
+function timeoutAfter(ms, valueFactory) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(typeof valueFactory === "function" ? valueFactory() : valueFactory), Math.max(50, Number(ms || 0)));
+  });
+}
+
 function makeSkyeMailId({ email, handle, fs27Sub } = {}) {
   return `skymail_${stableHex(fs27Sub || email || handle || crypto.randomUUID(), 16)}`;
 }
@@ -99,8 +144,31 @@ function cleanOrigin(value) {
   return clean(value).replace(/\/+$/, "");
 }
 
+function cookieValue(request, name) {
+  const raw = String(request.headers.get("cookie") || "");
+  for (const part of raw.split(";")) {
+    const index = part.indexOf("=");
+    if (index === -1) continue;
+    if (part.slice(0, index).trim() === name) return decodeURIComponent(part.slice(index + 1).trim());
+  }
+  return "";
+}
+
 function bearer(request) {
-  return (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  const values = [
+    request.headers.get("authorization"),
+    request.headers.get("x-skye-gate-session"),
+    request.headers.get("x-skygate-session"),
+    request.headers.get("x-fs27-session"),
+    request.headers.get("x-0s-gate-session"),
+    request.headers.get("x-free99-gate-session"),
+    cookieValue(request, "METRAIYUX_GATE_SESSION"),
+    cookieValue(request, "SKYGATEFS27_GATE_SESSION"),
+    cookieValue(request, "SKYE_GATE_SESSION"),
+    cookieValue(request, "metraiyux_admin_session"),
+    cookieValue(request, "skye_gate_session"),
+  ];
+  return values.map((value) => clean(value).replace(/^Bearer\s+/i, "")).find(Boolean) || "";
 }
 
 function base64Url(input) {
@@ -108,6 +176,11 @@ function base64Url(input) {
   let binary = "";
   bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function randomToken(length = 24) {
+  const bytes = crypto.getRandomValues(new Uint8Array(Math.max(12, length)));
+  return base64Url(bytes).slice(0, length);
 }
 
 function base64FromBytes(bytes) {
@@ -359,6 +432,8 @@ const SKYMAIL_TABLES = [
   "mailbox_offboarding_events",
   "workspace_key_cards",
   "skymail_backup_events",
+  "skyemail_telemetry_events",
+  "skyemail_game_events",
 ];
 
 function schemaName(env) {
@@ -405,9 +480,12 @@ async function queryCitadel(env, text, params = []) {
 async function requireAuth(request, env) {
   const token = bearer(request);
   if (!token) throw Object.assign(new Error("Unauthorized"), { statusCode: 401 });
+  const cacheKey = `auth:${stableHex(token, 32)}`;
+  const cached = cacheGet(cacheKey);
+  if (cached?.sub) return { ...cached, gate_token: token, auth_cache: "memory-hit" };
   const claims = await introspectFs27(env, token);
-  const user = await ensureUserFromFs27(env, claims);
-  return {
+  const user = await ensureUserFromFs27(env, claims, { token });
+  const auth = {
     sub: user.id,
     handle: user.handle,
     email: user.email,
@@ -421,6 +499,8 @@ async function requireAuth(request, env) {
     gate_token: token,
     fs27_claims: claims
   };
+  cacheSet(cacheKey, { ...auth, gate_token: "" }, 45000);
+  return auth;
 }
 
 function configuredDomains(env) {
@@ -448,9 +528,9 @@ const FS27_BRAIN_RUNTIME_ALIASES = Object.freeze({
 
 const SKYMAIL_AI_PLANS = Object.freeze({
   skymail_ai_free: { id: "skymail_ai_free", name: "SkyeMail Local Brain", included_messages: 0, backup_messages: 0, monthly_cents_cap: 0, provider_calls: false, auto_send: false },
-  "skyemail-ai-response-starter": { id: "skyemail-ai-response-starter", name: "SkyEmail AI Response Starter", included_messages: 125, backup_messages: 31, monthly_cents_cap: 700, provider_calls: true, auto_send: false },
-  "skyemail-ai-response-plus": { id: "skyemail-ai-response-plus", name: "SkyEmail AI Response Plus", included_messages: 425, backup_messages: 76, monthly_cents_cap: 2200, provider_calls: true, auto_send: false },
-  "skyemail-managed-ai-inbox": { id: "skyemail-managed-ai-inbox", name: "SkyEmail Managed AI Inbox", included_messages: 1000, backup_messages: 222, monthly_cents_cap: 6500, provider_calls: true, auto_send: true },
+  "skyemail-ai-response-starter": { id: "skyemail-ai-response-starter", name: "SkyeMail AI Response Starter", included_messages: 125, backup_messages: 31, monthly_cents_cap: 700, provider_calls: true, auto_send: false },
+  "skyemail-ai-response-plus": { id: "skyemail-ai-response-plus", name: "SkyeMail AI Response Plus", included_messages: 425, backup_messages: 76, monthly_cents_cap: 2200, provider_calls: true, auto_send: false },
+  "skyemail-managed-ai-inbox": { id: "skyemail-managed-ai-inbox", name: "SkyeMail Managed AI Inbox", included_messages: 1000, backup_messages: 222, monthly_cents_cap: 6500, provider_calls: true, auto_send: true },
   owner_operator: { id: "owner_operator", name: "Owner Operator FS27 Brain Lane", included_messages: 10000, backup_messages: 2500, monthly_cents_cap: 25000, provider_calls: true, auto_send: true },
 });
 
@@ -466,7 +546,7 @@ async function skygateRequest(env, path, init = {}) {
       if (response.status !== 404 && (response.status < 500 || !origin)) return response;
       if (response.status === 404 && !origin) return response;
     } catch {
-      if (!origin) throw Object.assign(new Error("SkyGate service binding failed and no public origin is configured."), { statusCode: 502 });
+      if (!origin) throw Object.assign(new Error("SkyeGate service binding failed and no public origin is configured."), { statusCode: 502 });
     }
   }
   return await fetch(`${origin}${path}`, init);
@@ -710,6 +790,7 @@ async function persistedSkymailAiEntitlement(env, userId, mailboxId = null) {
 
 async function resolveSkymailAiEntitlement(env, auth, mailbox = null) {
   const derived = skymailAiEntitlementFromAuth(env, auth, mailbox);
+  if (derived.id === "owner_operator") return derived;
   const stored = await persistedSkymailAiEntitlement(env, auth.sub, mailbox?.id || null).catch(() => null);
   if (!stored) return derived;
   const storedPlan = skymailAiPlanById(stored.plan_id);
@@ -751,7 +832,7 @@ function skymailAiAllowance(entitlement = {}, month = {}) {
 async function callSkymailFs27KaixuGateway(request, env, { auth, messages, brainRuntime, action, usageLane = "skymail-ai" }) {
   const gatewayBearer = skymailAiGatewayBearer(request, env, auth);
   if (!gatewayBearer.token) {
-    throw Object.assign(new Error("Shared FS27/SkyGate Brain bearer is not available."), { statusCode: 503, provider_path: "fs27-gateway-required" });
+    throw Object.assign(new Error("Shared SkyeGate FS27 Brain bearer is not available."), { statusCode: 503, provider_path: "fs27-gateway-required" });
   }
   const gateSession = clean(auth.gate_token || bearer(request));
   const response = await skygateRequest(env, "/gateway-chat", {
@@ -779,7 +860,7 @@ async function callSkymailFs27KaixuGateway(request, env, { auth, messages, brain
     }),
   });
   const data = await response.json().catch(() => ({ error: "invalid_gateway_response" }));
-  if (!response.ok) throw Object.assign(new Error(data.error || data.message || "FS27/SkyGate Brain gateway failed."), { statusCode: response.status || 502, providerResponse: data, provider_path: "fs27-gateway-chat" });
+  if (!response.ok) throw Object.assign(new Error(data.error || data.message || "SkyeGate FS27 Brain gateway failed."), { statusCode: response.status || 502, providerResponse: data, provider_path: "fs27-gateway-chat" });
   const outputText = data.output_text || data.choices?.[0]?.message?.content || "";
   return {
     output_text: outputText,
@@ -914,8 +995,8 @@ async function handleMailBrainCheckout(request, env, ctx) {
     platform_id: "skymail",
     offer_id: plan.id,
     customer_email: normalizeEmail(body.customer_email || auth.email),
-    customer_name: clean(body.customer_name || auth.handle || auth.email || "SkyEmail customer"),
-    company_name: clean(body.company_name || body.company || "SkyEmail workspace"),
+    customer_name: clean(body.customer_name || auth.handle || auth.email || "SkyeMail customer"),
+    company_name: clean(body.company_name || body.company || "SkyeMail workspace"),
     success_url: success,
     cancel_url: cancel,
     idempotency_key: clean(body.idempotency_key || body.request_id || `skymail-ai-${context.userId}-${plan.id}-${Date.now()}`),
@@ -957,7 +1038,7 @@ async function handleMailBrainCheckout(request, env, ctx) {
     body: JSON.stringify(checkoutBody),
   });
   const data = await response.json().catch(() => ({ ok: false, error: "invalid_skyepay_checkout_response" }));
-  if (!response.ok || data.ok === false) throw Object.assign(new Error(data.error || "SkyPay checkout failed."), { statusCode: response.status || 502, providerResponse: data });
+  if (!response.ok || data.ok === false) throw Object.assign(new Error(data.error || "SkyePay checkout failed."), { statusCode: response.status || 502, providerResponse: data });
   const pending = await query(env, `
     insert into ai_entitlements(user_id, mailbox_id, fs27_customer_id, plan_id, status, source,
       included_messages, backup_messages, monthly_cents_cap, auto_send_enabled, meta_json, created_at, updated_at)
@@ -1011,11 +1092,11 @@ async function handleMailBrainClaim(request, env, ctx) {
     },
   });
   const status = await response.json().catch(() => ({ ok: false, error: "invalid_skyepay_status_response" }));
-  if (!response.ok || status.ok === false) throw Object.assign(new Error(status.error || "SkyPay status check failed."), { statusCode: response.status || 502, providerResponse: status });
+  if (!response.ok || status.ok === false) throw Object.assign(new Error(status.error || "SkyePay status check failed."), { statusCode: response.status || 502, providerResponse: status });
   const order = status.order || status.checkout || status.session || status;
   const offer = clean(order.offer_id || order.offer || status.offer_id || plan.id);
   const paid = SKYMAIL_SKYEPAY_CONFIRMED.has(clean(order.payment_status || order.status || status.payment_status).toLowerCase());
-  if (offer && offer !== plan.id) throw Object.assign(new Error("SkyPay offer does not match requested SkyeMail AI plan."), { statusCode: 409, providerResponse: status });
+  if (offer && offer !== plan.id) throw Object.assign(new Error("SkyePay offer does not match requested SkyeMail AI plan."), { statusCode: 409, providerResponse: status });
   if (!paid) {
     return json({ ok: false, checkout_required: true, payment_pending: true, payment_status: order.payment_status || order.status || null, skyepay: status, plan: skymailAiPlanSnapshot(plan) }, 402);
   }
@@ -1105,12 +1186,36 @@ function validateMailboxInput(env, localPart, domain) {
   return { local, domain: dom, email: `${local}@${dom}` };
 }
 
-function serviceAuth(request, env) {
+function serviceScopes(scope) {
+  if (Array.isArray(scope)) return scope.map(String).filter(Boolean);
+  return String(scope || "").split(/\s+/).map((item) => item.trim()).filter(Boolean);
+}
+
+function canUseServiceLane(claims = {}) {
+  if (!claims.active && !claims.ok) return false;
+  const role = String(claims.role || claims.user?.role || "").toLowerCase();
+  const scopes = new Set(serviceScopes(claims.scope || claims.scopes || claims.user?.scope).map((scope) => scope.toLowerCase()));
+  return ["founder", "owner", "admin", "operator", "service"].includes(role)
+    || scopes.has("admin.write")
+    || scopes.has("gateway.invoke")
+    || scopes.has("skymail.admin")
+    || scopes.has("skymail.service")
+    || scopes.has("mail.admin");
+}
+
+async function serviceAuth(request, env) {
   const token = bearer(request) || clean(request.headers.get("x-skymail-service-token"));
   const expected = clean(env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN);
-  if (!expected) throw Object.assign(new Error("SKYMAIL_SERVICE_TOKEN is missing."), { statusCode: 501 });
-  if (!token || token !== expected) throw Object.assign(new Error("Unauthorized service request."), { statusCode: 401 });
-  return true;
+  if (token && token !== expected) {
+    const claims = await introspectFs27(env, token);
+    if (!canUseServiceLane(claims)) throw Object.assign(new Error("SkyeGate FS27 session is active but not service-scoped for SkyeMail."), { statusCode: 403 });
+    return { ok: true, source: "fs27-skygate", claims, token };
+  }
+  if (expected && token === expected) {
+    return { ok: true, source: "legacy-skymail-service-token", claims: { active: true, role: "service", scope: "skymail.service" }, token: "" };
+  }
+  if (!expected) throw Object.assign(new Error("SkyeGate FS27 service bearer required; SKYMAIL_SERVICE_TOKEN compatibility is not configured."), { statusCode: 401 });
+  throw Object.assign(new Error("Unauthorized service request."), { statusCode: 401 });
 }
 
 function mailboxLocalFromWorkspace(body = {}) {
@@ -1164,7 +1269,7 @@ function providerConfigured(env) {
 }
 
 function providerSetupMessage(provider = "stalwart") {
-  if (provider === "zoho") return "Set the Citadel mail credentials before live mailbox creation.";
+  if (provider === "zoho") return "Set the SkyeMail production mail credentials before live mailbox creation.";
   if (provider === "external-webhook") return "Set MAILBOX_PROVISION_WEBHOOK_URL and MAILBOX_PROVISION_WEBHOOK_SECRET before live mailbox account creation.";
   return "Set STALWART_BASE_URL and STALWART_MANAGEMENT_API_KEY before live mailbox account creation.";
 }
@@ -1204,7 +1309,7 @@ function zohoBackoffSecondsRemaining() {
 
 function zohoBackoffError() {
   const seconds = zohoBackoffSecondsRemaining();
-  return Object.assign(new Error(`Citadel mail sync is cooling down after provider rate limiting. Showing cached inbox for about ${seconds} more seconds.`), {
+  return Object.assign(new Error(`SkyeMail sync is cooling down after provider rate limiting. Showing cached inbox for about ${seconds} more seconds.`), {
     statusCode: 429,
     providerResponse: {
       status: "cooldown",
@@ -1232,7 +1337,7 @@ async function parseZohoResponse(res) {
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
   if (!res.ok) {
-    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `Citadel mail request failed (${res.status}).`;
+    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `SkyeMail provider request failed (${res.status}).`;
     if (zohoProviderLooksRateLimited(message, data)) noteZohoProviderBackoff(message);
     throw Object.assign(new Error(message), { statusCode: res.status, providerResponse: data });
   }
@@ -1240,7 +1345,7 @@ async function parseZohoResponse(res) {
 }
 
 async function getZohoTokenData(env) {
-  if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
+  if (!zohoApiConfigured(env)) throw Object.assign(new Error("SkyeMail production mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
   const cacheKey = `${zohoAccountsBase(env)}:${stableHex(`${envValue(env, "ZOHO_CLIENT_ID")}:${envValue(env, "ZOHO_REFRESH_TOKEN")}`, 24)}`;
   if (zohoAccessTokenCache.key === cacheKey && zohoAccessTokenCache.token && Date.now() < zohoAccessTokenCache.expiresAt - 60_000) {
     return {
@@ -1261,7 +1366,7 @@ async function getZohoTokenData(env) {
     method: "POST",
     headers: { accept: "application/json" },
   }));
-  if (!data?.access_token) throw Object.assign(new Error(data?.error || "Citadel mail token unavailable."), { statusCode: 502, providerResponse: data });
+  if (!data?.access_token) throw Object.assign(new Error(data?.error || "SkyeMail provider token unavailable."), { statusCode: 502, providerResponse: data });
   const ttlSeconds = Math.max(300, Number(data.expires_in || 3600) - 120);
   zohoAccessTokenCache = {
     key: cacheKey,
@@ -1308,7 +1413,7 @@ async function zohoRawFetch(env, path, init = {}) {
     const text = await res.text().catch(() => "");
     let data = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
-    const message = data?.data?.moreInfo || data?.status?.description || data?.error || text || `Citadel mail request failed (${res.status}).`;
+    const message = data?.data?.moreInfo || data?.status?.description || data?.error || text || `SkyeMail provider request failed (${res.status}).`;
     throw Object.assign(new Error(message), { statusCode: res.status, providerResponse: data });
   }
   return res;
@@ -1370,15 +1475,18 @@ function extractZohoMessageId(payload) {
 
 function extractZohoAliasId(payload, aliasEmail = "") {
   const email = normalizeEmail(aliasEmail);
+  const isUsableAliasId = (value) => value != null
+    && clean(value)
+    && !/OPERATION_NOT_PERMITTED|FAIL|ERROR|LIMIT|REACHED|NOT[_\s-]?ALLOWED|INVALID/i.test(String(value));
   const data = payload?.data || payload;
   const entries = Array.isArray(data) ? data : [data];
   for (const entry of entries) {
     if (!entry || typeof entry !== "object") continue;
     for (const [key, value] of Object.entries(entry)) {
-      if (normalizeEmail(key) === email && value != null && clean(value) && !/OPERATION_NOT_PERMITTED|FAIL|ERROR/i.test(String(value))) return String(value);
+      if (normalizeEmail(key) === email && isUsableAliasId(value)) return String(value);
     }
     const candidates = [entry.aliasId, entry.alias_id, entry.id, entry.emailAliasId];
-    const match = candidates.find((value) => value != null && clean(value));
+    const match = candidates.find(isUsableAliasId);
     if (match != null) return String(match);
   }
   return null;
@@ -1418,7 +1526,7 @@ async function getZohoOrganizationId(env, options = {}) {
   if (configured) return configured;
   const payload = await zohoFetch(env, "/api/organization", options);
   const orgId = extractZohoOrganizationId(payload);
-  if (!orgId) throw Object.assign(new Error("No Citadel organization id found. Check the Citadel mail organization credentials."), { statusCode: 502, providerResponse: payload });
+  if (!orgId) throw Object.assign(new Error("No SkyeMail provider organization id found. Check the SkyeMail provider organization credentials."), { statusCode: 502, providerResponse: payload });
   return orgId;
 }
 
@@ -1427,7 +1535,7 @@ async function getZohoMailAccountId(env, preferredAccountId = null, options = {}
   if (clean(preferredAccountId) && !String(preferredAccountId).startsWith("local:")) return clean(preferredAccountId);
   const payload = await zohoFetch(env, "/api/accounts", options);
   const accountId = extractZohoAccountId(payload);
-  if (!accountId) throw Object.assign(new Error("No Citadel mail account id found. Check the Citadel mailbox credentials."), { statusCode: 502, providerResponse: payload });
+  if (!accountId) throw Object.assign(new Error("No SkyeMail mailbox account id found. Check the SkyeMail production mailbox credentials."), { statusCode: 502, providerResponse: payload });
   return accountId;
 }
 
@@ -1443,7 +1551,7 @@ async function getZohoOrgUserId(env, preferredAccountId = null, options = {}) {
   }
   const payload = await zohoFetch(env, `/api/organization/${encodeURIComponent(orgId)}/accounts`, options);
   const zuid = extractZohoOrgUserId(payload, preferredAccountId);
-  if (!zuid) throw Object.assign(new Error("No Citadel organization user id found. Check the Citadel mailbox credentials."), { statusCode: 502, providerResponse: payload });
+  if (!zuid) throw Object.assign(new Error("No SkyeMail provider organization user id found. Check the SkyeMail production mailbox credentials."), { statusCode: 502, providerResponse: payload });
   return zuid;
 }
 
@@ -1492,7 +1600,7 @@ function randomMailboxPassword() {
 }
 
 async function provisionZohoMailbox(env, { email, localPart, user }) {
-  if (!zohoProvisioningConfigured(env)) throw Object.assign(new Error("Citadel mail provisioning is not configured."), { statusCode: 501 });
+  if (!zohoProvisioningConfigured(env)) throw Object.assign(new Error("SkyeMail mailbox provisioning is not configured."), { statusCode: 501 });
   const orgId = await getZohoOrganizationId(env);
   const password = randomMailboxPassword();
   const displayName = clean(user?.handle || email || localPart);
@@ -1512,12 +1620,12 @@ async function provisionZohoMailbox(env, { email, localPart, user }) {
     provider_account_id: extractZohoAccountId(data),
     provider_payload: { createAccount: data, organization_id: orgId, mail_base: zohoMailBase(env) },
     mailbox_password_once: password,
-    credential_note: "Citadel mailbox password was generated once. Store it in a secret manager if direct mailbox-server login is needed.",
+    credential_note: "SkyeMail production mailbox password was generated once. Store it in a secret manager if direct mailbox-server login is needed.",
   };
 }
 
 async function provisionZohoEmailAlias(env, { aliasEmail, accountId = null }) {
-  if (!zohoProvisioningConfigured(env)) throw Object.assign(new Error("Citadel mail provisioning is not configured."), { statusCode: 501 });
+  if (!zohoProvisioningConfigured(env)) throw Object.assign(new Error("SkyeMail mailbox provisioning is not configured."), { statusCode: 501 });
   const parsed = splitEmail(aliasEmail);
   if (!parsed) throw Object.assign(new Error("Valid alias email required."), { statusCode: 400 });
   const orgId = await getZohoOrganizationId(env);
@@ -1534,7 +1642,7 @@ async function provisionZohoEmailAlias(env, { aliasEmail, accountId = null }) {
   const providerAliasId = extractZohoAliasId(data, parsed.email);
   if (!providerAliasId) {
     const result = extractZohoAliasResult(data, parsed.email) || data?.status?.description || "missing alias id";
-    throw Object.assign(new Error(`Citadel did not create the receiving alias for ${parsed.email}: ${result}`), { statusCode: 502, providerResponse: data });
+    throw Object.assign(new Error(`SkyeMail did not create the receiving alias for ${parsed.email}: ${result}`), { statusCode: 502, providerResponse: data });
   }
   return {
     provider: "zoho",
@@ -1553,7 +1661,7 @@ async function provisionZohoEmailAlias(env, { aliasEmail, accountId = null }) {
 
 async function ensureZohoSendMailDetails(env, { accountId = null, fromAddress = "", displayName = "" } = {}) {
   const email = normalizeEmail(fromAddress);
-  if (!email) throw Object.assign(new Error("Citadel send identity email is required."), { statusCode: 400 });
+  if (!email) throw Object.assign(new Error("SkyeMail send identity email is required."), { statusCode: 400 });
   const writeBypass = { ignoreBackoff: true };
   const orgId = await getZohoOrganizationId(env, writeBypass);
   const zohoAccountId = await getZohoMailAccountId(env, accountId, writeBypass);
@@ -1601,11 +1709,11 @@ async function provisionZohoMailboxAliasRoute(env, { email, reason = "" }) {
     provider_payload: {
       ...alias.provider_payload,
       alias_route: true,
-      reason: reason || "Zoho mailbox account creation was unavailable, so SkyeMail created a sovereign receiving alias route.",
+      reason: reason || "SkyeMail backed by Citadel Database and SkyeNet created a sovereign receiving alias route because a dedicated mailbox seat was unavailable.",
     },
     provider_alias_id: alias.provider_alias_id,
     mailbox_password_once: null,
-    credential_note: "SkyeMail created this address as a real Citadel receiving alias on the shared mail account, so replies can be delivered without a separate provider seat.",
+    credential_note: "SkyeMail created this address as a real SkyeMail receiving alias on the shared mail account, so replies can be delivered without a separate provider seat.",
   };
 }
 
@@ -1753,10 +1861,10 @@ async function zohoUploadAttachments(env, accountId, attachments = []) {
 }
 
 async function zohoSendMail(env, { accountId, fromAddress, to, cc = "", bcc = "", replyTo = "", subject, html, text, replyMessageId = "", threadId = "", attachments = [] }) {
-  if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
+  if (!zohoApiConfigured(env)) throw Object.assign(new Error("SkyeMail production mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
   const zohoAccountId = await getZohoMailAccountId(env, accountId, { ignoreBackoff: true });
   const from = clean(fromAddress || envValue(env, "ZOHO_DEFAULT_FROM"));
-  if (!from) throw Object.assign(new Error("A Citadel default sender or hosted mailbox sender is required for sending."), { statusCode: 501 });
+  if (!from) throw Object.assign(new Error("A SkyeMail default sender or hosted mailbox sender is required for sending."), { statusCode: 501 });
   const sendPayload = {
     fromAddress: from,
     toAddress: addressList(to).join(","),
@@ -1771,8 +1879,6 @@ async function zohoSendMail(env, { accountId, fromAddress, to, cc = "", bcc = ""
   if (ccAddress) sendPayload.ccAddress = ccAddress;
   if (bccAddress) sendPayload.bccAddress = bccAddress;
   if (replyToAddress) sendPayload.replyTo = replyToAddress;
-  if (replyMessageId) sendPayload.inReplyTo = clean(replyMessageId);
-  if (threadId) sendPayload.references = clean(threadId);
   const uploadedAttachments = await zohoUploadAttachments(env, zohoAccountId, attachments);
   if (uploadedAttachments.length) sendPayload.attachments = uploadedAttachments;
   let payload = null;
@@ -1800,10 +1906,10 @@ async function zohoSendMail(env, { accountId, fromAddress, to, cc = "", bcc = ""
 }
 
 async function zohoSaveDraft(env, { accountId, fromAddress, to, cc = "", bcc = "", subject, html, text, replyMessageId = "", threadId = "", attachments = [] }) {
-  if (!zohoApiConfigured(env)) throw Object.assign(new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
+  if (!zohoApiConfigured(env)) throw Object.assign(new Error("SkyeMail production mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN."), { statusCode: 501 });
   const zohoAccountId = await getZohoMailAccountId(env, accountId, { ignoreBackoff: true });
   const from = clean(fromAddress || envValue(env, "ZOHO_DEFAULT_FROM"));
-  if (!from) throw Object.assign(new Error("A Citadel default sender or hosted mailbox sender is required for draft save."), { statusCode: 501 });
+  if (!from) throw Object.assign(new Error("A SkyeMail default sender or hosted mailbox sender is required for draft save."), { statusCode: 501 });
   const payload = {
     mode: "draft",
     fromAddress: from,
@@ -1853,8 +1959,9 @@ async function resolveZohoMessageRef(env, { id, userId, mailbox = null, requireF
   const raw = clean(id);
   if (!raw || mailbox?.provider !== "zoho" || !zohoApiConfigured(env)) return null;
   const accountId = await getZohoMailAccountId(env, mailbox.provider_account_id || null);
+  const isProviderMessageId = (value) => /^\d+$/.test(clean(value));
   let parsed = parseZohoUiId(raw, accountId);
-  if (raw.startsWith("zoho:") && parsed.messageId && (!requireFolder || parsed.folderId)) {
+  if (raw.startsWith("zoho:") && isProviderMessageId(parsed.messageId) && (!requireFolder || parsed.folderId)) {
     return { input_id: raw, accountId: parsed.accountId || accountId, folderId: parsed.folderId || "", messageId: clean(parsed.messageId) };
   }
 
@@ -1879,7 +1986,7 @@ async function resolveZohoMessageRef(env, { id, userId, mailbox = null, requireF
     const uiId = await findZohoUiIdForStoredRow(env, rows[0], mailbox).catch(() => "");
     parsed = parseZohoUiId(uiId || rows[0].provider_message_id || raw, accountId);
   }
-  if (!parsed.messageId) return null;
+  if (!isProviderMessageId(parsed.messageId)) return null;
   if (requireFolder && !parsed.folderId) return null;
   return { input_id: raw, accountId: parsed.accountId || accountId, folderId: parsed.folderId || "", messageId: clean(parsed.messageId) };
 }
@@ -1921,11 +2028,22 @@ async function mutateZohoMessageRefs(env, { refs = [], markRead = false, markUnr
     if (archive) mutations.push({ accountId, mode: "archiveMails", result: await zohoUpdateMessages(env, accountId, { mode: "archiveMails", messageId }) });
     if (trash || untrash) {
       const destfolderId = await zohoFolderIdForLabel(env, accountId, trash ? "TRASH" : "INBOX");
-      if (!destfolderId) throw Object.assign(new Error(`Zoho ${trash ? "Trash" : "Inbox"} folder id unavailable.`), { statusCode: 502 });
+      if (!destfolderId) throw Object.assign(new Error(`SkyeMail ${trash ? "Trash" : "Inbox"} folder id unavailable.`), { statusCode: 502 });
       mutations.push({ accountId, mode: trash ? "moveToTrash" : "restoreToInbox", result: await zohoUpdateMessages(env, accountId, { mode: "moveMessage", destfolderId, messageId }) });
     }
     if (starred !== null) {
-      mutations.push({ accountId, mode: "setFlag", result: await zohoUpdateMessages(env, accountId, { mode: "setFlag", flagid: starred ? "important" : "flag_not_set", messageId }) });
+      try {
+        mutations.push({ accountId, mode: "setFlag", result: await zohoUpdateMessages(env, accountId, { mode: "setFlag", flagid: starred ? "important" : "flag_not_set", messageId }) });
+      } catch (error) {
+        mutations.push({
+          accountId,
+          mode: "setFlag",
+          accepted: false,
+          skipped: true,
+          warning: error.message || "SkyeMail mail-state update failed; SkyeMail local priority state was retained.",
+          statusCode: error.statusCode || 502,
+        });
+      }
     }
   }
   return mutations;
@@ -2087,11 +2205,17 @@ async function saveMessageLabelState(env, { userId, id, starred = null, markRead
 async function applyMessageLabelState(env, userId, payload) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
   if (!items.length) return payload;
+  const requestedLabel = clean(payload?.requested_label || payload?.requestedLabel || "").toUpperCase();
   const keys = items
-    .map((item) => ({
-      provider: item.delivery_provider === "zoho" || String(item.id || "").startsWith("zoho:") ? "zoho" : "local",
-      provider_message_id: clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id),
-    }))
+    .map((item) => {
+      const provider = item.delivery_provider === "zoho" || String(item.id || "").startsWith("zoho:") ? "zoho" : "local";
+      return {
+        provider,
+        provider_message_id: provider === "local"
+          ? clean(messageLabelKeyFromId(item.id).provider_message_id || item.provider_message_id)
+          : clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id),
+      };
+    })
     .filter((key) => key.provider_message_id);
   if (!keys.length) return payload;
   const zohoIds = keys.filter((key) => key.provider === "zoho").map((key) => key.provider_message_id);
@@ -2106,24 +2230,41 @@ async function applyMessageLabelState(env, userId, payload) {
        )
   `, [userId, zohoIds, localIds]).catch(() => []);
   const stateMap = new Map(states.map((state) => [`${state.provider}:${state.provider_message_id}`, state]));
-  return {
-    ...payload,
-    items: items.map((item) => {
-      const provider = item.delivery_provider === "zoho" || String(item.id || "").startsWith("zoho:") ? "zoho" : "local";
-      const providerMessageId = clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id);
-      const state = stateMap.get(`${provider}:${providerMessageId}`);
-      const labels = Array.isArray(item.labels) ? [...item.labels] : [];
-      const starred = Boolean(state?.starred_at) || Boolean(item.starred);
-      if (starred && !labels.includes("STARRED")) labels.push("STARRED");
-      return {
-        ...item,
-        labels,
-        starred,
-        unread: state?.read_at ? false : item.unread,
-        delivery_status: state?.trashed_at ? "trashed" : item.delivery_status,
-      };
-    }),
-  };
+	  const mappedItems = items.map((item) => {
+	      const provider = item.delivery_provider === "zoho" || String(item.id || "").startsWith("zoho:") ? "zoho" : "local";
+	      const providerMessageId = provider === "local"
+	        ? clean(messageLabelKeyFromId(item.id).provider_message_id || item.provider_message_id)
+	        : clean(item.provider_message_id || messageLabelKeyFromId(item.id).provider_message_id);
+	      const stateKey = `${provider}:${providerMessageId}`;
+	      const hasState = stateMap.has(stateKey);
+	      const state = stateMap.get(stateKey);
+	      let labels = Array.isArray(item.labels) ? [...item.labels] : [];
+	      const starred = hasState ? Boolean(state?.starred_at) : Boolean(item.starred);
+	      const providerTrashed = String(item.delivery_status || "").toLowerCase() === "trashed" || labels.some((label) => String(label || "").toUpperCase() === "TRASH");
+	      const trashed = hasState ? Boolean(state?.trashed_at) : providerTrashed;
+	      if (!starred) labels = labels.filter((label) => String(label || "").toUpperCase() !== "STARRED");
+	      if (starred && !labels.includes("STARRED")) labels.push("STARRED");
+	      if (!trashed) labels = labels.filter((label) => String(label || "").toUpperCase() !== "TRASH");
+	      if (trashed && !labels.includes("TRASH")) labels.push("TRASH");
+	      return {
+	        ...item,
+	        labels,
+	        starred,
+	        unread: state?.read_at ? false : item.unread,
+	        delivery_status: trashed ? "trashed" : (String(item.delivery_status || "").toLowerCase() === "trashed" ? null : item.delivery_status),
+	      };
+	    });
+	  const filteredItems = requestedLabel === "STARRED"
+	    ? mappedItems.filter((item) => item.starred || (item.labels || []).some((label) => String(label || "").toUpperCase() === "STARRED"))
+	    : requestedLabel === "TRASH"
+	      ? mappedItems.filter((item) => String(item.delivery_status || "").toLowerCase() === "trashed" || (item.labels || []).some((label) => String(label || "").toUpperCase() === "TRASH"))
+	      : requestedLabel === "INBOX"
+	        ? mappedItems.filter((item) => String(item.delivery_status || "").toLowerCase() !== "trashed")
+	        : mappedItems;
+	  return {
+	    ...payload,
+	    items: filteredItems,
+	  };
 }
 
 function zohoAddressSet(value) {
@@ -2167,6 +2308,27 @@ function zohoSearchKeyForMailbox(mailbox) {
   return `to:${email}::or:cc:${email}`;
 }
 
+function zohoMessageMatchesQuery(message = {}, q = "") {
+  let needle = clean(q, 500).trim();
+  if (!needle) return true;
+  needle = needle
+    .replace(/^(entire|subject|from|to|cc|bcc):/i, "")
+    .replace(/^"|"$/g, "")
+    .trim()
+    .toLowerCase();
+  if (!needle || needle === "newmails") return true;
+  const haystack = [
+    message.subject,
+    message.summary,
+    message.sender,
+    message.fromAddress,
+    message.toAddress,
+    message.ccAddress,
+    message.bccAddress,
+  ].map((item) => clean(item, 4000).toLowerCase()).join("\n");
+  return haystack.includes(needle);
+}
+
 async function zohoListFolders(env, accountId = null, options = {}) {
   const zohoAccountId = await getZohoMailAccountId(env, accountId, options);
   const payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/folders`, options);
@@ -2205,13 +2367,22 @@ async function zohoListMessages(env, { accountId = null, mailbox = "", label = "
   const limit = Math.min(Math.max(Number(max || 25), 1), 100);
   const start = Math.max(Number(pageToken || 1), 1);
   const requestedLabel = clean(label).toUpperCase();
-  const folderId = q || !requestedLabel || requestedLabel === "INBOX" ? "" : await zohoFolderIdForLabel(env, zohoAccountId, requestedLabel);
-  const aliasFilteredInbox = Boolean(mailbox && requestedLabel !== "SENT" && !q);
-  const providerLimit = aliasFilteredInbox ? Math.max(limit, 100) : limit;
+  const folderId = requestedLabel ? await zohoFolderIdForLabel(env, zohoAccountId, requestedLabel) : "";
+  const labelScopedView = Boolean(folderId && requestedLabel && requestedLabel !== "ALL");
+  const aliasFilteredInbox = Boolean(mailbox && !requestedLabel && !q);
+  const providerLimit = (aliasFilteredInbox || labelScopedView || q) ? Math.max(limit, 100) : limit;
   const params = new URLSearchParams({ start: String(start), limit: String(providerLimit), includeto: "true" });
   let payload = null;
   let rawMessages = [];
-  if (aliasFilteredInbox) {
+  if (labelScopedView) {
+    params.set("status", "all");
+    params.set("sortBy", "date");
+    params.set("sortorder", "false");
+    params.set("includesent", "true");
+    params.set("folderId", folderId);
+    payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages/view?${params.toString()}`);
+    rawMessages = Array.isArray(payload?.data) ? [...payload.data].filter((message) => zohoMessageMatchesQuery(message, q)) : [];
+  } else if (aliasFilteredInbox) {
     params.set("searchKey", zohoSearchKeyForMailbox(mailbox));
     payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(zohoAccountId)}/messages/search?${params.toString()}`);
     rawMessages = Array.isArray(payload?.data) ? [...payload.data] : [];
@@ -2300,8 +2471,8 @@ function replaceCidImages(html, messageId, inlineItems = []) {
 async function zohoGetMessage(env, { id, accountId = null, mailbox = "" }) {
   const fallbackAccountId = await getZohoMailAccountId(env, accountId);
   const parsed = parseZohoUiId(id, fallbackAccountId);
-  if (!parsed.messageId) throw Object.assign(new Error("Zoho message id required."), { statusCode: 400 });
-  if (!parsed.folderId) throw Object.assign(new Error("Citadel message folder id missing. Open the message from a Citadel/SkyeNet inbox result."), { statusCode: 400 });
+  if (!parsed.messageId) throw Object.assign(new Error("SkyeMail message id required."), { statusCode: 400 });
+  if (!parsed.folderId) throw Object.assign(new Error("SkyeMail message folder id missing. Open the message from a Citadel Database and SkyeNet inbox result."), { statusCode: 400 });
   const payload = await zohoFetch(env, `/api/accounts/${encodeURIComponent(parsed.accountId)}/folders/${encodeURIComponent(parsed.folderId)}/messages/${encodeURIComponent(parsed.messageId)}/content`);
   const data = payload?.data || payload || {};
   const attachmentInfo = await zohoAttachmentInfo(env, parsed);
@@ -2351,6 +2522,65 @@ function localRouteProvision(email, reason = "Hosted mailbox provider is not con
     mailbox_password_once: null,
     credential_note: reason,
   };
+}
+
+function isProductionMailbox(row = {}) {
+  const provider = clean(row.provider).toLowerCase();
+  const status = clean(row.status).toLowerCase();
+  const provisioningStatus = clean(row.provisioning_status).toLowerCase();
+  return status === "active"
+    && provisioningStatus === "provisioned"
+    && provider
+    && !["skymail-local-route", "resend"].includes(provider);
+}
+
+function mailboxInventoryState(row = {}) {
+  const provider = clean(row.provider).toLowerCase();
+  const status = clean(row.status).toLowerCase();
+  const provisioningStatus = clean(row.provisioning_status).toLowerCase();
+  if (isProductionMailbox(row)) {
+    return {
+      inventory_class: "production_sellable",
+      sellable_production: true,
+      customer_facing_state: "SkyeMail production mailbox",
+      needs_action: "",
+    };
+  }
+  if (provider === "skymail-local-route") {
+    return {
+      inventory_class: "internal_local_route_not_provider_backed",
+      sellable_production: false,
+      customer_facing_state: "internal route only",
+      needs_action: "Archive or convert to a SkyeMail mailbox before customer use.",
+    };
+  }
+  if (provider === "resend") {
+    return {
+      inventory_class: "proof_demo_not_sellable",
+      sellable_production: false,
+      customer_facing_state: "proof/demo route",
+      needs_action: "Archive proof rows after the proof run; do not expose as mailbox inventory.",
+    };
+  }
+  if (["error", "failed", "disabled"].includes(status) || provisioningStatus.includes("error") || provisioningStatus.includes("failed")) {
+    return {
+      inventory_class: "provider_blocked_not_sellable",
+      sellable_production: false,
+      customer_facing_state: "provider provisioning blocked",
+      needs_action: "Repair provider state or retry provisioning before customer use.",
+    };
+  }
+  return {
+    inventory_class: "pending_not_sellable",
+    sellable_production: false,
+    customer_facing_state: "pending SkyeMail mailbox",
+    needs_action: "Complete provider provisioning before customer use.",
+  };
+}
+
+function localOnlyMailboxError(detail = "") {
+  const suffix = detail ? ` ${detail}` : "";
+  return Object.assign(new Error(`SkyeMail will not create or sell a local-only mailbox because external replies would bounce.${suffix}`), { statusCode: 409 });
 }
 
 function shouldUseLocalRouteFallback(error) {
@@ -2413,20 +2643,18 @@ async function provisionMailbox(env, { email, localPart, domain, user, fs27, all
       if (!zohoProviderCanProvision(env)) {
         return await provisionZohoMailboxAliasRoute(env, {
           email,
-          reason: "Citadel mail access is configured but full organization mailbox-seat provisioning is unavailable, so SkyeMail created a sovereign receiving alias route.",
+          reason: "SkyeMail provider access is configured but full organization mailbox-seat provisioning is unavailable, so SkyeMail created a sovereign receiving alias route.",
         });
       }
       return await provisionZohoMailbox(env, { email, localPart, domain, user, fs27 });
     } catch (error) {
       if (shouldUseLocalRouteFallback(error)) {
-        return await provisionZohoMailboxAliasRoute(env, { email, reason: `Citadel mailbox capacity is exhausted; SkyeMail created a real receiving alias instead. Mail lane said: ${error.message || "license limit reached"}` });
+        return await provisionZohoMailboxAliasRoute(env, { email, reason: `SkyeMail backed by Citadel Database and SkyeNet created a real receiving alias because production mailbox capacity is exhausted. SkyeMail detail: ${error.message || "capacity limit reached"}` });
       }
       if (shouldAttachExistingAddress(error)) {
-        return await provisionZohoMailboxAliasRoute(env, { email, reason: `Citadel reports ${email} already exists or is associated with another organization; SkyeMail confirmed a sovereign receiving alias route instead of saving a local-only address. Mail lane said: ${error.message || "address already exists"}` });
+        return await provisionZohoMailboxAliasRoute(env, { email, reason: `SkyeMail backed by Citadel Database and SkyeNet reports ${email} already exists or is associated with another organization; SkyeMail confirmed a sovereign receiving alias route instead of saving a local-only address. SkyeMail detail: ${error.message || "address already exists"}` });
       }
-      if (allowLocalRoute) {
-        return localRouteProvision(email, `Explicit operator override allowed an unroutable local SkyeMail route after provider provisioning failed. External replies may bounce until provider routing is repaired. Mail lane said: ${error.message || "provider provisioning failed"}`);
-      }
+      if (allowLocalRoute) throw localOnlyMailboxError(`SkyeMail backed by Citadel Database and SkyeNet could not provision the mailbox seat: ${error.message || "mail lane provisioning failed"}`);
       throw error;
     }
   }
@@ -2494,7 +2722,7 @@ async function introspectFs27(env, token) {
     last = { res, data };
     if (res.status === 404) continue;
     endpointMissing = false;
-    if (!res.ok || data.active !== true) throw Object.assign(new Error(data.error || "0S/SkyGate session is inactive."), { statusCode: res.ok ? 401 : res.status });
+    if (!res.ok || data.active !== true) throw Object.assign(new Error(data.error || "0S/SkyeGate session is inactive."), { statusCode: res.ok ? 401 : res.status });
     return data;
   }
   if (endpointMissing) {
@@ -2555,6 +2783,72 @@ async function mirrorFs27(env, payload = {}) {
   return { ok: res.ok, status: res.status, data: await res.json().catch(() => null) };
 }
 
+async function linkFs27AppSpine(env, claims = {}, user = {}, options = {}) {
+  const origin = cleanOrigin(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN);
+  const token = clean(options.token || "");
+  const secret = clean(env.SKYGATE_EVENT_MIRROR_SECRET || env.SKYGATEFS27_EVENT_MIRROR_SECRET);
+  if (!env.SKYGATEFS27_WORKER?.fetch && !origin) return { ok: false, skipped: true, reason: "FS27 origin/binding missing." };
+  if (!token && !secret) return { ok: false, skipped: true, reason: "FS27 app-spine auth missing." };
+  const card = claims.gate_card || claims.card || null;
+  const payload = {
+    app_id: "skymail",
+    app_label: "SkyeMail",
+    category: "mail",
+    login_surface_slug: "skymail",
+    login_surface_name: "SkyeMail",
+    login_url: "/login.html",
+    handoff_url: "/auth-fs27-session",
+    local_user_id: user.id || null,
+    local_user_kind: "skymail.user",
+    local_workspace_id: user.workspace_id || user.skymail_id || user.id || null,
+    local_workspace_kind: "mail-workspace",
+    workspace_slug: user.workspace_id || null,
+    workspace_name: user.handle ? `${user.handle} SkyeMail` : "SkyeMail workspace",
+    email: user.email || claims.email || claims.username || null,
+    handle: user.handle || null,
+    mailbox_email: options.mailbox_email || null,
+    skymail_user_id: user.id || null,
+    skymail_id: user.skymail_id || null,
+    fs27_user_id: claims.sub || null,
+    fs27_customer_id: claims.customer_id || claims.org || null,
+    fs27_gate_card_id: user.fs27_gate_card_id || claims.gate_card_id || card?.id || card?.card_id || null,
+    app_role: claims.role || "user",
+    tier: "free99",
+    plan_name: "free99-gate-owned",
+    entitlement_keys: ["skymail.mailbox", "skymail.ai.assist"],
+    local_auth_kind: "skymail.local-user-table",
+    local_auth_status: "fs27-linked",
+    migration_action: "linked_to_fs27",
+    migration_status: "preserved",
+    metadata: {
+      skymail_id: user.skymail_id || null,
+      workspace_id: user.workspace_id || null,
+      fs27_sub: claims.sub || null,
+      fs27_role: claims.role || null,
+      fs27_client_id: claims.client_id || null,
+      fs27_gate_card_id: user.fs27_gate_card_id || claims.gate_card_id || null,
+    },
+  };
+  const headers = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  else headers["x-skygate-mirror-secret"] = secret;
+  const paths = ["/app-spine/link", "/auth/app-spine/link", "/.netlify/functions/app-spine-link"];
+  let last = null;
+  for (const path of paths) {
+    const req = new Request(`${origin || "https://skyegatefs27-citadeldb.service"}${path}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+    const res = env.SKYGATEFS27_WORKER?.fetch ? await env.SKYGATEFS27_WORKER.fetch(req) : await fetch(req);
+    const data = await res.json().catch(() => ({ ok: res.ok, status: res.status }));
+    last = { ok: res.ok, status: res.status, data, path };
+    if (res.status === 404) continue;
+    return last;
+  }
+  return last || { ok: false, skipped: true, reason: "FS27 app-spine endpoint not found." };
+}
+
 async function backupCitadel(env, payload = {}) {
   const body = {
     source_app: "skymail",
@@ -2594,7 +2888,7 @@ async function backupCitadel(env, payload = {}) {
     }
   }
 
-  return results.length ? { ok: results.some((r) => r.ok), results } : { ok: false, skipped: true, reason: "Citadel backup env is not configured." };
+  return results.length ? { ok: results.some((r) => r.ok), results } : { ok: false, skipped: true, reason: "Citadel Database backup env is not configured." };
 }
 
 function extractAddress(value) {
@@ -2644,7 +2938,7 @@ async function verifyResendWebhook(request, env) {
       svixId: request.headers.get("svix-id") || null,
     };
   } catch {
-    throw Object.assign(new Error("Invalid Citadel webhook signature."), { statusCode: 401 });
+    throw Object.assign(new Error("Invalid SkyeMail routing webhook signature."), { statusCode: 401 });
   }
 }
 
@@ -2899,7 +3193,7 @@ async function handleInboundResend(request, env, ctx) {
   }
 }
 
-async function ensureUserFromFs27(env, claims) {
+async function ensureUserFromFs27(env, claims, options = {}) {
   const scope = String(claims.scope || claims.scopes || "").toLowerCase();
   const username = normalizeEmail(claims.username);
   const clientId = String(claims.client_id || "").toLowerCase();
@@ -2908,7 +3202,7 @@ async function ensureUserFromFs27(env, claims) {
     ? normalizeEmail(env.SKYMAIL_OWNER_EMAIL || env.SKYGATE_ADMIN_EMAIL || env.METRAIYUX_OWNER_EMAIL || env.NOTIFY_FROM_EMAIL || env.RESEND_FROM_EMAIL)
     : "";
   const email = normalizeEmail(claims.email || (username.includes("@") ? username : "") || adminEmailFallback);
-  if (!email || !email.includes("@")) throw Object.assign(new Error("0S/SkyGate session must include an email."), { statusCode: 400 });
+  if (!email || !email.includes("@")) throw Object.assign(new Error("0S/SkyeGate session must include an email."), { statusCode: 400 });
   const fs27Sub = claims.sub || null;
   const fs27CustomerId = claims.customer_id || claims.org || null;
   const fs27GateCardId = makeGateCardId({
@@ -2938,7 +3232,11 @@ async function ensureUserFromFs27(env, claims) {
        where id=$1
        returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id
     `, [user.id, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, JSON.stringify(claims.gate_card || claims.card || null)]);
-    return rows[0];
+    const linked = rows[0];
+    const mirror = linkFs27AppSpine(env, claims, linked, options).catch(() => null);
+    if (options.ctx?.waitUntil) options.ctx.waitUntil(mirror);
+    else if (options.token) await mirror;
+    return linked;
   }
   const handleBase = normalizeHandle(email).slice(0, 28) || "skyemail-user";
   let handle = handleBase;
@@ -2958,7 +3256,11 @@ async function ensureUserFromFs27(env, claims) {
     values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
     returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id
   `, [handle, email, `fs27:${claims.sub || crypto.randomUUID()}`, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, JSON.stringify(claims.gate_card || claims.card || null)]);
-  return rows[0];
+  const linked = rows[0];
+  const mirror = linkFs27AppSpine(env, claims, linked, options).catch(() => null);
+  if (options.ctx?.waitUntil) options.ctx.waitUntil(mirror);
+  else if (options.token) await mirror;
+  return linked;
 }
 
 async function ensureServiceUser(env, { email, handleSeed, sourceId }) {
@@ -3025,7 +3327,7 @@ async function handleVaultKeySetup(request, env, ctx) {
   };
   ctx?.waitUntil?.(mirrorFs27(env, event));
   ctx?.waitUntil?.(backupCitadel(env, { ...event, id: `vault_key_${user.id}_${version}` }));
-  return json({ ok: true, active: true, version, user: publicUser(user) });
+  return json({ ok: true, active: true, version, active_version: version, user: publicUser(user) });
 }
 
 function publicSkymailUrl(env) {
@@ -3056,7 +3358,7 @@ function buildWorkspaceKeyCard(env, { user, mailbox, body, keyState }) {
   const displayName = clean(body.owner_name || body.full_name || body.company_name || user.handle || user.email);
   return {
     type: "skymail_vault_key_card",
-    title: "SkyeMail Citadel Key Card",
+    title: "SkyeMail backed by Citadel Database and SkyeNet Key Card",
     workspace_id: workspaceId || null,
     customer_id: clean(body.customer_id) || null,
     company_name: clean(body.company_name) || null,
@@ -3078,7 +3380,7 @@ function buildWorkspaceKeyCard(env, { user, mailbox, body, keyState }) {
     security_model: [
       "The client creates the sovereign key pair in their browser.",
       "SkyeMail stores the public key for inbound encryption.",
-      "The private key is stored only after being wrapped by the client's Citadel passphrase.",
+      "The private key is stored only after being wrapped by the client's SkyeMail key passphrase.",
       "Admin recovery is optional and must be disclosed if enabled.",
     ],
     artifact_hint: {
@@ -3146,7 +3448,7 @@ async function handleAuthFs27(request, env, ctx) {
   const gateToken = bearer(request);
   const body = await request.json().catch(() => ({}));
   const claims = await introspectFs27(env, gateToken);
-  const user = await ensureUserFromFs27(env, claims);
+  const user = await ensureUserFromFs27(env, claims, { token: gateToken, ctx });
   const auth = {
     sub: user.id,
     email: user.email,
@@ -3218,7 +3520,7 @@ async function handleAuthSignup(request, env, ctx) {
   return json({
     ok: false,
     error: "app_local_auth_disabled_by_shared_gate",
-    message: "SkyeMail signup is owned by the canonical 0S Gate. Create or unlock the FS27/SkyGate session, then call /auth-fs27-session to bind SkyeMail.",
+    message: "SkyeMail signup is owned by the canonical 0S Gate. Create or unlock the SkyeGate FS27 session, then call /auth-fs27-session to bind SkyeMail.",
     gate_required: true,
     gate_signup: `${zeroOsGateOrigin(env)}/gate/signup/?return=${encodeURIComponent("/live/SkyeMail/session-handoff.html?next=onboarding.html&from=skymail-auth-signup")}`,
     session_endpoint: "/auth-fs27-session"
@@ -3230,31 +3532,271 @@ async function handleAuthLogin(request, env) {
   return json({
     ok: false,
     error: "app_local_auth_disabled_by_shared_gate",
-    message: "SkyeMail login is owned by the canonical 0S Gate. Use an active FS27/SkyGate bearer with /auth-fs27-session.",
+    message: "SkyeMail login is owned by the canonical 0S Gate. Use an active SkyeGate FS27 bearer with /auth-fs27-session.",
     gate_required: true,
     gate_login: zeroOsSkyEmailHandoffLogin(env, "dashboard.html"),
     session_endpoint: "/auth-fs27-session"
   }, 410);
 }
 
-async function handleMailboxDomains(_request, env) {
+async function handleAuthMe(request, env) {
+  const auth = await requireAuth(request, env);
+  const cacheKey = `auth-me:${auth.sub}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return json({ ...cached, cached: true, cache_ttl_seconds: 30 });
+  const users = await query(env, "select handle, email, recovery_enabled from users where id=$1 limit 1", [auth.sub]);
+  if (!users.length) throw Object.assign(new Error("Unauthorized"), { statusCode: 401 });
+  const keys = await query(env, `
+    select version, is_active, rsa_public_key_pem, vault_wrap_json, created_at
+      from user_keys
+     where user_id=$1
+     order by version asc
+  `, [auth.sub]);
+  const active = keys.find((item) => item.is_active) || null;
+  const body = {
+    ok: true,
+    handle: users[0].handle,
+    email: users[0].email,
+    recovery_enabled: Boolean(users[0].recovery_enabled),
+    keys,
+    active_version: active ? active.version : null,
+  };
+  cacheSet(cacheKey, body, 30000);
+  return json(body);
+}
+
+async function handleVaultExport(request, env) {
+  const auth = await requireAuth(request, env);
+  const users = await query(env, "select handle, email, recovery_enabled, created_at from users where id=$1 limit 1", [auth.sub]);
+  if (!users.length) throw Object.assign(new Error("Unauthorized"), { statusCode: 401 });
+  const keys = await query(env, `
+    select version, is_active, rsa_public_key_pem, vault_wrap_json, created_at
+      from user_keys
+     where user_id=$1
+     order by version asc
+  `, [auth.sub]);
+  const active = keys.find((item) => item.is_active) || null;
+  return json({
+    schema: "SMV_VAULT_PACK_V1",
+    exported_at: new Date().toISOString(),
+    user: {
+      handle: users[0].handle,
+      email: users[0].email,
+      created_at: users[0].created_at,
+      recovery_enabled: Boolean(users[0].recovery_enabled),
+    },
+    keys: keys.map((item) => ({
+      version: item.version,
+      is_active: Boolean(item.is_active),
+      rsa_public_key_pem: item.rsa_public_key_pem,
+      vault_wrap_json: item.vault_wrap_json,
+      created_at: item.created_at,
+    })),
+    active_version: active ? active.version : null,
+  });
+}
+
+async function handleVaultRestoreKeys(request, env) {
+  const auth = await requireAuth(request, env);
+  const body = await request.json().catch(() => ({}));
+  if (body?.schema !== "SMV_VAULT_PACK_V1") throw Object.assign(new Error("Invalid vault pack schema."), { statusCode: 400 });
+  if (!Array.isArray(body.keys) || !body.keys.length) throw Object.assign(new Error("Vault pack keys required."), { statusCode: 400 });
+  const nextKeys = [];
+  for (const key of body.keys) {
+    const version = Number(key.version);
+    if (!Number.isFinite(version) || version < 1) throw Object.assign(new Error("Invalid key version in pack."), { statusCode: 400 });
+    const rsaPublicKeyPem = clean(key.rsa_public_key_pem);
+    if (!rsaPublicKeyPem.includes("BEGIN PUBLIC KEY")) throw Object.assign(new Error("Invalid rsa_public_key_pem in pack."), { statusCode: 400 });
+    const vaultWrapJson = key.vault_wrap_json;
+    if (!vaultWrapJson) throw Object.assign(new Error("Invalid vault_wrap_json in pack."), { statusCode: 400 });
+    nextKeys.push({
+      version,
+      is_active: Boolean(key.is_active),
+      rsa_public_key_pem: rsaPublicKeyPem,
+      vault_wrap_json: typeof vaultWrapJson === "string" ? vaultWrapJson : JSON.stringify(vaultWrapJson),
+    });
+  }
+  await query(env, "delete from user_keys where user_id=$1", [auth.sub]);
+  for (const key of nextKeys) {
+    await query(env, `
+      insert into user_keys(user_id, version, is_active, rsa_public_key_pem, vault_wrap_json)
+      values($1,$2,$3,$4,$5)
+    `, [auth.sub, key.version, key.is_active, key.rsa_public_key_pem, key.vault_wrap_json]);
+  }
+  const activeVersion = Number(body.active_version || 0);
+  if (activeVersion > 0) {
+    await query(env, "update user_keys set is_active=(version=$2) where user_id=$1", [auth.sub, activeVersion]);
+  } else {
+    const latest = await query(env, "select coalesce(max(version),1) as version from user_keys where user_id=$1", [auth.sub]);
+    await query(env, "update user_keys set is_active=(version=$2) where user_id=$1", [auth.sub, Number(latest[0]?.version || 1)]);
+  }
+  return json({ ok: true });
+}
+
+async function handleKeysRotate(request, env, ctx) {
+  return await handleVaultKeySetup(request, env, ctx);
+}
+
+async function handlePublicKey(request, env) {
+  const handle = clean(new URL(request.url).searchParams.get("handle"));
+  if (!handle) throw Object.assign(new Error("handle required"), { statusCode: 400 });
+  const users = await query(env, "select id from users where lower(handle)=lower($1) limit 1", [handle]);
+  if (!users.length) throw Object.assign(new Error("Recipient not found."), { statusCode: 404 });
+  const keys = await query(env, "select version, rsa_public_key_pem from user_keys where user_id=$1 and is_active=true limit 1", [users[0].id]);
+  if (!keys.length) throw Object.assign(new Error("Recipient key missing."), { statusCode: 500 });
+  return json({ ok: true, version: keys[0].version, rsa_public_key_pem: keys[0].rsa_public_key_pem });
+}
+
+async function handleSubmitMessage(request, env, ctx) {
+  const body = await request.json().catch(() => ({}));
+  if (clean(body.website)) return json({ ok: true });
+  const handle = clean(body.handle);
+  const fromName = clean(body.from_name);
+  const fromEmail = normalizeEmail(body.from_email);
+  const keyVersion = Number(body.key_version || 0);
+  if (!handle) throw Object.assign(new Error("handle required"), { statusCode: 400 });
+  if (!fromEmail || !fromEmail.includes("@")) throw Object.assign(new Error("Valid sender email required."), { statusCode: 400 });
+  if (!clean(body.encrypted_key_b64) || !clean(body.iv_b64) || !clean(body.ciphertext_b64)) throw Object.assign(new Error("Encrypted payload required."), { statusCode: 400 });
+  if (!Number.isFinite(keyVersion) || keyVersion < 1) throw Object.assign(new Error("key_version required."), { statusCode: 400 });
+  const users = await query(env, "select id, email, handle from users where lower(handle)=lower($1) limit 1", [handle]);
+  if (!users.length) throw Object.assign(new Error("Recipient not found."), { statusCode: 404 });
+  const user = users[0];
+  const keyCheck = await query(env, "select 1 from user_keys where user_id=$1 and version=$2 limit 1", [user.id, keyVersion]);
+  if (!keyCheck.length) throw Object.assign(new Error("Recipient key rotated. Refresh the send page and try again."), { statusCode: 409 });
+  const existing = await query(env, `
+    select id, token
+      from threads
+     where user_id=$1 and lower(from_email)=lower($2)
+     order by last_activity_at desc
+     limit 1
+  `, [user.id, fromEmail]);
+  let threadId = existing[0]?.id || null;
+  let threadToken = existing[0]?.token || null;
+  if (threadId) {
+    await query(env, "update threads set last_activity_at=now() where id=$1", [threadId]);
+  } else {
+    threadToken = randomToken(24);
+    const created = await query(env, "insert into threads(user_id, token, from_name, from_email) values($1,$2,$3,$4) returning id", [user.id, threadToken, fromName || null, fromEmail]);
+    threadId = created[0]?.id || null;
+  }
+  const messages = await query(env, `
+    insert into messages(user_id, thread_id, from_name, from_email, key_version, encrypted_key_b64, iv_b64, ciphertext_b64)
+    values($1,$2,$3,$4,$5,$6,$7,$8)
+    returning id, created_at
+  `, [
+    user.id,
+    threadId,
+    fromName || null,
+    fromEmail,
+    keyVersion,
+    clean(body.encrypted_key_b64),
+    clean(body.iv_b64),
+    clean(body.ciphertext_b64),
+  ]);
+  const messageId = messages[0]?.id || null;
+  const attachments = Array.isArray(body.attachments) ? body.attachments : [];
+  if (attachments.length > 6) throw Object.assign(new Error("Max 6 attachments."), { statusCode: 400 });
+  for (const attachment of attachments) {
+    const filename = clean(attachment.filename);
+    const mimeType = clean(attachment.mime_type || "application/octet-stream");
+    const sizeBytes = Number(attachment.size_bytes || 0);
+    if (!filename) throw Object.assign(new Error("Attachment filename required."), { statusCode: 400 });
+    if (!clean(attachment.encrypted_key_b64) || !clean(attachment.iv_b64) || !clean(attachment.ciphertext_b64)) throw Object.assign(new Error("Attachment encrypted payload required."), { statusCode: 400 });
+    if (!Number.isFinite(sizeBytes) || sizeBytes <= 0) throw Object.assign(new Error("Attachment size_bytes invalid."), { statusCode: 400 });
+    if (sizeBytes > 4_000_000) throw Object.assign(new Error("Attachment too large (max 4MB each)."), { statusCode: 400 });
+    await query(env, `
+      insert into attachments(message_id, filename, mime_type, size_bytes, encrypted_key_b64, iv_b64, ciphertext)
+      values($1,$2,$3,$4,$5,$6,decode($7,'base64'))
+    `, [
+      messageId,
+      filename,
+      mimeType,
+      sizeBytes,
+      clean(attachment.encrypted_key_b64),
+      clean(attachment.iv_b64),
+      clean(attachment.ciphertext_b64),
+    ]);
+  }
+  ctx?.waitUntil?.(backupCitadel(env, {
+    id: `secure_message_${messageId}_${Date.now()}`,
+    type: "skymail.secure_message.received",
+    actor: fromEmail,
+    ws_id: user.id,
+    meta: { handle: user.handle, message_id: messageId, thread_id: threadId, attachment_count: attachments.length },
+  }).catch(() => null));
+  return json({ ok: true, id: messageId, thread_token: threadToken });
+}
+
+async function handleGoogleOauthStart(request, env) {
+  await requireAuth(request, env);
+  const next = clean(new URL(request.url).searchParams.get("next") || "/dashboard.html");
+  return json({
+    ok: false,
+    provider: "skyemail",
+    error: "gmail_oauth_disabled_for_skyemail_phase",
+    message: "This SkyeMail deployment is using the SkyeMail production sovereign mailbox lane. Gmail OAuth is not required for inbox parity.",
+    next,
+  }, 410);
+}
+
+async function handleGoogleDisconnect(request, env) {
+  const auth = await requireAuth(request, env);
+  await query(env, "delete from google_mailboxes where user_id=$1", [auth.sub]).catch(() => null);
+  return json({ ok: true, disconnected: true, provider: "skyemail" });
+}
+
+async function handleGmailWatch(request, env) {
+  await requireAuth(request, env);
+  return json({
+    ok: true,
+    configured: false,
+    provider: "skyemail",
+    mailbox: null,
+    watch: null,
+    message: "Gmail watch is not used on the SkyeMail production lane.",
+  });
+}
+
+function publicMailboxProviderState(provider, provisioningReady) {
+  return {
+    provider: "skyemail",
+    configured: Boolean(provider.configured),
+    mail_api_ready: Boolean(provider.configured),
+    provisioning_ready: Boolean(provisioningReady),
+    route: "SkyeMail production",
+    citadel_mail_ready: Boolean(provider.configured),
+  };
+}
+
+async function handleMailboxDomains(request, env) {
   const provider = providerConfigured(env);
   const zohoProvisioningReady = provider.provider === "zoho" ? zohoProviderCanProvision(env) : provider.configured;
-  return json({
+  const url = new URL(request.url);
+  const wantsInternalProviderProof = url.searchParams.get("internal") === "1" || request.headers.get("x-skymail-internal-provider-proof") === "1";
+  const body = {
     ok: true,
     domains: configuredDomains(env),
     primary_domain: configuredDomains(env)[0] || null,
     api_configured: provider.configured,
     provisioning_configured: zohoProvisioningReady,
-    provider: provider.provider,
-    provider_configured: provider,
+    provider: "skyemail",
+    provider_configured: publicMailboxProviderState(provider, zohoProvisioningReady),
     fs27_configured: Boolean(env.SKYGATEFS27_ORIGIN || env.SKYGATE_ORIGIN),
     citadel_backup_configured: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL),
-  });
+  };
+  if (wantsInternalProviderProof) {
+    const service = await serviceAuth(request, env).catch(() => null);
+    if (service?.ok) {
+      body.internal_provider = provider.provider;
+      body.internal_provider_configured = provider;
+      body.internal_provider_proof_auth = service.source || "service";
+    }
+  }
+  return json(body);
 }
 
 async function handleZohoProviderSmoke(request, env) {
-  serviceAuth(request, env);
+  await serviceAuth(request, env);
   const provider = providerConfigured(env);
   const report = {
     ok: false,
@@ -3278,7 +3820,7 @@ async function handleZohoProviderSmoke(request, env) {
     token: { ok: false },
     accounts: { ok: false },
     signature: { ok: false },
-    organization: { skipped: true, reason: "Citadel organization id is not configured." },
+    organization: { skipped: true, reason: "SkyeMail provider organization id is not configured." },
     result: {
       token_exchange_ready: false,
       mail_account_ready: false,
@@ -3315,7 +3857,7 @@ async function handleZohoProviderSmoke(request, env) {
   } catch (error) {
     report.error = {
       statusCode: error.statusCode || 500,
-      message: error.message || "Citadel mail lane smoke failed.",
+      message: error.message || "SkyeMail production mail lane smoke failed.",
       provider_summary: zohoResponseSummary(error.providerResponse || {}),
     };
   }
@@ -3325,6 +3867,11 @@ async function handleZohoProviderSmoke(request, env) {
 
 async function getHostedMailbox(env, userId, options = {}) {
   const includeInactive = Boolean(options.includeInactive || options.includeReleased);
+  const cacheKey = includeInactive ? "" : `hosted-mailbox:user:${userId}`;
+  if (cacheKey) {
+    const cached = cacheGet(cacheKey);
+    if (cached !== null) return cached;
+  }
   const rows = await query(env, `
     select id, user_id, mailbox_email, local_part, domain, workspace_id, skymail_id, fs27_gate_card_id,
            provider, provider_account_id,
@@ -3336,7 +3883,8 @@ async function getHostedMailbox(env, userId, options = {}) {
      order by (status='active') desc, created_at desc
      limit 1
   `, [userId]);
-  return rows[0] || null;
+  const mailbox = rows[0] || null;
+  return cacheKey ? cacheSet(cacheKey, mailbox, 15000) : mailbox;
 }
 
 function selectedMailboxEmailFromRequest(request, body = {}) {
@@ -3397,6 +3945,9 @@ function authCanSelectMailbox(env, auth, mailbox = {}) {
 async function getHostedMailboxByEmail(env, mailboxEmail) {
   const email = normalizeEmail(mailboxEmail);
   if (!email) return null;
+  const cacheKey = `hosted-mailbox:email:${email}`;
+  const cached = cacheGet(cacheKey);
+  if (cached !== null) return cached;
   const rows = await query(env, `
     select hm.*, u.email as owner_email, u.handle as owner_handle, u.fs27_customer_id
       from hosted_mailboxes hm
@@ -3405,11 +3956,14 @@ async function getHostedMailboxByEmail(env, mailboxEmail) {
        and coalesce(hm.status,'') not in ('released','offboarded','disabled')
      limit 1
   `, [email]);
-  return rows[0] || null;
+  return cacheSet(cacheKey, rows[0] || null, 15000);
 }
 
 async function listAccessibleMailboxes(env, auth) {
   const ownerMode = authIsOwnerOperator(env, auth);
+  const cacheKey = `mailboxes:${ownerMode ? "owner" : "user"}:${auth.sub}:${stableHex(normalizeEmail(auth.email), 12)}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
   const rows = ownerMode
     ? await query(env, `
       select hm.id, hm.user_id, hm.mailbox_email, hm.local_part, hm.domain, hm.workspace_id, hm.skymail_id,
@@ -3440,7 +3994,7 @@ async function listAccessibleMailboxes(env, auth) {
        order by (hm.status='active') desc, hm.created_at desc
        limit 25
     `, [auth.sub, normalizeEmail(auth.email)]);
-  return rows.map((row) => ({
+  const mailboxes = rows.map((row) => ({
     id: row.id,
     user_id: row.user_id,
     mailbox_email: row.mailbox_email,
@@ -3456,8 +4010,10 @@ async function listAccessibleMailboxes(env, auth) {
     inbox_total: Number(row.inbox_total || 0),
     inbox_unread: Number(row.inbox_unread || 0),
     sent_total: Number(row.sent_total || 0),
+    ...mailboxInventoryState(row),
     selected: false,
   }));
+  return cacheSet(cacheKey, mailboxes, 15000);
 }
 
 async function resolveMailboxContext(env, request, auth, body = {}) {
@@ -3781,7 +4337,7 @@ function mailBrainMode(body = {}, env = {}) {
 function mailBrainSystemPrompt({ action, mailboxEmail }) {
   return [
     "You are the SkyeMail mailbox brain inside the MetrAIyux 0S.",
-    "You work for Skyes Over London LC / SOLEnterprises and route through the shared FS27/SkyGate auth lane.",
+    "You work for Skyes Over London LC / SOLEnterprises and route through the shared SkyeGate FS27 auth lane.",
     `Active mailbox: ${mailboxEmail || "unknown"}.`,
     `Requested action: ${action}.`,
     "Be useful, operational, and concise.",
@@ -3842,10 +4398,73 @@ function outputFromAiText({ action, text, localOutput, messages }) {
   return output;
 }
 
+function mailBrainTruthy(value) {
+  if (value === true) return true;
+  if (typeof value === "number") return value === 1;
+  const text = clean(value).toLowerCase();
+  return ["1", "true", "yes", "y", "on", "send", "auto", "auto_send", "autopilot", "automated"].includes(text);
+}
+
+function mailBrainSendReadyBody(text = "") {
+  return clean(String(text || "")
+    .replace(/^subject\s*:[^\n]*\n+/i, "")
+    .replace(/^body\s*:\s*/i, "")
+    .trim()).slice(0, 12000);
+}
+
+function mailBrainAutomationDecision({ entitlement = {}, body = {}, prompt = "", messages = [], sendPayload = {} } = {}) {
+  const approval = clean(body.approval || body.approval_mode || body.send_mode).toLowerCase();
+  const requested = mailBrainTruthy(body.automation_consent)
+    || mailBrainTruthy(body.automationConsent)
+    || mailBrainTruthy(body.auto_send)
+    || mailBrainTruthy(body.autoSend)
+    || mailBrainTruthy(body.autopilot)
+    || approval === "auto_send"
+    || approval === "automated";
+  const haystack = [
+    prompt,
+    sendPayload.subject,
+    sendPayload.message,
+    sendPayload.text,
+    sendPayload.html,
+    ...messages.map((item) => `${item.subject || ""}\n${item.from || ""}\n${item.to || ""}\n${item.snippet || ""}`),
+  ].join("\n").toLowerCase();
+  const riskTerms = [
+    ["legal", /\b(legal|lawyer|attorney|lawsuit|court|subpoena|settlement|liability)\b/],
+    ["contract", /\b(contract|agreement|signature|terms|termination|breach|nda)\b/],
+    ["billing", /\b(invoice|billing|refund|chargeback|payment|wire|bank|stripe|tax|irs|payroll|salary)\b/],
+    ["hr", /\b(hiring|firing|termination|employee|contractor|harassment|disciplinary|background check)\b/],
+    ["safety", /\b(safety|injury|medical|health|emergency|security incident|threat)\b/],
+    ["credentials", /\b(password|credential|api key|secret|token|login|ssn|social security)\b/],
+    ["regulated", /\b(compliance|regulated|license|permit|government|audit|insurance|claim)\b/],
+  ].filter(([, pattern]) => pattern.test(haystack)).map(([label]) => label);
+  const blockedReasons = [];
+  if (requested && entitlement.active === false) blockedReasons.push("ai_entitlement_inactive");
+  if (requested && !entitlement.provider_calls) blockedReasons.push("provider_ai_not_enabled_for_plan");
+  if (requested && !entitlement.auto_send) blockedReasons.push("auto_send_not_enabled_for_plan");
+  if (requested && riskTerms.length) blockedReasons.push("high_risk_requires_manual_approval");
+  return {
+    requested,
+    allowed: requested && blockedReasons.length === 0,
+    plan_id: entitlement.id || "skymail_ai_free",
+    plan_name: entitlement.name || "SkyeMail AI",
+    auto_send_entitled: Boolean(entitlement.auto_send),
+    mode: requested && blockedReasons.length === 0 ? "paid_auto_send" : "manual_review",
+    risk_terms: riskTerms,
+    blocked_reasons: blockedReasons,
+  };
+}
+
 async function handleMailBrain(request, env, ctx) {
   const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
   const auth = await requireAuth(request, env);
   const mailboxContext = await resolveMailboxContext(env, request, auth, body);
+  const url = new URL(request.url);
+  const statusCacheKey = `mail-brain:get:${mailboxContext.userId}:${mailboxContext.mailbox?.id || "none"}:${url.searchParams.get("limit") || "20"}`;
+  if (request.method === "GET" && !["1", "true", "yes"].includes(String(url.searchParams.get("refresh") || "").toLowerCase())) {
+    const cached = cacheGet(statusCacheKey);
+    if (cached) return json({ ...cached, cached: true, cache_ttl_seconds: 15 });
+  }
   await ensureMailBrainSchema(env);
   await ensureSkymailAiRuntimeSchema(env);
   const mailbox = mailboxContext.mailbox;
@@ -3876,10 +4495,12 @@ async function handleMailBrain(request, env, ctx) {
   };
 
   if (request.method === "GET") {
-    const limit = new URL(request.url).searchParams.get("limit") || 20;
+    const limit = url.searchParams.get("limit") || 20;
     const history = await listMailBrainEvents(env, mailboxContext.userId, mailbox?.id || null, limit);
     const monitors = await refreshBrainMonitors(env, mailboxContext.userId, mailbox).catch(() => []);
-    return json({ ok: true, mailbox: mailboxPayload, model_mode: "fs27_metered_v1", ai: aiStatus, capabilities: mailBrainCapabilities(), history, monitors });
+    const responseBody = { ok: true, mailbox: mailboxPayload, model_mode: "fs27_metered_v1", ai: aiStatus, capabilities: mailBrainCapabilities(), history, monitors };
+    cacheSet(statusCacheKey, responseBody, 15000);
+    return json(responseBody);
   }
 
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -3895,14 +4516,15 @@ async function handleMailBrain(request, env, ctx) {
   let monitorResult = null;
 
   if (action === "send_and_monitor") {
+    const providedSendBody = clean(body.message || body.body || body.text || body.html);
     const sendPayload = {
       mailbox_email: mailbox?.mailbox_email || body.mailbox_email || "",
       to: clean(body.to || body.recipient || body.email),
       cc: clean(body.cc),
       bcc: clean(body.bcc),
       subject: clean(body.subject) || messages[0]?.subject || "Follow-up",
-      message: String(body.message || body.body || prompt || ""),
-      text: String(body.message || body.body || prompt || ""),
+      message: String(body.message || body.body || body.text || ""),
+      text: String(body.message || body.body || body.text || ""),
       html: String(body.html || ""),
       reply_message_id: clean(body.reply_message_id || body.replyMessageId || messages[0]?.id || ""),
       reply_thread_id: clean(body.reply_thread_id || body.thread_id || body.threadId || messages[0]?.thread_id || ""),
@@ -3910,16 +4532,87 @@ async function handleMailBrain(request, env, ctx) {
       attachments: Array.isArray(body.attachments) ? body.attachments : [],
     };
     const approved = body.approved === true || body.confirm_send === true || clean(body.approval).toLowerCase() === "send";
-    if (!approved) {
+    const automation = mailBrainAutomationDecision({ entitlement, body, prompt, messages, sendPayload });
+    if (!providedSendBody && modelMode !== "local_deterministic_v1") {
+      try {
+        const ai = await runMeteredSkymailAi(request, env, ctx, {
+          auth: mailboxContext.auth,
+          mailbox,
+          messages: mailBrainAiMessages({
+            action: "draft_reply",
+            mailboxEmail: mailbox?.mailbox_email || "",
+            prompt: [
+              "Prepare a send-ready email body for Send + Monitor.",
+              "Use the selected mailbox context and operator prompt.",
+              "Do not invent dates, prices, legal commitments, refunds, or guarantees.",
+              prompt ? `Operator prompt: ${prompt}` : "",
+            ].filter(Boolean).join("\n"),
+            messages,
+          }),
+          action: "mail-brain:send_and_monitor:draft",
+          prompt,
+          requestedModel: body.model || body.brain_model || body.kaixu_model || "",
+          source: clean(body.source || "skymail-brain-page"),
+        });
+        const drafted = mailBrainSendReadyBody(ai.output_text);
+        if (drafted) {
+          sendPayload.message = drafted;
+          sendPayload.text = drafted;
+        }
+        modelMode = ai.model_mode;
+        brainUsage = {
+          usage_event_id: ai.usage_event_id,
+          usage: ai.usage,
+          month: ai.month,
+          model: ai.model,
+          provider: ai.provider || "fs27_skygate_brain",
+          provider_path: ai.provider_path,
+          automation,
+        };
+      } catch (error) {
+        if (modelMode === "fs27_metered_v1") throw error;
+        output.model_warning = error.message || "FS27 Brain draft path unavailable; manual review is required.";
+        modelMode = "local_deterministic_v1";
+        brainUsage = { unavailable: true, error: output.model_warning, entitlement: error.entitlement || aiStatus.entitlement, month: error.month || aiStatus.month, automation };
+      }
+    } else if (!sendPayload.message && prompt) {
+      sendPayload.message = prompt;
+      sendPayload.text = prompt;
+    }
+    const generatedUnreviewedDraft = !providedSendBody && Boolean(sendPayload.message) && !automation.allowed;
+    const maySend = automation.allowed || (approved && !generatedUnreviewedDraft);
+    if (!maySend) {
+      const automationUpgrade = automation.requested && !automation.allowed
+        ? ["Automation was requested but blocked by entitlement or risk policy.", `Blocked: ${automation.blocked_reasons.join(", ") || "manual_review_required"}.`]
+        : generatedUnreviewedDraft
+          ? ["AI drafted the reply, but manual send needs the owner to review that generated body first.", "Open Compose with the draft or submit again with the reviewed body as message/body plus approved=true."]
+          : ["Submit with approved=true for a manual send, or enable Managed AI Inbox automation and request auto-send for allowlisted routine replies."];
       output = {
-        summary: "Send + Monitor is ready, but SkyeMail needs explicit approval before it sends an external email.",
+        summary: generatedUnreviewedDraft
+          ? "Send + Monitor generated a reply draft and stopped for owner review before sending."
+          : automation.requested
+          ? "Send + Monitor prepared the reply, but this message still requires manual approval before customer-facing send."
+          : "Send + Monitor is ready, but SkyeMail needs explicit approval before it sends an external email.",
         draft: { subject: sendPayload.subject, body: sendPayload.message || "Add the message body, then approve send." },
-        recommendations: ["Review the recipient, subject, body, attachments, and mailbox.", "Submit again with approved=true or confirm_send=true to send through the existing SkyeMail send lane.", "A reply monitor will be created after the send succeeds."],
+        recommendations: [
+          "Review the recipient, subject, body, attachments, and mailbox.",
+          "Submit again with approved=true or confirm_send=true to send manually through the existing SkyeMail send lane.",
+          ...automationUpgrade,
+          "A reply monitor will be created after the send succeeds."
+        ],
         quick_links: [{ label: "Compose", href: `compose.html?to=${encodeURIComponent(sendPayload.to)}&subject=${encodeURIComponent(sendPayload.subject)}&body=${encodeURIComponent(sendPayload.message)}` }],
-        boundaries: ["The brain will not send without explicit approval.", "Outbound mail still uses the existing provider-backed SkyeMail send guard."]
+        automation,
+        boundaries: [
+          "The brain will not send without explicit approval or a paid auto-send entitlement with explicit automation consent.",
+          "High-risk legal, billing, contract, HR, safety, credentials, and regulated messages require manual owner review.",
+          "Outbound mail still uses the existing SkyeMail send guard."
+        ]
       };
-      modelMode = "local_deterministic_v1";
+      if (!brainUsage?.usage_event_id && modelMode !== "fs27_metered_v1") modelMode = "local_deterministic_v1";
     } else {
+      if (automation.allowed && !sendPayload.message && !sendPayload.html) {
+        throw Object.assign(new Error("Automated Send + Monitor requires an AI-generated or supplied message body."), { statusCode: 400 });
+      }
       const sendRequest = new Request(request.url, {
         method: "POST",
         headers: request.headers,
@@ -3937,17 +4630,22 @@ async function handleMailBrain(request, env, ctx) {
         correspondent: sendPayload.to,
         sentMessageId: sendResult.message_id || "",
         threadId: sendResult.reply_thread_id || sendPayload.reply_thread_id || "",
-        meta: { source: "send_and_monitor", provider: sendResult.provider || "", to: sendResult.to || [] },
+        meta: { source: "send_and_monitor", provider: sendResult.provider || "", to: sendResult.to || [], automation_mode: automation.allowed ? "paid_auto_send" : "manual_approved", plan_id: automation.plan_id },
       });
       output = {
-        summary: `Email sent from ${sendResult.from || mailbox?.mailbox_email || "SkyeMail"} to ${sendPayload.to}. Reply monitoring is now watching this subject.`,
+        summary: `${automation.allowed ? "Paid automation sent" : "Manual approval sent"} email from ${sendResult.from || mailbox?.mailbox_email || "SkyeMail"} to ${sendPayload.to}. Reply monitoring is now watching this subject.`,
         recommendations: ["Use Monitoring or this Brain page to refresh reply status.", "Run Mail Sync when expecting a provider-side reply.", "Escalate legal, billing, contractor, or safety replies for owner review."],
         sent: sendResult,
         monitor: monitorResult,
+        automation: { ...automation, sent_mode: automation.allowed ? "paid_auto_send" : "manual_approved" },
         quick_links: [{ label: "Sent", href: "sent.html" }, { label: "Monitoring", href: "monitoring.html" }, { label: "Inbox", href: "dashboard.html" }],
-        boundaries: ["This send used the existing SkyeMail send provider guard.", "The monitor records and checks replies; it does not delete or auto-respond."]
+        boundaries: ["This send used the existing SkyeMail send provider guard.", "The monitor records and checks replies; it does not delete messages.", "Automation remains plan-capped and audited through SkyeGate FS27 usage plus SkyeMail brain events."]
       };
       modelMode = "send_and_monitor_v1";
+      brainUsage = {
+        ...(brainUsage || {}),
+        automation: { ...automation, sent_mode: automation.allowed ? "paid_auto_send" : "manual_approved" },
+      };
     }
   } else if (action === "monitor" && (body.to || body.subject || body.recipient)) {
     monitorResult = await createBrainMonitor(env, {
@@ -4065,7 +4763,7 @@ async function repairLocalRouteMailbox(env, { auth, mailbox, source = "mailbox-s
   const user = users[0] || { id: auth.sub, email: auth.email || auth.sub, handle: mailbox.local_part };
   const aliasRoute = await provisionZohoMailboxAliasRoute(env, {
     email: mailbox.mailbox_email,
-    reason: "Self-healed a SkyEmail local route into a real Citadel receiving alias after the address was allowed to send before provider inbound existed.",
+    reason: "Self-healed a SkyeMail local route into a real SkyeMail receiving alias after the address was allowed to send before provider inbound existed.",
   });
   const rows = await query(env, `
     update hosted_mailboxes
@@ -4174,7 +4872,7 @@ async function ensureProviderBackedMailbox(env, { auth, user, mailbox = null, so
     allowLocalRoute: false,
   });
   if (provisioned.provider === "skymail-local-route") {
-    throw Object.assign(new Error("SkyEmail could not create a sovereign receiving mailbox, so outbound sending is blocked until Citadel confirms the address."), { statusCode: 409 });
+    throw Object.assign(new Error("SkyeMail could not create a sovereign receiving mailbox, so outbound sending is blocked until Citadel confirms the address."), { statusCode: 409 });
   }
   return await saveProvisionedHostedMailbox(env, { auth, user, local, domain, email, provisioned, source });
 }
@@ -4224,6 +4922,12 @@ async function findMailboxByAddress(env, address) {
 async function handleMailStatus(request, env) {
   const auth = await requireAuth(request, env);
   const context = await resolveMailboxContext(env, request, auth);
+  const url = new URL(request.url);
+  const cacheKey = `mail-status:${context.userId}:${normalizeEmail(context.selected_mailbox_email || request.headers.get("x-skymail-mailbox-email") || "")}`;
+  if (!["1", "true", "yes"].includes(String(url.searchParams.get("refresh") || "").toLowerCase())) {
+    const cached = cacheGet(cacheKey);
+    if (cached) return json({ ...cached, cached: true, cache_ttl_seconds: 10 });
+  }
   const userId = context.userId;
   const users = await query(env, "select id, handle, email, skymail_id, workspace_id, fs27_customer_id, fs27_gate_card_id from users where id=$1 limit 1", [userId]);
   if (!users.length) throw Object.assign(new Error("Unauthorized"), { statusCode: 401 });
@@ -4246,7 +4950,7 @@ async function handleMailStatus(request, env) {
   `, [userId]).catch(() => [{ unread: 0, last_provider_import_at: null, last_delivery_event_at: null }]);
   const mailboxes = await listAccessibleMailboxes(env, auth).catch(() => []);
   const currentEmail = normalizeEmail(mailbox?.mailbox_email || "");
-  return json({
+  const body = {
     ok: true,
     connected: Boolean(mailbox),
     mode: mailbox ? "hosted-provider" : "not-connected",
@@ -4268,7 +4972,9 @@ async function handleMailStatus(request, env) {
       citadel_backup_configured: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL),
       error: provisioningReady ? null : providerSetupMessage(provider.provider),
     },
-  });
+  };
+  cacheSet(cacheKey, body, 10000);
+  return json(body);
 }
 
 async function handleMailboxesList(request, env) {
@@ -4286,6 +4992,104 @@ async function handleMailboxesList(request, env) {
   });
 }
 
+function mailboxInventoryLogin(env, mailbox = {}) {
+  const login = new URL("/admin/login.html", zeroOsGateOrigin(env));
+  const handoff = `/live/SkyeMail/session-handoff.html?next=dashboard.html&from=founder-command-mailbox-inventory&mailbox=${encodeURIComponent(mailbox.mailbox_email || "")}`;
+  login.searchParams.set("return", handoff);
+  return {
+    auth_mode: "shared SkyeGate FS27/Free99 owner session",
+    owner_login_url: login.toString(),
+    skyemail_session_handoff: handoff,
+    mailbox_dashboard_url: `${publicSkymailUrl(env)}/session-handoff.html?next=dashboard.html&mailbox=${encodeURIComponent(mailbox.mailbox_email || "")}`,
+    credential_policy: "No app-local mailbox passwords are stored or returned. Provider one-time passwords are discarded after creation; users enter through the shared 0S gate or provider reset/claim flow."
+  };
+}
+
+async function handleMailboxesServiceList(request, env) {
+  await serviceAuth(request, env);
+  const url = new URL(request.url);
+  const limit = Math.min(500, Math.max(1, Number(url.searchParams.get("limit") || 250) || 250));
+  const includeInactive = ["1", "true", "yes"].includes(String(url.searchParams.get("include_inactive") || "").toLowerCase());
+  const statusClause = includeInactive ? "" : "where coalesce(hm.status,'') not in ('released','offboarded','disabled')";
+  const rows = await query(env, `
+    select hm.id, hm.user_id, hm.mailbox_email, hm.local_part, hm.domain, hm.workspace_id, hm.skymail_id,
+           hm.provider, hm.status, hm.provisioning_status, hm.updated_at, hm.created_at, hm.provisioned_at,
+           u.email as owner_email, u.handle as owner_handle, u.workspace_id as owner_workspace_id, u.fs27_customer_id,
+           count(m.id) filter (where m.direction <> 'sent' and coalesce(m.delivery_status,'') <> 'trashed')::int as inbox_total,
+           count(m.id) filter (where m.direction = 'sent')::int as sent_total,
+           count(m.id) filter (where m.direction <> 'sent' and m.read_at is null and coalesce(m.delivery_status,'') <> 'trashed')::int as inbox_unread,
+           max(m.created_at) as last_message_at
+      from hosted_mailboxes hm
+      join users u on u.id=hm.user_id
+      left join messages m on m.user_id=hm.user_id
+      ${statusClause}
+     group by hm.id, u.id
+     order by (hm.status='active') desc, (hm.provider='zoho') desc, hm.updated_at desc nulls last, hm.created_at desc
+     limit $1
+  `, [limit]);
+  const allCounts = await query(env, `
+    select
+      count(*)::int as total,
+      count(*) filter (where status='active')::int as active,
+      count(*) filter (where provider='zoho')::int as zoho,
+      count(*) filter (where provisioning_status in ('provisioned','active','provider-attached'))::int as provider_ready,
+      count(*) filter (where status='active' and provisioning_status='provisioned' and provider not in ('skymail-local-route','resend'))::int as production_sellable,
+      count(*) filter (where provider='skymail-local-route')::int as internal_local_route,
+      count(*) filter (where provider='resend')::int as proof_demo,
+      count(*) filter (where status in ('error','failed','disabled') or provisioning_status like '%error%' or provisioning_status like '%failed%')::int as blocked_or_quarantined,
+      count(*) filter (where coalesce(status,'') in ('released','offboarded','disabled'))::int as inactive
+    from hosted_mailboxes
+  `).catch(() => []);
+  const counts = allCounts[0] || {};
+  const mailboxes = rows.map((row) => ({
+    id: row.id,
+    user_id: row.user_id,
+    mailbox_email: row.mailbox_email,
+    local_part: row.local_part,
+    domain: row.domain,
+    workspace_id: row.workspace_id || row.owner_workspace_id || "",
+    skymail_id: row.skymail_id || "",
+    provider: row.provider,
+    status: row.status,
+    provisioning_status: row.provisioning_status,
+    owner_email: row.owner_email || "",
+    owner_handle: row.owner_handle || "",
+    fs27_customer_id: row.fs27_customer_id || "",
+    inbox_total: Number(row.inbox_total || 0),
+    inbox_unread: Number(row.inbox_unread || 0),
+    sent_total: Number(row.sent_total || 0),
+    last_message_at: row.last_message_at || null,
+    provisioned_at: row.provisioned_at || null,
+    updated_at: row.updated_at || row.created_at || null,
+    ...mailboxInventoryState(row),
+    login: mailboxInventoryLogin(env, row)
+  }));
+  return json({
+    ok: true,
+    schema: "skymail.service.mailbox-inventory.v1",
+    generated_at: new Date().toISOString(),
+    origin: publicSkymailUrl(env),
+    route: "/mailboxes-service-list",
+    auth_boundary: "service-scoped SkyeGate FS27 bearer or SKYMAIL_SERVICE_TOKEN compatibility lane",
+    credential_policy: "Founder Command receives mailbox routing and login handoff metadata only. Raw provider passwords, bearer tokens, cookies, and private keys are never returned.",
+    include_inactive: includeInactive,
+    limit,
+    count: mailboxes.length,
+    counts: {
+      total: Number(counts.total || 0),
+      active: Number(counts.active || 0),
+      zoho: Number(counts.zoho || 0),
+      provider_ready: Number(counts.provider_ready || 0),
+      production_sellable: Number(counts.production_sellable || 0),
+      internal_local_route: Number(counts.internal_local_route || 0),
+      proof_demo: Number(counts.proof_demo || 0),
+      blocked_or_quarantined: Number(counts.blocked_or_quarantined || 0),
+      inactive: Number(counts.inactive || 0)
+    },
+    mailboxes
+  });
+}
+
 async function handleMailboxProvision(request, env, ctx) {
   const auth = await requireAuth(request, env);
   const body = await request.json().catch(() => ({}));
@@ -4297,9 +5101,8 @@ async function handleMailboxProvision(request, env, ctx) {
   const allowUnroutableLocalRoute = Boolean(body.allow_unroutable_local_route || body.allowUnroutableLocalRoute || body.dev_local_route || body.devLocalRoute);
   const provisioned = provider.configured
     ? await provisionMailbox(env, { email, localPart: local, domain, user, fs27: { sub: auth.fs27_sub || null, customer_id: auth.fs27_customer_id || user.fs27_customer_id || null, gate_card_id: auth.fs27_gate_card_id || user.fs27_gate_card_id || null }, allowLocalRoute: allowUnroutableLocalRoute })
-    : (allowUnroutableLocalRoute
-      ? localRouteProvision(email)
-      : (() => { throw Object.assign(new Error(`${providerSetupMessage(provider.provider)} SkyeMail will not create a sendable local-only mailbox because external replies would bounce.`), { statusCode: 501 }); })());
+    : (() => { throw Object.assign(new Error(`${providerSetupMessage(provider.provider)} SkyeMail will not create a sendable local-only mailbox because external replies would bounce.`), { statusCode: 501 }); })();
+  if (provisioned.provider === "skymail-local-route") throw localOnlyMailboxError("Provisioning returned an internal local route instead of a receiving mailbox.");
   const rows = await query(env, `
     insert into hosted_mailboxes(
       user_id, mailbox_email, local_part, domain, provider, provider_account_id,
@@ -4474,7 +5277,7 @@ function mailboxOffboardingChecklist(mailbox, body = {}) {
 
 async function mailboxOffboardingAuth(request, env) {
   try {
-    serviceAuth(request, env);
+    await serviceAuth(request, env);
     return { service: true, auth: { sub: "skymail-service", email: "skymail-service", role: "service" } };
   } catch (serviceError) {
     if (serviceError.statusCode === 501 && !bearer(request)) throw serviceError;
@@ -4800,7 +5603,7 @@ async function handleMailSettingsGet(request, env) {
       google_email: google?.google_email || null,
       scope: google?.scope || "",
       signature_scope_ready: false,
-      scope_note: google ? "Google settings sync is optional for Citadel/SkyeNet SkyeMail mailboxes." : "Citadel/SkyeNet SkyeMail aliases do not require Google settings scope.",
+      scope_note: google ? "Google settings sync is optional for Citadel Database and SkyeNet SkyeMail mailboxes." : "Citadel Database and SkyeNet SkyeMail aliases do not require Google settings scope.",
       contacts_last_sync_at: google?.contacts_last_sync_at || null,
       contacts_last_sync_count: Number(google?.contacts_last_sync_count || 0),
       contacts_sync_error: google?.contacts_sync_error || null,
@@ -4844,7 +5647,7 @@ async function handleMailSettingsSave(request, env) {
     clean(body.signature_html) || null,
     normalizeEmail(body.preferred_from_alias) || null,
   ]);
-  return json({ ok: true, gmail_updated: false, gmail_vacation_updated: false, gmail_error: body.sync_gmail || body.sync_vacation ? "Google settings sync is optional and not active on the Citadel/SkyeNet SkyeMail lane." : null });
+  return json({ ok: true, gmail_updated: false, gmail_vacation_updated: false, gmail_error: body.sync_gmail || body.sync_vacation ? "Google settings sync is optional and not active on the Citadel Database and SkyeNet SkyeMail lane." : null });
 }
 
 function messageSummary(row, mailboxEmail = "") {
@@ -4916,6 +5719,49 @@ function storedMessageDetail(row) {
     direction: row.direction || "inbound",
     delivery_provider: row.delivery_provider || null,
     provider_message_id: row.provider_message_id || null,
+  };
+}
+
+async function findStoredZohoDraft(env, userId, ref) {
+  const providerMessageId = clean(ref?.messageId || "");
+  if (!providerMessageId) return null;
+  const rows = await query(env, `
+    select id, thread_id, from_name, from_email, key_version, ciphertext_b64, created_at, read_at, starred_at,
+           direction, delivery_provider, provider_message_id, delivery_status, recipient_alias, delivered_to
+      from messages
+     where user_id=$1
+       and direction='draft'
+       and delivery_provider='zoho'
+       and provider_message_id=$2
+       and coalesce(delivery_status,'') <> 'deleted'
+     order by created_at desc
+     limit 1
+  `, [userId, providerMessageId]).catch(() => []);
+  return rows[0] || null;
+}
+
+function draftFromProviderAndProof({ id, message = {}, proof = {}, mailboxEmail = "" }) {
+  const headers = message.headers || {};
+  const providerBody = message.body || {};
+  const proofTo = Array.isArray(proof.to) ? proof.to.join(", ") : proof.to || "";
+  const proofCc = Array.isArray(proof.cc) ? proof.cc.join(", ") : proof.cc || "";
+  const proofBcc = Array.isArray(proof.bcc) ? proof.bcc.join(", ") : proof.bcc || "";
+  const providerSubject = clean(headers.subject || "");
+  const proofSubject = clean(proof.subject || "");
+  const html = providerBody.html || proof.html || "";
+  const text = providerBody.text || proof.message || proof.text || stripHtml(html);
+  return {
+    id: message.id || id,
+    draft_id: message.id || id,
+    message_id: message.id || id,
+    thread_id: message.thread_id || proof.thread_id || "",
+    from: headers.from || proof.from || mailboxEmail,
+    to: headers.to || proofTo || mailboxEmail,
+    cc: headers.cc || proofCc || "",
+    bcc: headers.bcc || proofBcc || "",
+    subject: providerSubject && providerSubject !== "(no subject)" ? providerSubject : proofSubject,
+    body: { text: text || "", html: html || (text ? `<p>${skymailHtmlEscape(text)}</p>` : "") },
+    attachments: message.attachments || [],
   };
 }
 
@@ -5017,6 +5863,83 @@ async function storedThreadResponse(env, rows, id, mailbox = null) {
   };
 }
 
+async function cacheZohoMessageDetail(env, { userId, mailbox = null, message = {} } = {}) {
+  const providerMessageId = clean(message.provider_message_id || messageLabelKeyFromId(message.id).provider_message_id || "");
+  if (!userId || !providerMessageId) return null;
+  const headers = message.headers || {};
+  const labels = (Array.isArray(message.labels) ? message.labels : []).map((label) => clean(label).toUpperCase()).filter(Boolean);
+  const parsedProviderId = parseZohoUiId(message.id || "", mailbox?.provider_account_id || null);
+  const direction = labels.includes("SENT") || message.direction === "outbound" ? "sent" : "inbound";
+  const deliveryStatus = labels.includes("TRASH") || String(message.delivery_status || "").toLowerCase() === "trashed"
+    ? "trashed"
+    : (direction === "sent" ? "sent" : "received");
+  const mailboxEmail = mailbox?.mailbox_email || "";
+  const from = clean(headers.from || message.from || "");
+  const to = clean(headers.to || message.to || mailboxEmail);
+  const proof = proofBlob({
+    subject: headers.subject || message.subject || "(no subject)",
+    message: message.body?.text || message.snippet || stripHtml(message.body?.html || ""),
+    html: message.body?.html || "",
+    snippet: message.snippet || "",
+    direction,
+    from,
+    to: to ? [to] : [],
+    cc: headers.cc ? [headers.cc] : [],
+    provider: "zoho",
+    provider_ui_id: message.id || "",
+    provider_folder_id: parsedProviderId.folderId || message.provider_folder_id || "",
+    provider_message_id: providerMessageId,
+    provider_thread_id: message.provider_thread_id || parsedProviderId.messageId || "",
+    has_attachments: Boolean(message.attachments?.length || message.has_attachments),
+    attachment_count: Array.isArray(message.attachments) ? message.attachments.length : 0,
+    cached_at: new Date().toISOString(),
+  });
+  const existing = await query(env, `
+    select id from messages
+     where user_id=$1
+       and delivery_provider='zoho'
+       and provider_message_id=$2
+     order by created_at desc
+     limit 1
+  `, [userId, providerMessageId]).catch(() => []);
+  if (existing[0]?.id) {
+    await query(env, `
+      update messages
+         set from_name=$3,
+             from_email=$4,
+             ciphertext_b64=$5,
+             direction=$6,
+             delivery_status=$7,
+             last_delivery_event_at=now(),
+             recipient_alias=coalesce(recipient_alias,$8),
+             delivered_to=coalesce(delivered_to,$9)
+       where id=$1
+         and user_id=$2
+         and coalesce(delivery_status,'') <> 'deleted'
+    `, [existing[0].id, userId, from || headers.subject || "Zoho message", from, proof, direction, deliveryStatus, mailboxEmail, mailboxEmail]).catch(() => null);
+    return existing[0].id;
+  }
+  const rows = await query(env, `
+    insert into messages(user_id, from_name, from_email, key_version, encrypted_key_b64, iv_b64, ciphertext_b64,
+      direction, delivery_provider, provider_message_id, delivery_status, last_delivery_event_at, recipient_alias, delivered_to)
+    values($1,$2,$3,0,$4,$5,$6,$7,'zoho',$8,$9,now(),$10,$11)
+    returning id
+  `, [
+    userId,
+    from || headers.subject || "Zoho message",
+    from,
+    "proof",
+    "proof",
+    proof,
+    direction,
+    providerMessageId,
+    deliveryStatus,
+    mailboxEmail,
+    mailboxEmail,
+  ]).catch(() => []);
+  return rows[0]?.id || null;
+}
+
 async function listStoredMessages(env, { userId, mailbox = null, label = "", max = 25, q = "" } = {}) {
   const params = [userId];
   let where = "where user_id=$1";
@@ -5067,9 +5990,10 @@ async function handleGmailList(request, env) {
   const cacheFirstInbox = Boolean(mailbox?.provider === "zoho" && !q && !pageToken && (!label || label === "INBOX"));
   if (cacheFirstInbox) {
     const cached = await listStoredMessages(env, { userId, mailbox, label: label || "INBOX", max, q });
-    return json(await applyMessageLabelState(env, userId, {
-      ...cached,
-      provider_cache: "citadel",
+	    return json(await applyMessageLabelState(env, userId, {
+	      ...cached,
+	      requested_label: label || "INBOX",
+	      provider_cache: "citadel-database",
       provider_note: "Inbox is served from the Citadel cache after sync/webhook import to avoid provider refresh throttling.",
     }));
   }
@@ -5092,15 +6016,16 @@ async function handleGmailList(request, env) {
             return key && !seen.has(key);
           });
           if (cachedOnly.length) {
-            return json(await applyMessageLabelState(env, userId, {
-              ...listed,
-              provider_cache_merge: "citadel",
+	            return json(await applyMessageLabelState(env, userId, {
+	              ...listed,
+	              requested_label: label,
+	              provider_cache_merge: "citadel",
               items: [...cachedOnly, ...(listed.items || [])].slice(0, max),
             }));
           }
         }
       }
-      return json(await applyMessageLabelState(env, userId, listed));
+	      return json(await applyMessageLabelState(env, userId, { ...listed, requested_label: label }));
     } catch (error) {
       const fallback = await listStoredMessages(env, { userId, mailbox, label, max, q });
       return json({
@@ -5110,30 +6035,43 @@ async function handleGmailList(request, env) {
       });
     }
   }
-  return json(await listStoredMessages(env, { userId, mailbox, label, max, q }));
+	  return json(await applyMessageLabelState(env, userId, { ...await listStoredMessages(env, { userId, mailbox, label, max, q }), requested_label: label }));
 }
 
 async function handleGmailLabels(request, env) {
   const auth = await requireAuth(request, env);
+  const url = new URL(request.url);
   const context = await resolveMailboxContext(env, request, auth);
   const mailbox = context.mailbox;
   const userId = context.userId;
   if (!mailbox) return json({ ok: true, items: [] });
-  if (mailbox.provider === "zoho" && zohoApiConfigured(env)) {
+  const providerRefresh = ["1", "true", "provider"].includes(clean(url.searchParams.get("refresh") || url.searchParams.get("source")).toLowerCase());
+  if (providerRefresh && mailbox.provider === "zoho" && zohoApiConfigured(env)) {
     const folders = await zohoListFolders(env, mailbox.provider_account_id).catch(() => null);
     if (folders?.items) return json({ ok: true, mailbox: mailbox.mailbox_email || "", items: folders.items });
   }
-  const rows = await query(env, `
-    select
-      count(*) filter (where direction <> 'sent')::int as inbox_total,
-      count(*) filter (where direction = 'sent')::int as sent_total
-    from messages
-    where user_id=$1
-  `, [userId]);
+  const cacheKey = `gmail-labels:${userId}:${stableHex(mailbox.mailbox_email || "", 12)}`;
+  const cached = !providerRefresh ? cacheGet(cacheKey) : null;
+  if (cached) return json({ ...cached, cached: true, cache_ttl_seconds: 30 });
+  const rows = await Promise.race([
+    query(env, `
+      select
+        count(*) filter (where direction <> 'sent')::int as inbox_total,
+        count(*) filter (where direction = 'sent')::int as sent_total
+      from messages
+      where user_id=$1
+    `, [userId]),
+    timeoutAfter(2500, () => [{ inbox_total: 0, sent_total: 0, timed_out: true }]),
+  ]);
   const counts = rows[0] || {};
-  return json({
+  const body = {
     ok: true,
     mailbox: mailbox.mailbox_email || "",
+    provider_cache: "citadel-database",
+    provider_note: providerRefresh
+      ? "SkyeMail labels are served from the SkyeMail cache because provider label refresh was unavailable."
+      : "Labels are served from the SkyeMail cache to keep mailbox navigation responsive under load.",
+    count_timeout: counts.timed_out === true,
     items: [
       { id: "INBOX", name: "Inbox", type: "system", messagesTotal: Number(counts.inbox_total || 0), messagesUnread: 0 },
       { id: "SENT", name: "Sent", type: "system", messagesTotal: Number(counts.sent_total || 0), messagesUnread: 0 },
@@ -5141,7 +6079,9 @@ async function handleGmailLabels(request, env) {
       { id: "SPAM", name: "Spam", type: "system", messagesTotal: 0, messagesUnread: 0 },
       { id: "TRASH", name: "Trash", type: "system", messagesTotal: 0, messagesUnread: 0 },
     ],
-  });
+  };
+  if (!providerRefresh) cacheSet(cacheKey, body, 30000);
+  return json(body);
 }
 
 async function handleGmailGet(request, env) {
@@ -5183,6 +6123,7 @@ async function handleGmailGet(request, env) {
       accountId: mailbox.provider_account_id,
       mailbox: mailbox.mailbox_email,
     }).then(async (data) => {
+      await cacheZohoMessageDetail(env, { userId, mailbox, message: data.message }).catch(() => null);
       const overlaid = await applyMessageLabelState(env, userId, { items: [data.message] });
       return { ...data, message: overlaid.items[0] || data.message };
     }));
@@ -5204,6 +6145,7 @@ async function handleGmailThreadGet(request, env) {
   if (localRows.length) return json(await storedThreadResponse(env, localRows, id, mailbox));
   if (mailbox?.provider === "zoho" && zohoApiConfigured(env)) {
     const data = await zohoGetMessage(env, { id, accountId: mailbox.provider_account_id, mailbox: mailbox.mailbox_email });
+    await cacheZohoMessageDetail(env, { userId, mailbox, message: data.message }).catch(() => null);
     const overlaid = await applyMessageLabelState(env, userId, { items: [data.message] });
     const message = overlaid.items[0] || data.message;
     const participants = Array.from(new Set([message.headers.from, message.headers.to, message.headers.cc].filter(Boolean)));
@@ -5293,7 +6235,7 @@ async function handleMailProofLoop(request, env, ctx) {
 }
 
 async function handleWorkspaceProvision(request, env, ctx) {
-  serviceAuth(request, env);
+  const service = await serviceAuth(request, env);
   const body = await request.json().catch(() => ({}));
   const domain = clean(body.domain) || configuredDomains(env)[0];
   const { local, email: mailboxEmail } = validateMailboxInput(env, mailboxLocalFromWorkspace(body), domain);
@@ -5303,6 +6245,9 @@ async function handleWorkspaceProvision(request, env, ctx) {
     handleSeed: body.workspace_slug || body.slug || body.company_name || local,
     sourceId: body.workspace_id || body.customer_id || body.source_id,
   });
+  const workspaceId = clean(body.workspace_id || body.workspace || user.workspace_id || "");
+  const skymailId = clean(user.skymail_id || body.skymail_id || makeSkyeMailId({ email: user.email, handle: user.handle, fs27Sub: service.claims?.sub || "" }));
+  const fs27GateCardId = clean(body.fs27_gate_card_id || service.claims?.gate_card_id || service.claims?.gate_card?.id || "");
   const provider = providerConfigured(env);
   let provisioned = {
     provider: provider.provider,
@@ -5324,6 +6269,7 @@ async function handleWorkspaceProvision(request, env, ctx) {
         fs27: { customer_id: body.customer_id || null },
         allowLocalRoute: Boolean(body.allow_unroutable_local_route || body.allowUnroutableLocalRoute || body.dev_local_route || body.devLocalRoute)
       });
+      if (provisioned.provider === "skymail-local-route") throw localOnlyMailboxError("Workspace provisioning returned an internal local route instead of a receiving mailbox.");
       status = "active";
       provisioningStatus = "provisioned";
     } catch (error) {
@@ -5336,15 +6282,19 @@ async function handleWorkspaceProvision(request, env, ctx) {
   const rows = await query(env, `
     insert into hosted_mailboxes(
       user_id, mailbox_email, local_part, domain, provider, provider_account_id,
+      workspace_id, skymail_id, fs27_gate_card_id,
       status, provisioning_status, provider_payload_json, imap_host, smtp_host, jmap_url,
       last_error, provisioned_at, updated_at
     )
-    values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10,$11,$12,$13,case when $8='provisioned' then now() else null end,now())
+    values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13,$14,$15,$16,case when $11='provisioned' then now() else null end,now())
     on conflict (mailbox_email)
     do update set
       user_id=excluded.user_id,
       provider=excluded.provider,
       provider_account_id=excluded.provider_account_id,
+      workspace_id=coalesce(excluded.workspace_id, hosted_mailboxes.workspace_id),
+      skymail_id=coalesce(excluded.skymail_id, hosted_mailboxes.skymail_id),
+      fs27_gate_card_id=coalesce(excluded.fs27_gate_card_id, hosted_mailboxes.fs27_gate_card_id),
       status=excluded.status,
       provisioning_status=excluded.provisioning_status,
       provider_payload_json=excluded.provider_payload_json,
@@ -5355,8 +6305,21 @@ async function handleWorkspaceProvision(request, env, ctx) {
       provisioned_at=coalesce(hosted_mailboxes.provisioned_at, excluded.provisioned_at),
       updated_at=now()
     returning *
-  `, [user.id, mailboxEmail, local, domain, provisioned.provider, provisioned.provider_account_id, status, provisioningStatus, JSON.stringify(provisioned.provider_payload || {}), env.SKYMAIL_IMAP_HOST || null, env.SKYMAIL_SMTP_HOST || null, env.SKYMAIL_JMAP_URL || null, lastError]);
+  `, [user.id, mailboxEmail, local, domain, provisioned.provider, provisioned.provider_account_id, workspaceId || null, skymailId || null, fs27GateCardId || null, status, provisioningStatus, JSON.stringify(provisioned.provider_payload || {}), env.SKYMAIL_IMAP_HOST || null, env.SKYMAIL_SMTP_HOST || null, env.SKYMAIL_JMAP_URL || null, lastError]);
   const mailbox = rows[0];
+  ctx.waitUntil(linkFs27AppSpine(env, {
+    ...(service.claims || {}),
+    email: user.email,
+    customer_id: body.customer_id || service.claims?.customer_id || service.claims?.org || null,
+  }, {
+    ...user,
+    skymail_id: skymailId,
+    workspace_id: workspaceId || mailbox.workspace_id || null,
+    fs27_gate_card_id: fs27GateCardId || null,
+  }, {
+    token: service.token || "",
+    mailbox_email: mailbox.mailbox_email,
+  }).catch(() => null));
   const primaryAlias = await saveMailboxAlias(env, {
     userId: user.id,
     mailboxId: mailbox.id,
@@ -5399,7 +6362,7 @@ async function handleWorkspaceProvision(request, env, ctx) {
 }
 
 async function handleWorkspaceMailboxSummary(request, env) {
-  serviceAuth(request, env);
+  await serviceAuth(request, env);
   const url = new URL(request.url);
   const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
   const mailboxEmail = clean(body.mailbox_email || body.email || url.searchParams.get("mailbox_email") || url.searchParams.get("email")).toLowerCase();
@@ -5525,10 +6488,10 @@ async function handleMailSend(request, env, ctx) {
   let hosted = context.mailbox || await getHostedMailbox(env, user.id);
   hosted = await ensureProviderBackedMailbox(env, { auth: { ...selectedAuth, email: user.email }, user, mailbox: hosted, source: "mail-send-self-heal" });
   if (!hosted) {
-    throw Object.assign(new Error("This SkyEmail account does not have a sovereign hosted mailbox yet, so sending is blocked to prevent reply bounces. Open mailbox status or reprovision the mailbox to create the Citadel receiving route."), { statusCode: 409 });
+    throw Object.assign(new Error("This SkyeMail account does not have a sovereign hosted mailbox yet, so sending is blocked to prevent reply bounces. Open mailbox status or reprovision the mailbox to create the SkyeMail receiving route."), { statusCode: 409 });
   }
   if (hosted?.provider === "skymail-local-route") {
-    throw Object.assign(new Error("This SkyEmail address is not sovereign-backed for inbound mail yet, so sending from it is blocked to prevent Gmail reply bounces. Open mailbox status or reprovision the mailbox to create the Citadel receiving route."), { statusCode: 409 });
+    throw Object.assign(new Error("This SkyeMail address is not sovereign-backed for inbound mail yet, so sending from it is blocked to prevent Gmail reply bounces. Open mailbox status or reprovision the mailbox to create the SkyeMail receiving route."), { statusCode: 409 });
   }
   const requestedFrom = normalizeEmail(body.from_alias || body.from || "");
   let fromEmail = hosted?.mailbox_email || `${user.handle}@${env.INBOUND_DOMAIN || configuredDomains(env)[0]}`;
@@ -5537,7 +6500,7 @@ async function handleMailSend(request, env, ctx) {
     const allowedAlias = aliases.find((item) => normalizeEmail(item.alias_email) === requestedFrom) || (normalizeEmail(hosted.mailbox_email) === requestedFrom ? { alias_email: hosted.mailbox_email, alias_type: "primary", provider_alias_id: hosted.provider_account_id } : null);
     const providerBacked = !allowedAlias || allowedAlias.alias_type === "primary" || Boolean(allowedAlias.provider_alias_id);
     if (allowedAlias && !providerBacked) {
-      throw Object.assign(new Error(`The alias ${requestedFrom} is saved in SkyeEmail but is not sovereign-backed for inbound replies yet. Recreate it in Settings so Citadel confirms the receiving alias before sending.`), { statusCode: 409 });
+      throw Object.assign(new Error(`The alias ${requestedFrom} is saved in SkyeEmail but is not sovereign-backed for inbound replies yet. Recreate it in Settings so SkyeMail confirms the receiving alias before sending.`), { statusCode: 409 });
     }
     if (allowedAlias) fromEmail = requestedFrom;
   }
@@ -5575,7 +6538,7 @@ async function handleMailSend(request, env, ctx) {
       const attachmentDenied = attachments.length && /access\s+denied/i.test(String(error.message || ""));
       if (!attachmentDenied || !resendApiKey(env) || zohoSelfSendRequiresZoho) {
         if (attachmentDenied && zohoSelfSendRequiresZoho) {
-          throw Object.assign(new Error("Citadel attachment send was denied by Zoho for this same-mailbox proof. SkyeMail did not fall back to Resend because self-send readiness must prove Zoho inbox parity."), {
+          throw Object.assign(new Error("SkyeMail attachment send was denied for this same-mailbox proof. SkyeMail kept the proof on the Citadel Database and SkyeNet lane because self-send readiness must prove SkyeMail inbox parity."), {
             statusCode: error.statusCode || 502,
             providerResponse: error.providerResponse || null,
           });
@@ -5656,10 +6619,10 @@ async function handleMailModify(request, env, ctx) {
   const trash = add.includes("TRASH") || body.trash === true;
   const starred = add.includes("STARRED") ? true : (remove.includes("STARRED") ? false : null);
   const zohoRefs = await resolveZohoMessageRefs(env, { ids, userId, mailbox }).catch((error) => {
-    throw Object.assign(new Error(error.message || "Zoho message lookup failed."), { statusCode: error.statusCode || 502 });
+    throw Object.assign(new Error(error.message || "SkyeMail message lookup failed."), { statusCode: error.statusCode || 502 });
   });
   const unresolvedZohoIds = ids.filter((id) => String(id || "").startsWith("zoho:") && !zohoRefs.some((ref) => ref.input_id === clean(id)));
-  if (unresolvedZohoIds.length) throw Object.assign(new Error("Zoho message id could not be resolved for provider mutation."), { statusCode: 400 });
+  if (unresolvedZohoIds.length) throw Object.assign(new Error("SkyeMail message id could not be resolved for mail-state mutation."), { statusCode: 400 });
   const providerMutations = zohoRefs.length
     ? await mutateZohoMessageRefs(env, { refs: zohoRefs, markRead, markUnread, archive, trash, starred })
     : [];
@@ -5684,9 +6647,27 @@ async function handleMailModify(request, env, ctx) {
     type: "skymail.mail.mutation",
     actor: auth.email || "skymail",
     ws_id: mailbox?.id || userId,
-    meta: { ids, applied: { markRead, markUnread, trash, archive, starred }, provider: zohoRefs.length ? "zoho" : "local", provider_mutation_count: providerMutations.length },
+    meta: {
+      ids,
+      applied: { markRead, markUnread, trash, archive, starred },
+      provider: zohoRefs.length ? "zoho" : "local",
+      provider_mutation_count: providerMutations.filter((item) => !item.skipped).length,
+      provider_warning_count: providerMutations.filter((item) => item.skipped || item.accepted === false).length,
+    },
   }));
-  return json({ ok: true, ids, applied: { markRead, markUnread, trash, archive, starred }, states: states.map((state) => state?.error ? { error: state.error } : { provider: state?.provider || null, provider_message_id: state?.provider_message_id || null, starred: Boolean(state?.starred_at) }), provider_mutation: zohoRefs.length ? "zoho+citadel-ledger" : "local-ledger", provider_results: providerMutations.map((item) => ({ accountId: item.accountId, mode: item.mode, accepted: true })) });
+  return json({
+    ok: true,
+    ids,
+    applied: { markRead, markUnread, trash, archive, starred },
+    states: states.map((state) => state?.error ? { error: state.error } : { provider: state?.provider || null, provider_message_id: state?.provider_message_id || null, starred: Boolean(state?.starred_at) }),
+    provider_mutation: zohoRefs.length ? "zoho+citadel-ledger" : "local-ledger",
+    provider_results: providerMutations.map((item) => ({
+      accountId: item.accountId,
+      mode: item.mode,
+      accepted: item.accepted !== false && !item.skipped,
+      warning: item.warning || null,
+    })),
+  });
 }
 
 async function handleMailTrash(request, env, ctx) {
@@ -5703,7 +6684,21 @@ async function handleMailTrash(request, env, ctx) {
   const trash = action === "trash";
   const zohoRefs = await resolveZohoMessageRefs(env, { ids, userId, mailbox });
   const unresolvedZohoIds = ids.filter((id) => String(id || "").startsWith("zoho:") && !zohoRefs.some((ref) => ref.input_id === clean(id)));
-  if (unresolvedZohoIds.length) throw Object.assign(new Error("Zoho message id could not be resolved for trash mutation."), { statusCode: 400 });
+  if (unresolvedZohoIds.length) throw Object.assign(new Error("SkyeMail message id could not be resolved for trash mutation."), { statusCode: 400 });
+  const preMutationCache = [];
+  if (mailbox?.provider === "zoho" && zohoApiConfigured(env)) {
+    for (const ref of zohoRefs) {
+      const data = await zohoGetMessage(env, {
+        id: zohoUiId(ref.accountId, ref.folderId, ref.messageId),
+        accountId: mailbox.provider_account_id,
+        mailbox: mailbox.mailbox_email,
+      }).catch(() => null);
+      if (data?.message) {
+        const cachedId = await cacheZohoMessageDetail(env, { userId, mailbox, message: data.message }).catch(() => null);
+        if (cachedId) preMutationCache.push(cachedId);
+      }
+    }
+  }
   const providerMutations = zohoRefs.length
     ? await mutateZohoMessageRefs(env, { refs: zohoRefs, trash, untrash: !trash, markRead: trash })
     : [];
@@ -5725,14 +6720,22 @@ async function handleMailTrash(request, env, ctx) {
       }
     }
   }
+  const restoreSync = !trash && zohoRefs.length
+    ? await importZohoInboxDeltas(env, context.auth, { limit: 100 }).catch((error) => ({
+      ok: false,
+      provider_warning: error.message || "Provider restore sync unavailable.",
+      imported: 0,
+      scanned: 0,
+    }))
+    : null;
   ctx?.waitUntil?.(backupCitadel(env, {
     id: `mail_trash_${userId}_${Date.now()}`,
     type: "skymail.mail.trash",
     actor: auth.email || "skymail",
     ws_id: mailbox?.id || userId,
-    meta: { ids, action, provider: zohoRefs.length ? "zoho" : "local", provider_mutation_count: providerMutations.length },
+    meta: { ids, action, provider: zohoRefs.length ? "zoho" : "local", provider_mutation_count: providerMutations.length, pre_mutation_cached: preMutationCache.length, restore_sync: restoreSync ? { ok: restoreSync.ok, imported: restoreSync.imported, scanned: restoreSync.scanned } : null },
   }));
-  return json({ ok: true, ids, count: ids.length, action, provider_mutation: zohoRefs.length ? "zoho+citadel-ledger" : "local-ledger", states: states.map((state) => state?.error ? { error: state.error } : { provider: state?.provider || null, provider_message_id: state?.provider_message_id || null, trashed: Boolean(state?.trashed_at) }) });
+  return json({ ok: true, ids, count: ids.length, action, provider_mutation: zohoRefs.length ? "zoho+citadel-ledger" : "local-ledger", pre_mutation_cached: preMutationCache.length, restore_sync: restoreSync ? { ok: restoreSync.ok, imported: restoreSync.imported, scanned: restoreSync.scanned, provider_warning: restoreSync.provider_warning || null } : null, states: states.map((state) => state?.error ? { error: state.error } : { provider: state?.provider || null, provider_message_id: state?.provider_message_id || null, trashed: Boolean(state?.trashed_at) }) });
 }
 
 async function handleMailBatchDelete(request, env, ctx) {
@@ -5746,7 +6749,7 @@ async function handleMailBatchDelete(request, env, ctx) {
   const zohoRefs = await resolveZohoMessageRefs(env, { ids, userId, mailbox });
   const zohoDelete = zohoRefs.length ? await deleteZohoMessageRefs(env, { refs: zohoRefs, expunge: true }) : { deleted: [], skipped: [] };
   if (ids.some((id) => String(id).startsWith("zoho:")) && zohoDelete.deleted.length === 0 && zohoDelete.skipped.length) {
-    throw Object.assign(new Error("Zoho message folder id missing; open the message from its folder and retry permanent delete."), { statusCode: 400 });
+    throw Object.assign(new Error("SkyeMail message folder id missing; open the message from its folder and retry permanent delete."), { statusCode: 400 });
   }
   for (const id of ids) {
     const key = messageLabelKeyFromId(id);
@@ -5791,7 +6794,7 @@ async function handleMailAttachment(request, env) {
     zohoId = await findZohoUiIdForStoredRow(env, rows[0], mailbox);
   }
   const parsed = parseZohoUiId(zohoId, await getZohoMailAccountId(env, mailbox?.provider_account_id || null));
-  if (!parsed.folderId || !parsed.messageId) throw Object.assign(new Error("Citadel message attachment source missing."), { statusCode: 400 });
+  if (!parsed.folderId || !parsed.messageId) throw Object.assign(new Error("SkyeMail message attachment source missing."), { statusCode: 400 });
   const info = await zohoAttachmentInfo(env, parsed);
   const normalizeCid = (value) => {
     const raw = clean(value).replace(/^<|>$/g, "");
@@ -6038,7 +7041,7 @@ async function importZohoWebhookMessage(env, target, mail, payload) {
   if (duplicate[0]) return { ok: true, duplicate: true, imported: 0, message_id: duplicate[0].id, user_id: target.user_id };
   const deliveredTo = normalizeEmail(target.recipient_alias || target.mailbox_email);
   const fromEmail = mail.fromEmail || normalizeEmail(extractAddress(mail.fromRaw || ""));
-  const messageText = clean(mail.bodyText) || htmlToText(mail.html || "") || "Citadel webhook delivered this inbound message.";
+  const messageText = clean(mail.bodyText) || htmlToText(mail.html || "") || "SkyeMail webhook delivered this inbound message.";
   const rows = await query(env, `
     insert into messages(user_id, from_name, from_email, key_version, encrypted_key_b64, iv_b64, ciphertext_b64,
       direction, delivery_provider, provider_message_id, delivery_status, last_delivery_event_at, recipient_alias, delivered_to, created_at)
@@ -6072,7 +7075,7 @@ async function importZohoWebhookMessage(env, target, mail, payload) {
     deliveredTo,
     deliveredTo,
   ]).catch((error) => {
-    throw Object.assign(new Error(error.message || "Citadel webhook import failed."), { statusCode: error.statusCode || 500 });
+    throw Object.assign(new Error(error.message || "SkyeMail routing webhook import failed."), { statusCode: error.statusCode || 500 });
   });
   return { ok: true, imported: 1, message_id: rows[0]?.id || null, user_id: target.user_id, recipient_alias: deliveredTo, provider_message_id: providerMessageId };
 }
@@ -6130,7 +7133,7 @@ async function handleZohoWebhookEventsList(request, env) {
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") || 20), 1), 100);
   let serviceScope = false;
   try {
-    serviceAuth(request, env);
+    await serviceAuth(request, env);
     serviceScope = true;
   } catch {
     serviceScope = false;
@@ -6198,7 +7201,7 @@ async function importZohoInboxDeltas(env, auth, { limit = 25 } = {}) {
     ? await getHostedMailboxByEmail(env, selectedMailboxEmail)
     : await getHostedMailbox(env, auth.sub);
   if (!mailbox || mailbox.provider !== "zoho" || !zohoApiConfigured(env)) {
-    return { ok: true, skipped: true, reason: "No Citadel-backed hosted mailbox is available for this account.", imported: 0, mailbox };
+    return { ok: true, skipped: true, reason: "No SkyeMail hosted mailbox is available for this account.", imported: 0, mailbox };
   }
   const userId = mailbox.user_id || auth.sub;
   const aliasRows = await listMailboxAliases(env, userId, mailbox.id).catch(() => []);
@@ -6232,7 +7235,37 @@ async function importZohoInboxDeltas(env, auth, { limit = 25 } = {}) {
          and provider_message_id=$2
        limit 1
     `, [userId, providerMessageId]).catch(() => []);
-    if (existing[0]) continue;
+    const proof = proofBlob({
+      subject: item.subject || "(no subject)",
+      message: item.snippet || "SkyeMail inbox message imported into SkyeMail.",
+      snippet: item.snippet || "",
+      direction: "inbound",
+      from: item.from || "",
+      to: [item.to || mailbox.mailbox_email],
+      provider: "zoho",
+      provider_ui_id: item.id || "",
+      provider_folder_id: parsedProviderId.folderId || "",
+      provider_message_id: providerMessageId,
+      has_attachments: Boolean(item.has_attachments),
+      imported_at: new Date().toISOString(),
+    });
+    if (existing[0]) {
+      await query(env, `
+        update messages
+           set delivery_status='received',
+               last_delivery_event_at=now(),
+               recipient_alias=coalesce(recipient_alias,$4),
+               delivered_to=coalesce(delivered_to,$5),
+               ciphertext_b64=$6
+         where id=$1
+           and user_id=$2
+           and delivery_provider='zoho'
+           and provider_message_id=$3
+           and direction <> 'sent'
+           and coalesce(delivery_status,'') <> 'deleted'
+      `, [existing[0].id, userId, providerMessageId, item.matched_alias || mailbox.mailbox_email, item.matched_alias || mailbox.mailbox_email, proof]).catch(() => null);
+      continue;
+    }
     await query(env, `
       insert into messages(user_id, from_name, from_email, key_version, encrypted_key_b64, iv_b64, ciphertext_b64,
         direction, delivery_provider, provider_message_id, delivery_status, last_delivery_event_at, recipient_alias, delivered_to)
@@ -6243,20 +7276,7 @@ async function importZohoInboxDeltas(env, auth, { limit = 25 } = {}) {
       item.from || "",
       "proof",
       "proof",
-      proofBlob({
-        subject: item.subject || "(no subject)",
-        message: item.snippet || "Citadel inbox message imported into SkyeMail.",
-        snippet: item.snippet || "",
-        direction: "inbound",
-        from: item.from || "",
-        to: [item.to || mailbox.mailbox_email],
-        provider: "zoho",
-        provider_ui_id: item.id || "",
-        provider_folder_id: parsedProviderId.folderId || "",
-        provider_message_id: providerMessageId,
-        has_attachments: Boolean(item.has_attachments),
-        imported_at: new Date().toISOString(),
-      }),
+      proof,
       providerMessageId,
       item.matched_alias || mailbox.mailbox_email,
       item.matched_alias || mailbox.mailbox_email,
@@ -6287,7 +7307,7 @@ async function handleMailSync(request, env, ctx) {
 }
 
 async function handleWorkspaceMailSync(request, env, ctx) {
-  serviceAuth(request, env);
+  await serviceAuth(request, env);
   const url = new URL(request.url);
   const body = request.method === "POST" ? await request.json().catch(() => ({})) : {};
   const mailboxEmail = clean(body.mailbox_email || body.email || url.searchParams.get("mailbox_email") || url.searchParams.get("email")).toLowerCase();
@@ -6342,7 +7362,7 @@ async function handleZohoWebhook(request, env, ctx) {
         imported: 0,
         user_id: target.user_id,
         recipient_alias: target.recipient_alias || target.mailbox_email || null,
-        error: error.message || "Citadel webhook import failed.",
+        error: error.message || "SkyeMail routing webhook import failed.",
       })));
     }
   }
@@ -6357,7 +7377,7 @@ async function handleZohoWebhook(request, env, ctx) {
       }, { limit: 25 }).catch((error) => ({
         ok: false,
         user_id: target.user_id,
-        error: error.message || "Citadel webhook sync failed.",
+        error: error.message || "SkyeMail routing webhook sync failed.",
       })));
     }
   }
@@ -6395,11 +7415,10 @@ async function handleResendHealth(request, env) {
   await requireAuth(request, env);
   const url = new URL(request.url);
   const base = clean(env.PUBLIC_BASE_URL || env.SKYMAIL_PUBLIC_URL || url.origin).replace(/\/+$/, "");
-  const resendEndpoint = `${base}/.netlify/functions/inbound-resend`;
-  const zohoWebhookEndpoint = `${base}/api/zoho-webhook`;
+  const mailRoutingWebhookEndpoint = `${base}/api/mail-routing-webhook`;
   return json({
     ok: true,
-    telemetry_source: "database-backed message_delivery_events plus provider webhook audit tables",
+    telemetry_source: "database-backed message_delivery_events plus mail routing webhook audit tables",
     configured: {
       database: configuredEnv(env, "NEON_DATABASE_URL", "DATABASE_URL"),
       provider_api: Boolean(zohoApiConfigured(env) || configuredEnv(env, "RESEND_API_KEY")),
@@ -6409,12 +7428,11 @@ async function handleResendHealth(request, env) {
       inbound_domain: configuredEnv(env, "INBOUND_DOMAIN", "SKYMAIL_PRIMARY_DOMAIN"),
     },
     inbound_domain: clean(env.INBOUND_DOMAIN || env.SKYMAIL_PRIMARY_DOMAIN) || null,
-    endpoint: resendEndpoint,
+    endpoint: mailRoutingWebhookEndpoint,
     endpoints: {
-      delivery_events: `${base}/api/resend-events-list`,
-      resend_webhook: resendEndpoint,
-      zoho_webhook: zohoWebhookEndpoint,
-      zoho_webhook_events: `${base}/api/zoho-webhook-events`,
+      delivery_events: `${base}/api/mail-routing-events`,
+      mail_routing_webhook: mailRoutingWebhookEndpoint,
+      mail_routing_webhook_events: `${base}/api/mail-routing-webhook-events`,
     },
     events_to_enable: [
       "email.received",
@@ -6559,7 +7577,8 @@ async function handleContactsSave(request, env) {
     clean(body.notes).slice(0, 2000),
     Boolean(body.favorite),
   ]);
-  return json({ ok: true, contact: rows[0] || null, synced_google: false });
+  const downstream = await syncContactToZeroOs(env, { ...auth, gate_token: bearer(request) }, rows[0] || {}, context.mailbox || null);
+  return json({ ok: true, contact: rows[0] || null, synced_google: false, downstream });
 }
 
 async function handleContactsDelete(request, env) {
@@ -6582,7 +7601,7 @@ async function handleGoogleContactsSync(request, env) {
     ok: true,
     provider: "citadel-skynet",
     synced_count: Number(rows[0]?.count || 0),
-    note: "Citadel/SkyeNet SkyeMail contact records are available; Citadel-native contacts sync is non-blocking in SkyeMail.",
+    note: "Citadel Database and SkyeNet SkyeMail contact records are available; SkyeMail-native contacts sync is non-blocking in SkyeMail.",
   });
 }
 
@@ -6624,7 +7643,7 @@ async function handleDraftsList(request, env) {
     mailbox: mailbox?.mailbox_email || auth.email || "",
     items: [],
     nextPageToken: null,
-    note: "Citadel-native draft storage is not required for Citadel/SkyeNet SkyeMail; compose can send directly.",
+    note: "SkyeMail-native draft storage is not required for Citadel Database and SkyeNet SkyeMail; compose can send directly.",
   });
 }
 
@@ -6637,26 +7656,23 @@ async function handleDraftGet(request, env) {
   const mailbox = context.mailbox || await getHostedMailbox(env, context.userId);
   if (mailbox?.provider === "zoho" && zohoApiConfigured(env)) {
     const ref = await resolveZohoMessageRef(env, { id, userId: context.userId, mailbox, requireFolder: true });
-    if (!ref) throw Object.assign(new Error("Citadel draft folder id missing. Open or refresh the draft from the Zoho-backed draft list."), { statusCode: 400 });
-    const data = await zohoGetMessage(env, { id: zohoUiId(ref.accountId, ref.folderId, ref.messageId), accountId: mailbox.provider_account_id, mailbox: mailbox.mailbox_email });
+    if (!ref) throw Object.assign(new Error("Draft not found."), { statusCode: 404 });
+    let data = null;
+    try {
+      data = await zohoGetMessage(env, { id: zohoUiId(ref.accountId, ref.folderId, ref.messageId), accountId: mailbox.provider_account_id, mailbox: mailbox.mailbox_email });
+    } catch (error) {
+      const notFoundish = [400, 404].includes(Number(error?.statusCode || error?.status || 0)) && /(invalid|not\s*found|does\s*not\s*exist|deleted)/i.test(String(error?.message || ""));
+      if (notFoundish) throw Object.assign(new Error("Draft not found."), { statusCode: 404 });
+      throw error;
+    }
     const message = data.message || {};
+    const storedDraft = await findStoredZohoDraft(env, context.userId, ref);
+    const proof = storedDraft && Number(storedDraft.key_version || 0) === 0 ? openProofBlob(storedDraft.ciphertext_b64) || {} : {};
     return json({
       ok: true,
       mailbox: mailbox.mailbox_email || "",
       provider: "zoho",
-      draft: {
-        id: message.id || id,
-        draft_id: message.id || id,
-        message_id: message.id || id,
-        thread_id: message.thread_id || "",
-        from: message.headers?.from || "",
-        to: message.headers?.to || "",
-        cc: message.headers?.cc || "",
-        bcc: message.headers?.bcc || "",
-        subject: message.headers?.subject || "",
-        body: message.body || { text: "", html: "" },
-        attachments: message.attachments || [],
-      },
+      draft: draftFromProviderAndProof({ id: message.id || id, message, proof, mailboxEmail: mailbox.mailbox_email || "" }),
     });
   }
   return json({ ok: true, draft: null });
@@ -6672,7 +7688,7 @@ async function handleDraftSave(request, env, ctx) {
     return json({
       ok: false,
       provider_native: false,
-      error: "Draft storage requires a Zoho-backed SkyeMail mailbox in this phase.",
+      error: "Draft storage requires a SkyeMail production mailbox in this phase.",
     }, 400);
   }
   const requestedFrom = normalizeEmail(body.from_alias || body.from || "");
@@ -6750,6 +7766,9 @@ async function handleDraftDelete(request, env, ctx) {
   const ids = (Array.isArray(body.ids) ? body.ids : [body.id || body.draft_id || body.draftId]).map(clean).filter(Boolean);
   if (!ids.length) throw Object.assign(new Error("Draft id required."), { statusCode: 400 });
   const refs = await resolveZohoMessageRefs(env, { ids, userId, mailbox, requireFolder: true });
+  if (mailbox?.provider === "zoho" && zohoApiConfigured(env) && !refs.length) {
+    throw Object.assign(new Error("No provider draft was resolved for the requested id; deletion was not performed."), { statusCode: 404 });
+  }
   const result = refs.length ? await deleteZohoMessageRefs(env, { refs, expunge: true }) : { deleted: [], skipped: [] };
   for (const id of ids) {
     const key = messageLabelKeyFromId(id);
@@ -6780,7 +7799,7 @@ const SKYEMAIL_OS_ACTIONS = [
     group: "Documents",
     panel: "docs",
     label: "SkyeDocxMax Editor",
-    path: "/Marketing-Made-Easy/SkyeDocxMax/editor.html",
+    path: "/Marketing-Made-Easy/SkyeDocxMax/editor",
     lane: "document-compose",
     capability: "verified_gated_app",
     bridge: "fragment_handoff",
@@ -6877,20 +7896,20 @@ const SKYEMAIL_OS_ACTIONS = [
     group: "CRM",
     panel: "crm",
     label: "CRM Pipeline",
-    path: "/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/pipeline-tracker.html",
+    path: "/Marketing-Made-Easy/AE-FlowPro/#deals",
     apiRoute: "/api/founder-command/actions",
     apiAction: "command-bridge.event.record",
     lane: "crm-intake",
-    capability: "packet_bridge",
+    capability: "live_api",
     bridge: "command_bridge_event",
     nativePanel: "crm",
     embed: false,
-    summary: "Record sender or thread context as a 0S Command Bridge CRM event.",
-    talksTo: ["SkyeMail workflow packets", "0S Command Bridge", "AE CRM surface"],
+    summary: "Record sender or thread context as a live 0S Command Bridge CRM event.",
+    talksTo: ["SkyeMail workflow packets", "0S Command Bridge", "AE FlowPro CRM"],
     verify: {
-      localFile: "metraiyux_0s_site/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/pipeline-tracker.html",
+      localFile: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
       liveApi: "/api/founder-command/actions",
-      localProof: "CRM page exists; native event recording uses Founder Command action command-bridge.event.record."
+      localProof: "AE FlowPro exists; native event recording uses Founder Command action command-bridge.event.record."
     }
   },
   {
@@ -6898,20 +7917,120 @@ const SKYEMAIL_OS_ACTIONS = [
     group: "CRM",
     panel: "crm",
     label: "CRM Follow-Up",
-    path: "/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/follow-up.html",
+    path: "/Marketing-Made-Easy/AE-FlowPro/#accounts",
     apiRoute: "/api/founder-command/actions",
     apiAction: "command-bridge.event.record",
     lane: "sales-follow-up",
-    capability: "packet_bridge",
+    capability: "live_api",
     bridge: "command_bridge_event",
     nativePanel: "crm",
     embed: false,
-    summary: "Queue reply work and client follow-up from a selected thread.",
-    talksTo: ["SkyeMail workflow packets", "0S Command Bridge", "AE follow-up surface"],
+    summary: "Queue reply work and client follow-up through the live 0S Command Bridge.",
+    talksTo: ["SkyeMail workflow packets", "0S Command Bridge", "AE FlowPro follow-up"],
     verify: {
-      localFile: "metraiyux_0s_site/Marketing-Made-Easy/WebGrowthOperator/ae-command-hub/follow-up.html",
+      localFile: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
       liveApi: "/api/founder-command/actions",
-      localProof: "Follow-up page exists; native event recording uses Founder Command action command-bridge.event.record."
+      localProof: "AE FlowPro follow-up lane exists; native event recording uses Founder Command action command-bridge.event.record."
+    }
+  },
+  {
+    id: "ae-flow-contact-capture",
+    group: "CRM",
+    panel: "crm",
+    label: "AE Flow Contact Capture",
+    path: "/Marketing-Made-Easy/AE-FlowPro/",
+    apiRoute: "/api/founder-command/ae-flow/capture",
+    lane: "crm-contact-sync",
+    capability: "live_api",
+    bridge: "direct_api",
+    nativePanel: "crm",
+    embed: false,
+    summary: "Persist sender/customer contact context into the founder AE FlowPro CRM store.",
+    talksTo: ["SkyeMail contacts", "AE FlowPro private CRM", "Citadel Database mirror ledger"],
+    verify: {
+      localFile: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
+      liveApi: "/api/founder-command/ae-flow/capture",
+      localProof: "AE FlowPro capture stores contact records through Founder Command."
+    }
+  },
+  {
+    id: "ae-flow-workflow-journal",
+    group: "CRM",
+    panel: "crm",
+    label: "AE Flow Journal",
+    path: "/Marketing-Made-Easy/AE-FlowPro/",
+    apiRoute: "/api/founder-command/ae-flow/runtime/journal",
+    lane: "crm-journal",
+    capability: "live_api",
+    bridge: "direct_api",
+    nativePanel: "crm",
+    embed: false,
+    summary: "Write selected email context into the AE FlowPro runtime journal for workspace visibility.",
+    talksTo: ["SkyeMail thread context", "AE FlowPro runtime journal", "Citadel Database mirror ledger"],
+    verify: {
+      localFile: "metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
+      liveApi: "/api/founder-command/ae-flow/runtime/journal",
+      localProof: "AE FlowPro runtime journal accepts POST records."
+    }
+  },
+  {
+    id: "saas-customer-command",
+    group: "Command",
+    panel: "automation",
+    label: "SaaS Customer Command",
+    path: "/saas/customer-dashboard.html",
+    apiRoute: "/api/saas/action-event",
+    lane: "customer-workspace-command",
+    capability: "live_api",
+    bridge: "direct_api",
+    nativePanel: "automation",
+    embed: false,
+    summary: "Persist a mail-derived customer/workspace command event into the SaaS layer.",
+    talksTo: ["SkyeMail context", "SaaS workspace ledger", "0S Command Bridge"],
+    verify: {
+      localFile: "metraiyux_0s_site/saas/customer-dashboard.html",
+      liveApi: "/api/saas/action-event",
+      localProof: "SaaS action-event route stores workspace events."
+    }
+  },
+  {
+    id: "skyecommerce-orders",
+    group: "Commerce",
+    panel: "commerce",
+    label: "SkyeCommerce Orders",
+    path: "/SkyeCommerce/merchant/index.html#orders",
+    apiRoute: "/SkyeCommerce/api/orders",
+    lane: "commerce-order-desk",
+    capability: "live_api",
+    bridge: "direct_api",
+    nativePanel: "commerce",
+    embed: false,
+    summary: "Read live SkyeCommerce order state from mailbox context.",
+    talksTo: ["SkyeMail customer messages", "SkyeCommerce orders", "shared 0S gate"],
+    verify: {
+      localFile: "metraiyux_0s_site/cloudflare/skyecommerce-runtime/index.js",
+      liveApi: "/SkyeCommerce/api/orders",
+      localProof: "SkyeCommerce order API is mounted through the 0S Worker."
+    }
+  },
+  {
+    id: "skyecommerce-analytics",
+    group: "Commerce",
+    panel: "commerce",
+    label: "Commerce Analytics",
+    path: "/SkyeCommerce/merchant/index.html#analytics",
+    apiRoute: "/SkyeCommerce/api/analytics/summary",
+    lane: "commerce-analytics",
+    capability: "live_api",
+    bridge: "direct_api",
+    nativePanel: "commerce",
+    embed: false,
+    summary: "Load live SkyeCommerce analytics so email context can move into store operations.",
+    talksTo: ["SkyeMail context", "SkyeCommerce analytics", "shared 0S gate"],
+    verify: {
+      localFile: "metraiyux_0s_site/cloudflare/skyecommerce-runtime/index.js",
+      liveApi: "/SkyeCommerce/api/analytics/summary",
+      localProof: "SkyeCommerce analytics summary is mounted through the 0S Worker."
     }
   },
   {
@@ -7057,7 +8176,7 @@ function mailOsActionPublic(env, action = {}, context = {}) {
   return {
     ...action,
     launchUrl: zeroOsActionLaunchUrl(env, action, context),
-    authMode: "shared FS27/SkyGate/Free99 session",
+    authMode: "shared SkyeGate FS27/Free99 session",
     openMode: "gate-native",
     iframe: false,
   };
@@ -7087,6 +8206,14 @@ function zeroOsActionLaunchUrl(env, action = {}, context = {}) {
   return gate.toString();
 }
 
+async function zeroOsRequest(env, route = "/", init = {}) {
+  const target = new URL(route || "/", zeroOsGateOrigin(env));
+  if (env.ZERO_OS_WORKER?.fetch) {
+    return await env.ZERO_OS_WORKER.fetch(new Request(`https://zero-os.internal${target.pathname}${target.search}${target.hash}`, init));
+  }
+  return await fetch(target.toString(), init);
+}
+
 function zeroOsForwardHeaders(auth = {}, lane = "skymail-workbench") {
   const token = clean(auth.gate_token || auth.token || "");
   return {
@@ -7101,6 +8228,93 @@ function zeroOsForwardHeaders(auth = {}, lane = "skymail-workbench") {
       "x-skye-gate-session": token,
       "x-skygate-session": token,
     } : {}),
+  };
+}
+
+function mailboxWorkspaceId(mailbox = {}, fallback = "metraiyux-0s") {
+  return clean(mailbox.workspace_id || mailbox.skymail_id || mailbox.mailbox_email || fallback)
+    .toLowerCase()
+    .replace(/@/g, "-")
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 160) || fallback;
+}
+
+async function zeroOsJson(env, auth, route, { method = "GET", body = null, lane = "skymail-workbench" } = {}) {
+  const headers = {
+    ...zeroOsForwardHeaders(auth, lane),
+    ...(body !== null ? { "content-type": "application/json" } : {}),
+  };
+  const response = await zeroOsRequest(env, route, {
+    method,
+    headers,
+    body: body !== null ? JSON.stringify(body) : undefined,
+    redirect: "manual",
+  });
+  const data = await response.json().catch(() => ({}));
+  return {
+    ok: response.status >= 200 && response.status < 300 && data?.ok !== false,
+    status: response.status,
+    route,
+    data,
+  };
+}
+
+async function syncContactToZeroOs(env, auth = {}, contact = {}, mailbox = null) {
+  const email = normalizeEmail(contact.email);
+  if (!email) return { ok: false, skipped: true, reason: "no_contact_email" };
+  const workspaceId = mailboxWorkspaceId(mailbox, "metraiyux-0s");
+  const profile = {
+    source: "skymail-contact-save",
+    source_id: clean(contact.id || email),
+    collection: "mail_contacts",
+    kind: "email_contact",
+    name: clean(contact.full_name || contact.name || email, 240),
+    email,
+    company: clean(contact.company, 240),
+    phone: clean(contact.phone, 80),
+    notes: clean(contact.notes, 2000),
+    tags: ["skyemail", "mail-contact"],
+    mailbox_email: clean(mailbox?.mailbox_email || ""),
+    workspace_id: workspaceId,
+  };
+  const [crm, saas] = await Promise.all([
+    zeroOsJson(env, auth, "/api/founder-command/ae-flow/capture", {
+      method: "POST",
+      lane: "skymail-contact-crm",
+      body: profile,
+    }).catch((error) => ({ ok: false, status: 0, route: "/api/founder-command/ae-flow/capture", error: clean(error?.message || "crm_sync_failed", 500) })),
+    zeroOsJson(env, auth, "/api/saas/action-event", {
+      method: "POST",
+      lane: "skymail-contact-saas-event",
+      body: {
+        workspace_id: workspaceId,
+        type: "skymail.contact.saved",
+        lane: "mail-contact-sync",
+        status: "recorded",
+        summary: `SkyeMail contact saved: ${profile.name || email}`,
+        metadata: profile,
+      },
+    }).catch((error) => ({ ok: false, status: 0, route: "/api/saas/action-event", error: clean(error?.message || "saas_event_failed", 500) })),
+  ]);
+  return {
+    ok: Boolean(crm.ok || saas.ok),
+    workspace_id: workspaceId,
+    crm: {
+      ok: Boolean(crm.ok),
+      status: crm.status || 0,
+      route: crm.route || "/api/founder-command/ae-flow/capture",
+      contact_id: crm.data?.captured?.contact_id || "",
+      error: crm.error || crm.data?.error || "",
+    },
+    saas: {
+      ok: Boolean(saas.ok),
+      status: saas.status || 0,
+      route: saas.route || "/api/saas/action-event",
+      stored: Boolean(saas.data?.stored),
+      event_id: saas.data?.event?.id || "",
+      error: saas.error || saas.data?.error || "",
+    },
   };
 }
 
@@ -7141,9 +8355,60 @@ function mailOsCommandBridgeParams(action = {}, context = {}) {
   };
 }
 
+function mailOsContactPayload(context = {}) {
+  const from = clean(context.from || context.sender || "");
+  const email = mailOsAttendeeEmail({ from, to: context.email || context.contact_email || "" });
+  const subject = clean(context.subject || "SkyeMail contact").slice(0, 240);
+  const inferredName = clean(context.name || context.full_name || from.replace(/<[^>]+>/g, "").replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/ig, "")).slice(0, 160);
+  return {
+    source: "skymail-workbench",
+    source_id: clean(context.message_id || context.messageId || context.thread_id || context.threadId || email || subject),
+    collection: "mail_threads",
+    kind: "email_contact",
+    name: inferredName || email || "SkyeMail contact",
+    email,
+    company: clean(context.company || ""),
+    phone: clean(context.phone || ""),
+    notes: mailOsContextDescription({ label: "AE Flow Contact Capture" }, context),
+    tags: ["skyemail", "mail-thread"],
+    mailbox_email: clean(context.mailbox || context.mailbox_email || ""),
+    workspace_id: mailboxWorkspaceId({ workspace_id: context.workspace_id || context.workspaceId, mailbox_email: context.mailbox || context.mailbox_email }, "metraiyux-0s"),
+  };
+}
+
 function mailOsDirectApiPayload(action = {}, context = {}) {
   const subject = clean(context.subject || `${action.label || "0S"} from SkyeMail`).slice(0, 240);
   const description = mailOsContextDescription(action, context);
+  if (action.id === "skydocxmax-editor") {
+    const markdown = [
+      `# ${subject || "SkyeMail Document"}`,
+      "",
+      description,
+      "",
+      "---",
+      "",
+      `SkyeMail message id: ${clean(context.message_id || context.messageId) || "none"}`,
+      `SkyeMail thread id: ${clean(context.thread_id || context.threadId) || "none"}`,
+    ].join("\n");
+    return {
+      route: "/api/sovereigndocs/editor/skye-docx-max/session",
+      method: "POST",
+      body: {
+        title: subject || "SkyeMail Document",
+        markdown,
+        html: `<h1>${skymailHtmlEscape(subject || "SkyeMail Document")}</h1><pre>${skymailHtmlEscape(description)}</pre>`,
+        metadata: {
+          source: "skyemail",
+          source_app: "skymail",
+          source_surface: "skyemail-0s-workbench",
+          mailbox: clean(context.mailbox || context.mailbox_email),
+          message_id: clean(context.message_id || context.messageId),
+          thread_id: clean(context.thread_id || context.threadId),
+          subject,
+        },
+      },
+    };
+  }
   if (action.id === "founder-calendar") {
     const startAt = clean(context.start_at || context.startAt || context.start || "");
     const endAt = clean(context.end_at || context.endAt || context.end || "");
@@ -7181,9 +8446,73 @@ function mailOsDirectApiPayload(action = {}, context = {}) {
       },
     };
   }
+  if (action.id === "ae-flow-contact-capture") {
+    return {
+      route: "/api/founder-command/ae-flow/capture",
+      method: "POST",
+      body: mailOsContactPayload(context),
+    };
+  }
+  if (action.id === "ae-flow-workflow-journal") {
+    return {
+      route: "/api/founder-command/ae-flow/runtime/journal",
+      method: "POST",
+      body: {
+        type: "skymail.thread.journal",
+        source: "skymail-workbench",
+        title: subject,
+        subject,
+        detail: description,
+        messageId: clean(context.message_id || context.messageId),
+        threadId: clean(context.thread_id || context.threadId),
+        mailbox: clean(context.mailbox || context.mailbox_email),
+        sender: clean(context.from),
+        recipient: clean(context.to),
+      },
+    };
+  }
+  if (action.id === "saas-customer-command") {
+    const workspaceId = mailboxWorkspaceId({ workspace_id: context.workspace_id || context.workspaceId, mailbox_email: context.mailbox || context.mailbox_email }, "metraiyux-0s");
+    return {
+      route: "/api/saas/action-event",
+      method: "POST",
+      body: {
+        workspace_id: workspaceId,
+        type: "skymail.workspace.command",
+        lane: action.lane || "customer-workspace-command",
+        status: "recorded",
+        summary: subject,
+        metadata: {
+          source: "skymail-workbench",
+          mailbox: clean(context.mailbox || context.mailbox_email),
+          message_id: clean(context.message_id || context.messageId),
+          thread_id: clean(context.thread_id || context.threadId),
+          from: clean(context.from),
+          to: clean(context.to),
+          snippet: clean(context.snippet || context.text).slice(0, 2400),
+        },
+      },
+    };
+  }
+  if (action.id === "skyecommerce-orders") {
+    const orderId = clean(context.order_id || context.orderId || "");
+    return {
+      route: orderId ? `/SkyeCommerce/api/orders/${encodeURIComponent(orderId)}` : "/SkyeCommerce/api/orders",
+      method: "GET",
+      body: null,
+    };
+  }
+  if (action.id === "skyecommerce-analytics") {
+    return {
+      route: "/SkyeCommerce/api/analytics/summary",
+      method: "GET",
+      body: null,
+    };
+  }
   if (action.apiAction || action.id === "founder-command-bridge" || action.bridge === "command_bridge_event") {
     return {
       route: "/api/founder-command/actions/execute",
+      method: "POST",
       body: {
         action_id: action.apiAction || "command-bridge.event.record",
         params: mailOsCommandBridgeParams(action, context),
@@ -7193,7 +8522,72 @@ function mailOsDirectApiPayload(action = {}, context = {}) {
   return null;
 }
 
+async function executeSkyeCommerceOrdersDirectApi(env, auth, action = {}, context = {}) {
+  const started = Date.now();
+  const workspaceId = mailboxWorkspaceId({ workspace_id: context.workspace_id || context.workspaceId, mailbox_email: context.mailbox || context.mailbox_email }, "metraiyux-0s");
+  const orderId = clean(context.order_id || context.orderId || "");
+  const metadata = {
+    source: "skymail-workbench",
+    mailbox: clean(context.mailbox || context.mailbox_email),
+    message_id: clean(context.message_id || context.messageId),
+    thread_id: clean(context.thread_id || context.threadId),
+    from: clean(context.from),
+    to: clean(context.to),
+    subject: clean(context.subject),
+    snippet: clean(context.snippet || context.text).slice(0, 2400),
+    order_id: orderId,
+  };
+  const orders = await zeroOsJson(env, auth, orderId ? `/SkyeCommerce/api/orders/${encodeURIComponent(orderId)}` : "/SkyeCommerce/api/orders", {
+    method: "GET",
+    lane: "skymail-commerce-order-read",
+  });
+  const event = await zeroOsJson(env, auth, "/api/saas/action-event", {
+    method: "POST",
+    lane: "skymail-commerce-order-event",
+    body: {
+      workspace_id: workspaceId,
+      type: orderId ? "skymail.commerce.order_thread_linked" : "skymail.commerce.order_desk_opened",
+      lane: action.lane || "commerce-order-desk",
+      status: orderId ? "linked" : "recorded",
+      summary: orderId
+        ? `SkyeMail thread linked to SkyeCommerce order ${orderId}`
+        : `SkyeMail opened SkyeCommerce order desk: ${clean(context.subject || "mail context")}`,
+      metadata: {
+        ...metadata,
+        order_count: Array.isArray(orders.data?.orders) ? orders.data.orders.length : null,
+        order_found: Boolean(orders.data?.order),
+      },
+    },
+  }).catch((error) => ({ ok: false, status: 0, route: "/api/saas/action-event", error: clean(error?.message || "saas_event_failed", 500), data: {} }));
+  return {
+    attempted: true,
+    ok: Boolean(orders.ok && event.ok),
+    mode: orderId ? "commerce_order_link" : "commerce_order_desk_event",
+    action_id: action.id || "",
+    route: orderId ? `/SkyeCommerce/api/orders/${encodeURIComponent(orderId)} + /api/saas/action-event` : "/SkyeCommerce/api/orders + /api/saas/action-event",
+    status: orders.ok && event.ok ? 200 : (orders.status || event.status || 0),
+    elapsed_ms: Date.now() - started,
+    result: {
+      orders: {
+        ok: Boolean(orders.ok),
+        status: orders.status || 0,
+        count: Array.isArray(orders.data?.orders) ? orders.data.orders.length : null,
+        order: orders.data?.order || null,
+        error: orders.data?.error || orders.error || "",
+      },
+      event: {
+        ok: Boolean(event.ok),
+        status: event.status || 0,
+        stored: Boolean(event.data?.stored),
+        event_id: event.data?.event?.id || "",
+        error: event.data?.error || event.error || "",
+      },
+    },
+  };
+}
+
 async function executeMailOsDirectApi(env, auth, action = {}, context = {}) {
+  if (action.id === "skyecommerce-orders") return await executeSkyeCommerceOrdersDirectApi(env, auth, action, context);
   const payload = mailOsDirectApiPayload(action, context);
   if (!payload) {
     return {
@@ -7204,17 +8598,16 @@ async function executeMailOsDirectApi(env, auth, action = {}, context = {}) {
       reason: "no_direct_api_for_action",
     };
   }
-  const target = new URL(payload.route, zeroOsGateOrigin(env));
   const started = Date.now();
   const headers = {
     ...zeroOsForwardHeaders(auth, `skymail-workbench:${action.lane || action.id || "direct-api"}`),
     "content-type": "application/json",
   };
   try {
-    const response = await fetch(target.toString(), {
-      method: "POST",
+    const response = await zeroOsRequest(env, payload.route, {
+      method: payload.method || "POST",
       headers,
-      body: JSON.stringify(payload.body),
+      body: payload.body === null || payload.body === undefined ? undefined : JSON.stringify(payload.body),
       redirect: "manual",
     });
     const data = await response.json().catch(() => ({}));
@@ -7254,7 +8647,7 @@ async function checkZeroOsRoute(env, auth, action = {}) {
   const started = Date.now();
   const headers = zeroOsForwardHeaders(auth, `skymail-workbench:${action.lane || action.id || "route-check"}`);
   try {
-    const res = await fetch(target.toString(), {
+    const res = await zeroOsRequest(env, `${target.pathname}${target.search}${target.hash}`, {
       method: "GET",
       headers,
       redirect: "manual",
@@ -7263,7 +8656,8 @@ async function checkZeroOsRoute(env, auth, action = {}) {
     const ok = (res.status >= 200 && res.status < 300) || gated || res.status === 405;
     if (!ok && res.status === 404) {
       const launchUrl = zeroOsActionLaunchUrl(env, action, {});
-      const launchRes = await fetch(launchUrl, { method: "GET", headers, redirect: "manual" }).catch(() => null);
+      const launchTarget = new URL(launchUrl);
+      const launchRes = await zeroOsRequest(env, `${launchTarget.pathname}${launchTarget.search}${launchTarget.hash}`, { method: "GET", headers, redirect: "manual" }).catch(() => null);
       const launchStatus = Number(launchRes?.status || 0);
       const launchGated = [301, 302, 303, 307, 308, 401, 403].includes(launchStatus);
       const launchOk = (launchStatus >= 200 && launchStatus < 300) || launchGated;
@@ -7282,7 +8676,7 @@ async function checkZeroOsRoute(env, auth, action = {}) {
         };
       }
       return {
-        ok: true,
+        ok: false,
         action_id: action.id,
         route,
         status: res.status,
@@ -7291,9 +8685,9 @@ async function checkZeroOsRoute(env, auth, action = {}) {
         capability: action.capability || "packet_bridge",
         bridge: action.bridge || "workflow_packet",
         checked_ms: Date.now() - started,
-        via: "external_live_route_proof_required",
+        via: "route_not_found",
         server_subrequest_ok: false,
-        external_proof: "Covered by the non-browser live human smoke, which calls the 0S origin directly with the shared gate bearer.",
+        external_proof: "Route is not considered healthy until a shared-gate live API or launch URL responds.",
       };
     }
     return {
@@ -7321,6 +8715,36 @@ async function checkZeroOsRoute(env, auth, action = {}) {
   }
 }
 
+async function runMailOsHealthChecks(env, auth, actions = []) {
+  const checks = [];
+  const concurrency = 10;
+  let cursor = 0;
+  async function worker() {
+    while (cursor < actions.length) {
+      const index = cursor;
+      cursor += 1;
+      const action = actions[index];
+      checks[index] = await Promise.race([
+        checkZeroOsRoute(env, auth, action),
+        timeoutAfter(10000, () => ({
+          ok: false,
+          action_id: action.id,
+          route: mailOsHealthRouteFor(action),
+          status: 0,
+          gated: false,
+          capability: action.capability || "packet_bridge",
+          bridge: action.bridge || "workflow_packet",
+          checked_ms: 10000,
+          error: "route_check_timeout",
+        })),
+      ]);
+    }
+  }
+  const lanes = Array.from({ length: Math.min(concurrency, actions.length) }, () => worker());
+  await Promise.all(lanes);
+  return checks;
+}
+
 async function handleMailOsActions(request, env) {
   await requireAuth(request, env);
   return json({
@@ -7339,29 +8763,44 @@ async function handleMailOsActions(request, env) {
 
 async function handleMailOsHealth(request, env) {
   const auth = { ...await requireAuth(request, env), gate_token: bearer(request) };
-  const checks = await Promise.all(SKYEMAIL_OS_ACTIONS.map((action) => checkZeroOsRoute(env, auth, action)));
-  const failed = checks.filter((item) => !item.ok);
-  const byCapability = checks.reduce((acc, item) => {
-    acc[item.capability] = acc[item.capability] || { total: 0, ok: 0 };
-    acc[item.capability].total += 1;
-    if (item.ok) acc[item.capability].ok += 1;
-    return acc;
-  }, {});
-  return json({
-    ok: failed.length === 0,
-    source: "skymail-0s-workbench",
-    zero_os_origin: zeroOsGateOrigin(env),
-    generated_at: new Date().toISOString(),
-    browser_proof: "owner-handled-by-repo-policy",
-    summary: {
-      total: checks.length,
-      reachable_or_gated: checks.length - failed.length,
-      failed: failed.length,
-      by_capability: byCapability,
-    },
-    checks,
-    actions: SKYEMAIL_OS_ACTIONS.map((action) => mailOsActionPublic(env, action, {})),
-  }, failed.length ? 207 : 200);
+  const url = new URL(request.url);
+  const cacheKey = `mail-os-health:${auth.sub}:${stableHex(auth.selected_mailbox_email || request.headers.get("x-skymail-mailbox-email") || "", 12)}`;
+  const refresh = ["1", "true", "yes"].includes(String(url.searchParams.get("refresh") || "").toLowerCase());
+  if (refresh) SKYE_MEMORY_CACHE.delete(cacheKey);
+  if (!refresh) {
+    const cached = cacheGet(cacheKey);
+    if (cached) {
+      const result = await cached;
+      return json({ ...result.body, cached: true, cache_ttl_seconds: 30 }, result.status);
+    }
+  }
+  const result = await cachedPromise(cacheKey, 30000, async () => {
+    const checks = await runMailOsHealthChecks(env, auth, SKYEMAIL_OS_ACTIONS);
+    const failed = checks.filter((item) => !item.ok);
+    const byCapability = checks.reduce((acc, item) => {
+      acc[item.capability] = acc[item.capability] || { total: 0, ok: 0 };
+      acc[item.capability].total += 1;
+      if (item.ok) acc[item.capability].ok += 1;
+      return acc;
+    }, {});
+    const body = {
+      ok: failed.length === 0,
+      source: "skymail-0s-workbench",
+      zero_os_origin: zeroOsGateOrigin(env),
+      generated_at: new Date().toISOString(),
+      browser_proof: "owner-handled-by-repo-policy",
+      summary: {
+        total: checks.length,
+        reachable_or_gated: checks.length - failed.length,
+        failed: failed.length,
+        by_capability: byCapability,
+      },
+      checks,
+      actions: SKYEMAIL_OS_ACTIONS.map((action) => mailOsActionPublic(env, action, {})),
+    };
+    return { body, status: failed.length ? 207 : 200 };
+  });
+  return json(result.body, result.status);
 }
 
 async function handleMailOsHandoff(request, env) {
@@ -7465,12 +8904,12 @@ async function requireMailAutomationAuth(request, env) {
   const serviceHeader = clean(request.headers.get("x-skymail-service-token"));
   const token = bearer(request);
   if (serviceHeader || (expected && token === expected)) {
-    serviceAuth(request, env);
+    const service = await serviceAuth(request, env);
     return {
       sub: "skymail-service",
       handle: "skymail-service",
       email: "skymail-service",
-      auth_provider: "skymail-service-token",
+      auth_provider: service.source || "skymail-service-token",
       service: true,
     };
   }
@@ -8005,32 +9444,291 @@ async function handleRuntimeCompat(request, env, name) {
   return json({ error: `Runtime route not implemented: ${runtimePath}` }, 404);
 }
 
+async function ensureSkyEmailTelemetrySchema(env) {
+  const schema = schemaName(env);
+  await query(env, `
+    create table if not exists ${schema}.skyemail_telemetry_events (
+      id text primary key,
+      user_id uuid references ${schema}.users(id) on delete set null,
+      mailbox_email text,
+      actor_hash text,
+      route text not null,
+      method text not null,
+      status integer not null default 0,
+      ok boolean not null default false,
+      elapsed_ms integer not null default 0,
+      source text not null default 'worker-api',
+      metadata_json jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now()
+    )
+  `);
+  await query(env, `create index if not exists skyemail_telemetry_user_created_idx on ${schema}.skyemail_telemetry_events(user_id, created_at desc)`);
+  await query(env, `create index if not exists skyemail_telemetry_route_created_idx on ${schema}.skyemail_telemetry_events(route, created_at desc)`);
+}
+
+async function telemetryActorForRequest(env, request) {
+  const token = bearer(request);
+  if (!token) return { user_id: null, actor_hash: "" };
+  try {
+    const claims = await introspectFs27(env, token);
+    const user = await ensureUserFromFs27(env, claims);
+    return {
+      user_id: user?.id || null,
+      actor_hash: stableHex(user?.email || claims?.sub || token, 24),
+    };
+  } catch {
+    return { user_id: null, actor_hash: stableHex(token, 24) };
+  }
+}
+
+async function recordSkyEmailTelemetry(env, request, routeName, responseStatus = 0, startedAt = Date.now(), metadata = {}) {
+  await ensureSkyEmailTelemetrySchema(env);
+  const actor = await telemetryActorForRequest(env, request);
+  const mailboxEmail = normalizeEmail(
+    request.headers.get("x-skymail-mailbox-email")
+      || request.headers.get("x-skymail-mailbox")
+      || "",
+  );
+  const status = Number(responseStatus || 0);
+  await query(env, `
+    insert into skyemail_telemetry_events(
+      id, user_id, mailbox_email, actor_hash, route, method, status, ok, elapsed_ms, source, metadata_json
+    )
+    values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb)
+  `, [
+    `skymailtel_${Date.now().toString(36)}_${stableHex(`${routeName}:${request.method}:${startedAt}:${Math.random()}`, 14)}`,
+    actor.user_id,
+    mailboxEmail,
+    actor.actor_hash,
+    clean(routeName || "unknown").slice(0, 160),
+    clean(request.method || "GET").slice(0, 12),
+    status,
+    status >= 200 && status < 400,
+    Math.max(0, Date.now() - startedAt),
+    "worker-api",
+    JSON.stringify({
+      path: new URL(request.url).pathname,
+      ...metadata,
+    }),
+  ]);
+}
+
+async function handleSkyEmailTelemetrySummary(request, env) {
+  const auth = await requireAuth(request, env);
+  const url = new URL(request.url);
+  const days = Math.max(1, Math.min(90, Number.parseInt(url.searchParams.get("days") || "7", 10) || 7));
+  const limit = Math.max(1, Math.min(250, Number.parseInt(url.searchParams.get("limit") || "80", 10) || 80));
+  const mailbox = normalizeEmail(url.searchParams.get("mailbox") || request.headers.get("x-skymail-mailbox-email") || "");
+  const cacheKey = `telemetry-summary:${auth.sub}:${days}:${limit}:${mailbox}`;
+  if (!["1", "true", "yes"].includes(String(url.searchParams.get("refresh") || "").toLowerCase())) {
+    const cached = cacheGet(cacheKey);
+    if (cached) return json({ ...cached, cached: true, cache_ttl_seconds: 15 });
+  }
+  await ensureSkyEmailTelemetrySchema(env);
+  const since = new Date(Date.now() - (days * 24 * 60 * 60 * 1000)).toISOString();
+  const params = [auth.sub, since, mailbox];
+  const where = `
+    where user_id=$1
+      and created_at >= $2::timestamptz
+      and ($3 = '' or mailbox_email=$3)
+  `;
+  const [summaryRows, routeRows, recent] = await Promise.all([
+    query(env, `
+      select
+        count(*)::int as total_events,
+        count(*) filter (where ok)::int as ok_events,
+        count(*) filter (where not ok)::int as failed_events,
+        count(*) filter (where route in ('mail-brain','gateway-chat','gateway-stream'))::int as ai_events,
+        count(*) filter (where route in ('mail-send','gmail-send'))::int as send_events,
+        count(*) filter (where route in ('gmail-list','gmail-get','gmail-thread-get','mail-sync'))::int as inbox_events,
+        count(*) filter (where route in ('mail-os-handoff','contacts-save'))::int as os_integration_events,
+        coalesce(round(avg(elapsed_ms))::int,0) as avg_ms,
+        coalesce(max(elapsed_ms),0)::int as max_ms
+      from skyemail_telemetry_events
+      ${where}
+    `, params),
+    query(env, `
+      select route, method,
+             count(*)::int as total,
+             count(*) filter (where ok)::int as ok,
+             count(*) filter (where not ok)::int as failed,
+             coalesce(round(avg(elapsed_ms))::int,0) as avg_ms,
+             coalesce(max(elapsed_ms),0)::int as max_ms,
+             max(created_at) as latest_at
+        from skyemail_telemetry_events
+       ${where}
+       group by route, method
+       order by total desc, latest_at desc
+       limit 80
+    `, params),
+    query(env, `
+      select id, route, method, status, ok, elapsed_ms, mailbox_email, source, metadata_json, created_at
+        from skyemail_telemetry_events
+       ${where}
+       order by created_at desc
+       limit $4
+    `, [...params, limit]),
+  ]);
+  const body = {
+    ok: true,
+    source: "skyemail-worker-telemetry",
+    window_days: days,
+    mailbox: mailbox || null,
+    summary: summaryRows[0] || {},
+    routes: routeRows,
+    recent,
+  };
+  cacheSet(cacheKey, body, 15000);
+  return json(body);
+}
+
+async function ensureSkyEmailGameSchema(env) {
+  const schema = schemaName(env);
+  await query(env, `
+    create table if not exists ${schema}.skyemail_game_events (
+      id text primary key,
+      user_id uuid references ${schema}.users(id) on delete set null,
+      mailbox_email text,
+      event_key text not null,
+      action text not null,
+      xp integer not null default 0,
+      badge_ids_json jsonb not null default '[]'::jsonb,
+      detail_json jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now()
+    )
+  `);
+  await query(env, `create unique index if not exists skyemail_game_user_event_key_idx on ${schema}.skyemail_game_events(user_id, event_key)`);
+  await query(env, `create index if not exists skyemail_game_user_created_idx on ${schema}.skyemail_game_events(user_id, created_at desc)`);
+  await query(env, `create index if not exists skyemail_game_mailbox_created_idx on ${schema}.skyemail_game_events(mailbox_email, created_at desc)`);
+}
+
+function normalizeGameBadges(value) {
+  const list = Array.isArray(value) ? value : [];
+  return list.map((item) => clean(item).replace(/[^a-z0-9._:-]+/ig, "-").slice(0, 80)).filter(Boolean).slice(0, 12);
+}
+
+async function handleSkyEmailGameEvent(request, env) {
+  const auth = await requireAuth(request, env);
+  const body = await request.json().catch(() => ({}));
+  const action = clean(body.action || body.type || "progress").replace(/[^a-z0-9._:-]+/ig, "-").slice(0, 80) || "progress";
+  const mailboxEmail = normalizeEmail(body.mailbox || body.mailbox_email || request.headers.get("x-skymail-mailbox-email") || auth.selected_mailbox_email || auth.email || "");
+  const detail = body.meta && typeof body.meta === "object" ? body.meta : {};
+  const receiptId = clean(detail.receiptId || detail.receipt_id || detail.id || detail.message_id || detail.order_id || detail.session_id || "");
+  const eventKey = clean(body.event_key || body.eventKey || detail.event_key || detail.key || (receiptId ? `${action}:${receiptId}` : "") || `${action}:${Date.now()}:${randomToken(8)}`).slice(0, 240);
+  const xp = Math.max(0, Math.min(10000, Number(body.xp || 0) || 0));
+  const badgeIds = normalizeGameBadges(body.badge_ids || body.badges || []);
+  await ensureSkyEmailGameSchema(env);
+  const rows = await query(env, `
+    insert into skyemail_game_events(
+      id, user_id, mailbox_email, event_key, action, xp, badge_ids_json, detail_json
+    )
+    values($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb)
+    on conflict (user_id, event_key) do nothing
+    returning id, created_at
+  `, [
+    `skymailgame_${Date.now().toString(36)}_${stableHex(`${auth.sub}:${eventKey}:${Math.random()}`, 14)}`,
+    auth.sub,
+    mailboxEmail,
+    eventKey,
+    action,
+    xp,
+    JSON.stringify(badgeIds),
+    JSON.stringify({
+      source: "skyemail-game-ledger",
+      receipt_backed: Boolean(detail.receipt_backed || receiptId || detail.celebration?.receiptBacked),
+      level: Number(body.level || 0) || null,
+      ...detail,
+    }),
+  ]);
+  return json({
+    ok: true,
+    stored: Boolean(rows.length),
+    duplicate: !rows.length,
+    event: {
+      id: rows[0]?.id || null,
+      event_key: eventKey,
+      action,
+      xp,
+      badge_ids: badgeIds,
+      mailbox: mailboxEmail || null,
+      created_at: rows[0]?.created_at || null,
+    },
+  }, rows.length ? 201 : 200);
+}
+
+async function handleSkyEmailGameSummary(request, env) {
+  const auth = await requireAuth(request, env);
+  const url = new URL(request.url);
+  const limit = Math.max(1, Math.min(100, Number.parseInt(url.searchParams.get("limit") || "40", 10) || 40));
+  const mailbox = normalizeEmail(url.searchParams.get("mailbox") || request.headers.get("x-skymail-mailbox-email") || "");
+  await ensureSkyEmailGameSchema(env);
+  const params = [auth.sub, mailbox];
+  const where = `where user_id=$1 and ($2 = '' or mailbox_email=$2)`;
+  const [summaryRows, recent] = await Promise.all([
+    query(env, `
+      select count(*)::int as total_events,
+             coalesce(sum(xp),0)::int as total_xp,
+             count(*) filter (where (detail_json->>'receipt_backed')::boolean is true)::int as receipt_backed_events,
+             count(*) filter (where action='celebration')::int as thank_you_events,
+             count(distinct action)::int as action_types
+        from skyemail_game_events
+       ${where}
+    `, params),
+    query(env, `
+      select id, mailbox_email, event_key, action, xp, badge_ids_json, detail_json, created_at
+        from skyemail_game_events
+       ${where}
+       order by created_at desc
+       limit $3
+    `, [...params, limit]),
+  ]);
+  return json({
+    ok: true,
+    source: "skyemail-game-ledger",
+    mailbox: mailbox || null,
+    summary: summaryRows[0] || {},
+    recent,
+  });
+}
+
 function apiNameFromPath(pathname) {
   const netlify = pathname.match(/^\/\.netlify\/functions\/(.+)$/);
   const api = pathname.match(/^\/api\/(.+)$/);
   const directNames = [
     "health",
     "admin-public-key",
+    "public-key",
+    "submit-message",
     ["auth", "signup"].join("-"),
     ["auth", "login"].join("-"),
+    ["auth", "me"].join("-"),
     "auth-fs27-session",
+    "vault-export",
+    "vault-restore-keys",
+    "keys-rotate",
     "vault-key-setup",
     "sovereign-key-setup",
     "gate-diagnostics",
     "mailbox-domains",
     "mail-status",
     "google-status",
-    "mailboxes-list",
-    "mailbox-provision",
-    "mailbox-aliases",
+    "google-oauth-start",
+    "google-disconnect",
+	    "gmail-watch",
+	    "mailboxes-list",
+	    "mailboxes-service-list",
+	    "mailbox-provision",
+	    "mailbox-aliases",
 	    "mailbox-offboarding",
 	    "mail-brain",
 	    "mail-brain-plans",
 	    "mail-brain-checkout",
 	    "mail-brain-claim",
 	    "mail-os-actions",
-	    "mail-os-health",
-	    "mail-os-handoff",
+    "mail-os-health",
+    "mail-os-handoff",
+	    "mail-game-event",
+	    "mail-game-summary",
 	    "thread-attach",
 	    "system-message",
 	    "mail-settings-get",
@@ -8040,11 +9738,16 @@ function apiNameFromPath(pathname) {
     "workspace-mail-sync",
     "mail-send",
     "mail-sync",
+    "mail-routing-health",
+    "mail-routing-events",
+    "mail-routing-webhook-events",
+    "mail-routing-webhook",
     "zoho-webhook",
     "zoho-webhook-events",
     "mail-proof-loop",
     "resend-health",
     "resend-events-list",
+    "telemetry-summary",
     "contacts-list",
     "contacts-save",
     "contacts-delete",
@@ -8077,20 +9780,30 @@ function apiNameFromPath(pathname) {
     .replace(/\.js$/i, "");
 }
 
-async function routeApi(request, env, ctx, name) {
+async function routeApiDispatch(request, env, ctx, name) {
   if (request.method === "OPTIONS") return json({ ok: true });
   if (name.startsWith("runtime/")) return await handleRuntimeCompat(request, env, name);
   if (name === "health") return json({ ok: true, platform: "SkyeMail Sovereign Worker", primary_database: Boolean(env.NEON_DATABASE_URL || env.DATABASE_URL), citadel_backup: Boolean(env.CITADEL_BACKUP_URL || env.CITADEL_DATABASE_URL || env.CITADEL_BACKUP_DATABASE_URL) });
   if (name === "admin-public-key" && request.method === "GET") return await handleAdminPublicKey(request, env);
+  if (name === "public-key" && request.method === "GET") return await handlePublicKey(request, env);
+  if (name === "submit-message" && request.method === "POST") return await handleSubmitMessage(request, env, ctx);
   if (name === ["auth", "signup"].join("-") && request.method === "POST") return await handleAuthSignup(request, env, ctx);
   if (name === ["auth", "login"].join("-") && request.method === "POST") return await handleAuthLogin(request, env);
+  if (name === ["auth", "me"].join("-") && request.method === "GET") return await handleAuthMe(request, env);
   if (name === "auth-fs27-session" && request.method === "POST") return await handleAuthFs27(request, env, ctx);
+  if (name === "vault-export" && request.method === "GET") return await handleVaultExport(request, env);
+  if (name === "vault-restore-keys" && request.method === "POST") return await handleVaultRestoreKeys(request, env);
+  if (name === "keys-rotate" && request.method === "POST") return await handleKeysRotate(request, env, ctx);
   if ((name === "vault-key-setup" || name === "sovereign-key-setup") && request.method === "POST") return await handleVaultKeySetup(request, env, ctx);
   if (name === "gate-diagnostics" && request.method === "POST") return await handleGateDiagnostics(request, env);
   if (name === "mailbox-domains" && request.method === "GET") return await handleMailboxDomains(request, env);
   if (name === "zoho-provider-smoke" && (request.method === "GET" || request.method === "POST")) return await handleZohoProviderSmoke(request, env);
   if ((name === "mail-status" || name === "google-status") && request.method === "GET") return await handleMailStatus(request, env);
+  if (name === "google-oauth-start" && request.method === "GET") return await handleGoogleOauthStart(request, env);
+  if (name === "google-disconnect" && request.method === "POST") return await handleGoogleDisconnect(request, env);
+  if (name === "gmail-watch" && (request.method === "GET" || request.method === "POST" || request.method === "DELETE")) return await handleGmailWatch(request, env);
   if (name === "mailboxes-list" && request.method === "GET") return await handleMailboxesList(request, env);
+  if (name === "mailboxes-service-list" && request.method === "GET") return await handleMailboxesServiceList(request, env);
   if (name === "mailbox-provision" && request.method === "POST") return await handleMailboxProvision(request, env, ctx);
 	  if (name === "mailbox-aliases" && (request.method === "GET" || request.method === "POST")) return await handleMailboxAliases(request, env, ctx);
 	  if (name === "mailbox-offboarding" && (request.method === "GET" || request.method === "POST")) return await handleMailboxOffboarding(request, env, ctx);
@@ -8101,6 +9814,8 @@ async function routeApi(request, env, ctx, name) {
 	  if (name === "mail-os-actions" && request.method === "GET") return await handleMailOsActions(request, env);
 	  if (name === "mail-os-health" && request.method === "GET") return await handleMailOsHealth(request, env);
 	  if (name === "mail-os-handoff" && request.method === "POST") return await handleMailOsHandoff(request, env);
+	  if (name === "mail-game-event" && request.method === "POST") return await handleSkyEmailGameEvent(request, env);
+	  if (name === "mail-game-summary" && request.method === "GET") return await handleSkyEmailGameSummary(request, env);
 	  if (name === "thread-attach" && request.method === "POST") return await handleThreadAttach(request, env);
 	  if (name === "system-message" && request.method === "POST") return await handleSystemMessage(request, env, ctx);
 	  if (name === "mail-settings-get" && request.method === "GET") return await handleMailSettingsGet(request, env);
@@ -8110,11 +9825,12 @@ async function routeApi(request, env, ctx, name) {
   if (name === "workspace-mail-sync" && (request.method === "GET" || request.method === "POST")) return await handleWorkspaceMailSync(request, env, ctx);
   if ((name === "mail-send" || name === "gmail-send") && request.method === "POST") return await handleMailSend(request, env, ctx);
   if (name === "mail-sync" && (request.method === "GET" || request.method === "POST")) return await handleMailSync(request, env, ctx);
-  if (name === "zoho-webhook" && request.method === "POST") return await handleZohoWebhook(request, env, ctx);
-  if (name === "zoho-webhook-events" && request.method === "GET") return await handleZohoWebhookEventsList(request, env);
+  if ((name === "zoho-webhook" || name === "mail-routing-webhook") && request.method === "POST") return await handleZohoWebhook(request, env, ctx);
+  if ((name === "zoho-webhook-events" || name === "mail-routing-webhook-events") && request.method === "GET") return await handleZohoWebhookEventsList(request, env);
   if (name === "mail-proof-loop" && request.method === "POST") return await handleMailProofLoop(request, env, ctx);
-  if (name === "resend-health" && request.method === "GET") return await handleResendHealth(request, env);
-  if (name === "resend-events-list" && request.method === "GET") return await handleResendEventsList(request, env);
+  if ((name === "resend-health" || name === "mail-routing-health") && request.method === "GET") return await handleResendHealth(request, env);
+  if ((name === "resend-events-list" || name === "mail-routing-events") && request.method === "GET") return await handleResendEventsList(request, env);
+  if (name === "telemetry-summary" && request.method === "GET") return await handleSkyEmailTelemetrySummary(request, env);
   if (name === "contacts-list" && request.method === "GET") return await handleContactsList(request, env);
   if (name === "contacts-save" && request.method === "POST") return await handleContactsSave(request, env);
   if (name === "contacts-delete" && request.method === "POST") return await handleContactsDelete(request, env);
@@ -8137,6 +9853,25 @@ async function routeApi(request, env, ctx, name) {
   if (name === "gateway-stream" && request.method === "POST") return await handleGatewayStream(request, env, ctx);
   if (name === "citadel-backup-test" && request.method === "POST") return await handleCitadelBackupTest(request, env);
   return json({ error: `SkyeMail API route not implemented: ${name}` }, 404);
+}
+
+async function routeApi(request, env, ctx, name) {
+  const started = Date.now();
+  let status = 500;
+  let errorMessage = "";
+  try {
+    const response = await routeApiDispatch(request, env, ctx, name);
+    status = Number(response?.status || 200);
+    return response;
+  } catch (error) {
+    status = Number(error?.statusCode || error?.status || 500);
+    errorMessage = clean(error?.message || "api_error").slice(0, 300);
+    throw error;
+  } finally {
+    if (request.method !== "OPTIONS") {
+      ctx?.waitUntil?.(recordSkyEmailTelemetry(env, request, name, status, started, errorMessage ? { error: errorMessage } : {}).catch(() => null));
+    }
+  }
 }
 
 function skyemailBackgroundPartialHtml() {
@@ -8165,6 +9900,12 @@ async function serveStatic(request, env) {
   if (!env.ASSETS) return null;
   const url = new URL(request.url);
   let pathname = url.pathname;
+  const legacySuiteStandalone = pathname.match(/^\/(?:suite\/)?standalone\/([a-z0-9-]+\.html)$/i);
+  if (legacySuiteStandalone) {
+    const target = new URL(`/${legacySuiteStandalone[1]}`, url.origin);
+    url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+    return Response.redirect(target.toString(), 302);
+  }
   if (pathname === "/favicon.ico") {
     return new Response(null, {
       status: 204,
@@ -8191,6 +9932,15 @@ async function serveStatic(request, env) {
     }
     return null;
   }
+  if (pathname === "/founder") {
+    const founderRequest = new Request(new URL("/__skyemail_founder", url.origin), request);
+    const founderRes = await env.ASSETS.fetch(founderRequest);
+    if (founderRes.status !== 404) {
+      const headers = new Headers(founderRes.headers);
+      headers.set("content-type", "text/html; charset=utf-8");
+      return new Response(founderRes.body, { status: founderRes.status, headers });
+    }
+  }
   const htmlPage = pathname.match(/^\/([a-z0-9-]+)\.html$/i);
   if (htmlPage && url.search) {
     const routedUrl = new URL(`/${htmlPage[1]}/${url.search}`, url.origin);
@@ -8201,6 +9951,9 @@ async function serveStatic(request, env) {
     const indexRequest = new Request(new URL(`${pathname}/index.html`, url.origin), request);
     const indexRes = await env.ASSETS.fetch(indexRequest);
     if (indexRes.status !== 404) return indexRes;
+    const htmlRequest = new Request(new URL(`${pathname}.html${url.search}`, url.origin), request);
+    const htmlRes = await env.ASSETS.fetch(htmlRequest);
+    if (htmlRes.status !== 404 && !isSelfCanonicalAssetRedirect(htmlRes, url)) return htmlRes;
   }
   const assetRequest = new Request(new URL(pathname, url.origin), request);
   const res = await env.ASSETS.fetch(assetRequest);
@@ -8208,8 +9961,22 @@ async function serveStatic(request, env) {
   return null;
 }
 
+function isSelfCanonicalAssetRedirect(response, url) {
+  if (![301, 302, 303, 307, 308].includes(response?.status)) return false;
+  const location = response.headers?.get?.("location") || "";
+  if (!location) return false;
+  try {
+    const target = new URL(location, url.origin);
+    return target.origin === url.origin
+      && target.pathname.replace(/\/$/, "") === url.pathname.replace(/\/$/, "")
+      && target.search === url.search;
+  } catch {
+    return false;
+  }
+}
+
 async function runScheduledMailSync(env, ctx) {
-  if (!zohoApiConfigured(env)) return { ok: true, skipped: true, reason: "Citadel mail API is not configured." };
+  if (!zohoApiConfigured(env)) return { ok: true, skipped: true, reason: "SkyeMail production mail API is not configured." };
   const rows = await query(env, `
     select hm.user_id, u.email, u.fs27_customer_id
       from hosted_mailboxes hm

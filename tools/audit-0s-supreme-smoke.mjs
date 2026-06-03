@@ -122,8 +122,8 @@ const routeContracts = [
     url: `${config.skyemailBase}/.netlify/functions/skymail-standalone-auth-signup.js`,
     method: "POST",
     body: {},
-    expectStatus: [400],
-    mustInclude: ["Valid email required."],
+    expectStatus: [410],
+    mustInclude: ["app_local_auth_disabled_by_shared_gate"],
   },
   {
     group: "skyemail",
@@ -131,8 +131,8 @@ const routeContracts = [
     url: `${config.skyemailBase}/api/auth-signup.js`,
     method: "POST",
     body: {},
-    expectStatus: [400],
-    mustInclude: ["Valid email required."],
+    expectStatus: [410],
+    mustInclude: ["app_local_auth_disabled_by_shared_gate"],
   },
   {
     group: "skygate",

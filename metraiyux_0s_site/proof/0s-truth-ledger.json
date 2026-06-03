@@ -1,7 +1,7 @@
 {
   "ok": true,
   "schema": "metraiyux.0s.truth-ledger.v1",
-  "generated_at": "2026-05-31T03:06:38.544Z",
+  "generated_at": "2026-06-02T23:59:49.481Z",
   "source_manifest": "metraiyux_0s_site/data/0s-closure-workflows.json",
   "no_browser_proof_run": true,
   "owner_manual_live_check": true,
@@ -10,13 +10,13 @@
     "operating_matrix": {
       "path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "ok": true,
-      "generated_at": "2026-05-31T02:36:06.748Z",
+      "generated_at": "2026-06-02T23:36:10.545Z",
       "route_failures": 0,
-      "behavior_green": 22,
+      "behavior_green": 24,
       "behavior_yellow": 0,
       "behavior_red": 0,
       "app_behavior_state": "green",
-      "app_behavior_green": 107,
+      "app_behavior_green": 108,
       "app_behavior_yellow": 0,
       "app_behavior_red": 0,
       "literal_per_app_depth_closed": true
@@ -24,32 +24,32 @@
     "live_capability_watch": {
       "path": "test-artifacts/0s-live-capability-watch/0s-live-capability-watch-latest.json",
       "ok": true,
-      "generated_at": "2026-05-30T19:44:25.295Z",
+      "generated_at": "2026-06-02T23:59:40.149Z",
       "summary": {
-        "total": 2,
-        "pass": 2,
+        "total": 9,
+        "pass": 9,
         "warn": 0,
         "fail": 0,
         "skipped": 0,
         "blocked": 0,
         "live_http_or_api": 0,
-        "local_behavior": 1,
-        "real_action_observed": 2,
+        "local_behavior": 7,
+        "real_action_observed": 8,
         "failed_ids": [],
         "warning_ids": []
       }
     }
   },
   "summary": {
-    "total": 22,
-    "built": 22,
+    "total": 24,
+    "built": 24,
     "partial": 0,
     "failing_proof": 0,
     "unproven": 0,
     "not_built_or_untracked": 0,
     "not_tracked": 0,
-    "provider_or_real_world_gated": 11,
-    "external_boundaries": 11,
+    "provider_or_real_world_gated": 12,
+    "external_boundaries": 12,
     "p0_not_built": [],
     "p1_not_built": []
   },
@@ -67,7 +67,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/ai-gate-audit/ai-gate-audit-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-28T22:49:53.058Z",
+      "receipt_generated_at": "2026-06-01T13:09:03.936Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.open_gaps",
       "blocking_gaps": [],
@@ -111,7 +111,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-28T06:13:20.050Z",
+      "receipt_generated_at": "2026-05-31T20:19:04.411Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.open_gaps",
       "blocking_gaps": [],
@@ -133,7 +133,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/founder-command-identity-spine/founder-command-identity-spine-live-http-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-30T05:03:26.774Z",
+      "receipt_generated_at": "2026-05-31T17:43:00.465Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.open_gaps",
       "blocking_gaps": [],
@@ -308,8 +308,8 @@
     {
       "id": "per-app-operating-proof-matrix",
       "priority": "P0",
-      "surface": "Whole 0S mounted app behavior matrix",
-      "claimed_truth": "green",
+      "surface": "Whole 0S mounted app route/family behavior matrix",
+      "claimed_truth": "partial",
       "computed_truth": "built",
       "gap_class": "none",
       "declared_gap_type": "none",
@@ -317,7 +317,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-31T02:36:06.748Z",
+      "receipt_generated_at": "2026-06-02T23:36:10.545Z",
       "evidence_receipts": [],
       "blocking_gap_source": "workflow.blocking_gaps",
       "blocking_gaps": [],
@@ -325,6 +325,28 @@
       "open_gaps": [],
       "next_step": "Keep proof fresh and re-run when the lane changes.",
       "next_build_step": "Keep operating-depth receipts fresh when mounted surfaces change.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html"
+    },
+    {
+      "id": "app-specific-human-deep-closure",
+      "priority": "P0",
+      "surface": "Every mounted 0S app and platform surface human-level behavior proof",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:app-deep-closure",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-app-deep-closure/0s-app-deep-closure-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-06-02T23:36:22.501Z",
+      "evidence_receipts": [],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Keep mounted-app control proof, app-specific scenarios, and deep-closure receipts fresh whenever any mounted surface changes.",
       "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html"
     },
     {
@@ -811,7 +833,7 @@
       "proof_exists": true,
       "receipt_path": "test-artifacts/valuation-deck-alignment/valuation-deck-alignment-latest.json",
       "receipt_ok": true,
-      "receipt_generated_at": "2026-05-29T16:29:27.464Z",
+      "receipt_generated_at": "2026-06-01T15:48:01.795Z",
       "evidence_receipts": [
         {
           "id": "valuation-deck-alignment-status",
@@ -829,6 +851,37 @@
       "next_step": "Keep proof fresh and re-run when the lane changes.",
       "next_build_step": "Regenerate valuation claims whenever the operating matrix, truth ledger, Worker deploy version, or live capability watch changes.",
       "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/site-valuation.html"
+    },
+    {
+      "id": "shared-experience-tour-celebration-layer",
+      "priority": "P1",
+      "surface": "Shared walkthrough, tour, celebration, and UI-only state layer",
+      "claimed_truth": "green",
+      "computed_truth": "built",
+      "gap_class": "none",
+      "declared_gap_type": "none",
+      "proof_command": "npm run 0s:shared-experience-proof",
+      "proof_exists": true,
+      "receipt_path": "test-artifacts/0s-shared-experience-layer/0s-shared-experience-layer-latest.json",
+      "receipt_ok": true,
+      "receipt_generated_at": "2026-06-02T23:35:53.221Z",
+      "evidence_receipts": [
+        {
+          "id": "0s-shared-experience-layer-proof",
+          "path": "test-artifacts/0s-shared-experience-layer/0s-shared-experience-layer-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "blocking_gap_source": "workflow.blocking_gaps",
+      "blocking_gaps": [],
+      "external_boundaries": [
+        "User-visible browser playback of tours and celebration animations remains owner-handled under the no-browser-proof policy."
+      ],
+      "open_gaps": [],
+      "next_step": "Keep proof fresh and re-run when the lane changes.",
+      "next_build_step": "Keep tour registry entries, receipt events, and celebration triggers fresh whenever React or static user surfaces add onboarding, walkthrough, thank-you, or achievement behavior.",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/"
     }
   ]
 }

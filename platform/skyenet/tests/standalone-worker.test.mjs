@@ -116,6 +116,9 @@ test('standalone SkyeNet console exposes full package publisher controls', async
   assert.match(html, /Customer export/);
   assert.match(html, /id="exportForm"/);
   assert.match(html, /Export customer data/);
+  assert.match(html, /Functions and env grants/);
+  assert.match(html, /id="functionFilterForm"/);
+  assert.match(html, /id="rollbackResult"/);
 });
 
 test('standalone SkyeNet serves approved public support profile', async () => {
@@ -234,19 +237,25 @@ test('standalone SkyeNet env and private source APIs map to FS27', async () => {
     [5, '/api/skyenet/source-file?workspace_id=demo&project_id=demo&deployment_id=dep_1&path=package.json', '/deploy/source-file'],
     [6, '/api/skyenet/source-search?workspace_id=demo&project_id=demo&deployment_id=dep_1&q=handler', '/deploy/source-search'],
     [7, '/api/skyenet/source-archive?workspace_id=demo&project_id=demo&deployment_id=dep_1&filename=source.tar.zst', '/deploy/source-archive'],
-    [8, '/api/skyenet/source-archive-link', '/deploy/source-archive-link']
+    [8, '/api/skyenet/source-archive-link', '/deploy/source-archive-link'],
+    [9, '/api/skyenet/functions-status?workspace_id=demo&project_id=demo&deployment_id=dep_1', '/deploy/functions-status'],
+    [10, '/api/skyenet/rollback', '/deploy/rollback']
   ]) {
     const response = await worker.fetch(req(path, {
       method: expected === '/deploy/source-archive'
         ? 'PUT'
         : expected === '/deploy/source-archive-link'
           ? 'POST'
+          : expected === '/deploy/rollback'
+            ? 'POST'
           : 'GET',
       headers: { authorization: 'Bearer gate-token' },
       body: expected === '/deploy/source-archive'
         ? 'archive'
         : expected === '/deploy/source-archive-link'
           ? JSON.stringify({ workspace_id: 'demo', project_id: 'demo', deployment_id: 'dep_1', key: 'source.tar.zst' })
+          : expected === '/deploy/rollback'
+            ? JSON.stringify({ workspace_id: 'demo', project_id: 'demo', deployment_id: 'dep_1', route_key: 'route:v1:test' })
           : undefined
     }), e);
     assert.equal(response.status, 200);

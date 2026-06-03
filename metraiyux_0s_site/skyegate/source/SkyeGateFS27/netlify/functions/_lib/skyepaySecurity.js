@@ -104,6 +104,10 @@ function skyeVaultAgentProvisioningActive(status = "") {
   return ["workspace_unlocked", "auto_unlock_pending", "ready_to_unlock"].includes(String(status || "").toLowerCase());
 }
 
+function orderPaymentActive(status = "") {
+  return ["paid", "complete", "no_payment_required", "active", "trialing"].includes(String(status || "").toLowerCase());
+}
+
 function safeRepoEnv(repoEnv = {}) {
   const allowed = [
     "SKYEVAULT_DROP_URL",
@@ -119,6 +123,183 @@ function safeRepoEnv(repoEnv = {}) {
     if (value) out[key] = value;
   }
   return out;
+}
+
+function objectOrNull(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : null;
+}
+
+function cleanPublicText(value, max = 220) {
+  return String(value || "").trim().slice(0, max) || null;
+}
+
+function normalizePublicEmail(value) {
+  const email = String(value || "").trim().toLowerCase().slice(0, 254);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+}
+
+function orderMetadata(row) {
+  const metadata = objectOrNull(row?.metadata) || {};
+  const nested = objectOrNull(metadata.metadata) || {};
+  return { ...nested, ...metadata };
+}
+
+function skyemailMailboxOffer(row, metadata) {
+  const offer = objectOrNull(row?.offer_snapshot) || {};
+  const policy = objectOrNull(offer.gate_policy) || {};
+  return Boolean(policy.skyemail_mailbox)
+    || String(metadata?.skyemail_mailbox || "").toLowerCase() === "true"
+    || ["skyemail-starter-mailbox", "skyemail-business-mailbox", "skyemail-operator-mailbox"].includes(String(row?.offer_id || ""));
+}
+
+function fulfillmentText(value, max = 360) {
+  return cleanPublicText(value, max) || "";
+}
+
+function activationRequiresOperatorReview(offer = {}) {
+  const activationPath = String(offer.activation_path || "").toLowerCase();
+  return offer.owner_approval_required === true
+    || activationPath.includes("owner_approved")
+    || activationPath.includes("pending_owner")
+    || activationPath.includes("pending_capacity")
+    || activationPath.includes("triage")
+    || activationPath.includes("scope");
+}
+
+function skyemailMailboxOfferFromOffer(offer = {}) {
+  return Boolean(skyemailMailboxPolicyFromOffer(offer))
+    || ["skyemail-starter-mailbox", "skyemail-business-mailbox", "skyemail-operator-mailbox"].includes(String(offer.id || ""));
+}
+
+function skyemailMailboxPolicyFromOffer(offer = {}) {
+  const policy = objectOrNull(offer.gate_policy) || {};
+  return objectOrNull(policy.skyemail_mailbox);
+}
+
+function skyemailMailboxAutoProvisionEnabled(offer = {}) {
+  const policy = skyemailMailboxPolicyFromOffer(offer);
+  return Boolean(policy)
+    && policy.enabled_after_skyepay !== false
+    && !activationRequiresOperatorReview(offer);
+}
+
+export function skyePayCustomerFulfillment(offer = {}, row = null) {
+  const offerId = String(row?.offer_id || offer.id || "").trim();
+  const activationPath = cleanPublicText(offer.activation_path || row?.offer?.activation_path, 160);
+  const paymentStatus = String(row?.payment_status || "").toLowerCase();
+  const approvalStatus = String(row?.approval_status || row?.owner_status || "").toLowerCase();
+  const provisioningStatus = String(row?.provisioning_status || "").toLowerCase();
+  const paymentActive = row ? orderPaymentActive(paymentStatus) : false;
+  const operatorReview = activationRequiresOperatorReview(offer);
+  const supportEmail = "SkyesOverLondonLC@solenterprises.org";
+
+  let type = "operator_review";
+  let activationLabel = "SkyePay records payment, then the SkyePay operator reviews and activates the order.";
+  let customerNextStep = "After checkout, keep the SkyePay return page open. Your order status will show payment state, activation state, and the next action.";
+  let deliverySurface = "SkyePay order status";
+  let selfServeAfterPayment = false;
+
+  if (skyemailMailboxOfferFromOffer(offer)) {
+    type = "skyemail_mailbox";
+    if (skyemailMailboxAutoProvisionEnabled(offer)) {
+      activationLabel = "SkyePay-confirmed payment provisions the requested SkyeMail mailbox through the SkyeMail account lane.";
+      customerNextStep = "Choose the mailbox address during checkout. After payment confirms, SkyePay shows the SkyeMail mailbox and readiness state.";
+      deliverySurface = "SkyeMail mailbox status";
+      selfServeAfterPayment = true;
+    } else {
+      activationLabel = "SkyePay records the paid SkyeMail mailbox request, then the SkyePay operator verifies SkyeMail capacity before mailbox activation.";
+      customerNextStep = "Choose the requested mailbox address during checkout. Payment records the request; mailbox use begins only after SkyeMail capacity is confirmed and the activation state is updated.";
+      deliverySurface = "SkyeMail capacity approval status";
+      selfServeAfterPayment = false;
+    }
+  } else if (String(offer.family || "").toLowerCase() === "skyevault" || offerId.startsWith("skyevault-")) {
+    type = "skyevault_agent";
+    activationLabel = "SkyePay-confirmed payment unlocks the gated SkyeVault agent delivery lane tied to this order.";
+    customerNextStep = "After payment confirms, return to the SkyePay status page to unlock the SkyeVault install lane and order-scoped access details.";
+    deliverySurface = "SkyeVault agent install center";
+    selfServeAfterPayment = true;
+  } else if (String(offer.family || "").toLowerCase() === "skyecommerce" || activationPath === "skyecommerce_order_payment_confirmed") {
+    type = "skyecommerce_order";
+    activationLabel = "Payment confirms the merchant order and writes the SkyeCommerce receivable ledger.";
+    customerNextStep = "After payment confirms, the merchant order ledger receives the paid status and the storefront can continue fulfillment.";
+    deliverySurface = "SkyeCommerce order ledger";
+    selfServeAfterPayment = true;
+  } else if (String(offer.family || "").toLowerCase() === "sovereigndocs" || activationPath?.includes("legal_review")) {
+    type = "operator_triage";
+    activationLabel = "Payment creates a review packet for operator triage. It does not promise legal outcome, attorney acceptance, or partner approval.";
+    customerNextStep = "After checkout, SkyePay records the packet and routes it for controlled operator triage before any partner handoff.";
+    deliverySurface = "SovereignDocs review packet";
+  } else if (!operatorReview) {
+    type = "paid_access";
+    activationLabel = "SkyePay-confirmed payment activates the paid access lane for this offer.";
+    customerNextStep = "After payment confirms, SkyePay records the paid state and exposes the order-specific access or delivery lane.";
+    deliverySurface = "SkyePay paid access status";
+    selfServeAfterPayment = true;
+  }
+
+  let accessState = row ? "waiting_for_payment" : "pre_checkout";
+  if (row) {
+    if (paymentActive && (provisioningStatus.includes("failed") || approvalStatus.includes("failed"))) {
+      accessState = "needs_operator_attention";
+      customerNextStep = "Payment is recorded, but fulfillment needs SkyePay operator attention. Keep the order status and contact support with the order id.";
+    } else if (paymentActive && (provisioningStatus.includes("unlocked") || provisioningStatus.includes("provisioned") || approvalStatus === "approved")) {
+      accessState = "available_or_approved";
+    } else if (paymentActive && operatorReview) {
+      accessState = "paid_pending_operator_review";
+      customerNextStep = "Payment is recorded. The SkyePay operator must review and activate this scoped order before customer-facing delivery continues.";
+    } else if (paymentActive) {
+      accessState = "paid_processing";
+    }
+  }
+
+  return {
+    type,
+    activation_path: activationPath,
+    activation_label: fulfillmentText(activationLabel),
+    owner_review_required: operatorReview,
+    self_serve_after_payment: selfServeAfterPayment,
+    access_state: accessState,
+    delivery_surface: fulfillmentText(deliverySurface, 180),
+    customer_next_step: fulfillmentText(customerNextStep),
+    support_email: supportEmail,
+    support_note: "Use the SkyePay order id when contacting support so the paid ledger and activation record can be located."
+  };
+}
+
+function safeSkyeMailMailboxForOrder(row) {
+  if (!row) return null;
+  const metadata = orderMetadata(row);
+  const provisioning = objectOrNull(metadata.skyemail_provisioning) || {};
+  const error = objectOrNull(metadata.skyemail_provisioning_error) || {};
+  const mailboxEmail = normalizePublicEmail(
+    provisioning.mailbox_email
+      || metadata.skyemail_mailbox_email
+      || metadata.mailbox_email
+      || metadata.skyemail
+  );
+  const [emailLocal = "", emailDomain = ""] = mailboxEmail ? mailboxEmail.split("@") : [];
+  const localPart = cleanPublicText(metadata.skyemail_mailbox_local_part || metadata.mailbox_local_part || emailLocal, 80);
+  const domain = cleanPublicText(metadata.skyemail_mailbox_domain || metadata.mailbox_domain || emailDomain, 120);
+  const isMailbox = skyemailMailboxOffer(row, metadata) || Boolean(mailboxEmail || provisioning.mailbox_id || error.message);
+  if (!isMailbox) return null;
+  return {
+    type: "skyemail-mailbox",
+    mailbox_email: mailboxEmail,
+    local_part: localPart,
+    domain,
+    mailbox_id: cleanPublicText(provisioning.mailbox_id, 140),
+    mailbox_status: cleanPublicText(provisioning.provisioning_status, 120),
+    provisioning_status: cleanPublicText(row.provisioning_status, 120),
+    inbox_ready: provisioning.inbox_ready === true,
+    key_state_active: provisioning.key_state_active === true,
+    needs_customer_mailbox_claim: provisioning.needs_customer_mailbox_claim === true || row.provisioning_status === "skyemail_mailbox_claim_required",
+    claim_reason: cleanPublicText(provisioning.claim_reason, 120),
+    error: error.message ? {
+      message: cleanPublicText(error.message, 280),
+      status: cleanPublicText(error.status, 40)
+    } : null,
+    provisioned_at: cleanPublicText(provisioning.provisioned_at || row.provisioned_at, 80)
+  };
 }
 
 export function skyeVaultAgentDeliveryForOrder(row, { includeSecrets = false } = {}) {
@@ -149,7 +330,7 @@ export function skyeVaultAgentDeliveryForOrder(row, { includeSecrets = false } =
 export function publicSkyePayOrder(row, options = {}) {
   if (!row) return null;
   const offer = row.offer_snapshot && typeof row.offer_snapshot === "object" ? row.offer_snapshot : {};
-  const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+  const metadata = orderMetadata(row);
   const skyemerit = metadata.skyemerit_code ? {
     applied: String(metadata.skyemerit_applied || "").toLowerCase() === "true",
     code: metadata.skyemerit_code || null,
@@ -174,6 +355,7 @@ export function publicSkyePayOrder(row, options = {}) {
       currency: row.currency || offer.currency || "usd",
       activation_path: offer.activation_path || null
     },
+    fulfillment: skyePayCustomerFulfillment(offer, row),
     checkout_mode: row.checkout_mode,
     payment_status: row.payment_status,
     approval_status: row.approval_status,
@@ -185,6 +367,7 @@ export function publicSkyePayOrder(row, options = {}) {
     approved_at: row.approved_at,
     provisioned_at: row.provisioned_at,
     agent_delivery: skyeVaultAgentDeliveryForOrder(row, { includeSecrets: options.includeVaultAgentSecrets === true }),
+    skyemail_mailbox: safeSkyeMailMailboxForOrder(row),
     created_at: row.created_at,
     updated_at: row.updated_at
   };

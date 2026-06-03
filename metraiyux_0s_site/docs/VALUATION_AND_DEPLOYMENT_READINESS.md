@@ -1,6 +1,6 @@
 # Site Valuation and Deployment Readiness
 
-Updated: 2026-05-29 after the full-repo Codex valuation audit, proof receipt index, SkyeCrawler static crawl, SkyWay route-atlas regeneration, smoke/stress/e2e remediation reruns, SkyeCommerce/Music Nexus integration, the Founder Command PWA Drop Factory live proof, the Gray Gang six-song storefront/PWA packaging proof, the Reflection project/storefront UX repair proof, the production MusicNexus SkyPay receivable/split/disbursement proof, the owner-admin browser-proof disabled policy, and the green 0S operating proof matrix closeout.
+Updated: 2026-06-01 after the SkyeMail money-lane pass, SkyePay buyer-fulfillment truth proof, Relay13 AI sales-registry closure, Stripe catalog parity rerun, SaaS customer thank-you telemetry proof, SkyeMail/0S integration smoke, and the prior May 29 full-repo valuation/proof alignment.
 
 ## Browser-Proof Policy
 
@@ -13,6 +13,41 @@ Policy anchors:
 - `.agents/live-browser-verifier/browser-proof-policy.toml`
 - `tools/browser-proof-disabled.mjs`
 - `npm run proof:live-browser` returns a no-browser receipt.
+
+## 2026-06-01 SkyeMail, SkyePay, And Customer-Access Valuation Addendum
+
+The valuation posture is stronger on sellability and buyer-readiness after the June 1 SkyeMail/SkyePay pass. This addendum does not create ARR, revenue multiples, or a formal appraisal. It adds evidence that more of the platform can be sold without confusing a customer about what they bought, how they access it, or which 0S surfaces it opens.
+
+New valuation signal:
+
+- SkyeMail is now consistently framed as `SkyeMail backed by Citadel Database and SkyeNet`, with stale `SkyeMail Citadel`, `SkyeMail Vault`, Cloudflare-backed, and Neon-backed buyer copy removed from touched customer surfaces.
+- SkyeMail is no longer just an inbox shell in the proof model. The June 1 human-production smoke covers mailbox auth, selected mailbox binding, self-send with image attachment, sync/read/search, attachment fetch, thread open, star/unstar, trash/restore, drafts, game ledger, paid Brain automation, SkyePay checkout, calendar, SkyeDocxMax, SovereignDocs, CRM/AE Flow, SkyeCommerce, PWA Factory, and telemetry.
+- SaaS customer data now has receipt-backed thank-you and celebration rows rather than static gratitude copy. This matters for retention and product feel because customer usage, signup, SkyePay handoff, and SkyeMerit activity can become visible customer appreciation and gamified progress.
+- The SkyePay catalog/money lane now has a specific buyer-fulfillment truth proof across all live public offers. It verifies fulfillment type, activation path, activation label, delivery surface, customer next step, support copy, line items, self-serve/operator-review consistency, banned provider/demo language, and SkyeMail mailbox auto-provision rules.
+- Stripe catalog parity and live catalog checkout proof were rerun against the same current public offer catalog, reducing the risk that buyer-facing products exist in SkyePay but not in the Stripe-backed pricing lane.
+- The follow-up sales-registry proof found and closed a concrete monetization gap: the approved Relay13 AI response plans now exist in the source SkyePay catalog and Stripe parity lane instead of living only as sales-registry records.
+- The current public catalog, source catalog, and Stripe parity state is now aligned: `153` SkyePay offers are live, `173` Stripe prices passed parity, `153/153` live checkout checks passed, and `12/12` self-serve offer checks passed after the FS27 redeploy.
+
+Proof:
+
+- `test-artifacts/skyemail-human-production-smoke/2026-06-01T09-45-43-489Z/receipt.json` - `61/61` live non-browser checks, selected mailbox `darthom-intelligence@solenterprises.org`, provisioned mailbox count `28`.
+- `test-artifacts/skyemail-live-production-stress-latest.json` - live SkyeMail production stress, `120/120` OK in the final pass.
+- `test-artifacts/skyemail-cloudflare-route-compat-latest.json` - route compatibility and legacy URL proof.
+- `test-artifacts/skyemail-saas-live-nonbrowser/branding-thanks-integrations-latest.json` - SkyeMail branding, suite redirects, CRM bridge, game ledger, authenticated SaaS customer-data mount, and visual-kit thank-you event checks.
+- `test-artifacts/saas-live-customer-thanks/saas-live-customer-thanks-latest.json` - live signup/workspace/action-event/customer-visual proof with `3` customer thank-you rows, `Thank-yous` KPI, `6` route rows, and `4` flow rows.
+- `test-artifacts/skyepay-readiness/skyepay-buyer-fulfillment-truth-latest.json` - `153` live public SkyePay offers, `0` failures; fulfillment split: `140` operator review, `5` paid access, `1` operator triage, `3` SkyeMail mailbox, `4` SkyeVault Agent.
+- `test-artifacts/skyepay-readiness/skyepay-customer-readiness-latest.json` - `153` public offers, `0` failures.
+- `test-artifacts/skyepay-live-nonbrowser/skyepay-live-catalog-checkout-latest.json` - `153/153` live catalog checkout checks, `0` failures.
+- `test-artifacts/skyepay-live-nonbrowser/skyepay-self-serve-live-access-latest.json` - `12/12` self-serve live access checks, `0` failures.
+- `test-artifacts/skyepay-live-nonbrowser/skyepay-live-public-contract-latest.json` - public customer surfaces and offer contract proof, banned provider/demo language absent.
+- `test-artifacts/skyepay-readiness/skyepay-sales-registry-money-lane-latest.json` - source catalog/sales-registry proof, `153` source SkyePay offers, `41` approved fixed-price sales offers checked, `12` direct-money platform mappings checked, `0` failures.
+- `test-artifacts/stripe-sync/skyepay-full-catalog-parity-latest.json` - Stripe catalog parity, `173` inspected prices, `0` failed prices.
+
+Valuation impact:
+
+- The master engineering replacement bands remain unchanged until revenue, retention, margins, and customer usage history exist. The current master range still treats zero ARR as a real discount.
+- Commercial readiness improved because SkyeMail now behaves more like a complete buyer-facing acquisition lane: email account, 0S workspace discovery, AI upsell path, SkyePay checkout, customer thanks/telemetry, and post-payment fulfillment proof.
+- Diligence quality improved because the platform now has separate proof receipts whose entire job is to catch paid products that would leave a customer unclear, blocked, missing from Stripe, or disconnected from the approved sales registry.
 
 ## 2026-05-29 Operating Proof Alignment
 

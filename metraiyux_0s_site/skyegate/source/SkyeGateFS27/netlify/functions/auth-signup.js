@@ -49,7 +49,7 @@ export default wrap(async (req) => {
     user,
     customerId: customer.id,
     scope: ["openid", "profile", "email", "offline_access", "gateway.read", "keys.read", "billing.read"],
-    title: "SkyeGateFS27 primary session",
+    title: "SkyeGate FS27 primary session",
     meta: { flow: "signup" },
     issuer
   });

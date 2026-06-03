@@ -5,7 +5,7 @@ const { requireFs27 } = require("./_skygate");
 /*
   Admin recovery export:
   - ONLY returns the stored admin-encrypted private key blob if recovery_enabled=true.
-  - Requires a shared FS27/SkyGate admin/operator session.
+  - Requires a shared SkyeGate FS27 admin/operator session.
   - This endpoint does NOT decrypt anything server-side.
   - Admin can decrypt the blob offline with the owner-held recovery private key.
 */

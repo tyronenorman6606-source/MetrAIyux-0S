@@ -2,7 +2,7 @@
 
 Updated: 2026-05-17
 
-SkyePay is the payment app inside SkyeGateFS27. It is not a separate card processor. Stripe handles Checkout, card data, subscriptions, trials, and receipts. FS27 owns the client route, public store catalog, approved offer metadata, webhook ledger, rate/vault policy, and owner approval before a workspace unlocks.
+SkyePay is the payment app inside SkyeGateFS27. It owns the public checkout route, public store catalog, approved offer metadata, webhook ledger, rate/vault policy, and owner approval before a workspace unlocks. Private payment processor details stay inside operator/runtime proofs, not customer-facing copy.
 
 ## Public Flow
 
@@ -10,12 +10,12 @@ SkyePay is the payment app inside SkyeGateFS27. It is not a separate card proces
 2. The preview routes them to `skyepay.html?client=<client-slug>`.
 3. SkyePay loads the client and approved offers from `/.netlify/functions/skyepay-offers`.
 4. The client submits name, email, company, and selected offer.
-5. `/.netlify/functions/skyepay-checkout` creates a Stripe Checkout Session. Subscription trial sessions send recurring line items only, set `trial_period_days`, and keep setup/onboarding as deferred owner-approved work so Checkout is $0 today.
-6. Stripe returns to `skyepay.html?status=success&session_id=...`.
+5. `/.netlify/functions/skyepay-checkout` creates a secure checkout session. Subscription trial sessions send recurring line items only, set `trial_period_days`, and keep setup/onboarding as deferred owner-approved work so Checkout is $0 today.
+6. SkyePay returns to `skyepay.html?status=success&session_id=...`.
 7. The webhook writes or updates `skyepay_orders`.
 8. Standard app/service orders sit at `paid_pending_owner_approval`.
 9. The owner approves standard app/service orders in `skyepay-admin.html`.
-10. SkyeVault subscription offers auto-provision a scoped vault workspace through SkyeVault-Drop after Stripe confirms payment.
+10. SkyeVault subscription offers auto-provision a scoped vault workspace through SkyeVault-Drop after payment confirms.
 
 ## API Flow
 
@@ -33,16 +33,16 @@ Public app endpoints:
 - `POST /skyepay/checkout`
 - `GET /skyepay/status?session_id={CHECKOUT_SESSION_ID}`
 
-## Repo Stripe Catalog
+## SkyePay Catalog Integrity
 
-SkyePay now imports checkout-safe products from `metraiyux_0s_site/brain/sales-offer-registry.json`, the machine-readable partner to the root `STRIPE_PRODUCT_PRICE_CATALOG.md`.
+SkyePay now imports checkout-safe products from `metraiyux_0s_site/brain/sales-offer-registry.json`, the machine-readable partner to the owner payment catalog.
 
 - Imported into SkyePay: 50 fixed-price `approved` or `approved_floor` offers from MetrAIyux-adjacent repo surfaces, SkyeGate, kAIxU, Lane Vault, SkyeCorp, SBCC, and SOL Staffing.
 - Already bundled manually: the five core MetrAIyux 0S app plans and the managed SkyeGateFS27 control-plane offer.
 - Left out of instant checkout by design: `quote_only`, `do_not_create`, `approved_metered`, and `one_time_variable`.
-- Checkout prefers existing Stripe Price lookup keys when they exist in the connected Stripe account. If a lookup key is not present yet, SkyePay falls back to Stripe Checkout `price_data` with the same repo metadata so checkout still works.
-- 2026-05-17 live Stripe sync moved the 0S lookup keys to the current Starter, Growth, RouteX, Autonomous, and Enterprise amounts; receipt: `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`.
-- `GET /skyepay/offers` returns `repo_stripe_catalog` with the source, imported checkout count, rule, and excluded instant-checkout categories.
+- Checkout prefers existing price lookup keys when they exist in the connected payment account. If a lookup key is not present yet, SkyePay falls back to metadata-preserving `price_data` so checkout still works.
+- 2026-05-17 live payment sync moved the 0S lookup keys to the current Starter, Growth, RouteX, Autonomous, and Enterprise amounts; receipt: `test-artifacts/stripe-sync/metraiyux-stripe-sync-receipt.json`.
+- `GET /skyepay/offers` returns `catalog_integrity` with the source, imported checkout count, rule, and excluded instant-checkout categories.
 
 Example checkout request:
 
@@ -61,13 +61,13 @@ Example checkout request:
 
 - `checkout_created`: Checkout Session exists, but payment completion has not been confirmed.
 - `demo_pending_owner_approval`: Local proof mode showed the owner-approval hold without charging a card.
-- `payment_pending`: Stripe has not confirmed a delayed payment yet.
-- `payment_failed`: Stripe reported delayed payment failure.
-- `paid_pending_owner_approval`: Stripe completed the session and FS27 is waiting for owner approval.
+- `payment_pending`: SkyePay has not confirmed a delayed payment yet.
+- `payment_failed`: SkyePay reported delayed payment failure.
+- `paid_pending_owner_approval`: SkyePay completed the session and FS27 is waiting for owner approval.
 - `approved`: Owner approved the closeout.
 - `ready_to_unlock`: Approved and ready for workspace activation.
 - `workspace_unlocked`: Owner marked the workspace active/unlocked.
-- `vault_provisioning_failed`: Stripe paid, but the SkyeVault-Drop provisioning endpoint rejected or failed the workspace setup.
+- `vault_provisioning_failed`: Payment was confirmed, but the SkyeVault-Drop provisioning endpoint rejected or failed the workspace setup.
 - `vault_suspended`: A subscription event suspended the provisioned vault workspace.
 - `void`: Owner voided the closeout.
 

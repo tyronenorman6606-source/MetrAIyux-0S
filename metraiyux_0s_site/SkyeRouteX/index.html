@@ -6,6 +6,7 @@
   <meta name="description" content="SkyeRouteX Logistics company lane for dispatch, route-heavy work, contractor assignment, proof, and 0S-owned workforce operations." />
   <title>SkyeRouteX Logistics | Dispatch, Route Work, Proof, and Workforce Command</title>
   <link rel="icon" href="./workforce-command-v0.4.0/assets/platform-mark.svg" type="image/svg+xml" />
+  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script src="/Free99/free99-gate.js" data-platform-id="skyeroutex" data-platform-name="SkyeRouteX Logistics" data-billing-mode="gate_owned" data-price-label="0S shared FS27/SkyGate owner session required" data-app-root="/SkyeRouteX/"></script>
   <style>
     :root{
@@ -187,7 +188,7 @@
     .notice{border-color:rgba(241,198,91,.32);background:rgba(241,198,91,.1)}
     .notice strong{color:var(--gold)}
     .link-list{display:grid;gap:10px}
-    .link-list a{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:12px}
+    .link-list a,.link-list .endpoint-row{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);padding:12px}
     .link-list span{color:var(--muted);font-size:12px;overflow-wrap:anywhere}
     .status-pill{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(88,216,138,.3);background:rgba(88,216,138,.1);color:#dfffea;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:800}
     .footer{border-top:1px solid var(--line);padding:28px 0 42px;color:var(--muted);font-size:13px}
@@ -215,7 +216,7 @@
         <span><strong>SkyeRouteX Logistics</strong><span>Dispatch, route work, proof, and workforce command</span></span>
       </a>
       <div class="nav-links">
-        <a href="/skyenet/skyeroutex-logistics/">Public Site</a>
+        <a href="https://skyenet.skyeroutex-logistics/">Public Site</a>
         <a href="#apps">Apps</a>
         <a href="#route-stack">Route Stack</a>
         <a href="#owner-inventory">Inventory</a>
@@ -233,7 +234,7 @@
         <h1 class="neon-gradient-text">SkyeRouteX Logistics</h1>
         <p>This gated page is the owner/operator doorway for SkyeRouteX apps, dispatch records, route-heavy work, contractor assignment, provider jobs, proof, payment state, and owner-controlled operations. The public company website now lives as a SkyeNet deployment, while this cockpit stays under the shared FS27/SkyGate/Free99 gate.</p>
         <div class="actions">
-          <a class="button gold" href="/skyenet/skyeroutex-logistics/">Open Public Company Site</a>
+          <a class="button gold" href="https://skyenet.skyeroutex-logistics/">Open Public Company Site</a>
           <a class="button primary" href="./workforce-command-v0.4.0/index.html">Open Workforce Command</a>
           <a class="button" href="./workforce-command-v0.4.0/index.html#provider-panel">Provider Jobs</a>
           <a class="button" href="./workforce-command-v0.4.0/index.html#contractor-panel">Contractor Dispatch</a>
@@ -338,8 +339,8 @@
         <div class="link-list">
           <a href="/founder-command/client-credentials/skyeroutex-logistics.json"><strong>Founder credential JSON</strong><span>/founder-command/client-credentials/skyeroutex-logistics.json</span></a>
           <a href="/docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md"><strong>Operating map</strong><span>/docs/SKYEROUTEX_LOGISTICS_OPERATING_MAP_2026-05-27.md</span></a>
-          <a href="/skyenet/skyeroutex-logistics/"><strong>Public company site</strong><span>/skyenet/skyeroutex-logistics/</span></a>
-          <a href="/api/skyeroutex/tour-token"><strong>Tour token endpoint</strong><span>POST /api/skyeroutex/tour-token</span></a>
+          <a href="https://skyenet.skyeroutex-logistics/"><strong>Public company site</strong><span>https://skyenet.skyeroutex-logistics/</span></a>
+          <div class="endpoint-row"><strong>Tour token endpoint</strong><span>POST /api/skyeroutex/tour-token, then GET /api/skyeroutex/tour-token/status with token</span></div>
           <a href="/founder-command/?view=clients"><strong>Founder Client Vault</strong><span>Open the company lane inside Founder Command</span></a>
           <a href="/proof/skyeroutex-expansion-receipt.html"><strong>Expansion receipt</strong><span>SkyeRouteX expansion proof surface</span></a>
           <a href="/SkyeRouteX/workforce-command-v0.4.0/proof/routex-ae-workforce-lane-latest.json"><strong>AE workforce lane receipt</strong><span>Latest RouteX AE/workforce lane receipt</span></a>

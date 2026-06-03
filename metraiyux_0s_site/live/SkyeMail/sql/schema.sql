@@ -1,4 +1,4 @@
--- SkyeMail Citadel schema (sovereign Postgres) — Full Gmail command center
+-- SkyeMail backed by Citadel Database and SkyeNet schema (sovereign Postgres) — Full Gmail command center
 -- Includes Gmail mailbox linkage, push-watch state, contacts sync, local prefs, and secure sovereign key tables.
 -- Keep SkyeMail isolated from existing platform tables in shared Citadel databases.
 
@@ -157,6 +157,24 @@ create table if not exists skymail.workflow_events (
 
 create index if not exists idx_workflow_events_user_created on skymail.workflow_events(user_id, created_at desc);
 create index if not exists idx_workflow_events_packet on skymail.workflow_events(user_id, packet_id, created_at desc);
+
+create table if not exists skymail.skyemail_telemetry_events (
+  id text primary key,
+  user_id uuid references skymail.users(id) on delete set null,
+  mailbox_email text,
+  actor_hash text,
+  route text not null,
+  method text not null,
+  status integer not null default 0,
+  ok boolean not null default false,
+  elapsed_ms integer not null default 0,
+  source text not null default 'worker-api',
+  metadata_json jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists skyemail_telemetry_user_created_idx on skymail.skyemail_telemetry_events(user_id, created_at desc);
+create index if not exists skyemail_telemetry_route_created_idx on skymail.skyemail_telemetry_events(route, created_at desc);
 
 create table if not exists skymail.attachments (
   id uuid primary key default gen_random_uuid(),

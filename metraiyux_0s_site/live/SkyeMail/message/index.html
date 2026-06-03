@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="assets/app.js"></script>
-  <script defer src="assets/mail-ui.js"></script>
-  <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Message — SkyeMail Citadel</title>
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <script defer src="/assets/os-bridge.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Message — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Message" data-page-hint="Single message surface">
 <div class="wrap">
@@ -24,7 +25,7 @@
             <div class="mail-from" id="metaTo"></div>
             <div class="mail-from" id="metaDate"></div>
           </div>
-          <div class="btnrow" style="margin-top:0"><a class="btn gold" id="replyBtn" href="#">Reply</a><a class="btn" id="threadBtn" href="#">Open Thread</a></div>
+          <div class="btnrow" style="margin-top:0"><a class="btn gold" id="replyBtn" aria-disabled="true" tabindex="-1">Reply</a><a class="btn" id="threadBtn" aria-disabled="true" tabindex="-1">Open Thread</a><button class="btn" id="docxBtn" type="button" disabled>SkyeDocxMax</button><a class="btn" id="workbenchBtn" href="workspace.html">0S Workbench</a></div>
         </div>
         <div class="mini" id="statusText">Waiting for message load…</div>
         <div id="messageContent"><div class="empty">Loading message…</div></div>
@@ -34,6 +35,6 @@
   </div>
   <div id="appFooter"></div>
 </div>
-<script defer src="assets/message-page.js"></script>
+<script defer src="/assets/message-page.js"></script>
 </body>
 </html>

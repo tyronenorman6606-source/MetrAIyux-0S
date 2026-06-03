@@ -318,7 +318,8 @@ function matrixLanes(matrix = {}) {
   return [];
 }
 
-function hasOkStress(data = {}) {
+function hasOkStress(data = {}, sourcePath = '') {
+  if (data.ok === true && /stress/i.test(String(sourcePath || ''))) return true;
   if (data.stress?.ok === true) return true;
   if (data.stress === true) return true;
   if (data.stressOk === true) return true;
@@ -660,7 +661,9 @@ function inferBehavior({ spec, lane, receipt, supportingReceipts, live, closeout
   const closeoutOk = Boolean(closeout?.command_bridge?.ok && closeout?.specific?.ok !== false);
   const specificCreated = closeout?.specific?.created === true;
   const specificRead = closeout?.specific?.read === true;
-  const stressOk = hasOkStress(receipt.data || {}) || supportingReceipts.some((item) => hasOkStress(item.data || {})) || closeoutStress?.ok === true;
+  const receiptStressOk = hasOkStress(receipt.data || {}, receipt.path || spec.receipt);
+  const supportingStressOk = supportingReceipts.some((item) => hasOkStress(item.data || {}, item.path || ''));
+  const stressOk = receiptStressOk || supportingStressOk || closeoutStress?.ok === true;
   const behavior = {
     create: workflowReceiptOk || primaryReceiptOk || supportingReceiptOk || specificCreated,
     read: receiptReadback && (workflowReceiptOk || liveReadOk || specificRead),
@@ -676,7 +679,7 @@ function inferBehavior({ spec, lane, receipt, supportingReceipts, live, closeout
       read: fieldEvidence(behavior.read, { receipt_readback: receiptReadback, live_http_read_ok: liveReadOk, specific_read: specificRead }),
       update_or_closeout: fieldEvidence(behavior.update_or_closeout, { workflow_receipt_ok: workflowReceiptOk, command_bridge_closeout_ok: Boolean(closeout?.command_bridge?.ok), specific_closeout_ok: closeout?.specific?.ok !== false }),
       receipt_readback: fieldEvidence(behavior.receipt_readback, { receipt_path: spec.receipt }),
-      stress: fieldEvidence(behavior.stress, { receipt_stress_ok: hasOkStress(receipt.data || {}), closeout_stress_ok: closeoutStress?.ok === true }),
+      stress: fieldEvidence(behavior.stress, { receipt_stress_ok: receiptStressOk || supportingStressOk, closeout_stress_ok: closeoutStress?.ok === true }),
       founder_command_visible: fieldEvidence(behavior.founder_command_visible, { command_bridge_entity_id: closeout?.command_bridge?.entity_id || '' })
     },
     live_http_read_ok: liveReadOk,

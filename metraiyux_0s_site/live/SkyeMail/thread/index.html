@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="assets/app.js"></script>
-  <script defer src="assets/mail-ui.js"></script>
-  <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Thread — SkyeMail Citadel</title>
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <script defer src="/assets/os-bridge.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Thread — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Thread View" data-page-hint="Conversation stack">
 <div class="wrap">
@@ -20,6 +21,7 @@
           <div class="badge">Conversation stack</div>
           <h1 class="h1" id="threadTitle">Loading thread…</h1>
           <p class="sub" id="threadMeta">Loading conversation metadata…</p>
+          <div class="btnrow"><button class="btn" id="threadDocxBtn" type="button">SkyeDocxMax</button><a class="btn" id="threadWorkbenchBtn" href="workspace.html">0S Workbench</a></div>
           <div class="mini" id="statusText">Waiting for thread load…</div>
         </section>
         <aside class="card">
@@ -36,6 +38,6 @@
   </div>
   <div id="appFooter"></div>
 </div>
-<script defer src="assets/thread-page.js"></script>
+<script defer src="/assets/thread-page.js"></script>
 </body>
 </html>

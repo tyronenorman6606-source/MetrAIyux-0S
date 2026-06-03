@@ -238,7 +238,7 @@ test('JobPing runs as a shared-gate paid runtime with checkout, entitlement, tri
   assert.equal(match.body.ok, true);
   assert.equal(match.body.paid_match, true);
   assert.ok(match.body.result.match_score >= 0);
-  assert.equal(match.body.provider_path, '0s-provider-runtime-openai-chat');
+  assert.equal(match.body.provider_path, 'fs27-gateway-chat');
   assert.equal(match.body.db_metered, true);
   assert.ok(match.body.receipt_id.startsWith('jobping_usage_'));
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyeVault Agent | SkyePay</title>
-  <meta name="description" content="Buy and install the SkyeVault repo custody agent through SkyePay, shared FS27 auth, encrypted baseline snapshots, additive deltas, and gated package delivery." />
+  <title>Reape0r | SkyePay</title>
+  <meta name="description" content="Buy and install Reape0r, the Autonomous Cloud Repo Mirror, through SkyePay, shared FS27 auth, one encrypted mutable current mirror, and gated package delivery." />
   <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html" />
   <link rel="stylesheet" href="assets/skyepay.css" />
   <style>
@@ -29,8 +29,8 @@
 
   <header class="pay-nav">
     <a class="pay-brand neon-magnetic" href="skyepay.html" aria-label="Back to SkyePay">
-      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
-      <span>SkyeVault Agent</span>
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGate FS27" />
+      <span>Reape0r</span>
     </a>
     <nav>
       <a href="#buy">Buy</a>
@@ -43,20 +43,20 @@
   <main class="store-shell" id="buy">
     <section class="store-hero">
       <div class="store-hero-copy">
-        <p class="eyebrow">Repo custody agent</p>
-        <h1><span class="neon-gradient-text text-effects">Sell the backup lane.</span> Deliver the actual installer.</h1>
-        <p class="lead">SkyeVault Agent is the paid repo-custody installer for client workspaces. It creates an encrypted full baseline, then sends encrypted changed-file deltas and tombstones so the buyer can recover a repo without depending on Codespaces, GitHub access, or one giant upload every ten minutes.</p>
+        <p class="eyebrow">Repo custody daemon</p>
+        <h1><span class="neon-gradient-text text-effects">Reape0r mirrors the repo.</span> Deliver the actual installer.</h1>
+        <p class="lead">Reape0r is the paid repo-custody installer for client workspaces. He keeps one encrypted mutable current mirror of the repo, then replaces changed encrypted objects inside that mirror so the buyer can recover the current codebase without depending on Codespaces or GitHub access.</p>
         <div class="agent-proof-grid" id="proof">
-          <article><b>Baseline</b><span>Encrypted literal repo snapshot, including dirty and untracked work when configured.</span></article>
-          <article><b>Delta</b><span>Additive encrypted changed-file packs after the baseline.</span></article>
+          <article><b>Current Mirror</b><span>Encrypted literal repo custody, including dirty and untracked work when configured.</span></article>
+          <article><b>Direct Updates</b><span>Changed encrypted objects update the same current mirror by path.</span></article>
           <article><b>Restore</b><span>Verify and restore commands are included in the package.</span></article>
-          <article><b>Auth</b><span>SkyePay provisions a workspace portal key; shared FS27/SkyGate bearer is optional for owner/admin lanes.</span></article>
+          <article><b>Auto-install</b><span>The $13 add-on runs the same installer non-interactively instead of creating a second auth lane.</span></article>
         </div>
       </div>
 
       <aside class="store-command-panel" aria-labelledby="checkoutTitle">
         <p class="eyebrow">SkyePay checkout</p>
-        <h2 id="checkoutTitle">Choose SkyeVault Pro</h2>
+        <h2 id="checkoutTitle">Choose Reape0r Pro</h2>
         <p id="checkoutSummary">Loading live SkyePay offer data.</p>
         <form id="agentCheckoutForm" class="pay-form compact-form">
           <label>
@@ -89,9 +89,9 @@
     <section class="store-band skypay-reveal">
       <div>
         <p class="eyebrow">Available lanes</p>
-        <h2>Starter, Pro, and Command are live SkyePay offers.</h2>
+        <h2>Starter, Pro, Command, and Auto-Install are live SkyePay offers.</h2>
       </div>
-      <p>The cards below load from `/skyepay/offers`, so prices and storage limits stay tied to the FS27 catalog instead of hardcoded copy.</p>
+      <p>The cards below load from `/skyepay/offers`, so prices, storage limits, and the $13 installer add-on stay tied to the FS27 catalog instead of hardcoded copy.</p>
     </section>
 
     <section class="agent-lane-grid" id="agentLaneGrid" aria-live="polite"></section>
@@ -101,22 +101,39 @@
         <p class="eyebrow">Installer contents</p>
         <h2>The package is a Node CLI, not a PDF promise.</h2>
       </div>
-      <p>It ships `doctor`, `init`, `snapshot`, `sync`, `watch`, `verify`, and `restore` commands. Owner/admin package download is gated by shared 0S auth; buyer download is gated by paid SkyePay session and workspace provisioning.</p>
+      <p>It ships `doctor`, `init`, `snapshot`, `sync`, `watch`, `verify`, and `restore` commands. Human terminal output shows receipt paths, restore kit paths, changed counts, upload state, and next commands. Owner/admin package download is gated by shared 0S auth; buyer download is gated by paid SkyePay session and workspace provisioning.</p>
     </section>
 
     <ul class="agent-command-list">
-      <li><b>Install</b><code>tar -xzf skyevault-agent-latest.tar.gz
+      <li><b>Manual install</b><code>tar -xzf skyevault-agent-latest.tar.gz
 cd skyevault-agent
 npm install --omit=dev
-node bin/skyevault-agent.mjs doctor --json</code></li>
+node bin/skyevault-agent.mjs doctor</code></li>
+      <li><b>Auto-install add-on</b><code>tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+SKYEVAULT_AGENT_AUTO_INSTALL=1 \
+SKYEVAULT_WORKSPACE_ID="$SKYEVAULT_WORKSPACE_ID" \
+SKYEVAULT_REPO_PATH="/path/to/repo" \
+SKYEVAULT_DROP_URL="$SKYEVAULT_DROP_URL" \
+SKYEVAULT_PORTAL_KEY="$SKYEVAULT_PORTAL_KEY" \
+SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;" \
+./install.sh</code></li>
       <li><b>Sync</b><code>node bin/skyevault-agent.mjs init --workspace="$SKYEVAULT_WORKSPACE_ID" --repo=/path/to/repo --vault-url="$SKYEVAULT_DROP_URL"
 export SKYEVAULT_PORTAL_KEY="&lt;workspace portal key from install center&gt;"
 export SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;"
-node bin/skyevault-agent.mjs sync --upload --json
+node bin/skyevault-agent.mjs sync --upload
 node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload</code></li>
-      <li><b>Recover</b><code>node bin/skyevault-agent.mjs verify --receipt=/path/to/full-or-delta-receipt.json --json
-node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delta-receipts=/path/to/delta-receipt.json --out=/tmp/restored-repo --json</code></li>
+      <li><b>Recover</b><code>node bin/skyevault-agent.mjs verify --receipt=/path/to/current-receipt.json
+node bin/skyevault-agent.mjs restore --receipt=/path/to/current-receipt.json --out=/tmp/restored-repo</code></li>
     </ul>
+
+    <section class="store-band skypay-reveal">
+      <div>
+        <p class="eyebrow">DevodeRator field guides</p>
+        <h2>Customer commands, daemon story, and the week-of-proof ledger are connected.</h2>
+      </div>
+      <p><a href="https://devooderator.pages.dev/blog/2026-06-02-reape0r-cli-install-guide" target="_blank" rel="noopener">CLI install guide</a> · <a href="https://devooderator.pages.dev/blog/2026-06-02-reape0r-demon-in-my-machine" target="_blank" rel="noopener">Demon in my Machine</a> · <a href="https://devooderator.pages.dev/blog/2026-06-02-0s-week-of-repairs-reape0r-proof" target="_blank" rel="noopener">Week of repairs</a></p>
+    </section>
   </main>
 
   <script>
@@ -158,17 +175,21 @@ node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delt
         const offer = selectedOffer();
         if (!offer) return;
         state.selectedOfferId = offer.id;
-        title.textContent = offer.title || 'SkyeVault Agent';
+        title.textContent = offer.title || 'Reape0r';
         summary.textContent = `${priceLine(offer)}. ${offer.description || ''}`;
         laneGrid.innerHTML = state.offers.map((item) => {
           const limits = item.rate_limits || {};
-          const storage = limits.vault_storage_mb ? `${Math.round(limits.vault_storage_mb / 1024)}GB vault` : 'vault limit';
-          const files = limits.vault_file_limit ? `${limits.vault_file_limit} files` : 'file limit';
-          const workspaces = limits.vault_workspace_limit ? `${limits.vault_workspace_limit} workspace${limits.vault_workspace_limit === 1 ? '' : 's'}` : 'workspace limit';
+          const detail = limits.vault_storage_mb
+            ? [
+                `${Math.round(limits.vault_storage_mb / 1024)}GB vault`,
+                `${limits.vault_file_limit} files`,
+                `${limits.vault_workspace_limit} workspace${limits.vault_workspace_limit === 1 ? '' : 's'}`
+              ]
+            : (Array.isArray(item.includes) && item.includes.length ? item.includes.slice(0, 3) : ['installer unlock']);
           return `<button type="button" class="agent-lane-card neon-magnetic" data-offer-id="${escapeHtml(item.id)}" aria-pressed="${item.id === state.selectedOfferId}">
             <b>${escapeHtml(item.title)}</b>
             <em>${escapeHtml(priceLine(item))}</em>
-            <span>${escapeHtml([storage, files, workspaces].join(' | '))}</span>
+            <span>${escapeHtml(detail.join(' | '))}</span>
           </button>`;
         }).join('');
         laneGrid.querySelectorAll('button').forEach((card) => {

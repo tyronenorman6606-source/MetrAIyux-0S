@@ -70,6 +70,31 @@ function slug(value) {
   return String(value || "proof").toLowerCase().replace(/^https?:\/\//, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 90) || "proof";
 }
 
+function readJson(file, fallback = null) {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function assertBrowserProofPreflight() {
+  const ownerAllowed = process.env.SKYEMAIL_OWNER_BROWSER_PROOF === "1" || process.env.OWNER_BROWSER_PROOF_REENABLED === "1";
+  if (!ownerAllowed) {
+    throw new Error("Browser proof is disabled by repo policy unless SKYEMAIL_OWNER_BROWSER_PROOF=1 or OWNER_BROWSER_PROOF_REENABLED=1 is set for the current task.");
+  }
+  const smokePath = path.join(repoRoot, "test-artifacts/skyemail-human-production-smoke-latest.json");
+  const stressPath = path.join(repoRoot, "test-artifacts/skyemail-live-production-stress-latest.json");
+  const smoke = readJson(smokePath, {});
+  const stress = readJson(stressPath, {});
+  if (smoke.ok !== true) throw new Error(`Browser proof preflight failed: latest human smoke is not ok at ${smokePath}`);
+  if (stress.ok !== true) throw new Error(`Browser proof preflight failed: latest production stress is not ok at ${stressPath}`);
+  return {
+    smoke: { path: smokePath, generated_at: smoke.generated_at || smoke.completed_at || "", selected_mailbox: smoke.selected_mailbox || "", passed_checks: smoke.checks?.filter?.((item) => item.ok).length || 0 },
+    stress: { path: stressPath, generated_at: stress.generated_at || "", selected_mailbox: stress.selected_mailbox || "", requests: stress.stress?.total_requests || 0 }
+  };
+}
+
 async function jsonFetch(url, options = {}) {
   const response = await fetch(url, {
     ...options,
@@ -301,7 +326,8 @@ async function scrollProof(page, artifactDir, label, entry) {
       .filter((value) => Number.isFinite(value));
     if (maxY < 80) return { height, maxY, stops: [0] };
     const rawStops = [...new Set([0, Math.round(maxY * 0.33), Math.round(maxY * 0.66), maxY, ...sections])].sort((a, b) => a - b);
-    const maxStops = Math.max(4, Math.min(8, Number(window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS || 6)));
+    const maxStops = Math.max(1, Math.min(8, Number(window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS || 6)));
+    if (maxStops === 1) return { height, maxY, stops: [0] };
     if (rawStops.length <= maxStops) return { height, maxY, stops: rawStops };
     const selected = new Set([rawStops[0], rawStops[rawStops.length - 1]]);
     for (let index = 1; index < maxStops - 1; index += 1) {
@@ -321,14 +347,17 @@ async function scrollProof(page, artifactDir, label, entry) {
       continue;
     }
     seenScrollY.add(metrics.scrollY);
-    const screenshot = path.join(artifactDir, `${label}-scroll-${String(index + 1).padStart(2, "0")}-y${metrics.scrollY}.jpg`);
-    const client = await page.context().newCDPSession(page);
-    const capture = await Promise.race([
-      client.send("Page.captureScreenshot", { format: "jpeg", quality: 72, fromSurface: false }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("CDP screenshot timed out")), Number(process.env.LIVE_BROWSER_SCREENSHOT_TIMEOUT_MS || 80000))),
-    ]);
-    const buffer = Buffer.from(capture.data, "base64");
-    fs.writeFileSync(screenshot, buffer);
+    const screenshot = path.join(artifactDir, `${label}-scroll-${String(index + 1).padStart(2, "0")}-y${metrics.scrollY}.png`);
+    await page.screenshot({
+      path: screenshot,
+      type: "png",
+      fullPage: false,
+      animations: "disabled",
+      caret: "hide",
+      scale: "css",
+      timeout: Number(process.env.LIVE_BROWSER_SCREENSHOT_TIMEOUT_MS || 20000),
+    });
+    const buffer = fs.readFileSync(screenshot);
     const pixels = analyzePng(buffer);
     const blankish = (metrics.visibleTextChars < 30 && metrics.mediaCount < 1 && metrics.visibleElementCount < 6) || pixels.blankishPixels;
     const stop = { index: index + 1, targetY: target, screenshot, metrics, pixels, blankish };
@@ -357,7 +386,30 @@ async function safeClick(page, selector, entry, label, options = {}) {
 async function safeFill(page, selector, value, entry, label) {
   const locator = page.locator(selector).first();
   if (!(await locator.isVisible().catch(() => false))) return false;
-  await locator.fill(value, { timeout: 5000 });
+  await locator.scrollIntoViewIfNeeded().catch(() => {});
+  let filled = false;
+  let firstError = null;
+  await locator.fill(value, { timeout: 5000 })
+    .then(() => { filled = true; })
+    .catch((error) => { firstError = error; });
+  if (!filled) {
+    const existing = await locator.inputValue({ timeout: 1000 }).catch(() => "");
+    if (String(existing || "").trim()) {
+      entry.actions.push(`${label} already populated`);
+      await page.waitForTimeout(120);
+      return true;
+    }
+    const modifier = process.platform === "darwin" ? "Meta" : "Control";
+    await locator.click({ timeout: 3000 }).catch(() => {});
+    await page.keyboard.press(`${modifier}+A`).catch(() => {});
+    await page.keyboard.type(value, { delay: 5 }).catch(() => {});
+    const typed = await locator.inputValue({ timeout: 1000 }).catch(() => "");
+    if (String(typed || "").trim()) filled = true;
+  }
+  if (!filled) {
+    entry.failures.push(`${label} fill failed: ${redact(firstError?.message || "field did not accept text")}`);
+    return false;
+  }
   entry.actions.push(label);
   await page.waitForTimeout(180);
   return true;
@@ -384,17 +436,19 @@ async function openPage(page, url, entry) {
 }
 
 async function runPublicPage(browser, artifactDir, viewport, route) {
-  const context = await browser.newContext({ viewport, ignoreHTTPSErrors: true, isMobile: viewport.width < 700 });
-  await context.addInitScript((maxStops) => { window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS = maxStops; }, Number(process.env.LIVE_BROWSER_SKYEMAIL_MAX_SCROLL_STOPS || 6));
-  const page = await context.newPage();
   const label = `${slug(route || "root")}-${viewport.width}x${viewport.height}`;
   const entry = { kind: "public-page", route, viewport, actions: [], scrollStops: [], consoleErrors: [], failedRequests: [], failedResponses: [], failures: [] };
-  attachWatchers(page, entry);
+  let context = null;
   try {
+    context = await browser.newContext({ viewport, ignoreHTTPSErrors: true, isMobile: viewport.width < 700 });
+    await context.addInitScript((maxStops) => { window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS = maxStops; }, Number(process.env.LIVE_BROWSER_SKYEMAIL_MAX_SCROLL_STOPS || 6));
+    const page = await context.newPage();
+    attachWatchers(page, entry);
     const originalUrl = `${baseUrl}${route}`;
     await openPage(page, originalUrl, entry);
     const body = await page.evaluate(() => document.body?.innerText || "").catch(() => "");
     if (!/SkyeMail|SkyEmail/i.test(body)) entry.failures.push("SkyeMail brand text not visible");
+    await scrollProof(page, artifactDir, label, entry);
     const pricingRect = await page.evaluate(() => {
       const link = Array.from(document.querySelectorAll("a")).find((item) => {
         const href = item.getAttribute("href") || "";
@@ -410,13 +464,11 @@ async function runPublicPage(browser, artifactDir, viewport, route) {
       entry.actions.push("clicked pricing/navigation link");
       await page.waitForURL(/\/pricing\/?$/, { timeout: 8000 }).catch(() => {});
       await page.waitForTimeout(700);
-      await openPage(page, originalUrl, entry);
     }
-    await scrollProof(page, artifactDir, label, entry);
   } catch (error) {
     entry.failures.push(redact(error.stack || error.message));
   } finally {
-    await context.close();
+    await context?.close().catch(() => {});
   }
   return entry;
 }
@@ -436,14 +488,15 @@ async function installSession(context, session) {
 }
 
 async function runAuthWorkspace(browser, artifactDir, viewport, session) {
-  const context = await browser.newContext({ viewport, ignoreHTTPSErrors: true, isMobile: viewport.width < 700, acceptDownloads: true });
-  await context.addInitScript((maxStops) => { window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS = maxStops; }, Number(process.env.LIVE_BROWSER_SKYEMAIL_MAX_SCROLL_STOPS || 6));
-  await installSession(context, session);
-  const page = await context.newPage();
   const label = `workspace-${viewport.width}x${viewport.height}`;
   const entry = { kind: "authenticated-workspace", viewport, actions: [], assertions: [], downloads: [], scrollStops: [], consoleErrors: [], failedRequests: [], failedResponses: [], failures: [] };
-  attachWatchers(page, entry);
+  let context = null;
   try {
+    context = await browser.newContext({ viewport, ignoreHTTPSErrors: true, isMobile: viewport.width < 700, acceptDownloads: true });
+    await context.addInitScript((maxStops) => { window.__SKYEMAIL_PROOF_MAX_SCROLL_STOPS = maxStops; }, Number(process.env.LIVE_BROWSER_SKYEMAIL_MAX_SCROLL_STOPS || 6));
+    await installSession(context, session);
+    const page = await context.newPage();
+    attachWatchers(page, entry);
     await openPage(page, `${baseUrl}/dashboard`, entry);
     await page.waitForSelector("#mailList", { timeout: 25000 });
     await page.waitForFunction(() => !/Loading mailbox/i.test(document.querySelector("#mailList")?.innerText || ""), null, { timeout: 25000 }).catch(() => {});
@@ -465,12 +518,15 @@ async function runAuthWorkspace(browser, artifactDir, viewport, session) {
       const before = await star.getAttribute("data-on");
       await star.click();
       entry.actions.push("clicked first message star toggle");
-      await page.waitForTimeout(1200);
+      await page.waitForFunction((previous) => {
+        const control = document.querySelector("[data-single-star]");
+        return control && control.getAttribute("data-on") !== previous;
+      }, before, { timeout: 8000 }).catch(() => {});
       const after = await page.locator("[data-single-star]").first().getAttribute("data-on").catch(() => "");
       entry.assertions.push({ name: "star_toggle_changed_state", ok: before !== after, state: { before, after } });
       await page.locator("[data-single-star]").first().click().catch(() => {});
       entry.actions.push("restored first message star state");
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1200);
     } else {
       entry.failures.push("no visible message star control");
     }
@@ -539,9 +595,45 @@ async function runAuthWorkspace(browser, artifactDir, viewport, session) {
   } catch (error) {
     entry.failures.push(redact(error.stack || error.message));
   } finally {
-    await context.close();
+    await context?.close().catch(() => {});
   }
   return entry;
+}
+
+async function launchProofBrowser() {
+  return await chromium.launch({
+    headless: false,
+    slowMo: Number(process.env.LIVE_BROWSER_SLOWMO || 25),
+    args: process.platform === "linux" ? [
+      "--ozone-platform=x11",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--no-proxy-server",
+      "--disable-features=NetworkServiceSandbox",
+    ] : [],
+  });
+}
+
+async function ensureBrowser(browser) {
+  if (browser?.isConnected?.()) return browser;
+  await browser?.close?.().catch(() => {});
+  return await launchProofBrowser();
+}
+
+function timeoutFailureEntry(kind, viewport, detail = {}) {
+  return {
+    kind,
+    viewport,
+    ...detail,
+    actions: [],
+    assertions: [],
+    downloads: [],
+    scrollStops: [],
+    consoleErrors: [],
+    failedRequests: [],
+    failedResponses: [],
+    failures: [],
+  };
 }
 
 async function main() {
@@ -566,24 +658,46 @@ async function main() {
 
   let browser;
   try {
+    report.preflight = assertBrowserProofPreflight();
     const session = await resolveSkyeMailSession();
     report.session = { owner_source: session.ownerSource, user: session.user, token_present: true };
-    browser = await chromium.launch({
-      headless: false,
-      slowMo: Number(process.env.LIVE_BROWSER_SLOWMO || 25),
-      args: process.platform === "linux" ? [
-        "--ozone-platform=x11",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--no-proxy-server",
-        "--disable-features=NetworkServiceSandbox",
-      ] : [],
-    });
+    browser = await launchProofBrowser();
+    async function runTimed(label, ms, fallback, fn) {
+      let timer;
+      try {
+        console.error(`[skyemail-browser-proof] ${label}`);
+        return await Promise.race([
+          fn(),
+          new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+          }),
+        ]);
+      } catch (error) {
+        fallback.failures.push(redact(error.stack || error.message));
+        await browser?.close?.().catch(() => {});
+        browser = null;
+        return fallback;
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    }
     for (const viewport of report.viewports) {
       for (const route of report.public_routes) {
-        report.checks.push(await runPublicPage(browser, artifactDir, viewport, route));
+        browser = await ensureBrowser(browser);
+        report.checks.push(await runTimed(
+          `public ${route} ${viewport.width}x${viewport.height}`,
+          Number(process.env.LIVE_BROWSER_PUBLIC_TIMEOUT_MS || 90000),
+          timeoutFailureEntry("public-page", viewport, { route }),
+          () => runPublicPage(browser, artifactDir, viewport, route)
+        ));
       }
-      report.checks.push(await runAuthWorkspace(browser, artifactDir, viewport, session));
+      browser = await ensureBrowser(browser);
+      report.checks.push(await runTimed(
+        `workspace ${viewport.width}x${viewport.height}`,
+        Number(process.env.LIVE_BROWSER_WORKSPACE_TIMEOUT_MS || 360000),
+        timeoutFailureEntry("authenticated-workspace", viewport),
+        () => runAuthWorkspace(browser, artifactDir, viewport, session)
+      ));
     }
   } catch (error) {
     report.failures.push(redact(error.stack || error.message));

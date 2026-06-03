@@ -54,7 +54,7 @@ export async function ensureSystemClient() {
       token_endpoint_auth_method, app_type, is_first_party, metadata
      )
      values (
-      $1,'skyegatefs27-firstparty','SkyeGateFS27 First-Party',
+      $1,'skyegatefs27-firstparty','SkyeGate FS27 First-Party',
       '{}'::text[],
       '{authorization_code,refresh_token,client_credentials}'::text[],
       '{code}'::text[],
@@ -97,7 +97,7 @@ export async function createOauthClient({
       uuid(),
       clientId,
       hash,
-      (clientName || "SkyeGateFS27 Client").toString().slice(0, 120),
+      (clientName || "SkyeGate FS27 Client").toString().slice(0, 120),
       redirectUris,
       grantTypes,
       responseTypes,

@@ -94,7 +94,7 @@ async function initTemplateOps(){
   await refresh();
 }
 async function initSkyeDocxMax(){
-  const canonicalEditor = '/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=sovereigndocs&ws_id=sovereigndocs&returnTo=/Free99/apps/sovereigndocs/vault/';
+  const canonicalEditor = '/Marketing-Made-Easy/SkyeDocxMax/editor?source=sovereigndocs&ws_id=sovereigndocs&returnTo=/Free99/apps/sovereigndocs/vault/';
   let lastLaunch=canonicalEditor;
   try{
     const config=await api('/api/editor/skye-docx-max/config');

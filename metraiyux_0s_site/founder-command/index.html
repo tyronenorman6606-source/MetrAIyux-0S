@@ -769,9 +769,28 @@
               </a>
             </div>
           </section>
-        </div>
+	        </div>
 
-        <div class="split-grid" id="workspace-handoffs">
+	        <section class="panel">
+	          <div class="panel-head">
+	            <p class="eyebrow">Provider custody</p>
+	            <h2>Live mailbox inventory</h2>
+	          </div>
+	          <p class="muted">Every hosted SkyeMail mailbox should be visible here and linked into Founder Command account custody through the shared 0S Gate.</p>
+	          <div class="status-grid">
+	            <div><span>Provider mailboxes</span><strong id="skyEmailInventoryCount">Checking</strong></div>
+	            <div><span>Custody linked</span><strong id="skyEmailCustodyCount">Checking</strong></div>
+	            <div><span>Missing custody</span><strong id="skyEmailCustodyMissing">Checking</strong></div>
+	          </div>
+	          <div class="tool-row">
+	            <button class="button secondary" id="refreshSkyEmailInventoryBtn" type="button">Refresh Inventory</button>
+	            <button class="button" id="syncSkyEmailCustodyBtn" type="button">Sync Custody</button>
+	          </div>
+	          <div class="list" id="skyEmailInventoryList"></div>
+	          <pre class="output-box" id="skyEmailInventoryOutput">Mailbox inventory not loaded yet.</pre>
+	        </section>
+
+	        <div class="split-grid" id="workspace-handoffs">
           <section class="panel">
             <div class="panel-head">
               <p class="eyebrow">Client workspace handoff</p>

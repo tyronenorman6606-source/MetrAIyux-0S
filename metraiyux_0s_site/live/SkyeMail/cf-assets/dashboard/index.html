@@ -6,7 +6,7 @@
   <script defer src="/assets/app.js"></script>
   <script defer src="/assets/mail-ui.js"></script>
   <link rel="stylesheet" href="/assets/mail-ui.css" />
-  <title>Inbox — SkyeMail Citadel</title>
+  <title>Inbox — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="dashboard" data-page-name="Inbox" data-page-hint="Primary mailbox command center" data-label="INBOX">
 <div class="wrap">
@@ -73,8 +73,8 @@
           </div>
           <div class="btnrow" style="margin-top:0">
             <button class="btn" id="refreshCalendarBtn" type="button">Refresh Calendar</button>
-            <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/?view=calendar" target="_blank" rel="noopener">Founder Calendar</a>
-            <a class="btn" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/apps/0s-calendar/" target="_blank" rel="noopener">SkyeCalendar</a>
+            <a class="btn" href="workspace.html?panel=calendar">0S Calendar Workbench</a>
+            <a class="btn" href="workspace.html?panel=automation">Command Actions</a>
           </div>
         </div>
         <div class="mini" id="calendarStatus">Waiting for calendar sync…</div>
@@ -299,7 +299,7 @@
           <button class="btn" id="advanceDispatchBtn" type="button">Advance Latest Dispatch</button>
         </div>
         <div class="grid3" style="margin-top:14px">
-          <div class="stat"><b id="dispatchQueuedCount">0</b><span class="mini">Queued packets</span></div>
+          <div class="stat"><b id="dispatchSentCount">0</b><span class="mini">Dispatched packets</span></div>
           <div class="stat"><b id="dispatchReadyCount">0</b><span class="mini">Ready packets</span></div>
           <div class="stat"><b id="dispatchBlockedCount">0</b><span class="mini">Blocked / unassigned</span></div>
         </div>

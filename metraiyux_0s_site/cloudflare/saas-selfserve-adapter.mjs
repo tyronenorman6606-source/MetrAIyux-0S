@@ -40,6 +40,14 @@ const PLAN_CATALOG = {
     limits: {commands: 10000, ai_credits: 250000, vault_mb: 51200, mailboxes: 25, seats: 50, proof_exports: 2500},
     free99: ['skyeprofitconsole', 'skyesplitengine', 'skyemediacenter', 'content-forge'],
     paid_boundary: 'custom written limits, white-label policy, and tenant resale require owner-approved terms'
+  },
+  'unlimited-command': {
+    id: 'unlimited-command',
+    name: 'Unlimited Command',
+    status: 'owner_qa_zero_balance_pending_owner_approval',
+    limits: {commands: 10000, ai_credits: 250000, vault_mb: 51200, mailboxes: 25, seats: 50, proof_exports: 2500},
+    free99: ['skyeprofitconsole', 'skyesplitengine', 'skyemediacenter', 'content-forge'],
+    paid_boundary: 'owner-approved QA/unlimited lane; live providers, AI, payment, identity, and custody remain quota-governed and shared-gate metered'
   }
 };
 
@@ -147,14 +155,17 @@ function actorFromAuth(auth = {}) {
 }
 
 function planFor(planId) {
-  return PLAN_CATALOG[cleanId(planId, 'starter-command')] || PLAN_CATALOG['starter-command'];
+  const raw = cleanId(planId, 'starter-command');
+  const normalized = raw === 'unlimited' ? 'unlimited-command' : raw;
+  return PLAN_CATALOG[normalized] || PLAN_CATALOG['starter-command'];
 }
 
 function identityFromInput(input = {}, auth = {}) {
-  const ownerEmail = cleanEmail(input.email || input.customer_email || input.billing_email || input.approval_email || auth.identity?.email || '');
+  const ownerEmail = cleanEmail(input.email || input.customer_email || input.billing_email || input.owner_email || input.approval_email || auth.identity?.email || '');
   const companyName = cleanText(input.company_name || input.company || input.brand_name || input.client || ownerEmail.split('@')[0] || 'Customer Workspace', 180);
-  const workspaceSlug = slugify(input.workspace_slug || input.client_slug || companyName);
-  const planId = cleanId(input.plan || input.plan_id || 'starter-command', 'starter-command');
+  const workspaceSlug = slugify(input.workspace_slug || input.client_slug || input.slug || companyName);
+  const rawPlanId = cleanId(input.plan || input.plan_id || 'starter-command', 'starter-command');
+  const planId = rawPlanId === 'unlimited' ? 'unlimited-command' : rawPlanId;
   const suffix = shortHash(`${workspaceSlug}:${ownerEmail}:${planId}`);
   const workspaceId = cleanId(input.workspace_id || input.workspace || input.id || `ws_${workspaceSlug}_${suffix}`, `ws_${suffix}`, 180);
   const customerId = cleanId(input.customer_id || `cust_${workspaceSlug}_${suffix}`, `cust_${suffix}`, 180);
@@ -166,7 +177,7 @@ function identityFromInput(input = {}, auth = {}) {
     owner_email: ownerEmail,
     plan_id: planId,
     gate_username: ownerEmail,
-    requested_skyemail: cleanEmail(input.skyemail || input.skyemail_alias || input.mailbox_email || input.email || ''),
+    requested_skyemail: cleanEmail(input.requested_skyemail || input.skyemail || input.skyemail_alias || input.mailbox_email || ''),
     generated_at: now()
   };
 }
@@ -197,8 +208,15 @@ async function saveWorkspace(kv, workspace) {
   return primary;
 }
 
-function buildKeyCard(workspace, env) {
+function skymailStatusLooksReady(status = {}) {
+  const text = String(status.status || status.provisioning_status || '').toLowerCase();
+  return Boolean(status.ok || /active|ready|live|provisioned|confirmed|synced/.test(text));
+}
+
+function buildKeyCard(workspace, env, skymailStatus = null) {
   const mailbox = cleanEmail(workspace.skyemail?.mailbox_email || workspace.identity?.requested_skyemail || '');
+  const ready = skymailStatusLooksReady(skymailStatus || workspace.skyemail || {});
+  const serviceConfigured = Boolean(env.SKYEMAIL_PLATFORM_WORKER || env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN || env.SKYEMAIL_SERVICE_TOKEN);
   return {
     id:`key_card_${workspace.workspace_id}`,
     type:'saas.skyemail.key_card',
@@ -206,11 +224,12 @@ function buildKeyCard(workspace, env) {
     workspace_slug:workspace.workspace_slug,
     company_name:workspace.company_name,
     mailbox_email:mailbox,
-    status:mailbox ? 'mailbox_pointer_recorded_provider_status_required' : 'mailbox_not_requested',
+    status:mailbox ? (ready ? 'skymail_mailbox_confirmed' : 'skymail_mailbox_requested_confirmation_pending') : 'mailbox_not_requested',
     gate:'FS27/SkyGate/Free99',
     credential_storage:'no_mail_password_stored_in_saas',
     citadel_backup_target:Boolean(env.CITADELDB || env.CITADEL_DB || env.CITADELDB_WORKER || env.CITADELDB_ORIGIN),
-    skymail_service_configured:Boolean(env.SKYEMAIL_PLATFORM_WORKER || env.SKYMAIL_SERVICE_TOKEN || env.SKYE_MAIL_SERVICE_TOKEN || env.SKYEMAIL_SERVICE_TOKEN),
+    skymail_service_configured:serviceConfigured,
+    confirmation_source:ready ? 'skymail_service_summary' : (serviceConfigured ? 'awaiting_skymail_service_readback' : 'skymail_service_not_configured_on_this_worker'),
     updated_at:now()
   };
 }
@@ -306,8 +325,8 @@ async function liveSkyMailStatus(env, deps, workspace, mailboxOverride = '') {
     workspace_id:workspace?.workspace_id || '',
     mailbox_email:mailboxEmail,
     service_configured:Boolean(serviceToken || env.SKYEMAIL_PLATFORM_WORKER),
-    status:mailboxEmail ? 'provider_status_unverified' : 'mailbox_not_requested',
-    provider_call_made:false,
+    status:mailboxEmail ? 'skymail_status_unverified' : 'mailbox_not_requested',
+    skymail_service_call_made:false,
     updated_at:now()
   };
   if (!serviceToken || typeof deps.founderSkyEmailServiceSummary !== 'function') {
@@ -345,7 +364,7 @@ async function liveSkyMailStatus(env, deps, workspace, mailboxOverride = '') {
     counts,
     recent_messages:data.recent_messages || data.messages || [],
     route:summary.route || '',
-    provider_call_made:true,
+    skymail_service_call_made:true,
     service_configured:true,
     updated_at:now()
   };
@@ -374,6 +393,36 @@ function countByStatus(rows = []) {
   return [...counts.entries()].map(([label, value]) => ({label, value, tone:label.includes('failed') || label.includes('error') ? 'danger' : 'mint'}));
 }
 
+function customerThanks({events = [], billings = [], skyemeritIssued = [], workspace = {}} = {}) {
+  const fromEvents = events
+    .filter((row) => /thank|celebrat|merit|paid|checkout|billing/i.test(String(row.type || row.event_type || row.summary || '')))
+    .map((row) => ({
+      status:row.status || 'recorded',
+      title:row.summary || 'Customer milestone recorded',
+      detail:row.lane || row.type || row.event_type || 'customer-visible receipt',
+      time:row.created_at || row.event_ts,
+      receipt_id:row.id || ''
+    }));
+  const fromBilling = billings.map((row) => ({
+    status:'receipt_backed',
+    title:`Thank you for choosing ${workspace.company_name || 'MetrAIyux 0S'}.`,
+    detail:`SkyePay handoff ${row.id || 'recorded'} for ${row.plan_id || workspace.plan_id || 'workspace plan'}.`,
+    time:row.created_at,
+    receipt_id:row.id || ''
+  }));
+  const fromMerit = skyemeritIssued.map((row) => ({
+    status:'merit_issued',
+    title:'SkyeMerit applied to your workspace journey.',
+    detail:`${row.pack_id || 'SkyeMerit'} is tied to the shared gate receipt.`,
+    time:row.created_at,
+    receipt_id:row.id || ''
+  }));
+  return [...fromEvents, ...fromBilling, ...fromMerit]
+    .filter((row) => row.time || row.title)
+    .sort((a, b) => String(b.time || '').localeCompare(String(a.time || '')))
+    .slice(0, 12);
+}
+
 async function buildVisuals(env, deps, workspace, url) {
   const kv = saasStore(env);
   const workspaceId = cleanId(workspace.workspace_id, 'workspace');
@@ -397,6 +446,7 @@ async function buildVisuals(env, deps, workspace, url) {
   const eventCount = events.length + (bridgePayload.summary?.total || 0);
   const billableIntentCents = billings.reduce((sum, row) => sum + Number(row.amount_cents || row.total_cents || 0), 0);
   const messageCount = Number(skymail.counts?.messages || skymail.counts?.total || skymail.recent_messages?.length || 0) || 0;
+  const thankYouRows = customerThanks({events, billings, skyemeritIssued, workspace});
   const progress = [
     {label:'Commands', used:commandCount, limit:plan.limits.commands, unit:'', status:'from customer-command receipts'},
     {label:'AI credits', used:Number(workspace.usage?.ai_credits_used || 0), limit:plan.limits.ai_credits, unit:'', status:'metered by FS27 gate when provider usage posts'},
@@ -440,9 +490,10 @@ async function buildVisuals(env, deps, workspace, url) {
       {label:'Commands', value:String(commandCount), detail:'stored customer-command receipts', tone:'cyan'},
       {label:'0S Events', value:String(eventCount), detail:'SaaS events plus Command Bridge entity events', tone:'mint'},
       {label:'SkyeMail', value:skymail.ok ? 'Live' : 'Pending', detail:skymail.mailbox_email || skymail.error || skymail.status, tone:skymail.ok ? 'mint' : 'gold'},
-      {label:'Billing Intent', value:billableIntentCents ? `$${(billableIntentCents / 100).toLocaleString()}` : String(billings.length), detail:'stored checkout intent receipts', tone:'violet'},
+      {label:'SkyePay Handoff', value:billableIntentCents ? `$${(billableIntentCents / 100).toLocaleString()}` : String(billings.length), detail:'stored SkyePay handoff receipts', tone:'violet'},
       {label:'SkyeMerit', value:String(skyemeritIssued.length), detail:'issued through Worker storage', tone:'gold'},
-      {label:'Mail Messages', value:String(messageCount), detail:skymail.ok ? 'from SkyeMail summary' : 'waiting on provider summary', tone:'cyan'}
+      {label:'Mail Messages', value:String(messageCount), detail:skymail.ok ? 'from SkyeMail summary' : 'waiting on provider summary', tone:'cyan'},
+      {label:'Thank-yous', value:String(thankYouRows.length), detail:'receipt-backed customer milestone ledger', tone:'gold'}
     ],
     progress,
     bars:[
@@ -454,6 +505,7 @@ async function buildVisuals(env, deps, workspace, url) {
     donut:countByStatus([...commands, ...events]),
     event_mix:eventMix([...events, ...bridgePayload.events]),
     timeline,
+    customer_thanks:thankYouRows,
     sovereign_stack:[
       {label:'Shared gate', value:'FS27/SkyGate/Free99', status:'required'},
       {label:'SaaS storage', value:storageName(env), status:kv ? 'configured' : 'missing'},
@@ -487,7 +539,11 @@ async function handleCreateWorkspace(request, env, deps) {
   const plan = planFor(identity.plan_id);
   const existing = await loadWorkspace(kv, identity.workspace_id);
   const createdAt = existing?.created_at || now();
-  const mailboxEmail = cleanEmail(body.mailbox_email || body.skyemail || body.skyemail_alias || identity.requested_skyemail || '');
+  const requestedLocal = slugify(body.mailbox_local_part || body.local_part || body.slug || identity.workspace_slug, identity.workspace_slug).slice(0, 48);
+  const requestedDomain = cleanText(body.mailbox_domain || env.ZERO_OS_SKYEMAIL_DOMAIN || env.SKYMAIL_PRIMARY_DOMAIN || env.INBOUND_DOMAIN || env.SKYE_EMAIL_DOMAIN || 'solenterprises.org', 120).toLowerCase();
+  const serviceList = Array.isArray(body.services) ? body.services : String(body.services || '').split(',').map((item) => cleanText(item, 100)).filter(Boolean);
+  const explicitMailboxSelected = body.mail_lane === 'skyemail' || body.request_skymail === true || body.request_skymail === 'true';
+  const mailboxEmail = cleanEmail(body.mailbox_email || body.skyemail || body.skyemail_alias || identity.requested_skyemail || (explicitMailboxSelected ? `${requestedLocal}@${requestedDomain}` : ''));
   const workspace = {
     schema:'metraiyux.0s.saas.workspace.v1',
     type:'customer_workspace',
@@ -503,13 +559,13 @@ async function handleCreateWorkspace(request, env, deps) {
     actor:actorFromAuth(deps.auth),
     identity,
     profile:body.profile || body.company_profile || {},
-    services:Array.isArray(body.services) ? body.services : String(body.services || '').split(',').map((item) => cleanText(item, 100)).filter(Boolean),
+    services:serviceList,
     onboarding:body.onboarding || {},
     usage:existing?.usage || {ai_credits_used:0, vault_mb_used:0, proof_exports:0},
     limits:plan.limits,
     skyemail:{
       mailbox_email:mailboxEmail,
-      status:mailboxEmail ? 'mailbox_requested_provider_confirmation_required' : 'not_requested',
+      status:mailboxEmail ? 'skymail_mailbox_requested_confirmation_pending' : 'not_requested',
       provider:'skymail',
       source:'saas_workspace_record'
     },
@@ -519,7 +575,27 @@ async function handleCreateWorkspace(request, env, deps) {
   };
   const stored = await saveWorkspace(kv, workspace);
   if (!stored.ok) return reply(deps, {ok:false, error:stored.error, storage:storageName(env)}, 503);
-  const keyCard = buildKeyCard(workspace, env);
+  const skymailProvision = mailboxEmail && typeof deps.provisionSkyEmail === 'function'
+    ? await deps.provisionSkyEmail({
+      email:identity.owner_email,
+      local_part:mailboxEmail.split('@')[0],
+      domain:mailboxEmail.split('@').slice(1).join('@'),
+      requested_email:mailboxEmail,
+      workspace_id:workspace.workspace_id,
+      customer_id:workspace.customer_id,
+      company_name:workspace.company_name
+    }).catch((error) => ({ok:false, status:0, error:error?.message || String(error)}))
+    : {ok:false, skipped:true, reason:mailboxEmail ? 'skymail_provision_helper_unavailable' : 'mailbox_not_requested'};
+  const skymailStatus = await liveSkyMailStatus(env, deps, workspace);
+  workspace.skyemail = {
+    ...workspace.skyemail,
+    status:mailboxEmail ? (skymailStatusLooksReady(skymailStatus) ? 'skymail_mailbox_confirmed' : 'skymail_mailbox_requested_confirmation_pending') : 'not_requested',
+    service_status:skymailStatus.status || '',
+    service_confirmed:Boolean(skymailStatusLooksReady(skymailStatus)),
+    updated_at:now()
+  };
+  await saveWorkspace(kv, workspace);
+  const keyCard = buildKeyCard(workspace, env, skymailStatus);
   await kvPut(kv, `saas:key-card:${workspace.workspace_id}`, keyCard);
   await appendSaasEvent(env, deps, {
     id:id('workspace_evt'),
@@ -530,14 +606,22 @@ async function handleCreateWorkspace(request, env, deps) {
     company_name:workspace.company_name,
     status:'recorded',
     summary:`Workspace recorded for ${workspace.company_name}`,
-    metadata:{plan_id:workspace.plan_id, mailbox_requested:Boolean(mailboxEmail)}
+    metadata:{plan_id:workspace.plan_id, mailbox_requested:Boolean(mailboxEmail), skymail_provision_ok:Boolean(skymailProvision.ok || skymailProvision.mailbox?.ok)}
   });
   return reply(deps, {
     ok:true,
     workspace,
+    workspace_id:workspace.workspace_id,
+    slug:workspace.workspace_slug,
     key_card:keyCard,
     storage:storageName(env),
-    skymail_status:await liveSkyMailStatus(env, deps, workspace),
+    skymail:{
+      ok:Boolean(skymailProvision.ok || skymailProvision.mailbox?.ok || skymailStatus.ok),
+      mailbox:skymailProvision.mailbox?.mailbox || skymailProvision.mailbox || {mailbox_email:mailboxEmail, workspace_id:workspace.workspace_id, provider:'skymail'},
+      provision:skymailProvision,
+      status:skymailStatus
+    },
+    skymail_status:skymailStatus,
     next:{dashboard:`/saas/customer-dashboard.html?workspace=${encodeURIComponent(workspace.workspace_id)}`, visuals:`/saas/customer-data.html?workspace=${encodeURIComponent(workspace.workspace_id)}`}
   }, existing ? 200 : 201);
 }
@@ -587,6 +671,16 @@ async function handleSignup(request, env, deps) {
     company_name:identity.company_name,
     status:'recorded',
     summary:`Signup intent recorded for ${identity.company_name}`
+  });
+  await appendSaasEvent(env, deps, {
+    type:'saas.customer_thank_you.issued',
+    lane:'customer-success',
+    workspace_id:identity.workspace_id,
+    customer_id:identity.customer_id,
+    company_name:identity.company_name,
+    status:'issued',
+    summary:`Thank you for starting your 0S workspace, ${identity.company_name}.`,
+    metadata:{signup_id:signup.id, skyemerit_id:skyemerit.id, receipt_backed:true}
   });
   return reply(deps, {ok:true, signup, identity, skyemerit, storage:storageName(env)}, 201);
 }
@@ -658,18 +752,20 @@ async function handleBillingIntent(request, env, deps) {
   const kv = saasStore(env);
   const body = await bodyJson(deps, request);
   const workspaceId = cleanId(body.workspace_id || body.workspace || body.client_slug || 'metraiyux-0s', 'metraiyux-0s');
-  const planId = cleanId(body.plan || body.plan_id || 'starter-command', 'starter-command');
+  const rawPlanId = cleanId(body.plan || body.plan_id || 'starter-command', 'starter-command');
+  const planId = rawPlanId === 'unlimited' ? 'unlimited-command' : rawPlanId;
   const subtotalCents = Math.max(0, Math.round(Number(body.subtotal_cents ?? body.amount_cents ?? 0) || 0));
   const merit = selectSkyeMerit(cleanText(body.skyemerit_code || 'SKYEMERIT-FIRST-BEST', 80), subtotalCents);
   const createdAt = now();
   const receipt = {
     schema:'metraiyux.0s.saas.billing-intent.v1',
     id:id('bill'),
-    type:'skyepay_billing_intent',
+    type:'skyepay_billing_handoff',
     workspace_id:workspaceId,
     plan_id:planId,
-    status:'checkout_intent_recorded_live',
+    status:'skypay_handoff_recorded_live',
     payment_provider:'skypay',
+    skypay_handoff_created:true,
     provider_session_created:false,
     checkout_url:skyePayUrl(planId, body.client_slug || workspaceId),
     subtotal_cents:subtotalCents,
@@ -682,14 +778,39 @@ async function handleBillingIntent(request, env, deps) {
   const stored = await kvPut(kv, `saas:billing:${workspaceId}:${createdAt}:${receipt.id}`, receipt);
   if (!stored.ok) return reply(deps, {ok:false, error:stored.error, storage:storageName(env)}, 503);
   await appendSaasEvent(env, deps, {
-    type:'saas.billing_intent.recorded',
+    type:'saas.skypay_handoff.recorded',
     lane:'billing',
     workspace_id:workspaceId,
     status:'recorded',
-    summary:`Billing intent recorded for ${planId}`,
+    summary:`SkyePay handoff recorded for ${planId}`,
     metadata:{billing_id:receipt.id, plan_id:planId, amount_cents:receipt.amount_cents}
   });
-  return reply(deps, {ok:true, billing_intent:receipt, checkout_url:receipt.checkout_url, storage:storageName(env)}, 201);
+  await appendSaasEvent(env, deps, {
+    type:'saas.customer_thank_you.issued',
+    lane:'billing',
+    workspace_id:workspaceId,
+    status:'issued',
+    summary:`Thank you for trusting MetrAIyux 0S with ${planId}.`,
+    metadata:{billing_id:receipt.id, plan_id:planId, amount_cents:receipt.amount_cents, receipt_backed:true}
+  });
+  const zeroBalance = receipt.amount_cents === 0 && /GRAYSCAPE467|OWNER-QA/i.test(cleanText(body.skyemerit_code || body.skyemerit_pack_id || '', 120));
+  return reply(deps, {
+    ok:true,
+    billing_intent:receipt,
+    checkout_url:receipt.checkout_url,
+    storage:storageName(env),
+    zero_balance:zeroBalance,
+    payment_status:zeroBalance ? 'no_payment_required' : 'skypay_handoff_recorded',
+    approval_status:zeroBalance ? 'zero_balance_pending_owner_approval' : receipt.status,
+    owner_approval_required:zeroBalance,
+    plan_id:planId,
+    skyemerit:{
+      ...merit,
+      adjusted_due_cents:receipt.amount_cents,
+      pack_id:cleanText(body.skyemerit_pack_id || '', 120),
+      code:cleanText(body.skyemerit_code || '', 80)
+    }
+  }, 201);
 }
 
 async function handleSkyeMeritIssue(request, env, deps) {
@@ -831,14 +952,26 @@ export async function handleSaasSelfServeRoute(request, env, ctx, url, matchedBa
     if (!workspaceId) return reply(localDeps, {ok:false, error:'workspace_id_required'}, 400);
     const workspace = await loadWorkspace(kv, workspaceId) || {workspace_id:workspaceId, workspace_slug:workspaceId, skyemail:{mailbox_email:cleanEmail(url.searchParams.get('email') || url.searchParams.get('mailbox_email') || '')}};
     const skymail = await liveSkyMailStatus(env, localDeps, workspace, url.searchParams.get('email') || url.searchParams.get('mailbox_email') || '');
-    return reply(localDeps, {ok:true, skymail, workspace_id:workspace.workspace_id});
+    return reply(localDeps, {
+      ok:true,
+      skymail,
+      rows:[{
+        workspace_id:workspace.workspace_id,
+        mailbox_email:skymail.mailbox_email || workspace.skyemail?.mailbox_email || '',
+        status:skymail.status || workspace.skyemail?.status || '',
+        provider:skymail.provider || workspace.skyemail?.provider || 'skymail',
+        skymail_service_call_made:Boolean(skymail.skymail_service_call_made),
+        error:skymail.error || ''
+      }],
+      workspace_id:workspace.workspace_id
+    });
   }
 
   if (request.method === 'GET' && suffix === '/key-card') {
     const workspaceId = cleanId(url.searchParams.get('workspace_id') || url.searchParams.get('workspace') || '', '');
     if (!workspaceId) return reply(localDeps, {ok:false, error:'workspace_id_required'}, 400);
     const stored = await kvGet(kv, `saas:key-card:${workspaceId}`, null);
-    if (stored) return reply(localDeps, {ok:true, key_card:stored});
+    if (stored) return reply(localDeps, {ok:true, key_card:stored, rows:[stored]});
     const workspace = await loadWorkspace(kv, workspaceId);
     if (!workspace) return reply(localDeps, {ok:false, error:'workspace_not_found', workspace_id:workspaceId}, 404);
     return reply(localDeps, {ok:true, key_card:buildKeyCard(workspace, env)});

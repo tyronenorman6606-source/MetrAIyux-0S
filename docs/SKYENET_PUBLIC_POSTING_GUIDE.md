@@ -26,12 +26,14 @@ SkyeNet is ready for:
 - Public or shared-gate-protected routes.
 - Client-facing media inside the plan bundle cap.
 - Deployment receipts, route records, dashboard state, gated full project source package download, env-variable registry, and stored source-transfer receipts.
-- Owner-approved managed function bundles in controlled preview.
+- Owner-approved managed JS/ESM function bundles with CLI bundling, server-signed activation, and Dynamic Worker invocation.
+- Netlify-style Forms capture with multipart private file custody, owner inbox APIs, moderation, policy spam controls, private file download, and receipt-only notification records.
 
 Do not sell as ready yet:
 
 - Unlimited Free99 hosting.
-- Unlimited arbitrary uploaded serverless functions.
+- Unlimited hostile-code serverless execution, scheduled/background functions, or native dependency builds.
+- External Forms email/SMS delivery without an owner-approved provider integration; current Forms notifications are stored receipt records.
 - Raw private-server claims without the SkyeNet Sovereign Runtime proof lane.
 - Full repo download from SkyeNet unless the project was intentionally uploaded through the private `--source-root` source package lane.
 
@@ -70,6 +72,7 @@ npm run skyenet:deploy -- \
   --mount / \
   --url-mode subdomain \
   --public \
+  --functions \
   --concurrency 4
 ```
 

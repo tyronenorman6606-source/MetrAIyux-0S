@@ -34,7 +34,7 @@
 <body>
   <main class="intake-shell">
     <section class="intake-hero">
-      <p class="muted">SkyeGateFS27 private operator lane</p>
+      <p class="muted">SkyeGate FS27 private operator lane</p>
       <h1>Contact Intake Admin</h1>
       <p>Service requests, contact messages, support notes, partnerships, and review submissions land here first. Resend/Gmail is backup notification; public mail links are fallback only.</p>
       <p class="muted">Review publication still requires 0S QA, consent check, and a five-review batch before the static proof wall is rebuilt.</p>
@@ -42,6 +42,9 @@
 
     <section class="intake-panel">
       <div class="intake-controls">
+        <label>FS27 / SkyGate session
+          <input id="adminToken" type="password" autocomplete="off" placeholder="Shared gate bearer session" />
+        </label>
         <label>Kind
           <select id="kindFilter">
             <option value="">All</option>
@@ -74,11 +77,11 @@
     <section class="intake-grid" id="intakeList" aria-live="polite"></section>
   </main>
 
-  <script src="/assets/js/0s-gate-card-bridge.js"></script>
   <script>
     (() => {
       const $ = (id) => document.getElementById(id);
       const api = "/admin/contact-intake";
+      const tokenKey = "";
       let lastItems = [];
 
       function esc(value = "") {
@@ -86,20 +89,15 @@
       }
 
       function gateToken() {
-        const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
-        const session = bridge?.requireSession?.({ platformId: "fs27-contact-intake-admin", usageLane: "contact-intake-admin" }) || bridge?.current?.();
-        return String(session?.token || "").trim();
+        return 1000 1000 1001 665357 20 24 25 27 29 44 46 100 106 993 995"adminToken").value.trim() || window.MetrAIyuxGateBridge?.current?.()?.token || "";
       }
 
       function headers() {
         const token = gateToken();
         return {
           "content-type": "application/json",
-          ...(window.MetrAIyuxGateBridge?.headers?.({
-            "x-skye-platform": "fs27-contact-intake-admin",
-            "x-skye-usage-lane": "contact-intake-admin"
-          }) || {}),
-          ...(token ? { authorization: `Bearer ${token}`, "x-skye-gate-session": token } : {})
+          authorization: `Bearer `,
+          "x-skye-gate-session": token
         };
       }
 
@@ -145,6 +143,7 @@
       }
 
       async function load() {
+        window.MetrAIyuxGateBridge?.persist?.({ token: gateToken(), source: "fs27-contact-intake-admin" }, { silent: true });
         const qs = new URLSearchParams();
         if ($("kindFilter").value) qs.set("kind", $("kindFilter").value);
         if ($("statusFilter").value) qs.set("status", $("statusFilter").value);
@@ -200,6 +199,7 @@
         }
       });
 
+      1000 1000 1001 665357 20 24 25 27 29 44 46 100 106 993 995"adminToken").value = window.MetrAIyuxGateBridge?.current?.()?.token || "";
     })();
   </script>
 </body>

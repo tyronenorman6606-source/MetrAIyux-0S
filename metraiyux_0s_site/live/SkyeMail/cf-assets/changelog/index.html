@@ -40,6 +40,61 @@
 
     <section class="section timeline">
       <article class="release-card current">
+        <p class="eyebrow">2026-06-01 • Live SkyePay and Stripe proven</p>
+        <h2>Relay13 AI sales-registry money-lane closure is deployed and live-proven.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped in source</h3>
+            <ul class="feature-list">
+              <li>Closed the approved-offer gap where Relay13 AI paid plans existed in the sales registry but were not fully present in the SkyePay catalog and Stripe parity lane.</li>
+              <li>Added real SkyePay offer coverage for <code>relay13-ai-response-starter</code>, <code>relay13-ai-response-plus</code>, and <code>relay13-managed-ai-inbox</code>.</li>
+              <li>Added <code>proof:skyepay:sales-registry</code> so approved fixed-price sales offers fail proof if they are missing from SkyePay or missing Stripe parity.</li>
+              <li>Updated Relay13 platform pricing language so AI response plans read as capped, paid, owner-approved FS27 Brain usage.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>Sales-registry proof passed with <code>153</code> source SkyePay offers, <code>41</code> approved fixed-price sales offers checked, <code>12</code> direct-money platform mappings checked, and <code>0</code> failures.</li>
+              <li>Stripe full catalog parity passed with <code>173</code> inspected prices and <code>0</code> failed prices.</li>
+              <li>Public SkyePay buyer-fulfillment proof passed <code>153</code> live offers with <code>0</code> failures.</li>
+              <li>Live catalog checkout checked <code>153/153</code> offers and self-serve access checked <code>9/9</code> offers with <code>0</code> failures after the primary SkyeMail mailbox plans were capacity-gated.</li>
+              <li>Receipts: <code>test-artifacts/skyepay-readiness/skyepay-sales-registry-money-lane-latest.json</code>, <code>test-artifacts/skyepay-readiness/skyepay-buyer-fulfillment-truth-latest.json</code>, <code>test-artifacts/skyepay-live-nonbrowser/skyepay-live-catalog-checkout-latest.json</code>, <code>test-artifacts/skyepay-live-nonbrowser/skyepay-self-serve-live-access-latest.json</code>, and <code>test-artifacts/stripe-sync/skyepay-full-catalog-parity-latest.json</code>.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: FS27 now serves the 153-offer catalog publicly, SkyePay order records route through Citadel D1, and live checkout proof is green across the full catalog.</div>
+      </article>
+
+      <article class="release-card current">
+        <p class="eyebrow">2026-06-01 • Live</p>
+        <h2>SkyeMail Money-Lane, 0S Integration, and Fulfillment Truth Closure is deployed.</h2>
+        <div class="grid two">
+          <div>
+            <h3>Shipped</h3>
+            <ul class="feature-list">
+              <li>Customer-facing copy now frames the platform as <code>SkyeMail backed by Citadel Database and SkyeNet</code> instead of treating Citadel as the product name.</li>
+              <li>Legacy suite standalone dashboard URLs redirect into the real SkyeMail root dashboard instead of dead-ending customers.</li>
+              <li>CRM handoffs now point to AE FlowPro live surfaces while keeping Command Bridge event receipts.</li>
+              <li>SaaS signup, workspace, SkyePay handoff, SkyeMerit, and usage flows now feed receipt-backed customer thank-you rows and the <code>Thank-yous</code> KPI.</li>
+              <li>0S integration proof covers calendar, SkyeDocxMax, SovereignDocs, Command Bridge/CRM, AE Flow, SkyeCommerce, PWA Factory, telemetry, game ledger, and paid Brain automation.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Verified</h3>
+            <ul class="feature-list">
+              <li>SkyeMail functional proof release <code>04689d1d-b143-4202-af6a-36f90842ee06</code> is deployed; changelog-only asset deploys may carry newer Worker IDs.</li>
+              <li>Human-production smoke passed <code>61/61</code> checks against selected mailbox <code>darthom-intelligence@solenterprises.org</code>.</li>
+              <li>Live SkyeMail stress passed <code>120/120</code> OK.</li>
+              <li>Live SaaS customer thank-you proof read back <code>3</code> thank-you rows, <code>6</code> route rows, and <code>4</code> flow rows.</li>
+              <li>SkyePay buyer-fulfillment truth proof now passes <code>153</code> live public offers with <code>0</code> failures; live catalog checkout checked <code>153/153</code> offers; self-serve access checked <code>9/9</code> offers after SkyeMail mailbox capacity gating; Stripe parity returned <code>173</code> inspected prices and <code>0</code> failed prices.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="notice-strip">Production truth: SkyeMail is the customer-facing product. Citadel Database and SkyeNet are the backing architecture, and every sold SkyePay offer now has a tested fulfillment path or explicit operator-review state.</div>
+      </article>
+
+      <article class="release-card current">
         <p class="eyebrow">2026-05-25 • Live</p>
         <h2>Founder Command Pocket SkyeMail and workspace handoffs are deployed.</h2>
         <div class="grid two">
@@ -47,7 +102,7 @@
             <h3>Shipped</h3>
             <ul class="feature-list">
               <li><code>/workspace-mailbox-summary</code> now returns owner mailbox status, unread counts, aliases, active key state, and recent message summaries through a service-token route.</li>
-              <li>Founder Command now includes a Pocket SkyeMail mini inbox and a Core Apps mobile dock for SkyeMail, FS27/SkyGate, SkyePay, SkyeNet, business card generators, Client App Factory, Valley CRM, and owner shortcuts.</li>
+              <li>Founder Command now includes a Pocket SkyeMail mini inbox and a Core Apps mobile dock for SkyeMail, SkyeGate FS27, SkyePay, SkyeNet, business card generators, Client App Factory, Valley CRM, and owner shortcuts.</li>
               <li>Workspace handoff packets now cover QR payloads, welcome URLs, safe claim/reset credential receipts, optional welcome email delivery, and SkyeMerit launch prompts.</li>
               <li>The main 0S Worker now binds SkyeMail internally as <code>SKYEMAIL_PLATFORM_WORKER</code>, so owner sync does not depend on public cross-worker HTTP.</li>
             </ul>
@@ -72,9 +127,9 @@
           <div>
             <h3>Shipped</h3>
             <ul class="feature-list">
-              <li>SaaS workspace provisioning can create a SkyeMail identity first, then the same person can claim it through the shared FS27/SkyGate session.</li>
+              <li>SaaS workspace provisioning can create a SkyeMail identity first, then the same person can claim it through the shared SkyeGate FS27 session.</li>
               <li>The claim path upgrades the placeholder service identity into a real password login, links the shared gate identity, and writes the active sovereign key.</li>
-              <li>Citadel-capacity blocks now fall back to the SkyeMail local inbox route instead of stopping account setup.</li>
+              <li>Mailbox-capacity blocks now fall back to the SkyeMail local inbox route instead of stopping account setup.</li>
               <li>The 0S readiness check now covers the full no-account-to-working-account proof.</li>
             </ul>
           </div>
@@ -88,7 +143,7 @@
             </ul>
           </div>
         </div>
-        <div class="notice-strip">Production truth: SkyeMail stays on the shared 0S gate. The Citadel/SkyeNet mail lane remains behind the SkyeMail product name, and SkyeMail keeps the inbox route active when SkyeNet capacity needs more seats.</div>
+        <div class="notice-strip">Production truth: SkyeMail stays on the shared 0S gate. The Citadel Database and SkyeNet mail lane remains behind the SkyeMail product name, and SkyeMail keeps the inbox route active when SkyeNet capacity needs more seats.</div>
       </article>
 
       <article class="release-card current">
@@ -102,7 +157,7 @@
               <li><code>/mail-sync</code> imports sovereign inbox deltas into SkyeMail before mailbox reads.</li>
               <li>A SkyeNet scheduled job runs sovereign mail sync every 15 minutes for inbox freshness.</li>
               <li>Gmail-compatible mutation routes now cover label updates, trash, batch delete, and attachment lookups for the inbox UI.</li>
-              <li>CC, BCC, HTML body, sender alias, reply/thread IDs, and attachment metadata survive the hosted send lane and FS27/Citadel backup receipts.</li>
+              <li>CC, BCC, HTML body, sender alias, reply/thread IDs, and attachment metadata survive the hosted send lane and FS27/Citadel Database backup receipts.</li>
             </ul>
           </div>
           <div>
@@ -111,7 +166,7 @@
               <li>SkyeMail Worker version <code>4e761bf8-fcec-4fc0-bef9-b48337a8aac7</code> is deployed.</li>
               <li>Local enterprise stress passed 500 runtime contract assertions and sovereign asset packaging checks.</li>
               <li>Live production stress passed 8 baseline HTTP checks and 32 stress reads.</li>
-              <li>SkyeMail status reports Citadel mail routing, organization, and provisioning readiness behind the SkyeMail product name.</li>
+              <li>SkyeMail status reports SkyeMail production mail routing, organization, and provisioning readiness behind the SkyeMail product name.</li>
             </ul>
           </div>
         </div>
@@ -128,7 +183,7 @@
               <li>The public founder page now names Gray Skyes directly.</li>
               <li>Founder/contact routing now uses grayskyes@solenterprises.org, skyemail@solenterprises.org, metraiyux-0s@solenterprises.org, and MediaOverLondon@solenterprises.org.</li>
               <li>The shared SkyeMail in-app contact footer now uses the same current public contact lane.</li>
-              <li>The founder surface now includes the current operating lanes: SkyEmail/SkyeMail, SkyeNet, CitadelDB Edge, SkyePay + FS27, Media Over London, Valley Verified, and SkyeMusicNexus.</li>
+              <li>The founder surface now includes the current operating lanes: SkyeMail, SkyeNet, Citadel Database, SkyePay + SkyeGate FS27, Media Over London, Valley Verified, and SkyeMusicNexus.</li>
             </ul>
           </div>
           <div>
@@ -146,13 +201,13 @@
 
       <article class="release-card current">
         <p class="eyebrow">2026-05-24 • Live</p>
-        <h2>Citadel-backed inbox send/read proof is deployed.</h2>
+        <h2>SkyeMail inbox send/read proof is deployed.</h2>
         <div class="grid two">
           <div>
             <h3>Shipped</h3>
             <ul class="feature-list">
-              <li>The live proof runner now follows the Citadel/SkyeNet SkyeMail lane instead of assuming the old external-only proof lane.</li>
-              <li>Citadel proof mode refreshes the sovereign mail lane, discovers the hosted mailbox, sends proof mail, and reads it back from the sovereign-backed inbox.</li>
+              <li>The live proof runner now follows the Citadel Database and SkyeNet SkyeMail lane instead of assuming the old external-only proof lane.</li>
+              <li>SkyeMail proof mode refreshes the sovereign mail lane, discovers the hosted mailbox, sends proof mail, and reads it back from the sovereign-backed inbox.</li>
               <li>The deployed proof page now publishes the sanitized sovereign inbox result without exposing OAuth tokens, private keys, passphrases, or mailbox secrets.</li>
               <li>The Worker asset build now includes the public proof JSON, proof video, and proof screenshot.</li>
             </ul>
@@ -162,8 +217,8 @@
             <ul class="feature-list">
               <li>The dedicated SkyeMail Worker is deployed and serving the sovereign proof lane.</li>
               <li>Run <code>codex-20260524-citadel-live-final</code> passed with both proof messages visible in the sovereign-backed inbox.</li>
-              <li><code>/.netlify/functions/mailbox-domains</code> reports Citadel mail routing, org, and provisioning readiness.</li>
-              <li>Local smokes passed for standalone proof, proof surface, and Citadel readiness.</li>
+              <li><code>/.netlify/functions/mailbox-domains</code> reports SkyeMail production mail routing, org, and provisioning readiness.</li>
+              <li>Local smokes passed for standalone proof, proof surface, and SkyeMail readiness.</li>
             </ul>
           </div>
         </div>
@@ -177,9 +232,9 @@
           <div>
             <h3>Shipped</h3>
             <ul class="feature-list">
-              <li>SkyGate FS27-first onboarding from the SkyeMail homepage.</li>
+              <li>SkyeGate FS27-first onboarding from the SkyeMail homepage.</li>
               <li>Gate card generator with Skye ID number and SkyeMail mailbox claim.</li>
-              <li>SkyeMail return bridge for signed 0S/SkyGate session/card/mailbox claims.</li>
+              <li>SkyeMail return bridge for signed 0S/SkyeGate session/card/mailbox claims.</li>
               <li>SkyeMail ID, workspace ID, FS27 customer, and FS27 gate card linkage.</li>
               <li>Mailbox provisioning records, primary alias records, and same-inbox alias foundation.</li>
               <li><span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Browser proof</span> loop that creates sent and received records under the FS27-backed workspace.</li>
@@ -205,7 +260,7 @@
       <article class="release-card">
         <p class="eyebrow">2026-05-16 • Documented</p>
         <h2>Ultimate FS27 + SkyeMail Plan</h2>
-        <p class="lead small">The plan now covers FS27 identity, mailbox generation, alias routing, public changelog discipline, pricing readiness, and future paid billing through SkyGate FS27.</p>
+        <p class="lead small">The plan now covers FS27 identity, mailbox generation, alias routing, public changelog discipline, pricing readiness, and future paid billing through SkyeGate FS27.</p>
       </article>
     </section>
   </main>

@@ -96,7 +96,7 @@
 
     [
       ["0s-core", "0S Core", "desktop-control"],
-      ["fs27", "FS27 SkyGate", "identity-auth"],
+      ["fs27", "SkyeGate FS27", "identity-auth"],
       ["0meg4kai", "0meg4kAI Security", "security-governance"],
       ["skyerunners", "SkyeRunners", "runner-orchestration"],
       ["skyemail", "SkyeMail", "mail-control"]

@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="assets/app.js"></script>
-  <script defer src="assets/mail-ui.js"></script>
-  <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Monitoring — SkyeMail Citadel</title>
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Monitoring — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="monitoring" data-page-name="Monitoring" data-page-hint="Delivery and webhook operations">
 <div class="wrap">
@@ -16,9 +16,9 @@
     <main class="main">
       <section class="hero">
         <section class="card">
-          <div class="badge" id="monitoringBadge">Checking provider health…</div>
+          <div class="badge" id="monitoringBadge">Checking SkyeMail production mail lane health...</div>
           <h1 class="h1">Monitoring</h1>
-          <p class="sub">Citadel lifecycle events, inbound webhook processing, and delivery health for the connected mailbox.</p>
+          <p class="sub">Real SkyeMail lifecycle events, SkyeMail routing webhook processing, and delivery health for the connected mailbox.</p>
           <div class="btnrow">
             <button class="btn gold" id="refreshMonitoringBtn" type="button">Refresh</button>
             <a class="btn" href="dashboard.html">Inbox</a>
@@ -37,7 +37,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Delivery Summary</h2>
-            <div class="mini">Last 30 days of Citadel events stored by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span>.</div>
+            <div class="mini">Last 30 days of SkyeMail events stored by <span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span>.</div>
           </div>
           <div class="mini" id="summaryStatus">Waiting for event load…</div>
         </div>
@@ -47,8 +47,20 @@
       <section class="card">
         <div class="toolbar">
           <div>
+            <h2 style="margin:0 0 4px">API Telemetry</h2>
+            <div class="mini">Authenticated route execution, AI calls, inbox actions, and 0S integration events recorded by the Worker.</div>
+          </div>
+          <div class="mini" id="telemetryStatus">Waiting for telemetry load…</div>
+        </div>
+        <div class="grid3" id="telemetryGrid"></div>
+        <div class="mailtable" id="telemetryEvents" style="margin-top:14px"><div class="empty">Loading API telemetry…</div></div>
+      </section>
+
+      <section class="card">
+        <div class="toolbar">
+          <div>
             <h2 style="margin:0 0 4px">Delivery Events</h2>
-            <div class="mini">Message lifecycle events matched back to SkyeMail messages.</div>
+            <div class="mini">Database-backed message lifecycle rows matched back to SkyeMail messages.</div>
           </div>
         </div>
         <div class="mailtable" id="deliveryEvents"><div class="empty">Loading delivery events…</div></div>
@@ -58,7 +70,7 @@
         <div class="toolbar">
           <div>
             <h2 style="margin:0 0 4px">Webhook Processing</h2>
-            <div class="mini">Signed Citadel webhook attempts processed by the backend.</div>
+            <div class="mini">Mail routing webhook audit rows processed by the backend. Local suite handoffs are not counted here.</div>
           </div>
         </div>
         <div class="mailtable" id="webhookEvents"><div class="empty">Loading webhook events…</div></div>
@@ -67,6 +79,6 @@
   </div>
   <div id="appFooter"></div>
 </div>
-<script defer src="assets/monitoring-page.js"></script>
+<script defer src="/assets/monitoring-page.js"></script>
 </body>
 </html>

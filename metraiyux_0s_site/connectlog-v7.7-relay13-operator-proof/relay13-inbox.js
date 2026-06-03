@@ -263,6 +263,11 @@
     control.addEventListener("click", () => handleAction(control.dataset.inboxAction));
   });
 
+  $(".reply-composer")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleAction("send-reply");
+  });
+
   $(".inbox-search input")?.addEventListener("input", () => applyFilter(activeFilter, true));
   renderThread(activeThread);
   applyFilter("All", true);

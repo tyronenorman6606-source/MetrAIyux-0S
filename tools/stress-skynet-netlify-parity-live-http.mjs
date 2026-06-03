@@ -9,13 +9,21 @@ const skynetBase = String(process.env.SKYENET_LIVE_BASE || 'https://skyenet.gray
 const runs = Math.max(1, Math.min(5, Number(process.env.SKYENET_STRESS_RUNS || 3)));
 const readLoops = Math.max(6, Math.min(90, Number(process.env.SKYENET_STRESS_READS || 36)));
 const workspaceId = process.env.SKYENET_STRESS_WORKSPACE || 'founder-skynet-parity-stress';
+const batchId = (process.env.SKYENET_STRESS_BATCH_ID || new Date().toISOString())
+  .replace(/[^a-zA-Z0-9]+/g, '')
+  .toLowerCase()
+  .slice(0, 18);
+const projectPrefix = String(process.env.SKYENET_STRESS_PROJECT_PREFIX || `skynet-parity-stress-${batchId}`)
+  .replace(/[^a-zA-Z0-9-]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+  .slice(0, 70);
 const artifactRoot = path.join(repoRoot, 'test-artifacts', 'skyenet-netlify-parity-stress');
 const latestReceipt = path.join(artifactRoot, 'skyenet-netlify-parity-stress-live-http-latest.json');
 const parityLatest = path.join(repoRoot, 'test-artifacts', 'skyenet-netlify-parity', 'skyenet-netlify-parity-live-http-latest.json');
 
 function runProof(index) {
   return new Promise((resolve) => {
-    const project = `skynet-parity-stress-${index}`;
+    const project = `${projectPrefix}-${index}`;
     const started = performance.now();
     const child = spawn('node', ['tools/proof-skynet-netlify-parity-live-http.mjs'], {
       cwd: repoRoot,
@@ -69,6 +77,8 @@ async function main() {
     owner_manual_browser_verification: true,
     skynet_base: skynetBase,
     workspace_id: workspaceId,
+    batch_id: batchId,
+    project_prefix: projectPrefix,
     runs_requested: runs,
     read_checks_requested: readLoops,
     deployments: [],

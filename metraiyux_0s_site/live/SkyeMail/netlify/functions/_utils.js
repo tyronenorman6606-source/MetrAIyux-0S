@@ -36,7 +36,7 @@ async function verifyAuth(event, options = {}){
   }
   try{
     const claims = await requireFs27(event, options);
-    const user = await ensureSkyeMailUser(claims);
+    const user = await ensureSkyeMailUser(claims, { token });
     return sessionFromGateUser(user, claims, token);
   }catch(e){
     if(e && e.statusCode) throw e;

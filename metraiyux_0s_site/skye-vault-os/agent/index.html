@@ -4,17 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>SkyeVault Agent Install Center</title>
+  <title>Reape0r Install Center</title>
   <link rel="icon" type="image/png" href="../../favicon-32.png">
   <link rel="stylesheet" href="../../style.css">
   <style>
     :root{color-scheme:dark;--bg:#050706;--panel:#101817;--line:rgba(255,255,255,.14);--text:#f7fff6;--muted:#afc1b8;--gold:#f1d27b;--mint:#73efbd;--cyan:#78d9ff;--bad:#ff8d9b}
     body.agent-page{margin:0;background:linear-gradient(180deg,rgba(5,7,6,.74),rgba(5,7,6,.96)),url("../../assets/metraiyux-0s-logo-gold-blue-poster.png") center top/cover fixed,var(--bg);color:var(--text)}
+    body.agent-page .living-background{pointer-events:none!important}
+    body.agent-page .site-header{overflow:visible}
+    body.agent-page .site-header .brand-logo{pointer-events:none}
+    body.agent-page .site-header nav,body.agent-page .site-header nav a{position:relative;z-index:30}
     .agent-shell{width:min(1240px,calc(100% - 28px));margin:0 auto;padding:6rem 0 4rem;display:grid;gap:16px}
     .agent-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:16px;align-items:stretch}
     .agent-panel,.agent-step,.agent-file{border:1px solid var(--line);border-radius:8px;background:rgba(16,24,23,.88);box-shadow:0 24px 70px rgba(0,0,0,.28)}
     .agent-panel{padding:18px}.agent-copy h1{font-size:clamp(2.5rem,6vw,5.4rem);line-height:.94;margin:.25rem 0 .8rem;letter-spacing:0}.agent-copy p,.agent-muted{color:var(--muted);line-height:1.55}.agent-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.agent-step{padding:14px;min-height:126px}.agent-step b{display:block;color:var(--gold);margin-bottom:8px}.agent-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.agent-button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:8px;padding:10px 12px;border:1px solid rgba(241,210,123,.42);background:rgba(255,255,255,.06);color:var(--text);font-weight:900;text-decoration:none}.agent-button.primary{background:var(--gold);color:#0d120f;border-color:var(--gold)}.agent-button.good{background:var(--mint);color:#07110d;border-color:var(--mint)}
-    .agent-command{display:block;white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px;color:#eafff8;line-height:1.55;font-size:.9rem}.agent-file{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px}.agent-file h2{margin:0 0 6px;font-size:1.08rem}.agent-file p{margin:.18rem 0;color:var(--muted);overflow-wrap:anywhere}.agent-status{border:1px solid rgba(120,217,255,.28);border-radius:8px;background:rgba(120,217,255,.07);padding:12px;color:#dff8ff;white-space:pre-wrap;word-break:break-word}.agent-status.bad{border-color:rgba(255,141,155,.38);background:rgba(255,141,155,.08);color:#ffe0e4}.agent-status.good{border-color:rgba(115,239,189,.34);background:rgba(115,239,189,.08);color:#e9fff6}.agent-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.agent-kv div{border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;background:rgba(255,255,255,.04)}.agent-kv b{display:block;color:#fff;overflow-wrap:anywhere}.agent-kv span{display:block;margin-top:4px;color:var(--muted);font-size:.84rem;overflow-wrap:anywhere}@media(max-width:880px){.agent-hero,.agent-grid,.agent-kv{grid-template-columns:1fr}.agent-file{grid-template-columns:1fr}.agent-shell{padding-top:5.2rem}}
+    .agent-command{display:block;white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px;color:#eafff8;line-height:1.55;font-size:.9rem}.agent-file{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px}.agent-file h2{margin:0 0 6px;font-size:1.08rem}.agent-file p{margin:.18rem 0;color:var(--muted);overflow-wrap:anywhere}.agent-status{border:1px solid rgba(120,217,255,.28);border-radius:8px;background:rgba(120,217,255,.07);padding:12px;color:#dff8ff;white-space:pre-wrap;word-break:break-word}.agent-status.bad{border-color:rgba(255,141,155,.38);background:rgba(255,141,155,.08);color:#ffe0e4}.agent-status.good{border-color:rgba(115,239,189,.34);background:rgba(115,239,189,.08);color:#e9fff6}.agent-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.agent-kv div{border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;background:rgba(255,255,255,.04)}.agent-kv b{display:block;color:#fff;overflow-wrap:anywhere}.agent-kv span{display:block;margin-top:4px;color:var(--muted);font-size:.84rem;overflow-wrap:anywhere}@media(max-width:880px){body.agent-page .site-header{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;overflow:visible!important}body.agent-page .site-header .brand{width:100%!important;max-width:100%!important;min-width:0!important;flex:0 0 auto!important}body.agent-page .site-header nav{width:100%!important;max-width:100%!important;max-height:none!important;display:flex!important;flex-wrap:wrap!important;justify-content:flex-start!important;gap:8px!important;overflow:visible!important;white-space:normal!important;padding:4px 0 8px!important}body.agent-page .site-header nav a{display:inline-flex!important;padding:9px 10px!important}.agent-hero,.agent-grid,.agent-kv{grid-template-columns:1fr}.agent-file{grid-template-columns:1fr}.agent-shell{padding-top:5.2rem}}
   </style>
 </head>
 <body class="agent-page skyesol-living-page">
@@ -22,7 +26,7 @@
   <header class="site-header">
     <a class="brand" href="../../index.html">
       <img class="brand-logo floating-logo" src="../../assets/metraiyux-0s-emblem-transparent.png" alt="MetrAIyux 0S emblem">
-      <span class="brand-text">SkyeVault Agent</span>
+      <span class="brand-text">Reape0r</span>
     </a>
     <nav>
       <a href="../">VaultOS</a>
@@ -36,11 +40,11 @@
     <section class="agent-hero">
       <div class="agent-panel agent-copy">
         <p class="eyebrow">Gated install lane</p>
-        <h1>SkyeVault Agent Install Center</h1>
-        <p>This is the paid workspace delivery room for the repo custody agent. The agent creates an encrypted full baseline first, then encrypts delta bundles for changed and deleted files so customer repos are not forced into a giant full upload every run. Buyer upload uses the SkyePay-provisioned workspace portal key; owner/admin lanes can also pass the shared FS27/SkyGate bearer. No separate SkyeVault password is created here.</p>
+        <h1>Reape0r: the Autonomous Cloud Repo Mirror</h1>
+        <p>This is the paid workspace delivery room for Reape0r. He keeps one encrypted mutable current mirror of the repo. The first run seeds it, later runs replace changed encrypted objects inside that same current mirror, and deleted files leave the current restore view. Buyer upload uses the SkyePay-provisioned workspace portal key; owner/admin lanes can also pass the shared FS27/SkyGate bearer. No separate SkyeVault password is created here.</p>
         <div class="agent-actions">
           <a class="agent-button primary" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&amp;offer=skyevault-pro-access" target="_blank" rel="noopener">Open SkyePay</a>
-          <a class="agent-button good" id="downloadButton" href="../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz">Download Agent</a>
+          <a class="agent-button good" id="downloadButton" href="../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz">Download Reape0r</a>
           <a class="agent-button" id="manifestButton" href="../../downloads/skyevault-agent/latest.json">Release Manifest</a>
         </div>
       </div>
@@ -59,7 +63,7 @@
     <section class="agent-grid" aria-label="Install steps">
       <article class="agent-step"><b>1. Buy or approve</b><span class="agent-muted">SkyePay confirms a SkyeVault Starter, Pro, or Command offer and provisions the workspace through the FS27 vault hook.</span></article>
       <article class="agent-step"><b>2. Download</b><span class="agent-muted">The customer downloads this signed release package from the gated 0S install room.</span></article>
-      <article class="agent-step"><b>3. Run</b><span class="agent-muted">The agent reads the shared gate bearer from the shell, encrypts baseline and delta custody artifacts locally, and can verify or restore from receipts.</span></article>
+      <article class="agent-step"><b>3. Run</b><span class="agent-muted">Manual mode runs the CLI commands. Auto-install mode writes the env file, seeds the mutable current mirror, and attempts the watcher service from the same package.</span></article>
     </section>
 
     <section class="agent-panel" id="deliveryPanel" hidden>
@@ -69,11 +73,11 @@
     </section>
 
     <section class="agent-panel">
-      <h2>Install Commands</h2>
+      <h2>Manual Install Commands</h2>
       <code class="agent-command">tar -xzf skyevault-agent-latest.tar.gz
 cd skyevault-agent
 npm install --omit=dev
-node bin/skyevault-agent.mjs doctor --json
+node bin/skyevault-agent.mjs doctor
 
 export SKYEVAULT_PORTAL_KEY="&lt;workspace portal key&gt;"
 export SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;"
@@ -82,19 +86,43 @@ export SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;"
 export SKYEVAULT_GATE_BEARER="&lt;shared FS27/SkyGate bearer&gt;"
 
 node bin/skyevault-agent.mjs init --workspace=my-company --repo=/path/to/repo --vault-url=https://skyevault-drop.graylondonskyes.workers.dev
-node bin/skyevault-agent.mjs sync --upload --json
+node bin/skyevault-agent.mjs sync --upload
 node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload
-node bin/skyevault-agent.mjs verify --receipt=/path/to/full-or-delta-receipt.json --json
-node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delta-receipts=/path/to/delta-receipt.json --out=/tmp/restored-repo --json</code>
+node bin/skyevault-agent.mjs verify --receipt=/path/to/current-receipt.json
+node bin/skyevault-agent.mjs restore --receipt=/path/to/current-receipt.json --out=/tmp/restored-repo</code>
+    </section>
+
+    <section class="agent-panel">
+      <h2>Auto-Install Add-On Command</h2>
+      <p class="agent-muted">This is the $13 lane: the installer writes the env file with private permissions, configures the repo, runs doctor, seeds the encrypted mutable current mirror, and starts the watcher service when the machine supports it. Normal terminal output shows the receipt path, restore kit path, sync counts, and next commands; add <code>--json</code> when automation needs the raw receipt.</p>
+      <code class="agent-command">tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+SKYEVAULT_AGENT_AUTO_INSTALL=1 \
+SKYEVAULT_WORKSPACE_ID="&lt;workspace id&gt;" \
+SKYEVAULT_REPO_PATH="/path/to/repo" \
+SKYEVAULT_DROP_URL="https://skyevault-drop.graylondonskyes.workers.dev" \
+SKYEVAULT_PORTAL_KEY="&lt;workspace portal key&gt;" \
+SKYEVAULT_AGENT_PASSPHRASE="&lt;customer-owned unlock passphrase&gt;" \
+./install.sh</code>
     </section>
 
     <section class="agent-file">
       <div>
         <p class="eyebrow">What the package contains</p>
-        <h2>Portable Node CLI, local encryption, upload session client, baseline/delta sync, verify, restore, doctor/status/watch commands</h2>
-        <p>The default baseline is literal repo custody: committed Git state, untracked files, dirty worktree files, and the `.git` directory. The agent only skips its own output directories unless the buyer runs `--skip-deps`. Future syncs upload changed-file deltas and tombstones against the last baseline. Buyer uploads work with the portal key SkyePay provisions for that workspace.</p>
+        <h2>Portable Node CLI, local encryption, upload session client, auto-install, mutable current sync, verify, restore, doctor/status/watch commands</h2>
+        <p>The default current mirror is literal repo custody: committed Git state, untracked files, dirty worktree files, and the `.git` directory. The agent only skips its own output directories unless the buyer runs `--skip-deps`. Future syncs upload changed encrypted current objects and keep one current restore receipt. Buyer uploads work with the portal key SkyePay provisions for that workspace.</p>
       </div>
       <a class="agent-button primary" id="packageManifestButton" href="../../downloads/skyevault-agent/releases/latest/manifest.json">Open Package Manifest</a>
+    </section>
+
+    <section class="agent-panel">
+      <h2>Reape0r field guides</h2>
+      <p class="agent-muted">Use these DevodeRator receipts for customer onboarding, operator proof, and the full story behind the daemon.</p>
+      <div class="agent-actions">
+        <a class="agent-button" href="https://devooderator.pages.dev/blog/2026-06-02-reape0r-cli-install-guide" target="_blank" rel="noopener">CLI install guide</a>
+        <a class="agent-button" href="https://devooderator.pages.dev/blog/2026-06-02-reape0r-demon-in-my-machine" target="_blank" rel="noopener">Demon in my Machine</a>
+        <a class="agent-button" href="https://devooderator.pages.dev/blog/2026-06-02-0s-week-of-repairs-reape0r-proof" target="_blank" rel="noopener">Week of repairs</a>
+      </div>
     </section>
   </main>
 
@@ -138,6 +166,12 @@ node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delt
       document.getElementById('releaseBytes').textContent = 'After entitlement';
       document.getElementById('releaseSha').textContent = 'After entitlement';
     }
+    document.getElementById('downloadButton').addEventListener('click', (event) => {
+      if (event.currentTarget.getAttribute('aria-disabled') !== 'true') return;
+      event.preventDefault();
+      statusBox.className = 'agent-status bad';
+      statusBox.textContent = `${statusBox.textContent}\n\nDownload is still locked. Finish SkyePay payment/provisioning or sign in through the shared 0S owner gate.`;
+    });
     function shellQuote(value) {
       return `'${String(value || '').replace(/'/g, `'\\''`)}'`;
     }
@@ -159,8 +193,12 @@ node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delt
       }
       lines.push('export SKYEVAULT_AGENT_PASSPHRASE="<customer-owned unlock passphrase>"');
       lines.push('');
+      lines.push('# $13 auto-install add-on path: writes env file, configures repo, seeds the mutable current mirror, then attempts the watcher service.');
+      lines.push('SKYEVAULT_AGENT_AUTO_INSTALL=1 SKYEVAULT_REPO_PATH=/path/to/repo ./install.sh');
+      lines.push('');
+      lines.push('# Manual path:');
       lines.push('node bin/skyevault-agent.mjs init --workspace="$SKYEVAULT_WORKSPACE_ID" --repo=/path/to/repo --vault-url="$SKYEVAULT_DROP_URL"');
-      lines.push('node bin/skyevault-agent.mjs sync --upload --json');
+      lines.push('node bin/skyevault-agent.mjs sync --upload');
       lines.push('node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload');
       deliveryEnvCommand.textContent = lines.join('\n');
       deliveryPanel.hidden = false;
@@ -181,7 +219,7 @@ node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delt
       document.getElementById('releaseBytes').textContent = fmtBytes(manifest.release?.bytes);
       document.getElementById('releaseSha').textContent = String(manifest.release?.sha256 || 'Unknown').slice(0, 18) + '...';
       document.getElementById('downloadButton').href = withEntitlement(manifest.release?.latestArchiveUrl || '../../downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz');
-      document.getElementById('downloadButton').textContent = 'Download Agent';
+      document.getElementById('downloadButton').textContent = 'Download Reape0r';
       document.getElementById('downloadButton').removeAttribute('aria-disabled');
       return manifest;
     }
@@ -221,6 +259,5 @@ node bin/skyevault-agent.mjs restore --receipt=/path/to/full-receipt.json --delt
       }
     })();
   </script>
-  <script src="../../script.js"></script>
 </body>
 </html>

@@ -150,14 +150,14 @@ async function main() {
 
   const offersResponse = await fetch(`${origin}/skyepay/offers?client=metraiyux-0s`);
   const offersJson = await offersResponse.json().catch(() => null);
-  report.checks.repoStripeCatalog = {
+  report.checks.catalogIntegrity = {
     ok: offersResponse.ok &&
       (offersJson?.offers?.length || 0) >= 60 &&
-      (offersJson?.repo_stripe_catalog?.imported_checkout_offers || 0) >= 50,
+      (offersJson?.catalog_integrity?.imported_checkout_offers || 0) >= 50,
     status: offersResponse.status,
     offerCount: offersJson?.offers?.length || 0,
-    importedCheckoutOffers: offersJson?.repo_stripe_catalog?.imported_checkout_offers || 0,
-    source: offersJson?.repo_stripe_catalog?.source || null
+    importedCheckoutOffers: offersJson?.catalog_integrity?.imported_checkout_offers || 0,
+    source: offersJson?.catalog_integrity?.source || null
   };
 
   await page.fill('input[name="customer_name"]', "SkyePay Live Browser Proof");
@@ -242,7 +242,7 @@ async function main() {
     report.checks.store.hasVaultOffer &&
     report.checks.store.zeroUpfrontShown &&
     !report.checks.store.overflow.overflow &&
-    report.checks.repoStripeCatalog.ok &&
+    report.checks.catalogIntegrity.ok &&
     report.checks.checkoutCreated.ok &&
     report.checks.productionStatus.ok &&
     report.checks.videoPlayback.ok &&

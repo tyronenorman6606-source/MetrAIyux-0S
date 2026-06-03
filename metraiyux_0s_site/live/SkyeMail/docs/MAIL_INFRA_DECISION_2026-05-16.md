@@ -4,7 +4,7 @@ Date: 2026-05-16
 
 ## Decision
 
-SkyeMail should stay Citadel/SkyeNet-backed for the current app-inbox launch.
+SkyeMail should stay Citadel Database and SkyeNet-backed for the current app-inbox launch.
 
 That means:
 
@@ -56,7 +56,7 @@ Mailgun is a close Resend-style alternative with API, SMTP, webhooks, and inboun
 
 ## Recommended Path
 
-1. Keep current SkyeMail live on the Citadel/SkyeNet app inbox.
+1. Keep current SkyeMail live on the Citadel Database and SkyeNet app inbox.
 2. Make user-created aliases the only path for custom aliases.
 3. Add a provider abstraction so outbound/inbound transport can be Resend, SES, or Mailgun without rewriting SkyeMail.
 4. Add Stalwart only when the product truly needs mailbox-server accounts.

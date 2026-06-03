@@ -2,7 +2,12 @@ import { wrap } from "./_lib/wrap.js";
 import { json, badRequest } from "./_lib/http.js";
 import { q } from "./_lib/db.js";
 import { getSkyePayOffer } from "./_lib/skyepayCatalog.js";
-import { cleanRequestToken, publicSkyePayOrder, skyePayHeaders } from "./_lib/skyepaySecurity.js";
+import {
+  cleanRequestToken,
+  publicSkyePayOrder,
+  skyePayCustomerFulfillment,
+  skyePayHeaders
+} from "./_lib/skyepaySecurity.js";
 
 export default wrap(async (req) => {
   const headers = skyePayHeaders(req);
@@ -35,6 +40,7 @@ export default wrap(async (req) => {
           currency: demoOffer.currency || "usd",
           activation_path: demoOffer.activation_path || null
         } : null,
+        fulfillment: demoOffer ? skyePayCustomerFulfillment(demoOffer) : null,
         payment_status: "demo_not_charged",
         approval_status: ownerApproval ? "demo_pending_owner_approval" : "demo_checkout",
         owner_status: ownerApproval ? "pending_owner_approval" : "demo_not_charged",

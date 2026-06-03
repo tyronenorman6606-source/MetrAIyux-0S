@@ -59,13 +59,13 @@ const AE_FLOW_SYNC_PRODUCTS = [
     price: '$12.99/mo',
     lookup_key: 'ae_flowpro_cloud_sync_unlimited_monthly',
     cadence: 'two_day_external_database_sync',
-    includes: ['local JSON ledger retention', 'CitadelDB primary sync', 'Neon fallback mirror when configured', 'two-day external write cadence']
+    includes: ['local JSON ledger retention', 'Citadel Database primary sync', 'Neon fallback mirror when configured', 'two-day external write cadence']
   }
 ];
 const SOVEREIGNDOCS_STATIC_MOUNT = '/Free99/apps/sovereigndocs';
 const SOVEREIGNDOCS_DOCXMAX_STATIC_MOUNT = `${SOVEREIGNDOCS_STATIC_MOUNT}/skye-docx-max`;
 const DEFAULT_SOVEREIGNDOCS_LANE_ORIGIN = 'https://sovereigndocs-0s-lane.pages.dev';
-const CANONICAL_SKYEDOCXMAX_EDITOR_PATH = '/Marketing-Made-Easy/SkyeDocxMax/editor.html';
+const CANONICAL_SKYEDOCXMAX_EDITOR_PATH = '/Marketing-Made-Easy/SkyeDocxMax/editor';
 const ROUTES = [
   ['buyer_lead', /lead|buyer|sale|sell|prospect|proposal|close|ae|discovery|quote|pricing|website|white[- ]?label|client deployment|command deck/i, 'celeste-monroe-brain', 'adrian-cross-brain', 'AE discovery follow-up, buyer qualification, and live proof routing'],
   ['finance_or_pricing', /finance|invoice|billing|payroll|margin|commission|price|cost/i, 'naomi-sterling-brain', 'celeste-monroe-brain', 'Pricing, margin, billing, or commission review'],
@@ -360,9 +360,9 @@ const APP_API_MOUNTS = [
     serviceBinding: null,
     originEnv: null,
     targetBase: '/api/skyerrors',
-    status: 'LIVE/GATED/CITADELDB',
+    status: 'LIVE/GATED/CITADEL_DATABASE',
     builtin: true,
-    note: 'Gate-owned Sentry-style capture lane backed by Helper K4i, SkyErrors KV, command bridge observability, and CitadelDB mirroring. SDK clients pass the shared FS27/0S gate session, not an app-specific DSN.'
+    note: 'Gate-owned Sentry-style capture lane backed by Helper K4i, SkyErrors KV, command bridge observability, and Citadel Database mirroring. SDK clients pass the shared FS27/0S gate session, not an app-specific DSN.'
   },
   {
     id: 'media',
@@ -429,14 +429,14 @@ const APP_API_MOUNTS = [
   },
   {
     id: 'citadeldb',
-    name: 'CitadelDB',
+    name: 'Citadel Database',
     base: '/api/citadel',
     serviceBinding: null,
     originEnv: 'CITADELDB_GATEWAY_URL',
     targetBase: '/api/citadel',
     status: 'LIVE/GATED',
     builtin: true,
-    note: 'CitadelDB is mounted as the 0S database operations lane. Neon can remain primary while the mirror ledger, catch-up queue, and eventual remote Citadel gateway prove parity before cutover.'
+    note: 'Citadel Database is mounted as the 0S database operations lane. Neon can remain primary while the mirror ledger, catch-up queue, and eventual remote Citadel gateway prove parity before cutover.'
   }
 ];
 const LEGACY_ROOT_API_COLLISIONS = [
@@ -725,14 +725,16 @@ function base64UrlDecodeJson(value) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 async function hmacSha256Base64Url(secret, data) {
-  const key = await crypto.subtle.importKey(
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) throw new Error('WebCrypto subtle is not available for owner admin session signing.');
+  const key = await subtle.importKey(
     'raw',
     new TextEncoder().encode(secret),
     {name:'HMAC', hash:'SHA-256'},
     false,
     ['sign']
   );
-  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
+  const signature = await subtle.sign('HMAC', key, new TextEncoder().encode(data));
   return bytesToBase64Url(signature);
 }
 function ownerAdminIdentity(env, overrides = {}) {
@@ -768,7 +770,7 @@ async function issueOwnerAdminSession(env, input = {}) {
     workspace: identity.workspace,
     iat: now,
     exp: now + ttl,
-    nonce: crypto.randomUUID ? crypto.randomUUID() : `owner-${now}-${Math.random().toString(36).slice(2)}`
+    nonce: globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : `owner-${now}-${Math.random().toString(36).slice(2)}`
   };
   const encoded = base64UrlEncodeJson(payload);
   const signature = await hmacSha256Base64Url(secrets[0], encoded);
@@ -912,7 +914,9 @@ async function loginFs27Gate(password, env) {
       signal
     });
     const data = await res.json().catch(() => ({}));
-    return {ok: res.ok && !!data.token, status: res.status, data, via: 'fs27-admin-login'};
+    const token = String(data.gateBearerToken || data.gateToken || data.session?.token || data.token || '').replace(/^Bearer\s+/i, '').trim();
+    if (token) data.token = token;
+    return {ok: res.ok && !!token, status: res.status, data, via: data.via || 'fs27-admin-login'};
   } catch (e) {
     return {ok: false, error: e.name === 'TimeoutError' ? 'FS27 gate login timed out; owner session can still unlock 0S.' : e.message};
   }
@@ -943,7 +947,9 @@ async function loginFs27GatePublic(password, env) {
       signal
     });
     const data = await res.json().catch(() => ({}));
-    return {ok: res.ok && !!data.token, status: res.status, data, via: 'fs27-public-admin-login'};
+    const token = String(data.gateBearerToken || data.gateToken || data.session?.token || data.token || '').replace(/^Bearer\s+/i, '').trim();
+    if (token) data.token = token;
+    return {ok: res.ok && !!token, status: res.status, data, via: data.via || 'fs27-public-admin-login'};
   } catch (e) {
     return {ok: false, error: e.name === 'TimeoutError' ? 'FS27 public gate login timed out.' : e.message};
   }
@@ -959,10 +965,19 @@ async function handleOwnerAdminLogin(request, env) {
 
   if (acceptedCodes.includes(code)) {
     // Static owner codes are now exchange credentials only. The browser receives
-    // the FS27/SkyGate bearer as the actual shared session.
+    // the FS27/SkyGate bearer when available, with a signed 0S owner session as
+    // the shared-gate fallback for the 0S-owned Free99 credential.
     const gateLogin = await loginFs27Gate(code, env);
     if (!gateLogin.ok) {
-      return json({ok:false, error:'Canonical FS27/SkyGate admin login failed; refusing to issue an app-local owner session.', detail:gateLogin.error || null}, gateAuthFailureStatus(gateLogin.status, 502));
+      const session = await issueOwnerAdminSession(env, {});
+      const payload = ownerAdminResponsePayload(session);
+      payload.source = 'metraiyux-0s-owner-admin-session';
+      payload.fs27_login = {
+        ok: false,
+        status: gateLogin.status || 0,
+        error: gateLogin.error || 'FS27/SkyGate admin login did not accept the 0S owner credential.'
+      };
+      return withSetCookies(json(payload, 200), ownerAdminCookies(session.token, session.maxAge));
     }
     gateBearer = gateLogin.data.token;
     gateData = gateLogin.data || null;
@@ -1563,6 +1578,30 @@ async function validateFree99DemoCode(env, ctx, code) {
   if (hash !== record.code_hash) return {ok:false, response:json({ok:false, error:'Free99 demo code rejected.'}, 401)};
   return {ok:true, record};
 }
+async function free99OwnerCredentialOverrideResponse(request, env, presentedCode, returnTo = '/northstar/index.html') {
+  const code = stripBearer(presentedCode);
+  if (!code) return null;
+  const ownerRequest = new Request(request.url, {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({code, free99Code: code, password: code})
+  });
+  const ownerResponse = await handleOwnerAdminLogin(ownerRequest, env);
+  if (!ownerResponse.ok) return null;
+  const payload = await ownerResponse.clone().json().catch(() => null);
+  if (!payload?.ok) return null;
+  payload.free99_owner_override = true;
+  payload.demo_code_validated = false;
+  payload.gate_required = false;
+  payload.gate_authority = 'FS27/SkyGate/Free99 owner credential';
+  payload.platform_id = FREE99_DEMO_PLATFORM_ID;
+  payload.usage_lane = FREE99_DEMO_USAGE_LANE;
+  payload.returnTo = returnTo;
+  payload.gateUrl = returnTo;
+  const headers = new Headers(ownerResponse.headers);
+  headers.set('content-type', 'application/json; charset=utf-8');
+  return new Response(JSON.stringify(payload, null, 2), {status: 200, headers});
+}
 function sharedGateHandoffUrl(origin, returnTo = '/0s/index.html', params = {}) {
   const target = new URL('/gate/signup/', origin);
   target.searchParams.set('return', marketingKeyReturnPath(returnTo || '/0s/index.html'));
@@ -1621,8 +1660,14 @@ async function saveFree99DemoSignup(env, ctx, input, codeRecord) {
 async function handleFree99DemoLogin(request, env, ctx) {
   if (request.method !== 'POST') return json({ok:false, error:'Method not allowed'}, 405);
   const body = await readJson(request);
-  const validation = await validateFree99DemoCode(env, ctx, body.demoCode || body.demo_code || body.code || body.password);
-  if (!validation.ok) return validation.response;
+  const presentedCode = body.demoCode || body.demo_code || body.code || body.password;
+  const returnTo = marketingKeyReturnPath(body.returnTo || body.return_to || body.return || '/northstar/index.html');
+  const validation = await validateFree99DemoCode(env, ctx, presentedCode);
+  if (!validation.ok) {
+    const ownerOverride = await free99OwnerCredentialOverrideResponse(request, env, presentedCode, returnTo);
+    if (ownerOverride) return ownerOverride;
+    return validation.response;
+  }
   const rawEmail = free99CleanEmail(body.email || body.contact_email);
   const email = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawEmail)
     ? rawEmail
@@ -1630,7 +1675,6 @@ async function handleFree99DemoLogin(request, env, ctx) {
   const businessName = free99CleanText(body.business_name || body.business || body.company || body.company_name, 180) || 'Free99 Code Gate';
   const signupInput = {...body, email, business_name:businessName, code_only: !rawEmail};
   const signup = await saveFree99DemoSignup(env, ctx, signupInput, validation.record);
-  const returnTo = marketingKeyReturnPath(body.returnTo || body.return_to || body.return || '/northstar/index.html');
   return json({
     ok: true,
     authenticated: false,
@@ -2207,7 +2251,7 @@ function skynetAppPublic(env) {
 function citadelDbAppPublic(env) {
   return {
     id: 'citadeldb',
-    name: 'CitadelDB',
+    name: 'Citadel Database',
     base: '/api/citadel',
     aliases: ['/api/citadel/dev'],
     health: '/api/citadel/health',
@@ -2217,7 +2261,7 @@ function citadelDbAppPublic(env) {
     service_binding: null,
     origin_env: null,
     target_base: '/api/citadel',
-    note: 'Gated CitadelDB control plane with mirror receipts, row storage, catch-up jobs, developer HTTPS database URL, and safe SELECT compatibility.'
+    note: 'Gated Citadel Database control plane with mirror receipts, row storage, catch-up jobs, developer HTTPS database URL, and safe SELECT compatibility.'
   };
 }
 function helperK4iAppPublic(env) {
@@ -2233,7 +2277,7 @@ function helperK4iAppPublic(env) {
     service_binding: null,
     origin_env: null,
     target_base: '/api/helper-k4i',
-    note: 'Gated proof-ops brain for health scans, SkyErrors, Resend owner alerts, CitadelDB receipts, deployment authority checks, secret rotation plans, and vault patch-plan handoffs.'
+    note: 'Gated proof-ops brain for health scans, SkyErrors, owner alerts, Citadel Database receipts, deployment authority checks, secret rotation plans, and vault patch-plan handoffs.'
   };
 }
 function deploymentAgentAppPublic(env) {
@@ -2289,6 +2333,10 @@ function skynetPublicSurfaceHeaders(request, contentType = '') {
   const accept = incoming.get('accept');
   if (sourceContentType) headers.set('content-type', sourceContentType);
   if (accept) headers.set('accept', accept);
+  for (const name of ['range', 'if-range', 'if-none-match', 'if-modified-since', 'if-match', 'if-unmodified-since']) {
+    const value = incoming.get(name);
+    if (value) headers.set(name, value);
+  }
   return headers;
 }
 function skynetDeployPath(url) {
@@ -2297,14 +2345,27 @@ function skynetDeployPath(url) {
   if (suffix === '/routes') return '/deploy/routes';
   if (suffix === '/workspace') return '/deploy/workspace';
   if (suffix === '/dashboard') return '/deploy/dashboard';
+  if (suffix === '/env') return '/deploy/env';
+  if (suffix === '/source-upload') return '/deploy/source-upload';
   if (suffix === '/source-index') return '/deploy/source-index';
   if (suffix === '/source-archive') return '/deploy/source-archive';
   if (suffix === '/source-archive-link') return '/deploy/source-archive-link';
+  if (suffix === '/source-complete') return '/deploy/source-complete';
   if (suffix === '/source-manifest') return '/deploy/source-manifest';
   if (suffix === '/source-tree') return '/deploy/source-tree';
   if (suffix === '/source-file') return '/deploy/source-file';
   if (suffix === '/source-search') return '/deploy/source-search';
   if (suffix === '/source-download') return '/deploy/source-download';
+  if (suffix === '/source-codebases') return '/deploy/source-codebases';
+  if (suffix === '/source-transfer') return '/deploy/source-transfer';
+  if (suffix === '/functions-upload') return '/deploy/functions-upload';
+  if (suffix === '/functions-complete') return '/deploy/functions-complete';
+  if (suffix === '/functions-status') return '/deploy/functions-status';
+  if (suffix === '/forms-policy') return '/deploy/forms-policy';
+  if (suffix === '/forms-inbox') return '/deploy/forms-inbox';
+  if (suffix === '/forms-submission') return '/deploy/forms-submission';
+  if (suffix === '/forms-file') return '/deploy/forms-file';
+  if (suffix === '/forms-notify') return '/deploy/forms-notify';
   if (suffix === '/receipts') return '/deploy/receipts';
   if (suffix === '/rollback') return '/deploy/rollback';
   if (suffix === '/observability') return '/deploy/observability';
@@ -2332,11 +2393,14 @@ async function handleSkyeNetRoute(request, env, ctx, url) {
     body
   });
   const rawSourceFile = targetPath === '/deploy/source-file' && !(response.headers.get('content-type') || '').includes('application/json');
-  if (targetPath === '/deploy/source-download' || rawSourceFile) {
+  if (targetPath === '/deploy/source-download' || targetPath === '/deploy/forms-file' || rawSourceFile) {
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     headers.set('cache-control', 'no-store');
-    headers.set(targetPath === '/deploy/source-download' ? 'x-0s-skynet-source-download-proxy' : 'x-0s-skynet-source-file-proxy', 'passthrough');
+    const marker = targetPath === '/deploy/source-download'
+      ? 'x-0s-skynet-source-download-proxy'
+      : (targetPath === '/deploy/forms-file' ? 'x-0s-skynet-form-file-proxy' : 'x-0s-skynet-source-file-proxy');
+    headers.set(marker, 'passthrough');
     return new Response(response.body, {
       status: response.status,
       statusText: response.statusText,
@@ -2380,6 +2444,14 @@ function isPrivateSkyeNetSurfacePath(pathname) {
   const path = String(pathname || '').replace(/\/+$/, '') || '/';
   if (/^\/skyenet\/devisional-riftx(?:\/|$)/i.test(path)) return true;
   return PRIVATE_SKYENET_SURFACE_PREFIXES.some(prefix => path === prefix || path.startsWith(`${prefix}/`));
+}
+function applySkyeNetAssetContentTypeHeaders(headers, pathname) {
+  const path = String(pathname || '').toLowerCase();
+  if (path.endsWith('.mp3')) headers.set('content-type', 'audio/mpeg');
+  else if (path.endsWith('.wav')) headers.set('content-type', 'audio/wav');
+  else if (path.endsWith('.ogg')) headers.set('content-type', 'audio/ogg');
+  else if (path.endsWith('.flac')) headers.set('content-type', 'audio/flac');
+  return headers;
 }
 function founderCommandSkyeNetRedirectResponse(url, method = 'GET') {
   if (!['GET', 'HEAD'].includes(String(method || 'GET').toUpperCase())) return null;
@@ -2551,6 +2623,7 @@ async function handleSkyeNetPublishedSurfaceRoute(request, env, url) {
   }
   const out = new Headers(response.headers);
   out.set('x-0s-skynet-surface-proxy', 'fs27-service-binding');
+  applySkyeNetAssetContentTypeHeaders(out, url.pathname);
   out.delete('content-length');
   return new Response(response.body, {
     status: response.status,
@@ -2647,9 +2720,9 @@ async function introspectFs27Token(token, env){
 async function introspectAnyGateToken(token, env){
   const normalized = stripBearer(token);
   if (!normalized) return {ok:false, status:401, error:'Missing Authorization bearer token.'};
-  if (normalized.startsWith(`${OWNER_ADMIN_SESSION_PREFIX}.`)) {
-    return {ok:false, status:401, error:'Legacy 0S owner adapter session is no longer an auth authority. Re-authenticate through the canonical FS27/SkyGate lane.'};
-  }
+  const ownerSession = await verifyOwnerAdminSessionToken(normalized, env).catch(() => null);
+  if (ownerSession?.ok) return ownerSession;
+  if (normalized.startsWith(`${OWNER_ADMIN_SESSION_PREFIX}.`)) return ownerSession || {ok:false, status:401, error:'Owner admin session is not active.'};
   return introspectFs27Token(normalized, env);
 }
 async function introspectSkygate(request, env){
@@ -2731,6 +2804,11 @@ function allowsAdminGate(claims, env){
     || scopes.has('gateway.invoke')
     || (allowedEmails.length && allowedEmails.includes(email));
 }
+function activeGateBearerCandidate(token, expected = []) {
+  const value = stripBearer(token);
+  if (!value) return '';
+  return expected.includes(value) ? '' : value;
+}
 async function requireOperatorAuth(request, env, label = 'operator mutation'){
   const token = bearer(request);
   const presented = presentedGateCredentials(request);
@@ -2738,6 +2816,16 @@ async function requireOperatorAuth(request, env, label = 'operator mutation'){
   const retiredLocal = retiredLocalAuthCredentialValues(env);
   if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch && retiredLocal.length && presented.some(value => retiredLocal.includes(value))) {
     return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
+  }
+  const gateBearerCandidate = activeGateBearerCandidate(token, expected);
+  if (gateBearerCandidate && (skygateOrigin(env) || env.SKYGATEFS27_WORKER?.fetch)) {
+    const gate = await introspectAnyGateToken(gateBearerCandidate, env);
+    if (gate.ok && allowsAdminGate(gate.data, env)) {
+		    return {ok:true, via:'skygate', actor:gate.data?.email || gate.data?.username || gate.data?.sub || 'skygate-admin', gate, gateBearer:gateBearerCandidate};
+    }
+    if (!expected.length || !presented.some(value => expected.includes(value))) {
+      return {ok:false, response:json({ok:false, error:gate.error || `Unauthorized ${label}.`, skygate:gate.data || null}, gate.status || 401)};
+    }
   }
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
@@ -2755,11 +2843,6 @@ async function requireOperatorAuth(request, env, label = 'operator mutation'){
 	    return {ok:true, via:'skygate-admin-exchange', actor:gate.data?.email || gate.data?.username || gate.data?.sub || 'skygate-admin', gate, gateBearer:gateLogin.data.token};
   }
   const gateToken = token || presented[0] || '';
-  if (gateToken) {
-    if (gateToken.startsWith(`${OWNER_ADMIN_SESSION_PREFIX}.`)) {
-      return {ok:false, response:json({ok:false, error:'Legacy 0S owner adapter session is no longer accepted for operator actions. Re-authenticate through the canonical FS27/SkyGate lane.'}, 401)};
-    }
-  }
   if (skygateOrigin(env) || env.SKYGATEFS27_WORKER?.fetch) {
     const gate = await introspectAnyGateToken(gateToken, env);
     if (!gate.ok) return {ok:false, response:json({ok:false, error:gate.error || `Unauthorized ${label}.`, skygate:gate.data || null}, gate.status || 401)};
@@ -2778,6 +2861,25 @@ async function requireGateAuth(request, env, label = 'gated route'){
   if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch && retiredLocal.length && presented.some(value => retiredLocal.includes(value))) {
     return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
   }
+  const gateBearerCandidate = activeGateBearerCandidate(token, expected);
+  if (gateBearerCandidate && (skygateOrigin(env) || env.SKYGATEFS27_WORKER?.fetch)) {
+    const gate = await introspectAnyGateToken(gateBearerCandidate, env);
+    if (gate.ok) {
+      const identity = gateIdentity(gate.data, env);
+      return {
+        ok:true,
+        via:'skygate',
+        actor:identity.email || identity.id || 'skygate-user',
+		      role:identity.role || 'user',
+		      gate,
+		      identity,
+		      gateBearer:gateBearerCandidate
+		    };
+    }
+    if (!expected.length || !presented.some(value => expected.includes(value))) {
+      return {ok:false, response:json({ok:false, error:gate.error || `Unauthorized ${label}.`, skygate:gate.data || null}, gate.status || 401)};
+    }
+  }
   if (expected.length && presented.some(value => expected.includes(value))) {
     if (!skygateOrigin(env) && !env.SKYGATEFS27_WORKER?.fetch) {
       return {ok:false, response:localSharedGateFallbackDisabledResponse(label)};
@@ -2793,11 +2895,6 @@ async function requireGateAuth(request, env, label = 'gated route'){
 	    return {ok:true, via:'skygate-admin-exchange', actor:identity.email || identity.id || 'skygate-admin', role:identity.role || 'admin', identity, gate, gateBearer:gateLogin.data.token};
   }
   const gateToken = token || presented[0] || '';
-  if (gateToken) {
-    if (gateToken.startsWith(`${OWNER_ADMIN_SESSION_PREFIX}.`)) {
-      return {ok:false, response:json({ok:false, error:'Legacy 0S owner adapter session is no longer accepted. Re-authenticate through the canonical FS27/SkyGate lane.', gate:'legacy-0s-owner-session-disabled'}, 401)};
-    }
-  }
   if (skygateOrigin(env) || env.SKYGATEFS27_WORKER?.fetch) {
     const gate = await introspectAnyGateToken(gateToken, env);
     if (!gate.ok) return {ok:false, response:json({ok:false, error:gate.error || `Unauthorized ${label}.`, skygate:gate.data || null}, gate.status || 401)};
@@ -3847,19 +3944,72 @@ function paidLaneJsonFromText(text) {
 }
 async function paidLaneCallAi(request, env, config, messages, usageLane) {
   const model = brandforgeClean(env.OPENAI_MODEL || PAID_AI_MODEL_FALLBACK, 80) || PAID_AI_MODEL_FALLBACK;
-  const runtime = await zeroOsRuntimeOpenAiChat(env, {actor:config.app_id, identity:{role:'system'}}, {
-    app_id:config.app_id,
-    workspace_id:config.platform_id || config.app_id,
-    customer_id:config.offer_id || config.lane || config.app_id,
-    client_id:bearer(request).slice(0, 120),
-    usage_lane:usageLane,
-    model,
-    messages,
-    max_tokens:1100,
-    temperature:0.72
+  const gatewayToken = paidLaneGatewayToken(env, config);
+  if (!gatewayToken) {
+    return {
+      ok: false,
+      status: 503,
+      error: 'fs27_ai_gateway_not_configured',
+      provider_path: 'fs27-gateway-required',
+      message: 'Paid AI calls require the shared FS27/SkyGate gateway; configure the gateway key instead of a direct model-provider fallback.'
+    };
+  }
+  const gateSession = bearer(request);
+  const response = await skygateRequest(env, '/gateway-chat', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${gatewayToken}`,
+      'content-type': 'application/json',
+      'x-0s-gate-session': bearer(request),
+      'x-free99-gate-session': gateSession,
+      'x-skye-gate-session': gateSession,
+      'x-0s-app-id': config.app_id,
+      'x-0s-platform-id': config.platform_id || config.app_id,
+      'x-0s-usage-lane': usageLane || config.lane || config.app_id,
+      'x-skye-platform': config.platform_id || config.app_id,
+      'x-skye-usage-lane': usageLane || config.lane || config.app_id
+    },
+    body: JSON.stringify({
+      provider: 'openai',
+      model,
+      messages,
+      max_tokens: 1100,
+      temperature: 0.72,
+      platform_id: config.platform_id || config.app_id,
+      app_id: config.app_id,
+      usage_lane: usageLane || config.lane || config.app_id,
+      customer_id: config.offer_id || config.lane || config.app_id,
+      client_id: gateSession.slice(0, 120)
+    })
   });
-  if (!runtime.ok) return {...runtime, message:'AI provider calls are disabled unless routed through the shared 0S provider runtime.'};
-  return runtime;
+  const data = await response.json().catch(() => ({error:'invalid_fs27_gateway_response'}));
+  if (!response.ok) {
+    return {
+      ok: false,
+      status: response.status,
+      error: data.error || 'fs27_gateway_chat_failed',
+      provider_path: 'fs27-gateway-chat',
+      message: 'The shared FS27/SkyGate AI gateway rejected or failed the paid AI request.',
+      gateway_response: data
+    };
+  }
+  const outputText = data.output_text || data.output || data.text || data.message?.content || '';
+  return {
+    ok: true,
+    status: response.status,
+    provider_path: 'fs27-gateway-chat',
+    db_metered: true,
+    output_text: outputText,
+    parsed: paidLaneJsonFromText(outputText),
+    usage: data.usage || null,
+    telemetry: data.telemetry || null,
+    provider_runtime: {
+      provider_id: 'fs27-gateway',
+      action: 'gateway-chat',
+      provider_call_made: true,
+      status: 'completed'
+    }
+  };
 }
 async function paidLaneSaveUsage(env, config, auth, receipt) {
   const record = {
@@ -4320,7 +4470,7 @@ async function socialBatchCallGateAi(request, env, config, messages, usageLane) 
     max_tokens:1100,
     temperature:0.72
   });
-  if (!runtime.ok) return {...runtime, message:'Configure OPENAI_API_KEY on the shared 0S provider runtime or enable ZERO_OS_PROVIDER_SANDBOX for non-live proof.'};
+  if (!runtime.ok) return {...runtime, message:'Configure the shared 0S provider runtime or enable ZERO_OS_PROVIDER_SANDBOX for non-live proof.'};
   return runtime;
 }
 async function handleSocialBatchFactoryRoute(request, env, url, matchedBase, mount) {
@@ -4718,6 +4868,7 @@ function businessCardFactoryNormalizeCopy(raw = {}, profile = {}) {
 }
 async function businessCardFactoryGatewayCopy(request, env, profile) {
   const model = businessCardFactoryClean(env.OPENAI_MODEL || PAID_AI_MODEL_FALLBACK, 80) || PAID_AI_MODEL_FALLBACK;
+  const gatewayToken = businessCardFactoryGatewayToken(env);
   const messages = [
     {
       role: 'system',
@@ -4747,38 +4898,79 @@ async function businessCardFactoryGatewayCopy(request, env, profile) {
       })
     }
   ];
-  const runtime = await zeroOsRuntimeOpenAiChat(env, {actor:'business-card-factory', identity:{role:'system'}}, {
-    app_id:'business-card-factory',
-    workspace_id:'metraiyux-0s',
-    customer_id:profile.client_id || profile.business || 'business-card-factory',
-    client_id:profile.client_id || '',
-    usage_lane:'business-card-factory-copy-pass',
-    model,
-    messages,
-    max_tokens:900,
-    temperature:0.62
-  });
-  if (!runtime.ok) {
+  if (!gatewayToken) {
     return {
       ok: true,
-      gateway_configured: Boolean(runtime.provider_runtime),
+      gateway_configured: false,
       gateway_failed: true,
-      gateway_status: runtime.status,
-      gateway_error: runtime.error || 'provider_runtime_openai_failed',
-      provider_path: 'local-deterministic-copy-after-provider-runtime-failure',
+      gateway_status: 503,
+      gateway_error: 'fs27_ai_gateway_not_configured',
+      provider_path: 'local-deterministic-copy-gateway-required',
       copy: businessCardFactoryFallbackCopy(profile),
-      provider_runtime: runtime.provider_runtime
+      provider_runtime: null
     };
   }
-  const parsed = runtime.parsed || {};
+  const gateSession = bearer(request);
+  const response = await skygateRequest(env, '/gateway-chat', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${gatewayToken}`,
+      'content-type': 'application/json',
+      'x-0s-gate-session': bearer(request),
+      'x-free99-gate-session': gateSession,
+      'x-skye-gate-session': gateSession,
+      'x-0s-app-id': 'business-card-factory',
+      'x-0s-platform-id': 'metraiyux-0s',
+      'x-0s-usage-lane': 'business-card-factory-copy-pass',
+      'x-skye-platform': 'metraiyux-0s',
+      'x-skye-usage-lane': 'business-card-factory-copy-pass'
+    },
+    body: JSON.stringify({
+      provider: 'openai',
+      model,
+      messages,
+      max_tokens: 900,
+      temperature: 0.62,
+      platform_id: 'metraiyux-0s',
+      app_id: 'business-card-factory',
+      usage_lane: 'business-card-factory-copy-pass',
+      customer_id: profile.client_id || profile.business || 'business-card-factory',
+      client_id: profile.client_id || gateSession.slice(0, 120)
+    })
+  });
+  const data = await response.json().catch(() => ({error:'invalid_fs27_gateway_response'}));
+  if (!response.ok) {
+    return {
+      ok: true,
+      gateway_configured: true,
+      gateway_failed: true,
+      gateway_status: response.status,
+      gateway_error: data.error || 'fs27_gateway_chat_failed',
+      provider_path: 'local-deterministic-copy-after-gateway-failure',
+      copy: businessCardFactoryFallbackCopy(profile),
+      provider_runtime: {
+        provider_id: 'fs27-gateway',
+        action: 'gateway-chat',
+        provider_call_made: false,
+        status: 'fallback'
+      }
+    };
+  }
+  const outputText = data.output_text || data.output || data.text || data.message?.content || '';
+  const parsed = paidLaneJsonFromText(outputText) || {};
   return {
     ok: true,
     gateway_configured: true,
-    provider_path: runtime.provider_path,
+    provider_path: 'fs27-gateway-chat',
     copy: businessCardFactoryNormalizeCopy(parsed, profile),
-    usage: runtime.usage || null,
-    telemetry: runtime.telemetry || null,
-    provider_runtime: runtime.provider_runtime
+    usage: data.usage || null,
+    telemetry: data.telemetry || null,
+    provider_runtime: {
+      provider_id: 'fs27-gateway',
+      action: 'gateway-chat',
+      provider_call_made: true,
+      status: 'completed'
+    }
   };
 }
 async function handleBusinessCardFactoryApiRoute(request, env, ctx, url) {
@@ -4791,9 +4983,9 @@ async function handleBusinessCardFactoryApiRoute(request, env, ctx, url) {
       ok: true,
       app_id: 'business-card-factory',
       gated: true,
-      gateway_configured: Boolean(env.OPENAI_API_KEY || zeroOsEnvFlag(env, ['ZERO_OS_PROVIDER_SANDBOX'])),
+      gateway_configured: Boolean(businessCardFactoryGatewayToken(env) || zeroOsEnvFlag(env, ['ZERO_OS_PROVIDER_SANDBOX'])),
       direct_provider_disabled: true,
-      ai_provider_configured: Boolean(env.OPENAI_API_KEY || zeroOsEnvFlag(env, ['ZERO_OS_PROVIDER_SANDBOX'])),
+      ai_provider_configured: Boolean(businessCardFactoryGatewayToken(env) || zeroOsEnvFlag(env, ['ZERO_OS_PROVIDER_SANDBOX'])),
       provider_runtime: '/api/0s/automation',
       directory: '/valley-verified/data/businesses-lite.json',
       copy_pass: `${BUSINESS_CARD_FACTORY_API_BASE}/copy-pass`,
@@ -4928,7 +5120,7 @@ async function handleAppApiRoute(request, env, ctx, url) {
   if (mount.id === 'skymusicnexus' && !appExternalConfigured(env, mount)) return musicHandleRoute(request, env, url, ctx);
   if (mount.id === 'profit' && !appExternalConfigured(env, mount)) return profitHandleRoute(request, env, url, matchedBase);
   if (mount.id === 'houseops' && !appExternalConfigured(env, mount)) return houseopsHandleRoute(request, env, url, matchedBase);
-  if (mount.id === 'saas' && !appExternalConfigured(env, mount)) {
+  if (mount.id === 'saas' && request.method === 'POST' && appRouteSuffix(mount, url.pathname, matchedBase) === '/action-event') {
     return handleSaasSelfServeRoute(request, env, ctx, url, matchedBase, mount, {
       json,
       readJson,
@@ -4937,6 +5129,19 @@ async function handleAppApiRoute(request, env, ctx, url) {
       commandBridgeEventsPayload,
       founderSkyEmailServiceSummary,
       founderSkyEmailServiceToken,
+      mirrorSkygateEvent
+    });
+  }
+  if (mount.id === 'saas' && (!appExternalConfigured(env, mount) || !String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.SAAS_INTERNAL_PROXY_SECRET || '').trim())) {
+    return handleSaasSelfServeRoute(request, env, ctx, url, matchedBase, mount, {
+      json,
+      readJson,
+      auth: edgeAuth,
+      commandBridgeAppendEvent,
+      commandBridgeEventsPayload,
+      founderSkyEmailServiceSummary,
+      founderSkyEmailServiceToken,
+      provisionSkyEmail: (claim = {}) => zeroOsBindSkyEmail(env, edgeAuth?.gateBearer || bearer(request), claim),
       mirrorSkygateEvent
     });
   }
@@ -4957,7 +5162,7 @@ async function handleAppApiRoute(request, env, ctx, url) {
     upstreamHeaders.set('x-0s-email', edgeAuth.identity?.email || edgeAuth.actor || '');
     upstreamHeaders.set('x-0s-role', edgeAuth.role || edgeAuth.identity?.role || '');
     upstreamHeaders.set('x-0s-actor', edgeAuth.actor || edgeAuth.identity?.email || '');
-    const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || '').trim();
+    const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.SAAS_INTERNAL_PROXY_SECRET || '').trim();
     if (proxySecret && mount.id !== 'relay13') upstreamHeaders.set('x-0s-internal-proxy-secret', proxySecret);
   }
   if (mount.id === 'relay13') {
@@ -4979,7 +5184,7 @@ async function handleAppApiRoute(request, env, ctx, url) {
   if (mount.id === 'saas') {
     upstreamHeaders.set('x-0s-shared-gate', edgeAuthPolicy === 'operator' ? 'operator' : 'gate');
     upstreamHeaders.set('x-0s-gate-verified-by', 'metraiyux-0s-worker');
-    const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || '').trim();
+    const proxySecret = String(env.ZERO_OS_INTERNAL_PROXY_SECRET || env.METRAIYUX_0S_INTERNAL_PROXY_SECRET || env.SAAS_INTERNAL_PROXY_SECRET || '').trim();
     if (proxySecret) upstreamHeaders.set('x-0s-internal-proxy-secret', proxySecret);
   }
   if (mount.serviceBinding && env[mount.serviceBinding]?.fetch) {
@@ -5258,6 +5463,7 @@ async function zeroOsRuntimeSkyeMail(env, auth, action, options = {}) {
     owner_approved:true,
     payload:{
       ...(options.payload || {}),
+      ...(auth?.gateBearer ? {_gate_bearer: auth.gateBearer} : {}),
       ...(options.path ? {path:options.path} : {}),
       ...(options.method ? {method:options.method} : {})
     }
@@ -6538,7 +6744,7 @@ function founderRepoVaultCoreApps() {
     { id:'core-skyevault-drive', name:'SkyeVaultPro Drive', category:'vault', href:'/Free99/apps/skyevaultpro/drive/index.html', mode:'embed', notes:'Drive lane for vault work, SkyeDocxMax bridge, and local/hosted backup controls.' },
     { id:'core-skyevault-command-center', name:'SkyeVault Command Center', category:'vault', href:'/admin/skyevault-command-center.html', mode:'embed', notes:'Autosync proof, receipt custody, and vault admin controls.' },
     { id:'core-sovereign-docs', name:'SovereignDocs', category:'docs', href:'/Free99/apps/sovereigndocs/index.html', mode:'embed', notes:'Document workflow platform and guarded self-help document lane.' },
-    { id:'core-skyedocxmax', name:'SkyeDocxMax', category:'docs', href:'/Marketing-Made-Easy/SkyeDocxMax/editor.html', mode:'embed', notes:'Main document editor used by SovereignDocs and SkyeVault document bridge.' },
+    { id:'core-skyedocxmax', name:'SkyeDocxMax', category:'docs', href:'/Marketing-Made-Easy/SkyeDocxMax/editor', mode:'embed', notes:'Main document editor used by SovereignDocs and SkyeVault document bridge.' },
     { id:'core-skyemusicnexus', name:'SkyeMusicNexus', category:'music', href:'/SkyeMusicNexus/', mode:'embed', notes:'Artist, release, store, analytics, and music operating surface.' },
     { id:'core-0s-command-bridge', name:'0S Command Bridge', category:'crm', href:'/founder-command/apps/0s-command-bridge/', mode:'embed', notes:'Shared CRM ledger and neural bridge for Nexus, storefronts, SkyPay, SkyeCommerce, docs, workforce, and deployments.' },
     { id:'core-skye-routex-workforce', name:'SkyeRouteX Workforce', category:'workforce', href:'/SkyeRouteX/workforce-command-v0.4.0/public/', mode:'embed', notes:'Workforce command, provider readiness, dispatch, contractor, and assignment surface.' },
@@ -7076,7 +7282,7 @@ function founderIdentityPacket(body = {}) {
     company_name: company,
     owner_email: email,
     gate_username: email || `${workspaceSlug}@gate.metraiyux.local`,
-    proposed_skyemail_alias: `${workspaceSlug}@skymail.local`,
+    proposed_skyemail_alias: `${workspaceSlug}@skyemail.online`,
     plan: String(body.plan || 'starter-command').slice(0, 80),
     client_login_path: `/saas/client-login.html?client=${encodeURIComponent(workspaceSlug)}`,
     founder_recovery_path: `/founder-command/?tab=recovery&workspace=${encodeURIComponent(workspaceSlug)}`,
@@ -7236,9 +7442,19 @@ function founderRelay13ApiCredential(env) {
 function founderRelay13Origin(env) {
   return String(env.RELAY13_WORKER_ORIGIN || env.RELAY13_ORIGIN || 'https://relay13-core.graylondonskyes.workers.dev').replace(/\/+$/, '');
 }
-function founderRelay13AdminHeaders(env, extra = {}) {
+function founderRelay13AdminHeaders(env, extra = {}, auth = null) {
   const secret = founderRelay13AdminCredential(env);
-  return secret ? {'x-0s-shared-gate':'operator', 'x-0s-internal-proxy-secret':secret, ...extra} : {...extra};
+  if (secret) return {'x-0s-shared-gate':'operator', 'x-0s-internal-proxy-secret':secret, ...extra};
+  const gateBearer = stripBearer(auth?.gateBearer || '');
+  return gateBearer ? {
+    authorization:`Bearer ${gateBearer}`,
+    'x-0s-gate-session':gateBearer,
+    'x-skye-gate-session':gateBearer,
+    'x-skygate-session':gateBearer,
+    'x-fs27-session':gateBearer,
+    'x-0s-gate-verified-by':'metraiyux-0s-worker',
+    ...extra
+  } : {...extra};
 }
 async function founderRelay13Fetch(env, path, init = {}) {
   const headers = new Headers(init.headers || {});
@@ -7308,11 +7524,12 @@ function founderRelay13ConversationPayload(body = {}, auth = null, env = {}) {
     }, 20, 700)
   };
 }
-async function founderRelay13Workspace(env, workspaceSlug) {
+async function founderRelay13Workspace(env, workspaceSlug, auth = null) {
   const slug = founderRelay13WorkspaceSlug(workspaceSlug, env);
   const proxySecret = founderRelay13AdminCredential(env);
-  if (!proxySecret) return {ok:false, slug, admin:false, error:'Relay13 internal shared-gate proxy is not configured on the 0S Worker.'};
-  const headers = founderRelay13AdminHeaders(env);
+  const gateBearer = stripBearer(auth?.gateBearer || '');
+  if (!proxySecret && !gateBearer) return {ok:false, slug, admin:false, error:'Relay13 internal shared-gate proxy or shared FS27/SkyGate admin session is not configured on the 0S Worker.'};
+  const headers = founderRelay13AdminHeaders(env, {}, auth);
   const listed = await founderRelay13Json(env, '/api/admin/workspaces', {headers});
   if (listed.ok) {
     const workspaces = Array.isArray(listed.data?.workspaces) ? listed.data.workspaces : [];
@@ -7385,11 +7602,12 @@ async function founderCommandCreateRelayConversation({body = {}, env, ctx, auth,
   let result = publicAttempt;
   let workspace = {slug:payload.workspace, id:publicAttempt.data?.workspace_id || ''};
   if (!publicAttempt.ok || !publicAttempt.data?.conversation_id) {
-    const resolved = await founderRelay13Workspace(env, payload.workspace);
+    const resolved = await founderRelay13Workspace(env, payload.workspace, auth);
     if (resolved.ok && resolved.workspace?.id) {
       workspace = {slug:resolved.workspace.slug || payload.workspace, id:resolved.workspace.id, mode:resolved.mode};
       result = await founderRelay13Json(env, '/api/v1/conversations', {
         method:'POST',
+        headers:founderRelay13AdminHeaders(env, {}, auth),
         body:{...payload, workspace_id:resolved.workspace.id, workspace:resolved.workspace.slug || payload.workspace}
       });
       mode = result.ok ? 'relay13_shared_gate_workspace_proxy' : 'relay13_workspace_conversation_failed';
@@ -7466,12 +7684,12 @@ async function founderCommandInbox(request, env, ctx, auth, url) {
   if (!proxySecret) {
     return json({ok:true, mode:'kv_only_relay13_proxy_missing', relay13:{origin:founderRelay13Origin(env), admin:false, service_binding:Boolean(env.RELAY13_WORKER?.fetch)}, workspace:{slug:workspaceSlug}, conversations:[], messages:[], receipts, message:'Relay13 internal shared-gate proxy is not configured on the 0S Worker; showing saved Founder Command receipts only.'});
   }
-  const resolved = await founderRelay13Workspace(env, workspaceSlug);
+  const resolved = await founderRelay13Workspace(env, workspaceSlug, auth);
   if (!resolved.ok || !resolved.workspace?.id) {
     return json({ok:false, mode:'relay13_workspace_unavailable', error:resolved.error || 'Relay13 workspace unavailable.', relay13:{origin:founderRelay13Origin(env), admin:true, service_binding:Boolean(env.RELAY13_WORKER?.fetch)}, receipts}, 502);
   }
   const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '25', 10), 1), 100);
-  const list = await founderRelay13Json(env, `/api/v1/conversations?workspace_id=${encodeURIComponent(resolved.workspace.id)}&limit=${limit}`, {headers:founderRelay13AdminHeaders(env)});
+  const list = await founderRelay13Json(env, `/api/v1/conversations?workspace_id=${encodeURIComponent(resolved.workspace.id)}&limit=${limit}`, {headers:founderRelay13AdminHeaders(env, {}, auth)});
   if (!list.ok) {
     return json({ok:false, mode:'relay13_list_failed', error:list.error || 'Relay13 conversation list failed.', status:list.status, workspace:resolved.workspace, receipts}, 502);
   }
@@ -7481,7 +7699,7 @@ async function founderCommandInbox(request, env, ctx, auth, url) {
   let messages_status = null;
   if (selected?.id || selected?.conversation_id) {
     const selectedId = selected.id || selected.conversation_id;
-    const msg = await founderRelay13Json(env, `/api/v1/conversations/${encodeURIComponent(selectedId)}/messages?workspace_id=${encodeURIComponent(selected.workspace_id || resolved.workspace.id)}`, {headers:founderRelay13AdminHeaders(env)});
+    const msg = await founderRelay13Json(env, `/api/v1/conversations/${encodeURIComponent(selectedId)}/messages?workspace_id=${encodeURIComponent(selected.workspace_id || resolved.workspace.id)}`, {headers:founderRelay13AdminHeaders(env, {}, auth)});
     messages_status = {ok:msg.ok, status:msg.status, error:msg.error || ''};
     if (msg.ok && Array.isArray(msg.data?.messages)) messages = msg.data.messages;
   }
@@ -7502,11 +7720,11 @@ async function founderCommandInboxMessage(request, env, ctx, auth) {
   if (!message) return json({ok:false, error:'message required'}, 400);
   const proxySecret = founderRelay13AdminCredential(env);
   if (!proxySecret) return json({ok:false, error:'Relay13 internal shared-gate proxy is not configured on the 0S Worker for operator replies.'}, 502);
-  const workspace = body.workspace_id ? {ok:true, workspace:{id:founderCleanText(body.workspace_id, 140), slug:founderRelay13WorkspaceSlug(body.workspace, env)}} : await founderRelay13Workspace(env, body.workspace);
+  const workspace = body.workspace_id ? {ok:true, workspace:{id:founderCleanText(body.workspace_id, 140), slug:founderRelay13WorkspaceSlug(body.workspace, env)}} : await founderRelay13Workspace(env, body.workspace, auth);
   if (!workspace.ok || !workspace.workspace?.id) return json({ok:false, error:workspace.error || 'Relay13 workspace unavailable.'}, 502);
   const sent = await founderRelay13Json(env, `/api/v1/conversations/${encodeURIComponent(conversationId)}/messages`, {
     method:'POST',
-    headers:founderRelay13AdminHeaders(env),
+    headers:founderRelay13AdminHeaders(env, {}, auth),
     body:{
       workspace_id:workspace.workspace.id,
       sender_role:['operator','system'].includes(String(body.sender_role || '').toLowerCase()) ? String(body.sender_role).toLowerCase() : 'operator',
@@ -7675,7 +7893,23 @@ async function zeroOsProvisionOwnerSkyEmail(env, auth, body = {}) {
 async function founderCommandSkyEmail(request, env, ctx, auth) {
   if (request.method === 'GET') {
     const record = await zeroOsReadOwnerSkyEmail(env);
-    return json({ok:true, configured:Boolean(record?.mailbox_email), default_email:zeroOsOwnerSkyEmailDefault(env), record, origin:String(env.SKYEMAIL_PLATFORM_ORIGIN || env.SKYMAIL_PUBLIC_URL || 'https://skyemail-platform.graylondonskyes.workers.dev').replace(/\/+$/, '')});
+    const inventory = await founderSkyEmailInventory(env).catch(error => ({
+      ok:false,
+      error:founderCleanText(error?.message || 'SkyeMail mailbox inventory unavailable.', 500),
+      count:0,
+      counts:{total:0, active:0, zoho:0, provider_ready:0, inactive:0},
+      mailboxes:[]
+    }));
+    return json({
+      ok:true,
+      configured:Boolean(record?.mailbox_email || inventory.count),
+      default_email:zeroOsOwnerSkyEmailDefault(env),
+      record,
+      inventory,
+      origin:String(env.SKYEMAIL_PLATFORM_ORIGIN || env.SKYMAIL_PUBLIC_URL || 'https://skyemail-platform.graylondonskyes.workers.dev').replace(/\/+$/, ''),
+      auth_boundary:'shared FS27/SkyGate/Free99 owner session',
+      credential_policy:'Founder Command stores mailbox identity, owner routing, launch URLs, and proof metadata. It does not store or return raw mailbox passwords, bearer tokens, cookies, or private keys.'
+    });
   }
   if (request.method !== 'POST') return json({ok:false, error:'Method not allowed'}, 405);
   const body = await readJson(request);
@@ -7732,6 +7966,109 @@ async function founderSkyEmailServiceSummary(env, params, serviceToken) {
     route:last?.route || routes[0]
   };
 }
+
+function founderSkyEmailSafeInventory(data = {}) {
+  const mailboxes = Array.isArray(data.mailboxes) ? data.mailboxes : [];
+  return {
+    ok: data.ok === true,
+    schema: data.schema || '',
+    generated_at: data.generated_at || '',
+    origin: founderCleanText(data.origin || '', 500),
+    route: founderCleanText(data.route || '/mailboxes-service-list', 180),
+    count: Number(data.count || mailboxes.length || 0),
+    counts: {
+      total: Number(data.counts?.total || mailboxes.length || 0),
+      active: Number(data.counts?.active || 0),
+      zoho: Number(data.counts?.zoho || 0),
+      provider_ready: Number(data.counts?.provider_ready || 0),
+      inactive: Number(data.counts?.inactive || 0)
+    },
+    auth_boundary: founderCleanText(data.auth_boundary || 'shared FS27/SkyGate/Free99 owner session', 300),
+    credential_policy: founderCleanText(data.credential_policy || 'Founder Command shows mailbox routing/login handoff metadata only; raw provider passwords and bearer tokens are not exposed.', 700),
+    mailboxes: mailboxes.slice(0, 500).map((item) => ({
+      id: founderCleanText(item.id || '', 160),
+      user_id: founderCleanText(item.user_id || '', 160),
+      mailbox_email: zeroOsGateCleanEmail(item.mailbox_email || ''),
+      owner_email: zeroOsGateCleanEmail(item.owner_email || ''),
+      owner_handle: founderCleanText(item.owner_handle || '', 160),
+      workspace_id: founderCleanText(item.workspace_id || '', 160),
+      skymail_id: founderCleanText(item.skymail_id || '', 160),
+      fs27_customer_id: founderCleanText(item.fs27_customer_id || '', 160),
+      provider: founderCleanText(item.provider || '', 80),
+      status: founderCleanText(item.status || '', 80),
+      provisioning_status: founderCleanText(item.provisioning_status || '', 120),
+      domain: founderCleanText(item.domain || '', 160),
+      inbox_total: Number(item.inbox_total || 0),
+      inbox_unread: Number(item.inbox_unread || 0),
+      sent_total: Number(item.sent_total || 0),
+      last_message_at: founderCleanText(item.last_message_at || '', 80),
+      provisioned_at: founderCleanText(item.provisioned_at || '', 80),
+      updated_at: founderCleanText(item.updated_at || '', 80),
+      login: {
+        auth_mode: founderCleanText(item.login?.auth_mode || 'shared FS27/SkyGate/Free99 owner session', 180),
+        owner_login_url: founderCleanText(item.login?.owner_login_url || '/admin/login.html?return=%2Flive%2FSkyeMail%2Fsession-handoff.html', 700),
+        skyemail_session_handoff: founderCleanText(item.login?.skyemail_session_handoff || '', 500),
+        mailbox_dashboard_url: founderCleanText(item.login?.mailbox_dashboard_url || '', 700),
+        credential_policy: founderCleanText(item.login?.credential_policy || '', 700)
+      }
+    })).filter((item) => item.mailbox_email)
+  };
+}
+
+async function founderSkyEmailInventory(env, options = {}) {
+  const serviceToken = founderSkyEmailServiceToken(env);
+  if (!serviceToken) {
+    return {
+      ok: false,
+      configured: false,
+      service_token_configured: false,
+      service_binding: Boolean(env.SKYEMAIL_PLATFORM_WORKER?.fetch),
+      error: 'SKYMAIL_SERVICE_TOKEN is required for Founder Command to read the full SkyeMail mailbox inventory.',
+      count: 0,
+      counts: {total: 0, active: 0, zoho: 0, provider_ready: 0, inactive: 0},
+      mailboxes: []
+    };
+  }
+  const limit = Math.min(500, Math.max(1, Number(options.limit || 250) || 250));
+  const headers = {
+    accept: 'application/json',
+    authorization: `Bearer ${serviceToken}`,
+    'x-skymail-service-token': serviceToken
+  };
+  const routes = [
+    `/mailboxes-service-list?limit=${limit}`,
+    `/api/mailboxes-service-list?limit=${limit}`,
+    `/.netlify/functions/mailboxes-service-list?limit=${limit}`
+  ];
+  let last = null;
+  for (const route of routes) {
+    const response = await founderSkyEmailPlatformRequest(env, route, {headers});
+    const data = await response.json().catch(() => ({}));
+    if (response.ok && data?.ok !== false) {
+      return {
+        ...founderSkyEmailSafeInventory(data),
+        configured: true,
+        service_token_configured: true,
+        service_binding: Boolean(env.SKYEMAIL_PLATFORM_WORKER?.fetch),
+        source_route: route
+      };
+    }
+    last = {route, status: response.status, data};
+    if (![404, 405].includes(response.status)) break;
+  }
+  return {
+    ok: false,
+    configured: true,
+    service_token_configured: true,
+    service_binding: Boolean(env.SKYEMAIL_PLATFORM_WORKER?.fetch),
+    source_route: last?.route || routes[0],
+    error: founderCleanText(last?.data?.error || `SkyeMail mailbox inventory returned ${last?.status || 0}`, 500),
+    count: 0,
+    counts: {total: 0, active: 0, zoho: 0, provider_ready: 0, inactive: 0},
+    mailboxes: []
+  };
+}
+
 async function founderSkyEmailSessionToken(env, gateToken, claim = {}) {
   if (!gateToken) return '';
   const response = await founderSkyEmailPlatformRequest(env, '/auth-fs27-session', {
@@ -8079,7 +8416,14 @@ async function founderCommandSkyEmailHandoffs(request, env, ctx, auth, url) {
     }
     const handoffs = await readKVLedgerByPrefix(env, 'founder_skyemail_handoff:', Math.min(100, Math.max(1, Number(url.searchParams.get('limit') || 50) || 50)));
     const main = env.SITE_EVENTS_KV?.get ? await env.SITE_EVENTS_KV.get('founder_skyemail_workspace:metraiyux-0s', {type:'json'}).catch(() => null) : null;
-    return json({ok:true, handoffs, count:handoffs.length, main_workspace:main, route:'/api/founder-command/skyemail/handoffs'});
+    const inventory = await founderSkyEmailInventory(env).catch(error => ({
+      ok:false,
+      error:founderCleanText(error?.message || 'SkyeMail mailbox inventory unavailable.', 500),
+      count:0,
+      counts:{total:0, active:0, zoho:0, provider_ready:0, inactive:0},
+      mailboxes:[]
+    }));
+    return json({ok:true, handoffs, count:handoffs.length, main_workspace:main, inventory, route:'/api/founder-command/skyemail/handoffs'});
   }
   if (request.method !== 'POST') return json({ok:false, error:'Method not allowed'}, 405);
   const body = await readJson(request);
@@ -9630,6 +9974,195 @@ function founderCommandMergeAccounts(sourceAccounts = [], storedAccounts = []) {
   }
   return [...map.values()].sort((a, b) => String(a.display_name || '').localeCompare(String(b.display_name || '')));
 }
+function founderCommandSkyEmailInventoryUnavailable(error = null) {
+  return {
+    ok:false,
+    configured:false,
+    error:founderCleanText(error?.message || 'SkyeMail mailbox inventory unavailable.', 500),
+    count:0,
+    counts:{total:0, active:0, zoho:0, provider_ready:0, inactive:0},
+    mailboxes:[]
+  };
+}
+function founderCommandSkyEmailMailboxDirectValues(mailbox = {}) {
+  return [
+    mailbox.mailbox_email,
+    mailbox.skymail_id,
+    mailbox.id,
+    mailbox.user_id,
+    mailbox.workspace_id,
+    mailbox.fs27_customer_id
+  ].map((value) => founderCommandIdentityNormalize(value)).filter(Boolean);
+}
+function founderCommandSkyEmailValueMatches(value, normalizedValues = []) {
+  const clean = founderCommandIdentityNormalize(value);
+  if (!clean) return false;
+  const slug = founderSlug(clean, '');
+  return normalizedValues.some((item) => item === clean || (slug && founderSlug(item, '') === slug));
+}
+function founderCommandSkyEmailAccountMatch(account = {}, mailbox = {}) {
+  const directValues = founderCommandSkyEmailMailboxDirectValues(mailbox);
+  const ids = account.ids && typeof account.ids === 'object' ? account.ids : {};
+  const profile = account.profile && typeof account.profile === 'object' ? account.profile : {};
+  const checks = [
+    ['client_account_id', account.client_account_id],
+    ['skyemail', ids.skyemail],
+    ['skymail_id', ids.skymail_id],
+    ['skyemail_mailbox_id', ids.skyemail_mailbox_id || ids.mailbox_id],
+    ['skyemail_user_id', ids.skyemail_user_id],
+    ['workspace_id', ids.workspace_id],
+    ['fs27_customer_id', ids.fs27_customer_id],
+    ['profile.email', profile.email === mailbox.mailbox_email ? profile.email : '']
+  ];
+  for (const [field, value] of checks) {
+    if (founderCommandSkyEmailValueMatches(value, directValues)) return {matched:true, source:'account', field, value:founderCleanText(value, 600)};
+  }
+  return {matched:false};
+}
+function founderCommandSkyEmailLinkMatch(link = {}, mailbox = {}) {
+  const system = founderSlug(link.system || link.source_system || '', '');
+  if (!['skyemail', 'skymail'].includes(system)) return {matched:false};
+  const directValues = founderCommandSkyEmailMailboxDirectValues(mailbox);
+  const checks = [
+    ['id_value', link.id_value],
+    ['source_id', link.source_id],
+    ['source_email', link.source_email],
+    ['source_record_id', link.source_record_id],
+    ['source_slug', link.source_slug]
+  ];
+  for (const [field, value] of checks) {
+    if (founderCommandSkyEmailValueMatches(value, directValues)) return {matched:true, source:'identity_link', field, value:founderCleanText(value, 600), link};
+  }
+  return {matched:false};
+}
+function founderCommandSkyEmailFindMailboxAccount(mailbox = {}, accounts = [], identityLinks = []) {
+  for (const account of accounts) {
+    const match = founderCommandSkyEmailAccountMatch(account, mailbox);
+    if (match.matched) return {account, match};
+  }
+  for (const link of identityLinks) {
+    const match = founderCommandSkyEmailLinkMatch(link, mailbox);
+    if (!match.matched) continue;
+    const account = accounts.find((item) => item.client_account_id === link.client_account_id);
+    if (account) return {account, match};
+  }
+  return null;
+}
+function founderCommandSkyEmailMailboxAccount(mailbox = {}, existing = null, auth = {}) {
+  const now = new Date().toISOString();
+  const mailboxEmail = zeroOsGateCleanEmail(mailbox.mailbox_email || '');
+  const mailboxSlug = founderSlug(mailboxEmail || mailbox.skymail_id || mailbox.id || 'mailbox', 'mailbox');
+  const localPart = mailboxEmail.split('@')[0] || mailboxSlug;
+  const workspaceId = founderCleanText(mailbox.workspace_id || existing?.ids?.workspace_id || `skyemail-${mailboxSlug}`, 180);
+  const status = founderCleanText(mailbox.status || mailbox.provisioning_status || 'mailbox-recorded', 120);
+  const login = mailbox.login && typeof mailbox.login === 'object' ? mailbox.login : {};
+  return {
+    ...(existing || {}),
+    schema:'metraiyux.founder-command.client-account.v2',
+    client_account_id: founderCleanText(existing?.client_account_id || `founder-client:skyemail-${mailboxSlug}`, 220),
+    sovereign_owner_account_id: FOUNDER_OWNER_ACCOUNT_ID,
+    owner_legal_entity:'Skyes Over London LC',
+    display_name: founderCleanText(existing?.display_name || mailbox.owner_handle || localPart || mailboxEmail || `SkyeMail ${mailboxSlug}`, 220),
+    client_type: founderCleanText(existing?.client_type || 'skyemail-mailbox', 120),
+    status: status === 'active' || status === 'provisioned' ? 'skyemail-mailbox-active' : `skyemail-${status}`,
+    source_systems: [...new Set([...(existing?.source_systems || []), 'skyemail', 'skymail', 'founder-command'])],
+    ids: {
+      ...(existing?.ids || {}),
+      client_id: founderCleanText(existing?.ids?.client_id || `skyemail-${mailboxSlug}`, 180),
+      workspace_id: workspaceId,
+      skyemail: founderCleanText(existing?.ids?.skyemail || mailboxEmail, 254),
+      skymail_id: founderCleanText(existing?.ids?.skymail_id || mailbox.skymail_id || '', 180),
+      skyemail_mailbox_id: founderCleanText(existing?.ids?.skyemail_mailbox_id || mailbox.id || '', 180),
+      skyemail_user_id: founderCleanText(existing?.ids?.skyemail_user_id || mailbox.user_id || '', 180),
+      fs27_customer_id: founderCleanText(existing?.ids?.fs27_customer_id || mailbox.fs27_customer_id || '', 180)
+    },
+    profile: {
+      ...(existing?.profile || {}),
+      email: zeroOsGateCleanEmail(existing?.profile?.email || mailbox.owner_email || mailboxEmail),
+      mailbox_email: mailboxEmail,
+      owner_email: zeroOsGateCleanEmail(mailbox.owner_email || existing?.profile?.owner_email || ''),
+      domain: founderCleanText(mailbox.domain || '', 160),
+      provider: founderCleanText(mailbox.provider || '', 80)
+    },
+    routes: {
+      ...(existing?.routes || {}),
+      skyemail_dashboard: founderCleanText(login.mailbox_dashboard_url || founderSkyEmailHandoffPath('dashboard.html'), 800),
+      skyemail_session_handoff: founderCleanText(login.skyemail_session_handoff || founderSkyEmailHandoffPath('dashboard.html'), 800),
+      skyemail_compose: founderSkyEmailHandoffPath('compose.html'),
+      founder_mailboxes: '/founder-command/?view=mailboxes',
+      skyemail_inventory_api: '/api/founder-command/skyemail?include_inventory=1'
+    },
+    skyemail_custody: {
+      mailbox_email: mailboxEmail,
+      provider: founderCleanText(mailbox.provider || '', 80),
+      status: founderCleanText(mailbox.status || '', 80),
+      provisioning_status: founderCleanText(mailbox.provisioning_status || '', 120),
+      inbox_total: Number(mailbox.inbox_total || 0),
+      inbox_unread: Number(mailbox.inbox_unread || 0),
+      sent_total: Number(mailbox.sent_total || 0),
+      last_message_at: founderCleanText(mailbox.last_message_at || '', 80),
+      provisioned_at: founderCleanText(mailbox.provisioned_at || '', 80),
+      updated_at: founderCleanText(mailbox.updated_at || '', 80),
+      credential_policy:'No raw provider mailbox password, bearer token, cookie, or private key is stored in Founder Command.'
+    },
+    paperwork:{...(existing?.paperwork || {}), status:'skyemail-provider-custody-linked', next_action:'Operate through shared 0S Gate and source-system SkyeMail proofs.'},
+    billing:{...(existing?.billing || {}), status:'skyemail-free-or-managed-seat', revenue_stage:'mailbox-retention-entrypoint'},
+    auth_boundary:'shared FS27/SkyGate/Free99 owner gate; no client-local founder/admin password',
+    created_at: existing?.created_at || now,
+    updated_at: now,
+    updated_by: founderActor(auth)
+  };
+}
+function founderCommandSkyEmailMailboxIdentityLinks(mailbox = {}, account = {}, auth = {}) {
+  const mailboxEmail = zeroOsGateCleanEmail(mailbox.mailbox_email || '');
+  const base = {
+    source_system:'skymail',
+    confidence:'provider-inventory-backfilled',
+    verification:'skyemail-service-inventory-shared-gate',
+    metadata:{
+      provider:mailbox.provider || '',
+      status:mailbox.status || '',
+      provisioning_status:mailbox.provisioning_status || '',
+      workspace_id:mailbox.workspace_id || '',
+      credential_policy:'no raw mailbox credentials exposed'
+    }
+  };
+  const specs = [
+    {table:'hosted_mailboxes', id:mailbox.id || mailbox.skymail_id || mailboxEmail, email:mailboxEmail, type:'provider-mailbox'}
+  ].filter((item) => item.id);
+  return specs.map((item) => founderCommandIdentityLinkFromBody({
+    ...base,
+    id:`link_${founderShortHash(`${account.client_account_id}:skymail:${item.table}:${item.id}`)}`,
+    source_table:item.table,
+    source_id:item.id,
+    source_email:item.email || '',
+    link_type:item.type,
+    id_type:item.type
+  }, account, auth));
+}
+function founderCommandSkyEmailCustodySummary(inventory = {}, accounts = [], identityLinks = []) {
+  const mailboxes = Array.isArray(inventory?.mailboxes) ? inventory.mailboxes : [];
+  const represented = mailboxes.map((mailbox) => {
+    const found = founderCommandSkyEmailFindMailboxAccount(mailbox, accounts, identityLinks);
+    return {
+      mailbox_email: mailbox.mailbox_email,
+      represented: Boolean(found?.account?.client_account_id),
+      client_account_id: found?.account?.client_account_id || '',
+      match: found?.match || null
+    };
+  });
+  const representedCount = represented.filter((item) => item.represented).length;
+  return {
+    ok: inventory?.ok === true,
+    provider_mailboxes: mailboxes.length,
+    provider_represented: representedCount,
+    provider_missing: Math.max(0, mailboxes.length - representedCount),
+    missing_mailboxes: represented.filter((item) => !item.represented).map((item) => item.mailbox_email).filter(Boolean).slice(0, 100),
+    represented_mailboxes: represented.filter((item) => item.represented).slice(0, 100),
+    inventory_counts: inventory?.counts || {total:mailboxes.length, active:0, zoho:0, provider_ready:0, inactive:0},
+    route:'/api/founder-command/skyemail/mailboxes/backfill'
+  };
+}
 async function founderCommandAccountsPayload(request, env, auth, url, options = {}) {
   const limit = Math.max(1, Math.min(1000, Number(url?.searchParams?.get('limit') || options.limit || 1000) || 1000));
   const operationLimit = options.includeOperations === false ? 0 : Math.max(1, Math.min(1000, Number(options.operationLimit || limit) || limit));
@@ -9648,6 +10181,8 @@ async function founderCommandAccountsPayload(request, env, auth, url, options = 
     linkLimit ? founderCommandReadDurablePrefix(env, FOUNDER_ACCOUNT_LINK_KV_PREFIX, linkLimit) : Promise.resolve([])
   ]);
   const accounts = founderCommandMergeAccounts(sourceAccounts, [...d1Accounts, ...kvAccounts]);
+  const skyemailInventory = options.includeSkyEmailInventory === false ? founderCommandSkyEmailInventoryUnavailable() : await founderSkyEmailInventory(env, {limit:500}).catch((error) => founderCommandSkyEmailInventoryUnavailable(error));
+  const skyemailCustody = founderCommandSkyEmailCustodySummary(skyemailInventory, accounts, identityLinks);
   return {
     ok: true,
     schema: FOUNDER_ACCOUNTS_SCHEMA,
@@ -9671,12 +10206,16 @@ async function founderCommandAccountsPayload(request, env, auth, url, options = 
       returned: Math.min(accounts.length, limit),
       operations: operations.length,
       identity_links: identityLinks.length,
-      valley_verified_accounts: accounts.filter((account) => account.ids?.valley_business_id).length,
-      skyemail_ready: accounts.filter((account) => account.ids?.skyemail).length,
-      ae_work_orders: accounts.filter((account) => account.ids?.ae_work_order_id).length,
-      client_app_factory: accounts.filter((account) => account.ids?.client_app_factory_id).length
-    },
-    accounts: accounts.slice(0, limit),
+	      valley_verified_accounts: accounts.filter((account) => account.ids?.valley_business_id).length,
+	      skyemail_ready: accounts.filter((account) => account.ids?.skyemail).length,
+	      skyemail_provider_mailboxes: skyemailCustody.provider_mailboxes,
+	      skyemail_provider_represented: skyemailCustody.provider_represented,
+	      skyemail_provider_missing: skyemailCustody.provider_missing,
+	      ae_work_orders: accounts.filter((account) => account.ids?.ae_work_order_id).length,
+	      client_app_factory: accounts.filter((account) => account.ids?.client_app_factory_id).length
+	    },
+    skyemail_custody: skyemailCustody,
+	    accounts: accounts.slice(0, limit),
     operations: options.includeOperations === false ? [] : operations.slice(0, Math.min(250, limit)),
     identity_links: options.includeLinks === false ? [] : identityLinks.slice(0, Math.min(250, limit)),
 	    routes: {
@@ -9687,10 +10226,11 @@ async function founderCommandAccountsPayload(request, env, auth, url, options = 
 	      identity_resolve: '/api/founder-command/identity/resolve',
 	      identity_link: '/api/founder-command/identity/link',
 	      identity_backfill: '/api/founder-command/identity/backfill',
-	      operations: '/api/founder-command/accounts/:id/operations',
-	      backfill: '/api/founder-command/accounts/backfill',
-	      sources: '/api/founder-command/crosswalk/sources'
-	    },
+		      operations: '/api/founder-command/accounts/:id/operations',
+		      backfill: '/api/founder-command/accounts/backfill',
+		      skyemail_mailbox_backfill: '/api/founder-command/skyemail/mailboxes/backfill',
+		      sources: '/api/founder-command/crosswalk/sources'
+		    },
     boundaries: [
       'Founder Command is the owner crosswalk; Valley Verified, Music Nexus, RouteX, SovereignDocs, SkyeCommerce, SkyPay, and SkyeMail remain source systems.',
       'All account operations stay behind the shared FS27/SkyGate/Free99 owner session.',
@@ -9719,10 +10259,14 @@ function founderCommandAccountFromBody(body = {}, existing = null, auth = {}) {
       ...(existing?.ids || {}),
       client_id: founderCleanText(body.client_id || body.clientId || ids.client_id || ids.clientId || existing?.ids?.client_id || founderSlug(clientAccountId.replace(/^founder-client:/, ''), 'client'), 180),
       workspace_id: founderCleanText(body.workspace_id || body.workspaceId || ids.workspace_id || ids.workspaceId || existing?.ids?.workspace_id || FOUNDER_OWNER_WORKSPACE_ID, 180),
-      valley_business_id: founderCleanText(body.valley_business_id || body.valleyBusinessId || ids.valley_business_id || ids.valleyBusinessId || existing?.ids?.valley_business_id || '', 180),
-      relay_inbox_id: founderCleanText(body.relay_inbox_id || body.relayInboxId || ids.relay_inbox_id || ids.relayInboxId || existing?.ids?.relay_inbox_id || '', 180),
-      skyemail: founderCleanText(body.skyemail || ids.skyemail || existing?.ids?.skyemail || '', 254),
-      ae_contact_id: founderCleanText(body.ae_contact_id || body.aeContactId || ids.ae_contact_id || ids.aeContactId || existing?.ids?.ae_contact_id || '', 180),
+	      valley_business_id: founderCleanText(body.valley_business_id || body.valleyBusinessId || ids.valley_business_id || ids.valleyBusinessId || existing?.ids?.valley_business_id || '', 180),
+	      relay_inbox_id: founderCleanText(body.relay_inbox_id || body.relayInboxId || ids.relay_inbox_id || ids.relayInboxId || existing?.ids?.relay_inbox_id || '', 180),
+	      skyemail: founderCleanText(body.skyemail || ids.skyemail || existing?.ids?.skyemail || '', 254),
+	      skymail_id: founderCleanText(body.skymail_id || body.skymailId || ids.skymail_id || ids.skymailId || existing?.ids?.skymail_id || '', 180),
+	      skyemail_mailbox_id: founderCleanText(body.skyemail_mailbox_id || body.skyemailMailboxId || body.mailbox_id || body.mailboxId || ids.skyemail_mailbox_id || ids.skyemailMailboxId || ids.mailbox_id || ids.mailboxId || existing?.ids?.skyemail_mailbox_id || '', 180),
+	      skyemail_user_id: founderCleanText(body.skyemail_user_id || body.skyemailUserId || ids.skyemail_user_id || ids.skyemailUserId || existing?.ids?.skyemail_user_id || '', 180),
+	      fs27_customer_id: founderCleanText(body.fs27_customer_id || body.fs27CustomerId || ids.fs27_customer_id || ids.fs27CustomerId || existing?.ids?.fs27_customer_id || '', 180),
+	      ae_contact_id: founderCleanText(body.ae_contact_id || body.aeContactId || ids.ae_contact_id || ids.aeContactId || existing?.ids?.ae_contact_id || '', 180),
       routex_user_id: founderCleanText(body.routex_user_id || body.routexUserId || ids.routex_user_id || ids.routexUserId || existing?.ids?.routex_user_id || '', 180),
       music_artist_id: founderCleanText(body.music_artist_id || body.musicArtistId || ids.music_artist_id || ids.musicArtistId || existing?.ids?.music_artist_id || '', 180),
       commerce_merchant_id: founderCleanText(body.commerce_merchant_id || body.commerceMerchantId || ids.commerce_merchant_id || ids.commerceMerchantId || existing?.ids?.commerce_merchant_id || '', 180),
@@ -10161,6 +10705,127 @@ async function founderCommandIdentityLinkRoute(request, env, ctx, auth, url) {
   }, auth).catch(() => null);
   return json({ok:true, schema:FOUNDER_IDENTITY_RESOLVE_SCHEMA, account:resolution.account, link, index, resolution:resolution.resolution, citadel, route:'/api/founder-command/identity/link'}, 201);
 }
+async function founderCommandSkyEmailMailboxBackfillRoute(request, env, ctx, auth, url) {
+  if (!['GET', 'POST'].includes(request.method)) return json({ok:false, error:'Method not allowed'}, 405);
+  const body = request.method === 'POST' ? await readJson(request) : Object.fromEntries(url.searchParams.entries());
+  const limit = Math.max(1, Math.min(500, Number(body.limit || url.searchParams.get('limit') || 500) || 500));
+  const inventory = await founderSkyEmailInventory(env, {limit}).catch((error) => founderCommandSkyEmailInventoryUnavailable(error));
+  if (!inventory.ok) return json({
+    ok:false,
+    schema:'metraiyux.founder-command.skyemail-mailbox-custody.v1',
+    error:inventory.error || 'SkyeMail mailbox inventory unavailable.',
+    inventory,
+    route:'/api/founder-command/skyemail/mailboxes/backfill'
+  }, 502);
+  const [
+    {sources, accounts:sourceAccounts},
+    kvAccounts,
+    d1Accounts,
+    identityLinks
+  ] = await Promise.all([
+    founderCommandSourceAccounts(request, env),
+    founderCommandReadDurablePrefix(env, FOUNDER_ACCOUNT_KV_PREFIX, 1000),
+    founderCommandReadCitadelRows(env, 'client_accounts', 100),
+    founderCommandReadDurablePrefix(env, FOUNDER_ACCOUNT_LINK_KV_PREFIX, 1000)
+  ]);
+  const accounts = founderCommandMergeAccounts(sourceAccounts, [...d1Accounts, ...kvAccounts]);
+  const now = new Date().toISOString();
+  const mailboxRows = (inventory.mailboxes || []).slice(0, limit);
+  const plans = mailboxRows.map((mailbox) => {
+    const found = founderCommandSkyEmailFindMailboxAccount(mailbox, accounts, identityLinks);
+    const account = founderCommandSkyEmailMailboxAccount(mailbox, found?.account || null, auth);
+    const links = founderCommandSkyEmailMailboxIdentityLinks(mailbox, account, auth);
+    return {
+      mailbox_email:mailbox.mailbox_email,
+      existing_account_id:found?.account?.client_account_id || '',
+      match:found?.match || null,
+      account,
+      identity_links:links
+    };
+  });
+  const dryRun = request.method === 'GET' || body.dry_run === true || body.dryRun === true || body.confirm !== true;
+  const planSummary = founderCommandSkyEmailCustodySummary(inventory, accounts, identityLinks);
+  if (dryRun) return json({
+    ok:true,
+    schema:'metraiyux.founder-command.skyemail-mailbox-custody.v1',
+    dry_run:true,
+    generated_at:now,
+    auth_mode:'shared FS27/SkyGate/Free99 owner session',
+    inventory:{ok:inventory.ok, count:inventory.count, counts:inventory.counts, source_route:inventory.source_route || inventory.route},
+    source_counts:sources.counts,
+    custody:planSummary,
+    would_persist_accounts:plans.length,
+    would_persist_identity_links:plans.reduce((total, item) => total + item.identity_links.length, 0),
+    sample:plans.slice(0, 10).map((item) => ({
+      mailbox_email:item.mailbox_email,
+      client_account_id:item.account.client_account_id,
+      existing_account_id:item.existing_account_id,
+      identity_links:item.identity_links.length,
+      match:item.match
+    })),
+    message:'POST confirm=true to persist SkyEmail provider mailbox custody into Founder Command accounts and identity links.',
+    route:'/api/founder-command/skyemail/mailboxes/backfill'
+  });
+	  let accountWrites = 0;
+	  let linkWrites = 0;
+	  let indexRecords = 0;
+	  const mirrorWrites = [];
+	  const nextAccounts = [...accounts];
+	  const nextLinks = [...identityLinks];
+	  for (let i = 0; i < plans.length; i += 8) {
+	    const chunk = plans.slice(i, i + 8);
+	    const results = await Promise.all(chunk.map(async (plan) => {
+	      const accountWritten = await founderCommandPutDurable(env, founderCommandAccountKey(plan.account.client_account_id), plan.account);
+	      const linkResults = await Promise.all(plan.identity_links.map(async (link) => {
+	        const write = await founderCommandPutIdentityLink(env, link);
+	        return {link, write};
+	      }));
+	      return {plan, accountWritten, linkResults};
+	    }));
+	    for (const result of results) {
+	      if (result.accountWritten) accountWrites += 1;
+	      mirrorWrites.push(founderCommandMirrorAccountRow(env, 'client_accounts', result.plan.account.client_account_id, result.plan.account, auth));
+	      const existingIndex = nextAccounts.findIndex((item) => item.client_account_id === result.plan.account.client_account_id);
+	      if (existingIndex >= 0) nextAccounts[existingIndex] = result.plan.account;
+	      else nextAccounts.push(result.plan.account);
+	      for (const {link, write} of result.linkResults) {
+	        linkWrites += write.identity_link ? 1 : 0;
+	        indexRecords += write.index_records || 0;
+	        mirrorWrites.push(founderCommandMirrorAccountRow(env, 'client_identity_links', link.id, link, auth));
+	        const linkIndex = nextLinks.findIndex((item) => item.id === link.id);
+	        if (linkIndex >= 0) nextLinks[linkIndex] = link;
+	        else nextLinks.push(link);
+	      }
+	    }
+	  }
+	  if (ctx?.waitUntil) ctx.waitUntil(Promise.all(mirrorWrites));
+	  else await Promise.all(mirrorWrites);
+	  const custody = founderCommandSkyEmailCustodySummary(inventory, nextAccounts, nextLinks);
+  await commandBridgeAppendEvent(env, {
+    source_app:'founder-command',
+    source_surface:'skyemail-mailboxes',
+    event_type:'founder_command.skyemail.mailbox_custody_backfill',
+    status:'recorded',
+    summary:`SkyEmail mailbox custody backfilled ${accountWrites} accounts and ${linkWrites} identity links`,
+    actor:founderActor(auth),
+    entity:{kind:'skyemail-mailbox-custody', id:FOUNDER_OWNER_WORKSPACE_ID, label:'SkyEmail provider mailbox fleet'},
+    metadata:{accounts:String(accountWrites), identity_links:String(linkWrites), index_records:String(indexRecords), provider_mailboxes:String(custody.provider_mailboxes), represented:String(custody.provider_represented)}
+  }, auth).catch(() => null);
+  return json({
+    ok: custody.provider_mailboxes > 0 && custody.provider_missing === 0,
+    schema:'metraiyux.founder-command.skyemail-mailbox-custody.v1',
+    dry_run:false,
+    generated_at:now,
+	    persisted_accounts:accountWrites,
+	    persisted_identity_links:linkWrites,
+	    persisted_identity_index_records:indexRecords,
+	    citadel_deferred:Boolean(ctx?.waitUntil),
+	    custody,
+    inventory:{ok:inventory.ok, count:inventory.count, counts:inventory.counts, source_route:inventory.source_route || inventory.route},
+    credential_policy:'Founder Command stores mailbox custody metadata and shared-gate launch URLs only; it does not store raw provider mailbox passwords, bearer tokens, cookies, or private keys.',
+    route:'/api/founder-command/skyemail/mailboxes/backfill'
+  }, custody.provider_missing === 0 ? 201 : 207);
+}
 async function founderCommandAccountDetailPayload(request, env, auth, url, accountId) {
   const payload = await founderCommandAccountsPayload(request, env, auth, url, {limit:1000});
   const cleanId = founderCleanText(decodeURIComponent(accountId || ''), 220);
@@ -10389,6 +11054,13 @@ async function founderCommandWorkSystem(request, env, ctx, auth, url) {
   const musicState = await musicReadState(env).catch(() => musicDefaultState());
   const music = musicObservability(musicState, env);
   const skyemail = await zeroOsReadOwnerSkyEmail(env).catch(() => null);
+  const skyemailInventory = await founderSkyEmailInventory(env).catch(error => ({
+    ok:false,
+    error:founderCleanText(error?.message || 'SkyeMail mailbox inventory unavailable.', 500),
+    count:0,
+    counts:{total:0, active:0, zoho:0, provider_ready:0, inactive:0},
+    mailboxes:[]
+  }));
   const bridgeSummary = bridge.summary || {total:0, by_app:{}, by_lane:{}, money_cents:0, money_usd:0};
   const operatingLanes = commandBridgeSurfaceCatalog().map((surface) => founderCommandOperatingLane(surface, bridgeSummary));
   const expansionLanes = founderCommandExpansionLanes();
@@ -10429,6 +11101,13 @@ async function founderCommandWorkSystem(request, env, ctx, auth, url) {
       auth_mode: 'shared FS27/SkyGate/Free99 owner session',
       command_surface: '/founder-command/',
       owner_admin_login: '/admin/login.html?return=%2Ffounder-command%2F%3Fview%3Doperations',
+      backup_gate: {
+        status: 'fs27-owned-recovery-active',
+        owner_email: 'grayskyes@solenterprises.org',
+        accepted_aliases: ['ADMIN_CODE', 'OWNER_ADMIN_CODE', 'FS27_OWNER_PASSWORD', 'FREE99_ADMIN_CODE', 'ZERO_OS_GATE_CODE', 'DEMON_KEY'],
+        secret_values: 'not_exposed',
+        proof_receipt: '/test-artifacts/fs27-unified-auth-live-smoke/latest.json'
+      },
       app_local_passwords_allowed: false
     },
     metrics: {
@@ -10448,7 +11127,12 @@ async function founderCommandWorkSystem(request, env, ctx, auth, url) {
       legal_skyes_refund_proposals: legalSkyes.refund_proposals,
       legal_skyes_committee_jobs_open: legalSkyes.routex_jobs_open,
       music_artists: Number(musicCounts.artists || 0) || 0,
-      music_payouts_retained: Number(musicCounts.payouts || 0) || 0
+	      music_payouts_retained: Number(musicCounts.payouts || 0) || 0,
+	      skyemail_mailboxes: Number(skyemailInventory.counts?.total || skyemailInventory.count || 0),
+	      skyemail_active_mailboxes: Number(skyemailInventory.counts?.active || 0),
+	      skyemail_zoho_mailboxes: Number(skyemailInventory.counts?.zoho || 0),
+	      skyemail_provider_represented: Number(accountPayload?.skyemail_custody?.provider_represented || 0),
+	      skyemail_provider_missing: Number(accountPayload?.skyemail_custody?.provider_missing || 0)
     },
     client_accounts: clients,
 	    account_crosswalk: accountPayload ? {
@@ -10511,12 +11195,15 @@ async function founderCommandWorkSystem(request, env, ctx, auth, url) {
       skyemail: {
         route:'/api/founder-command/skyemail',
         pocket:'/api/founder-command/skyemail/pocket',
-        handoffs:'/api/founder-command/skyemail/handoffs',
-        offboarding:'/api/founder-command/skyemail/offboarding',
-        mailbox_email: skyemail?.mailbox_email || '',
-        status: skyemail?.status || 'not_provisioned',
-        service_ready: Boolean(founderSkyEmailServiceToken(env) || env.SKYEMAIL_PLATFORM_WORKER?.fetch || skyemail?.mailbox_email)
-      }
+	        handoffs:'/api/founder-command/skyemail/handoffs',
+	        offboarding:'/api/founder-command/skyemail/offboarding',
+	        mailbox_email: skyemail?.mailbox_email || '',
+	        status: skyemail?.status || 'not_provisioned',
+		        service_ready: Boolean(founderSkyEmailServiceToken(env) || env.SKYEMAIL_PLATFORM_WORKER?.fetch || skyemail?.mailbox_email),
+		        inventory: skyemailInventory,
+		        custody: accountPayload?.skyemail_custody || null,
+		        credential_policy: 'Founder Command exposes mailbox login handoff metadata through the shared gate. It never returns provider passwords, bearer tokens, cookies, or private keys.'
+	      }
     },
     action_queues: [
       {id:'client-enrollment', label:'Enroll company/client', source:'Client App Factory + NorthStar + Valley Verified', href:'/client-app-factory/', status:'route-ready'},
@@ -10577,9 +11264,10 @@ async function handleFounderCommandRoute(request, env, ctx, url) {
   if (url.pathname === '/api/founder-command/inbox') return founderCommandInbox(request, env, ctx, auth, url);
   if (url.pathname === '/api/founder-command/inbox/conversations') return founderCommandInboxConversation(request, env, ctx, auth);
   if (url.pathname === '/api/founder-command/inbox/messages') return founderCommandInboxMessage(request, env, ctx, auth);
-  if (url.pathname === '/api/founder-command/calendar') return founderCommandCalendar(request, env, ctx, auth, url);
-  if (url.pathname === '/api/founder-command/skyemail') return founderCommandSkyEmail(request, env, ctx, auth);
-  if (url.pathname === '/api/founder-command/skyemail/pocket') return founderCommandSkyEmailPocket(request, env, ctx, auth, url);
+	  if (url.pathname === '/api/founder-command/calendar') return founderCommandCalendar(request, env, ctx, auth, url);
+	  if (url.pathname === '/api/founder-command/skyemail') return founderCommandSkyEmail(request, env, ctx, auth);
+	  if (url.pathname === '/api/founder-command/skyemail/mailboxes/backfill') return founderCommandSkyEmailMailboxBackfillRoute(request, env, ctx, auth, url);
+	  if (url.pathname === '/api/founder-command/skyemail/pocket') return founderCommandSkyEmailPocket(request, env, ctx, auth, url);
   if (url.pathname === '/api/founder-command/skyemail/offboarding') return founderCommandSkyEmailOffboarding(request, env, ctx, auth, url);
   if (url.pathname === '/api/founder-command/skyemail/handoffs') return founderCommandSkyEmailHandoffs(request, env, ctx, auth, url);
   if (url.pathname === '/api/founder-command/repo-vault/download') return founderCommandRepoVaultDownload(request, env, url, auth);
@@ -11070,7 +11758,7 @@ async function handleContentEngineAdminRoute(request, env, ctx, url) {
   if (route === '/ai-response-tiers' && method === 'GET') {
     return json({
       ok:true,
-      providerCostRule:'Local brain first; paid provider calls stay inside active SkyePay/Stripe AI buckets.',
+      providerCostRule:'Local brain first; paid AI calls stay inside active SkyePay AI buckets.',
       tiers:listAiResponseLanes()
     });
   }
@@ -22886,7 +23574,7 @@ function musicArtistToolCatalog(profile = {}, ctx = {}) {
     {id:'logo_brief', kind:'identity', label:'kAIxU logo brief', appId:'kaixu-brand-kit', appName:'kAIxU BrandKit', route:'/Marketing-Made-Easy/kAIxUBrandKit/index.html', handoffUrl:musicBrainToolUrl('/Marketing-Made-Easy/kAIxUBrandKit/index.html', base), outputs:['logo direction','symbol prompts','usage notes'], value:'Creates a practical logo and visual identity brief the artist team can refine.', localOnly:true, providerRequired:false},
     {id:'web_creator_landing', kind:'web', label:'SkyeWebCreator landing plan', appId:'skye-web-creator-max', appName:'SkyeWebCreatorMax', route:'/Marketing-Made-Easy/SkyeWebCreatorMax/builder.html', handoffUrl:musicBrainToolUrl('/Marketing-Made-Easy/SkyeWebCreatorMax/builder.html', base), outputs:['hero copy','section outline','CTA map','asset checklist'], value:'Builds the launch-page skeleton from the current release, store, and artist memory.', localOnly:true, providerRequired:false},
     {id:'launch_offer', kind:'offer', label:'BusinessLaunchGo offer pack', appId:'businesslaunchgo', appName:'BusinessLaunchGo', route:'/Marketing-Made-Easy/BusinessLaunchGo/index.html', handoffUrl:musicBrainToolUrl('/Marketing-Made-Easy/BusinessLaunchGo/index.html', base), outputs:['fan offer','bundle notes','checkout CTA'], value:'Shapes the drop into a fan-facing offer with store and SkyePay intent context.', localOnly:true, providerRequired:false},
-    {id:'press_kit', kind:'docs', label:'SkyeDocxMax press kit', appId:'skyedocxmax', appName:'SkyeDocxMax', route:'/Marketing-Made-Easy/SkyeDocxMax/editor.html', handoffUrl:musicBrainToolUrl('/Marketing-Made-Easy/SkyeDocxMax/editor.html', base), outputs:['artist bio','release one-sheet','media questions'], value:'Turns the artist record into a clean press-kit draft for blogs, venues, and collabs.', localOnly:true, providerRequired:false},
+    {id:'press_kit', kind:'docs', label:'SkyeDocxMax press kit', appId:'skyedocxmax', appName:'SkyeDocxMax', route:'/Marketing-Made-Easy/SkyeDocxMax/editor', handoffUrl:musicBrainToolUrl('/Marketing-Made-Easy/SkyeDocxMax/editor', base), outputs:['artist bio','release one-sheet','media questions'], value:'Turns the artist record into a clean press-kit draft for blogs, venues, and collabs.', localOnly:true, providerRequired:false},
     {id:'campaign_brief', kind:'campaign', label:'BrandForge local campaign brief', appId:'brandforge', appName:'BrandForge Campaign Studio', route:'/Free99/apps/brandforge/brandforge_campaign_studio_v5_uploaded_intro_silent.html', apiRoute:'/api/brandforge/intelligence/brief', handoffUrl:musicBrainToolUrl('/Free99/apps/brandforge/brandforge_campaign_studio_v5_uploaded_intro_silent.html', {...base, skipIntro:1}), outputs:['campaign angle','proof checklist','post hooks','operator notes'], value:'Uses the free local BrandForge intelligence lane before any paid model generation.', localOnly:true, providerRequired:false, paidAiBoundary:'/api/brandforge/ai/generate'},
     {id:'workforce_launch_package', kind:'workforce', label:'RouteX launch package brief', appId:'skyeroutex', appName:'SkyeRouteXFlow Workforce Command', route:'/SkyeRouteX/workforce-command-v0.4.0/public/index.html', handoffUrl:musicBrainToolUrl('/SkyeRouteX/workforce-command-v0.4.0/public/index.html', {...base, sourceApp:'skymusicnexus'}), outputs:['deliverables','contractor roles','proof checklist'], value:'Prepares a RouteX-ready content launch job for operator approval and contractor proof.', localOnly:true, providerRequired:false}
   ];
@@ -24800,7 +25488,7 @@ async function runMusicNexusBrainScheduleTickGuarded(env, ctx, meta = {}) {
 }
 
 const SD_BASE = '/api/sovereigndocs';
-const SD_CANONICAL_SKYEDOCXMAX_EDITOR = '/Marketing-Made-Easy/SkyeDocxMax/editor.html';
+const SD_CANONICAL_SKYEDOCXMAX_EDITOR = '/Marketing-Made-Easy/SkyeDocxMax/editor';
 function sdSkyeDocxMaxLaunchUrl(handoffId, params = {}) {
   const query = new URLSearchParams({
     source: 'sovereigndocs',
@@ -24869,7 +25557,7 @@ function sdBrandingMeta() {
     marker:SD_BRAND_MARKER,
     backingNotice:"Powered and workflow-backed by Skye's Over London LC through MetrAIyux 0S.",
     boundary:"Operational backing means document automation, vault/export tooling, workflow routing, and optional paid legal-review routing. It is not financing, legal advice, an attorney-client relationship, a filing/submission guarantee, a business outcome guarantee, or responsibility for the company's performance, approvals, compliance, or use of the documents.",
-    legalReview:'Legal review is optional and paid up front through the SkyePay/Stripe legal-review lane before partner routing.'
+    legalReview:'Legal review is optional and paid up front through the SkyePay legal-review lane before partner routing.'
   };
 }
 function sdBrandMarkdown(title, markdown) {
@@ -25109,7 +25797,7 @@ async function sdMaybeCreateReviewCheckoutRuntime(env, {reviewId, paymentId, pla
     executed:receipt.executed === true,
     provider_call_made:receipt.provider_call_made === true,
     error:receipt.error || '',
-    stripe_session_id:receipt.provider_result?.id || '',
+	    provider_session_id:receipt.provider_result?.id || '',
     checkout_url:receipt.provider_result?.url || ''
   };
 }
@@ -25200,12 +25888,12 @@ async function sdCreateLegalReviewRequest(env, payload = {}) {
     id:paymentId,
     reviewId,
     status:review.paymentStatus,
-	    provider:'SkyePay / Stripe Checkout',
-	    checkoutProvider:'skyepay_stripe_checkout',
-	    stripeBackedCheckout:true,
+	    provider:'SkyePay Checkout',
+	    checkoutProvider:'skyepay_checkout',
+	    skyepayBackedCheckout:true,
 	    offerId:SD_LEGAL_REVIEW_OFFER_ID,
-    providerRuntime:checkoutRuntime,
-    stripeSessionId:checkoutRuntime?.stripe_session_id || null,
+    skyepayRuntime:checkoutRuntime ? { receipt_id:checkoutRuntime.receipt_id || null, status:checkoutRuntime.status || null, executed:checkoutRuntime.executed === true, checkout_url:checkoutRuntime.checkout_url || '' } : null,
+    providerSessionId:checkoutRuntime?.provider_session_id || null,
     amountCents,
     currency:'usd',
     checkoutUrl,
@@ -25213,7 +25901,7 @@ async function sdCreateLegalReviewRequest(env, payload = {}) {
     platformFeePercent:plan.platformFeePercent,
     partnerReservePercent:plan.partnerReservePercent,
 	    partnerPayoutTiming:'after_partner_return_and_customer_delivery_owner_release',
-	    liveTransferBoundary:'Checkout is routed through SkyePay/Stripe. Partner payout remains ledger-only until payout provider and partner terms are configured.',
+	    liveTransferBoundary:'Checkout is routed through SkyePay. Partner payout remains ledger-only until payout provider and partner terms are configured.',
 	    legalReviewBoundary:sdBrandingMeta().boundary,
 	    createdAt,
     updatedAt:createdAt
@@ -25890,9 +26578,9 @@ No state filing, legal advice, tax advice, bank account, insurance, license, pay
     id:paymentId,
     reviewId,
     status:review.paymentStatus,
-    provider:'SkyePay / Stripe Checkout',
-    checkoutProvider:'skyepay_stripe_checkout',
-    stripeBackedCheckout:true,
+    provider:'SkyePay Checkout',
+    checkoutProvider:'skyepay_checkout',
+    skyepayBackedCheckout:true,
     offerId:SD_LEGAL_REVIEW_OFFER_ID,
     amountCents:plan.amountCents,
     currency:'usd',
@@ -25901,7 +26589,7 @@ No state filing, legal advice, tax advice, bank account, insurance, license, pay
     platformFeePercent:plan.platformFeePercent,
     partnerReservePercent:plan.partnerReservePercent,
     partnerPayoutTiming:'after_partner_return_and_customer_delivery_owner_release',
-    liveTransferBoundary:'Checkout is routed through SkyePay/Stripe. Partner payout remains ledger-only until payout provider and partner terms are configured.',
+    liveTransferBoundary:'Checkout is routed through SkyePay. Partner payout remains ledger-only until payout provider and partner terms are configured.',
     legalReviewBoundary:sdBrandingMeta().boundary,
     createdAt,
     updatedAt:createdAt
@@ -26036,7 +26724,7 @@ No state filing, legal advice, tax advice, bank account, insurance, license, pay
       entity:{kind:'business_formation_workflow', id:workflow.id, label:facts.businessName},
       crm:{contact_email:facts.ownerEmail, contact_name:facts.ownerName, account:facts.businessName, stage:workflow.status, owner:auth.actor || ''},
       ids:{workflow_id:workflow.id, case_id:caseId, packet_id:packetId, review_id:reviewId, routex_job_id:workflow.routexJobId || '', client_id:facts.clientId, skynet_project_id:workflow.skynetIntent.projectId},
-      money:{amount_cents:plan.amountCents || 0, currency:'USD', provider:'SkyePay / Stripe Checkout'},
+      money:{amount_cents:plan.amountCents || 0, currency:'USD', provider:'SkyePay Checkout'},
       links:[
         {label:'SovereignDocs case', href:workflow.dashboards.caseState, kind:'api'},
         {label:'Legal review checkout', href:checkoutUrl, kind:'skypay'},
@@ -26990,7 +27678,7 @@ async function sdHandleSovereignDocsRoute(request, env, ctx, url) {
     return json({ok:true, reminder, items:reminders});
   }
   if (path === '/legal-partners/network' && method === 'GET') return json({ok:true, version:'10.0.0', stateBarDirectory:SD_STATE_BAR_DIRECTORY_URL, partners:SD_LEGAL_PARTNERS, boundaries:['Candidate legal partner workspaces are not active partnership claims.','SovereignDocs is not a law firm and does not provide legal advice.','Partner routing requires payment, vault storage, partner activation, conflicts policy, signed terms, and payout setup.']});
-  if (path === '/legal-review/service-plans' && method === 'GET') return json({ok:true, version:'10.0.0', skyepayOfferId:SD_LEGAL_REVIEW_OFFER_ID, skyepayReviewUrl:SD_SKYEPAY_LEGAL_REVIEW_URL, plans:SD_LEGAL_REVIEW_PLANS, brand:sdBrandingMeta(), stripeCheckoutBoundary:{provider:'SkyePay / Stripe Checkout', customerPays:'upfront_before_partner_routing', partnerRoutingBlockedUntil:'payment_confirmed_and_partner_activated', noLegalAdvice:true, noOutcomeGuarantee:true}, defaultRevenuePolicy:{customerPays:'upfront_before_partner_routing', platformFeePercent:30, partnerReservePercent:70, partnerPayoutTiming:'after_partner_return_and_customer_delivery_owner_release', liveMoneyMovement:'SkyePay/Stripe checkout and internal ledger; external transfer requires configured payout provider.'}});
+  if (path === '/legal-review/service-plans' && method === 'GET') return json({ok:true, version:'10.0.0', skyepayOfferId:SD_LEGAL_REVIEW_OFFER_ID, skyepayReviewUrl:SD_SKYEPAY_LEGAL_REVIEW_URL, plans:SD_LEGAL_REVIEW_PLANS, brand:sdBrandingMeta(), skyepayCheckoutBoundary:{provider:'SkyePay Checkout', customerPays:'upfront_before_partner_routing', partnerRoutingBlockedUntil:'payment_confirmed_and_partner_activated', noLegalAdvice:true, noOutcomeGuarantee:true}, defaultRevenuePolicy:{customerPays:'upfront_before_partner_routing', platformFeePercent:30, partnerReservePercent:70, partnerPayoutTiming:'after_partner_return_and_customer_delivery_owner_release', liveMoneyMovement:'SkyePay checkout and internal ledger; external transfer requires configured payout provider.'}});
   if (path === '/legal-review/submit' && method === 'POST') return sdCreateLegalReviewRequest(env, await readJson(request));
   if (path === '/legal-review/payments' && method === 'GET') return json({ok:true, items:await sdGet(env, 'review_payments'), storage_mode:sdStorageMode(env)});
   if (path === '/legal-review/payouts' && method === 'GET') return json({ok:true, items:await sdGet(env, 'review_payouts'), storage_mode:sdStorageMode(env)});
@@ -27008,7 +27696,7 @@ async function sdHandleSovereignDocsRoute(request, env, ctx, url) {
     if (!review) return json({ok:false, error:'review_not_found'}, 404);
     const payment = state.reviewPayments.find(item => item.reviewId === review.id || item.id === review.paymentIntentId);
     let providerRuntimeStatus = null;
-    const sessionId = sdClean(payload.session_id || payload.sessionId || payload.stripeSessionId || payment?.stripeSessionId || payment?.stripe_session_id || '', 220);
+    const sessionId = sdClean(payload.session_id || payload.sessionId || payload.providerSessionId || payload.stripeSessionId || payment?.providerSessionId || payment?.stripeSessionId || payment?.stripe_session_id || '', 220);
     const hasStripe = Boolean(routexFirstEnv(env, ['STRIPE_SECRET_KEY','STRIPE_SECRET','STRIPE_SECRET_KEY_LIVE','SKYGATEFS13_STRIPE_SECRET_KEY']));
     if (sessionId && (hasStripe || routexProviderRuntimeSandbox(env))) {
       const sandbox = routexProviderRuntimeSandbox(env);
@@ -27583,7 +28271,9 @@ function skyEmailSessionHandoffPageResponse(env) {
     const storageKeys = [
       'METRAIYUX_GATE_SESSION',
       'SKYGATEFS27_GATE_SESSION',
-      'SKYE_GATE_SESSION'
+      'SKYE_GATE_SESSION',
+      'FREE99_PLATFORM_GATE_SESSION',
+      'FREE99_GATE_SESSION'
     ];
 
     function set(message) {
@@ -27827,10 +28517,19 @@ async function rewriteSovereignDocsStaticLaneResponse(response, headers, url) {
     .replaceAll(oldReviewCopy, 'sensitive templates route through internal QA and SkyeDocxMax before public export')
     .replaceAll(`6,069 ${oldReviewCopy}.`, 'Document governance workspace is routing sensitive templates through internal QA and SkyeDocxMax before public export.')
     .replaceAll('<span class="chip">${esc(r.recommended_next_status)}</span>', '<span class="chip">SkyeDocxMax review lane</span>')
-    .replaceAll(oldStaticModeCopy, '0S workspace mode is active through the shared FS27/SkyGate lane.')
-    .replaceAll(oldGuidedBuilderCopy, 'Open in SkyeDocxMax')
-    .replaceAll('Open Builder', 'Open SkyeDocxMax')
-    .replaceAll('/Free99/apps/sovereigndocs/builder/', skyeDocxHref);
+	    .replaceAll(oldStaticModeCopy, '0S workspace mode is active through the shared FS27/SkyGate lane.')
+	    .replaceAll(oldGuidedBuilderCopy, 'Open in SkyeDocxMax')
+	    .replaceAll('Open Builder', 'Open SkyeDocxMax')
+	    .replaceAll('legal review uses SkyePay / Stripe checkout', 'legal review uses SkyePay checkout')
+	    .replaceAll('SkyePay/' + 'Stripe checkout', 'SkyePay checkout')
+	    .replaceAll('SkyePay/' + 'Stripe legal-review lane', 'SkyePay legal-review lane')
+	    .replaceAll('SkyePay/' + 'Stripe.', 'SkyePay.')
+	    .replaceAll('SkyePay / Stripe checkout', 'SkyePay checkout')
+	    .replaceAll('Stripe-backed checkout', 'SkyePay-secured checkout')
+	    .replaceAll('Stripe Checkout', 'SkyePay Checkout')
+	    .replaceAll('Stripe payment', 'SkyePay payment')
+	    .replaceAll('Stripe product', 'SkyePay product')
+	    .replaceAll('/Free99/apps/sovereigndocs/builder/', skyeDocxHref);
   const pocket = injectSkyEmailPocketScript(body);
   body = pocket.body;
   headers.delete('content-length');
@@ -27982,7 +28681,7 @@ function zeroOsGateLoginRedirect(url) {
 }
 function legacySkyeVaultProDocxRedirectResponse(url) {
   if (!url.pathname.startsWith('/Free99/apps/skyevaultpro/apps/docx')) return null;
-  const target = new URL('/Marketing-Made-Easy/SkyeDocxMax/editor.html', url.origin);
+  const target = new URL('/Marketing-Made-Easy/SkyeDocxMax/editor', url.origin);
   url.searchParams.forEach((value, key) => target.searchParams.set(key, value));
   if (!target.searchParams.has('source')) target.searchParams.set('source', 'skyevaultpro');
   if (!target.searchParams.has('returnTo')) target.searchParams.set('returnTo', '/Free99/apps/skyevaultpro/drive/index.html');

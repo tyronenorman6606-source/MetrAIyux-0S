@@ -88,7 +88,7 @@
       const hostedMailbox = settings.hosted?.mailbox?.mailbox_email || '';
       qs('#gmailStatus').textContent = hostedMailbox ? `Connected mailbox • ${hostedMailbox}` : (settings.gmail?.connected ? `Connected mailbox • ${settings.gmail.google_email}` : 'No SkyeMail mailbox provisioned');
       qs('#scopeStatus').textContent = hostedMailbox ? 'SkyeMail mailbox settings are ready.' : (settings.gmail?.signature_scope_ready ? 'Mailbox settings scope is ready.' : (settings.gmail?.scope_note || 'Provision SkyeMail to manage mailbox settings.'));
-      qs('#contactsScope').textContent = settings.gmail?.connected ? `Contacts sync ${settings.gmail.contacts_last_sync_at ? `ready • last sync ${fmtDate(settings.gmail.contacts_last_sync_at)}` : 'ready • never synced yet'}` : 'Citadel/SkyeNet aliases and contact records are managed here.';
+      qs('#contactsScope').textContent = settings.gmail?.connected ? `Contacts sync ${settings.gmail.contacts_last_sync_at ? `ready • last sync ${fmtDate(settings.gmail.contacts_last_sync_at)}` : 'ready • never synced yet'}` : 'Citadel Database and SkyeNet aliases and contact records are managed here.';
       renderAliases([...(settings.hosted?.aliases || []), ...(settings.gmail?.aliases || [])]);
       const vacation = settings.gmail?.vacation || {};
       qs('#vacation_enabled').checked = !!vacation.enableAutoReply;

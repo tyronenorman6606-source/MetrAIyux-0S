@@ -17,7 +17,7 @@ This pass adds the first real platform-control layer: FS27-gated session exchang
 - All JS/MJS files under `netlify`, `assets`, `runtime`, `smoke`, `tools`, and `suite` passed `node --check`.
 - `npm audit --omit=dev --json` reported 0 known vulnerabilities in the lockfile.
 - Schema exists for users, keys, messages, attachments, Gmail mailbox tokens, preferences, contacts, Resend webhook events, and delivery events.
-- Added `auth-fs27-session` so SkyeGateFS27 can be the primary auth gate.
+- Added `auth-fs27-session` so SkyeGate FS27 can be the primary auth gate.
 - Added `mailbox-domains`, `mail-status`, and `mailbox-provision`.
 - Added `hosted_mailboxes` schema.
 - Added Stalwart/external-webhook mailbox provider adapter.

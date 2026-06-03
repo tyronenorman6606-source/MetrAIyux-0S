@@ -99,7 +99,7 @@ async function introspectToken(token) {
   }
   const cleanToken = String(token || "").replace(/^Bearer\s+/i, "").trim();
   if (!cleanToken) {
-    const err = new Error("Missing 0S/SkyGate session.");
+    const err = new Error("Missing 0S/SkyeGate session.");
     err.statusCode = 401;
     throw err;
   }
@@ -112,11 +112,11 @@ async function introspectToken(token) {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ token: cleanToken })
     });
-    const data = await res.json().catch(() => ({ active: false, error: "Invalid 0S/SkyGate response." }));
+    const data = await res.json().catch(() => ({ active: false, error: "Invalid 0S/SkyeGate response." }));
     last = { status: res.status, data, path };
     if (res.status === 404) continue;
     if (!res.ok || data.active !== true) {
-      const err = new Error(data.error || "0S/SkyGate session is inactive.");
+      const err = new Error(data.error || "0S/SkyeGate session is inactive.");
       err.statusCode = res.ok ? 401 : res.status;
       err.skygate = data;
       throw err;
@@ -124,20 +124,87 @@ async function introspectToken(token) {
     return { ...data, _introspection_path: path };
   }
 
-  const err = new Error(`0S/SkyGate introspection endpoint was not found at ${origin}.`);
+  const err = new Error(`0S/SkyeGate introspection endpoint was not found at ${origin}.`);
   err.statusCode = last?.status || 404;
   throw err;
+}
+
+async function linkFs27AppSpine(claims = {}, user = {}, options = {}) {
+  const origin = fs27Origin();
+  if (!origin) return { ok: false, skipped: true, reason: "FS27 origin missing." };
+  const token = String(options.token || "").replace(/^Bearer\s+/i, "").trim();
+  const secret = mirrorSecret();
+  if (!token && !secret) return { ok: false, skipped: true, reason: "FS27 app-spine auth missing." };
+
+  const card = claims.card || claims.gate_card || claims.skyegate_card || null;
+  const payload = {
+    app_id: "skymail",
+    app_label: "SkyeMail",
+    category: "mail",
+    login_surface_slug: "skymail",
+    login_surface_name: "SkyeMail",
+    login_url: "/login.html",
+    handoff_url: "/auth-fs27-session",
+    local_user_id: user.id || null,
+    local_user_kind: "skymail.user",
+    local_workspace_id: user.workspace_id || user.skymail_id || user.id || null,
+    local_workspace_kind: "mail-workspace",
+    workspace_slug: user.workspace_id || null,
+    workspace_name: user.handle ? `${user.handle} SkyeMail` : "SkyeMail workspace",
+    email: user.email || claims.email || claims.username || null,
+    handle: user.handle || null,
+    skymail_user_id: user.id || null,
+    skymail_id: user.skymail_id || null,
+    fs27_user_id: claims.sub || null,
+    fs27_customer_id: claims.customer_id || claims.org || null,
+    fs27_gate_card_id: user.fs27_gate_card_id || claims.gate_card_id || card?.id || card?.card_id || null,
+    app_role: claims.role || "user",
+    tier: "free99",
+    plan_name: "free99-gate-owned",
+    entitlement_keys: ["skymail.mailbox", "skymail.ai.assist"],
+    local_auth_kind: "skymail.local-user-table",
+    local_auth_status: "fs27-linked",
+    migration_action: "linked_to_fs27",
+    migration_status: "preserved",
+    metadata: {
+      skymail_id: user.skymail_id || null,
+      workspace_id: user.workspace_id || null,
+      fs27_sub: claims.sub || null,
+      fs27_role: claims.role || null,
+      fs27_client_id: claims.client_id || null,
+      fs27_gate_card_id: user.fs27_gate_card_id || claims.gate_card_id || null
+    }
+  };
+
+  const headers = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  else headers["x-skygate-mirror-secret"] = secret;
+
+  const paths = ["/app-spine/link", "/auth/app-spine/link", "/.netlify/functions/app-spine-link"];
+  let last = null;
+  for (const path of paths) {
+    const res = await fetch(`${origin}${path}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({ ok: res.ok, status: res.status }));
+    last = { ok: res.ok, status: res.status, data, path };
+    if (res.status === 404) continue;
+    return last;
+  }
+  return last || { ok: false, skipped: true, reason: "FS27 app-spine endpoint not found." };
 }
 
 async function requireFs27(event, options = {}) {
   const claims = await introspectToken(getBearer(event));
   if (options.admin && !isAdminLike(claims)) {
-    const err = new Error("0S/SkyGate session is active but not admin/operator scoped for SkyeMail.");
+    const err = new Error("0S/SkyeGate session is active but not admin/operator scoped for SkyeMail.");
     err.statusCode = 403;
     throw err;
   }
   if (Array.isArray(options.anyScope) && options.anyScope.length && !hasAnyScope(claims, options.anyScope)) {
-    const err = new Error(`0S/SkyGate session is missing required scope: ${options.anyScope.join(" or ")}`);
+    const err = new Error(`0S/SkyeGate session is missing required scope: ${options.anyScope.join(" or ")}`);
     err.statusCode = 403;
     throw err;
   }
@@ -158,10 +225,10 @@ async function uniqueHandle(base) {
   return `${root.slice(0, 18)}-${randomToken(4).toLowerCase()}`;
 }
 
-async function ensureSkyeMailUser(claims = {}) {
+async function ensureSkyeMailUser(claims = {}, options = {}) {
   const email = normalizeEmail(claims.email || claims.username || "");
   if (!email || !email.includes("@")) {
-    const err = new Error("0S/SkyGate session must include an email/username email before SkyeMail can create a workspace user.");
+    const err = new Error("0S/SkyeGate session must include an email/username email before SkyeMail can create a workspace user.");
     err.statusCode = 400;
     throw err;
   }
@@ -199,7 +266,9 @@ async function ensureSkyeMailUser(claims = {}) {
         returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id`,
       [user.id, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, card ? JSON.stringify(card) : null]
     );
-    return updated.rows[0];
+    const linked = updated.rows[0];
+    await linkFs27AppSpine(claims, linked, options).catch(() => null);
+    return linked;
   }
 
   const handle = await uniqueHandle(email);
@@ -214,7 +283,9 @@ async function ensureSkyeMailUser(claims = {}) {
      returning id, handle, email, skymail_id, workspace_id, fs27_sub, fs27_customer_id, fs27_gate_card_id`,
     [handle, email, skymailId, workspaceId, fs27Sub, fs27CustomerId, fs27GateCardId, card ? JSON.stringify(card) : null]
   );
-  return inserted.rows[0];
+  const linked = inserted.rows[0];
+  await linkFs27AppSpine(claims, linked, options).catch(() => null);
+  return linked;
 }
 
 function sessionFromGateUser(user, claims = {}, token = "") {
@@ -266,6 +337,7 @@ module.exports = {
   requireFs27,
   isAdminLike,
   ensureSkyeMailUser,
+  linkFs27AppSpine,
   sessionFromGateUser,
   mirrorPlatformEvent
 };

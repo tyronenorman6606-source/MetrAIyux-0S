@@ -43,7 +43,7 @@ export default wrap(async (req) => {
     token: session.token,
     expires_in: ttl_seconds,
     key_last4: keyRow.key_last4 || null,
-    authority: "SkyeGateFS27",
+    authority: "SkyeGate FS27",
     session_id: session.session_id
   }, cors);
 });

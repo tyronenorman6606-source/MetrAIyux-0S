@@ -64,7 +64,7 @@
   function setNote(msg, kind=''){ setStatus(statusEl, msg, kind); }
   function setCalendarNote(msg, kind=''){ setStatus(calendarStatusEl, msg, kind); }
   function displayProviderName(value){
-    return value ? 'Citadel/SkyeNet' : 'SkyeMail';
+    return value ? 'Citadel Database and SkyeNet' : 'SkyeMail';
   }
 
   function localDateTimeToIso(value){
@@ -109,7 +109,7 @@
       watchEl.textContent = `Route ${status.mailbox.provisioning_status || status.mailbox.watch_status || 'active'} • mail lane ${displayProviderName(status.mailbox.provider)}`;
     } else {
       badgeEl.textContent = 'No SkyeMail mailbox provisioned';
-      watchEl.textContent = 'Provision a Citadel/SkyeNet SkyeMail mailbox on the onboarding page.';
+      watchEl.textContent = 'Provision a Citadel Database and SkyeNet SkyeMail mailbox on the onboarding page.';
     }
   }
 
@@ -149,7 +149,7 @@
   }
 
   function suggestPacketLabel(){
-    const active = state.items.find((item) => selectedIds().includes(item.id));
+    const active = state.items.find((item) => selectedIds().includes(messageActionId(item)));
     if(active && active.subject) return `${document.body.dataset.pageName || 'Mail'} • ${active.subject}`.slice(0, 120);
     const mailbox = boot.status?.mailbox?.google_email || localStorage.getItem('SMV_HANDLE') || 'mailbox';
     return `${mailbox} • ${document.body.dataset.pageName || 'Inbox'} follow-up`;
@@ -530,7 +530,7 @@
   async function buildPacketPayload(){
     const ids = selectedIds();
     if(!ids.length) throw new Error('Select at least one message before archiving a handoff packet.');
-    const selected = state.items.filter((item)=> ids.includes(item.id));
+    const selected = state.items.filter((item)=> ids.includes(messageActionId(item)));
     const [drafts, contacts] = await Promise.all([
       apiFetch('/gmail-drafts-list').catch(()=>({ items:[] })),
       apiFetch('/contacts-list').catch(()=>({ contacts_saved:[], contacts_recent:[] }))
@@ -552,8 +552,8 @@
         selectedCount: selected.length
       },
       messages: selected.map((item)=>({
-        id: item.id,
-        threadId: item.thread_id || item.id,
+        id: messageActionId(item),
+        threadId: normalizeActionId(item.thread_id) || messageActionId(item),
         subject: item.subject,
         from: item.from,
         to: item.to,
@@ -700,19 +700,41 @@
     return buttons.join('');
   }
 
+  function normalizeActionId(value){
+    const id = String(value || '').trim();
+    if(!id || /^(undefined|null)$/i.test(id)) return '';
+    return id;
+  }
+
+  function messageActionId(item = {}){
+    const candidates = [
+      item.id,
+      item.provider_ui_id,
+      item.message_id,
+      item.provider_message_id,
+      item.thread_id
+    ];
+    return candidates.map(normalizeActionId).find(Boolean) || '';
+  }
+
   function rowActions(item){
 	    const actions = [];
-	    actions.push(`<a class="btn small" href="${runtime.href('thread.html', { id: item.thread_id || item.id })}">Thread</a>`);
-	    actions.push(`<a class="btn small" href="${runtime.href('message.html', { id: item.id })}">Open</a>`);
-	    actions.push(`<a class="btn small" href="${runtime.href('brain.html', { message_id: item.id, subject: item.subject || '' })}">Brain</a>`);
-	    actions.push(`<a class="btn small" href="${runtime.href('workspace.html', { message_id: item.id, thread_id: item.thread_id || item.id, subject: item.subject || '', from: item.from || '' })}">0S</a>`);
-	    actions.push(`<button class="btn small" type="button" data-single-star="${item.id}" data-on="${item.starred ? '1':'0'}">${item.starred ? 'Unstar':'Star'}</button>`);
+    const actionId = messageActionId(item);
+    const threadId = normalizeActionId(item.thread_id) || actionId;
+    if(!actionId){
+      return '<button class="btn small" type="button" disabled>Message id missing</button>';
+    }
+	    actions.push(`<a class="btn small" href="${runtime.href('thread.html', { id: threadId })}">Thread</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('message.html', { id: actionId })}">Open</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('brain.html', { message_id: actionId, subject: item.subject || '' })}">Brain</a>`);
+	    actions.push(`<a class="btn small" href="${runtime.href('workspace.html', { message_id: actionId, thread_id: threadId, subject: item.subject || '', from: item.from || '' })}">0S</a>`);
+	    actions.push(`<button class="btn small" type="button" data-single-star="${safe(actionId)}" data-on="${item.starred ? '1':'0'}" aria-pressed="${item.starred ? 'true':'false'}">${item.starred ? 'Unstar':'Star'}</button>`);
     if(state.viewLabel === 'TRASH'){
-      actions.push(`<button class="btn small ok" type="button" data-single-restore="${item.id}">Restore</button>`);
-      actions.push(`<button class="btn small danger" type="button" data-single-delete="${item.id}">Delete Forever</button>`);
+      actions.push(`<button class="btn small ok" type="button" data-single-restore="${safe(actionId)}">Restore</button>`);
+      actions.push(`<button class="btn small danger" type="button" data-single-delete="${safe(actionId)}">Delete Forever</button>`);
     }else{
-      actions.push(`<button class="btn small" type="button" data-single-archive="${item.id}">Archive</button>`);
-      actions.push(`<button class="btn small danger" type="button" data-single-trash="${item.id}">Trash</button>`);
+      actions.push(`<button class="btn small" type="button" data-single-archive="${safe(actionId)}">Archive</button>`);
+      actions.push(`<button class="btn small danger" type="button" data-single-trash="${safe(actionId)}">Trash</button>`);
     }
     return actions.join('');
   }
@@ -731,20 +753,23 @@
   }
 
   function render(items){
-    state.items = items || [];
+    state.items = (items || []).map((item)=> ({ ...item, action_id: messageActionId(item) }));
     const selected = new Set(selectedIds());
     if(!state.items.length){
       listEl.innerHTML = '<div class="empty">No messages matched this mailbox view.</div>';
       updateSelectionSummary();
       return;
     }
-    listEl.innerHTML = state.items.map((item)=>`
+    listEl.innerHTML = state.items.map((item)=>{
+      const actionId = messageActionId(item);
+      const threadId = normalizeActionId(item.thread_id) || actionId;
+      return `
       <article class="mail ${item.unread ? 'unread':''}">
-        <div class="mail-check"><input type="checkbox" data-mail-check value="${safe(item.id)}" ${selected.has(item.id)?'checked':''} /></div>
+        <div class="mail-check"><input type="checkbox" data-mail-check value="${safe(actionId)}" ${actionId ? '' : 'disabled'} ${selected.has(actionId)?'checked':''} /></div>
         <div class="mail-main">
           <div class="mail-top">
             <div>
-              <div class="mail-subject"><a href="${runtime.href('thread.html', { id: item.thread_id || item.id })}">${safe(item.subject || '(no subject)')}</a></div>
+              <div class="mail-subject">${threadId ? `<a href="${runtime.href('thread.html', { id: threadId })}">${safe(item.subject || '(no subject)')}</a>` : safe(item.subject || '(no subject)')}</div>
               <div class="mail-from">${safe(item.from || 'Unknown sender')}</div>
             </div>
             <div class="mini">${safe(fmtDate(item.internal_date || item.date || ''))}</div>
@@ -759,20 +784,34 @@
           </div>
         </div>
         <div class="mail-actions">${rowActions(item)}</div>
-      </article>`).join('');
+      </article>`;
+    }).join('');
 
     document.querySelectorAll('[data-mail-check]').forEach((el)=> el.onchange = updateSelectionSummary);
     document.querySelectorAll('[data-single-star]').forEach((btn)=> btn.onclick = async ()=> {
       try{
-        await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: btn.dataset.singleStar, addLabelIds: btn.dataset.on === '1' ? [] : ['STARRED'], removeLabelIds: btn.dataset.on === '1' ? ['STARRED'] : [] }) });
-        SMV.trackGame(btn.dataset.on === '1' ? 'unstar' : 'star');
+        const id = normalizeActionId(btn.dataset.singleStar);
+        if(!id) throw new Error('Message id missing. Refresh the mailbox and try again.');
+        const wasOn = btn.dataset.on === '1';
+        const nextOn = !wasOn;
+        btn.disabled = true;
+        btn.textContent = nextOn ? 'Starring...' : 'Unstarring...';
+        await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ ids:[id], addLabelIds: wasOn ? [] : ['STARRED'], removeLabelIds: wasOn ? ['STARRED'] : [] }) });
+        btn.dataset.on = nextOn ? '1' : '0';
+        btn.setAttribute('aria-pressed', nextOn ? 'true' : 'false');
+        btn.textContent = nextOn ? 'Unstar' : 'Star';
+        SMV.trackGame(wasOn ? 'unstar' : 'star');
         await refreshInbox();
-      }catch(err){ setNote(err.message || 'Mailbox update failed.', 'danger'); }
+      }catch(err){
+        btn.disabled = false;
+        btn.textContent = btn.dataset.on === '1' ? 'Unstar' : 'Star';
+        setNote(err.message || 'Mailbox update failed.', 'danger');
+      }
     });
-    document.querySelectorAll('[data-single-archive]').forEach((btn)=> btn.onclick = async ()=> { try{ await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ id: btn.dataset.singleArchive, addLabelIds: [], removeLabelIds:['INBOX'] }) }); SMV.trackGame('archive'); await refreshInbox(); }catch(err){ setNote(err.message || 'Archive failed.', 'danger'); } });
-    document.querySelectorAll('[data-single-trash]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.trashMessages([btn.dataset.singleTrash]); await refreshInbox(); }catch(err){ setNote(err.message || 'Trash failed.', 'danger'); } });
-    document.querySelectorAll('[data-single-restore]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.untrashMessages([btn.dataset.singleRestore]); await refreshInbox(); }catch(err){ setNote(err.message || 'Restore failed.', 'danger'); } });
-    document.querySelectorAll('[data-single-delete]').forEach((btn)=> btn.onclick = async ()=> { try{ await SMV.deleteMessages([btn.dataset.singleDelete]); await refreshInbox(); }catch(err){ setNote(err.message || 'Delete failed.', 'danger'); } });
+    document.querySelectorAll('[data-single-archive]').forEach((btn)=> btn.onclick = async ()=> { try{ const id = normalizeActionId(btn.dataset.singleArchive); if(!id) throw new Error('Message id missing.'); await apiFetch('/gmail-modify', { method:'POST', body: JSON.stringify({ ids:[id], addLabelIds: [], removeLabelIds:['INBOX'] }) }); SMV.trackGame('archive'); await refreshInbox(); }catch(err){ setNote(err.message || 'Archive failed.', 'danger'); } });
+    document.querySelectorAll('[data-single-trash]').forEach((btn)=> btn.onclick = async ()=> { try{ const id = normalizeActionId(btn.dataset.singleTrash); if(!id) throw new Error('Message id missing.'); await SMV.trashMessages([id]); await refreshInbox(); }catch(err){ setNote(err.message || 'Trash failed.', 'danger'); } });
+    document.querySelectorAll('[data-single-restore]').forEach((btn)=> btn.onclick = async ()=> { try{ const id = normalizeActionId(btn.dataset.singleRestore); if(!id) throw new Error('Message id missing.'); await SMV.untrashMessages([id]); await refreshInbox(); }catch(err){ setNote(err.message || 'Restore failed.', 'danger'); } });
+    document.querySelectorAll('[data-single-delete]').forEach((btn)=> btn.onclick = async ()=> { try{ const id = normalizeActionId(btn.dataset.singleDelete); if(!id) throw new Error('Message id missing.'); await SMV.deleteMessages([id]); await refreshInbox(); }catch(err){ setNote(err.message || 'Delete failed.', 'danger'); } });
     updateSelectionSummary();
   }
 
@@ -824,17 +863,21 @@
     try{
       setNote('Sending and receiving a SkyeMail proof loop…');
       const mailbox = boot.status?.mailbox?.mailbox_email || boot.status?.mailbox?.google_email || '';
-      await apiFetch('/mail-proof-loop', {
-        method:'POST',
-        body: JSON.stringify({
+	      const data = await apiFetch('/mail-proof-loop', {
+	        method:'POST',
+	        body: JSON.stringify({
           to: mailbox,
           subject: `SkyeMail browser proof ${new Date().toISOString()}`,
           message: 'Browser proof: sent record and received inbox record created under the FS27-backed SkyeMail workspace.'
         })
       });
-      await refreshInbox();
-      setNote('Proof loop created: sent mail and received inbox mail are now in the mailbox list.', 'ok');
-      SMV.trackGame('proof_loop');
+	      await refreshInbox();
+	      setNote('Proof loop created: sent mail and received inbox mail are now in the mailbox list.', 'ok');
+	      SMV.trackGame('proof_loop', { id:data.received?.id || data.sent?.id || data.alias_delivery?.id || data.mailbox?.id || '' }, {
+	        celebrate:true,
+	        triggerType:'proof-green',
+	        message:'Proof loop completed. Thank you for proving the SkyeMail lane with real mail.'
+	      });
     }catch(err){ setNote(err.message || 'Proof loop failed.', 'danger'); }
   };
   qs('#watchBtn').onclick = async ()=> { try{ const data = await SMV.enableWatch(); setNote(`Push watch active until ${fmtDate(data.watch?.expiration || '')}.`, 'ok'); }catch(err){ setNote(err.message || 'Push watch enable failed.', 'danger'); } };

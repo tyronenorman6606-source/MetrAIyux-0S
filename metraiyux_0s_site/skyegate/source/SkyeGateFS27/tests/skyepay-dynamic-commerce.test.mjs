@@ -2,11 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildSkyeCommerceDynamicOffer,
+  buildStripeLineItemsWithCatalogPrices,
   buildSkyePayMetadata,
   getSkyePayClient,
   getSkyePayOffer,
   makeDemoSession,
+  publicOffer,
   skyePayDeliveryReturnUrl,
+  SKYPAY_OFFERS,
   stripeSafeSkyePayMetadata,
   normalizeSkyeCommerceDynamicCheckoutBody
 } from '../netlify/functions/_lib/skyepayCatalog.js';
@@ -18,6 +21,13 @@ import {
 import {
   publicSkyePayOrder
 } from '../netlify/functions/_lib/skyepaySecurity.js';
+import {
+  isVaultProvisioningOrder,
+  skyePayVaultPlanLimits
+} from '../netlify/functions/_lib/skyepayVaultProvisioning.js';
+import {
+  publicSkyeMeritCatalog
+} from '../netlify/functions/_lib/skyeMerit.js';
 
 const dynamicBody = {
   source: 'skyecommerce',
@@ -117,6 +127,89 @@ test('SkyePay sends Stripe a compact metadata set under provider limits', () => 
   assert.equal(compact.legal_terms_accepted, 'true');
 });
 
+test('SkyePay static public catalog offers require live Stripe lookup-key prices', async () => {
+  const staticOffers = SKYPAY_OFFERS.filter((offer) => offer.storefront !== false);
+  const notRequired = staticOffers.filter((offer) => offer.require_stripe_lookup_key !== true);
+  assert.equal(notRequired.length, 0, notRequired.map((offer) => offer.id).join(', '));
+
+  const offer = getSkyePayOffer('brandforge-ai-generation');
+  const client = getSkyePayClient('metraiyux-0s');
+  const missingStripe = { prices: { list: async () => ({ data: [] }) } };
+  await assert.rejects(
+    buildStripeLineItemsWithCatalogPrices({ stripe: missingStripe, offer, client }),
+    /Required Stripe lookup-key price is missing/
+  );
+});
+
+test('SkyePay public offers expose a customer fulfillment contract', () => {
+  const client = getSkyePayClient('metraiyux-0s');
+  const publicOffers = SKYPAY_OFFERS.filter((offer) => offer.storefront !== false);
+  assert.ok(publicOffers.length >= 100);
+  for (const offer of publicOffers) {
+    const exposed = publicOffer(offer, client);
+    assert.equal(typeof exposed.fulfillment?.type, 'string', offer.id);
+    assert.equal(typeof exposed.fulfillment?.activation_label, 'string', offer.id);
+    assert.equal(typeof exposed.fulfillment?.customer_next_step, 'string', offer.id);
+    assert.equal(typeof exposed.fulfillment?.delivery_surface, 'string', offer.id);
+    assert.equal(typeof exposed.fulfillment?.support_email, 'string', offer.id);
+    assert.notEqual(exposed.fulfillment.activation_label.length, 0, offer.id);
+    assert.notEqual(exposed.fulfillment.customer_next_step.length, 0, offer.id);
+    assert.equal(JSON.stringify(exposed.fulfillment).includes('zoho'), false, offer.id);
+    assert.equal(JSON.stringify(exposed.fulfillment).includes('resend'), false, offer.id);
+    assert.equal(JSON.stringify(exposed.fulfillment).includes('provider-backed'), false, offer.id);
+  }
+
+  const skyemailStarter = publicOffer(getSkyePayOffer('skyemail-starter-mailbox'), client).fulfillment;
+  assert.equal(skyemailStarter.type, 'skyemail_mailbox');
+  assert.equal(skyemailStarter.owner_review_required, true);
+  assert.equal(skyemailStarter.self_serve_after_payment, false);
+  assert.match(skyemailStarter.activation_label, /capacity/i);
+  assert.equal(publicOffer(getSkyePayOffer('skyevault-pro-access'), client).fulfillment.type, 'skyevault_agent');
+  assert.equal(publicOffer(getSkyePayOffer('sovereigndocs-legal-review-lane'), client).fulfillment.type, 'operator_triage');
+});
+
+test('SkyePay public SkyeMerit catalog does not expose owner-only free checkout codes', () => {
+  const catalog = publicSkyeMeritCatalog();
+  const text = JSON.stringify(catalog);
+  assert.equal(text.includes('GRAYSCAPE467'), false);
+  assert.equal(text.includes('owner_qa_unlimited'), false);
+  assert.equal(catalog.stack_policy.owner_free_checkout_codes_public, false);
+  assert.equal(catalog.rules.some((rule) => rule.allow_free_checkout === true), false);
+  assert.equal(catalog.packs.some((pack) => pack.audience === 'owner_qa_unlimited'), false);
+});
+
+test('SkyePay can include owner-only SkyeMerit catalog only through explicit internal option', () => {
+  const catalog = publicSkyeMeritCatalog({ includeOwnerQa: true });
+  assert.equal(catalog.rules.some((rule) => rule.code === 'GRAYSCAPE467' && rule.allow_free_checkout === true), true);
+  assert.equal(catalog.packs.some((pack) => pack.audience === 'owner_qa_unlimited'), true);
+});
+
+test('SkyePay required static offers cannot disable lookup-key enforcement by env flag', async () => {
+  const previous = process.env.SKYPAY_USE_STRIPE_LOOKUP_KEYS;
+  process.env.SKYPAY_USE_STRIPE_LOOKUP_KEYS = 'false';
+  try {
+    const offer = getSkyePayOffer('brandforge-ai-generation');
+    const client = getSkyePayClient('metraiyux-0s');
+    await assert.rejects(
+      buildStripeLineItemsWithCatalogPrices({ stripe: null, offer, client }),
+      /lookup-key price lookup is disabled/
+    );
+  } finally {
+    if (previous == null) delete process.env.SKYPAY_USE_STRIPE_LOOKUP_KEYS;
+    else process.env.SKYPAY_USE_STRIPE_LOOKUP_KEYS = previous;
+  }
+});
+
+test('SkyePay still allows signed dynamic SkyeCommerce carts to use runtime price data', async () => {
+  const dynamic = buildSkyeCommerceDynamicOffer(dynamicBody);
+  const client = getSkyePayClient('metraiyux-0s');
+  const missingStripe = { prices: { list: async () => ({ data: [] }) } };
+  const lineItems = await buildStripeLineItemsWithCatalogPrices({ stripe: missingStripe, offer: dynamic.offer, client });
+  assert.equal(dynamic.offer.require_stripe_lookup_key, false);
+  assert.equal(lineItems.length, 3);
+  assert.ok(lineItems.every((item) => item.price_data));
+});
+
 test('SkyeVault offers return paid and proof sessions to the agent install center', () => {
   const client = getSkyePayClient('metraiyux-0s');
   const offer = getSkyePayOffer('skyevault-pro-access');
@@ -143,6 +236,37 @@ test('SkyeVault offers return paid and proof sessions to the agent install cente
   assert.equal(demoUrl.pathname, '/skye-vault-os/agent/');
   assert.equal(demoUrl.searchParams.get('demo_session'), demo.id);
   assert.equal(demoUrl.searchParams.get('offer'), 'skyevault-pro-access');
+});
+
+test('SkyeVault paid plan limits pass to provisioning without the old 200-file choke point', () => {
+  const starter = skyePayVaultPlanLimits({ offer_snapshot: getSkyePayOffer('skyevault-starter-access') });
+  const pro = skyePayVaultPlanLimits({ offer_snapshot: getSkyePayOffer('skyevault-pro-access') });
+  const command = skyePayVaultPlanLimits({ offer_snapshot: getSkyePayOffer('skyevault-command-access') });
+
+  assert.equal(starter.maxFilesPerSubmission, 250);
+  assert.equal(starter.maxTotalSubmissionGb, 1);
+  assert.equal(pro.maxFilesPerSubmission, 1500);
+  assert.equal(pro.maxTotalSubmissionGb, 25);
+  assert.equal(command.maxFilesPerSubmission, 10000);
+  assert.equal(command.maxTotalSubmissionGb, 100);
+});
+
+test('SkyeVault agent delivery metadata names the real buyer auth lane', () => {
+  for (const offerId of ['skyevault-starter-access', 'skyevault-pro-access', 'skyevault-command-access', 'skyevault-auto-install-addon']) {
+    const offer = getSkyePayOffer(offerId);
+    assert.equal(offer.delivery.auth_model, 'skyevault-portal-key-plus-optional-shared-gate');
+    assert.match(offer.delivery.install_center, /\/skye-vault-os\/agent\//);
+    assert.match(offer.delivery.agent_package, /\/downloads\/skyevault-agent\/releases\/latest\/skyevault-agent-latest\.tar\.gz$/);
+  }
+});
+
+test('SkyeVault auto-install add-on is a real $13 SKU but does not mint a second vault workspace', () => {
+  const offer = getSkyePayOffer('skyevault-auto-install-addon');
+  assert.equal(offer.mode, 'payment');
+  assert.equal(offer.line_items[0].amount_cents, 1300);
+  assert.equal(offer.provisioning.workspace_required, false);
+  assert.match(offer.delivery.auto_install_command, /SKYEVAULT_AGENT_AUTO_INSTALL=1/);
+  assert.equal(isVaultProvisioningOrder({ offer_id: offer.id, offer_snapshot: offer, metadata: {} }), false);
 });
 
 test('SkyeVault paid agent delivery exposes repo env only to session status after unlock', () => {
@@ -192,6 +316,55 @@ test('SkyeVault paid agent delivery exposes repo env only to session status afte
   const sessionOrder = publicSkyePayOrder(row, { includeVaultAgentSecrets: true });
   assert.equal(sessionOrder.agent_delivery.repo_env.SKYEVAULT_PORTAL_KEY, 'portal_secret_not_for_public_order_lookup');
   assert.equal(sessionOrder.agent_delivery.repo_env.EXTRA_SECRET, undefined);
+});
+
+test('SkyeMail paid mailbox delivery exposes safe provisioned mailbox details publicly', () => {
+  const offer = getSkyePayOffer('skyemail-starter-mailbox');
+  const row = {
+    id: 'skypay_mailbox_delivery',
+    client_slug: 'metraiyux-0s-skm',
+    workspace_slug: 'buyer-mail',
+    customer_email: 'buyer@example.com',
+    offer_id: 'skyemail-starter-mailbox',
+    offer_snapshot: offer,
+    amount_setup_cents: 0,
+    amount_recurring_cents: 900,
+    currency: 'usd',
+    checkout_mode: 'subscription',
+    payment_status: 'paid',
+    approval_status: 'approved',
+    owner_status: 'auto_approved',
+    provisioning_status: 'skyemail_mailbox_provisioned',
+    provisioned_at: '2026-06-01T00:00:00.000Z',
+    metadata: {
+      skyemail_mailbox: 'true',
+      skyemail_mailbox_email: 'frontdesk@solenterprises.org',
+      skyemail_mailbox_local_part: 'frontdesk',
+      skyemail_mailbox_domain: 'solenterprises.org',
+      skyemail_provisioning: {
+        ok: true,
+        mailbox_email: 'frontdesk@solenterprises.org',
+        mailbox_id: 'mailbox_123',
+        provider: 'internal-mail-route',
+        provisioning_status: 'provisioned',
+        inbox_ready: true,
+        key_state_active: true,
+        provisioned_at: '2026-06-01T00:00:00.000Z'
+      }
+    }
+  };
+
+  const publicOrder = publicSkyePayOrder(row);
+  assert.equal(publicOrder.skyemail_mailbox.mailbox_email, 'frontdesk@solenterprises.org');
+  assert.equal(publicOrder.skyemail_mailbox.provider, undefined);
+  assert.equal(publicOrder.skyemail_mailbox.mailbox_status, 'provisioned');
+  assert.equal(publicOrder.skyemail_mailbox.inbox_ready, true);
+  assert.equal(publicOrder.skyemail_mailbox.needs_customer_mailbox_claim, false);
+  assert.equal(publicOrder.fulfillment.type, 'skyemail_mailbox');
+  assert.equal(publicOrder.fulfillment.access_state, 'available_or_approved');
+  assert.equal(publicOrder.fulfillment.self_serve_after_payment, false);
+  assert.match(publicOrder.fulfillment.customer_next_step, /mailbox use begins only after SkyeMail capacity/i);
+  assert.equal(JSON.stringify(publicOrder).includes('buyer@example.com'), false);
 });
 
 test('SkyePay Legal Skyes acceptance normalizes to Stripe metadata', () => {

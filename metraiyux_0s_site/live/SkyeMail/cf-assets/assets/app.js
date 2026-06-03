@@ -1,11 +1,12 @@
 const SMV_RUNTIME_CONFIG = window.SMV_RUNTIME_CONFIG || {};
 const API_BASES = [...new Set([
+  "",
   SMV_RUNTIME_CONFIG.apiBase,
   ...(Array.isArray(SMV_RUNTIME_CONFIG.apiBases) ? SMV_RUNTIME_CONFIG.apiBases : []),
-  "/.netlify/functions",
-  "/api"
-].filter(Boolean).map(base => String(base).replace(/\/+$/, "")))];
-const API_BASE = API_BASES[0] || "/.netlify/functions";
+  "/api",
+  "/.netlify/functions"
+].filter((base) => base !== undefined && base !== null).map(base => String(base).replace(/\/+$/, "")))];
+const API_BASE = API_BASES.find(Boolean) || "";
 const API_FUNCTION_PREFIX = "skymail-standalone-";
 const APP_ROOT_URL = new URL(SMV_RUNTIME_CONFIG.appRoot || "/", window.location.origin);
 const ACTIVE_MAILBOX_KEY = "SMV_ACTIVE_MAILBOX";
@@ -48,26 +49,74 @@ function setStatus(el, msg, kind=""){
     : "var(--muted)";
 }
 
+const SESSION_STORAGE_KEYS = ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","SKYGATE_USER_TOKEN","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"];
+
+function cleanBearer(value){
+  return String(value || "").replace(/^Bearer\s+/i, "").trim();
+}
+
+function readStoredGateSession(){
+  try{
+    for(const store of [localStorage, sessionStorage]){
+      for(const key of SESSION_STORAGE_KEYS){
+        const raw = store.getItem(key);
+        if(!raw) continue;
+        try{
+          const parsed = JSON.parse(raw);
+          const parsedToken = cleanBearer(parsed?.token || parsed?.gateToken || parsed?.gateBearerToken || parsed?.session || parsed?.bearer);
+          if(parsedToken) return { ...parsed, token: parsedToken, source: parsed?.source || key };
+        }catch(_parseErr){
+          const token = cleanBearer(raw);
+          if(token) return { token, source:key };
+        }
+      }
+    }
+  }catch(_err){}
+  return null;
+}
+
+function persistGateSession(session){
+  const token = cleanBearer(session?.token);
+  if(!token) return "";
+  const value = Object.assign({ source:"skymail-fs27-session", platform_id:"skymail", usage_lane:"mail", issued_at:new Date().toISOString() }, session, { token });
+  try{
+    for(const store of [localStorage, sessionStorage]){
+      store.setItem("SMV_SKYEMAIL_SESSION", JSON.stringify(value));
+      store.setItem("SMV_AUTH_TOKEN", token);
+      store.setItem("free99_gate_session", token);
+      store.setItem("skye_gate_session", token);
+      store.setItem("skygate_session", token);
+      store.setItem("FREE99_PLATFORM_GATE_SESSION", token);
+      store.setItem("SKYGATE_USER_TOKEN", token);
+      store.setItem("SKYGATE_SESSION_TOKEN", token);
+      store.setItem("adminBrainToken", token);
+      store.setItem("saas_client_session", token);
+    }
+  }catch(_err){}
+  return token;
+}
+
 function readGateSession(){
   const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   try{
     const current = bridge?.current?.();
-    if(current?.token) return current;
+    const token = cleanBearer(current?.token);
+    if(token) return { ...current, token };
   }catch(_err){}
-  return null;
+  return readStoredGateSession();
 }
 function getToken(){ return readGateSession()?.token || ""; }
 function setToken(t){
-  const token = String(t || "").trim();
+  const token = cleanBearer(t);
   if(!token) return "";
   const session = { token, source:"skymail-fs27-session", platform_id:"skymail", usage_lane:"mail", issued_at:new Date().toISOString() };
   const bridge = window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
   bridge?.persist?.(session, { silent:true });
-  return token;
+  return persistGateSession(session);
 }
 function clearToken(){
   try{
-    ["SMV_SKYEMAIL_SESSION","SMV_AUTH_TOKEN","free99_gate_session","skye_gate_session","skygate_session","FREE99_PLATFORM_GATE_SESSION","SKYGATE_USER_TOKEN","SKYGATE_SESSION_TOKEN","adminBrainToken","saas_client_session"].forEach((key) => {
+    SESSION_STORAGE_KEYS.forEach((key) => {
       sessionStorage.removeItem(key);
       localStorage.removeItem(key);
     });
@@ -141,7 +190,8 @@ async function apiFetch(path, opts = {}){
   let lastError = null;
 
   for(const apiBase of API_BASES){
-    for(const prefix of [API_FUNCTION_PREFIX, ""]){
+    const prefixes = apiBase === "" ? ["", API_FUNCTION_PREFIX] : [API_FUNCTION_PREFIX, ""];
+    for(const prefix of prefixes){
       if(prefix === "" && !API_FUNCTION_PREFIX) continue;
       try{
         const res = await fetch(smvApiUrl(path, prefix, apiBase), requestOptions);
@@ -257,7 +307,7 @@ function mountSkyEmailBackgroundPartial(){
 
   fetch(partialUrl, { credentials:"same-origin", cache:"no-store" })
     .then((res) => {
-      if(!res.ok) throw new Error(`SkyEmail background partial ${res.status}`);
+      if(!res.ok) throw new Error(`SkyeMail background partial ${res.status}`);
       return res.text();
     })
     .then((html) => {

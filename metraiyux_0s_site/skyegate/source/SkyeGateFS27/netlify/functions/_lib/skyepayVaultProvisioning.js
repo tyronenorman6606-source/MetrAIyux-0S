@@ -98,17 +98,20 @@ export function isVaultProvisioningOrder(order) {
   const offer = order?.offer_snapshot && typeof order.offer_snapshot === "object" ? order.offer_snapshot : {};
   const metadata = order?.metadata && typeof order.metadata === "object" ? order.metadata : {};
   const md = metadata.metadata && typeof metadata.metadata === "object" ? metadata.metadata : metadata;
+  const provisioning = offer.provisioning && typeof offer.provisioning === "object" ? offer.provisioning : {};
+  if (provisioning.workspace_required === false) return false;
   return offer.family === "skyevault"
     || md.vault_workspace === "true"
     || String(order?.offer_id || "").startsWith("skyevault-");
 }
 
-function planLimits(order) {
+export function skyePayVaultPlanLimits(order) {
   const offer = order?.offer_snapshot && typeof order.offer_snapshot === "object" ? order.offer_snapshot : {};
   const policy = offer.gate_policy || {};
   const storageGb = policy.vault_storage_mb ? Math.max(1, Math.ceil(Number(policy.vault_storage_mb) / 1024)) : null;
+  const fileLimit = policy.vault_file_limit ? Math.max(1, Math.floor(Number(policy.vault_file_limit))) : null;
   return {
-    maxFilesPerSubmission: policy.vault_file_limit ? Math.min(200, Math.max(1, Number(policy.vault_file_limit))) : undefined,
+    maxFilesPerSubmission: fileLimit || undefined,
     maxTotalSubmissionGb: storageGb || undefined,
     maxFileSizeGb: storageGb || undefined,
     rateLimitUploadSessionsPerWindow: policy.vault_workspace_limit ? Number(policy.vault_workspace_limit) * 20 : undefined,
@@ -138,7 +141,7 @@ function provisioningPayload(order, action = "provision") {
     stripeSubscriptionId: clean(order.stripe_subscription_id, 160),
     skyepayOrderId: clean(order.id, 180),
     active: action !== "suspend" && action !== "cancel",
-    ...planLimits(order)
+    ...skyePayVaultPlanLimits(order)
   };
 }
 
@@ -164,7 +167,7 @@ export async function provisionVaultWorkspaceForOrder(order, { action = "provisi
   const baseUrl = vaultBaseUrl();
   const bearer = await provisioningBearer();
   if (!baseUrl || !bearer.token) {
-    const error = new Error("SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared FS27/SkyGate bearer or admin login env.");
+    const error = new Error("SkyeVault provisioning requires SKYEVAULT_DROP_URL plus a shared SkyeGate FS27 bearer or admin login env.");
     error.status = 500;
     throw error;
   }

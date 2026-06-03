@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkyePay | SkyeGateFS27</title>
-  <meta name="description" content="SkyePay is the SkyeGateFS27 free trial, Stripe checkout, paid-status ledger, SkyeMerit discount, and controlled workspace activation route." />
+  <title>SkyePay | SkyeGate FS27</title>
+  <meta name="description" content="SkyePay is the SkyeGate FS27 free trial, secure checkout, paid-status ledger, SkyeMerit discount, and controlled workspace activation route." />
   <link rel="canonical" href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay.html" />
   <link rel="stylesheet" href="assets/skyepay.css" />
   <script type="importmap">
@@ -22,9 +22,9 @@
   <div class="scanline" aria-hidden="true"></div>
 
   <header class="pay-nav pay-nav-v2">
-    <a class="pay-brand neon-magnetic" href="index.html" aria-label="Back to SkyeGateFS27">
-      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGateFS27" />
-      <span>SkyeGateFS27 / SkyePay</span>
+    <a class="pay-brand neon-magnetic" href="index.html" aria-label="Back to SkyeGate FS27">
+      <img src="https://cdn1.sharemyimage.com/2026/02/16/logo1_transparent.png" alt="SkyeGate FS27" />
+      <span>SkyeGate FS27 / SkyePay</span>
     </a>
     <nav>
       <a href="#checkout">Checkout</a>
@@ -43,14 +43,14 @@
           <span>Live payment lane</span>
         </div>
         <h1 id="heroTitle"><span class="neon-gradient-text text-effects">SkyePay</span> is the checkout room before the gate opens.</h1>
-        <p class="lead" id="heroLead">Stripe creates the payment event. FS27 records the order, policy, and owner approval state. The workspace unlock only after the gate says it should.</p>
+	        <p class="lead" id="heroLead">SkyePay creates the payment event. FS27 records the order, policy, and activation state. The workspace opens only after the gate says it should.</p>
         <div class="hero-actions">
           <a class="primary-action neon-magnetic" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/feature-atlas.html">Inspect full 0S feature atlas</a>
         </div>
         <div class="hero-points proof-ticker" id="heroPoints" aria-label="SkyePay route">
-          <span>Stripe checkout</span>
+          <span>Secure checkout</span>
           <span>FS27 ledger</span>
-          <span>Owner approval</span>
+	          <span>Provisioning</span>
           <span>Workspace policy</span>
         </div>
         <div class="route-matrix" aria-label="SkyePay settlement path">
@@ -62,7 +62,7 @@
           <div>
             <span>02</span>
             <strong>Checkout</strong>
-            <small>Stripe handles card data outside the app.</small>
+            <small>Card data stays outside the app.</small>
           </div>
           <div>
             <span>03</span>
@@ -71,8 +71,8 @@
           </div>
           <div>
             <span>04</span>
-            <strong>Unlock</strong>
-            <small>Owner approval controls activation.</small>
+	            <strong>Provision</strong>
+	            <small>The gate controls activation and provisioning.</small>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
             <p class="eyebrow">Checkout room</p>
             <h2 id="checkoutTitle">Continue the private app preview</h2>
           </div>
-          <span class="live-badge" id="proofModeBadge">Stripe backed</span>
+        <span class="live-badge" id="proofModeBadge">SkyePay live</span>
         </div>
 
         <div class="client-strip">
@@ -96,8 +96,8 @@
             <strong id="trialDays">7 days</strong>
           </div>
           <div>
-            <span class="mini-label">Approval</span>
-            <strong>Owner gated</strong>
+	            <span class="mini-label">Activation</span>
+	            <strong>Gate controlled</strong>
           </div>
         </div>
 
@@ -111,13 +111,31 @@
               Email for receipt
               <input name="customer_email" type="email" autocomplete="email" placeholder="owner@company.com" required />
             </label>
-            <label class="field-wide">
-              Company
-              <input name="company_name" autocomplete="organization" placeholder="Bob's Smoke Shop" />
-            </label>
-          </div>
+	            <label class="field-wide">
+	              Company
+	              <input name="company_name" autocomplete="organization" placeholder="Bob's Smoke Shop" />
+	            </label>
+	          </div>
 
-          <div class="skyemerit-panel">
+	          <div id="skyemailMailboxClaim" class="skyemail-mailbox-claim" hidden>
+	            <div>
+	              <span class="mini-label">SkyeMail mailbox</span>
+	              <strong id="skyemailMailboxPreview">mailbox@solenterprises.org</strong>
+	            </div>
+	            <div class="mailbox-claim-row">
+	              <label>
+	                Mailbox name
+	                <input name="mailbox_local_part" autocomplete="off" inputmode="email" placeholder="info" />
+	              </label>
+	              <label>
+	                Domain
+	                <input name="mailbox_domain" autocomplete="off" inputmode="url" value="solenterprises.org" />
+	              </label>
+	            </div>
+	            <p>The claimed address is sent into SkyeMail after payment so the inbox can be provisioned against the live mail lane.</p>
+	          </div>
+
+	          <div class="skyemerit-panel">
             <label>
               SkyeMerit
               <select id="skyemeritCode" name="skyemerit_code">
@@ -148,7 +166,7 @@
           <button class="primary-action neon-magnetic" type="submit" id="checkoutBtn">
             Start secure trial
           </button>
-          <p class="fine-print" id="clientSpecial">Free preview first. Confirmed Stripe payment waits for owner-approved activation.</p>
+          <p class="fine-print" id="clientSpecial">Free preview first. Confirmed SkyePay payment waits for owner-approved activation.</p>
         </form>
         <div class="client-contact" id="clientContact" hidden></div>
 
@@ -159,7 +177,7 @@
         </div>
 
         <div class="settlement-note" aria-label="SkyePay boundary">
-          <span>Card data stays with Stripe.</span>
+          <span>Card data stays outside FS27.</span>
           <span>Activation stays with FS27.</span>
         </div>
       </section>
@@ -190,8 +208,8 @@
     </section>
 
     <section class="gate-path skypay-reveal" id="gate-path">
-      <p class="eyebrow" id="gateEyebrow">SkyeGateFS27 route</p>
-      <h2 id="gateTitle">Payment is not the finish line. It is the event FS27 turns into a controlled activation record.</h2>
+      <p class="eyebrow" id="gateEyebrow">SkyeGate FS27 route</p>
+          <h2 id="gateTitle">Payment is not the finish line. It is the event FS27 turns into a controlled activation and provisioning record.</h2>
       <div class="path-rail" id="pathRail">
         <article>
           <span>01</span>
@@ -200,23 +218,23 @@
         </article>
         <article>
           <span>02</span>
-          <h3>Stripe Checkout</h3>
+          <h3>Secure Checkout</h3>
           <p>SkyePay creates a Checkout Session with approved catalog metadata and no card data touching the app.</p>
         </article>
         <article>
           <span>03</span>
           <h3>Gate ledger</h3>
-          <p>The webhook writes the confirmed payment or trial state into FS27, then owner approval controls activation.</p>
+          <p>The webhook writes the confirmed payment or trial state into FS27, then the offer policy controls activation and provisioning.</p>
         </article>
         <article>
           <span>04</span>
-          <h3>Owner approval</h3>
+          <h3>Activation record</h3>
           <p>You can still void, audit, or manually correct the workspace from the SkyePay ledger.</p>
         </article>
         <article>
           <span>05</span>
           <h3>Repo platforms</h3>
-          <p>After live proof, the last lane is wiring the repo platforms into SkyePay as billable app routes.</p>
+          <p>The current SkyePay lane is live for approved offers. Checkout, customer status, owner-review state, self-serve access, and fulfillment receipts are proved before an offer is treated as production-sellable.</p>
         </article>
       </div>
     </section>

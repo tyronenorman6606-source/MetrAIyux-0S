@@ -55,7 +55,7 @@
 
       <div class="number-row" style="margin-top:32px;">
         <div class="num-pill"><span class="n">17</span><span class="l">Brain command personas</span></div>
-        <div class="num-pill"><span class="n">17</span><span class="l">Cloudflare Workers tracked in the live ledger</span></div>
+        <div class="num-pill"><span class="n">17</span><span class="l">0S Workers tracked in the live ledger</span></div>
         <div class="num-pill"><span class="n">80</span><span class="l">Live production surfaces</span></div>
         <div class="num-pill"><span class="n">875</span><span class="l">HTML surfaces in the catch-up scan</span></div>
         <div class="num-pill"><span class="n">1493</span><span class="l">JSON manifests, proof records, and configs</span></div>
@@ -70,7 +70,7 @@
         <h4>Contents</h4>
         <ol>
           <li><a href="#brains">The 17 Brain Command Personas</a></li>
-          <li><a href="#workers">The 17 Cloudflare Workers</a></li>
+          <li><a href="#workers">The 17 0S Workers</a></li>
           <li><a href="#stack">Full Tech Stack</a></li>
           <li><a href="#surfaces">Live Public Surfaces</a></li>
           <li><a href="#security">Security Architecture</a></li>
@@ -244,9 +244,9 @@
       <div class="band-inner" style="grid-template-columns:1fr;">
         <div class="section-head reveal" style="grid-template-columns:1fr;">
           <div>
-            <p class="eyebrow">The 17 Cloudflare Workers</p>
+            <p class="eyebrow">The 17 0S Workers</p>
             <h2>All 17 deployed. All live on the global edge.</h2>
-            <p style="color:var(--soft);font-size:17px;margin-top:14px;">Every Worker runs as an ES module on Cloudflare's global edge network. Each has its own D1 SQL database, KV namespace bindings, and Queue connections. All confirmed live with CF-Ray headers as of deployment.</p>
+            <p style="color:var(--soft);font-size:17px;margin-top:14px;">Every Worker runs as an ES module on Cloudflare's global edge network. Each has its own 0S storage SQL database, KV namespace bindings, and Command Bridge connections. All confirmed live with CF-Ray headers as of deployment.</p>
           </div>
         </div>
         <div class="reveal">
@@ -255,7 +255,7 @@
               <tr>
                 <th>Worker Name</th>
                 <th>Function</th>
-                <th>D1 Database</th>
+                <th>0S storage Database</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -268,19 +268,19 @@
               </tr>
               <tr>
                 <td>admin-automation-brain</td>
-                <td>Admin command routing — receives authenticated operator commands, routes to all 17 brain personas, writes receipts to D1, dispatches async tasks via Queue, fires Resend approval emails</td>
+                <td>Admin command routing — receives authenticated operator commands, routes to all 17 brain personas, writes receipts to 0S storage, dispatches async tasks via Command Bridge, fires SkyeMail approval emails</td>
                 <td>metraiyux-admin-db</td>
                 <td><span class="live-badge">LIVE</span></td>
               </tr>
               <tr>
                 <td>omeg4kai-security-gateway</td>
-                <td>0meg4kAI security scanner — stateless command inspection at the edge, tenant isolation enforcement, privilege escalation detection, legal/financial risk scoring, quarantine routing, D1 event logging, Queue escalation</td>
+                <td>0meg4kAI security scanner — stateless command inspection at the edge, tenant isolation enforcement, privilege escalation detection, legal/financial risk scoring, quarantine routing, 0S storage event logging, Command Bridge escalation</td>
                 <td>metraiyux-omega-db</td>
                 <td><span class="live-badge">LIVE</span></td>
               </tr>
               <tr>
                 <td>sovereign-saas-provisioning-worker</td>
-                <td>Customer SaaS — handles signup, company profile, service selection, workspace provisioning, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">Stripe checkout</span> session creation, tenant registration, customer command routing</td>
+                <td>Customer SaaS — handles signup, company profile, service selection, workspace provisioning, <span class="magic-highlighter" data-highlight="highlight" style="--highlighter-color:#87CEFA;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;border-radius:.18em;padding:0 .12em;background:linear-gradient(104deg,transparent .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) .08em,color-mix(in srgb,var(--highlighter-color) 68%,transparent) calc(100% - .08em),transparent calc(100% - .08em));text-shadow:0 .08em .22em rgba(0,0,0,.16)">SkyePay checkout</span> session creation, tenant registration, customer command routing</td>
                 <td>metraiyux-saas-db</td>
                 <td><span class="live-badge">LIVE</span></td>
               </tr>
@@ -298,7 +298,7 @@
               </tr>
               <tr>
                 <td>sovereign-13-site-operator-quantum</td>
-                <td>QUANTUM operator — route management, task creation, event dispatch, ledger endpoints, D1 with KV fallback for high-frequency reads</td>
+                <td>QUANTUM operator — route management, task creation, event dispatch, ledger endpoints, 0S storage with KV fallback for high-frequency reads</td>
                 <td>metraiyux-site-operator-db</td>
                 <td><span class="live-badge">LIVE</span></td>
               </tr>
@@ -348,11 +348,11 @@
           <div class="stack-layers">
             <div class="stack-layer">
               <div class="stack-layer-id">Workers</div>
-              <div><h3>Cloudflare Workers (ES modules)</h3><p>17 Workers deployed. compatibility_date 2026-05-15. All wrangler.toml configured. Includes kAIxu 6.7 brain with service binding to site-operator.</p></div>
+              <div><h3>0S Workers (ES modules)</h3><p>17 Workers deployed. compatibility_date 2026-05-15. All wrangler.toml configured. Includes kAIxu 6.7 brain with service binding to site-operator.</p></div>
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Data</div>
-              <div><h3>D1 SQL + KV + Queues</h3><p>9 live SQL database lanes. KV for fast lookup. Queues for async task dispatch and approval escalation.</p></div>
+              <div><h3>0S storage SQL + KV + Command Bridges</h3><p>9 live SQL database lanes. KV for fast lookup. Command Bridges for async task dispatch and approval escalation.</p></div>
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Hosting</div>
@@ -369,7 +369,7 @@
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Security</div>
-              <div><h3>0meg4kAI (2 layers)</h3><p>Browser scanner: regex + scoring before request leaves client. Worker scanner: edge-side stateless pass before any D1 write executes.</p></div>
+              <div><h3>0meg4kAI (2 layers)</h3><p>Browser scanner: regex + scoring before request leaves client. Worker scanner: edge-side stateless pass before any 0S storage write executes.</p></div>
             </div>
           </div>
           <p class="eyebrow" style="margin-top:32px;margin-bottom:12px;">Integrations</p>
@@ -380,7 +380,7 @@
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Billing</div>
-              <div><h3>Stripe</h3><p>Checkout session endpoint in the SaaS provisioning Worker. Customer signup &rarr; service selection &rarr; Stripe checkout &rarr; workspace provisioning.</p></div>
+              <div><h3>Stripe</h3><p>Checkout session endpoint in the SaaS provisioning Worker. Customer signup &rarr; service selection &rarr; SkyePay checkout &rarr; workspace provisioning.</p></div>
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Brain Layer</div>
@@ -481,7 +481,7 @@
           <p class="eyebrow">Security Architecture</p>
           <h2>Two layers. Nothing skips both.</h2>
         </div>
-        <p>0meg4kAI runs first in the browser before the request leaves the client, and again at the Cloudflare Worker before anything executes. Two independent inspection passes — a command has to defeat both layers or it doesn't move.</p>
+        <p>0meg4kAI runs first in the browser before the request leaves the client, and again at the 0S Worker before anything executes. Two independent inspection passes — a command has to defeat both layers or it doesn't move.</p>
       </div>
 
       <div class="two-col reveal">
@@ -491,7 +491,7 @@
         </div>
         <div class="panel">
           <h3>Layer 2 — Edge Scanner (Worker)</h3>
-          <p style="margin-top:12px;">Runs at the Cloudflare Worker before any D1 write or action executes. Stateless scanner — same scoring model, independent of browser. Records every scan decision to D1 (metraiyux-omega-db). KV cache for repeat-pattern fast rejection. Queue dispatch for escalation events requiring admin review. Resend notification fires to admin email on quarantine or escalation.</p>
+          <p style="margin-top:12px;">Runs at the 0S Worker before any 0S storage write or action executes. Stateless scanner — same scoring model, independent of browser. Records every scan decision to 0S storage (metraiyux-omega-db). KV cache for repeat-pattern fast rejection. Command Bridge dispatch for escalation events requiring admin review. Resend notification fires to admin email on quarantine or escalation.</p>
         </div>
         <div class="panel">
           <h3>Hard Approval Gates (Non-Configurable)</h3>
@@ -508,7 +508,7 @@
           <ul class="check-list" style="margin-top:12px;">
             <li>Enforced at the Worker level on every customer command</li>
             <li>Customer workspace commands cannot reach owner-scoped brains</li>
-            <li>Customer commands cannot reach other tenants' D1 data</li>
+            <li>Customer commands cannot reach other tenants' 0S storage data</li>
             <li>0meg4kAI scans every customer command at runtime for boundary violations</li>
             <li>Isolation is structural — not a policy toggle that can be misconfigured</li>
           </ul>
@@ -537,12 +537,12 @@
             </div>
             <div class="stack-layer">
               <div class="stack-layer-id">Stripe</div>
-              <div><h3>Payment &amp; Subscription Billing</h3><p>Checkout session endpoint in SaaS provisioning Worker. Customer signup flow &rarr; service selection &rarr; Stripe checkout &rarr; workspace provisioning.</p></div>
+              <div><h3>Payment &amp; Subscription Billing</h3><p>Checkout session endpoint in SaaS provisioning Worker. Customer signup flow &rarr; service selection &rarr; SkyePay checkout &rarr; workspace provisioning.</p></div>
             </div>
           </div>
           <div class="stack-layers">
             <div class="stack-layer">
-              <div class="stack-layer-id">Cloudflare D1</div>
+              <div class="stack-layer-id">Cloudflare 0S storage</div>
               <div><h3>Persistent SQL Storage</h3><p>8 dedicated databases: admin receipts, security scan events, SaaS customer records, CROWN ledger, NEXUS CRM records, QUANTUM task ledger, site operator events, sentinel audit trail.</p></div>
             </div>
             <div class="stack-layer">

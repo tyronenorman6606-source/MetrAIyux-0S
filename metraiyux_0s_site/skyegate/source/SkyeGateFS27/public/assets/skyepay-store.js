@@ -83,21 +83,126 @@
     return chips.slice(0, 5).map((chip) => `<span>${escapeHtml(chip)}</span>`).join("");
   }
 
-  function selectedOffer() {
-    return state.offers.find((offer) => offer.id === state.selectedOfferId) || state.offers[0] || null;
+  function fulfillmentMode(offer) {
+    const f = offer.fulfillment || {};
+    if (f.self_serve) return "Self-serve delivery";
+    if (f.owner_review_required) return "Operator review";
+    return "Payment-confirmed delivery";
   }
 
-  function renderSelected() {
-    const offer = selectedOffer();
+  function fulfillmentPanel(offer) {
+    const f = offer.fulfillment || {};
+    if (!f.activation_label && !f.customer_next_step && !f.delivery_surface) return "";
+    return `
+      <div class="fulfillment-panel">
+        <div>
+          <span>Delivery route</span>
+          <strong>${escapeHtml(f.delivery_surface || fulfillmentMode(offer))}</strong>
+        </div>
+        <div>
+          <span>After checkout</span>
+          <strong>${escapeHtml(f.customer_next_step || f.activation_label || fulfillmentMode(offer))}</strong>
+        </div>
+        <div>
+          <span>Support</span>
+          <strong>${escapeHtml(f.support_email || "support@metraiyux.com")}</strong>
+        </div>
+      </div>
+    `;
+  }
+
+	  function selectedOffer() {
+	    return state.offers.find((offer) => offer.id === state.selectedOfferId) || state.offers[0] || null;
+	  }
+
+	  function isSkyeMailMailboxOffer(offer) {
+	    return Boolean(offer?.gate_policy?.skyemail_mailbox) || [
+	      "skyemail-starter-mailbox",
+	      "skyemail-business-mailbox",
+	      "skyemail-operator-mailbox"
+	    ].includes(String(offer?.id || ""));
+	  }
+
+	  function normalizeMailboxLocalPart(value) {
+	    return String(value || "")
+	      .trim()
+	      .toLowerCase()
+	      .replace(/[^a-z0-9._-]+/g, "-")
+	      .replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, "")
+	      .slice(0, 64);
+	  }
+
+	  function normalizeMailboxDomain(value) {
+	    return String(value || "")
+	      .trim()
+	      .toLowerCase()
+	      .replace(/[^a-z0-9.-]+/g, "")
+	      .replace(/^-+|-+$/g, "")
+	      .slice(0, 120);
+	  }
+
+	  function syncMailboxClaimPanel() {
+	    const form = $("#storeCheckoutForm");
+	    const preview = $("#storeSkyemailMailboxPreview");
+	    if (!form || !preview) return;
+	    const local = normalizeMailboxLocalPart(form.mailbox_local_part?.value || "");
+	    const domain = normalizeMailboxDomain(form.mailbox_domain?.value || "");
+	    preview.textContent = local && domain ? `${local}@${domain}` : "mailbox address required";
+	  }
+
+	  function renderMailboxClaimPanel() {
+	    const form = $("#storeCheckoutForm");
+	    const panel = $("#storeSkyemailMailboxClaim");
+	    if (!form || !panel) return;
+	    const active = isSkyeMailMailboxOffer(selectedOffer());
+	    panel.hidden = !active;
+	    if (form.mailbox_local_part) form.mailbox_local_part.required = active;
+	    if (form.mailbox_domain) form.mailbox_domain.required = active;
+	    if (!active) return;
+	    const requestedEmail = params.get("mailbox_email") || params.get("mailbox") || params.get("skyemail") || "";
+	    const [requestedLocal = "", requestedDomain = ""] = requestedEmail.includes("@") ? requestedEmail.split("@") : ["", ""];
+	    if (form.mailbox_domain && !form.mailbox_domain.value) form.mailbox_domain.value = normalizeMailboxDomain(params.get("mailbox_domain") || params.get("domain") || requestedDomain || "solenterprises.org");
+	    if (form.mailbox_local_part && !form.mailbox_local_part.value) {
+	      form.mailbox_local_part.value = normalizeMailboxLocalPart(requestedLocal || form.company_name?.value || form.customer_name?.value || form.customer_email?.value?.split("@")[0] || "info");
+	      form.mailbox_local_part.dataset.autofilled = "true";
+	    }
+	    if (form.mailbox_local_part && !form.mailbox_local_part.dataset.bound) {
+	      form.mailbox_local_part.dataset.bound = "true";
+	      form.mailbox_local_part.addEventListener("input", () => {
+	        form.mailbox_local_part.dataset.autofilled = "false";
+	        syncMailboxClaimPanel();
+	      });
+	    }
+	    if (form.mailbox_domain && !form.mailbox_domain.dataset.bound) {
+	      form.mailbox_domain.dataset.bound = "true";
+	      form.mailbox_domain.addEventListener("input", syncMailboxClaimPanel);
+	    }
+	    [form.company_name, form.customer_name, form.customer_email].forEach((input) => {
+	      if (!input || input.dataset.mailboxSeedBound) return;
+	      input.dataset.mailboxSeedBound = "true";
+	      input.addEventListener("input", () => {
+	        if (form.mailbox_local_part?.dataset.autofilled === "true") {
+	          form.mailbox_local_part.value = normalizeMailboxLocalPart(form.company_name?.value || form.customer_name?.value || form.customer_email?.value?.split("@")[0] || "info");
+	        }
+	        syncMailboxClaimPanel();
+	      });
+	    });
+	    syncMailboxClaimPanel();
+	  }
+
+	  function renderSelected() {
+	    const offer = selectedOffer();
     if (!offer) return;
     state.selectedOfferId = offer.id;
     $("#storeCheckoutTitle").textContent = offer.title;
     $("#selectedOfferSummary").textContent = `${priceLine(offer)}. ${offer.description}`;
     $("#selectedPolicy").innerHTML = policyChips(offer);
-    $$(".store-card").forEach((card) => {
-      card.setAttribute("aria-pressed", String(card.dataset.offerId === offer.id));
-    });
-  }
+    $("#selectedFulfillment").innerHTML = fulfillmentPanel(offer);
+	    $$(".store-card").forEach((card) => {
+	      card.setAttribute("aria-pressed", String(card.dataset.offerId === offer.id));
+	    });
+	    renderMailboxClaimPanel();
+	  }
 
   function renderCatalog() {
     const groups = new Map();
@@ -122,6 +227,7 @@
               </span>
               <span class="store-card-copy">${escapeHtml(offer.description)}</span>
               <span class="selected-policy">${policyChips(offer)}</span>
+              <span class="store-card-fulfillment">${escapeHtml(fulfillmentMode(offer))}</span>
             </button>
           `).join("")}
         </div>
@@ -166,18 +272,32 @@
       return;
     }
     button.disabled = true;
-    button.textContent = "Preparing Stripe...";
+    button.textContent = "Preparing secure lane...";
     setStatus("Creating checkout", "SkyePay is routing this offer through the FS27 payment gate.");
-    const payload = {
-      client_slug: state.clientSlug,
-      offer_id: offer.id,
+	    const payload = {
+	      client_slug: state.clientSlug,
+	      offer_id: offer.id,
       customer_name: form.customer_name.value,
       customer_email: form.customer_email.value,
       company_name: form.company_name.value || state.client?.company_name || "",
-      dry_run: state.dryRun,
-      ...legalAcceptancePayload(form, "skyepay-store")
-    };
-    payload.idempotency_key = requestToken(payload);
+	      dry_run: state.dryRun,
+	      ...legalAcceptancePayload(form, "skyepay-store")
+	    };
+	    if (isSkyeMailMailboxOffer(offer)) {
+	      const localPart = normalizeMailboxLocalPart(form.mailbox_local_part?.value || "");
+	      const domain = normalizeMailboxDomain(form.mailbox_domain?.value || "");
+	      if (!/^[a-z0-9][a-z0-9._-]{1,62}[a-z0-9]$/.test(localPart) || !/^[a-z0-9][a-z0-9.-]*\.[a-z0-9-]{2,}$/.test(domain)) {
+	        button.disabled = false;
+	        button.textContent = "Open secure checkout";
+	        setStatus("Mailbox address required", "Choose the exact SkyeMail address to provision after payment.");
+	        form.mailbox_local_part?.focus();
+	        return;
+	      }
+	      payload.mailbox_local_part = localPart;
+	      payload.mailbox_domain = domain;
+	      payload.mailbox_email = `${localPart}@${domain}`;
+	    }
+	    payload.idempotency_key = requestToken(payload);
     try {
       const data = await fetchJson("/skyepay/checkout", {
         method: "POST",
@@ -262,7 +382,7 @@
       state.client = data.client;
       state.offers = data.offers || [];
       if (!state.selectedOfferId) state.selectedOfferId = state.offers[0]?.id || "";
-      $("#storeClientBadge").textContent = `${state.offers.length} Stripe-backed offers`;
+      $("#storeClientBadge").textContent = `${state.offers.length} SkyePay offers`;
       renderCatalog();
       setStatus("Store ready", "Choose an offer and open secure checkout.", false);
     } catch (error) {

@@ -18,10 +18,10 @@ exports.handler = async (event) => {
   try{
     await verifyAuth(event);
     const base = String(process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
-    const resendEndpoint = base ? `${base}/.netlify/functions/inbound-resend` : "/.netlify/functions/inbound-resend";
+    const mailRoutingWebhookEndpoint = base ? `${base}/api/mail-routing-webhook` : "/api/mail-routing-webhook";
     return json(200, {
       ok: true,
-      telemetry_source: "database-backed message_delivery_events plus provider webhook audit tables",
+      telemetry_source: "database-backed message_delivery_events plus mail routing webhook audit tables",
       configured: {
         database: configured("DATABASE_URL"),
         provider_api: Boolean(zohoConfigured() || configured("RESEND_API_KEY")),
@@ -31,12 +31,11 @@ exports.handler = async (event) => {
         inbound_domain: configured("INBOUND_DOMAIN"),
       },
       inbound_domain: process.env.INBOUND_DOMAIN || null,
-      endpoint: resendEndpoint,
+      endpoint: mailRoutingWebhookEndpoint,
       endpoints: {
-        delivery_events: base ? `${base}/api/resend-events-list` : "/api/resend-events-list",
-        resend_webhook: resendEndpoint,
-        zoho_webhook: base ? `${base}/api/zoho-webhook` : "/api/zoho-webhook",
-        zoho_webhook_events: base ? `${base}/api/zoho-webhook-events` : "/api/zoho-webhook-events",
+        delivery_events: base ? `${base}/api/mail-routing-events` : "/api/mail-routing-events",
+        mail_routing_webhook: mailRoutingWebhookEndpoint,
+        mail_routing_webhook_events: base ? `${base}/api/mail-routing-webhook-events` : "/api/mail-routing-webhook-events",
       },
       events_to_enable: [
         "email.received",

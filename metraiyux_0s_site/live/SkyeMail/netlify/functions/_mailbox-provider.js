@@ -133,7 +133,7 @@ async function parseZohoResponse(res) {
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
   if (!res.ok) {
-    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `Citadel mail request failed (${res.status}).`;
+    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || text || `SkyeMail provider request failed (${res.status}).`;
     const err = new Error(message);
     err.statusCode = res.status;
     err.providerResponse = data;
@@ -144,7 +144,7 @@ async function parseZohoResponse(res) {
 
 async function getZohoAccessToken() {
   if (!zohoApiConfigured()) {
-    const err = new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
+    const err = new Error("SkyeMail production mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
     err.statusCode = 501;
     throw err;
   }
@@ -159,7 +159,7 @@ async function getZohoAccessToken() {
     headers: { "accept": "application/json" }
   }));
   if (!data?.access_token) {
-    const err = new Error(data?.error || "Citadel mail token unavailable.");
+    const err = new Error(data?.error || "SkyeMail provider token unavailable.");
     err.statusCode = 502;
     err.providerResponse = data;
     throw err;
@@ -217,15 +217,18 @@ function extractZohoMessageId(payload) {
 
 function extractZohoAliasId(payload, aliasEmail = "") {
   const email = normalizeEmail(aliasEmail);
+  const isUsableAliasId = (value) => value != null
+    && clean(value)
+    && !/OPERATION_NOT_PERMITTED|FAIL|ERROR|LIMIT|REACHED|NOT[_\s-]?ALLOWED|INVALID/i.test(String(value));
   const data = payload?.data || payload;
   const entries = Array.isArray(data) ? data : [data];
   for (const entry of entries) {
     if (!entry || typeof entry !== "object") continue;
     for (const [key, value] of Object.entries(entry)) {
-      if (normalizeEmail(key) === email && value != null && clean(value) && !/OPERATION_NOT_PERMITTED|FAIL|ERROR/i.test(String(value))) return String(value);
+      if (normalizeEmail(key) === email && isUsableAliasId(value)) return String(value);
     }
     const candidates = [entry.aliasId, entry.alias_id, entry.id, entry.emailAliasId];
-    const match = candidates.find((value) => value != null && clean(value));
+    const match = candidates.find(isUsableAliasId);
     if (match != null) return String(match);
   }
   return null;
@@ -264,7 +267,7 @@ async function getZohoOrganizationId() {
   const payload = await zohoFetch("/api/organization");
   const orgId = extractZohoOrganizationId(payload);
   if (!orgId) {
-    const err = new Error("No Citadel organization id found. Check the Citadel mail organization credentials.");
+    const err = new Error("No SkyeMail provider organization id found. Check the SkyeMail provider organization credentials.");
     err.statusCode = 502;
     err.providerResponse = payload;
     throw err;
@@ -278,7 +281,7 @@ async function getZohoMailAccountId(preferredAccountId = null) {
   const payload = await zohoFetch("/api/accounts");
   const accountId = extractZohoAccountId(payload);
   if (!accountId) {
-    const err = new Error("No Citadel mail account id found. Check the Citadel mailbox credentials.");
+    const err = new Error("No SkyeMail mailbox account id found. Check the SkyeMail production mailbox credentials.");
     err.statusCode = 502;
     err.providerResponse = payload;
     throw err;
@@ -299,7 +302,7 @@ async function getZohoOrgUserId(preferredAccountId = null) {
   const payload = await zohoFetch(`/api/organization/${encodeURIComponent(orgId)}/accounts`);
   const zuid = extractZohoOrgUserId(payload, preferredAccountId);
   if (!zuid) {
-    const err = new Error("No Citadel organization user id found. Check the Citadel mailbox credentials.");
+    const err = new Error("No SkyeMail provider organization user id found. Check the SkyeMail production mailbox credentials.");
     err.statusCode = 502;
     err.providerResponse = payload;
     throw err;
@@ -309,7 +312,7 @@ async function getZohoOrgUserId(preferredAccountId = null) {
 
 async function provisionZohoMailbox({ email, localPart, displayName }) {
   if (!zohoProvisioningConfigured()) {
-    const err = new Error("Citadel/SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
+    const err = new Error("Citadel Database and SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
     err.statusCode = 501;
     throw err;
   }
@@ -336,14 +339,14 @@ async function provisionZohoMailbox({ email, localPart, displayName }) {
       mail_base: zohoMailBase()
     },
     credentials_issued: true,
-    credential_note: "Zoho mailbox password was generated once during provisioning. Store it in your secret manager if direct Zoho/IMAP login is needed.",
+    credential_note: "A SkyeMail mailbox password was generated once during provisioning. Store it in your secret manager if direct mailbox login is needed.",
     mailbox_password_once: password
   };
 }
 
 async function provisionZohoEmailAlias({ aliasEmail, accountId = null }) {
   if (!zohoProvisioningConfigured()) {
-    const err = new Error("Citadel/SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
+    const err = new Error("Citadel Database and SkyeNet mailbox lane is not configured. Set the required sovereign mail adapter credentials.");
     err.statusCode = 501;
     throw err;
   }
@@ -362,7 +365,7 @@ async function provisionZohoEmailAlias({ aliasEmail, accountId = null }) {
   const providerAliasId = extractZohoAliasId(data, parsed.email);
   if (!providerAliasId) {
     const result = extractZohoAliasResult(data, parsed.email) || data?.status?.description || "missing alias id";
-    const err = new Error(`Zoho did not create the receiving alias for ${parsed.email}: ${result}`);
+    const err = new Error(`SkyeMail backed by Citadel Database and SkyeNet did not create the receiving alias for ${parsed.email}: ${result}`);
     err.statusCode = 502;
     err.providerResponse = data;
     throw err;
@@ -449,14 +452,14 @@ async function provisionMailboxAlias({ mailbox, aliasEmail, user = null, auth = 
 
 async function zohoSendMail({ accountId, fromAddress, to, cc = "", bcc = "", replyTo = "", subject, html, text, replyMessageId = "", threadId = "" }) {
   if (!zohoApiConfigured()) {
-    const err = new Error("Citadel mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
+    const err = new Error("SkyeMail production mail API is not configured. Set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, and ZOHO_REFRESH_TOKEN.");
     err.statusCode = 501;
     throw err;
   }
   const zohoAccountId = await getZohoMailAccountId(accountId);
   const from = clean(fromAddress || envValue("ZOHO_DEFAULT_FROM"));
   if (!from) {
-    const err = new Error("A Citadel default sender or hosted mailbox sender is required for sending.");
+    const err = new Error("A SkyeMail default sender or hosted mailbox sender is required for sending.");
     err.statusCode = 501;
     throw err;
   }
@@ -657,12 +660,12 @@ async function zohoGetMessage({ id, accountId = null, mailbox = "" }) {
   const fallbackAccountId = await getZohoMailAccountId(accountId);
   const parsed = parseZohoUiId(id, fallbackAccountId);
   if (!parsed.messageId) {
-    const err = new Error("Zoho message id required.");
+    const err = new Error("SkyeMail message id required.");
     err.statusCode = 400;
     throw err;
   }
   if (!parsed.folderId) {
-    const err = new Error("Citadel message folder id missing. Open the message from a Citadel/SkyeNet inbox result.");
+    const err = new Error("SkyeMail message folder id missing. Open the message from a Citadel Database and SkyeNet inbox result.");
     err.statusCode = 400;
     throw err;
   }

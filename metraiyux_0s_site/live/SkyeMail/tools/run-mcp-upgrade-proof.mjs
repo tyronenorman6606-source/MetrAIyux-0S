@@ -93,14 +93,14 @@ async function main() {
       requireFirstPerson: false,
       content: [
         "SkyeMail gives each 0S client a real email lane, a sovereign-key onboarding card, Resend delivery monitoring, encrypted inbox storage, and a clean workspace.",
-        "The client workspace uses SkyeGateFS27 access, proof receipts, sovereign keys, and delivery routing.",
+        "The client workspace uses SkyeGate FS27 access, proof receipts, sovereign keys, and delivery routing.",
       ].join("\n"),
     });
     const generatedContent = await callTool("design_content_generate", {
       product: "SkyeMail",
       audience: "0S clients",
       offer: "a real secure email workspace",
-      components: ["client workspace", "SkyeGateFS27 access", "proof receipts", "sovereign keys", "delivery routing"],
+      components: ["client workspace", "SkyeGate FS27 access", "proof receipts", "sovereign keys", "delivery routing"],
       format: "proof",
     });
     const stackAudit = await callTool("design_stack_audit", {

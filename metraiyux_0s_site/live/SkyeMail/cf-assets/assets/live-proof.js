@@ -38,7 +38,7 @@
     const ok = Boolean(proof.ok);
     set("[data-proof-status]", ok ? "Passed" : "Needs attention");
     set("[data-proof-title]", ok ? "SkyeMail passed the two-way proof run." : "SkyeMail proof run needs attention.");
-    set("[data-proof-summary]", `Run ${safe(proof.run_id)} completed at ${safe(proof.completed_at)} on ${safe(proof.domain)} through the Citadel/SkyeNet mail lane.`);
+    set("[data-proof-summary]", `Run ${safe(proof.run_id)} completed at ${safe(proof.completed_at)} on ${safe(proof.domain)} through the Citadel Database and SkyeNet mail lane.`);
     const ab = proof.runs?.[0];
     const ba = proof.runs?.[1];
     const confirmed = (run) => Boolean(run?.imported_to_inbox || run?.sovereign_inbox_visible || run?.provider_inbox_visible);
@@ -52,7 +52,7 @@
           <b>${escapeHtml(run.label)}</b>
           <span>${escapeHtml(run.from)} to ${escapeHtml(run.to)}</span><br>
           <span>Subject: ${escapeHtml(run.subject)}</span><br>
-          <span>Mail lane: Citadel/SkyeNet sovereign mail lane</span><br>
+          <span>Mail lane: Citadel Database and SkyeNet sovereign mail lane</span><br>
           <span>Mail ID: ${escapeHtml(mailId(run))}</span><br>
           <span class="${confirmed(run) ? "status-ok" : "status-warn"}">${confirmed(run) ? "Sovereign inbox confirmed" : "Inbox confirmation missing"}</span>
         </article>

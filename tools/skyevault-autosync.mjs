@@ -13,11 +13,11 @@ const dryRun = flag('--dry-run') || envFlag('SKYEVAULT_AUTOSYNC_DRY_RUN', false)
 const force = flag('--force') || envFlag('SKYEVAULT_AUTOSYNC_FORCE', false);
 const skipMap = flag('--skip-map') || envFlag('SKYEVAULT_AUTOSYNC_SKIP_MAP', false);
 const skipBins = flag('--skip-bins') || envFlag('SKYEVAULT_AUTOSYNC_SKIP_BINS', false);
-const skipDelta = flag('--skip-delta') || envFlag('SKYEVAULT_AUTOSYNC_SKIP_DELTA', false);
+const skipDelta = flag('--skip-delta') || envFlag('SKYEVAULT_AUTOSYNC_SKIP_DELTA', true);
 const skipGitOrigin = flag('--skip-git-origin') || envFlag('SKYEVAULT_AUTOSYNC_SKIP_GIT_ORIGIN', false);
 const gitOriginSync = !skipGitOrigin && envFlag('SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC', false);
 const deltaRequired = flag('--require-delta') || envFlag('SKYEVAULT_AUTOSYNC_DELTA_REQUIRED', false);
-const deltaUpload = !flag('--no-delta-upload') && envFlag('SKYEVAULT_AUTOSYNC_DELTA_UPLOAD', true);
+const deltaUpload = !flag('--no-delta-upload') && envFlag('SKYEVAULT_AUTOSYNC_DELTA_UPLOAD', false);
 
 const SKIP_DIRS = new Set([
   '.git',
@@ -143,14 +143,20 @@ function intValue(name, fallback, minimum = 1) {
 }
 
 function modeValue() {
-  return String(argValue('--mode', process.env.SKYEVAULT_AUTOSYNC_MODE || 'git+full')).trim().toLowerCase();
+  return String(argValue('--mode', process.env.SKYEVAULT_AUTOSYNC_MODE || 'mirror')).trim().toLowerCase();
 }
 
 function additiveBaselineEnabled() {
-  return !flag('--no-additive-baseline')
+  return !mirrorOnlyMode()
+    && !flag('--no-additive-baseline')
     && !flag('--full-checkpoint')
     && !envFlag('SKYEVAULT_AUTOSYNC_FULL_CHECKPOINT', false)
     && envFlag('SKYEVAULT_AUTOSYNC_ADDITIVE_BASELINE', true);
+}
+
+function mirrorOnlyMode() {
+  const mode = modeValue();
+  return mode === 'mirror';
 }
 
 function rel(file) {
@@ -579,10 +585,31 @@ function readLatestFullRepoSuccess() {
   return readJson(path.join(repoRoot, '.skyevault-out', 'autosync', 'latest-full-repo-success.json'), null);
 }
 
+const PRIMARY_MODE_ORDER = ['mirror', 'git', 'safe', 'full'];
+
+function cleanMirrorId(value, fallback) {
+  return String(value || fallback)
+    .replace(/[^A-Za-z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 120) || fallback;
+}
+
+function livingMirrorManifestPath() {
+  const workspaceId = cleanMirrorId(process.env.SKYEVAULT_OWNER_WORKSPACE_ID || 'metraiyux-0s-owner', 'owner');
+  const repoName = cleanMirrorId(process.env.SKYEVAULT_LIVING_MIRROR_REPO_ID || path.basename(repoRoot), 'repo');
+  return path.join(repoRoot, '.skyevault-out', 'living-mirror', workspaceId, repoName, 'current', 'manifest.json');
+}
+
+function livingMirrorFullCurrentReady() {
+  const manifest = readJson(livingMirrorManifestPath(), null);
+  return Boolean(manifest && manifest.mode === 'full-current-index' && !manifest.baseArtifact);
+}
+
 function modeForRun(run) {
   const explicit = String(run?.mode || '').trim();
-  if (['git', 'safe', 'full'].includes(explicit)) return explicit;
+  if (PRIMARY_MODE_ORDER.includes(explicit)) return explicit;
   const label = String(run?.label || '').trim();
+  if (label === 'living-repo-mirror') return 'mirror';
   if (label === 'git-vault-pack') return 'git';
   if (label === 'safe-repo-archive') return 'safe';
   if (label === 'encrypted-full-repo') return 'full';
@@ -628,7 +655,7 @@ function mergeRunSummaries(preferredRuns, fallbackRuns = []) {
     if (!run.ok || byMode.has(run.mode)) continue;
     byMode.set(run.mode, run);
   }
-  return [...byMode.values()].sort((a, b) => ['git', 'safe', 'full'].indexOf(a.mode) - ['git', 'safe', 'full'].indexOf(b.mode));
+  return [...byMode.values()].sort((a, b) => PRIMARY_MODE_ORDER.indexOf(a.mode) - PRIMARY_MODE_ORDER.indexOf(b.mode));
 }
 
 function primarySuccessRecord(receipt) {
@@ -714,6 +741,7 @@ function latestBaselineRunCoverage(state, modes) {
 
   for (const run of primaryRunSummaries(latestPrimary)) {
     if (!run.ok || !modes.includes(run.mode) || byMode.has(run.mode)) continue;
+    if (run.mode === 'mirror') continue;
     byMode.set(run.mode, run);
     sourcesByMode[run.mode] = 'latest-primary-baseline';
   }
@@ -872,7 +900,10 @@ function findPrimaryCoverage(state, modes) {
   return primaryCoverageFromModeCoverage(primaryModeCoverage(state, modes), state, modes);
 }
 
-function collectState() {
+function collectState(options = {}) {
+  const mirrorOnly = mirrorOnlyMode();
+  const includeChangedFingerprints = !mirrorOnly && options.includeChangedFingerprints !== false;
+  const includeBoundaryScan = !mirrorOnly && options.includeBoundaryScan !== false;
   const branch = git(['branch', '--show-current'], 'HEAD') || 'HEAD';
   const head = git(['rev-parse', 'HEAD'], '');
   const shortHead = git(['rev-parse', '--short', 'HEAD'], '');
@@ -881,8 +912,20 @@ function collectState() {
   const rawStatusShort = gitLines(['status', '--porcelain=v1', '--branch']);
   const statusShort = filterStatusShort(rawStatusShort);
   const counts = statusCounts(statusShort);
-  const boundary = scanLocalBoundary(statusShort);
-  const changedFingerprints = changedWorkspaceFingerprints(statusShort);
+  const boundary = includeBoundaryScan ? scanLocalBoundary(statusShort) : {
+    scannedFiles: 0,
+    skippedGenerated: 0,
+    scanGenerated: false,
+    scanMode: 'status-fast',
+    localOnly: [],
+    localOnlyTotal: 0,
+    secretLikeTotal: 0,
+    rules: {
+      scannerRules: SECRET_PATTERNS.map(([name]) => name),
+      localOnlyExtensions: [...LOCAL_ONLY_EXTS.keys()].sort()
+    }
+  };
+  const changedFingerprints = includeChangedFingerprints ? changedWorkspaceFingerprints(statusShort) : [];
   const legacyDigestInput = {
     branch,
     head,
@@ -900,7 +943,8 @@ function collectState() {
   };
   const digestInput = {
     ...legacyDigestInput,
-    changedFingerprints
+    changedFingerprints,
+    changedFingerprintScanSkipped: !includeChangedFingerprints
   };
   const changedFingerprintMaxMtimeMs = changedFingerprints.reduce((max, item) => Math.max(max, Number(item.mtimeMs || 0)), 0);
   const localOnlyCriticalMaxMtimeMs = boundary.localOnly.reduce((max, item) => Math.max(max, Number(item.mtimeMs || 0)), 0);
@@ -939,16 +983,35 @@ function plannedModes(state) {
     if (state.localOnlyCriticalCount > 0) modes.push('full');
     return modes;
   }
-  if (mode === 'all') return ['git', 'safe', 'full'];
+  if (mode === 'all') return ['mirror', 'git', 'safe', 'full'];
   return mode
     .split(/[,+]/)
     .map((item) => item.trim())
     .filter(Boolean)
     .flatMap((item) => item === 'repo' ? ['safe'] : item)
-    .filter((item, index, list) => ['git', 'safe', 'full'].includes(item) && list.indexOf(item) === index);
+    .filter((item, index, list) => PRIMARY_MODE_ORDER.includes(item) && list.indexOf(item) === index);
 }
 
 function commandForMode(mode) {
+  if (mode === 'mirror') {
+    const args = [
+      path.join(repoRoot, 'tools', 'skyevault-living-repo-mirror.mjs'),
+      'sync',
+      `--env-file=${argValue('--env-file', process.env.SKYEVAULT_AUTOSYNC_ENV_FILE || '.env')}`,
+      '--full-current-index',
+      `--concurrency=${argValue('--mirror-concurrency', process.env.SKYEVAULT_LIVING_MIRROR_CONCURRENCY || '8')}`
+    ];
+    if (envFlag('SKYEVAULT_LIVING_MIRROR_UPLOAD', true) && !flag('--no-mirror-upload')) args.push('--upload');
+    if (flag('--keep-local-objects')) args.push('--keep-local-objects');
+    if (flag('--skip-generated')) args.push('--skip-generated');
+    if (flag('--adopt-existing-base')) args.push('--adopt-existing-base');
+    return {
+      mode,
+      label: 'living-repo-mirror',
+      command: process.execPath,
+      args
+    };
+  }
   if (mode === 'git') {
     return {
       mode,
@@ -1414,7 +1477,7 @@ async function runOnce() {
     : primaryModeCoverage(state, modes);
   const primaryCoverage = force ? null : primaryCoverageFromModeCoverage(modeCoverage, state, modes);
   if (primaryCoverage?.record && primaryCoverage.source !== 'latest-primary-success' && !modeCoverage.needsDelta && !dryRun) {
-    writePrimarySuccessPointers(primaryCoverage.record);
+    writePrimarySuccessPointers(primaryCoverage.record, { updateLatestFull: false });
   }
   const receiptPrimaryCoverage = primaryCoverage
     ? Object.fromEntries(Object.entries(primaryCoverage).filter(([key]) => key !== 'record'))
@@ -1526,7 +1589,7 @@ async function runOnce() {
 }
 
 function status() {
-  const state = collectState();
+  const state = collectState({ includeChangedFingerprints: false, includeBoundaryScan: false });
   const latest = readJson(path.join(receiptBase(), 'latest-success.json'), null);
   const latestPrimary = readLatestPrimarySuccess();
   const latestFullRepo = readJson(path.join(receiptBase(), 'latest-full-repo-success.json'), null);
@@ -1590,6 +1653,34 @@ function status() {
   }, null, 2));
 }
 
+function stateSummary() {
+  const state = collectState({ includeChangedFingerprints: false, includeBoundaryScan: false });
+  console.log(JSON.stringify({
+    ok: true,
+    schema: 'skyevault.autosync-current-state.v1',
+    checkedAt: new Date().toISOString(),
+    state: {
+      branch: state.branch,
+      shortHead: state.shortHead,
+      upstream: state.upstream,
+      ahead: state.ahead,
+      behind: state.behind,
+      dirty: state.dirty,
+      statusCounts: state.statusCounts,
+      digest: state.digest,
+      digestVersion: state.digestVersion,
+      legacyDigest: state.legacyDigest,
+      scanMode: state.boundary.scanMode,
+      scannedFiles: state.boundary.scannedFiles,
+      changedFileFingerprintCount: state.changedFileFingerprintCount,
+      localOnlyCriticalCount: state.localOnlyCriticalCount,
+      localOnlyCriticalMaxMtimeMs: state.localOnlyCriticalMaxMtimeMs,
+      changedFileFingerprintMaxMtimeMs: state.changedFileFingerprintMaxMtimeMs,
+      secretLikeTotal: state.boundary.secretLikeTotal
+    }
+  }, null, 2));
+}
+
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -1613,6 +1704,8 @@ if (command === 'once') {
   await watch();
 } else if (command === 'status') {
   status();
+} else if (command === 'state') {
+  stateSummary();
 } else {
   console.error(`Unknown SkyeVault autosync command: ${command}`);
   process.exit(1);

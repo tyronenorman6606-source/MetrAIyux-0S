@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   return json(410, {
     ok: false,
     error: "app_local_auth_disabled_by_shared_gate",
-    message: "SkyeMail login is owned by the canonical 0S Gate. Use an active FS27/SkyGate bearer with /auth-fs27-session.",
+    message: "SkyeMail login is owned by the canonical 0S Gate. Use an active SkyeGate FS27 bearer with /auth-fs27-session.",
     gate_required: true,
     gate_login: login.toString(),
     session_endpoint: "/auth-fs27-session"

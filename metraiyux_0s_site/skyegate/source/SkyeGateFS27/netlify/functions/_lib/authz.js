@@ -169,7 +169,7 @@ function gateAuthError(status, code, message, hint = "") {
 
 export function gateAuthErrorResponse(error, cors) {
   return json(error?.status || 401, {
-    error: error?.message || "0S/SkyGate session required",
+    error: error?.message || "0S/SkyeGate FS27 session required",
     code: error?.code || "GATE_AUTH_REQUIRED",
     ...(error?.hint ? { hint: error.hint } : {})
   }, cors);
@@ -193,7 +193,7 @@ export async function requireGateAuth(req, requiredRole = "viewer") {
       customer_id: customerId,
       customer_email: gateHeader(req, "x-0s-email") || null,
       key_last4: "gate",
-      label: "0S/SkyGate session",
+      label: "0S/SkyeGate FS27 session",
       role,
       key_metadata: { type: "0s_gate_session", source: gateHeader(req, "x-metraiyux-session-source") || "0s-gate-card-bridge" },
       is_active: true,
@@ -205,9 +205,9 @@ export async function requireGateAuth(req, requiredRole = "viewer") {
   }
 
   if (!token) {
-    throw gateAuthError(401, "GATE_SESSION_REQUIRED", "0S/SkyGate session required", "Sign into the 0S gate; apps should inherit that session instead of asking for a Kaixu key.");
+    throw gateAuthError(401, "GATE_SESSION_REQUIRED", "0S/SkyeGate FS27 session required", "Sign into the 0S gate; apps should inherit that session instead of asking for a Kaixu key.");
   }
-  throw gateAuthError(401, "GATE_SESSION_UNVERIFIED", "0S/SkyGate session could not be verified by this gate", "The app sent a token, but the gate could not resolve it to an active session or scoped gate card.");
+  throw gateAuthError(401, "GATE_SESSION_UNVERIFIED", "0S/SkyeGate FS27 session could not be verified by this gate", "The app sent a token, but the gate could not resolve it to an active session or scoped gate card.");
 }
 
 export async function getMonthRollup(customer_id, month = monthKeyUTC()) {

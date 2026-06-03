@@ -261,6 +261,8 @@ export async function resolveGatewayRoute(request, env) {
     mount_path: mountPath,
     strip_mount_path: record.strip_mount_path !== false && record.stripMountPath !== false,
     customer_id: cleanText(record.customer_id || record.customerId || '', 160),
+    workspace_id: cleanText(record.workspace_id || record.workspaceId || '', 180),
+    plan_name: cleanText(record.plan_name || record.planName || '', 120),
     project_id: cleanText(record.project_id || record.projectId || '', 160),
     active_deployment_id: cleanText(record.active_deployment_id || record.deployment_id || record.deploymentId || '', 180),
     public_access: record.public_access !== false,

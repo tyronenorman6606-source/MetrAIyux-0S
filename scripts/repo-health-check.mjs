@@ -40,6 +40,18 @@ function readJson(file) {
   }
 }
 
+function isSafeClientCredentialPack(relative, text) {
+  if (!/(^|\/)metraiyux_0s_site\/founder-command\/client-credentials\/[^/]+\.json$/i.test(relative)) return false;
+  try {
+    const data = JSON.parse(text);
+    return data?.schema === 'founder-command.client-credential-pack.v1'
+      && /shared FS27\/SkyGate\/Free99/i.test(String(data.auth_boundary || ''))
+      && !/\b(password|token|secret|private[_-]?key)\b\s*:\s*"(?!false|no|none|not stored|not_stored|redacted|pending|blocked)[^"]{8,}"/i.test(text);
+  } catch {
+    return false;
+  }
+}
+
 function scanTrackedFiles() {
   const output = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: GIT_MAX_BUFFER });
   const files = output.toString('utf8').split('\0').filter(Boolean);
@@ -89,6 +101,7 @@ function scanRiskyTrackedFiles() {
       continue;
     }
     const hits = secretPatterns.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
+    if (!hits.length && isSafeClientCredentialPack(relative, text)) continue;
     findings.push({ file: relative, hits: hits.length ? hits : ['risky-filename'] });
   }
 

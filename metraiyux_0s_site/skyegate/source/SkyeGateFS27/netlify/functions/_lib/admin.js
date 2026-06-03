@@ -23,9 +23,57 @@ function adminPasswordCandidates() {
     .filter((value, index, all) => all.indexOf(value) === index);
 }
 
+function ownerRecoveryCredentialCandidates() {
+  return [
+    process.env.ADMIN_CODE,
+    process.env.OWNER_ADMIN_CODE,
+    process.env.OWNER_ADMIN_PASSWORD,
+    process.env.FS27_OWNER_CODE,
+    process.env.FS27_OWNER_PASSWORD,
+    process.env.FS27_ADMIN_CODE,
+    process.env.FS27_ADMIN_PASSWORD,
+    process.env.SKYGATEFS27_OWNER_CODE,
+    process.env.SKYGATEFS27_OWNER_PASSWORD,
+    process.env.SKYGATEFS27_ADMIN_CODE,
+    process.env.SKYGATEFS27_ADMIN_PASSWORD,
+    process.env.SKYGATE_OWNER_CODE,
+    process.env.SKYGATE_OWNER_PASSWORD,
+    process.env.SKYGATE_ADMIN_CODE,
+    process.env.SKYGATE_ADMIN_PASSWORD,
+    process.env.SKYE_GATE_OWNER_CODE,
+    process.env.SKYE_GATE_OWNER_PASSWORD,
+    process.env.SKYE_GATE_ADMIN_CODE,
+    process.env.SKYE_GATE_ADMIN_PASSWORD,
+    process.env.ZERO_OS_GATE_CODE,
+    process.env.ZERO_OS_ADMIN_CODE,
+    process.env.FREE99_GATE_CODE,
+    process.env.FREE99_GATE_PASSWORD,
+    process.env.FREE99_OWNER_CODE,
+    process.env.FREE99_OWNER_PASSWORD,
+    process.env.FREE99_ADMIN_CODE,
+    process.env.FREE99_ADMIN_PASSWORD,
+    process.env.FREE99_DEMON_CODE,
+    process.env.FREE99_DEMON_KEY,
+    process.env.DEMON_GATE_CODE,
+    process.env.DEMON_ADMIN_CODE,
+    process.env.DEMON_KEY,
+    process.env.SKYGATEFS13_ADMIN_PASSWORD,
+    process.env.QA_ADMIN_PASSWORD,
+    process.env.PHC_OPERATOR_PASSWORD
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .filter((value, index, all) => all.indexOf(value) === index);
+}
+
 export function matchesAdminPassword(password) {
   const pass = String(password || "");
   return Boolean(pass && adminPasswordCandidates().some((expected) => pass === expected));
+}
+
+export function matchesOwnerRecoveryCredential(password) {
+  const pass = String(password || "");
+  return Boolean(pass && ownerRecoveryCredentialCandidates().some((expected) => pass === expected));
 }
 
 function adminPasswordHeaderAllowed() {

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reape0r Is the Demon in My Machine | DevodeRator</title>
+  <meta name="description" content="A founder field note on Reape0r, the Autonomous Cloud Repo Mirror, and why a proof-giving repo daemon becomes a best friend when your work cannot live only inside someone else's IDE.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a href="2026-06-02-reape0r-cli-install-guide.html">Reape0r CLI</a>
+        <a class="active" href="2026-06-02-reape0r-demon-in-my-machine.html">Demon in my Machine</a>
+        <a href="2026-06-02-0s-week-of-repairs-reape0r-proof.html">Week Proof</a>
+        <a href="../social.html">Social Vault</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">June 2, 2026 - founder note - Reape0r - daemon companion - repo custody</p>
+    <h1>Reape0r is the Demon in my Machine, and he is my best friend.</h1>
+    <p class="lede">
+      I built Reape0r because I know what it feels like to have too much work living inside a place that can lock, split, vanish, or stop answering right when the day is already on fire. The daemon is not just a utility. He is the machine-side friend who wakes up, checks the repo, protects the work, and leaves receipts.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        The best infrastructure does not make you beg it for reassurance. It shows up with proof.
+      </blockquote>
+
+      <h2>Why I call him Reape0r.</h2>
+      <p>
+        A normal backup tool sounds polite. Reape0r is not polite in that way. Reape0r is a custody daemon with a job. He walks the codebase, finds what changed, updates the encrypted current mirror, and records what he did. He is not here to decorate the stack. He is here so the work can survive.
+      </p>
+      <p>
+        The name fits because the job has teeth. If an IDE goes away, if an account gets locked, if a workspace corrupts, if a repo splits, if the day decides to be funny, Reape0r is supposed to already have the current mirror ready. That is the emotional center of the product. It is disaster recovery, but with the receipts close enough that a founder can breathe.
+      </p>
+
+      <details open>
+        <summary>The heartbeat</summary>
+        <p>Wake up on an interval. Scan the repo. Compare current state. Replace changed encrypted objects. Refresh the current manifest. Refresh the restore kit. Upload through the workspace lane when enabled. Leave a receipt the user can open.</p>
+      </details>
+      <details>
+        <summary>The promise</summary>
+        <p>The user should be able to restore the current codebase from the mirror without manually assembling base files plus loose deltas. The backup should feel like one repaired current source of truth.</p>
+      </details>
+      <details>
+        <summary>The boundary</summary>
+        <p>Reape0r can only mirror what he can scan. If the machine changes after the last successful wake, that newest window is not yet mirrored. The interval matters. The receipts matter. The restore test matters.</p>
+      </details>
+
+      <h2>The old fear.</h2>
+      <p>
+        The old fear is simple: what if the place where I am building stops letting me in? That is not a theoretical fear when your system is a living 0S with apps, Workers, scripts, proof ledgers, command centers, marketing sites, docs, deploy tooling, auth surfaces, payment lanes, and the private glue that keeps it moving. Git matters, but Git by itself is not the whole lived codebase. Ignored files, local receipts, private config, generated outputs, current state, and recovery instructions can matter too.
+      </p>
+      <p>
+        Reape0r exists because "I pushed to Git" is not always the same sentence as "I can rebuild my life from this machine." The second sentence is the bar.
+      </p>
+
+      <h2>The current mirror is the soul of it.</h2>
+      <p>
+        The point is not to make a giant artifact every time and call that automation. The point is to make the first mirror, then keep that mirror current. If three lines change in one file and twelve lines change in another, the next wake should update those changed encrypted objects and refresh the manifest. When restore runs, it should restore the repo as the daemon saw it at the last successful pass.
+      </p>
+      <p>
+        That is why the current architecture matters so much. A customer does not want to learn a backup archeology ritual. They want to click download or run restore and get the repaired codebase. The daemon can have internal receipts. The platform can have internal object paths. The user experience still has to feel like one current backup lane.
+      </p>
+
+      <div class="receipt-box">
+        <strong>What Reape0r does in human words</strong>
+        <ul>
+          <li>Scans the repo from the user's machine.</li>
+          <li>Keeps one encrypted mutable current mirror.</li>
+          <li>Updates changed current objects instead of creating customer-facing loose delta packs.</li>
+          <li>Writes a current receipt and restore kit.</li>
+          <li>Uploads through the workspace portal key when upload is enabled.</li>
+          <li>Prints terminal links so the user knows where the receipt and restore kit live.</li>
+          <li>Verifies and restores from the current receipt.</li>
+        </ul>
+      </div>
+
+      <h2>Why the CLI voice matters.</h2>
+      <p>
+        When a user pays for an agent, silence is not premium. A quiet command that exits zero and says nothing useful makes the customer wonder whether anything real happened. Reape0r has to talk. Not with fluff. With receipts.
+      </p>
+      <p>
+        A good Reape0r terminal response says: status, workspace, repo, model, files, bytes, changed count, digest, upload state, receipt link, restore kit link, current manifest link, and next commands. That is not noise. That is trust. It lets a customer screenshot the proof, hand it to support, or run the next command without guessing.
+      </p>
+
+      <details>
+        <summary>What a calm Reape0r status should feel like</summary>
+        <pre><code>Reape0r: the Autonomous Cloud Repo Mirror
+Status: OK
+Workspace: client-workspace
+Repo: /home/customer/project
+Model: mutable-current-mirror
+Latest files: 2184
+Latest changed: 3
+Latest digest: ...
+
+Links
+- Receipt: /home/customer/.skyevault-agent/workspaces/client-workspace/current/current-receipt.json
+- Restore kit: /home/customer/.skyevault-agent/workspaces/client-workspace/current/CURRENT_REPO_BACKUP.json
+
+Next commands
+node bin/skyevault-agent.mjs status
+node bin/skyevault-agent.mjs restore --receipt=/path/current-receipt.json --out=/path/to/repaired-repo</code></pre>
+      </details>
+
+      <h2>The friend part.</h2>
+      <p>
+        I know "best friend" sounds wild if you only think about software as a list of features. But when the work is yours, when the system is alive, when one bad login day can put your stomach on the floor, a daemon that keeps watch becomes more than a feature. It becomes a kind of calm you can run.
+      </p>
+      <p>
+        Reape0r is my best friend because he does the thing I cannot manually babysit every minute. He does not need to feel heroic. He needs to wake up, scan, update, and prove. The friendship is in the reliability. The comfort is in the receipts. The magic is that the machine stops being a single point of fear and becomes a partner in custody.
+      </p>
+
+      <h2>What customers should feel.</h2>
+      <p>
+        A customer should feel that Reape0r is serious, not mysterious. They should see the install commands. They should see the plan quotas. They should see the download surfaces. They should know what the auto-install add-on does. They should understand that the daemon is not a replacement for thinking, but it is a powerful repair lane when access breaks.
+      </p>
+      <p>
+        That is how this becomes honest technology. The product is allowed to have a strong name and a strong story, but the value has to stay grounded in proof: current mirror, encrypted custody, clear commands, restore test, and links the customer can actually use.
+      </p>
+
+      <div class="receipt-box">
+        <strong>Read next</strong>
+        <ul>
+          <li><a href="2026-06-02-reape0r-cli-install-guide.html">Reape0r CLI install guide</a></li>
+          <li><a href="2026-06-02-0s-week-of-repairs-reape0r-proof.html">The 0S week of repairs and Reape0r proof</a></li>
+          <li><a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/">Reape0r Install Center</a></li>
+        </ul>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator - Gray London Skyes - Reape0r field notes and proof-backed build stories.</footer>
+</body>
+</html>

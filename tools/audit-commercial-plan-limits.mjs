@@ -1,15 +1,16 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { SKYPAY_OFFERS } from "../SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js";
+import { SKYPAY_OFFERS } from "../metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const siteDir = path.join(root, "metraiyux_0s_site");
 const plansPath = path.join(siteDir, "data", "plans.json");
 const gatewayPath = path.join(siteDir, "data", "skyepay-gateway.json");
 const workerPath = path.join(siteDir, "cloudflare-saas-provisioning-worker", "src", "index.js");
-const stripeWebhookPath = path.join(root, "SkyeGateFS27", "netlify", "functions", "stripe-webhook.js");
-const activationPath = path.join(root, "SkyeGateFS27", "netlify", "functions", "_lib", "skyepayActivation.js");
+const skyeGateRoot = path.join(siteDir, "skyegate", "source", "SkyeGateFS27");
+const stripeWebhookPath = path.join(skyeGateRoot, "netlify", "functions", "stripe-webhook.js");
+const activationPath = path.join(skyeGateRoot, "netlify", "functions", "_lib", "skyepayActivation.js");
 
 const planOfferMap = {
   "starter-command": "metraiyux-starter-command",
@@ -67,7 +68,7 @@ const htmlRequiredTokens = {
     "90 rpm",
     "120 rpm",
     "180 rpm",
-    "Confirmed Stripe payment records paid status",
+    "Confirmed SkyePay payment records paid status",
     "Skye Split Engine"
   ],
   "saas/signup.html": [

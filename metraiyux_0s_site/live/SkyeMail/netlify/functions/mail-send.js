@@ -30,7 +30,7 @@ async function resendSend(payload){
   let data = null;
   try{ data = text ? JSON.parse(text) : null; }catch(e){ data = { raw: text }; }
   if(!res.ok){
-    throw new Error((data && data.message) || (data && data.error) || text || `Resend send failed (${res.status})`);
+    throw new Error((data && data.message) || (data && data.error) || text || `SkyeMail backed by Citadel Database and SkyeNet send failed (${res.status})`);
   }
   return data;
 }
@@ -67,7 +67,7 @@ exports.handler = async (event) => {
 
     const hosted = await getHostedMailbox(user.id).catch(() => null);
     if (!hosted) {
-      return json(409, { error: "This SkyEmail account does not have a Citadel/SkyeNet mailbox route yet, so sending is blocked to prevent reply bounces. Open mailbox status or reprovision the mailbox to create the receiving route." });
+      return json(409, { error: "This SkyeMail account does not have a Citadel Database and SkyeNet mailbox route yet, so sending is blocked to prevent reply bounces. Open mailbox status or reprovision the mailbox to create the receiving route." });
     }
     const inboundDomain = process.env.INBOUND_DOMAIN || hosted.domain || requireEnv("INBOUND_DOMAIN");
     let fromEmail = hosted.mailbox_email || `${user.handle}@${inboundDomain}`;

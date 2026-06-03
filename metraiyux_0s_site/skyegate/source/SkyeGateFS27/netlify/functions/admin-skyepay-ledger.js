@@ -5,6 +5,7 @@ import { audit } from "./_lib/audit.js";
 import { q } from "./_lib/db.js";
 import { canApproveSkyePayOrder, skyePayHeaders } from "./_lib/skyepaySecurity.js";
 import { skyePayOfferRequiresOwnerApproval } from "./_lib/skyepayActivation.js";
+import { publicProviderRuntime, runZeroOsProviderAction } from "./_lib/providerRuntime.js";
 import {
   isVaultProvisioningOrder,
   markVaultProvisioningFailure,
@@ -23,6 +24,47 @@ function numberOrNull(value) {
 
 function arrayOrNull(value) {
   return Array.isArray(value) && value.length ? value.map((item) => clean(item, 80)).filter(Boolean) : null;
+}
+
+function metadataObject(order = {}) {
+  const metadata = order.metadata && typeof order.metadata === "object" ? order.metadata : {};
+  const nested = metadata.metadata && typeof metadata.metadata === "object" ? metadata.metadata : {};
+  return { ...nested, ...metadata };
+}
+
+export function skyePayAdminPaymentIsRefundable(status = "") {
+  return ["paid", "complete", "active", "partially_refunded"].includes(String(status || "").toLowerCase());
+}
+
+export function skyePayAdminCanVoidWithoutRefund(order = {}) {
+  const paymentStatus = String(order.payment_status || "").toLowerCase();
+  return !skyePayAdminPaymentIsRefundable(paymentStatus);
+}
+
+export function skyePayRefundableOrderAmountCents(order = {}) {
+  const metadata = metadataObject(order);
+  const adjustedDue = Number(metadata.skyemerit_adjusted_due_cents || metadata.adjusted_due_cents || 0);
+  if (Number.isFinite(adjustedDue) && adjustedDue > 0) return Math.trunc(adjustedDue);
+  return Math.max(0, Number(order.amount_setup_cents || 0) + Number(order.amount_recurring_cents || 0));
+}
+
+export function skyePayRemainingRefundableCents(order = {}, priorRefundedCents = 0) {
+  return Math.max(0, skyePayRefundableOrderAmountCents(order) - Math.max(0, Number(priorRefundedCents || 0)));
+}
+
+export function skyePayAdminNextRefundState({ order = {}, amountCents = 0, priorRefundedCents = 0 } = {}) {
+  const orderAmount = skyePayRefundableOrderAmountCents(order);
+  const totalRefunded = Math.max(0, Number(priorRefundedCents || 0)) + Math.max(0, Number(amountCents || 0));
+  const fullRefund = orderAmount > 0 && totalRefunded >= orderAmount;
+  return {
+    order_amount_cents: orderAmount,
+    total_refunded_cents: totalRefunded,
+    full_refund: fullRefund,
+    payment_status: fullRefund ? "refunded" : "partially_refunded",
+    approval_status: fullRefund ? "refunded" : clean(order.approval_status || "paid_pending_owner_approval", 80),
+    owner_status: fullRefund ? "refunded" : clean(order.owner_status || "pending_owner_approval", 80),
+    provisioning_status: fullRefund ? "refunded" : clean(order.provisioning_status || "waiting_for_owner_approval", 80)
+  };
 }
 
 function gatePolicyFromOrder(order) {
@@ -244,6 +286,258 @@ async function findOrCreateCustomer(order) {
   return inserted.rows[0]?.id || null;
 }
 
+async function retrievePaymentIntentForRefund(order) {
+  if (order.payment_intent_id) return { paymentIntentId: order.payment_intent_id, receipt: null };
+  if (!order.stripe_session_id) return { paymentIntentId: "", receipt: null };
+  const retrieveRuntime = await runZeroOsProviderAction({
+    provider_id: "stripe",
+    action: "stripe.checkout.retrieve",
+    app_id: "skyepay",
+    workspace_id: order.workspace_slug || order.client_slug,
+    customer_id: order.customer_email,
+    client_id: order.client_slug,
+    usage_lane: "skyepay:admin-checkout-retrieve-for-refund",
+    payload: { session_id: order.stripe_session_id }
+  });
+  const receipt = retrieveRuntime.receipt;
+  if (!retrieveRuntime.ok) {
+    await audit("admin", "SKYEPAY_ADMIN_CHECKOUT_RETRIEVE_FOR_REFUND_FAILED", `skyepay:${order.id}`, {
+      stripe_session_id: order.stripe_session_id,
+      provider_runtime_receipt_id: receipt?.id || "",
+      error: receipt?.error || retrieveRuntime.response?.error || "stripe_checkout_retrieve_runtime_failed"
+    });
+    const err = new Error("Stripe checkout retrieve failed before refund.");
+    err.status = retrieveRuntime.status || 502;
+    err.providerRuntime = receipt;
+    throw err;
+  }
+  const paymentIntentId = clean(receipt?.provider_result?.payment_intent_id || receipt?.provider_result?.payment_intent || "", 180);
+  if (paymentIntentId) {
+    await q(`update skyepay_orders set payment_intent_id=$1, updated_at=now() where id=$2`, [paymentIntentId, order.id]);
+  }
+  return { paymentIntentId, receipt };
+}
+
+async function refundSkyePayOrder(order, body, admin) {
+  if (!skyePayAdminPaymentIsRefundable(order.payment_status)) {
+    return {
+      ok: false,
+      status: 409,
+      body: { error: "Order is not in a refundable paid state.", code: "SKYEPAY_ORDER_NOT_REFUNDABLE" }
+    };
+  }
+
+  const defaultAmount = skyePayRefundableOrderAmountCents(order);
+  const amountCents = Math.max(0, Math.trunc(Number(body.amount_cents ?? body.amountCents ?? defaultAmount)));
+  if (!amountCents) {
+    return {
+      ok: false,
+      status: 400,
+      body: { error: "Refund amount is required.", code: "SKYEPAY_REFUND_AMOUNT_REQUIRED" }
+    };
+  }
+  const priorRefunds = await q(
+    `select coalesce(sum(amount_cents), 0)::int as refunded_cents
+     from skyepay_refunds
+     where skyepay_order_id=$1 and status in ('succeeded','pending','requires_action')`,
+    [order.id]
+  );
+  const priorRefundedCents = Number(priorRefunds.rows[0]?.refunded_cents || 0);
+  const orderAmountCents = skyePayRefundableOrderAmountCents(order);
+  const remainingRefundableCents = skyePayRemainingRefundableCents(order, priorRefundedCents);
+  if (!remainingRefundableCents) {
+    return {
+      ok: false,
+      status: 409,
+      body: { error: "Order has already been fully refunded.", code: "SKYEPAY_ORDER_ALREADY_REFUNDED" }
+    };
+  }
+  if (amountCents > remainingRefundableCents) {
+    return {
+      ok: false,
+      status: 400,
+      body: {
+        error: "Refund amount exceeds the remaining refundable balance.",
+        code: "SKYEPAY_REFUND_AMOUNT_EXCEEDS_REMAINING",
+        remaining_refundable_cents: remainingRefundableCents,
+        prior_refunded_cents: priorRefundedCents,
+        order_amount_cents: orderAmountCents
+      }
+    };
+  }
+
+  let paymentIntentId = "";
+  let retrieveRuntimeReceipt = null;
+  try {
+    const retrieved = await retrievePaymentIntentForRefund(order);
+    paymentIntentId = retrieved.paymentIntentId;
+    retrieveRuntimeReceipt = retrieved.receipt;
+  } catch (error) {
+    return {
+      ok: false,
+      status: error.status || 502,
+      body: {
+        error: error.message || "Stripe checkout retrieve failed before refund.",
+        code: "STRIPE_PROVIDER_RUNTIME_FAILED",
+        provider_runtime: publicProviderRuntime(error.providerRuntime)
+      }
+    };
+  }
+  if (!paymentIntentId) {
+    return {
+      ok: false,
+      status: 409,
+      body: { error: "Stripe payment intent is not available for this SkyePay order.", code: "PAYMENT_INTENT_NOT_FOUND" }
+    };
+  }
+
+  const reason = ["duplicate", "fraudulent", "requested_by_customer"].includes(clean(body.reason, 80))
+    ? clean(body.reason, 80)
+    : "requested_by_customer";
+  const idempotencyToken = clean(body.idempotency_key || body.idempotencyKey || crypto.randomUUID(), 220);
+  const refundRuntime = await runZeroOsProviderAction({
+    provider_id: "stripe",
+    action: "stripe.refund.create",
+    app_id: "skyepay",
+    workspace_id: order.workspace_slug || order.client_slug,
+    customer_id: order.customer_email,
+    client_id: order.client_slug,
+    usage_lane: "skyepay:admin-refund",
+    payload: {
+      payment_intent_id: paymentIntentId,
+      amount_cents: amountCents,
+      reason,
+      source: "skypay_admin",
+      idempotency_key: `skyepay_admin_refund:${order.id}:${idempotencyToken}:${amountCents}`.slice(0, 255)
+    }
+  });
+  const refundRuntimeReceipt = refundRuntime.receipt;
+  if (!refundRuntime.ok) {
+    await audit("admin", "SKYEPAY_ADMIN_REFUND_FAILED", `skyepay:${order.id}`, {
+      stripe_session_id: order.stripe_session_id,
+      payment_intent_id: paymentIntentId,
+      amount_cents: amountCents,
+      provider_runtime_receipt_id: refundRuntimeReceipt?.id || "",
+      error: refundRuntimeReceipt?.error || refundRuntime.response?.error || "stripe_refund_runtime_failed"
+    });
+    return {
+      ok: false,
+      status: refundRuntime.status || 502,
+      body: {
+        error: "Stripe refund provider runtime failed",
+        code: "STRIPE_PROVIDER_RUNTIME_FAILED",
+        provider_runtime: publicProviderRuntime(refundRuntimeReceipt)
+      }
+    };
+  }
+
+  const refund = {
+    id: clean(refundRuntimeReceipt?.provider_result?.id || `re_provider_${crypto.randomUUID()}`, 180),
+    status: clean(refundRuntimeReceipt?.provider_result?.status || "succeeded", 80),
+    currency: clean(refundRuntimeReceipt?.provider_result?.currency || order.currency || "usd", 20).toLowerCase()
+  };
+  const next = skyePayAdminNextRefundState({
+    order,
+    amountCents,
+    priorRefundedCents
+  });
+
+  await q(
+    `insert into skyepay_refunds (
+       id, skyepay_order_id, stripe_refund_id, stripe_payment_intent_id, amount_cents,
+       currency, status, reason, metadata
+     ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
+     on conflict (stripe_refund_id) do update set
+       status=excluded.status,
+       metadata=excluded.metadata,
+       updated_at=now()`,
+    [
+      `skypay_ref_${refund.id}`,
+      order.id,
+      refund.id,
+      paymentIntentId,
+      amountCents,
+      refund.currency || String(order.currency || "usd").toLowerCase(),
+      refund.status || "succeeded",
+      reason,
+      JSON.stringify({
+        source: "skypay_admin",
+        admin_role: admin.role || "admin",
+        admin_via: admin.via || "admin",
+        order_amount_cents: next.order_amount_cents,
+        total_refunded_cents: next.total_refunded_cents,
+        full_refund: next.full_refund,
+        provider_runtime_receipt_id: refundRuntimeReceipt?.id || "",
+        checkout_retrieve_provider_runtime_receipt_id: retrieveRuntimeReceipt?.id || ""
+      })
+    ]
+  );
+  await q(
+    `update skyepay_orders
+     set payment_status=$2,
+         approval_status=$3,
+         owner_status=$4,
+         provisioning_status=$5,
+         updated_at=now(),
+         metadata=coalesce(metadata, '{}'::jsonb) || $6::jsonb
+     where id=$1`,
+    [
+      order.id,
+      next.payment_status,
+      next.approval_status,
+      next.owner_status,
+      next.provisioning_status,
+      JSON.stringify({
+        last_owner_action: next.full_refund ? "refund_full" : "refund_partial",
+        last_owner_action_at: new Date().toISOString(),
+        refunded_by: admin.role || "admin",
+        refunded_via: admin.via || "admin",
+        last_refund: {
+          refund_id: refund.id,
+          amount_cents: amountCents,
+          currency: refund.currency || order.currency || "usd",
+          reason,
+          status: refund.status,
+          payment_intent_id: paymentIntentId,
+          order_amount_cents: next.order_amount_cents,
+          total_refunded_cents: next.total_refunded_cents,
+          full_refund: next.full_refund,
+          provider_runtime_receipt_id: refundRuntimeReceipt?.id || "",
+          checkout_retrieve_provider_runtime_receipt_id: retrieveRuntimeReceipt?.id || ""
+        }
+      })
+    ]
+  );
+  await audit("admin", "SKYEPAY_ADMIN_REFUND_CREATED", `skyepay:${order.id}`, {
+    stripe_refund_id: refund.id,
+    stripe_session_id: order.stripe_session_id,
+    payment_intent_id: paymentIntentId,
+    amount_cents: amountCents,
+    payment_status: next.payment_status,
+    full_refund: next.full_refund,
+    provider_runtime_receipt_id: refundRuntimeReceipt?.id || "",
+    checkout_retrieve_provider_runtime_receipt_id: retrieveRuntimeReceipt?.id || ""
+  });
+  return {
+    ok: true,
+    status: 200,
+    body: {
+      ok: true,
+      action: "refund",
+      order_id: order.id,
+      refund_id: refund.id,
+      payment_intent_id: paymentIntentId,
+      amount_cents: amountCents,
+      currency: refund.currency || order.currency || "usd",
+      refund_status: refund.status || "succeeded",
+      payment_status: next.payment_status,
+      full_refund: next.full_refund,
+      provider_runtime: publicProviderRuntime(refundRuntimeReceipt),
+      checkout_retrieve_provider_runtime: publicProviderRuntime(retrieveRuntimeReceipt)
+    }
+  };
+}
+
 export default wrap(async (req) => {
   const cors = skyePayHeaders(req);
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: cors });
@@ -272,7 +566,8 @@ export default wrap(async (req) => {
           count(*)::int as total,
           count(*) filter (where approval_status='paid_pending_owner_approval')::int as pending_approval,
           count(*) filter (where approval_status='approved')::int as approved,
-          count(*) filter (where provisioning_status='workspace_unlocked')::int as workspace_unlocked
+          count(*) filter (where provisioning_status='workspace_unlocked')::int as workspace_unlocked,
+          count(*) filter (where payment_status in ('refunded','partially_refunded'))::int as refunded
        from skyepay_orders`,
       []
     );
@@ -290,12 +585,19 @@ export default wrap(async (req) => {
     const orderId = clean(body.order_id || body.id, 180);
     const action = clean(body.action, 80);
     if (!orderId) return badRequest("Missing order_id", cors);
-    if (!["approve", "void", "mark_provisioned"].includes(action)) return badRequest("Unsupported SkyePay action", cors);
+    if (!["approve", "void", "mark_provisioned", "refund"].includes(action)) return badRequest("Unsupported SkyePay action", cors);
 
     const orderRes = await q(`select * from skyepay_orders where id=$1 limit 1`, [orderId]);
     if (!orderRes.rowCount) return json(404, { error: "SkyePay order not found" }, cors);
     const order = orderRes.rows[0];
     const approvalStatus = clean(order.approval_status, 80);
+
+    if (action === "refund") {
+      const refundResult = await refundSkyePayOrder(order, body, admin);
+      if (!refundResult.ok) return json(refundResult.status, refundResult.body, cors);
+      const updated = await q(`select * from skyepay_orders where id=$1`, [orderId]);
+      return json(200, { ...refundResult.body, order: updated.rows[0] || null }, cors);
+    }
 
     let customerId = order.customer_id || null;
     if (action === "approve") {
@@ -363,6 +665,12 @@ export default wrap(async (req) => {
     }
 
     if (action === "void") {
+      if (!skyePayAdminCanVoidWithoutRefund(order)) {
+        return json(409, {
+          error: "Paid SkyePay orders cannot be voided without a Stripe refund. Use refund instead.",
+          code: "PAID_ORDER_REQUIRES_REFUND"
+        }, cors);
+      }
       await q(
         `update skyepay_orders
          set approval_status='void',

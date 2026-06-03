@@ -348,9 +348,113 @@ const mediaOverLondonOffers = [
 
 const skyEmailOffers = [
   {
+    planId: "skyemail-starter-mailbox",
+    productName: "SkyEmail Starter Mailbox",
+    description: "SkyEmail production mailbox with one inbox, verified aliases, one custom domain, shared SkyeGate FS27 login custody, and delivery proof.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Starter Mailbox monthly", lookupKey: "skyemail_starter_mailbox_monthly", amount: 900, interval: "month" }
+    ],
+    includes: "skyemail_1_mailbox_5_aliases_1_domain_5gb_2000_sends"
+  },
+  {
+    planId: "skyemail-business-mailbox",
+    productName: "SkyEmail Business Mailbox",
+    description: "SkyEmail team mailbox plan with three production mailboxes, verified domains, pooled storage, send volume, admin visibility, and 0S handoff context.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Business Mailbox monthly", lookupKey: "skyemail_business_mailbox_monthly", amount: 1900, interval: "month" }
+    ],
+    includes: "skyemail_3_mailboxes_15_aliases_3_domains_25gb_10000_sends"
+  },
+  {
+    planId: "skyemail-operator-mailbox",
+    productName: "SkyEmail Operator Mailbox",
+    description: "Operator-grade SkyEmail mailbox fleet for managed rooms, agencies, and multi-workspace operators with monitoring and priority provisioning.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Operator Mailbox monthly", lookupKey: "skyemail_operator_mailbox_monthly", amount: 4900, interval: "month" }
+    ],
+    includes: "skyemail_10_mailboxes_50_aliases_10_domains_100gb_50000_sends"
+  },
+  {
+    planId: "skyemail-extra-mailbox",
+    productName: "SkyEmail Extra Mailbox",
+    description: "Owner-approved capacity add-on for one additional SkyEmail production mailbox.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Extra Mailbox monthly", lookupKey: "skyemail_extra_mailbox_monthly", amount: 500, interval: "month" }
+    ],
+    includes: "skyemail_capacity_1_extra_mailbox"
+  },
+  {
+    planId: "skyemail-extra-domain",
+    productName: "SkyEmail Extra Verified Domain",
+    description: "Owner-approved capacity add-on for one additional verified custom domain on an active SkyEmail plan.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail Extra Verified Domain monthly", lookupKey: "skyemail_extra_domain_monthly", amount: 300, interval: "month" }
+    ],
+    includes: "skyemail_capacity_1_extra_verified_domain"
+  },
+  {
+    planId: "skyemail-storage-5gb-block",
+    productName: "SkyEmail 5 GB Storage Block",
+    description: "Owner-approved capacity add-on for 5 GB additional pooled SkyEmail mailbox storage.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail 5 GB Storage Block monthly", lookupKey: "skyemail_storage_5gb_monthly", amount: 300, interval: "month" }
+    ],
+    includes: "skyemail_capacity_5gb_storage"
+  },
+  {
+    planId: "skyemail-send-volume-1000",
+    productName: "SkyEmail 1,000 Send Block",
+    description: "Owner-approved capacity add-on for 1,000 additional outbound SkyEmail sends per month.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail 1,000 Send Block monthly", lookupKey: "skyemail_send_volume_1000_monthly", amount: 200, interval: "month" }
+    ],
+    includes: "skyemail_capacity_1000_outbound_sends"
+  },
+  {
+    planId: "skyemail-alias-pack-10",
+    productName: "SkyEmail 10 Alias Pack",
+    description: "Owner-approved capacity add-on for 10 additional verified SkyEmail send-as aliases.",
+    sourceFolder: "metraiyux_0s_site/live/SkyeMail",
+    sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
+    offerFamily: "skyemail",
+    ownerApprovalRequired: true,
+    prices: [
+      { kind: "monthly", nickname: "SkyEmail 10 Alias Pack monthly", lookupKey: "skyemail_alias_pack_10_monthly", amount: 200, interval: "month" }
+    ],
+    includes: "skyemail_capacity_10_aliases"
+  },
+  {
     planId: "skyemail-ai-response-starter",
     productName: "SkyEmail AI Response Starter",
-    description: "Paid SkyEmail Brain starter add-on with FS27/SkyGate metering, SkyPay entitlement claims, mailbox-scoped usage ledgering, owner-reviewed response drafts, and no browser-side provider keys.",
+    description: "Paid SkyEmail Brain starter add-on with SkyeGate FS27 metering, SkyePay entitlement claims, mailbox-scoped usage ledgering, owner-reviewed response drafts, and no browser-side model keys.",
     sourceFolder: "metraiyux_0s_site/live/SkyeMail",
     sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
     offerFamily: "skyemail",
@@ -364,7 +468,7 @@ const skyEmailOffers = [
   {
     planId: "skyemail-ai-response-plus",
     productName: "SkyEmail AI Response Plus",
-    description: "Higher-volume SkyEmail Brain add-on with FS27/SkyGate metering, SkyPay entitlement claims, usage caps, priority draft work, expanded FAQ tuning, and no direct provider exposure.",
+    description: "Higher-volume SkyEmail Brain add-on with SkyeGate FS27 metering, SkyePay entitlement claims, usage caps, priority draft work, expanded FAQ tuning, and no direct outside-model exposure.",
     sourceFolder: "metraiyux_0s_site/live/SkyeMail",
     sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
     offerFamily: "skyemail",
@@ -378,7 +482,7 @@ const skyEmailOffers = [
   {
     planId: "skyemail-managed-ai-inbox",
     productName: "SkyEmail Managed AI Inbox",
-    description: "Managed SkyEmail Brain inbox add-on with FS27/SkyGate metering, SkyPay entitlement claims, monitored usage caps, allowlisted routine response policy, and human escalation boundaries.",
+    description: "Managed SkyEmail Brain inbox add-on with SkyeGate FS27 metering, SkyePay entitlement claims, monitored usage caps, allowlisted routine response policy, and human escalation boundaries.",
     sourceFolder: "metraiyux_0s_site/live/SkyeMail",
     sourceFile: "metraiyux_0s_site/skyegate/source/SkyeGateFS27/netlify/functions/_lib/skyepayCatalog.js",
     offerFamily: "skyemail",
@@ -611,9 +715,9 @@ const offers = [
   ...musicOffers,
   {
     planId: "skygatefs27-managed",
-    productName: "SkyeGateFS27 Managed Control Plane",
+    productName: "SkyeGate FS27 Managed Control Plane",
     description: "Managed gate operations, billing visibility, auth clearance, usage ledger, platform mirroring, and control-plane support.",
-    sourceFolder: "SkyeGateFS27",
+    sourceFolder: "SkyeGate FS27",
     brainOwner: "naomi-sterling-brain",
     prices: [
       { kind: "onboarding", nickname: "Managed gate onboarding", lookupKey: "skygatefs27_managed_gate_onboarding", amount: 1250000 },
@@ -623,9 +727,9 @@ const offers = [
   },
   {
     planId: "skygatefs27-lane-maintenance",
-    productName: "SkyeGateFS27 Lane Maintenance",
+    productName: "SkyeGate FS27 Lane Maintenance",
     description: "Monthly lane maintenance for gate-connected client app routes, updates, small fixes, and proof support.",
-    sourceFolder: "SkyeGateFS27",
+    sourceFolder: "SkyeGate FS27",
     brainOwner: "naomi-sterling-brain",
     prices: [
       { kind: "monthly", nickname: "Lane maintenance monthly", lookupKey: "skygatefs27_lane_maintenance_monthly", amount: 24900, interval: "month" }

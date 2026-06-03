@@ -292,8 +292,8 @@
     {
       "id": "per-app-operating-proof-matrix",
       "priority": "P0",
-      "current_truth": "green",
-      "surface": "Whole 0S mounted app behavior matrix",
+      "current_truth": "partial",
+      "surface": "Whole 0S mounted app route/family behavior matrix",
       "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html",
       "proof_command": "npm run 0s:operating-proof-matrix",
       "receipt_path": "test-artifacts/0s-operating-proof-matrix/0s-operating-proof-matrix-latest.json",
@@ -312,7 +312,7 @@
         "The closure manifest and runner now provide a first whole-0S work queue.",
         "Latest matrix receipt checked 107 mounted app and curated Worker asset routes with zero route/auth failures and zero red behavior lanes.",
         "The matrix runner follows unauthenticated redirect chains, includes curated live proof assets from the Worker deploy script, and emits a behavior_proof_registry with create/read/update-or-closeout/receipt/stress/Founder Command coverage and missing-behavior rows.",
-        "The latest registry resolves create/read/receipt/stress/Founder Command coverage across all tracked behavior lanes; update-or-closeout remains yellow where child workflows are intentionally partial or provider-gated."
+        "The latest registry resolves create/read/receipt/stress/Founder Command coverage across tracked behavior lanes, but this is route/family evidence and is not the same as human-level proof for every visible app control."
       ],
       "open_gaps": [],
       "gap_type": "none",
@@ -322,6 +322,38 @@
         "Matrix route/auth proof is green for all mounted apps, and child behavior lanes now close update-or-closeout through the operating-depth closeout receipt.",
         "Former blocker resolved or moved to external boundary: The matrix runner and behavior-proof registry now exist and include staged live proof assets, but the matrix stays yellow until every child lane has update-or-closeout closure.",
         "Former blocker resolved or moved to external boundary: Need to close each remaining partial lane from route/auth proof plus existing receipts into full per-app behavior proof commands."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": []
+    },
+    {
+      "id": "app-specific-human-deep-closure",
+      "priority": "P0",
+      "current_truth": "green",
+      "surface": "Every mounted 0S app and platform surface human-level behavior proof",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/founder-command/index.html",
+      "proof_command": "npm run 0s:app-deep-closure",
+      "receipt_path": "test-artifacts/0s-app-deep-closure/0s-app-deep-closure-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "For every mounted app: a declared app-specific human scenario or an exact mounted-app control proof row.",
+        "Scenario/control proof proves real navigation/control path instead of a bare HTTP 200.",
+        "Stateful apps prove create/read/update-or-closeout/receipt readback/stress.",
+        "Scenario proves Founder Command visibility where relevant.",
+        "Scenario proves telemetry or command-event capture for the app action.",
+        "Only read-only/proof assets may use an explicit no-mutation boundary."
+      ],
+      "green_evidence": [
+        "test-artifacts/0s-mounted-app-control-proof/0s-mounted-app-control-proof-latest.json inventories 107 mounted apps with 1053 wired buttons, 1890 wired links, 82 wired forms, and 140 fetch/API targets.",
+        "test-artifacts/0s-app-deep-closure/0s-app-deep-closure-latest.json reports 107 of 107 mounted apps deep_closed with zero route/auth failures, zero missing scenarios, and zero missing required evidence."
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Keep mounted-app control proof, app-specific scenarios, and deep-closure receipts fresh whenever any mounted surface changes.",
+      "external_boundaries": [],
+      "resolved_gaps": [
+        "Former blocker resolved: strict verifier now consumes exact mounted-app control proof rows in addition to declared app-specific scenarios.",
+        "Former blocker resolved: npm run 0s:app-deep-closure returns ok:true with every mounted app green."
       ],
       "blocking_gaps": [],
       "implementation_gaps": []
@@ -1043,6 +1075,50 @@
           "required": true
         }
       ]
+    },
+    {
+      "id": "shared-experience-tour-celebration-layer",
+      "priority": "P1",
+      "current_truth": "green",
+      "surface": "Shared walkthrough, tour, celebration, and UI-only state layer",
+      "owner_url": "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/",
+      "proof_command": "npm run 0s:shared-experience-proof",
+      "receipt_path": "test-artifacts/0s-shared-experience-layer/0s-shared-experience-layer-latest.json",
+      "fresh_eligible": true,
+      "required_steps": [
+        "React surfaces use one shared react-joyride registry instead of hardcoded walkthrough arrays.",
+        "Registry entries include app id, route, role, step id, target selector, placement, copy, prerequisites, and completion receipt event.",
+        "React celebration overlays use one shared react-confetti layer.",
+        "Static/vanilla pages use one shared canvas-confetti layer.",
+        "Celebration triggers are receipt-aware, reduced-motion-aware, deduped, and support optional thank-you video modals.",
+        "Zustand usage stays scoped to UI-only tour and celebration state, not server truth."
+      ],
+      "green_evidence": [
+        "Root dependencies include react-joyride 3.1.0, zustand 5.0.14, react-confetti 6.4.0, and canvas-confetti 1.9.4.",
+        "Shared package exists at packages/zero-os-experience with registry, React Joyride wrapper, React celebration layer, UI-only Zustand store, and event contract.",
+        "Static celebration layer exists at metraiyux_0s_site/assets/js/0s-celebration-layer.js and loads canvas-confetti centrally.",
+        "Latest proof receipt is ok:true at test-artifacts/0s-shared-experience-layer/0s-shared-experience-layer-latest.json with 4 registry entries, 9 guided steps, direct-use findings 0, and all shared-layer requirements true."
+      ],
+      "evidence_receipts": [
+        {
+          "id": "0s-shared-experience-layer-proof",
+          "path": "test-artifacts/0s-shared-experience-layer/0s-shared-experience-layer-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ],
+      "open_gaps": [],
+      "gap_type": "none",
+      "next_build_step": "Keep tour registry entries, receipt events, and celebration triggers fresh whenever React or static user surfaces add onboarding, walkthrough, thank-you, or achievement behavior.",
+      "external_boundaries": [
+        "User-visible browser playback of tours and celebration animations remains owner-handled under the no-browser-proof policy."
+      ],
+      "resolved_gaps": [
+        "The package decisions for react-joyride, zustand, react-confetti, and canvas-confetti are now implemented as shared infrastructure and backed by a dedicated non-browser proof receipt.",
+        "The shared celebration layer prevents scattered one-off confetti integrations and refuses unreceipted preview/draft triggers."
+      ],
+      "blocking_gaps": [],
+      "implementation_gaps": []
     }
   ]
 }

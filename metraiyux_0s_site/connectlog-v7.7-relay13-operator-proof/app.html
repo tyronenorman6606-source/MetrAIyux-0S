@@ -288,10 +288,10 @@
                 <h3>Relay13 Inbox</h3>
                 <p class="panel-hint">Desktop is a real operator desk: folders, thread list, conversation, and delivery context all visible at once.</p>
                 <div class="mail-folder-list" aria-label="Inbox folders">
-                  <button type="button" class="mail-folder active"><span>Inbox</span><b>live</b></button>
-                  <button type="button" class="mail-folder"><span>Needs reply</span><b>focus</b></button>
-                  <button type="button" class="mail-folder"><span>Queued</span><b>proof</b></button>
-                  <button type="button" class="mail-folder"><span>All threads</span><b>vault</b></button>
+                  <button type="button" class="mail-folder active" data-relay-folder="inbox" aria-pressed="true"><span>Inbox</span><b>live</b></button>
+                  <button type="button" class="mail-folder" data-relay-folder="needs-reply" aria-pressed="false"><span>Needs reply</span><b>focus</b></button>
+                  <button type="button" class="mail-folder" data-relay-folder="queued" aria-pressed="false"><span>Queued</span><b>proof</b></button>
+                  <button type="button" class="mail-folder" data-relay-folder="all" aria-pressed="false"><span>All threads</span><b>vault</b></button>
                 </div>
                 <div class="mailbox-actions">
                   <button class="primary-btn small" id="relayCreateThreadBtn" type="button">Thread from active card</button>

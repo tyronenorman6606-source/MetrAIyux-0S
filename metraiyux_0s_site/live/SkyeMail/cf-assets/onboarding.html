@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Onboarding — SkyeMail Citadel</title>
+  <title>Onboarding — SkyeMail backed by Citadel Database and SkyeNet</title>
   <script src="assets/app.js"></script>
   <script src="assets/skye0s-onboard-bridge.js"></script>
   <script src="assets/mail-ui.js"></script>
@@ -50,7 +50,7 @@
       const domains = data.domains || [];
       domainSelect.innerHTML = domains.map((domain)=>`<option value="${safe(domain)}">${safe(domain)}</option>`).join('');
       if(data.primary_domain) domainSelect.value = data.primary_domain;
-      if(!data.provisioning_configured) setBox('Citadel mail lane env is not configured yet. Provisioning will fail loudly until those env vars are set.', 'danger');
+      if(!data.provisioning_configured) setBox('SkyeMail production mail lane env is not configured yet. Provisioning will fail loudly until those env vars are set.', 'danger');
     }catch(err){ setBox(err.message || 'Unable to load mailbox domains.', 'danger'); }
   }
   async function loadStatus(){
@@ -75,7 +75,7 @@
       SMV.trackGame('mailbox_provision');
     }catch(err){ setBox(err.message || 'Mailbox provisioning failed.', 'danger'); }
   };
-  qs('#disconnectBtn').onclick = async ()=> { if(!confirm('Disconnect this mailbox from the Citadel/SkyeNet SkyeMail workspace?')) return; try{ await SMV.disconnectGoogle(); setBadge('Mailbox disconnected'); setBox('Mailbox disconnected from this workspace.', 'ok'); }catch(err){ setBox(err.message || 'Disconnect failed.', 'danger'); } };
+  qs('#disconnectBtn').onclick = async ()=> { if(!confirm('Disconnect this mailbox from the Citadel Database and SkyeNet SkyeMail workspace?')) return; try{ await SMV.disconnectGoogle(); setBadge('Mailbox disconnected'); setBox('Mailbox disconnected from this workspace.', 'ok'); }catch(err){ setBox(err.message || 'Disconnect failed.', 'danger'); } };
   qs('#watchBtn').onclick = async ()=> { try{ const data = await SMV.enableWatch(); setBox(`Mailbox watch ${data.watch?.status || 'live'}.`, 'ok'); }catch(err){ setBox(err.message || 'Watch enable failed.', 'danger'); } };
   const defaultLocal = (getHandle() || '').split('@')[0] || 'operator';
   localPartInput.value = defaultLocal.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || 'operator';

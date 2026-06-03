@@ -43,7 +43,7 @@
     if(!select) return;
     const hostedMailbox = settings?.hosted?.mailbox || mailStatus?.mailbox || null;
     const hostedAliases = hostedMailbox ? [
-      { sendAsEmail: hostedMailbox.mailbox_email, displayName: 'Primary mailbox', verificationStatus: 'Citadel/SkyeNet' },
+      { sendAsEmail: hostedMailbox.mailbox_email, displayName: 'Primary mailbox', verificationStatus: 'Citadel Database and SkyeNet' },
       ...(settings?.hosted?.aliases || []).filter((item)=> String(item.status || 'active').toLowerCase() === 'active').map((item)=>({
         sendAsEmail: item.alias_email,
         displayName: item.display_name || item.alias_type || 'Alias',
@@ -190,7 +190,11 @@
       qs('#draft_id').value = data.draft?.id || '';
       qs('#thread_id').value = data.draft?.thread_id || qs('#thread_id').value;
       note(`Draft saved in ${data.mailbox}.`, 'ok');
-      SMV.trackGame('draft_save');
+      SMV.trackGame('draft_save', { id:data.draft?.id || data.draft?.message_id || data.draft?.thread_id || '' }, {
+        celebrate:true,
+        triggerType:'receipt-saved',
+        message:'Draft saved. Thanks for using SkyeMail to keep the next move ready.'
+      });
     }catch(err){ note(err.message || 'Draft save failed.', 'danger'); }
   }
 
@@ -224,7 +228,11 @@
         };
       const data = await apiFetch(endpoint, { method:'POST', body: JSON.stringify(sendPayload) });
       note(`Email sent from ${data.from || data.from_alias || data.mailbox}.`, 'ok');
-      SMV.trackGame('send');
+      SMV.trackGame('send', { id:data.message?.id || data.sent?.id || data.id || data.provider_message_id || data.message_id || '' }, {
+        celebrate:true,
+        triggerType:'workflow-complete',
+        message:'Email sent and recorded. Thank you for trusting SkyeMail with the business move.'
+      });
       setTimeout(()=>{ window.SMVRuntime.redirect('sent.html'); }, 700);
     }catch(err){ note(err.message || 'Send failed.', 'danger'); }
   }

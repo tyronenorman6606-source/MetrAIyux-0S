@@ -4,11 +4,11 @@ Date: 2026-05-16
 
 ## Control Plane
 
-SkyeMail now treats SkyeGateFS27 as the primary gate for platform login.
+SkyeMail now treats SkyeGate FS27 as the primary gate for platform login.
 
 Flow:
 
-1. Operator/client signs into the 0S/SkyGate session.
+1. Operator/client signs into the 0S/SkyeGate session.
 2. SkyeMail calls `auth-fs27-session`.
 3. `auth-fs27-session` introspects the inherited session against the gate.
 4. If active, SkyeMail finds or creates the local app user by FS27 email.

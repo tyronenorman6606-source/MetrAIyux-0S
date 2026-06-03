@@ -24,7 +24,7 @@ npm run vault:agent:status
 npm run vault:agent:stop
 ```
 
-`vault:source:*` is the owner-source-of-truth wrapper. It treats SkyeVault/SkyeDrive as custody and Codespaces/local IDEs as disposable compute. The wrapper reports the daemon, latest primary/full receipts, active full-stream progress, storage limits, recovery links, and writes a private restore guide at `.skyevault-out/sovereign-source/RESTORE_FROM_SKYEVAULT.md`.
+`vault:source:*` is the owner-source-of-truth wrapper. It treats SkyeVault/SkyeDrive as custody and Codespaces/local IDEs as disposable compute. The owner default is now the living current mirror: `--mode=mirror --full-current-index --skip-delta`. The wrapper reports the daemon, living mirror receipt, owner Git origin, storage limits, recovery links, and writes a private restore guide at `.skyevault-out/sovereign-source/RESTORE_FROM_SKYEVAULT.md`.
 
 Autosync also runs the configured SkyeVault Bin companion exports after the main repo custody lane:
 
@@ -59,15 +59,57 @@ Put live credentials in `/etc/skyevault/autosync.env`, not in Git.
 
 ## Daemon and Recovery Window
 
-In this lane, "daemon" means a background process that keeps running without an open terminal or browser tab. It wakes on the interval, scans the repo, sends a Git-level custody pack plus encrypted full-repo artifact when the digest changed, writes receipts, then sleeps.
+In this lane, "daemon" means a background process that keeps running without an open terminal or browser tab. It wakes on the interval, scans the repo, updates the living current mirror, writes receipts, syncs the owner Git origin when enabled, then sleeps.
 
-If VS Code closes but the machine/Codespace/VM stays alive, the daemon keeps working. If the underlying workspace is stopped or destroyed, the daemon cannot keep reading files from that filesystem; the safe recovery point is the latest completed artifact receipt. A literal full-repo artifact can take longer than ten minutes, so autosync now runs a fast encrypted delta journal before the heavier full snapshot stream. The delta journal seals changed files, untracked source, local-critical secret/config files, and deletion tombstones in a `.skyesecrets` pack first; the full encrypted repo artifact then catches up as the complete disaster-recovery lane.
+If VS Code closes but the machine/Codespace/VM stays alive, the daemon keeps working. If the underlying workspace is stopped or destroyed, the daemon cannot keep reading files from that filesystem; the safe recovery point is the latest completed living mirror receipt. The first full-current seed can be large, but after that scan the mirror compares file metadata and hashes so normal wakes upload only changed files, new files, and deletion tombstones into the same current source of truth.
 
-The live web role is the coordinator and recovery surface: Worker, R2, dashboard, proof log, and notifications. The file scanner itself must run wherever the files live, because a remote Worker cannot read untracked local files or root env files from a closed workstation by itself. Codespaces should be treated as compute, not custody. The custody sequence is Git-level pack/remote refs for cloneable source history, encrypted delta journal for fast dirty/local work, and encrypted literal full snapshots as owner checkpoints.
+The live web role is the coordinator and recovery surface: Worker, R2, dashboard, proof log, and notifications. The file scanner itself must run wherever the files live, because a remote Worker cannot read untracked local files or root env files from a closed workstation by itself. Codespaces should be treated as compute, not custody. The custody sequence is a full current mirror for the whole workspace, with normal files stored as current objects and ignored/secret/private files stored as encrypted owner-unlock objects, plus owner-private Git refs for terminal clone/fetch/push convenience.
+
+## Living Current Mirror
+
+The owner backup contract is plain:
+
+1. If no mirror exists, create a full current mirror.
+2. On each later wake, scan the repo.
+3. If a normal file changed, replace that file's current object.
+4. If an ignored, secret-looking, or private file changed, replace its encrypted owner-unlock object.
+5. If a file was deleted, remove it from the current manifest and remote object set.
+6. Owner restore/download reads the current mirror as one source of truth and rebuilds one repaired repo folder.
+
+The owner should not manually combine a baseline plus delta folders. Deltas may exist as older receipts, customer-agent proof, or a legacy fast lane, but they are not the owner-facing restore model for this repo.
+
+Current owner commands:
+
+```bash
+npm run vault:source:start -- --env-file=.env --interval-seconds=600
+npm run vault:source:status -- --env-file=.env
+npm run vault:source:download -- --env-file=.env
+npm run vault:mirror:restore -- --env-file=.env --out=/path/to/restore
+npm run vault:mirror:export -- --env-file=.env --upload-export
+npm run vault:mirror:unlock -- --env-file=.env --unlock-file=/path/to/CURRENT_REPO_UNLOCK.json --from-r2 --out=/path/to/repaired-repo --force
+```
+
+The local owner download launcher is:
+
+```text
+http://127.0.0.1:17687/CURRENT_REPO_BACKUP.html
+```
+
+The old `FULL_17GB_REPO_DOWNLOAD.html` path is a legacy alias only; it redirects to the current mirror launcher and must not serve a stale full artifact. The current launcher mints one encrypted export from the living mirror and stores the private unlock material locally. Do not publish passphrases, bearer tokens, or signed owner URLs.
+
+June 1/2 owner living-current production proof:
+
+- Seeded the full-current mirror to Cloudflare R2 with digest `512ac60b496b6e8e438d169e5e8831dc155b9ecaefede0c6337f2760b2cc3c5a`, `374,298` files, `512,867` entries, `20,690,721,698` total bytes, `374,290` protected files, and `0` upload failures. Receipt: `.skyevault-out/living-mirror/metraiyux-0s-owner/MetrAIyux-0S/receipts/living-mirror-20260601T212619Z.json`.
+- Uploaded the first production repaired export as `MetrAIyux-0S-current-20260601T212752Z.tar.gz.enc`, `16,341,078,821` bytes, SHA-256 `66c84506007c5d0744a209f96975fb9e3e8aeec50ba199806a2c937a5e911ab0`. The signed download URL and unlock passphrase stay private in local owner receipts.
+- Proved `vault:mirror:unlock` against that production export from R2. The repaired folder restored `374,298` files, `138,514` directories, `55` symlinks, and `20,690,721,698` bytes, and spot checks matched `.env`, `.git/HEAD`, and `package.json` without printing secret contents. Receipt: `.skyevault-out/living-mirror/metraiyux-0s-owner/MetrAIyux-0S/receipts/living-mirror-unlock-20260602T000343Z.json`.
+- Ran a current mirror wake after the proof. New digest `327549cd2356644d7ff3b74f83ce01a8e20470a2ee4d60889f5609bc034a6865`, `374,299` files, `512,868` entries, `20,690,727,654` bytes, `101,121` changed files uploaded through `6` encrypted current packs, and `0` failed uploads. Receipt: `.skyevault-out/living-mirror/metraiyux-0s-owner/MetrAIyux-0S/receipts/living-mirror-20260602T005231Z.json`.
+- Fixed and proof-backed packed-current no-change stability. Packed current files now retain their logical file role while recording encrypted backend pack storage separately, so the next no-change wake does not re-upload packed plain files. R2 proof receipt `test-artifacts/skyevault-living-mirror/2026-06-02T01-35-49-873Z.json` passes `noChangeWakeStable` with `changedCount:0`, `uploaded:0`, and `packObjects:0` on the third wake.
+
+`.skyevault-out` is intentionally excluded from scans so local run logs, signed-link receipts, and `CURRENT_REPO_UNLOCK.json` are not folded back into the protected repo export.
 
 ## Owner Git Origin
 
-The owner-private Git origin is the clone/fetch/push lane that sits beside the encrypted full baseline and delta journal. It is not a replacement for the full encrypted artifact, because Git only restores committed refs. Its job is Git parity: a fresh terminal can clone the repo from SkyeVault-owned local infrastructure instead of depending on GitHub or the current Codespace.
+The owner-private Git origin is the clone/fetch/push lane that sits beside the encrypted living mirror. It is not a replacement for the mirror, because Git only restores committed refs. Its job is Git parity: a fresh terminal can clone the repo from SkyeVault-owned local infrastructure instead of depending on GitHub or the current Codespace.
 
 ```bash
 npm run vault:origin:start
@@ -94,9 +136,9 @@ May 30 owner proof:
 
 The managed daemon exports `SKYEVAULT_AUTOSYNC_GIT_ORIGIN_SYNC=1`. Future changed daemon ticks run the encrypted delta journal, then sync the owner Git origin, while the 17GB encrypted artifact remains the all-bytes baseline.
 
-## Fast Delta Journal
+## Legacy Fast Delta Journal
 
-The delta journal is the quick parity lane layered above literal full-repo custody. It does not replace the full encrypted repo artifact; it gives the daemon a smaller, encrypted first move for the files most likely to disappear when a workspace is dirty.
+The delta journal is a legacy quick parity lane layered above older literal full-repo custody. It does not replace the living current mirror, and it is not the owner-facing restore contract for this repo. Keep it only for older receipts, customer-agent proof, or explicit experiments where the owner asks for a delta journal.
 
 ```bash
 npm run vault:delta:status
@@ -188,9 +230,9 @@ After a full encrypted baseline exists, `git+full` treats that full artifact as 
 
 May 30 source-of-truth closure: the corrected dirty-state full baseline landed as `MetrAIyux-0S-full-repo-20260529T213111Z.tar.zst.enc`, `17,323,174,736` bytes, SHA-256 `9ad319fd784a06ce458a6e04b73f67dd0c4f684ef31a36bef335a30e9da0b0e6`, artifact receipt `cdv_1cf38e5689280e988baf684e`, control-pack receipt `cdv_509b88a877b464c28b63d596`. The additive Git restore pack landed as `MetrAIyux-0S-git-vault-20260529T232230Z.zip`, `5,390,708,355` bytes, SHA-256 `ddc3dbe1b585c3c79c4f0a2bf9b8b17bf193dba3825211c489d01baa398ebd21`, receipt `cdv_2f05efd07da5cb70d60375f9`. Final daemon patch packs were encrypted through SkyeSecure receipts `cdv_f9dec7fd7d147220a5bcac15` and `cdv_2f9793158134de9b6b2f2d38`. The restarted daemon's first scan wrote `.skyevault-out/autosync/autosync-20260530T002429Z.json` with `coveredModes:["git","full"]` and `runModes:[]`.
 
-May 30 owner download handoff correction: the owner-facing default is the HTTP launcher, not a local workspace file link. Run `npm run vault:source:download -- --env-file=.env` to mint the latest owner-private full-repo signed ticket and serve `http://127.0.0.1:17687/FULL_17GB_REPO_DOWNLOAD.html`. `vault:source:status` reports this under `ownerDownloadLauncher`; signed R2 URLs remain private inside `.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.json`.
+May 30 owner download handoff correction, superseded by the living-current launcher: the owner-facing default is the HTTP launcher, not a local workspace file link. Run `npm run vault:source:download -- --env-file=.env` to mint the current owner-private signed ticket and serve `http://127.0.0.1:17687/CURRENT_REPO_BACKUP.html`. `http://127.0.0.1:17687/FULL_17GB_REPO_DOWNLOAD.html` remains a legacy redirect only. `vault:source:status` reports the launcher under `ownerDownloadLauncher`; signed R2 URLs remain private inside local `.skyevault-out` receipts.
 
-May 31 owner download and delta correction: the launcher now refreshes expired signed full-repo links when `FULL_17GB_REPO_DOWNLOAD.html` is opened and exposes `/refresh` plus `/refresh.json` for explicit reminting. The delta journal no longer excludes production media extensions and defaults to a 5000 MB per-file ceiling so changed PNG/JPG/MP4 and similar repo assets are carried in encrypted additive packs instead of silently skipped. The corrected real upload wrote receipt `cdv_969c28eebe708b59a649c7c8` with `skippedCount:0`, followed by daemon receipt `cdv_dd6c4a0e11ea53c53659ec8a`, also with `skippedCount:0`.
+May 31 owner download and delta correction, now historical: the launcher first learned to refresh expired signed full-repo links from the legacy `FULL_17GB_REPO_DOWNLOAD.html` path. That behavior is superseded by `CURRENT_REPO_BACKUP.html` and the living-current export/unlock flow above. The delta journal media-ceiling fix from that pass remains useful for older receipts and customer-agent proof, but it is not the owner-facing restore model for this repo.
 
 May 30 additive-baseline correction: after the 17GB encrypted full-repo artifact exists, the daemon treats that artifact as the baseline and advances custody through encrypted additive delta journals. A normal `git+full` daemon tick must not launch a new 17GB full stream or 5GB Git pack just because the repo digest moved; it should cover the baseline modes and run only the delta journal unless the owner explicitly asks for `--force`, `--full-checkpoint`, or disables additive baseline mode. The baseline delta head was seeded from the completed full export timestamp and the first additive catch-up uploaded `skyevault-delta-20260530T071247Z.skyesecrets`, `19,904,673` bytes, receipt `cdv_ebe84f35641c71e201ffff51`, covering 166 changed files and 757 tombstones after baseline.
 

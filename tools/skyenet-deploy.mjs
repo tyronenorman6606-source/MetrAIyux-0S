@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
+import { convertProject } from './skyenet-functions-convert.mjs';
 
 const SOURCE_INDEX_UPLOAD_THRESHOLD = 20000;
 
@@ -47,6 +48,10 @@ Common:
 	  --source-archive <archive.tar|archive.tar.zst>
 	  --source-index-only
 	  --no-source
+	  --functions
+	  --no-functions
+	  --functions-no-install-build
+	  --functions-no-os-jail
 	  --include-public-originals
   --concurrency 6
   --resume
@@ -111,6 +116,16 @@ async function collectSourceFiles(root) {
   return files.filter((file) => isSafeSourcePath(file.rel));
 }
 
+async function hasFunctionSources(root) {
+  for (const rel of ['netlify/functions', 'functions', 'skyenet/functions']) {
+    try {
+      const stat = await fs.stat(path.join(root, rel));
+      if (stat.isDirectory()) return true;
+    } catch {}
+  }
+  return false;
+}
+
 async function extractZip(zipPath) {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), 'skyenet-zip-'));
   const result = spawnSync('unzip', ['-qq', zipPath, '-d', temp], { encoding: 'utf8' });
@@ -162,6 +177,15 @@ function sourceFileRecord(file) {
 
 function sourceIndexBody(files) {
   return `${files.map((file) => JSON.stringify(sourceFileRecord(file))).join('\n')}\n`;
+}
+
+function functionUploadMode(plan) {
+  const envValue = String(process.env.SKYENET_FUNCTIONS || '').trim().toLowerCase();
+  if (/^(0|false|no|off)$/.test(envValue)) return 'disabled';
+  if (flag('no-functions')) return 'disabled';
+  if (flag('functions') || /^(1|true|yes|on|force)$/.test(envValue)) return 'force';
+  if (/functions|sovereign/i.test(String(plan || ''))) return 'auto';
+  return 'disabled';
 }
 
 async function apiFetch(api, token, pathname, options = {}) {
@@ -274,6 +298,11 @@ const concurrency = intArg('concurrency', 1, 1, 12);
 const resumeUploads = flag('resume') || String(process.env.SKYENET_RESUME || '').toLowerCase() === 'true';
 const uploadSourcePackage = !flag('no-source') && String(process.env.SKYENET_NO_SOURCE || '').toLowerCase() !== 'true';
 const includePublicOriginals = flag('include-public-originals') || /^(1|true|yes)$/i.test(process.env.SKYENET_INCLUDE_PUBLIC_ORIGINALS || '');
+const functionsMode = functionUploadMode(planName);
+const bundleFunctions = !flag('functions-no-bundle') && !/^(0|false|no)$/i.test(String(process.env.SKYENET_FUNCTIONS_BUNDLE || '1'));
+const installBuildFunctions = !flag('functions-no-install-build') && !/^(0|false|no)$/i.test(String(process.env.SKYENET_FUNCTIONS_INSTALL_BUILD || '1'));
+const functionBuildTimeoutMs = Number(process.env.SKYENET_FUNCTIONS_BUILD_TIMEOUT_MS || 120000);
+const functionBuildOsJail = flag('functions-no-os-jail') ? 'disabled' : (process.env.SKYENET_FUNCTIONS_OS_JAIL || 'auto');
 
 if (!token || !projectId || (!dirArg && !zipArg)) {
   if (!token && resolvedGateAuth?.error) process.stderr.write(`skyenet-deploy: ${resolvedGateAuth.error}\n`);
@@ -427,10 +456,85 @@ if (uploadSourcePackage && sourceFiles.length) {
   await apiFetch(api, token, '/deploy/source-complete', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-	    body: JSON.stringify(sourceCompletePayload),
+    body: JSON.stringify(sourceCompletePayload),
     retries: 5,
     retryDelayMs: 900
   });
+}
+
+let uploadedFunctionBundle = null;
+if (functionsMode !== 'disabled') {
+  const functionRoot = privateSourceRoot && existsSync(privateSourceRoot) ? privateSourceRoot : sourceRoot;
+  const functionSourcesPresent = await hasFunctionSources(functionRoot);
+  if (!functionSourcesPresent && functionsMode === 'force') {
+    throw new Error(`--functions was requested but no netlify/functions, functions, or skyenet/functions directory exists under ${functionRoot}`);
+  }
+  if (functionSourcesPresent) {
+    const outDir = path.join(functionRoot, '.skyenet', 'functions-bundle');
+    process.stderr.write(`skyenet-deploy: bundling Netlify functions from ${functionRoot}\n`);
+    const converted = await convertProject(functionRoot, {
+      outDir,
+      tenantId: workspaceId,
+      signingKey: process.env.SKYENET_FUNCTION_BUNDLE_SIGNING_KEY || '',
+      bundle: bundleFunctions,
+      installBuild: installBuildFunctions,
+      installBuildTimeoutMs: functionBuildTimeoutMs,
+      installBuildOsJail: functionBuildOsJail
+    });
+    const functionFiles = await collectFiles(outDir, { skipDirs: [] });
+    process.stderr.write(`skyenet-deploy: uploading function bundle ${functionFiles.length} files with concurrency ${concurrency}\n`);
+    await uploadWithConcurrency(functionFiles, concurrency, async (file) => {
+      const params = new URLSearchParams({
+        workspaceId,
+        projectId,
+        deploymentId,
+        plan_name: planName,
+        path: file.rel
+      });
+      const body = await fs.readFile(file.full);
+      try {
+        await apiFetch(api, token, `/deploy/functions-upload?${params.toString()}`, {
+          method: 'PUT',
+          headers: { 'content-type': contentTypeForPath(file.rel) },
+          body,
+          retries: 5,
+          retryDelayMs: 900
+        });
+      } catch (error) {
+        error.message = `Function bundle upload failed for ${file.rel}: ${error.message}`;
+        throw error;
+      }
+    });
+    const activated = await apiFetch(api, token, '/deploy/functions-complete', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        workspace_id: workspaceId,
+        plan_name: planName,
+        project_id: projectId,
+        deployment_id: deploymentId,
+        server_sign_manifest: true,
+        customer_upload: true
+      }),
+      retries: 5,
+      retryDelayMs: 900
+    });
+    uploadedFunctionBundle = {
+      uploaded: true,
+      source_root: functionRoot,
+      bundle_dir: outDir,
+      bundled: bundleFunctions,
+      install_build: installBuildFunctions,
+      os_jail: converted.manifest.build_pipeline?.os_jail || null,
+      build_receipt: converted.buildReceipt ? 'build-receipt.json' : null,
+      file_count: functionFiles.length,
+      function_count: converted.manifest.function_count,
+      functions: converted.manifest.functions.map((fn) => ({ name: fn.name, routes: fn.routes, bundle_path: fn.bundle_path })),
+      activation_status: activated.function_bundle?.status || '',
+      server_signed: activated.function_bundle?.signature?.server_signed === true,
+      runtime: activated.function_bundle?.runtime_policy?.isolation || ''
+    };
+  }
 }
 
 const route = await apiFetch(api, token, '/deploy/route', {
@@ -471,6 +575,11 @@ console.log(JSON.stringify({
 	  } : {
     uploaded: false,
     reason: '--no-source'
+  },
+  functions: uploadedFunctionBundle || {
+    uploaded: false,
+    mode: functionsMode,
+    reason: functionsMode === 'disabled' ? 'functions upload disabled for this deploy command or plan' : 'no function sources found'
   },
   live_url: route.live_url,
   route_key: route.key,

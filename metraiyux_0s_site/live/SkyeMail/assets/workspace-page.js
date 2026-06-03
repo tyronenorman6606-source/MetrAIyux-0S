@@ -10,6 +10,7 @@
     { id:'docs', label:'Docs' },
     { id:'calendar', label:'Calendar' },
     { id:'crm', label:'CRM' },
+    { id:'commerce', label:'Commerce' },
     { id:'finance', label:'Finance' },
     { id:'legal', label:'Legal' },
     { id:'builder', label:'Builder' },
@@ -24,6 +25,10 @@
     founderActions: null,
     automation: null,
     pwa: null,
+    commerceOrders: null,
+    commerceAnalytics: null,
+    aeFlowContact: null,
+    aeFlowJournal: null,
     activePanel: PANELS.some((item)=>item.id === params.get('panel')) ? params.get('panel') : 'overview'
   };
 
@@ -125,6 +130,9 @@
     const health = healthById(action.id);
     const routeText = health ? `${health.status}${health.gated ? ' gated' : ''}` : 'unchecked';
     const openUrl = action.id === 'skydocxmax-editor' ? bridge.skyeDocxUrl(ctx) : bridge.toolUrl(action, ctx);
+    const isLiveApi = action.capability === 'live_api';
+    const openLabel = 'Open app';
+    const packetLabel = isLiveApi ? (options.liveLabel || 'Run + receipt') : (options.packetLabel || 'Create packet');
     return `
       <article class="workspace-action-card" data-action-card="${esc(action.id)}">
         <div>
@@ -140,8 +148,8 @@
           </div>
         </div>
         <div class="btnrow">
-          <a class="btn small gold" href="${esc(openUrl)}" target="_blank" rel="noopener" data-open-action="${esc(action.id)}">Open</a>
-          <button class="btn small" type="button" data-archive-action="${esc(action.id)}">${esc(options.packetLabel || 'Packet')}</button>
+          <a class="btn small gold" href="${esc(openUrl)}" target="_blank" rel="noopener" data-open-action="${esc(action.id)}">${esc(openLabel)}</a>
+          <button class="btn small" type="button" data-archive-action="${esc(action.id)}">${esc(packetLabel)}</button>
         </div>
       </article>`;
   }
@@ -229,12 +237,56 @@
       <div class="workspace-panel-grid">
         <section class="workspace-panel-main">
           ${renderActionRows(actionsFor('crm'), 'CRM packet')}
+          ${state.aeFlowContact ? `<div class="notice"><b>AE Flow contact captured</b><br><span class="mini">${esc(state.aeFlowContact.mailHandoffPacket?.summary?.directApi?.result?.captured?.contact_id || state.aeFlowContact.mailHandoffPacket?.summary?.directApi?.status || 'Contact sync completed.')}</span></div>` : ''}
+          ${state.aeFlowJournal ? `<div class="notice"><b>AE Flow journal written</b><br><span class="mini">${esc(state.aeFlowJournal.mailHandoffPacket?.summary?.directApi?.result?.entry?.id || state.aeFlowJournal.mailHandoffPacket?.summary?.directApi?.status || 'Journal sync completed.')}</span></div>` : ''}
         </section>
         <aside class="workspace-panel-side">
           <div class="rail-title">Command event</div>
           <label>Event summary<textarea id="crmSummary">${esc(context().subject || context().snippet || 'SkyeMail CRM follow-up')}</textarea></label>
           <button class="btn gold full" id="recordCrmEventBtn" type="button">Record CRM event</button>
+          <button class="btn full" id="captureAeFlowContactBtn" type="button">Capture contact</button>
+          <button class="btn full" id="journalAeFlowBtn" type="button">Write journal</button>
           <div class="mini" id="crmEventStatus">Ready.</div>
+        </aside>
+      </div>`;
+  }
+
+  function renderCommerce(){
+    const orderResult = state.commerceOrders?.mailHandoffPacket?.summary?.directApi?.result?.orders
+      || state.commerceOrders?.mailHandoffPacket?.summary?.directApi?.result
+      || {};
+    const orders = Array.isArray(orderResult) ? orderResult
+      : Array.isArray(orderResult.orders) ? orderResult.orders
+      : orderResult.order ? [orderResult.order]
+      : [];
+    const orderCount = Array.isArray(orders) && orders.length ? orders.length : Number(orderResult.count || 0);
+    const analytics = state.commerceAnalytics?.mailHandoffPacket?.summary?.directApi?.result?.analytics
+      || state.commerceAnalytics?.mailHandoffPacket?.summary?.directApi?.result?.summary
+      || {};
+    return `
+      <div class="workspace-panel-grid">
+        <section class="workspace-panel-main">
+          ${renderActionRows(actionsFor('commerce'), 'Commerce sync')}
+          <div class="workspace-status-grid">
+            <div class="stat"><b>${esc(orderCount)}</b><span class="mini">orders loaded from SkyeCommerce</span></div>
+            <div class="stat"><b>${esc(analytics.total_orders || analytics.orders || analytics.order_count || 0)}</b><span class="mini">analytics orders</span></div>
+            <div class="stat"><b>${esc(analytics.gross_revenue || analytics.revenue || analytics.total_revenue || 0)}</b><span class="mini">analytics revenue signal</span></div>
+          </div>
+          <div class="mailtable workspace-list">
+            ${Array.isArray(orders) && orders.length ? orders.slice(0, 8).map((order)=>`
+              <article class="mail">
+                <div class="mail-main">
+                  <div class="mail-top"><div><div class="mail-subject">${esc(order.customer_email || order.email || order.id || 'Commerce order')}</div><div class="mail-from">${esc(order.status || order.payment_status || 'order')}</div></div><span class="chip">${esc(order.total || order.amount || order.total_cents || '')}</span></div>
+                  <div class="mail-snippet">${esc(order.summary || order.notes || order.created_at || '')}</div>
+                </div>
+              </article>`).join('') : '<div class="empty">Load SkyeCommerce orders to bring store context into the mailbox workspace.</div>'}
+          </div>
+        </section>
+        <aside class="workspace-panel-side">
+          <div class="rail-title">Commerce bridge</div>
+          <button class="btn gold full" id="loadCommerceOrdersBtn" type="button">Load orders</button>
+          <button class="btn full" id="loadCommerceAnalyticsBtn" type="button">Load analytics</button>
+          <div class="mini" id="commerceStatus">Ready.</div>
         </aside>
       </div>`;
   }
@@ -318,6 +370,7 @@
       docs: renderDocs,
       calendar: renderCalendar,
       crm: renderCrm,
+      commerce: renderCommerce,
       finance: renderFinance,
       legal: renderLegal,
       builder: renderBuilder,
@@ -404,6 +457,14 @@
     if(createCalendar) createCalendar.onclick = createCalendarPanelEvent;
     const recordCrm = root.querySelector('#recordCrmEventBtn');
     if(recordCrm) recordCrm.onclick = recordCrmPanelEvent;
+    const captureAeFlow = root.querySelector('#captureAeFlowContactBtn');
+    if(captureAeFlow) captureAeFlow.onclick = captureAeFlowContactPanel;
+    const journalAeFlow = root.querySelector('#journalAeFlowBtn');
+    if(journalAeFlow) journalAeFlow.onclick = journalAeFlowPanel;
+    const loadCommerceOrders = root.querySelector('#loadCommerceOrdersBtn');
+    if(loadCommerceOrders) loadCommerceOrders.onclick = loadCommerceOrdersPanel;
+    const loadCommerceAnalytics = root.querySelector('#loadCommerceAnalyticsBtn');
+    if(loadCommerceAnalytics) loadCommerceAnalytics.onclick = loadCommerceAnalyticsPanel;
     const analyzePwa = root.querySelector('#analyzePwaBtn');
     if(analyzePwa) analyzePwa.onclick = analyzePwaPanel;
     const loadFounderStatus = root.querySelector('#loadFounderStatusBtn');
@@ -460,6 +521,74 @@
       await packetAction('crm-pipeline', 'Archiving CRM packet...');
     }catch(err){
       out.textContent = err.message || 'CRM event failed.';
+      note(out.textContent, 'danger');
+    }
+  }
+
+  async function captureAeFlowContactPanel(){
+    const out = qs('#crmEventStatus');
+    try{
+      out.textContent = 'Capturing contact...';
+      state.aeFlowContact = await bridge.aeFlowContactCapture(context());
+      const direct = state.aeFlowContact?.mailHandoffPacket?.summary?.directApi;
+      if(direct && direct.ok === false) throw new Error(direct.error || direct.result?.error || 'AE Flow contact capture failed.');
+      out.textContent = direct?.result?.captured?.contact_id || 'AE Flow contact captured.';
+      note('AE Flow contact capture completed.', 'ok');
+      await refreshPackets();
+      renderPanel();
+    }catch(err){
+      out.textContent = err.message || 'AE Flow contact capture failed.';
+      note(out.textContent, 'danger');
+    }
+  }
+
+  async function journalAeFlowPanel(){
+    const out = qs('#crmEventStatus');
+    try{
+      out.textContent = 'Writing journal...';
+      state.aeFlowJournal = await bridge.aeFlowJournal(context());
+      const direct = state.aeFlowJournal?.mailHandoffPacket?.summary?.directApi;
+      if(direct && direct.ok === false) throw new Error(direct.error || direct.result?.error || 'AE Flow journal failed.');
+      out.textContent = direct?.result?.entry?.id || 'AE Flow journal written.';
+      note('AE Flow journal completed.', 'ok');
+      await refreshPackets();
+      renderPanel();
+    }catch(err){
+      out.textContent = err.message || 'AE Flow journal failed.';
+      note(out.textContent, 'danger');
+    }
+  }
+
+  async function loadCommerceOrdersPanel(){
+    const out = qs('#commerceStatus');
+    try{
+      out.textContent = 'Loading orders...';
+      state.commerceOrders = await bridge.commerceOrders(context());
+      const direct = state.commerceOrders?.mailHandoffPacket?.summary?.directApi;
+      if(direct && direct.ok === false) throw new Error(direct.error || direct.result?.error || 'SkyeCommerce orders failed.');
+      out.textContent = 'SkyeCommerce orders loaded.';
+      note('SkyeCommerce orders loaded into the workbench.', 'ok');
+      await refreshPackets();
+      renderPanel();
+    }catch(err){
+      out.textContent = err.message || 'SkyeCommerce orders failed.';
+      note(out.textContent, 'danger');
+    }
+  }
+
+  async function loadCommerceAnalyticsPanel(){
+    const out = qs('#commerceStatus');
+    try{
+      out.textContent = 'Loading analytics...';
+      state.commerceAnalytics = await bridge.commerceAnalytics(context());
+      const direct = state.commerceAnalytics?.mailHandoffPacket?.summary?.directApi;
+      if(direct && direct.ok === false) throw new Error(direct.error || direct.result?.error || 'SkyeCommerce analytics failed.');
+      out.textContent = 'SkyeCommerce analytics loaded.';
+      note('SkyeCommerce analytics loaded into the workbench.', 'ok');
+      await refreshPackets();
+      renderPanel();
+    }catch(err){
+      out.textContent = err.message || 'SkyeCommerce analytics failed.';
       note(out.textContent, 'danger');
     }
   }

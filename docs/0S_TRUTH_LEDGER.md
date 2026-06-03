@@ -1,6 +1,6 @@
 # 0S Truth Ledger
 
-Generated: 2026-05-31T03:06:38.544Z
+Generated: 2026-06-02T23:59:49.481Z
 
 This ledger is intentionally strict: a lane is `built` only when the declared proof command exists, the declared receipt exists and is `ok:true`, and no open gaps remain in `metraiyux_0s_site/data/0s-closure-workflows.json`.
 
@@ -8,16 +8,16 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 
 ## Summary
 
-- Total workflows: 22
-- Built: 22
+- Total workflows: 24
+- Built: 24
 - Partial: 0
 - Failing proof: 0
 - Unproven: 0
 - Not built or untracked: 0
-- Provider/real-world gated gaps: 11
-- External boundaries: 11
+- Provider/real-world gated gaps: 12
+- External boundaries: 12
 - Literal per-app behavior state: green
-- Literal per-app rows: 107 green, 0 yellow, 0 red
+- Literal per-app rows: 108 green, 0 yellow, 0 red
 
 ## Repair Queue
 
@@ -35,6 +35,7 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 - **P1 content-engine-provider-dispatch** - External social/email/site provider publishing intentionally remains provider_call_made:false until owner-approved connector credentials and rollback receipts are attached.
 - **P2 external-provider-hardening** - Customer-impacting live sends, calls, payouts, refunds, social publishing, calendar actions, and background checks remain owner-approved/provider-credential-gated; provider runtime smoke/stress and admin/content receipts prove safe sandbox, retry, dead-letter, and boundary behavior.
 - **P2 valuation-deck-alignment** - Valuation remains directional internal diligence, not a formal appraisal or ARR valuation; customer revenue, retention, churn, CAC, and paid-contract evidence remain commercial diligence boundaries.
+- **P1 shared-experience-tour-celebration-layer** - User-visible browser playback of tours and celebration animations remains owner-handled under the no-browser-proof policy.
 
 ## Workflow Truth
 
@@ -50,7 +51,8 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 | P0 | nexus-ad-hire-workforce-job | green | built | none | missing |
 | P0 | admin-brain-automation | green | built | none | missing |
 | P0 | broad-real-user-saas-skymail-skynet | green | built | none | missing |
-| P0 | per-app-operating-proof-matrix | green | built | none | missing |
+| P0 | per-app-operating-proof-matrix | partial | built | none | missing |
+| P0 | app-specific-human-deep-closure | green | built | none | missing |
 | P1 | command-bridge-all-lanes | green | built | none | missing |
 | P1 | skyeroutex-workforce-depth | green | built | none | missing |
 | P1 | skymail-company-crm-lane | green | built | none | missing |
@@ -62,6 +64,7 @@ Browser proof remains owner-handled. Provider-spend, destructive, legal/governme
 | P1 | jobping-product-depth | green | built | none | missing |
 | P2 | external-provider-hardening | green | built | none | missing |
 | P2 | valuation-deck-alignment | green | built | none | missing |
+| P1 | shared-experience-tour-celebration-layer | green | built | none | missing |
 
 Source JSON: `metraiyux_0s_site/proof/0s-truth-ledger.json`.
 

@@ -120,6 +120,34 @@
     }
   }
 
+  async function maybeRecordUsageThanks(root, data) {
+    const workspaceId = data?.workspace?.workspace_id || root.dataset.resolvedWorkspace || activeWorkspaceId(root);
+    if (!workspaceId) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `saas_visual_thanks:${workspaceId}:${today}`;
+    try {
+      if (localStorage.getItem(key) === "recorded") return;
+    } catch {
+      return;
+    }
+    const result = await recordVisualTelemetry("saas.customer_thank_you.issued", {
+      workspace_id: workspaceId,
+      workspace_slug: data?.workspace?.workspace_slug || "",
+      status: "issued",
+      summary: "Thank you for using your 0S workspace today.",
+      cadence: "daily_workspace_visual_load",
+      receipt_backed: true,
+      source: "customer-visuals"
+    });
+    if (result?.ok !== false) {
+      try {
+        localStorage.setItem(key, "recorded");
+      } catch {
+        /* localStorage can be unavailable in locked-down browsers; the Worker event is still authoritative. */
+      }
+    }
+  }
+
   function resolveSources(root) {
     const workspaceId = activeWorkspaceId(root);
     root.dataset.resolvedWorkspace = workspaceId;
@@ -344,6 +372,19 @@
     `).join("");
   }
 
+  function renderThanks(el, rows) {
+    if (!el) return;
+    const data = rows || [];
+    el.innerHTML = data.length ? data.map((row) => `
+      <article class="visual-thanks-row">
+        <span>${esc(row.status || "receipt")}</span>
+        <strong>${esc(row.title || "Thank you")}</strong>
+        <small>${esc(row.detail || "")}</small>
+        <code>${esc(row.receipt_id || "")}</code>
+      </article>
+    `).join("") : `<article class="visual-thanks-row"><strong>No customer thank-you receipt yet</strong><small>Signup, SkyeMerit, usage, and SkyePay receipts will appear here after live Worker events exist.</small></article>`;
+  }
+
   async function renderDashboard(root) {
     const status = root.querySelector("[data-visual-status]");
     try {
@@ -360,6 +401,8 @@
       renderRoutes(root.querySelector("[data-visual-routes]"), data.route_health);
       renderFlows(root.querySelector("[data-visual-flows]"), data.flows);
       renderAudit(root.querySelector("[data-visual-audit]"), data.audit_events);
+      renderThanks(root.querySelector("[data-visual-thanks]"), data.customer_thanks);
+      maybeRecordUsageThanks(root, data);
       const source = data.__visualDataSource || { kind: "unknown", label: "Unknown source", fallback: true, attempts: [] };
       root.dataset.visualDataSource = source.kind;
       root.classList.toggle("visual-dashboard-live", source.live === true);

@@ -581,6 +581,38 @@ function basicAuth(user, pass) {
   return `Basic ${encoded}`;
 }
 
+function boundedProviderTimeoutMs(value, fallback = 20000) {
+  const ms = Number(value);
+  if (!Number.isFinite(ms) || ms <= 0) return fallback;
+  return Math.max(1000, Math.min(55000, Math.round(ms)));
+}
+
+function providerFetchTimeoutMs(env = {}, providerId = '') {
+  const providerKey = clean(providerId, 40).toUpperCase().replace(/[^A-Z0-9]+/g, '_');
+  return boundedProviderTimeoutMs(
+    env[`${providerKey}_PROVIDER_FETCH_TIMEOUT_MS`] ||
+      env.ZERO_OS_PROVIDER_FETCH_TIMEOUT_MS ||
+      env.SKYPAY_PROVIDER_FETCH_TIMEOUT_MS,
+    20000
+  );
+}
+
+async function fetchWithProviderTimeout(env, providerId, url, init = {}, label = 'provider request') {
+  const timeoutMs = providerFetchTimeoutMs(env, providerId);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new Error(`${label} timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function bytesToBase64(bytes) {
   if (typeof Buffer !== 'undefined') return Buffer.from(bytes).toString('base64');
   let binary = '';
@@ -939,11 +971,11 @@ async function callStripeCheckout(env, request) {
   const params = stripeParamsFromObject(rawParams);
   if (!params.get('mode')) params.set('mode', 'payment');
   const idempotencyKey = clean(request.payload.idempotency_key || request.payload.idempotencyKey || '', 255);
-  const response = await fetch(`${apiBase.replace(/\/+$/, '')}/v1/checkout/sessions`, {
+  const response = await fetchWithProviderTimeout(env, 'stripe', `${apiBase.replace(/\/+$/, '')}/v1/checkout/sessions`, {
     method: 'POST',
     headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/x-www-form-urlencoded', ...(idempotencyKey ? { 'idempotency-key': idempotencyKey } : {}) },
     body: params
-  });
+  }, 'Stripe checkout create');
   const data = await response.json().catch(() => ({}));
   if (!response.ok) return { ok: false, status: response.status, error: clean(data.error?.message || data.message || 'stripe_checkout_failed', 500), provider_call_made: true, result: publicProviderResult(data) };
   return { ok: true, status: response.status, provider_call_made: true, result: publicProviderResult(data) };
@@ -954,7 +986,7 @@ async function stripeFetch(env, method, path, body = null, extraHeaders = {}) {
   const secret = firstEnv(env, def.required.secret_key);
   const apiBase = firstEnv(env, def.optional.api_base) || 'https://api.stripe.com';
   if (!secret) return { ok: false, status: 503, error: 'stripe_not_configured' };
-  const response = await fetch(`${apiBase.replace(/\/+$/, '')}${path}`, {
+  const response = await fetchWithProviderTimeout(env, 'stripe', `${apiBase.replace(/\/+$/, '')}${path}`, {
     method,
     headers: {
       authorization: `Bearer ${secret}`,
@@ -962,7 +994,7 @@ async function stripeFetch(env, method, path, body = null, extraHeaders = {}) {
       ...extraHeaders
     },
     body
-  });
+  }, `Stripe ${method} ${path}`);
   const data = await response.json().catch(() => ({}));
   if (!response.ok) return { ok: false, status: response.status, error: clean(data.error?.message || data.message || 'stripe_request_failed', 500), provider_call_made: true, result: publicProviderResult(data) };
   return { ok: true, status: response.status, provider_call_made: true, result: publicProviderResult(data) };
@@ -1591,7 +1623,7 @@ async function callSkyeMail(env, request) {
   const def = PROVIDERS.find((item) => item.id === 'skymail');
   const apiUrl = firstEnv(env, def.required.api_url);
   const serviceBinding = env.SKYEMAIL_PLATFORM_WORKER || env.SKYMAIL_PLATFORM_WORKER || null;
-  const token = firstEnv(env, def.optional.api_token);
+  const legacyToken = firstEnv(env, def.optional.api_token);
   const action = request.action;
   const object = action.replace('skymail.', '');
   if (request.sandbox) {
@@ -1608,8 +1640,22 @@ async function callSkyeMail(env, request) {
   const method = clean(request.payload.method || (action === 'skymail.mailbox.status' ? 'GET' : 'POST'), 10).toUpperCase();
   const target = new URL(path, `${(apiUrl || 'https://skyemail-platform.internal').replace(/\/+$/, '')}/`);
   const bodyPayload = request.payload.body && typeof request.payload.body === 'object' ? request.payload.body : { ...request.payload };
+  const gateToken = clean(
+    bodyPayload._gate_bearer ||
+      bodyPayload.gate_token ||
+      bodyPayload.gateToken ||
+      bodyPayload.fs27_token ||
+      bodyPayload.fs27Token ||
+      '',
+    4000
+  );
   delete bodyPayload.path;
   delete bodyPayload.method;
+  delete bodyPayload._gate_bearer;
+  delete bodyPayload.gate_token;
+  delete bodyPayload.gateToken;
+  delete bodyPayload.fs27_token;
+  delete bodyPayload.fs27Token;
   const runtimeCorrelation = {
     provider_runtime_receipt_id: request.id,
     provider_runtime_action: request.action,
@@ -1631,7 +1677,10 @@ async function callSkyeMail(env, request) {
   const headers = {
     accept: 'application/json',
     ...(method === 'GET' ? {} : { 'content-type': 'application/json' }),
-    ...(token ? { 'x-skymail-service-token': token, ...(action === 'skymail.mailbox.status' ? { authorization: `Bearer ${token}` } : {}) } : {})
+    ...(legacyToken ? { 'x-skymail-service-token': legacyToken } : {}),
+    ...(action === 'skymail.mailbox.status' && legacyToken ? { authorization: `Bearer ${legacyToken}` } : {}),
+    ...(gateToken ? { 'x-skye-gate-session': gateToken, 'x-free99-gate-session': gateToken } : {}),
+    ...(!legacyToken && gateToken ? { authorization: `Bearer ${gateToken}` } : {})
   };
   if (method === 'GET') {
     for (const [key, value] of Object.entries(bodyPayload)) if (value !== undefined && value !== null && String(value) !== '') target.searchParams.set(key, String(value));
@@ -2788,6 +2837,11 @@ async function storeDeadLetter(env, receipt, request, reason) {
         content_base64: request.payload?.content_base64 ? '[redacted-content-base64-stored-in-receipt-boundary]' : request.payload?.content_base64,
         secret: request.payload?.secret ? '[redacted-secret-stored-in-receipt-boundary]' : request.payload?.secret,
         token: request.payload?.token ? '[redacted-token-stored-in-receipt-boundary]' : request.payload?.token,
+        gate_token: request.payload?.gate_token ? '[redacted-gate-token-stored-in-receipt-boundary]' : request.payload?.gate_token,
+        gateToken: request.payload?.gateToken ? '[redacted-gate-token-stored-in-receipt-boundary]' : request.payload?.gateToken,
+        fs27_token: request.payload?.fs27_token ? '[redacted-fs27-token-stored-in-receipt-boundary]' : request.payload?.fs27_token,
+        fs27Token: request.payload?.fs27Token ? '[redacted-fs27-token-stored-in-receipt-boundary]' : request.payload?.fs27Token,
+        _gate_bearer: request.payload?._gate_bearer ? '[redacted-gate-bearer-stored-in-receipt-boundary]' : request.payload?._gate_bearer,
         auth_token: request.payload?.auth_token ? '[redacted-auth-token-stored-in-receipt-boundary]' : request.payload?.auth_token,
         authToken: request.payload?.authToken ? '[redacted-auth-token-stored-in-receipt-boundary]' : request.payload?.authToken,
         access_token: request.payload?.access_token ? '[redacted-access-token-stored-in-receipt-boundary]' : request.payload?.access_token,

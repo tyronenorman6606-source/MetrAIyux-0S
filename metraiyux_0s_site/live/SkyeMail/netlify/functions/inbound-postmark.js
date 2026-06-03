@@ -169,9 +169,9 @@ exports.handler = async (event) => {
       const html = `
         <div style="font-family:Arial,sans-serif;line-height:1.5">
           <h2>New imported email</h2>
-          <p>A new email was received for <b>${escapeHtml(user.handle)}</b> and imported into SkyeMail Citadel.</p>
+          <p>A new email was received for <b>${escapeHtml(user.handle)}</b> and imported into SkyeMail backed by Citadel Database and SkyeNet.</p>
           <p>From: <b>${escapeHtml(fromName || "")}</b> &lt;${escapeHtml(fromEmail)}&gt;</p>
-          <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in SkyeMail Citadel</a></p>
+          <p><a href="${inboxLink}" target="_blank" rel="noopener">Open in SkyeMail</a></p>
           <p style="color:#666;font-size:12px">Content is encrypted at rest in the Vault database. This notification does not include message content.</p>
         </div>
       `;

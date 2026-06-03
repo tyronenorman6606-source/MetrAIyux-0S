@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyeVault Agent Became a Sellable Lane | DevodeRator</title>
+  <meta name="description" content="Gray London Skyes records the May 31 SkyeVault Agent platform pass: SkyePay buyer page, gated installer, reproducible package, encrypted baseline and delta proof, and production receipts.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-05-31-skyevault-agent-platform-lane.html">SkyeVault Agent</a>
+        <a href="../money-paths/index.html">Money Paths</a>
+        <a href="../social.html">Social Vault</a>
+        <a href="../cards.html">Cards</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">May 31, 2026 · SkyeVault Agent · SkyePay · gated installer · reproducible release · platform proof</p>
+    <h1>SkyeVault Agent had to become a real product lane.</h1>
+    <p class="lede">
+      Today was about separating a real customer product from loose infrastructure. A sellable repo custody agent needs a buyer page, a payment lane, a gated installer, a downloadable package, proof that the package does what it claims, and a receipt trail that can survive scrutiny.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        A backup promise is not enough. The buyer needs the page, the payment return, the package, the commands, the lock, and the proof.
+      </blockquote>
+
+      <h2>What is live now.</h2>
+      <p>
+        The SkyeVault Agent lane now has a public buyer surface on FS27, a SkyePay offer path, and a gated 0S install center. The customer does not get a separate SkyeVault password. SkyePay provisions the workspace handoff, and the agent uses the workspace portal key for buyer uploads. Owner/admin lanes can still use the shared 0S/FS27/SkyGate bearer.
+      </p>
+      <div class="receipt-box">
+        <strong>Production surfaces</strong>
+        <ul>
+          <li>Buyer page: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html">skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html</a></li>
+          <li>Buyer alias: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent">skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent</a></li>
+          <li>SkyePay store: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store?client=metraiyux-0s&amp;offer=skyevault-pro-access">SkyeVault Pro offer</a></li>
+          <li>Install center: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/">metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/</a></li>
+          <li>Package route: <code>/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz</code></li>
+        </ul>
+      </div>
+
+      <h2>The package stopped drifting.</h2>
+      <p>
+        The release builder now creates a reproducible archive. That matters because a versioned installer should not change checksum just because the package command ran again. The proof runs the package command twice and requires the same SHA both times.
+      </p>
+      <div class="receipt-box">
+        <strong>Release facts</strong>
+        <ul>
+          <li>Agent version: <code>0.2.2</code></li>
+          <li>Package SHA-256: <code>5cb4ceb88b12b5af06684deed401179dcca6c7cbdd3101a3ef2c38223a7518aa</code></li>
+          <li>Archive bytes: <code>15967</code></li>
+          <li>Release manifest: <code>/downloads/skyevault-agent/latest.json</code></li>
+          <li>Reproducible package check: passed across repeated packaging.</li>
+          <li>Archive contents: CLI, auto-installer, runbook, env template, Linux service, and macOS launchd template.</li>
+        </ul>
+      </div>
+
+      <h2>The $13 auto-install lane is real now.</h2>
+      <p>
+        The install promise needed to become an actual command path. Release <code>0.2.2</code> adds <code>skyevault-agent auto-install</code> and a non-interactive <code>install.sh</code> mode. The one-time SkyePay add-on is <code>skyevault-auto-install-addon</code> at $13. It does not create a second vault workspace; it uses the buyer's existing SkyeVault plan and runs the install flow around that workspace key.
+      </p>
+      <div class="receipt-box">
+        <strong>Auto-install proof</strong>
+        <ul>
+          <li>Shipped tarball extracted and ran <code>install.sh</code> in auto mode: passed.</li>
+          <li>Private env file written at mode <code>0600</code>: passed.</li>
+          <li>Raw portal key and unlock passphrase were not printed in stdout/stderr/receipt: passed.</li>
+          <li>First encrypted full baseline created: passed.</li>
+          <li>Post-install delta for changed file, new file, and tombstone: passed.</li>
+          <li>Verify and restore recovered <code>.git</code>, untracked work, edits, creates, and deletes: passed.</li>
+          <li>Receipt: <code>test-artifacts/skyevault-agent-auto-install/2026-05-31T21-03-07-066Z.json</code></li>
+        </ul>
+      </div>
+
+      <h2>The agent behavior is proven locally.</h2>
+      <p>
+        The platform proof does not just check that a file exists. It runs the CLI syntax check, help/version, doctor command, archive listing, encrypted literal snapshot, baseline plus delta sync, verify, restore, untracked-file plus .git restore coverage, and a mocked SkyeVault Drop upload using only the buyer portal key.
+      </p>
+      <div class="receipt-box">
+        <strong>Agent proof coverage</strong>
+        <ul>
+          <li>Encrypted literal repo snapshot: passed.</li>
+          <li>Paid SkyePay webhook provisions buyer vault workspace and stores unlock handoff: passed.</li>
+          <li>Full baseline then changed-file delta: passed.</li>
+          <li>Deleted-file tombstone tracking: passed.</li>
+          <li>Verify full and delta receipts: passed.</li>
+          <li>Restore full plus delta into final repo state: passed.</li>
+          <li>Upload-session, object PUT, and upload-complete lifecycle through portal key: passed.</li>
+        </ul>
+      </div>
+
+      <h2>The live payment return is locked correctly.</h2>
+      <p>
+        Production HTTP proof creates a live SkyePay checkout session for the SkyeVault offer, reads the pending SkyePay status, opens the install center from the return session, and confirms the package stays locked until payment and workspace provisioning finish. The local platform proof also runs the paid webhook provisioning test so a confirmed SkyePay vault checkout provisions the buyer workspace and records the install handoff. The pending session does not expose the workspace portal key. Owner/shared-gate proof also downloads the live package and verifies the tarball SHA against the live manifest.
+      </p>
+      <p>
+        The closure proof is now harsher than a simple status check. It verifies page content, store hydrator code, the SkyePay offers API metadata, live unpaid checkout creation, pending lock behavior, owner-gated manifest and package integrity, the downloaded package's CLI behavior, valuation source alignment, and 156 concurrent live stress reads with zero failures. Because browser proof was re-enabled for this task, the lane also passed a headed browser sweep across desktop and mobile: buyer page, SkyePay store, Stripe handoff without completing payment, pending install lock, owner download, Drop, and this post.
+      </p>
+      <div class="receipt-box">
+        <strong>Receipts</strong>
+        <ul>
+          <li><code>test-artifacts/skyevault-agent-platform/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-auto-install/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-auto-install/2026-05-31T21-03-07-066Z.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-sales-readiness/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-sales-readiness/2026-05-31T22-44-15-311Z.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-live-browser/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-live-browser/2026-05-31T22-32-41-667Z.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-live-http/2026-05-31T12-27-52-516Z.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-package/latest.json</code></li>
+          <li><code>test-artifacts/0s-worker-deploy/2026-05-31T21-07-21-331Z-worker-deploy.json</code></li>
+        </ul>
+      </div>
+
+      <h2>The honest boundary.</h2>
+      <p>
+        This pass proves the sellable SkyeVault Agent lane: public page, SkyePay checkout, gated installer, reproducible package, auto-install path, encrypted baseline/delta behavior, restore behavior, portal-key upload, and browser-level customer flow. It does not magically close every internal owner-daemon auth issue. The owner repo daemon and the customer SkyeVault Agent lane are related, but they are not the same proof.
+      </p>
+      <blockquote>
+        The win today is that the agent lane now has a real shape a customer can buy, receive, install, run, verify, and restore from. That is the level the platform has to keep holding.
+      </blockquote>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator · Gray London Skyes · build receipts, proof journals, and sovereign infrastructure notes.</footer>
+</body>
+</html>

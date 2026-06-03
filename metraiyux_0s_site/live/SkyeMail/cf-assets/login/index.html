@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login — SkyeMail Citadel</title>
+  <title>Login — SkyeMail backed by Citadel Database and SkyeNet</title>
 
   <style>
 :root{
@@ -108,6 +108,13 @@ a:hover{ text-decoration:underline; }
   font-size:13px;
 }
 .pill:hover{ background: rgba(212,175,55,.14); }
+@media (max-width: 520px){
+  .nav{ align-items:flex-start; padding:12px; gap:10px; flex-wrap:wrap; }
+  .brand{ min-width:0; flex:1 1 100%; }
+  .brand .name{ min-width:0; }
+  .navlinks{ width:100%; max-width:100%; justify-content:flex-start; overflow:hidden; }
+  .pill{ max-width:100%; flex:1 1 auto; text-align:center; }
+}
 
 .container{
   width:100%;
@@ -332,13 +339,13 @@ small{ color: var(--muted); }
       <div class="brand">
         <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
         <div class="name">
-          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Citadel</b>
-          <span>Encrypted business message center • Citadel + SkyeNet</span>
+          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span></b>
+          <span>Encrypted business message center • Citadel Database + SkyeNet</span>
         </div>
       </div>
       <div class="navlinks">
         <a class="pill" href="index.html">Home</a>
-        <a class="pill" href="signup.html">Citadel setup</a>
+        <a class="pill" href="signup.html">SkyeMail setup</a>
         <a class="pill" href="login.html">Login</a>
         <a class="pill" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
         <a class="pill" href="ai.html">AI</a>
@@ -354,7 +361,7 @@ small{ color: var(--muted); }
   <div class="split">
     <div>
       <label>SkyeMail inbox address</label>
-      <input id="mailboxEmail" type="email" placeholder="darthom-intelligence@solenterprises.org" autocomplete="username" />
+      <input id="mailboxEmail" type="email" placeholder="you@yourdomain.com" autocomplete="username" />
       <small>This selects the actual inbox SkyeMail opens after 0S Gate accepts you.</small>
 
       <div class="mailbox-picks" aria-label="Known SkyeMail inboxes">
@@ -373,7 +380,7 @@ small{ color: var(--muted); }
 
       <div class="btnrow" style="margin-top:14px;">
         <button class="btn ok" id="btnFs27Login" type="button">Continue with 0S Gate</button>
-        <a class="btn" href="signup.html">Set up Citadel lane</a>
+        <a class="btn" href="signup.html">Set up SkyeMail lane</a>
       </div>
 
       <div class="hr"></div>
@@ -384,7 +391,7 @@ small{ color: var(--muted); }
       <div class="pane">
         <h3>Sovereign unlock</h3>
         <div class="notice">
-          Login gets you access to your inbox metadata. To decrypt message contents you will unlock with your Citadel passphrase on the Inbox screen.
+          Login gets you access to your inbox metadata. To decrypt message contents you will unlock with your SkyeMail key passphrase on the Inbox screen.
         </div>
       </div>
       <div class="pane" style="margin-top:12px;">
@@ -447,15 +454,17 @@ small{ color: var(--muted); }
   }
 
   const params = new URLSearchParams(location.search);
-  setSelectedMailbox(params.get("mailbox_email") || params.get("mailbox") || window.SMVRuntime?.getActiveMailbox?.() || "darthom-intelligence@solenterprises.org");
+  const initialMailbox = params.get("mailbox_email") || params.get("mailbox") || window.SMVRuntime?.getActiveMailbox?.() || "";
+  setSelectedMailbox(initialMailbox);
   mailboxInput.addEventListener("input", () => setSelectedMailbox(mailboxInput.value));
   document.querySelectorAll("[data-mailbox-pick]").forEach((btn) => {
     btn.addEventListener("click", () => setSelectedMailbox(btn.dataset.mailboxPick));
   });
 
-  const initialSession = bridge?.current?.();
+  const initialSession = bridge?.current?.() || (typeof readGateSession === "function" ? readGateSession() : null);
   if (initialSession?.token) gateState.value = initialSession.email || initialSession.actor || "Gate session active";
-  else setStatus(status, "Open the 0S Gate first.", "danger");
+  else setStatus(status, "Open the 0S Gate first, then enter the exact mailbox you are opening.", "danger");
+  if(!initialMailbox) setStatus(status, "Enter your exact SkyeMail inbox address, or choose a provisioned mailbox.", initialSession?.token ? "" : "danger");
 
   qs("#btnFs27Login").addEventListener("click", async () => {
     setStatus(status, "Checking 0S Gate...", "");
@@ -465,7 +474,7 @@ small{ color: var(--muted); }
       mailboxInput.focus();
       return;
     }
-    const session = bridge?.requireSession?.({ platformId:"skyemail", usageLane:"mail-auth" }) || bridge?.current?.();
+    const session = bridge?.requireSession?.({ platformId:"skyemail", usageLane:"mail-auth" }) || bridge?.current?.() || (typeof readGateSession === "function" ? readGateSession() : null);
     const fs27 = (session?.token || "").trim().replace(/^Bearer\s+/i, "");
     if(!fs27) {
       setStatus(status, `Opening 0S Gate for ${mailbox}...`, "danger");
@@ -504,7 +513,7 @@ small{ color: var(--muted); }
       <p class="linksbox">
         <a href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
         <a href="https://solenterprises.org/pages/leadership-hub" target="_blank" rel="noopener">Leadership Hub</a>
-        <a href="brain.html">SkyEmail Brain</a>
+        <a href="brain.html">SkyeMail Brain</a>
         <a href="https://solenterprisesnexusconnect.netlify.app/" target="_blank" rel="noopener">NexusConnect</a>
         <a href="https://familycommand.netlify.app/" target="_blank" rel="noopener">FamilyCommand</a>
         <a href="https://skyecode-nexus.netlify.app/" target="_blank" rel="noopener">SkyeCode Nexus</a>

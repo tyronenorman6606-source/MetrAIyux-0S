@@ -147,17 +147,21 @@
     const body = qs('#replyText').value;
     if(!body.trim()){ note('Write a reply first.', 'danger'); return; }
     try{
-      await apiFetch('/mail-send', { method:'POST', body: JSON.stringify({
-        to: SMV.emailOnly(latest.headers.from || ''),
-        subject: /^Re:/i.test(thread.subject || '') ? thread.subject : `Re: ${thread.subject || ''}`,
-        message: body,
+	      const data = await apiFetch('/mail-send', { method:'POST', body: JSON.stringify({
+	        to: SMV.emailOnly(latest.headers.from || ''),
+	        subject: /^Re:/i.test(thread.subject || '') ? thread.subject : `Re: ${thread.subject || ''}`,
+	        message: body,
         text: body,
         reply_message_id: latest.id,
         reply_thread_id: thread.id,
       }) });
-      qs('#replyText').value='';
-      note('Reply sent.', 'ok');
-      SMV.trackGame('reply_send');
+	      qs('#replyText').value='';
+	      note('Reply sent.', 'ok');
+	      SMV.trackGame('reply_send', { id:data.message?.id || data.sent?.id || data.id || data.provider_message_id || data.message_id || '' }, {
+	        celebrate:true,
+	        triggerType:'workflow-complete',
+	        message:'Reply sent and recorded. Thanks for keeping the conversation moving in SkyeMail.'
+	      });
       await load();
     }catch(err){ note(err.message || 'Reply send failed.', 'danger'); }
   };

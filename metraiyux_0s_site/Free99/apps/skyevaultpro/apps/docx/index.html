@@ -1,20 +1,444 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-app="skyevaultpro-docx" data-page="skyevaultpro-docx-app">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Opening SkyeVaultPro Docx Workspace</title>
-  <meta http-equiv="refresh" content="0; url=/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=skyevaultpro&ws_id=skyevaultpro&vault_mode=docx">
+  <title>SkyeVaultPro Docx App</title>
+  <meta name="theme-color" content="#030407">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="icon" href="../../assets/img/skyes-logo.png">
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <script src="../../../../free99-gate.js" data-platform-id="skyevaultpro-docx" data-platform-name="SkyeVaultPro Docx App" data-billing-mode="included_local_first" data-price-label="Included local-first SkyeVaultPro document bridge." data-app-root="/Free99/apps/skyevaultpro/apps/docx/"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --docx-ink: #f8fbff;
+      --docx-muted: rgba(226, 232, 240, 0.78);
+      --docx-panel: rgba(6, 12, 24, 0.78);
+      --docx-line: rgba(148, 163, 184, 0.22);
+      --docx-cyan: #6ee7ff;
+      --docx-green: #8fffcb;
+      --docx-violet: #c4b5fd;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(110, 231, 255, 0.16), transparent 32%),
+        radial-gradient(circle at 86% 8%, rgba(196, 181, 253, 0.14), transparent 28%),
+        linear-gradient(145deg, #020617 0%, #08111f 48%, #030407 100%);
+      color: var(--docx-ink);
+    }
+
+    .docx-shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .docx-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .docx-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--docx-ink);
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .docx-brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .docx-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .docx-nav-links a {
+      color: var(--docx-muted);
+      text-decoration: none;
+      border: 1px solid var(--docx-line);
+      border-radius: 8px;
+      padding: 9px 12px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .docx-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .docx-panel {
+      border: 1px solid var(--docx-line);
+      border-radius: 8px;
+      background: var(--docx-panel);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
+      padding: 22px;
+      backdrop-filter: blur(18px);
+    }
+
+    .docx-hero {
+      min-height: 100%;
+      display: grid;
+      gap: 18px;
+      align-content: space-between;
+    }
+
+    .eyebrow {
+      color: var(--docx-green);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 720px;
+      margin-bottom: 14px;
+      font-size: clamp(2.25rem, 6vw, 5rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: clamp(1.35rem, 2.3vw, 2.1rem);
+      letter-spacing: 0;
+    }
+
+    p {
+      color: var(--docx-muted);
+      line-height: 1.65;
+    }
+
+    .docx-kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .docx-kpi {
+      border: 1px solid var(--docx-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.62);
+    }
+
+    .docx-kpi strong {
+      display: block;
+      color: var(--docx-ink);
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+
+    .docx-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .docx-form label {
+      display: grid;
+      gap: 7px;
+      color: var(--docx-muted);
+      font-size: 0.92rem;
+    }
+
+    .docx-form input,
+    .docx-form textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--docx-line);
+      border-radius: 8px;
+      background: rgba(2, 6, 23, 0.7);
+      color: var(--docx-ink);
+      padding: 12px 13px;
+      font: inherit;
+    }
+
+    .docx-form textarea {
+      min-height: 118px;
+      resize: vertical;
+    }
+
+    .docx-actions,
+    .docx-quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .docx-button,
+    .docx-ghost {
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid rgba(110, 231, 255, 0.34);
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 800;
+      color: #04111f;
+      background: linear-gradient(135deg, var(--docx-cyan), var(--docx-green));
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .docx-ghost {
+      color: var(--docx-ink);
+      background: rgba(15, 23, 42, 0.68);
+      border-color: var(--docx-line);
+    }
+
+    .docx-receipt {
+      margin-top: 12px;
+      border: 1px solid rgba(143, 255, 203, 0.28);
+      border-radius: 8px;
+      background: rgba(4, 17, 31, 0.82);
+      padding: 14px;
+      color: var(--docx-muted);
+      min-height: 98px;
+      overflow-wrap: anywhere;
+    }
+
+    .docx-event-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .docx-event {
+      border: 1px solid var(--docx-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .docx-event strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .docx-note {
+      margin-top: 16px;
+      border-left: 3px solid var(--docx-violet);
+      padding-left: 12px;
+      color: var(--docx-muted);
+    }
+
+    @media (max-width: 860px) {
+      .docx-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .docx-nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .docx-kpis {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>Opening SkyeVaultPro Docx Workspace</h1>
-    <p>This mounted route is a local-first vault document handoff. Browser cache, offline drafts, and local exports stay local until a hosted vault or bridge receipt confirms them.</p>
-    <p><a href="/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=skyevaultpro&ws_id=skyevaultpro&vault_mode=docx">Open SkyeDocxMax editor</a></p>
+  <main class="docx-shell">
+    <header class="docx-nav">
+      <a class="docx-brand" href="../../drive/index.html">
+        <img src="../../assets/img/skyes-logo.png" alt="Skyes Over London logo">
+        <span>SkyeVaultPro Docx App</span>
+      </a>
+      <nav class="docx-nav-links" aria-label="SkyeVaultPro Docx routes">
+        <a href="../../drive/index.html">Vault</a>
+        <a href="/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=skyevaultpro-docx&returnTo=/Free99/apps/skyevaultpro/apps/docx/index.html">SkyeDocxMax</a>
+        <a href="../../founder/index.html">Founder Command</a>
+      </nav>
+    </header>
+
+    <div class="docx-grid">
+      <section class="docx-panel docx-hero" aria-labelledby="docx-title">
+        <div>
+          <div class="eyebrow">Local-first document bridge</div>
+          <h1 id="docx-title">SkyeVaultPro Docx App</h1>
+          <p>This route is the live SkyeVaultPro document room for moving browser-local vault work into SkyeDocxMax, then bringing the user back with a local receipt. It is local, offline-capable, exportable, and gated through the shared 0S lane.</p>
+        </div>
+
+        <div class="docx-kpis" aria-label="Docx bridge guarantees">
+          <div class="docx-kpi">
+            <strong>Local</strong>
+            <span>Draft intent, event receipt, and bridge state stay in browser storage unless the user exports them.</span>
+          </div>
+          <div class="docx-kpi">
+            <strong>Bridge</strong>
+            <span>SkyeDocxMax opens with source and return parameters tied back to SkyeVaultPro.</span>
+          </div>
+          <div class="docx-kpi">
+            <strong>Receipt</strong>
+            <span>Every create, launch, export, and closeout action writes a local telemetry receipt.</span>
+          </div>
+        </div>
+
+        <div class="docx-note">
+          No separate owner password is created here. Access remains under the shared FS27/SkyGate/Free99 session, and document mutation is explicitly local-first until the vault or user exports the receipt.
+        </div>
+      </section>
+
+      <section class="docx-panel" aria-labelledby="create-title">
+        <div class="eyebrow">Create / update / closeout</div>
+        <h2 id="create-title">Prepare a SkyeDocxMax vault document</h2>
+        <form id="docx-intake-form" class="docx-form">
+          <label>Document title
+            <input id="docx-title-input" name="title" type="text" autocomplete="off" value="SkyeVaultPro Working Document">
+          </label>
+          <label>Vault note
+            <textarea id="docx-note-input" name="note">Start in SkyeVaultPro, edit in SkyeDocxMax, return to the vault with a local receipt.</textarea>
+          </label>
+          <button class="docx-button" type="submit">Create local receipt</button>
+        </form>
+
+        <div class="docx-quick-actions" style="margin-top:14px;">
+          <button id="open-docx-button" class="docx-button" type="button">Open SkyeDocxMax</button>
+          <button id="export-receipt-button" class="docx-ghost" type="button">Export receipt</button>
+          <button id="clear-session-button" class="docx-ghost" type="button">Clear local session</button>
+        </div>
+
+        <div id="docx-receipt" class="docx-receipt" role="status" aria-live="polite">Loading local SkyeVaultPro Docx receipt...</div>
+        <div id="docx-event-list" class="docx-event-list" aria-label="Local receipt events"></div>
+      </section>
+    </div>
   </main>
+
   <script>
-    location.replace('/Marketing-Made-Easy/SkyeDocxMax/editor.html?source=skyevaultpro&ws_id=skyevaultpro&vault_mode=docx');
+    (() => {
+      const storageKey = 'skyevaultpro.docx.bridge.receipt.v1';
+      const returnTo = '/Free99/apps/skyevaultpro/apps/docx/index.html';
+      const editorBase = '/Marketing-Made-Easy/SkyeDocxMax/editor.html';
+      const elements = {
+        form: document.getElementById('docx-intake-form'),
+        title: document.getElementById('docx-title-input'),
+        note: document.getElementById('docx-note-input'),
+        open: document.getElementById('open-docx-button'),
+        export: document.getElementById('export-receipt-button'),
+        clear: document.getElementById('clear-session-button'),
+        receipt: document.getElementById('docx-receipt'),
+        events: document.getElementById('docx-event-list')
+      };
+
+      function readReceipt() {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey) || 'null') || null;
+        } catch {
+          return null;
+        }
+      }
+
+      function writeReceipt(next) {
+        localStorage.setItem(storageKey, JSON.stringify(next, null, 2));
+        renderReceipt(next);
+        return next;
+      }
+
+      function receiptBase(action) {
+        const existing = readReceipt();
+        const now = new Date().toISOString();
+        return {
+          schema: 'skyevaultpro.docx.local-bridge.receipt.v1',
+          app_id: 'skyevaultpro-docx',
+          app_name: 'SkyeVaultPro Docx App',
+          action,
+          created_at: existing?.created_at || now,
+          updated_at: now,
+          source: 'skyevaultpro',
+          target: 'SkyeDocxMax',
+          gate_lane: 'FS27/SkyGate/Free99 shared session',
+          local_first: true,
+          offline_boundary: true,
+          export_supported: true,
+          return_to: returnTo,
+          title: elements.title.value.trim() || 'SkyeVaultPro Working Document',
+          note: elements.note.value.trim(),
+          events: [...(existing?.events || []), { action, at: now }]
+        };
+      }
+
+      function renderReceipt(receipt) {
+        if (!receipt) {
+          elements.receipt.textContent = 'No local receipt yet. Create one, open SkyeDocxMax, or export a proof bundle.';
+          elements.events.innerHTML = '';
+          return;
+        }
+        elements.receipt.textContent = `${receipt.app_name} ${receipt.action} receipt saved locally at ${receipt.updated_at}. Title: ${receipt.title}. Return lane: ${receipt.return_to}.`;
+        elements.events.innerHTML = (receipt.events || []).slice(-5).reverse().map((event) => (
+          `<div class="docx-event"><strong>${event.action}</strong><span>${event.at}</span></div>`
+        )).join('');
+      }
+
+      function buildEditorUrl(receipt) {
+        const params = new URLSearchParams({
+          source: 'skyevaultpro-docx',
+          returnTo,
+          title: receipt.title,
+          vaultDocId: receipt.created_at.replace(/[^0-9]/g, '').slice(0, 14) || 'skyevaultpro-docx'
+        });
+        return `${editorBase}?${params.toString()}`;
+      }
+
+      elements.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        writeReceipt(receiptBase('created_or_updated'));
+      });
+
+      elements.open.addEventListener('click', () => {
+        const receipt = writeReceipt(receiptBase('opened_skyedocxmax_bridge'));
+        window.location.href = buildEditorUrl(receipt);
+      });
+
+      elements.export.addEventListener('click', () => {
+        const receipt = writeReceipt(receiptBase('exported_local_receipt'));
+        const blob = new Blob([JSON.stringify(receipt, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = `skyevaultpro-docx-receipt-${Date.now()}.json`;
+        document.body.append(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      elements.clear.addEventListener('click', () => {
+        const receipt = receiptBase('closed_out_local_session');
+        localStorage.removeItem(storageKey);
+        renderReceipt(receipt);
+      });
+
+      renderReceipt(readReceipt());
+    })();
   </script>
 </body>
 </html>

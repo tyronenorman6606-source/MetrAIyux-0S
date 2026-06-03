@@ -8,8 +8,10 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = path.resolve(new URL('..', import.meta.url).pathname);
 const scriptPath = fileURLToPath(import.meta.url);
 const autosyncDir = path.join(repoRoot, '.skyevault-out', 'autosync');
-const htmlOut = path.join(autosyncDir, 'FULL_17GB_REPO_DOWNLOAD.html');
-const privateJsonOut = path.join(autosyncDir, 'FULL_17GB_REPO_DOWNLOAD.json');
+const htmlOut = path.join(autosyncDir, 'CURRENT_REPO_BACKUP.html');
+const legacyHtmlOut = path.join(autosyncDir, 'FULL_17GB_REPO_DOWNLOAD.html');
+const privateJsonOut = path.join(autosyncDir, 'CURRENT_REPO_BACKUP.json');
+const legacyPrivateJsonOut = path.join(autosyncDir, 'FULL_17GB_REPO_DOWNLOAD.json');
 const publicStateOut = path.join(autosyncDir, 'owner-download-launcher.json');
 const pidFile = path.join(autosyncDir, 'download-launcher.pid');
 const logFile = path.join(autosyncDir, 'download-launcher.log');
@@ -29,18 +31,18 @@ function hasFlag(name) {
   return argv.includes(name);
 }
 
-function writeJson(file, value, mode = 0o600) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, { mode });
-  try { fs.chmodSync(file, mode); } catch {}
-}
-
 function readJson(file, fallback = null) {
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch {
     return fallback;
   }
+}
+
+function writeJson(file, value, mode = 0o600) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, { mode });
+  try { fs.chmodSync(file, mode); } catch {}
 }
 
 function readPid() {
@@ -64,24 +66,192 @@ function pidAlive(pid) {
   }
 }
 
-function latestFullReceipt() {
-  const override = argValue('--receipt', '');
-  if (override) return { receiptId: override, source: 'arg' };
-  const latest = readJson(path.join(autosyncDir, 'latest-full-repo-success.json'), null);
-  const summaries = latest?.fullRun?.childSummaries || [];
-  const artifact = summaries.find((item) => item.receiptId && Number(item.artifactBytes || 0) > 0)
-    || summaries.find((item) => item.receiptId);
-  return {
-    receiptId: artifact?.receiptId || '',
-    fileName: artifact?.fileName || '',
-    bytes: artifact?.artifactBytes || null,
-    sha256: artifact?.artifactSha256 || '',
-    source: 'latest-full-repo-success'
-  };
+function rel(file) {
+  return path.relative(repoRoot, file).split(path.sep).join('/');
 }
 
 function localUrl(port = 17687) {
+  return `http://127.0.0.1:${port}/CURRENT_REPO_BACKUP.html`;
+}
+
+function legacyLocalUrl(port = 17687) {
   return `http://127.0.0.1:${port}/FULL_17GB_REPO_DOWNLOAD.html`;
+}
+
+function currentRepoState(envFile = '.env') {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, 'tools', 'skyevault-autosync.mjs'),
+    'state',
+    `--env-file=${envFile}`
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 16
+  });
+  if (result.status !== 0) {
+    return {
+      ok: false,
+      status: result.status,
+      error: (result.stderr || result.stdout || 'current repo state scan failed').trim().slice(-2000)
+    };
+  }
+  try {
+    const parsed = JSON.parse(result.stdout || '{}');
+    return { ok: Boolean(parsed.ok), state: parsed.state || null };
+  } catch (error) {
+    return { ok: false, error: `current repo state JSON parse failed: ${error.message}` };
+  }
+}
+
+function livingMirrorStatus(envFile = '.env') {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, 'tools', 'skyevault-living-repo-mirror.mjs'),
+    'status',
+    `--env-file=${envFile}`
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 12
+  });
+  try {
+    const parsed = JSON.parse(result.stdout || '{}');
+    return { ok: result.status === 0 && Boolean(parsed.ok), status: result.status, ...parsed };
+  } catch {
+    return { ok: false, status: result.status, error: (result.stderr || result.stdout || 'living mirror status unavailable').trim().slice(-2000) };
+  }
+}
+
+function latestPrimarySuccess() {
+  return readJson(path.join(autosyncDir, 'latest-primary-success.json'), null);
+}
+
+function ownerMasterKeyMaterial(mirrorRoot = '') {
+  const fromEnv = String(process.env.SKYEVAULT_LIVING_MIRROR_MASTER_KEY || '').trim();
+  if (fromEnv) {
+    const keyBase64 = /^[0-9a-f]{64}$/i.test(fromEnv) ? Buffer.from(fromEnv, 'hex').toString('base64') : fromEnv;
+    return { source: 'env:SKYEVAULT_LIVING_MIRROR_MASTER_KEY', keyBase64 };
+  }
+  const keyPath = path.join(mirrorRoot || path.join(repoRoot, '.skyevault-out', 'living-mirror', 'metraiyux-0s-owner', 'MetrAIyux-0S'), 'private', 'owner-master-key.json');
+  const key = readJson(keyPath, null);
+  if (!key?.keyBase64) throw new Error(`Owner restore key is missing: ${keyPath}`);
+  return { source: rel(keyPath), keyBase64: key.keyBase64 };
+}
+
+function currentRestoreKit(state, envFile = '.env') {
+  if (!state.mirrorState?.current) throw new Error(state.mirrorState?.staleReason || 'living mirror is not current yet');
+  const mirror = state.mirrorState.mirror || {};
+  const ownerKey = ownerMasterKeyMaterial(mirror.mirrorRoot || '');
+  return {
+    ok: true,
+    schema: 'skyevault.mutable-current-restore-kit.v1',
+    createdAt: new Date().toISOString(),
+    model: 'mutable-living-current-mirror',
+    ownerContract: 'daemon updates the current mirror directly; this kit points at the already-current restore source, not a rebuilt tar export',
+    envFile,
+    workspaceId: 'metraiyux-0s-owner',
+    repoId: 'MetrAIyux-0S',
+    digest: mirror.digest || '',
+    currentAsOf: mirror.generatedAt || state.mirrorState.currentAsOf || '',
+    entryCount: mirror.entryCount || 0,
+    fileCount: mirror.fileCount || 0,
+    totalBytes: mirror.totalBytes || 0,
+    remote: mirror.remote || null,
+    privateManifestKey: mirror.remote?.privateManifestKey || '',
+    publicManifestKey: mirror.remote?.manifestKey || '',
+    latestReceipt: mirror.latestReceipt || null,
+    ownerUnlock: {
+      algorithm: 'aes-256-gcm',
+      masterKeySource: ownerKey.source,
+      masterKeyBase64: ownerKey.keyBase64,
+      warning: 'Private owner restore material. Do not commit, print, or share.'
+    },
+    restoreCommand: 'npm run vault:mirror:restore -- --env-file=.env --kit-file=/path/to/CURRENT_REPO_BACKUP.json --out=/path/to/repaired-repo --force'
+  };
+}
+
+function writeCurrentRestoreKit(state, envFile = '.env') {
+  const kit = currentRestoreKit(state, envFile);
+  writeJson(privateJsonOut, kit);
+  writeJson(legacyPrivateJsonOut, {
+    ok: false,
+    replacedBy: rel(privateJsonOut),
+    reason: 'Legacy immutable full artifact retired. Use the mutable current restore kit.'
+  });
+  return {
+    ok: true,
+    schema: 'skyevault.mutable-current-restore-kit.public.v1',
+    createdAt: kit.createdAt,
+    model: kit.model,
+    digest: kit.digest,
+    currentAsOf: kit.currentAsOf,
+    fileCount: kit.fileCount,
+    totalBytes: kit.totalBytes,
+    privateKitPath: rel(privateJsonOut),
+    restoreCommand: kit.restoreCommand
+  };
+}
+
+function mirrorState(envFile = '.env') {
+  const repo = currentRepoState(envFile);
+  const mirror = livingMirrorStatus(envFile);
+  const primary = latestPrimarySuccess();
+  const currentDigest = repo.state?.digest || '';
+  const primaryDigest = primary?.state?.digest || '';
+  const plannedModes = Array.isArray(primary?.plannedModes) ? primary.plannedModes : [];
+  const fullCurrentIndexReady = Boolean(mirror.manifest?.fullCurrentIndexReady);
+  const current = Boolean(mirror.ok && fullCurrentIndexReady);
+  let staleReason = '';
+  if (!mirror.ok) staleReason = mirror.error || 'living mirror has not been seeded yet';
+  else if (!fullCurrentIndexReady) staleReason = 'living mirror is not a full current index yet; the seeding scan must finish first';
+  return {
+    ok: Boolean(mirror.ok),
+    current,
+    staleReason,
+    currentAsOf: mirror.manifest?.generatedAt || '',
+    recoveryWindowSeconds: Number(process.env.SKYEVAULT_AUTOSYNC_INTERVAL_SECONDS || 600),
+    repo: repo.ok ? {
+      digest: currentDigest,
+      branch: repo.state?.branch || '',
+      shortHead: repo.state?.shortHead || '',
+      dirty: Boolean(repo.state?.dirty),
+      statusCounts: repo.state?.statusCounts || null,
+      changedFileFingerprintCount: repo.state?.changedFileFingerprintCount || 0
+    } : {
+      ok: false,
+      error: repo.error || 'repo state unavailable'
+    },
+    primary: primary ? {
+      recordedAt: primary.recordedAt || '',
+      digest: primaryDigest,
+      plannedModes,
+      receiptPath: rel(path.join(autosyncDir, 'latest-primary-success.json'))
+    } : null,
+    mirror: mirror.ok ? {
+      digest: mirror.manifest?.digest || '',
+      generatedAt: mirror.manifest?.generatedAt || '',
+      mode: mirror.manifest?.mode || '',
+      fullCurrentIndexReady,
+      adoptedBasePresent: Boolean(mirror.manifest?.adoptedBasePresent),
+      entryCount: mirror.manifest?.entryCount || 0,
+      fileCount: mirror.manifest?.fileCount || 0,
+      totalBytes: mirror.manifest?.totalBytes || 0,
+      remote: mirror.manifest?.remote || null,
+      latestReceipt: mirror.latestReceipt || null,
+      mirrorRoot: mirror.mirrorRoot || ''
+    } : {
+      ok: false,
+      error: mirror.error || 'mirror unavailable'
+    }
+  };
+}
+
+function handoffCurrentMirror(envFile = '.env', port = 17687) {
+  const state = statusSnapshot(port, envFile);
+  const kit = writeCurrentRestoreKit(state, envFile);
+  state.restoreKit = kit;
+  writeHtmlFiles(state);
+  writeJson(publicStateOut, state);
+  return { ok: true, kit, state };
 }
 
 async function headStatus(url) {
@@ -97,74 +267,92 @@ async function headStatus(url) {
   }
 }
 
-function safeDownloadSummary() {
-  const receipt = readJson(privateJsonOut, null);
-  const downloads = Array.isArray(receipt?.downloads) ? receipt.downloads : [];
-  return {
-    mintedAt: receipt?.createdAt || '',
-    expiresInSeconds: receipt?.expiresInSeconds || null,
-    downloads: downloads.map((item) => ({
-      label: item.label || '',
-      receiptId: item.receiptId || '',
-      ok: Boolean(item.ok),
-      status: item.status || null,
-      fileName: item.fileName || item.requestedFileName || '',
-      fileSize: item.fileSize || null,
-      expiresAt: item.expiresAt || '',
-      hasDownloadUrl: Boolean(item.downloadUrl)
-    }))
-  };
+function htmlEscape(value) {
+  return String(value ?? '').replace(/[<>&"]/g, (char) => ({
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    '"': '&quot;'
+  }[char]));
 }
 
-function signedDownloadNeedsRefresh(summary, windowMs = 5 * 60 * 1000) {
-  const downloads = Array.isArray(summary?.downloads) ? summary.downloads : [];
-  if (!downloads.length) return true;
-  return downloads.some((item) => {
-    if (!item.ok || !item.hasDownloadUrl) return true;
-    const expiresAt = Date.parse(item.expiresAt || '');
-    if (!Number.isFinite(expiresAt)) return true;
-    return expiresAt <= Date.now() + windowMs;
-  });
-}
-
-function mintLatestDownload(envFile, receiptId) {
-  const args = [
-    path.join(repoRoot, 'tools', 'skyevault-mint-receipt-downloads.mjs'),
-    `--env-file=${envFile}`,
-    `--receipt=${receiptId}`,
-    `--html-out=${htmlOut}`,
-    `--out=${privateJsonOut}`,
-    '--quiet'
-  ];
-  const result = spawnSync(process.execPath, args, {
-    cwd: repoRoot,
-    encoding: 'utf8'
-  });
-  if (result.status !== 0) {
-    throw new Error((result.stderr || result.stdout || 'Could not mint SkyeVault download link.').trim());
+function formatBytes(value) {
+  const bytes = Number(value || 0);
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = bytes;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit += 1;
   }
-  return JSON.parse(result.stdout || '{}');
+  return `${size.toFixed(unit ? 2 : 0)} ${units[unit]}`;
 }
 
-function ensureFreshSignedDownload(envFile, options = {}) {
-  const receipt = latestFullReceipt();
-  if (!receipt.receiptId) throw new Error('No latest full-repo receipt was found.');
-  const before = safeDownloadSummary();
-  if (!options.force && !signedDownloadNeedsRefresh(before)) {
-    return { refreshed: false, receipt, signedDownload: before };
-  }
-  const mint = mintLatestDownload(envFile, receipt.receiptId);
-  return {
-    refreshed: true,
-    receipt,
-    signedDownload: safeDownloadSummary(),
-    mint: {
-      ok: Boolean(mint.ok),
-      createdAt: mint.createdAt || '',
-      expiresInSeconds: mint.expiresInSeconds || null,
-      downloads: mint.downloads || []
-    }
-  };
+function renderHtml(state) {
+  const mirror = state.mirrorState?.mirror || {};
+  const restoreKit = state.restoreKit || null;
+  const ready = Boolean(state.mirrorState?.current);
+  const title = ready ? 'Mutable current repo backup is ready' : 'Current repo backup is seeding';
+  const statusText = ready ? 'READY' : 'SEEDING';
+  const restoreCommand = restoreKit?.restoreCommand || 'Download CURRENT_REPO_BACKUP.json first.';
+  const downloadButton = '<a class="button primary" href="/CURRENT_REPO_BACKUP.json" download="CURRENT_REPO_BACKUP.json">Download current restore kit</a>';
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SkyeVault Current Repo Backup</title>
+  <style>
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #eff7ff; background: #07110f; }
+    main { max-width: 920px; margin: 0 auto; padding: 40px 20px; }
+    h1 { margin: 0 0 12px; font-size: clamp(28px, 5vw, 48px); line-height: 1.05; letter-spacing: 0; }
+    p { line-height: 1.6; color: #b9c9c4; }
+    .status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid #46645c; border-radius: 6px; color: #d9f5ec; background: #10231f; font-weight: 800; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 24px 0; }
+    .cell { border: 1px solid #223d36; border-radius: 8px; padding: 14px; background: #0b1815; }
+    .label { display: block; color: #84a39a; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .value { display: block; margin-top: 6px; font-size: 16px; overflow-wrap: anywhere; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 14px; border-radius: 6px; border: 1px solid #d6b95f; color: #f7e6a0; text-decoration: none; font-weight: 800; margin: 6px 8px 6px 0; }
+    .primary { background: #f0ca62; color: #08110f; }
+    code { background: #10231f; border: 1px solid #223d36; border-radius: 5px; padding: 2px 5px; }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="status">${htmlEscape(statusText)}</span>
+    <h1>${htmlEscape(title)}</h1>
+    <p>This page is tied to the mutable living current mirror. The old immutable full-artifact/export lane is retired.</p>
+    ${ready ? `<p>The daemon has a full current index as of ${htmlEscape(state.mirrorState?.currentAsOf || 'the latest completed mirror')}. The restore kit points at the current cloud mirror immediately; it does not mint or rebuild a tar export.</p>` : `<p>${htmlEscape(state.mirrorState?.staleReason || 'The full-current mirror seed has not completed yet.')}</p>`}
+    <p>
+      ${ready ? downloadButton : '<a class="button primary" href="/status.json">Check current mirror status</a>'}
+      <a class="button" href="/status.json">Status JSON</a>
+    </p>
+    <div class="grid">
+      <div class="cell"><span class="label">Mirror mode</span><span class="value">${htmlEscape(mirror.mode || 'none')}</span></div>
+      <div class="cell"><span class="label">Files</span><span class="value">${htmlEscape(mirror.fileCount ?? 0)}</span></div>
+      <div class="cell"><span class="label">Bytes indexed</span><span class="value">${htmlEscape(formatBytes(mirror.totalBytes || 0))}</span></div>
+      <div class="cell"><span class="label">Generated</span><span class="value">${htmlEscape(mirror.generatedAt || 'not yet')}</span></div>
+      <div class="cell"><span class="label">Recovery window</span><span class="value">${htmlEscape(state.mirrorState?.recoveryWindowSeconds || 600)} seconds</span></div>
+      <div class="cell"><span class="label">Mirror digest</span><span class="value"><code>${htmlEscape(String(mirror.digest || '').slice(0, 24) || 'none')}</code></span></div>
+      <div class="cell"><span class="label">Restore kit</span><span class="value">${htmlEscape(restoreKit?.createdAt || 'not written')}</span></div>
+      <div class="cell"><span class="label">Restore command</span><span class="value"><code>${htmlEscape(restoreCommand)}</code></span></div>
+    </div>
+  </main>
+</body>
+</html>
+`;
+}
+
+function writeHtmlFiles(state) {
+  fs.mkdirSync(autosyncDir, { recursive: true });
+  fs.writeFileSync(htmlOut, renderHtml(state), { mode: 0o600 });
+  fs.writeFileSync(legacyHtmlOut, `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/CURRENT_REPO_BACKUP.html"><title>Moved</title></head>
+<body><p>The stale full artifact page has moved to <a href="/CURRENT_REPO_BACKUP.html">CURRENT_REPO_BACKUP.html</a>.</p></body>
+</html>
+`, { mode: 0o600 });
 }
 
 function startDetachedServer(port, envFile) {
@@ -185,6 +373,7 @@ function startDetachedServer(port, envFile) {
     command: `node ${path.relative(repoRoot, scriptPath)} serve --port=${port} --env-file=${envFile}`,
     port,
     url: localUrl(port),
+    legacyUrl: legacyLocalUrl(port),
     directory: path.relative(repoRoot, autosyncDir),
     logFile: path.relative(repoRoot, logFile)
   };
@@ -199,6 +388,65 @@ function contentType(file) {
   return 'application/octet-stream';
 }
 
+function writeErrorResponse(response, error, status = 409, html = false) {
+  if (html) {
+    const body = `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SkyeVault Backup Not Ready</title></head>
+<body><main>
+<h1>SkyeVault current backup is not ready</h1>
+<p>${htmlEscape(error.message || error)}</p>
+<p>Use <code>npm run vault:source:status -- --env-file=.env</code> to watch the full-current mirror seed.</p>
+</main></body>
+</html>
+`;
+    response.writeHead(status, {
+      'content-type': 'text/html; charset=utf-8',
+      'content-length': Buffer.byteLength(body),
+      'cache-control': 'no-store'
+    });
+    response.end(body);
+    return;
+  }
+  const body = `${JSON.stringify({ ok: false, error: error.message || String(error) }, null, 2)}\n`;
+  response.writeHead(status, {
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': Buffer.byteLength(body),
+    'cache-control': 'no-store'
+  });
+  response.end(body);
+}
+
+function sendJson(response, payload, status = 200) {
+  const body = `${JSON.stringify(payload, null, 2)}\n`;
+  response.writeHead(status, {
+    'content-type': 'application/json; charset=utf-8',
+    'content-length': Buffer.byteLength(body),
+    'cache-control': 'no-store'
+  });
+  response.end(body);
+}
+
+function serveFile(response, file, method = 'GET') {
+  fs.stat(file, (statError, stat) => {
+    if (statError || !stat.isFile()) {
+      response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
+      response.end('Not found');
+      return;
+    }
+    response.writeHead(200, {
+      'content-type': contentType(file),
+      'content-length': stat.size,
+      'cache-control': 'no-store'
+    });
+    if (method === 'HEAD') {
+      response.end();
+      return;
+    }
+    fs.createReadStream(file).pipe(response);
+  });
+}
+
 function serve(port, envFile = '.env') {
   fs.mkdirSync(autosyncDir, { recursive: true });
   const server = http.createServer(async (request, response) => {
@@ -211,45 +459,45 @@ function serve(port, envFile = '.env') {
       response.end('Bad request');
       return;
     }
-    if (decoded === '/refresh' || decoded === '/refresh.json') {
+    if (decoded === '/' || decoded === '/FULL_17GB_REPO_DOWNLOAD.html') {
+      response.writeHead(303, { location: '/CURRENT_REPO_BACKUP.html', 'cache-control': 'no-store' });
+      response.end();
+      return;
+    }
+    if (decoded === '/status.json') {
+      sendJson(response, await status(port, envFile));
+      return;
+    }
+    if (decoded === '/refresh' || decoded === '/refresh.json' || decoded === '/export' || decoded === '/export.json') {
       try {
-        const fresh = ensureFreshSignedDownload(envFile, { force: true });
-        const state = await status(port);
-        const payload = { ok: true, refreshed: true, fresh, state };
+        const payload = handoffCurrentMirror(envFile, port);
+        payload.deprecatedExportEndpoint = decoded.includes('export');
         if (decoded.endsWith('.json') || (request.headers.accept || '').includes('application/json')) {
-          const body = `${JSON.stringify(payload, null, 2)}\n`;
-          response.writeHead(200, {
-            'content-type': 'application/json; charset=utf-8',
-            'content-length': Buffer.byteLength(body),
-            'cache-control': 'no-store'
-          });
-          response.end(body);
+          sendJson(response, payload);
           return;
         }
-        response.writeHead(303, {
-          location: '/FULL_17GB_REPO_DOWNLOAD.html',
-          'cache-control': 'no-store'
-        });
+        response.writeHead(303, { location: '/CURRENT_REPO_BACKUP.html', 'cache-control': 'no-store' });
         response.end();
         return;
       } catch (error) {
-        const body = `${JSON.stringify({ ok: false, error: error.message }, null, 2)}\n`;
-        response.writeHead(500, {
-          'content-type': 'application/json; charset=utf-8',
-          'content-length': Buffer.byteLength(body),
-          'cache-control': 'no-store'
-        });
-        response.end(body);
+        writeErrorResponse(response, error, 409, !decoded.endsWith('.json'));
         return;
       }
     }
-    if (decoded === '/') decoded = '/FULL_17GB_REPO_DOWNLOAD.html';
-    if (decoded === '/FULL_17GB_REPO_DOWNLOAD.html') {
+    if (decoded === '/CURRENT_REPO_BACKUP.json') {
       try {
-        ensureFreshSignedDownload(envFile);
+        statusSnapshot(port, envFile);
+        serveFile(response, privateJsonOut, request.method);
       } catch (error) {
-        console.error(`[owner-download-launcher] refresh failed: ${error.message}`);
+        writeErrorResponse(response, error, 409, false);
       }
+      return;
+    }
+    if (decoded === '/CURRENT_REPO_BACKUP.html') {
+      const state = statusSnapshot(port, envFile);
+      writeHtmlFiles(state);
+      serveFile(response, htmlOut, request.method);
+      return;
     }
     const target = path.resolve(autosyncDir, `.${decoded}`);
     const root = `${path.resolve(autosyncDir)}${path.sep}`;
@@ -258,72 +506,59 @@ function serve(port, envFile = '.env') {
       response.end('Forbidden');
       return;
     }
-    fs.stat(target, (statError, stat) => {
-      if (statError || !stat.isFile()) {
-        response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
-        response.end('Not found');
-        return;
-      }
-      response.writeHead(200, {
-        'content-type': contentType(target),
-        'content-length': stat.size,
-        'cache-control': 'no-store'
-      });
-      if (request.method === 'HEAD') {
-        response.end();
-        return;
-      }
-      fs.createReadStream(target).pipe(response);
-    });
+    serveFile(response, target, request.method);
   });
   server.listen(port, '127.0.0.1', () => {
-    console.log(`SkyeVault owner download launcher listening at ${localUrl(port)}`);
+    console.log(`SkyeVault owner current backup launcher listening at ${localUrl(port)}`);
   });
 }
 
-async function status(port = 17687) {
+function statusSnapshot(port = 17687, envFile = '.env') {
   const pidRecord = readPid();
   const running = pidAlive(Number(pidRecord?.pid || 0));
-  const receipt = latestFullReceipt();
-  const download = safeDownloadSummary();
-  const url = localUrl(port);
-  const http = running ? await headStatus(url) : { ok: false, status: 0 };
   const state = {
-    ok: running && http.ok,
-    schema: 'skyevault.owner-download-launcher-status.v1',
+    ok: true,
+    schema: 'skyevault.owner-current-backup-launcher-status.v1',
     checkedAt: new Date().toISOString(),
     running,
     pid: running ? Number(pidRecord.pid) : null,
     port,
-    url,
-    htmlOut: path.relative(repoRoot, htmlOut),
-    privateReceipt: path.relative(repoRoot, privateJsonOut),
-    publicState: path.relative(repoRoot, publicStateOut),
-    latestFullReceipt: receipt,
-    signedDownload: download,
-    http
+    url: localUrl(port),
+    legacyUrl: legacyLocalUrl(port),
+    htmlOut: rel(htmlOut),
+    privateReceipt: rel(privateJsonOut),
+    publicState: rel(publicStateOut),
+    model: 'mutable living current mirror; no owner-facing delta packs; no tar export mint on download',
+    mirrorState: mirrorState(envFile)
   };
+  if (state.mirrorState.current) {
+    state.restoreKit = writeCurrentRestoreKit(state, envFile);
+  } else {
+    writeJson(privateJsonOut, {
+      ok: false,
+      schema: 'skyevault.mutable-current-restore-kit.v1',
+      error: state.mirrorState.staleReason || 'living mirror is not current yet'
+    });
+  }
+  writeHtmlFiles(state);
   writeJson(publicStateOut, state);
   return state;
+}
+
+async function status(port = 17687, envFile = '.env') {
+  const snapshot = statusSnapshot(port, envFile);
+  snapshot.http = snapshot.running ? await headStatus(snapshot.url) : { ok: false, status: 0 };
+  writeJson(publicStateOut, snapshot);
+  return snapshot;
 }
 
 async function start() {
   const port = Number(argValue('--port', '17687')) || 17687;
   const envFile = argValue('--env-file', '.env') || '.env';
-  const receipt = latestFullReceipt();
-  if (!receipt.receiptId) throw new Error('No latest full-repo receipt was found.');
-  let mint = null;
-  if (!hasFlag('--no-mint')) mint = mintLatestDownload(envFile, receipt.receiptId);
   const server = startDetachedServer(port, envFile);
   await new Promise((resolve) => setTimeout(resolve, 250));
-  const state = await status(port);
+  const state = await status(port, envFile);
   state.started = server;
-  state.mint = mint ? {
-    ok: Boolean(mint.ok),
-    createdAt: mint.createdAt || '',
-    expiresInSeconds: mint.expiresInSeconds || null,
-    downloads: mint.downloads || []
-  } : null;
   writeJson(publicStateOut, state);
   return state;
 }
@@ -333,6 +568,7 @@ async function stop() {
   const pid = Number(pidRecord?.pid || 0);
   const wasRunning = pidAlive(pid);
   if (wasRunning) process.kill(pid, 'SIGTERM');
+  try { fs.unlinkSync(pidFile); } catch {}
   const state = {
     ok: true,
     stoppedAt: new Date().toISOString(),
@@ -351,12 +587,27 @@ if (command === 'serve') {
     process.exit(1);
   });
 } else if (command === 'status') {
-  status(Number(argValue('--port', '17687')) || 17687).then((state) => console.log(JSON.stringify(state, null, 2))).catch((error) => {
+  status(Number(argValue('--port', '17687')) || 17687, argValue('--env-file', '.env') || '.env').then((state) => console.log(JSON.stringify(state, null, 2))).catch((error) => {
     console.error(error.stack || error.message);
     process.exit(1);
   });
 } else if (command === 'stop') {
   stop().then((state) => console.log(JSON.stringify(state, null, 2))).catch((error) => {
+    console.error(error.stack || error.message);
+    process.exit(1);
+  });
+} else if (command === 'export') {
+  Promise.resolve(handoffCurrentMirror(argValue('--env-file', '.env') || '.env', Number(argValue('--port', '17687')) || 17687)).then((payload) => {
+    payload.deprecatedCommand = 'export now returns the mutable current restore kit; it does not mint a tar artifact';
+    console.log(JSON.stringify(payload, null, 2));
+  }).catch((error) => {
+    console.error(error.stack || error.message);
+    process.exit(1);
+  });
+} else if (command === 'handoff') {
+  Promise.resolve(handoffCurrentMirror(argValue('--env-file', '.env') || '.env', Number(argValue('--port', '17687')) || 17687)).then((payload) => {
+    console.log(JSON.stringify(payload, null, 2));
+  }).catch((error) => {
     console.error(error.stack || error.message);
     process.exit(1);
   });

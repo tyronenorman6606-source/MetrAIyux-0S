@@ -84,32 +84,38 @@ function runAgentRoundTripProof(packageCli) {
     fs.writeFileSync(path.join(repo, 'nested', 'b.txt'), 'beta\n');
     step('git add', ['git', 'add', '.'], { cwd: repo });
     step('git commit', ['git', 'commit', '-q', '-m', 'init'], { cwd: repo });
+    fs.writeFileSync(path.join(repo, 'untracked.md'), 'untracked current file\n');
     step('agent init', [process.execPath, packageCli, 'init', '--workspace=proof-client', `--repo=${repo}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
-    const full = step('agent sync full baseline', [process.execPath, packageCli, 'sync', '--workspace=proof-client', `--repo=${repo}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
+    const first = step('agent seed mutable current mirror', [process.execPath, packageCli, 'sync', '--workspace=proof-client', `--repo=${repo}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
     fs.writeFileSync(path.join(repo, 'a.txt'), 'alpha changed\n');
     fs.rmSync(path.join(repo, 'nested', 'b.txt'), { force: true });
     fs.writeFileSync(path.join(repo, 'c.txt'), 'gamma\n');
-    const delta = step('agent sync delta', [process.execPath, packageCli, 'sync', '--workspace=proof-client', `--repo=${repo}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
-    const fullReceipt = JSON.parse(full.stdout);
-    const deltaReceipt = JSON.parse(delta.stdout);
-    const verifyFull = step('agent verify full', [process.execPath, packageCli, 'verify', `--receipt=${fullReceipt.receiptPath}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
-    const verifyDelta = step('agent verify delta', [process.execPath, packageCli, 'verify', `--receipt=${deltaReceipt.receiptPath}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
+    const second = step('agent update same mutable current mirror', [process.execPath, packageCli, 'sync', '--workspace=proof-client', `--repo=${repo}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
+    const firstReceipt = JSON.parse(first.stdout);
+    const secondReceipt = JSON.parse(second.stdout);
+    const verifyFirst = step('agent verify current mirror after seed', [process.execPath, packageCli, 'verify', `--receipt=${firstReceipt.receiptPath}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
+    const verifySecond = step('agent verify current mirror after update', [process.execPath, packageCli, 'verify', `--receipt=${secondReceipt.receiptPath}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
     const restoreRoot = path.join(tempRoot, 'restore');
-    const restore = step('agent restore full plus delta', [process.execPath, packageCli, 'restore', `--receipt=${fullReceipt.receiptPath}`, `--delta-receipts=${deltaReceipt.receiptPath}`, `--out=${restoreRoot}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
+    const restore = step('agent restore current mirror', [process.execPath, packageCli, 'restore', `--receipt=${secondReceipt.receiptPath}`, `--out=${restoreRoot}`, '--passphrase-env=SKYEVAULT_AGENT_TEST_PASSPHRASE', '--json']);
     const restoredA = fs.readFileSync(path.join(restoreRoot, 'a.txt'), 'utf8');
     const restoredC = fs.readFileSync(path.join(restoreRoot, 'c.txt'), 'utf8');
+    const restoredUntracked = fs.readFileSync(path.join(restoreRoot, 'untracked.md'), 'utf8');
     const tombstoneGone = !fs.existsSync(path.join(restoreRoot, 'nested', 'b.txt'));
-    if (restoredA !== 'alpha changed\n' || restoredC !== 'gamma\n' || !tombstoneGone) throw new Error('restored repo content did not match expected delta state');
+    const gitHeadRestored = fs.existsSync(path.join(restoreRoot, '.git', 'HEAD'));
+    if (restoredA !== 'alpha changed\n' || restoredC !== 'gamma\n' || restoredUntracked !== 'untracked current file\n' || !tombstoneGone || !gitHeadRestored) throw new Error('restored repo content did not match expected current mirror state');
     const summary = {
       ok: true,
-      full: { kind: fullReceipt.kind, receiptPath: fullReceipt.receiptPath },
-      delta: { kind: deltaReceipt.kind, changedFileCount: deltaReceipt.changedFileCount, tombstoneCount: deltaReceipt.tombstoneCount, receiptPath: deltaReceipt.receiptPath },
-      verifyFull: JSON.parse(verifyFull.stdout),
-      verifyDelta: JSON.parse(verifyDelta.stdout),
-      restore: JSON.parse(restore.stdout)
+      first: { kind: firstReceipt.kind, action: firstReceipt.action, receiptPath: firstReceipt.receiptPath, manifestDigest: firstReceipt.manifestDigest },
+      second: { kind: secondReceipt.kind, action: secondReceipt.action, changedFileCount: secondReceipt.changedFileCount, tombstoneCount: secondReceipt.tombstoneCount, receiptPath: secondReceipt.receiptPath, manifestDigest: secondReceipt.manifestDigest },
+      sameCurrentReceipt: firstReceipt.receiptPath === secondReceipt.receiptPath,
+      verifyFirst: JSON.parse(verifyFirst.stdout),
+      verifySecond: JSON.parse(verifySecond.stdout),
+      restore: JSON.parse(restore.stdout),
+      untrackedCurrentRestored: true,
+      gitHeadRestored
     };
     return {
-      name: 'agent baseline delta restore round trip',
+      name: 'agent mutable current mirror restore round trip',
       ok: true,
       status: 0,
       durationMs: Date.now() - started,
@@ -118,7 +124,7 @@ function runAgentRoundTripProof(packageCli) {
     };
   } catch (error) {
     return {
-      name: 'agent baseline delta restore round trip',
+      name: 'agent mutable current mirror restore round trip',
       ok: false,
       status: 1,
       durationMs: Date.now() - started,
@@ -306,11 +312,19 @@ const checks = [];
 const commands = [];
 
 commands.push(run('package release', ['npm', 'run', 'vault:agent:package']));
+commands.push(run('package release deterministic rerun', ['npm', 'run', 'vault:agent:package']));
 
 const packageCli = path.join(repoRoot, 'packages', 'skyevault-agent', 'bin', 'skyevault-agent.mjs');
 commands.push(run('agent cli syntax', [process.execPath, '--check', packageCli]));
+commands.push(run('agent help', [process.execPath, packageCli, '--help']));
+commands.push(run('agent version', [process.execPath, packageCli, '--version']));
 commands.push(run('agent doctor', [process.execPath, packageCli, 'doctor', '--json']));
 commands.push(run('release archive listing', ['tar', '-tzf', path.join(repoRoot, 'metraiyux_0s_site', 'downloads', 'skyevault-agent', 'releases', 'latest', 'skyevault-agent-latest.tar.gz')]));
+commands.push(run('SkyePay paid vault webhook provisioning proof', [
+  process.execPath,
+  '--test',
+  path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'tests', 'skyepay-paid-vault-webhook.test.mjs')
+]));
 
 const snapshotOut = path.join(os.tmpdir(), `skyevault-agent-proof-${Date.now()}`);
 commands.push(run('agent snapshot proof', [
@@ -335,6 +349,7 @@ const latestArchivePath = path.join(repoRoot, 'metraiyux_0s_site', 'downloads', 
 const installPagePath = path.join(repoRoot, 'metraiyux_0s_site', 'skye-vault-os', 'agent', 'index.html');
 const publicAgentPagePath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'skyevault-agent.html');
 const publicAgentAssetPath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'public', 'skyevault-agent.html');
+const packageJsonPath = path.join(repoRoot, 'packages', 'skyevault-agent', 'package.json');
 const skyepayCatalogPath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayCatalog.js');
 const skyepaySecurityPath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepaySecurity.js');
 const skyepayProvisioningPath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'netlify', 'functions', '_lib', 'skyepayVaultProvisioning.js');
@@ -343,6 +358,7 @@ const deployScriptPath = path.join(repoRoot, 'scripts', 'deploy-0s-worker.mjs');
 const packageReceiptPath = path.join(repoRoot, 'test-artifacts', 'skyevault-agent-package', 'latest.json');
 
 const manifest = fs.existsSync(latestManifestPath) ? readJson(latestManifestPath) : null;
+const agentPackageJson = fs.existsSync(packageJsonPath) ? readJson(packageJsonPath) : null;
 const archiveSha = fs.existsSync(latestArchivePath) ? await sha256File(latestArchivePath) : '';
 const page = fs.existsSync(installPagePath) ? read(installPagePath) : '';
 const publicAgentPage = fs.existsSync(publicAgentPagePath) ? read(publicAgentPagePath) : '';
@@ -358,9 +374,33 @@ const packageReceipt = fs.existsSync(packageReceiptPath) ? readJson(packageRecei
 checks.push(check(fs.existsSync(latestArchivePath), 'download archive exists', { file: rel(latestArchivePath) }));
 checks.push(check(manifest?.ok === true, 'release manifest exists and is ok', { file: rel(latestManifestPath) }));
 checks.push(check(archiveSha && archiveSha === manifest?.release?.latestSha256, 'latest archive sha matches manifest', { archiveSha }));
-checks.push(check(page.includes('SkyeVault Agent Install Center'), 'install center page exists'));
-checks.push(check(publicAgentPage.includes('SkyeVault Agent') && publicAgentPage.includes('agentCheckoutForm') && publicAgentPage.includes('/skyepay/checkout'), 'public buyer page exists and opens SkyePay checkout'));
-checks.push(check(publicAgentAsset.includes('SkyeVault Agent') && publicAgentAsset.includes('skyevault-pro-access'), 'public buyer page is staged in FS27 public assets'));
+const versionStdout = String(commands.find((item) => item.name === 'agent version')?.stdout || '').trim();
+checks.push(check(
+  agentPackageJson?.version
+    && manifest?.package?.version === agentPackageJson.version
+    && manifest?.release?.id === `v${agentPackageJson.version}`
+    && versionStdout === agentPackageJson.version,
+  'agent package, release manifest, archive id, and CLI version are aligned',
+  {
+    packageVersion: agentPackageJson?.version || '',
+    manifestVersion: manifest?.package?.version || '',
+    releaseId: manifest?.release?.id || '',
+    cliVersion: versionStdout
+  }
+));
+let firstPackageSha = '';
+let secondPackageSha = '';
+try {
+  firstPackageSha = JSON.parse(commands.find((item) => item.name === 'package release')?.stdout?.match(/\{[\s\S]*\}\s*$/)?.[0] || '{}')?.archive?.latestSha256 || '';
+  secondPackageSha = JSON.parse(commands.find((item) => item.name === 'package release deterministic rerun')?.stdout?.match(/\{[\s\S]*\}\s*$/)?.[0] || '{}')?.archive?.latestSha256 || '';
+} catch {}
+checks.push(check(firstPackageSha && firstPackageSha === secondPackageSha && secondPackageSha === archiveSha, 'agent release archive is reproducible across repeated packaging', {
+  firstPackageSha,
+  secondPackageSha
+}));
+checks.push(check(page.includes('Reape0r: the Autonomous Cloud Repo Mirror'), 'install center page exists'));
+checks.push(check(publicAgentPage.includes('Reape0r') && publicAgentPage.includes('agentCheckoutForm') && publicAgentPage.includes('/skyepay/checkout'), 'public buyer page exists and opens SkyePay checkout'));
+checks.push(check(publicAgentAsset.includes('Reape0r') && publicAgentAsset.includes('skyevault-pro-access'), 'public buyer page is staged in FS27 public assets'));
 checks.push(check(page.includes('skyepay-store.html?client=metraiyux-0s') && page.includes('skyevault-pro-access'), 'install center links to SkyePay offer'));
 checks.push(check(page.includes('/skyepay/status') && page.includes('provisioning_status'), 'install center checks SkyePay return status'));
 checks.push(check(page.includes('entitlementQuery') && page.includes('session_id') && page.includes('withEntitlement'), 'install center carries SkyePay session into package downloads'));
@@ -368,9 +408,11 @@ checks.push(check(page.includes('SKYEVAULT_PORTAL_KEY') && page.includes('SKYEVA
 checks.push(check(page.includes('node bin/skyevault-agent.mjs sync --upload') && page.includes('verify --receipt') && page.includes('restore --receipt'), 'install center documents sync, verify, and restore commands'));
 checks.push(check(page.includes('Unlocked Workspace Env') && page.includes('agent_delivery') && page.includes('repo_env'), 'install center renders the provisioned workspace env after SkyePay unlock'));
 checks.push(check(skyepayProvisioning.includes('repoEnv: safeRepoEnv(result?.repoEnv || {})') && skyepayProvisioning.includes('portalKeyReturned: Boolean(result?.portalKey)'), 'SkyePay provisioning stores agent repo env handoff after vault workspace unlock'));
+checks.push(check(skyepayProvisioning.includes('export function skyePayVaultPlanLimits') && !skyepayProvisioning.includes('Math.min(200'), 'SkyePay provisioning passes paid SkyeVault plan file limits without the old 200-file choke point'));
 checks.push(check(skyepayProvisioning.includes('authorization: `Bearer ${gateBearer}`') && skyepayProvisioning.includes('x-skyepay-lane') && !skyepayProvisioning.includes('x-skyevault-provisioning-secret'), 'SkyePay vault provisioning calls Drop with shared FS27/SkyGate bearer, not the old provisioning-secret lane'));
 checks.push(check(skyepaySecurity.includes('includeVaultAgentSecrets') && skyepaySecurity.includes('SKYEVAULT_PORTAL_KEY') && skyepaySecurity.includes('repo_env'), 'SkyePay status can return agent repo env only through session-scoped unlocked delivery'));
 checks.push(check(agentCli.includes("reason: 'missing_portal_key_env'") && agentCli.includes("authMode: bearer ? 'portal-key-plus-shared-gate' : 'portal-key'"), 'agent upload works with portal key only and treats shared gate bearer as optional'));
+checks.push(check(agentCli.includes('function helpCommand()') && agentCli.includes('function versionCommand()'), 'agent has real help and version commands for buyer install support'));
 checks.push(check(worker.includes("'/skye-vault-os'") && worker.includes("'/downloads'"), '0S gate covers install center and downloads prefixes'));
 checks.push(check(worker.includes('checkSkyeVaultAgentSkyPaySession') && worker.includes('isSkyeVaultAgentInstallPath'), 'Worker allows real SkyePay sessions into the agent install page before owner-login redirect'));
 checks.push(check(worker.includes('requireSkyeVaultAgentPackageAccess') && worker.includes('skyevault_agent_entitlement_not_unlocked') && worker.includes('presentedGateCredentials'), 'Worker enforces owner/admin or SkyePay entitlement for agent package downloads'));
@@ -379,16 +421,26 @@ checks.push(check(page.includes('setLockedReleaseLinks') && page.includes('Downl
 checks.push(check(deployScript.includes("'downloads/skyevault-agent'"), '0S Worker deploy stages the agent download package assets'));
 const fs27WorkerPath = path.join(repoRoot, 'metraiyux_0s_site', 'skyegate', 'source', 'SkyeGateFS27', 'cloudflare', 'worker.mjs');
 const fs27Worker = read(fs27WorkerPath);
-checks.push(check(fs27Worker.includes("import stripeWebhook from '../netlify/functions/stripe-webhook.js'"), 'FS27 Worker imports Stripe webhook handler for live payment completion'));
-checks.push(check(fs27Worker.includes("['POST', '/.netlify/functions/stripe-webhook', stripeWebhook]") && fs27Worker.includes("['POST', '/skyepay/stripe-webhook', stripeWebhook]"), 'FS27 Worker mounts Stripe webhook routes used by SkyePay provisioning'));
-checks.push(check(fs27Worker.includes("['/vault-agent', '/skyevault-agent.html']") && publicAgentAsset.includes('skyevault-agent.html') && publicAgentAsset.includes('agentCheckoutForm'), 'FS27 Worker exposes the public SkyeVault Agent buyer surface and vault-agent alias'));
+checks.push(check(fs27Worker.includes("import stripeWebhook from '../netlify/functions/stripe-webhook.js'"), 'FS27 Worker imports the SkyePay payment-provider webhook handler for live payment completion'));
+checks.push(check(fs27Worker.includes("['POST', '/.netlify/functions/stripe-webhook', stripeWebhook]") && fs27Worker.includes("['POST', '/skyepay/stripe-webhook', stripeWebhook]"), 'FS27 Worker mounts SkyePay payment-provider webhook routes used by provisioning'));
+checks.push(check(fs27Worker.includes("['/vault-agent', '/skyevault-agent.html']") && publicAgentAsset.includes('skyevault-agent.html') && publicAgentAsset.includes('agentCheckoutForm'), 'FS27 Worker exposes the public Reape0r buyer surface and vault-agent alias'));
 for (const offer of ['skyevault-starter-access', 'skyevault-pro-access', 'skyevault-command-access']) {
   const offerBlock = catalog.slice(catalog.indexOf(`id: "${offer}"`), catalog.indexOf('gate_policy', catalog.indexOf(`id: "${offer}"`)) + 1200);
   checks.push(check(offerBlock.includes('delivery') && offerBlock.includes('/skye-vault-os/agent/') && offerBlock.includes('/downloads/skyevault-agent/latest.json'), `${offer} has agent delivery metadata`));
+  checks.push(check(offerBlock.includes('skyevault-portal-key-plus-optional-shared-gate'), `${offer} delivery metadata names the portal-key buyer auth lane`));
 }
 checks.push(check(packageReceipt?.ok === true, 'package receipt exists', { file: rel(packageReceiptPath) }));
 const listing = commands.find((item) => item.name === 'release archive listing')?.stdout || '';
 checks.push(check(listing.includes('skyevault-agent/package.json') && listing.includes('skyevault-agent/bin/skyevault-agent.mjs'), 'release archive extracts into skyevault-agent folder'));
+checks.push(check(
+  listing.includes('skyevault-agent/install.sh')
+    && listing.includes('skyevault-agent/RUNBOOK.md')
+    && listing.includes('skyevault-agent/templates/skyevault-agent.env.example')
+    && listing.includes('skyevault-agent/templates/skyevault-agent.service')
+    && listing.includes('skyevault-agent/templates/com.skyevault.reape0r.plist'),
+  'release archive includes installer, runbook, and service templates'
+));
+checks.push(check(commands.find((item) => item.name === 'SkyePay paid vault webhook provisioning proof')?.ok === true, 'paid SkyePay checkout webhook provisions buyer vault workspace and stores unlock handoff'));
 
 let snapshotReceipt = null;
 try {
@@ -401,12 +453,13 @@ checks.push(check(snapshotReceipt?.artifact?.sha256 && fs.existsSync(snapshotRec
 checks.push(check(snapshotReceipt?.literalRepo === true, 'snapshot default is literal repo custody'));
 let roundTrip = null;
 try {
-  roundTrip = JSON.parse(commands.find((item) => item.name === 'agent baseline delta restore round trip')?.stdout || '{}');
+  roundTrip = JSON.parse(commands.find((item) => item.name === 'agent mutable current mirror restore round trip')?.stdout || '{}');
 } catch {}
-checks.push(check(roundTrip?.ok === true, 'agent proves baseline plus delta restore round trip'));
-checks.push(check(roundTrip?.full?.kind === 'full' && roundTrip?.delta?.kind === 'delta', 'agent sync creates full baseline then delta'));
-checks.push(check(roundTrip?.delta?.changedFileCount === 2 && roundTrip?.delta?.tombstoneCount === 1, 'agent delta tracks changed files and deletions'));
-checks.push(check(roundTrip?.restore?.ok === true && roundTrip?.restore?.appliedDeltas?.length === 1, 'agent restore applies delta receipts'));
+checks.push(check(roundTrip?.ok === true, 'agent proves mutable current mirror restore round trip'));
+checks.push(check(roundTrip?.first?.kind === 'current' && roundTrip?.second?.kind === 'current' && roundTrip?.sameCurrentReceipt === true, 'agent sync writes to the same current mirror receipt'));
+checks.push(check(roundTrip?.second?.changedFileCount === 2 && roundTrip?.second?.tombstoneCount === 1, 'agent current mirror tracks changed files and deletions'));
+checks.push(check(roundTrip?.restore?.ok === true && roundTrip?.restore?.baseKind === 'current', 'agent restore rebuilds directly from current mirror receipt'));
+checks.push(check(roundTrip?.untrackedCurrentRestored === true && roundTrip?.gitHeadRestored === true, 'agent current mirror restores untracked files and .git metadata'));
 let portalUpload = null;
 try {
   portalUpload = JSON.parse(commands.find((item) => item.name === 'agent portal-key upload proof')?.stdout || '{}');

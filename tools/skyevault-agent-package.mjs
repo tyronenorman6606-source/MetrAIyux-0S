@@ -62,6 +62,39 @@ function runCheck(file) {
   };
 }
 
+function createReproducibleArchive(stageRoot, archivePath) {
+  const tar = spawnSync('tar', [
+    '--sort=name',
+    '--mtime=@0',
+    '--owner=0',
+    '--group=0',
+    '--numeric-owner',
+    '--pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime',
+    '-cf',
+    '-',
+    '-C',
+    stageRoot,
+    'skyevault-agent'
+  ], {
+    cwd: repoRoot,
+    encoding: null,
+    maxBuffer: 1024 * 1024 * 200
+  });
+  if (tar.status !== 0) {
+    throw new Error(`tar failed: ${String(tar.stderr || tar.stdout || tar.status)}`);
+  }
+  const gzip = spawnSync('gzip', ['-n', '-9'], {
+    cwd: repoRoot,
+    input: tar.stdout,
+    encoding: null,
+    maxBuffer: 1024 * 1024 * 200
+  });
+  if (gzip.status !== 0) {
+    throw new Error(`gzip failed: ${String(gzip.stderr || gzip.stdout || gzip.status)}`);
+  }
+  fs.writeFileSync(archivePath, gzip.stdout, { mode: 0o644 });
+}
+
 async function pack() {
   const pkg = readJson(path.join(packageRoot, 'package.json'));
   const version = argValue('--version', pkg.version);
@@ -85,14 +118,13 @@ async function pack() {
   const stageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'skyevault-agent-release-'));
   const stagePackageRoot = path.join(stageRoot, 'skyevault-agent');
   fs.cpSync(packageRoot, stagePackageRoot, { recursive: true });
-  const result = spawnSync('tar', ['-czf', archivePath, '-C', stageRoot, 'skyevault-agent'], {
-    cwd: repoRoot,
-    encoding: 'utf8'
-  });
-  fs.rmSync(stageRoot, { recursive: true, force: true });
-  if (result.status !== 0) {
-    console.error(result.stderr || result.stdout || `tar failed ${result.status}`);
-    process.exit(result.status || 1);
+  try {
+    createReproducibleArchive(stageRoot, archivePath);
+  } catch (error) {
+    console.error(error?.message || String(error));
+    process.exit(1);
+  } finally {
+    fs.rmSync(stageRoot, { recursive: true, force: true });
   }
   fs.copyFileSync(archivePath, latestArchivePath);
 
@@ -115,6 +147,7 @@ async function pack() {
     package: {
       name: pkg.name,
       version,
+      product: 'Reape0r: the Autonomous Cloud Repo Mirror',
       bin: pkg.bin,
       engines: pkg.engines
     },
@@ -126,12 +159,39 @@ async function pack() {
       latestArchiveUrl: '/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz',
       bytes: fs.statSync(archivePath).size,
       sha256: archiveSha256,
-      latestSha256
+      latestSha256,
+      reproducible: true
     },
     skyepay: {
-      offers: ['skyevault-starter-access', 'skyevault-pro-access', 'skyevault-command-access'],
+      offers: ['skyevault-starter-access', 'skyevault-pro-access', 'skyevault-command-access', 'skyevault-auto-install-addon'],
       storeUrl: 'https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyepay-store.html?client=metraiyux-0s&offer=skyevault-pro-access',
-      activationPath: '/skye-vault-os/agent/'
+      activationPath: '/skye-vault-os/agent/',
+      plans: [
+        {
+          id: 'skyevault-starter-access',
+          title: 'Reape0r Starter Access',
+          price: '$49/month',
+          quota: { workspaces: 1, storage: '1 GB', filesPerMonth: 250, rpm: 30, rpd: 500, devices: 1, monthlyCap: '$50' }
+        },
+        {
+          id: 'skyevault-pro-access',
+          title: 'Reape0r Pro Access',
+          price: '$149/month',
+          quota: { workspaces: 3, storage: '25 GB', filesPerMonth: 1500, rpm: 90, rpd: 2500, devices: 3, monthlyCap: '$150' }
+        },
+        {
+          id: 'skyevault-command-access',
+          title: 'Reape0r Command Access',
+          price: '$499/month',
+          quota: { workspaces: 10, storage: '100 GB', filesPerMonth: 10000, rpm: 240, rpd: 10000, devices: 10, monthlyCap: '$500' }
+        },
+        {
+          id: 'skyevault-auto-install-addon',
+          title: 'Reape0r Auto-Install Add-On',
+          price: '$13 one time',
+          quota: { machines: 1, requiresExistingPlan: true, includes: ['env file written 0600', 'first current mirror receipt', 'watcher service attempt'] }
+        }
+      ]
     },
     auth: {
       model: 'SkyePay workspace portal key for buyer uploads; optional shared 0S/FS27/SkyGate bearer for owner/admin lanes',

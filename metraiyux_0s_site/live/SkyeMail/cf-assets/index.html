@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SkyeMail Citadel — Business Email Center</title>
+  <title>SkyeMail backed by Citadel Database and SkyeNet — Business Email Center</title>
   <script type="importmap">
     {
       "imports": {
@@ -537,8 +537,8 @@ body.skymail-homepage .linksbox a{
       <div class="brand">
         <img src="/assets/skyes-over-london-deity-logo.png" alt="Skyes Over London LC Logo" />
         <div class="name">
-          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span> Citadel</b>
-          <span>Encrypted business message center • Citadel + SkyeNet</span>
+          <b><span class="magic-highlighter" data-highlight="underline" style="--highlighter-color:#FF9800;display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;text-decoration-line:underline;text-decoration-color:var(--highlighter-color);text-decoration-thickness:.16em;text-underline-offset:.13em;text-decoration-skip-ink:none">SkyeMail</span></b>
+          <span>Encrypted business message center • Citadel Database + SkyeNet</span>
         </div>
       </div>
       <div class="navlinks">
@@ -564,7 +564,7 @@ body.skymail-homepage .linksbox a{
   <div class="card">
     <h1 class="h1 glow-text neon-gradient-text">A secure email workspace for every client room.</h1>
     <p class="sub">
-      SkyeMail Citadel is a secure “public inbox” for your brand: anyone can send you a message from your public page,
+      SkyeMail backed by Citadel Database and SkyeNet is a secure “public inbox” for your brand: anyone can send you a message from your public page,
       you get an instant email alert, and the full message content stays end-to-end encrypted in your sovereign mail core.
       Only the unlocked workspace can read it, unless recovery is explicitly enabled during setup.
     </p>
@@ -573,7 +573,7 @@ body.skymail-homepage .linksbox a{
       <div class="kpi"><b>End‑to‑end encrypted</b><div>Sender encrypts subject + body in their browser using your public key. Server stores ciphertext only.</div></div>
       <div class="kpi"><b>Inbox + notification</b><div>Citadel stores encrypted sovereign mail data while SkyeNet serves the hosted inbox, send lane, and delivery receipts.</div></div>
       <div class="kpi"><b>Recovery is opt‑in</b><div>At signup you can allow admin recovery. If you don’t, nobody can recover the sovereign mail core.</div></div>
-      <div class="kpi"><b>SkyEmail Brain ready</b><div>Mailbox AI runs through the shared FS27/SkyGate Brain lane with SkyPay entitlements and no direct provider UI.</div></div>
+      <div class="kpi"><b>SkyeMail Brain ready</b><div>Mailbox AI runs through the shared SkyeGate FS27 Brain lane with SkyePay entitlements and no outside mail console exposed to users.</div></div>
     </div>
 
     <div class="skyemerit-card" id="launchSpark">
@@ -584,8 +584,8 @@ body.skymail-homepage .linksbox a{
     </div>
 
     <div class="btnrow">
-      <a class="btn gold" id="skyegateStartLink" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=%2Flive%2FSkyeMail%2Fsession-handoff.html%3Fnext%3Ddashboard.html%26from%3Dskymail-index-start">Start With Skyegate FS27</a>
-      <a class="btn" href="signup.html">Create Citadel Mail Core</a>
+      <a class="btn gold" id="skyegateStartLink" href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html?return=%2Flive%2FSkyeMail%2Fsession-handoff.html%3Fnext%3Ddashboard.html%26from%3Dskymail-index-start">Start With SkyeGate FS27</a>
+      <a class="btn" href="signup.html">Create SkyeMail Core</a>
       <a class="btn" href="marketing.html">See SkyeMail</a>
       <a class="btn" href="live-proof.html">Live Proof</a>
       <a class="btn" href="security.html">Security</a>
@@ -595,7 +595,7 @@ body.skymail-homepage .linksbox a{
       <a class="btn" href="suite/index.html">Open Platform</a>
       <a class="btn" href="login.html">Login</a>
       <a class="btn" href="compose.html">Compose</a><a class="pill" href="onboarding.html">Onboarding</a><a class="pill" href="founder.html">Founder</a>
-      <a class="btn" href="brain.html">SkyEmail Brain</a>
+      <a class="btn" href="brain.html">SkyeMail Brain</a>
     </div>
 
     <div class="hr"></div>
@@ -603,14 +603,14 @@ body.skymail-homepage .linksbox a{
     <div class="notice">
       Public address format: <span class="mono">/u/&lt;handle&gt;</span><br/>
       Example: <span class="mono">https://your-site.netlify.app/u/yourbrand</span><br/>
-      Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your Citadel passphrase.
+      Messages are encrypted on the sender side, stored encrypted, and decrypted locally after you unlock with your SkyeMail key passphrase.
     </div>
 
     <div class="hr"></div>
 
     <div class="grid2">
       <div class="kpi"><b>What is the sovereign key?</b><div>Your workspace creates a public/private key pair. The public key receives encrypted mail. The private key is what opens it.</div></div>
-      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your Citadel passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
+      <div class="kpi"><b>Why the passphrase matters</b><div>Your private key is stored only after being wrapped by your SkyeMail key passphrase. SkyeMail can hold the locked key, but it cannot read messages without your unlock step.</div></div>
       <div class="kpi"><b>What the sovereign mail lane does</b><div>Citadel and SkyeNet carry inbound and outbound mail events. SkyeMail then encrypts inbound content into Citadel before saving the inbox record.</div></div>
       <div class="kpi"><b>What recovery means</b><div>If recovery is off and you lose the passphrase, encrypted content may be unrecoverable. If recovery is on, a separate admin-recovery copy is stored encrypted.</div></div>
     </div>
@@ -648,7 +648,7 @@ body.skymail-homepage .linksbox a{
       <p class="linksbox">
         <a href="https://solenterprises.org/pages/contact-hub" target="_blank" rel="noopener">Contact Hub</a>
         <a href="https://solenterprises.org/pages/leadership-hub" target="_blank" rel="noopener">Leadership Hub</a>
-        <a href="brain.html">SkyEmail Brain</a>
+        <a href="brain.html">SkyeMail Brain</a>
         <a href="https://solenterprisesnexusconnect.netlify.app/" target="_blank" rel="noopener">NexusConnect</a>
         <a href="https://familycommand.netlify.app/" target="_blank" rel="noopener">FamilyCommand</a>
         <a href="https://skyecode-nexus.netlify.app/" target="_blank" rel="noopener">SkyeCode Nexus</a>

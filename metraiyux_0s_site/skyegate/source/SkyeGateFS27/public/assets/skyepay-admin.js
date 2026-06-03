@@ -24,18 +24,9 @@
     $("#ledgerToast").textContent = message;
   }
 
-  function bridgeSession() {
-    const bridge = globalThis.MetrAIyuxGateBridge || (globalThis.parent && globalThis.parent !== globalThis ? globalThis.parent.MetrAIyuxGateBridge : null);
-    return bridge?.requireSession?.({ platformId: "skyepay-admin", usageLane: "skyepay-ledger" }) || bridge?.current?.() || null;
-  }
-
   async function adminJson(path, options = {}) {
-    const token = auth.gateToken || bridgeSession()?.token || "";
+    const token = auth.gateToken || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
     const headers = {
-      ...(globalThis.MetrAIyuxGateBridge?.headers?.({
-        "x-skye-platform": "skyepay-admin",
-        "x-skye-usage-lane": "skyepay-ledger"
-      }) || {}),
       authorization: `Bearer ${token}`,
       "x-skye-gate-session": token,
       ...(options.body ? { "content-type": "application/json" } : {})
@@ -59,12 +50,26 @@
     return money(setup);
   }
 
+  function paidOrder(order) {
+    return ["paid", "complete", "active", "partially_refunded"].includes(String(order.payment_status || "").toLowerCase());
+  }
+
+  function defaultRefundAmount(order) {
+    const metadata = order.metadata || {};
+    const nested = metadata.metadata || {};
+    const adjusted = Number(metadata.skyemerit_adjusted_due_cents || nested.skyemerit_adjusted_due_cents || 0);
+    if (Number.isFinite(adjusted) && adjusted > 0) return adjusted;
+    return Math.max(0, Number(order.amount_setup_cents || 0) + Number(order.amount_recurring_cents || 0));
+  }
+
   function renderLedger(data) {
     const summary = data.summary || {};
     $("#statTotal").textContent = summary.total || 0;
     $("#statPending").textContent = summary.pending_approval || 0;
     $("#statApproved").textContent = summary.approved || 0;
     $("#statUnlocked").textContent = summary.workspace_unlocked || 0;
+    const refundedStat = $("#statRefunded");
+    if (refundedStat) refundedStat.textContent = summary.refunded || 0;
 
     const tbody = $("#ledgerTable tbody");
     tbody.innerHTML = (data.orders || []).map((order) => `
@@ -88,7 +93,8 @@
           <div class="row-actions">
             <button data-action="approve" data-id="${escapeHtml(order.id)}">Approve</button>
             <button data-action="mark_provisioned" data-id="${escapeHtml(order.id)}">Unlock</button>
-            <button data-action="void" data-id="${escapeHtml(order.id)}">Void</button>
+            <button data-action="refund" data-id="${escapeHtml(order.id)}" data-amount="${defaultRefundAmount(order)}"${paidOrder(order) ? "" : " disabled"}>Refund</button>
+            <button data-action="void" data-id="${escapeHtml(order.id)}"${paidOrder(order) ? " disabled title=\"Paid orders require a Stripe refund instead of void.\"" : ""}>Void</button>
           </div>
         </td>
       </tr>
@@ -107,11 +113,27 @@
   }
 
   async function updateOrder(orderId, action) {
+    const payload = { order_id: orderId, action };
+    if (action === "refund") {
+      const button = $$('[data-action="refund"]').find((item) => item.dataset.id === orderId);
+      const defaultAmount = Number(button?.dataset.amount || 0);
+      const dollars = prompt("Refund amount in dollars", defaultAmount ? String((defaultAmount / 100).toFixed(2)) : "");
+      if (dollars == null) return;
+      const amountCents = Math.round(Number(dollars) * 100);
+      if (!Number.isFinite(amountCents) || amountCents <= 0) {
+        toast("Refund cancelled: amount required.");
+        return;
+      }
+      payload.amount_cents = amountCents;
+      payload.reason = "requested_by_customer";
+      payload.idempotency_key = `admin-refund-${orderId}-${Date.now()}`;
+    }
     toast(`Sending ${action}...`);
-    await adminJson("/.netlify/functions/admin-skyepay-ledger", {
+    const result = await adminJson("/.netlify/functions/admin-skyepay-ledger", {
       method: "PATCH",
-      body: JSON.stringify({ order_id: orderId, action })
+      body: JSON.stringify(payload)
     });
+    if (action === "refund") toast(`Refund recorded: ${money(result.amount_cents || payload.amount_cents)} ${result.full_refund ? "full" : "partial"}.`);
     await loadLedger();
   }
 
@@ -159,11 +181,12 @@
   }
 
   $("#loginBtn")?.addEventListener("click", async () => {
-    auth.gateToken = bridgeSession()?.token || "";
+    auth.gateToken = ($("#adminPassword").value || "").trim() || globalThis.MetrAIyuxGateBridge?.current?.()?.token || "";
     if (!auth.gateToken) {
       $("#ledgerToast").textContent = "Open the shared FS27/SkyGate session.";
       return;
     }
+    globalThis.MetrAIyuxGateBridge?.persist?.({ token: auth.gateToken, source: "skyepay-admin" }, { silent: true });
     $("#loginPanel").hidden = true;
     $("#ledgerPanel").hidden = false;
     try {

@@ -13,9 +13,9 @@ exports.handler = async (event) => {
       return json(405, { error: "Method not allowed" });
     }
 
-    const claims = await requireFs27(event);
-    const user = await ensureSkyeMailUser(claims);
     const token = getBearer(event);
+    const claims = await requireFs27(event);
+    const user = await ensureSkyeMailUser(claims, { token });
     const session = sessionFromGateUser(user, claims, token);
 
     await mirrorPlatformEvent({

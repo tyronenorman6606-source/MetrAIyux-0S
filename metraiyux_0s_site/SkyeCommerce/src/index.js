@@ -168,6 +168,7 @@ import {
   mapSkyPayStatusToPayment,
   merchantPayoutLedgerRecord,
   merchantPayoutStatusForPayment,
+  skyPayCommerceSecret,
   upsertMerchantPayoutLedgerForPayment
 } from './lib/skyepay.js';
 import {
@@ -193,6 +194,37 @@ function requirePaidCheckoutLegalAcceptance(body = {}, source = 'skyecommerce') 
   const missing = missingLegalAcceptance(body);
   if (missing.length) return { ok: false, response: json(legalAcceptanceError(missing), 403) };
   return { ok: true, acceptance: normalizeLegalAcceptance(body, source), metadata: legalAcceptanceMetadata(body, source) };
+}
+
+function cleanWebhookSignature(value = '') {
+  return String(value || '').trim().replace(/^sha256=/i, '').toLowerCase();
+}
+
+function constantSignatureEqual(a = '', b = '') {
+  const left = cleanWebhookSignature(a);
+  const right = cleanWebhookSignature(b);
+  if (!left || !right || left.length !== right.length) return false;
+  let diff = 0;
+  for (let index = 0; index < left.length; index += 1) diff |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  return diff === 0;
+}
+
+async function verifyPaymentWebhookSignature(env, raw, headers) {
+  const genericSecret = String(env.PAYMENT_WEBHOOK_SECRET || env.SESSION_SECRET || '').trim();
+  const genericSignature = headers.get('x-skye-signature') || '';
+  if (genericSecret && genericSignature) {
+    const expected = await hmacHex(genericSecret, raw);
+    if (constantSignatureEqual(genericSignature, expected)) return { ok: true, lane: 'generic' };
+  }
+
+  const commerceSecret = skyPayCommerceSecret(env);
+  const commerceSignature = headers.get('x-skyepay-commerce-signature') || headers.get('x-skyecommerce-signature') || '';
+  if (commerceSecret && commerceSignature) {
+    const expected = await hmacHex(commerceSecret, raw);
+    if (constantSignatureEqual(commerceSignature, expected)) return { ok: true, lane: 'skyepay-commerce' };
+  }
+
+  return { ok: false, lane: '' };
 }
 
 function sharedGateHandoffSecret(env) {
@@ -3764,9 +3796,8 @@ async function handleApi(request, env, url) {
 
   if (request.method === 'POST' && url.pathname === '/api/payments/webhook') {
     const raw = await request.text();
-    const signature = request.headers.get('x-skye-signature') || '';
-    const expected = await hmacHex(env.PAYMENT_WEBHOOK_SECRET || env.SESSION_SECRET, raw);
-    if (!signature || signature !== expected) return json({ error: 'Invalid webhook signature.' }, 401);
+    const signature = await verifyPaymentWebhookSignature(env, raw, request.headers);
+    if (!signature.ok) return json({ error: 'Invalid webhook signature.' }, 401);
     let body = {};
     try { body = JSON.parse(raw || '{}'); } catch { return json({ error: 'Malformed webhook body.' }, 400); }
     const incoming = normalizePaymentWebhookInput(body);
@@ -4522,8 +4553,7 @@ async function handleApi(request, env, url) {
     let giftCardApplied = { appliedCents: 0, codeLast4: '', reason: 'not_requested' };
     if (body.giftCardCode) giftCardApplied = await redeemGiftCardForOrder(env, merchant.id, orderId, body.giftCardCode, quote.totalCents);
     const totalDueCents = Math.max(0, quote.totalCents - Number(giftCardApplied.appliedCents || 0));
-    const requestedPaymentProvider = normalizePublicCheckoutProvider(body);
-    if (totalDueCents > 0 && !requestedPaymentProvider) return json({ error: 'paymentProvider must be skyepay, stripe, or paypal for paid storefront checkout.' }, 400);
+    const requestedPaymentProvider = totalDueCents > 0 ? 'skyepay' : normalizePublicCheckoutProvider(body);
     const legalAcceptance = totalDueCents > 0 ? requirePaidCheckoutLegalAcceptance(body, 'skyecommerce-public-order') : { ok: true, metadata: {} };
     if (!legalAcceptance.ok) return legalAcceptance.response;
     const paymentStatus = totalDueCents === 0 ? 'paid' : 'pending_provider';

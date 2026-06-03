@@ -102,8 +102,8 @@
       <div class="content-lane-toolbar">
         <div>
           <p class="eyebrow">Repo custody heartbeat</p>
-          <h2>SkyeVault Autosync Proof</h2>
-          <p class="mini-note">Build publishes the public-safe proof log; the daemon handles encrypted literal full-repo custody every ten minutes by default. Email notifications are deduped and can be disabled here.</p>
+          <h2>Reape0r Autosync Proof</h2>
+          <p class="mini-note">Build publishes the public-safe proof log; Reape0r handles one encrypted mutable current repo mirror every ten minutes by default. Email notifications are deduped and can be disabled here.</p>
         </div>
         <div class="button-row">
           <a class="admin-btn secondary" href="../proof/skyevault-autosync-proof.html">Open Proof Page</a>
@@ -113,18 +113,20 @@
       <div id="autosyncProofCards" class="autosync-proof-grid">
         <article class="autosync-proof-card"><b>Loading</b><span>Reading generated proof receipt.</span></article>
       </div>
-      <div class="vault-user-guide" aria-label="Literal full repo custody guide">
-        <h2>Literal full-repo custody lane</h2>
+      <div class="vault-user-guide" aria-label="Mutable current repo custody guide">
+        <h2>Mutable current repo custody lane</h2>
         <ol>
-          <li><strong>Full</strong> now means an encrypted all-bytes repo stream, not the older filtered source-custody package.</li>
-          <li>The daemon runs the delta journal first, then streams the encrypted full artifact to SkyeVault/R2 and writes the SkyeSecure control-pack handoff.</li>
-          <li>Private signed artifact/control-pack links are minted only into local owner receipts such as <code>.skyevault-out/autosync/latest-full-repo-download-links.json</code>.</li>
-          <li>Use the vault drive for custody, this dashboard for receipts, the local direct-download opener for temporary signed links, and SkyeSecure for unlock. Do not paste bearer tokens, passphrases, peppers, or signed URLs into public proof pages.</li>
+          <li><strong>Current</strong> means one encrypted repo state: changed files replace their current encrypted objects, unchanged files are reused, and deleted files leave the restore manifest.</li>
+          <li>Reape0r scans the workspace, writes the current manifest, uploads changed current objects to SkyeVault/R2, and refreshes the owner restore kit.</li>
+          <li>The owner-facing recovery link is <code>CURRENT_REPO_BACKUP.html</code>; the private unlock kit is <code>CURRENT_REPO_BACKUP.json</code>.</li>
+          <li>Use the vault drive for custody, this dashboard for receipts, the local direct-download opener for the repaired current backup, and SkyeSecure for unlock. Do not paste bearer tokens, passphrases, peppers, or signed URLs into public proof pages.</li>
         </ol>
         <div class="vault-guide-actions">
           <a class="primary" href="https://skyevault-drop.graylondonskyes.workers.dev/#client-vault" target="_blank" rel="noopener">Open Vault Drive</a>
           <a href="../skye-secure-secret-packs/app.html" target="_blank" rel="noopener">Open Unlocker</a>
           <a href="../proof/skyevault-autosync-proof.html" target="_blank" rel="noopener">Open Proof</a>
+          <a href="https://devooderator.pages.dev/blog/2026-06-02-reape0r-cli-install-guide" target="_blank" rel="noopener">Reape0r CLI Guide</a>
+          <a href="https://devooderator.pages.dev/blog/2026-06-02-0s-week-of-repairs-reape0r-proof" target="_blank" rel="noopener">Week Proof</a>
         </div>
       </div>
       <div class="autosync-notify-controls">

@@ -1,5 +1,6 @@
 (function () {
   const BASE = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
+  const SESSION_KEY = 'skyeroutex_gate_owner_session';
   const $ = (id) => document.getElementById(id);
 
   function escapeHtml(value) {
@@ -12,12 +13,8 @@
     }[char]));
   }
 
-  function bridge() {
-    return window.MetrAIyuxGateBridge || (window.parent && window.parent !== window ? window.parent.MetrAIyuxGateBridge : null);
-  }
-
-  function currentSession() {
-    return bridge()?.requireSession?.({ platformId: 'skyeroutex', usageLane: 'gate-dashboard' }) || bridge()?.current?.() || {};
+  function readSession() {
+    try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}'); } catch { return {}; }
   }
 
   function setStatus(message, bad) {
@@ -28,23 +25,32 @@
   }
 
   async function login() {
-    if (!currentSession().token) {
-      setStatus('Open the shared 0S/FS27 gate first.', true);
+    const code = $('owner-code').value.trim();
+    if (!code) {
+      setStatus('Enter the shared 0S owner/admin code.', true);
       return;
     }
-    setStatus('Owner session attached through the shared gate.');
+    const res = await fetch(`${BASE}/api/owner/admin-login`, {
+      method: 'POST',
+      credentials: 'omit',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Owner login failed (${res.status})`);
+    const token = String(data.gateToken || data.gateBearerToken || data.token || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
+    if (!token) throw new Error('Owner login did not return a bearer token.');
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ token, issued_at: new Date().toISOString() }));
+    $('owner-code').value = '';
+    setStatus('Owner session attached for this tab.');
     await refresh();
   }
 
   async function fetchDashboard() {
-    const session = currentSession();
+    const session = readSession();
     if (!session.token) throw new Error('Owner session required. Unlock the dashboard with the shared 0S code.');
     const res = await fetch(`${BASE}/api/routex/gate-dashboard`, {
       headers: {
-        ...(bridge()?.headers?.({
-          'x-skye-platform': 'skyeroutex',
-          'x-skye-usage-lane': 'gate-dashboard'
-        }) || {}),
         authorization: `Bearer ${session.token}`,
         'x-skye-gate-session': session.token,
         'x-skye-platform': 'skyeroutex'
@@ -105,5 +111,5 @@
 
   $('login-btn')?.addEventListener('click', () => login().catch(error => setStatus(error.message, true)));
   $('refresh-btn')?.addEventListener('click', () => refresh().catch(error => setStatus(error.message, true)));
-  if (currentSession().token) refresh().catch(error => setStatus(error.message, true));
+  if (readSession().token) refresh().catch(error => setStatus(error.message, true));
 })();

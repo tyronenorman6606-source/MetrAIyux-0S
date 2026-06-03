@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script defer src="assets/app.js"></script>
-  <script defer src="assets/skye0s-onboard-bridge.js"></script>
-  <script defer src="assets/mail-ui.js"></script>
-  <link rel="stylesheet" href="assets/mail-ui.css" />
-  <title>Settings — SkyeMail Citadel</title>
+  <script defer src="/assets/app.js"></script>
+  <script defer src="/assets/skye0s-onboard-bridge.js"></script>
+  <script defer src="/assets/mail-ui.js"></script>
+  <link rel="stylesheet" href="/assets/mail-ui.css" />
+  <title>Settings — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="settings" data-page-name="Settings" data-page-hint="Profile, aliases, signatures, and vacation responder">
 <div class="wrap">
@@ -18,15 +18,15 @@
 
       <section class="hero">
         <section class="card">
-          <div class="badge" id="gmailStatus">Checking SkyeMail status…</div>
+          <div class="badge" id="gmailStatus">Checking mailbox status…</div>
           <h1 class="h1">Profile, aliases, signatures, and auto-reply.</h1>
-          <p class="sub">Set your mailbox identity inside the app, choose a preferred send-as alias, sync signatures into SkyeMail, and manage the auto reply from the same command surface.</p>
+          <p class="sub">Set your mailbox identity inside the app, choose a preferred send-as alias, sync signatures into the SkyeMail routing lane, and manage the vacation responder from the same command surface.</p>
           <div class="btnrow">
             <button class="btn gold" id="saveBtn" type="button">Save App Settings</button>
-            <button class="btn ok" id="syncBtn" type="button">Save SkyeMail Settings</button>
+            <button class="btn ok" id="syncBtn" type="button">Save + Sync Mail Settings</button>
             <button class="btn" id="watchBtn" type="button">Enable Push Watch</button>
-            <button class="btn" id="connectBtn" type="button">Provision SkyeMail</button>
-            <button class="btn danger" id="disconnectBtn" type="button">Disconnect SkyeMail</button>
+            <button class="btn" id="connectBtn" type="button">Reconnect Mailbox</button>
+            <button class="btn danger" id="disconnectBtn" type="button">Disconnect Mailbox</button>
           </div>
           <div class="mini" id="statusText" style="margin-top:12px">Waiting for settings load…</div>
         </section>
@@ -68,7 +68,7 @@
       <section class="card">
         <div class="kicker">Vacation responder</div>
         <div class="fieldgrid" style="margin-top:12px">
-          <div><label for="vacation_enabled">Enable auto reply</label><div class="toggleline"><input id="vacation_enabled" type="checkbox" />Turn on SkyeMail auto replies</div></div>
+          <div><label for="vacation_enabled">Enable auto reply</label><div class="toggleline"><input id="vacation_enabled" type="checkbox" />Turn on SkyeMail vacation responses</div></div>
           <div><label for="vacation_restrict_contacts">Restrict responses</label><div class="toggleline"><input id="vacation_restrict_contacts" type="checkbox" />Reply only to contacts</div></div>
           <div><label for="vacation_restrict_domain">Domain-only responses</label><div class="toggleline"><input id="vacation_restrict_domain" type="checkbox" />Reply only inside the workspace domain</div></div>
           <div></div>
@@ -86,6 +86,6 @@
   </div>
   <div id="appFooter"></div>
 </div>
-<script defer src="assets/settings-page.js"></script>
+<script defer src="/assets/settings-page.js"></script>
 </body>
 </html>

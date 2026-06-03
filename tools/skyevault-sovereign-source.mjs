@@ -9,6 +9,7 @@ const args = process.argv.slice(2);
 const command = args.find((arg) => !arg.startsWith('--')) || 'status';
 const repoName = path.basename(repoRoot);
 const autosyncDir = path.join(repoRoot, '.skyevault-out', 'autosync');
+const ownerDesiredMode = 'living-mirror';
 
 function argValue(name, fallback = '') {
   const prefix = `${name}=`;
@@ -55,6 +56,30 @@ function modeFromCommand(commandText) {
   return spaced?.[1] || '';
 }
 
+function commandHasFlag(commandText, flagName) {
+  return String(commandText || '').split(/\s+/).includes(flagName);
+}
+
+function ownerFullCurrentDaemonArgs({ envFile, intervalSeconds } = {}) {
+  return [
+    `--env-file=${envFile || argValue('--env-file', '.env')}`,
+    '--mode=mirror',
+    '--full-current-index',
+    '--skip-delta',
+    `--interval-seconds=${intervalSeconds || argValue('--interval-seconds', '600')}`
+  ];
+}
+
+function ownerFullCurrentOnceArgs({ envFile } = {}) {
+  return [
+    `--env-file=${envFile || argValue('--env-file', '.env')}`,
+    '--mode=mirror',
+    '--full-current-index',
+    '--skip-delta',
+    '--skip-map'
+  ];
+}
+
 function runNpm(script, extraArgs = []) {
   const result = spawnSync('npm', ['run', script, '--', ...extraArgs], {
     cwd: repoRoot,
@@ -62,6 +87,49 @@ function runNpm(script, extraArgs = []) {
     env: process.env
   });
   if (result.status !== 0) process.exit(result.status || 1);
+}
+
+function currentRepoState() {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, 'tools', 'skyevault-autosync.mjs'),
+    'state',
+    `--env-file=${argValue('--env-file', '.env')}`
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 16
+  });
+  if (result.status !== 0) {
+    return {
+      ok: false,
+      status: result.status,
+      error: (result.stderr || result.stdout || 'current repo state scan failed').trim().slice(-2000)
+    };
+  }
+  try {
+    const parsed = JSON.parse(result.stdout || '{}');
+    return { ok: Boolean(parsed.ok), state: parsed.state || null };
+  } catch (error) {
+    return { ok: false, error: `current repo state JSON parse failed: ${error.message}` };
+  }
+}
+
+function livingMirrorStatus() {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, 'tools', 'skyevault-living-repo-mirror.mjs'),
+    'status',
+    `--env-file=${argValue('--env-file', '.env')}`
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 8
+  });
+  try {
+    const parsed = JSON.parse(result.stdout || '{}');
+    return { ok: result.status === 0 && Boolean(parsed.ok), status: result.status, ...parsed };
+  } catch {
+    return { ok: false, status: result.status, error: (result.stderr || result.stdout || 'living mirror status unavailable').trim().slice(-2000) };
+  }
 }
 
 function latestTempFullRun() {
@@ -122,14 +190,20 @@ function daemonStatus() {
   const record = readJson(pidFile, null);
   const pid = Number(record?.pid || 0);
   const commandText = record?.command || '';
+  const running = pidAlive(pid);
+  const mode = modeFromCommand(commandText);
+  const isDesired = mode === 'mirror'
+    && commandHasFlag(commandText, '--skip-delta')
+    && commandHasFlag(commandText, '--full-current-index');
   return {
-    running: pidAlive(pid),
+    running,
     pid: Number.isInteger(pid) && pid > 0 ? pid : null,
     startedAt: record?.startedAt || '',
     command: commandText,
-    mode: modeFromCommand(commandText),
-    desiredMode: 'git+full',
-    needsRestartForDesiredMode: Boolean(pidAlive(pid) && modeFromCommand(commandText) && modeFromCommand(commandText) !== 'git+full'),
+    mode,
+    desiredMode: ownerDesiredMode,
+    desiredCommandShape: '--mode=mirror --full-current-index --skip-delta',
+    needsRestartForDesiredMode: Boolean(running && !isDesired),
     pidFile: fs.existsSync(pidFile) ? pidFile : ''
   };
 }
@@ -137,7 +211,7 @@ function daemonStatus() {
 function storageLimits() {
   const daemonMaxGb = Number(process.env.SKYEVAULT_AUTOSYNC_FULL_MAX_GB || process.env.SKYEVAULT_FULL_REPO_MAX_GB || 50);
   return {
-    currentDaemonFullStreamMaxGb: Number.isFinite(daemonMaxGb) ? daemonMaxGb : 50,
+    legacyFullStreamMaxGb: Number.isFinite(daemonMaxGb) ? daemonMaxGb : 50,
     defaultVaultDestinationMaxFileSizeGb: 5000,
     defaultVaultSubmissionMaxTotalGb: 5000,
     defaultVaultFilesPerSubmission: 25,
@@ -152,10 +226,14 @@ function readLauncherStatus() {
   const pid = Number(status?.pid || 0);
   return {
     running: pidAlive(pid),
-    pid: Number.isInteger(pid) && pid > 0 ? pid : null,
-    url: status?.url || 'http://127.0.0.1:17687/FULL_17GB_REPO_DOWNLOAD.html',
-    htmlOut: status?.htmlOut || '.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.html',
-    signedDownload: status?.signedDownload || null,
+    pid: pidAlive(pid) ? pid : null,
+    url: status?.url && !String(status.url).includes('FULL_17GB_REPO_DOWNLOAD')
+      ? status.url
+      : 'http://127.0.0.1:17687/CURRENT_REPO_BACKUP.html',
+    htmlOut: status?.htmlOut && !String(status.htmlOut).includes('FULL_17GB_REPO_DOWNLOAD')
+      ? status.htmlOut
+      : '.skyevault-out/autosync/CURRENT_REPO_BACKUP.html',
+    restoreKit: status?.restoreKit || null,
     statusReceipt: fs.existsSync(file) ? file : ''
   };
 }
@@ -203,18 +281,18 @@ function writeRestoreGuide(status) {
   const text = `# Restore From SkyeVault Sovereign Source
 
 This repo treats Codespaces as disposable compute. SkyeVault is the custody lane.
-Autosync tracks custody coverage per lane, so a missing Git pack can be added without re-uploading an already-covered full encrypted artifact for the same digest.
+The owner lane keeps one living encrypted repo mirror. The daemon updates the current base itself, and download/restore reads that current mirror.
 
 ## What To Restore First
 
-1. Restore the latest Git vault pack when you need clone/fetch/push-level repo history.
-2. Restore the latest encrypted full-repo artifact when you need everything in the workspace, including ignored/generated/local state.
+1. Restore from the living current mirror when you need everything in the workspace, including ignored/generated/local state.
+2. Use the owner Git origin only as a terminal clone/fetch/push convenience lane.
 3. Restore secret/control material through SkyeSecure, not chat or public docs.
 
 ## One Login Truth
 
 - The shared 0S/FS27/SkyGate/Free99 gate session is the owner/admin login.
-- A signed SkyeVault download URL is only a short-lived file ticket minted after that gate session is accepted.
+- The owner restore kit is the private pointer to the current mutable mirror; it is not a separate rebuilt full artifact.
 - SkyeSecure passphrase/pepper material unlocks encrypted \`.skyesecrets\` packs. It is encryption material, not another app login.
 - Legacy admin/operator tokens are emergency fallback only when the shared gate is unavailable.
 
@@ -224,17 +302,17 @@ Autosync tracks custody coverage per lane, so a missing Git pack can be added wi
 - SkyeVault Command Center: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/skyevault-command-center.html
 - SkyeSecure Unlocker: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-secure-secret-packs/app.html
 - Owner login: https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html
-- Owner HTTP download launcher: ${status.links?.ownerDownloadLauncher || 'run `npm run vault:source:download -- --env-file=.env`'}
+- Owner current backup launcher: ${status.links?.ownerDownloadLauncher || 'run `npm run vault:source:download -- --env-file=.env`'}
 - Owner Git origin: ${status.links?.ownerGitOrigin || 'run `npm run vault:origin:start && npm run vault:origin:proof`'}
-- Private fallback opener: \`.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.html\` when minted locally
+- Private fallback opener: \`.skyevault-out/autosync/CURRENT_REPO_BACKUP.html\` when served locally
 
 ## Latest Local Pointers
 
 - Primary custody receipt: ${status.latestPrimarySuccess?.file ? `\`${rel(status.latestPrimarySuccess.file)}\`` : 'none yet'}
-- Full repo custody receipt: ${status.latestFullRepoSuccess?.file ? `\`${rel(status.latestFullRepoSuccess.file)}\`` : 'none yet'}
+- Living mirror receipt: ${status.livingMirror?.latestReceipt?.receiptPath ? `\`${rel(status.livingMirror.latestReceipt.receiptPath)}\`` : 'none yet'}
 - Owner download launcher receipt: \`.skyevault-out/autosync/owner-download-launcher.json\`
 - Owner Git origin receipt: \`.skyevault-out/git-remote/owner-git-origin-status.json\`
-- Private signed-link receipt: \`.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.json\` when minted locally
+- Private current restore kit: \`.skyevault-out/autosync/CURRENT_REPO_BACKUP.json\`
 
 Signed URLs, bearer tokens, passphrases, peppers, and private unlock material stay out of this guide.
 `;
@@ -249,29 +327,64 @@ function buildStatus() {
   const full = latestReceipt('latest-full-repo-success.json');
   const current = latestTempFullRun();
   const launcher = readLauncherStatus();
+  const currentState = currentRepoState();
+  const mirror = livingMirrorStatus();
+  const currentDigest = currentState.state?.digest || '';
+  const latestFullDigest = full?.value?.state?.digest || '';
+  const latestFullCurrent = Boolean(currentState.ok && currentDigest && latestFullDigest && currentDigest === latestFullDigest);
   const status = {
     ok: true,
     schema: 'skyevault.sovereign-source-status.v1',
     checkedAt: new Date().toISOString(),
     repo: repoName,
     model: {
-      sourceOfTruth: 'SkyeVault/SkyeDrive custody lane',
+      sourceOfTruth: 'living current encrypted repo mirror in SkyeVault/SkyeDrive custody',
       compute: 'Codespaces/local IDE are disposable restore targets',
-      daemonMode: 'git+full',
-      laneCoverage: 'mode-level dedupe: git/full/safe receipts can combine for the same digest without re-streaming covered lanes',
-      gitLevelLane: 'Git bundle/remote refs plus sanitized dirty overlay',
-      fullStateLane: 'encrypted literal full-repo tar.zst snapshots',
-      fastLane: 'encrypted delta journal for changed/untracked/local-critical files',
-      gitOriginLane: 'local owner-private smart HTTP Git origin for clone/fetch/push restore'
+      daemonMode: ownerDesiredMode,
+      ownerContract: 'one living current encrypted repo mirror; no owner restore from separate delta packs',
+      fullStateLane: 'full current encrypted per-path mirror objects plus one current manifest; owner download returns the current restore kit, not a rebuilt full artifact',
+      gitOriginLane: 'local owner-private smart HTTP Git origin for clone/fetch/push restore convenience',
+      staleDownloadRule: 'the launcher must refuse stale restore kits whose digest does not match the current mirror manifest'
     },
     authModel: {
       login: 'shared 0S/FS27/SkyGate/Free99 gate session',
-      signedDownloadUrl: 'short-lived SkyeVault object ticket minted after gate auth',
+      restoreKit: 'private current mirror pointer issued after owner gate auth',
       skyeSecureUnlock: 'encryption unlock material for .skyesecrets packs, not an app login',
       legacyFallback: 'legacy admin/operator token only when the shared gate is unavailable'
     },
     daemon: daemonStatus(),
+    livingMirror: mirror.ok ? {
+      ok: true,
+      digest: mirror.manifest?.digest || '',
+      generatedAt: mirror.manifest?.generatedAt || '',
+      mode: mirror.manifest?.mode || '',
+      fullCurrentIndexReady: Boolean(mirror.manifest?.fullCurrentIndexReady),
+      adoptedBasePresent: Boolean(mirror.manifest?.adoptedBasePresent),
+      needsFullCurrentSeed: !mirror.manifest?.fullCurrentIndexReady,
+      entryCount: mirror.manifest?.entryCount || 0,
+      fileCount: mirror.manifest?.fileCount || 0,
+      totalBytes: mirror.manifest?.totalBytes || 0,
+      remote: mirror.manifest?.remote || null,
+      latestReceipt: mirror.latestReceipt || null,
+      mirrorRoot: mirror.mirrorRoot || ''
+    } : {
+      ok: false,
+      error: mirror.error || 'living mirror has not been seeded yet',
+      status: mirror.status ?? null
+    },
     ownerGitOrigin: readOwnerGitOriginStatus(),
+    currentRepoState: currentState.ok ? {
+      digest: currentDigest,
+      branch: currentState.state?.branch || '',
+      shortHead: currentState.state?.shortHead || '',
+      dirty: Boolean(currentState.state?.dirty),
+      statusCounts: currentState.state?.statusCounts || null,
+      changedFileFingerprintCount: currentState.state?.changedFileFingerprintCount || 0,
+      localOnlyCriticalCount: currentState.state?.localOnlyCriticalCount || 0
+    } : {
+      ok: false,
+      error: currentState.error || 'current repo state unavailable'
+    },
     latestPrimarySuccess: primary ? {
       file: primary.file,
       recordedAt: primary.value.recordedAt || '',
@@ -282,6 +395,8 @@ function buildStatus() {
       file: full.file,
       recordedAt: full.value.recordedAt || '',
       digest: full.value.state?.digest || '',
+      current: latestFullCurrent,
+      staleReason: latestFullCurrent ? '' : `latest full digest ${String(latestFullDigest).slice(0, 16)} does not match current repo digest ${String(currentDigest).slice(0, 16)}`,
       artifactBytes: full.value.fullRun?.childSummaries?.find((item) => item.artifactBytes)?.artifactBytes || null,
       artifactSha256: full.value.fullRun?.childSummaries?.find((item) => item.artifactSha256)?.artifactSha256 || '',
       artifactReceiptId: full.value.fullRun?.childSummaries?.find((item) => item.receiptId)?.receiptId || '',
@@ -303,7 +418,7 @@ function buildStatus() {
       ownerLogin: 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev/admin/login.html',
       ownerGitOrigin: readOwnerGitOriginStatus().cloneUrl,
       ownerDownloadLauncher: launcher.url,
-      localDirectDownloadOpener: '.skyevault-out/autosync/FULL_17GB_REPO_DOWNLOAD.html'
+      localDirectDownloadOpener: '.skyevault-out/autosync/CURRENT_REPO_BACKUP.html'
     }
   };
   const out = path.join(repoRoot, '.skyevault-out', 'sovereign-source', 'latest-status.json');
@@ -316,23 +431,11 @@ function buildStatus() {
 if (command === 'status') {
   console.log(JSON.stringify(buildStatus(), null, 2));
 } else if (command === 'start') {
-  runNpm('vault:agent:start', [
-    `--env-file=${argValue('--env-file', 'env.txt')}`,
-    '--mode=git+full',
-    `--interval-seconds=${argValue('--interval-seconds', '600')}`
-  ]);
+  runNpm('vault:agent:start', ownerFullCurrentDaemonArgs());
 } else if (command === 'restart') {
-  runNpm('vault:agent:restart', [
-    `--env-file=${argValue('--env-file', 'env.txt')}`,
-    '--mode=git+full',
-    `--interval-seconds=${argValue('--interval-seconds', '600')}`
-  ]);
+  runNpm('vault:agent:restart', ownerFullCurrentDaemonArgs());
 } else if (command === 'sync-once') {
-  runNpm('vault:autosync:once', [
-    `--env-file=${argValue('--env-file', 'env.txt')}`,
-    '--mode=git+full',
-    '--skip-map'
-  ]);
+  runNpm('vault:autosync:once', ownerFullCurrentOnceArgs());
 } else if (command === 'download') {
   runNpm('vault:source:download', [
     `--env-file=${argValue('--env-file', '.env')}`,

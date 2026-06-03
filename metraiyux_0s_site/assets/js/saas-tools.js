@@ -24,7 +24,7 @@
       company_name: company,
       owner_email: email,
       gate_username: email || `${workspace_slug}@gate.metraiyux.local`,
-      proposed_skyemail_alias: `${workspace_slug}@skyemail.online`,
+      requested_skyemail: String(data.requested_skyemail || data.skyemail || data.skyemail_alias || data.mailbox_email || '').trim().toLowerCase(),
       plan: data.plan || 'starter-command',
       client_login_path: `client-login.html?client=${encodeURIComponent(workspace_slug)}`,
       founder_recovery_path: `/founder-command/?tab=recovery&workspace=${encodeURIComponent(workspace_slug)}`,
@@ -153,6 +153,51 @@
   }
 	  function htmlEscape(value){ return String(value ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 	  function linkButton(label, href){ return href ? `<a class='saas-btn' href='${htmlEscape(href)}'>${htmlEscape(label)}</a>` : ''; }
+	  function numberLike(value, fallback=0){
+	    const number = Number(value);
+	    return Number.isFinite(number) ? number : fallback;
+	  }
+	  function progressValue(progress=[], label=''){
+	    const wanted = String(label || '').toLowerCase();
+	    const row = (progress || []).find((item)=>String(item.label || '').toLowerCase() === wanted);
+	    return numberLike(row?.used, 0);
+	  }
+	  function kpiValue(kpis=[], label=''){
+	    const wanted = String(label || '').toLowerCase();
+	    const row = (kpis || []).find((item)=>String(item.label || '').toLowerCase() === wanted);
+	    return numberLike(String(row?.value || '').replace(/[^0-9.-]/g, ''), 0);
+	  }
+	  function setLiveUsageCounters(usage={}){
+	    document.querySelectorAll('[data-live-usage]').forEach((el)=>{
+	      const key = el.dataset.liveUsage;
+	      el.textContent = String(usage[key] ?? '-');
+	    });
+	  }
+	  function usageFromVisuals(visuals={}, workspace={}){
+	    const progress = visuals.progress || [];
+	    const kpis = visuals.kpis || [];
+	    return {
+	      commands: progressValue(progress, 'Commands'),
+	      events: kpiValue(kpis, '0S Events'),
+	      proof_exports: progressValue(progress, 'Proof exports'),
+	      seats: numberLike(workspace.limits?.seats ?? workspace.included_usage?.tester_seats ?? workspace.included_usage?.seats, 0),
+	      mailboxes: progressValue(progress, 'Mailboxes')
+	    };
+	  }
+	  async function loadLiveWorkspaceUsage(workspaceId, workspace={}){
+	    if(!workspaceId) return null;
+	    try{
+	      const result = await apiJson(`/api/saas/customer-visuals?workspace_id=${encodeURIComponent(workspaceId)}`);
+	      const usage = usageFromVisuals(result.visuals || {}, workspace);
+	      const active = read('saas_active_workspace', {}) || {};
+	      write('saas_active_workspace', {...active, live_usage:usage, live_usage_loaded_at:now()});
+	      setLiveUsageCounters(usage);
+	      return {result, usage};
+	    }catch(error){
+	      setLiveUsageCounters({commands:'-', events:'-', proof_exports:'-', seats:'-'});
+	      return {ok:false,error:error.message || 'live_usage_unavailable'};
+	    }
+	  }
 	  async function loadLlcWorkflowStatus(){
 	    const target=$('llcWorkflowStatus');
 	    if(!target) return;
@@ -180,11 +225,12 @@
         el.innerHTML = '<span class="danger-pill">Not signed in</span><p>Use the client login page to open a workspace.</p>';
         return;
       }
-      const workspace = read('saas_active_workspace', {}) || {};
-      const merit = read('saas_skyemerit_pack', null);
-      el.innerHTML = `<span class="status-pill">Signed in</span><h3>${session.client}</h3><p><strong>Workspace:</strong> ${session.workspace}</p><p><strong>Email:</strong> ${session.email}</p><p><strong>Status:</strong> ${session.status}</p><p><strong>Usage:</strong> ${workspace.included_usage?.scans ?? 0} scans, ${workspace.included_usage?.commands ?? 0} commands, ${workspace.included_usage?.proof_exports ?? 0} proof exports, ${workspace.included_usage?.tester_seats ?? 0} tester seats</p>${merit ? `<p><strong>SkyeMerit:</strong> ${merit.kaixu_credit_label}; ${merit.coupon_codes.join(', ')}. Gate required.</p>` : ''}`;
-    });
-  }
+	      const workspace = read('saas_active_workspace', {}) || {};
+	      const usage = workspace.live_usage || usageFromVisuals({}, workspace);
+	      const merit = read('saas_skyemerit_pack', null);
+	      el.innerHTML = `<span class="status-pill">Signed in</span><h3>${session.client}</h3><p><strong>Workspace:</strong> ${session.workspace}</p><p><strong>Email:</strong> ${session.email}</p><p><strong>Status:</strong> ${session.status}</p><p><strong>Live usage:</strong> ${usage.events ?? 0} 0S events, ${usage.commands ?? 0} commands, ${usage.proof_exports ?? 0} proof exports, ${usage.seats ?? 0} seats</p>${workspace.live_usage_loaded_at ? `<p><strong>Usage updated:</strong> ${workspace.live_usage_loaded_at}</p>` : '<p><strong>Usage:</strong> waiting for live workspace visuals.</p>'}${merit ? `<p><strong>SkyeMerit:</strong> ${merit.kaixu_credit_label}; ${merit.coupon_codes.join(', ')}. Gate required.</p>` : ''}`;
+	    });
+	  }
   const sharedGateKeys = [
     'METRAIYUX_GATE_SESSION',
     'SKYGATEFS27_GATE_SESSION',
@@ -298,10 +344,11 @@
             { id: 'skyerunners', name: 'SkyeRunners', scope: 'workspace-routing' }
           ]
         });
-        output('clientLoginReceipt', {...result, session, next:'Claim workspace or open dashboard.'});
-        recordAction('client_login.opened_workspace', {workspace_id: workspace.workspace_id, workspace_slug: workspace.workspace_slug, client_id: clientId});
-        renderSession();
-        return result;
+	        output('clientLoginReceipt', {...result, session, next:'Claim workspace or open dashboard.'});
+	        recordAction('client_login.opened_workspace', {workspace_id: workspace.workspace_id, workspace_slug: workspace.workspace_slug, client_id: clientId});
+	        await loadLiveWorkspaceUsage(workspace.workspace_id, workspace);
+	        renderSession();
+	        return result;
       } catch(error) {
         output('clientLoginReceipt',{ok:false,error:error.message || 'workspace_unavailable', gate:'FS27/SkyGate/Free99'});
         return null;
@@ -383,7 +430,10 @@
     async createWorkspace(){
       const profile=read('saas_company_profile',{}), services=read('saas_service_selection',{}), onboarding=read('saas_onboarding',[]).slice(-1)[0]||{};
       const identity=read('saas_identity_preview', null)||identityPreview({...profile,...onboarding},'workspace');
-      const payload={...identity, company_name:identity.company_name || profile.company_name || profile.brand_name, email:identity.owner_email || onboarding.approval_email, plan:services.plan || identity.plan_id || query.get('plan') || 'starter-command', profile, services:services.services || [], onboarding, mailbox_email:identity.proposed_skyemail_alias || identity.requested_skyemail || ''};
+	      const payload={...identity, company_name:identity.company_name || profile.company_name || profile.brand_name, email:identity.owner_email || onboarding.approval_email, plan:services.plan || identity.plan_id || query.get('plan') || 'starter-command', profile, services:services.services || [], onboarding};
+	      if (identity.requested_skyemail) payload.mailbox_email = identity.requested_skyemail;
+	      if (identity.mailbox_local_part) payload.mailbox_local_part = identity.mailbox_local_part;
+	      if (identity.mailbox_domain) payload.mailbox_domain = identity.mailbox_domain;
       try{
         const result=await postJson('/api/saas/workspaces', payload);
         write('saas_workspace',result.workspace);
@@ -414,7 +464,7 @@
         const all=read('saas_billing_intents',[]);
         all.push(result.billing_intent || result);
         write('saas_billing_intents',all);
-        recordAction('billing.checkout_session_created', {workspace_id:data.workspace_id || workspace.workspace_id || data.client_slug || query.get('workspace') || 'metraiyux-0s', plan});
+	        recordAction('billing.skypay_handoff_recorded', {workspace_id:data.workspace_id || workspace.workspace_id || data.client_slug || query.get('workspace') || 'metraiyux-0s', plan});
         output('billingReceipt',result);
         return result;
       }catch(error){

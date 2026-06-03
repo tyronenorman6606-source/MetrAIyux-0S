@@ -12,6 +12,7 @@ const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const receiptPath = path.join(artifactRoot, stamp, 'receipt.json');
 const latestPath = path.join(artifactRoot, '0s-operating-proof-matrix-latest.json');
 const perAppProofPath = path.join(repoRoot, 'test-artifacts', '0s-per-app-operating-proof', '0s-per-app-operating-proof-latest.json');
+const appDeepClosurePath = path.join(repoRoot, 'test-artifacts', '0s-app-deep-closure', '0s-app-deep-closure-latest.json');
 const osJsPath = path.join(repoRoot, 'metraiyux_0s_site', '0s', 'os.js');
 const closureManifestPath = path.join(repoRoot, 'metraiyux_0s_site', 'data', '0s-closure-workflows.json');
 const deployScriptPath = path.join(repoRoot, 'scripts', 'deploy-0s-worker.mjs');
@@ -158,6 +159,21 @@ function readPerAppProofRows() {
     const data = JSON.parse(read(perAppProofPath));
     if (data?.ok !== true || !Array.isArray(data.rows)) return new Map();
     return new Map(data.rows.map((row) => [row.id, row]));
+  } catch {
+    return new Map();
+  }
+}
+
+function readAppDeepClosureRows() {
+  if (!fs.existsSync(appDeepClosurePath)) return new Map();
+  try {
+    const data = JSON.parse(read(appDeepClosurePath));
+    if (!Array.isArray(data.rows)) return new Map();
+    return new Map(data.rows.map((row) => [row.id, {
+      ...row,
+      strict_deep_closure: true,
+      generated_at: data.generated_at || row.generated_at || ''
+    }]));
   } catch {
     return new Map();
   }
@@ -435,6 +451,7 @@ const directAppLaneMap = new Map([
   ['gate', 'shared-owner-gate'],
   ['founder-command', 'founder-command-work-system'],
   ['founder-calendar', 'founder-command-work-system'],
+  ['business-card-factory', 'founder-account-valley-crosswalk'],
   ['admin', 'admin-brain-automation'],
   ['operator', 'admin-brain-automation'],
   ['0s-command-bridge', 'command-bridge-all-lanes'],
@@ -473,6 +490,8 @@ function canonicalFamilyForApp(app, laneById) {
 function stateProfileForApp(app = {}) {
   const text = appSearchText(app);
   if (app.route_source === 'scripts/deploy-0s-worker.mjs' || app.kind === 'worker_asset_file_include' || /^worker-asset-/.test(app.id)) return 'proof_asset';
+  if (/business-card-factory/i.test(text)) return 'proxy_stateful';
+  if (/^connectlog$|connectlog-v7.*app\.html/i.test(`${app.id || ''} ${app.mounted_path || ''}`)) return 'local_first_stateful';
   if (/free-stack|flyer|pricing|commercial-terms|blog|terms|valuation|proof\/|live\//i.test(text)) return 'read_only_static';
   if (/brand-id|brandid|webcreator|skyeweb|skyedocx|max|vaultpro|doctor-ops|documorph|arcade|authenticator|offline|pwa/i.test(text)) return 'local_first_stateful';
   if (/skyemail|skymail|relay13|skyenet|citadeldb|company-knowledge|provider|external|worker|proxy/i.test(text)) return 'proxy_stateful';
@@ -482,6 +501,7 @@ function stateProfileForApp(app = {}) {
 function appMissingDepth({ profile, directReceipt, familyState, routeOk, appProof }) {
   if (!routeOk) return ['route_or_shared_gate_render'];
   if (appProof?.ok === true) return [];
+  if (appProof?.strict_deep_closure) return appProof.failures?.length ? appProof.failures : ['app_specific_human_deep_closure_missing_or_failing'];
   if (directReceipt && familyState === 'green') return [];
   if (profile === 'read_only_static' || profile === 'proof_asset') {
     return [
@@ -512,6 +532,7 @@ function appMissingDepth({ profile, directReceipt, familyState, routeOk, appProo
 function appBehaviorMatrix(routeRows, lanes) {
   const laneById = new Map(lanes.map((lane) => [lane.id, lane]));
   const perAppProofRows = readPerAppProofRows();
+  const appDeepClosureRows = readAppDeepClosureRows();
   const rows = routeRows.map((row) => {
     const canonicalFamily = canonicalFamilyForApp(row, laneById);
     const familyLane = canonicalFamily ? laneById.get(canonicalFamily) : null;
@@ -520,7 +541,7 @@ function appBehaviorMatrix(routeRows, lanes) {
     const directReceipt = directAppLaneMap.get(row.id) === canonicalFamily;
     const familyState = familyLane?.state || 'unmapped';
     const familyReceiptOk = familyLane?.receipt?.ok === true || familyLane?.evidence_receipts?.some((item) => item.ok) || familyLane?.behavior_receipts?.some((item) => item.ok);
-    const appProof = perAppProofRows.get(row.id) || null;
+    const appProof = appDeepClosureRows.get(row.id) || perAppProofRows.get(row.id) || null;
     const missing = appMissingDepth({ profile, directReceipt, familyState, routeOk, appProof });
     const state = !routeOk || familyState === 'red'
       ? 'red'
@@ -541,7 +562,9 @@ function appBehaviorMatrix(routeRows, lanes) {
       route_gate_ok: row.unauth?.ok === true,
       route_authenticated_ok: row.authenticated?.ok === true,
       route_ok: routeOk,
-      coverage_model: appProof?.ok === true
+      coverage_model: appProof?.strict_deep_closure
+        ? 'app_specific_human_deep_closure'
+        : appProof?.ok === true
         ? 'app_specific_behavior_receipt'
         : directReceipt
         ? 'direct_app_lane_receipt'
@@ -550,9 +573,12 @@ function appBehaviorMatrix(routeRows, lanes) {
         : 'route_auth_only_unmapped',
       app_specific_receipt: appProof ? {
         ok: appProof.ok === true,
+        strict_deep_closure: appProof.strict_deep_closure === true,
         source_file: appProof.source_file || '',
         source_sha256: appProof.source_sha256 || '',
         proof_model: appProof.proof_model?.model || '',
+        scenario_id: appProof.scenario_id || '',
+        scenario_label: appProof.scenario_label || '',
         generated_at: appProof.generated_at || ''
       } : null,
       missing_depth: missing,
@@ -759,9 +785,14 @@ async function main() {
       behavior_proof_registry: registry
     },
     app_behavior_matrix: perApp,
-    operating_closure_state: perApp.literal_per_app_depth_closed ? 'green' : 'route_and_family_green_per_app_depth_yellow',
+    operating_closure_state: p0NotGreen.length
+      ? 'p0_behavior_not_green'
+      : perApp.literal_per_app_depth_closed
+      ? 'green'
+      : 'route_and_family_green_per_app_depth_yellow',
     honest_warnings: [
-      ...(perApp.literal_per_app_depth_closed ? [] : [`Literal per-mounted-app behavior depth is ${perApp.state}: ${perApp.yellow} yellow app rows, ${perApp.red} red app rows. The 22-lane behavior registry is family evidence, not full independent app behavior for all ${perApp.total_apps} routes.`])
+      ...(perApp.literal_per_app_depth_closed ? [] : [`Literal per-mounted-app behavior depth is ${perApp.state}: ${perApp.yellow} yellow app rows, ${perApp.red} red app rows. Route/family evidence is not full independent app behavior for all ${perApp.total_apps} routes.`]),
+      ...(p0NotGreen.length ? [`P0 behavior lanes are not green: ${p0NotGreen.map((lane) => lane.id).join(', ')}.`] : [])
     ],
     next_targets: [
       ...perApp.rows

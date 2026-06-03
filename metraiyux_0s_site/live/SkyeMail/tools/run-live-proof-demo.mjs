@@ -175,7 +175,7 @@ async function zohoJson(pathname, init = {}) {
   });
   const data = await readJsonResponse(res);
   if (!res.ok) {
-    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || `Citadel mail request failed ${res.status}`;
+    const message = data?.data?.moreInfo || data?.data?.errorMessage || data?.message || data?.status?.description || data?.error || `SkyeMail provider request failed ${res.status}`;
     throw Object.assign(new Error(message), { statusCode: res.status, providerResponse: data });
   }
   return data;
@@ -369,6 +369,20 @@ async function runResendProof() {
     return user;
   }
 
+  async function archiveProofMailboxes() {
+    await sql.query(
+      `update skymail.hosted_mailboxes
+          set status='offboarded',
+              provisioning_status='resend-proof-demo-archived',
+              provider_payload_json=coalesce(provider_payload_json, '{}'::jsonb) || $2::jsonb,
+              updated_at=now()
+        where lower(mailbox_email)=any($1::text[])
+          and provider='resend'
+          and provisioning_status='resend-proof-demo'`,
+      [[a.email, b.email].map((email) => email.toLowerCase()), JSON.stringify({ proof_demo_archived: true, archived_at: new Date().toISOString(), run_id: runId })],
+    );
+  }
+
   async function sendMail({ from, to, subject, text }) {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -433,6 +447,7 @@ async function runResendProof() {
     text: `Run ${runId}: Operator B replies back into Operator A's encrypted SkyeMail inbox.`,
   });
   const importBA = await waitForImport({ userId: userA.id, fromEmail: b.email, subject: subjectBA });
+  await archiveProofMailboxes();
 
   return {
     ok: Boolean(importAB.imported && importBA.imported),
@@ -474,7 +489,7 @@ async function runResendProof() {
     security: {
       citadel_keys_active: true,
       private_keys_exposed: false,
-      inbox_storage: "encrypted payloads in the Citadel/SkyeNet sovereign mail store",
+      inbox_storage: "encrypted payloads in the Citadel Database and SkyeNet sovereign mail store",
       mail_events: "Citadel webhooks processed by SkyeMail Sovereign Worker",
     },
   };
@@ -483,14 +498,14 @@ async function runResendProof() {
 async function runZohoProof() {
   const { accountId, defaultFrom } = await getZohoMailboxIdentity();
   const domain = defaultFrom.split("@")[1] || env.SKYMAIL_PRIMARY_DOMAIN || env.INBOUND_DOMAIN || "solenterprises.org";
-  const subjectAB = `SkyeMail Citadel live inbox proof A ${runId}`;
-  const subjectBA = `SkyeMail Citadel live inbox proof B ${runId}`;
+  const subjectAB = `SkyeMail backed by Citadel Database and SkyeNet live inbox proof A ${runId}`;
+  const subjectBA = `SkyeMail backed by Citadel Database and SkyeNet live inbox proof B ${runId}`;
   const sendAB = await zohoSend({
     accountId,
     from: defaultFrom,
     to: defaultFrom,
     subject: subjectAB,
-    text: `Run ${runId}: SkyeMail sends through the Citadel/SkyeNet sovereign mail lane and waits until the message is visible to the sovereign inbox.`,
+    text: `Run ${runId}: SkyeMail sends through the Citadel Database and SkyeNet sovereign mail lane and waits until the message is visible to the sovereign inbox.`,
   });
   const importAB = await waitForZohoMailboxVisibility({ accountId, subject: subjectAB });
   const sendBA = await zohoSend({
@@ -498,7 +513,7 @@ async function runZohoProof() {
     from: defaultFrom,
     to: defaultFrom,
     subject: subjectBA,
-    text: `Run ${runId}: SkyeMail runs a second Citadel/SkyeNet send and verifies the mailbox can read the return proof.`,
+    text: `Run ${runId}: SkyeMail runs a second Citadel Database and SkyeNet send and verifies the mailbox can read the return proof.`,
   });
   const importBA = await waitForZohoMailboxVisibility({ accountId, subject: subjectBA });
   const runAInbox = importAB.inbox?.[0] || importAB.search?.find((message) => /inbox/i.test(messageFolder(message))) || null;
@@ -514,7 +529,7 @@ async function runZohoProof() {
     public_demo_url: `${publicUrl}/live-proof`,
     domain,
     actors: [
-      { label: "Active Citadel mailbox", mailbox: defaultFrom, citadel_lane_id: accountId },
+      { label: "Active SkyeMail production mailbox", mailbox: defaultFrom, citadel_lane_id: accountId },
       { label: "SkyeMail sovereign inbox reader", mailbox: defaultFrom, citadel_lane_id: accountId },
     ],
     runs: [
@@ -550,8 +565,8 @@ async function runZohoProof() {
     security: {
       citadel_keys_active: true,
       private_keys_exposed: false,
-      inbox_storage: "Citadel/SkyeNet sovereign mailbox read through SkyeMail; no raw OAuth token is published",
-      mail_events: "Citadel/SkyeNet send and inbox-read proof",
+      inbox_storage: "Citadel Database and SkyeNet sovereign mailbox read through SkyeMail; no raw OAuth token is published",
+      mail_events: "Citadel Database and SkyeNet send and inbox-read proof",
     },
   };
 }

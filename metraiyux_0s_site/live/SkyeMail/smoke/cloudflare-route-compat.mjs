@@ -82,6 +82,20 @@ const checks = [
     expectText: "Unauthorized",
     description: "api .js gmail-send compatibility route",
   },
+  {
+    method: "GET",
+    path: "/suite/standalone/dashboard.html",
+    expectStatus: [200],
+    expectText: "SkyeMail backed by Citadel Database and SkyeNet",
+    description: "legacy suite standalone dashboard route redirects to the real inbox surface",
+  },
+  {
+    method: "GET",
+    path: "/standalone/compose.html",
+    expectStatus: [200],
+    expectText: "SkyeMail backed by Citadel Database and SkyeNet",
+    description: "legacy standalone compose route redirects to the real compose surface",
+  },
 ];
 
 async function timedFetch(check) {

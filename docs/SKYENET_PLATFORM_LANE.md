@@ -1,6 +1,6 @@
 # SkyeNet Platform Lane
 
-Last updated: 2026-05-28
+Last updated: 2026-06-01
 
 SkyeNet is real in this repo as the FS27-backed deployment lane for static edge surfaces and managed SkyeNet platform functions. It is also now deployed as its own standalone Cloudflare Worker project at `https://skyenet.graylondonskyes.workers.dev`. It is not a separate app with its own password. It uses the shared 0S FS27/SkyGate/Free99 auth lane.
 
@@ -30,21 +30,29 @@ Live today as SkyeNet Edge:
 - Gate-aware route metadata.
 - Fallback-origin route records for platform-owned backends.
 - Managed SkyeNet function lanes mounted through the 0S/FS27 estate.
+- Netlify-style Forms capture with multipart private file custody, policy-driven spam controls, owner inbox APIs, submission moderation, private file download, and receipt-only notification records.
 - Internal status, route, observability, and cost model APIs.
 - Gated deployed-bundle source download through `/api/skyenet/source-download`.
+- Private source custody through manifest, tree, file, search, source transfer, and source codebase mount APIs.
+- Project-aware SkyeDrive/SkyeVault/secure `.skye` source mounts for IDE/MCP clients without copying giant packages into repos.
+- Plain-tar, tar.gz, and zip lazy archive-backed per-file reads for indexed source files that have not been separately materialized.
 
 Signed runtime v1 now:
 
 - Netlify-style function folder intake from `netlify/functions/*`, `functions/*`, or `skyenet/functions/*`.
 - Compatible `/.netlify/functions/<name>` and `/.skyenet/functions/<name>` route maps.
 - Signed SkyeNet function bundle manifests with tenant IDs, function IDs, route records, limits, and runtime contract metadata.
-- SkyeNet-owned runtime proof with request body caps, timeout caps, memory caps, deny-by-default env grants, and default-deny outbound fetch.
+- Deploy CLI bundling, customer upload, server-signed activation after storage hash verification, and Dynamic Worker invocation.
+- SkyeNet-owned runtime with request body caps, timeout caps, scheduled/background invocation metadata, scheduled trigger indexing, deny-by-default env grants, default-deny outbound fetch, and required invocation receipts.
+- Standalone SkyeNet console function-grant inspection and rollback-route controls backed by `/api/skyenet/functions-status`, `/api/skyenet/env`, and `/api/skyenet/rollback`.
 
-Controlled preview / not unlimited yet:
+Still not unlimited hostile-code parity:
 
-- Arbitrary uploaded serverless functions that execute untrusted customer code.
+- Unrestricted execution of untrusted hostile customer code outside owner-approved/function-plan bounds.
+- External Forms email/SMS delivery without an owner-approved provider integration; current Forms notifications are stored receipt records.
+- Non-materialized `.tar.zst` source-file reads still require materialization or a decompressor/index service; plain `.tar`, `.tar.gz`, and `.zip` are now lazy-readable without extracting the whole package.
 
-The repo now has a SkyeNet Functions converter and signed Netlify-compatible proof runtime. Uploaded function bundles can be accepted, converted, inspected, signed, staged, and executed in the controlled v1 runtime for trusted or owner-approved bundles. Unlimited execution of untrusted customer code still needs the SkyeNet isolated runtime, sandbox policy, build admission checks, per-tenant CPU limits, secret isolation, abuse controls, and billing guards before it should be marketed as full hostile-code Netlify Functions parity.
+The repo now has a SkyeNet Functions converter and production Netlify-compatible function lane. Uploaded JS/ESM function bundles can be detected by `skyenet:deploy`, installed/built inside a Linux user/mount/PID namespace with a chrooted `/workspace` when available, bundled with helper imports and installed file dependencies, uploaded with build receipts, server-signed after storage verification, activated, and executed in the Dynamic Worker runtime for managed/owner-approved workspaces. Scheduled functions are indexed for the FS27 cron dispatcher, background functions accept async jobs with receipts, and the console exposes per-function env grants plus rollback controls. Unlimited hostile-code execution still needs the SkyeNet isolated runtime, sandbox policy, build admission checks, per-tenant CPU limits, secret isolation, abuse controls, and billing guards before it should be marketed as unrestricted Functions parity.
 
 ## Function Runtime Upgrade Path
 
@@ -119,6 +127,8 @@ Official sources:
 6. Completion writes a deployment manifest through `/api/skyenet/deploy/complete`.
 7. Route registration writes the host/path record through `/api/skyenet/deploy/route`; public company/customer-facing apps should use a platform-native host like `skyenet.<company-slug>`, an empty mount or `/`, and `url_mode: subdomain`. The shared `skyenet.graylondonskyes.workers.dev/<project>` route is infrastructure, fallback, proof, or temporary staging unless the owner explicitly approves it as public copy.
 8. Observability and cost panels read from `/api/skyenet/status`, `/api/skyenet/routes`, `/api/skyenet/observability`, and `/api/skyenet/cost-model`.
+9. Forms owner workflows read from `/api/skyenet/forms-inbox`, `/api/skyenet/forms-submission`, `/api/skyenet/forms-file`, `/api/skyenet/forms-policy`, and `/api/skyenet/forms-notify`.
+10. Source custody workflows read from `/api/skyenet/source-manifest`, `/api/skyenet/source-tree`, `/api/skyenet/source-file`, `/api/skyenet/source-search`, `/api/skyenet/source-transfer`, and `/api/skyenet/source-codebases`.
 
 CLI deploy shape:
 
@@ -131,6 +141,7 @@ npm run skyenet:deploy -- \
   --mount / \
   --url-mode subdomain \
   --public \
+  --functions \
   --concurrency 4
 ```
 
@@ -148,6 +159,10 @@ After any production deployment, this repo uses non-browser verification unless 
 
 ```bash
 node tools/proof-skynet-source-download-live-http.mjs
+npm run skyenet:netlify-parity:proof
+npm run skyenet:netlify-parity:stress
+npm run skyenet:0s-source-aliases:proof
+npm run skyenet:mcp-source-codebase:proof
 ```
 
 Save receipts for build checks, API smoke, route smoke, source-download proof, and any blocked items. Browser verification is owner-handled under the repo policy in `AGENTS.md`.

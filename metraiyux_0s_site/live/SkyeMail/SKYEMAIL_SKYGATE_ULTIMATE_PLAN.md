@@ -1,14 +1,14 @@
-# SkyeMail x Skyegate FS27 Ultimate Plan
+# SkyeMail x SkyeGate FS27 Ultimate Plan
 
 Date: 2026-05-16
 
 ## Target
 
-Make SkyeMail provision workspaces from Skyegate FS27 instead of acting like a separate signup island.
+Make SkyeMail provision workspaces from SkyeGate FS27 instead of acting like a separate signup island.
 
 The final flow:
 
-1. User signs up or authenticates at Skyegate FS27.
+1. User signs up or authenticates at SkyeGate FS27.
 2. FS27 creates a basic gate identity and card, even if the user has no paid usage yet.
 3. FS27 hands SkyeMail an active token/card claim.
 4. SkyeMail creates or finds the workspace user, generates a SkyeMail ID, generates the primary SkyeMail address, provisions the mailbox, and records the FS27 card/customer/session linkage.
@@ -20,7 +20,7 @@ The final flow:
 
 SkyeMail already has:
 
-- 0S/SkyGate session intake: `netlify/functions/auth-fs27-session.js`
+- 0S/SkyeGate session intake: `netlify/functions/auth-fs27-session.js`
 - FS27 introspection and event mirroring: `netlify/functions/_skygate.js`
 - Hosted mailbox provisioning: `netlify/functions/mailbox-provision.js`
 - Provider bridge for Stalwart or external webhooks: `netlify/functions/_mailbox-provider.js`
@@ -31,7 +31,7 @@ SkyeMail already has:
 The gap:
 
 - Normal signup still creates a standalone SkyeMail user.
-- 0S/SkyGate session intake creates a user, but it does not fully persist the gate card, SkyeMail ID, workspace ID, or mailbox birth record.
+- 0S/SkyeGate session intake creates a user, but it does not fully persist the gate card, SkyeMail ID, workspace ID, or mailbox birth record.
 - Mailbox routing guesses by local handle for inbound messages.
 - There is no first-class alias table, so one mailbox cannot safely own multiple recipient addresses with uniqueness and proof of which alias received the message.
 
@@ -125,7 +125,7 @@ Current pricing truth:
 
 - Launch access is free.
 - Paid checkout is not active yet.
-- Future paid plan state should come from SkyGate FS27, not a separate SkyeMail billing island.
+- Future paid plan state should come from SkyeGate FS27, not a separate SkyeMail billing island.
 - FS27 should remain the source of truth for customer ID, gate card, billing state, reloads, usage, and AI metering.
 
 Billing-ready tier structure:
@@ -145,7 +145,7 @@ Direct SkyeMail signup should remain possible for local recovery/admin cases, bu
 
 1. FS27 `/auth-signup` creates the user/customer/session.
 2. FS27 `/auth-card` exposes the gate identity/card.
-3. SkyeMail `/auth-fs27-session` introspects the inherited 0S/SkyGate session.
+3. SkyeMail `/auth-fs27-session` introspects the inherited 0S/SkyeGate session.
 4. SkyeMail creates the workspace identity and session.
 5. SkyeMail `/mailbox-provision` creates the mailbox and primary alias.
 6. SkyeMail `/mailbox-aliases` creates additional same-inbox aliases.
@@ -184,8 +184,8 @@ Content-Type: application/json
 - Duplicate username/handle is rejected or made unique deterministically.
 - Duplicate mailbox email is rejected unless it belongs to the same user.
 - Duplicate alias email is rejected globally.
-- 0S/SkyGate session creates SkyeMail session.
-- 0S/SkyGate session response includes SkyeMail ID, workspace ID, and FS27 customer/card metadata.
+- 0S/SkyeGate session creates SkyeMail session.
+- 0S/SkyeGate session response includes SkyeMail ID, workspace ID, and FS27 customer/card metadata.
 - Mailbox provisioning creates a hosted mailbox and a primary alias.
 - Alias provisioning creates a second route to the same inbox.
 - Inbound email to the alias lands in the same inbox and records `recipient_alias`.

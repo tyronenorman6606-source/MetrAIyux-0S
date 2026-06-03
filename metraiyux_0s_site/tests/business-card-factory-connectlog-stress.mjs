@@ -213,12 +213,9 @@ assert.equal(liveCopy.body?.ok, true, 'live copy pass ok');
 assert.ok(liveCopy.body?.receipt_id, 'live copy pass records receipt');
 assert.ok([
   'fs27-gateway-chat',
-  '0s-provider-runtime-openai-chat',
-  '0s-openai-direct',
-  '0s-openai-direct-after-fs27-gateway-failure',
+  'local-deterministic-copy-gateway-required',
   'local-deterministic-copy',
   'local-deterministic-copy-after-gateway-failure',
-  'local-deterministic-copy-after-openai-failure'
 ].includes(liveCopy.body?.provider_path), `provider path ${liveCopy.body?.provider_path}`);
 
 const stressMs = Math.round(performance.now() - startedStress);

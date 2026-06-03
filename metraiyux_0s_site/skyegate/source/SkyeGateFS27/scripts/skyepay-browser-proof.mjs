@@ -218,7 +218,7 @@ async function verifyApiContract(origin, browser) {
       const status = await statusResponse.json();
       return {
         offersOk: offers.ok === true && offers.offers.length >= 60,
-        registryOk: offers.repo_stripe_catalog?.imported_checkout_offers >= 50,
+        registryOk: offers.catalog_integrity?.imported_checkout_offers >= 50,
         checkoutOk: checkout.ok === true && typeof checkout.url === "string",
         routexOfferOk: offers.offers.some((offer) => (
           offer.id === "metraiyux-routex-workforce-command" &&
@@ -231,7 +231,7 @@ async function verifyApiContract(origin, browser) {
           status.order?.provisioning_status === "waiting_for_owner_approval",
         client: offers.client?.client_slug || offers.client?.slug || null,
         offerCount: offers.offers.length,
-        repoImported: offers.repo_stripe_catalog?.imported_checkout_offers || 0,
+        repoImported: offers.catalog_integrity?.imported_checkout_offers || 0,
         checkoutId: checkout.id || null
       };
     });

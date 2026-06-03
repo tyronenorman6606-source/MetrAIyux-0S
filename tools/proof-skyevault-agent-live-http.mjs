@@ -1,6 +1,8 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = path.resolve(new URL('..', import.meta.url).pathname);
 const artifactDir = path.join(repoRoot, 'test-artifacts', 'skyevault-agent-live-http');
@@ -47,6 +49,32 @@ async function jsonFetch(url, init = {}) {
   };
 }
 
+async function bytesFetch(url, init = {}) {
+  const response = await fetch(url, init);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  return {
+    url,
+    status: response.status,
+    ok: response.ok,
+    contentType: response.headers.get('content-type') || '',
+    bytes,
+    headers: Object.fromEntries(response.headers.entries())
+  };
+}
+
+function sha256(bytes) {
+  return crypto.createHash('sha256').update(bytes).digest('hex');
+}
+
+function ownerHeaders(token) {
+  return {
+    accept: 'application/octet-stream, application/json',
+    authorization: `Bearer ${token}`,
+    'x-skye-gate-session': token,
+    'x-free99-gate-session': token
+  };
+}
+
 async function createCheckout() {
   const stamp = Date.now();
   return await jsonFetch(`${fs27}/skyepay/checkout`, {
@@ -56,8 +84,8 @@ async function createCheckout() {
       client_slug: 'metraiyux-0s',
       offer_id: offer,
       customer_email: `skyevault-agent-proof+${stamp}@example.com`,
-      customer_name: 'SkyeVault Agent Live Proof',
-      company_name: 'SkyeVault Agent Proof Co',
+      customer_name: 'Reape0r Live Proof',
+      company_name: 'Reape0r Proof Co',
       idempotency_key: `skyevault-agent-live-proof-${stamp}`,
       legal_acceptance: {
         legal_terms_accepted: true,
@@ -98,9 +126,9 @@ function check(name, ok, details = {}) {
 }
 
 const publicAgentPage = await textFetch(receipt.surfaces.publicAgentPage, { headers: { accept: 'text/html' } });
-check('Public SkyeVault Agent page is live buyer HTML', publicAgentPage.status === 200
+check('Public Reape0r page is live buyer HTML', publicAgentPage.status === 200
   && publicAgentPage.contentType.includes('text/html')
-  && publicAgentPage.text.includes('SkyeVault Agent')
+  && publicAgentPage.text.includes('Reape0r')
   && publicAgentPage.text.includes('agentCheckoutForm')
   && publicAgentPage.text.includes('/skyepay/checkout'), {
   status: publicAgentPage.status,
@@ -108,9 +136,12 @@ check('Public SkyeVault Agent page is live buyer HTML', publicAgentPage.status =
 });
 
 const publicAlias = await textFetch(receipt.surfaces.publicAgentAlias, { headers: { accept: 'text/html' } });
-check('Public SkyeVault Agent alias resolves to the buyer page', publicAlias.status === 200
-  && publicAlias.text.includes('SkyeVault Agent')
-  && publicAlias.text.includes('Starter, Pro, and Command'), {
+check('Public Reape0r alias resolves to the buyer page', publicAlias.status === 200
+  && publicAlias.contentType.includes('text/html')
+  && publicAlias.text.includes('Reape0r')
+  && publicAlias.text.includes('Starter, Pro, Command, and Auto-Install')
+  && publicAlias.text.includes('agentCheckoutForm')
+  && publicAlias.text.includes('/skyepay/checkout'), {
   status: publicAlias.status,
   contentType: publicAlias.contentType
 });
@@ -162,7 +193,7 @@ check('Pending SkyePay session does not expose workspace portal key before payme
 
 const installUrl = `${zeroOs}/skye-vault-os/agent/?session_id=${encodeURIComponent(sessionId)}&offer=${encodeURIComponent(offer)}`;
 const install = sessionId ? await textFetch(installUrl, { headers: { accept: 'text/html' } }) : { status: 0, text: '', contentType: '' };
-check('Agent install page opens from the live SkyePay return session', install.status === 200 && install.text.includes('SkyeVault Agent Install Center'), {
+check('Reape0r install page opens from the live SkyePay return session', install.status === 200 && install.text.includes('Reape0r: the Autonomous Cloud Repo Mirror'), {
   status: install.status,
   contentType: install.contentType,
   hasPendingCopy: install.text.includes('Download unlocks after provisioning')
@@ -173,6 +204,42 @@ const pkg = sessionId ? await textFetch(packageUrl, { headers: { accept: 'applic
 check('Agent package stays locked until payment and workspace provisioning complete', pkg.status === 402 && pkg.text.includes('skyevault_agent_entitlement_not_unlocked'), {
   status: pkg.status,
   contentType: pkg.contentType
+});
+
+let ownerAuth = { ok: false, token: '', credential: { key: '', source: '' }, response: {} };
+try {
+  ownerAuth = await resolveZeroOsGateAuth({ zeroOsBase: zeroOs });
+} catch (error) {
+  ownerAuth = { ok: false, token: '', credential: { key: '', source: '' }, response: { error: error?.message || String(error) } };
+}
+check('Shared 0S/FS27 owner gate credential is available for package download proof', ownerAuth.ok && Boolean(ownerAuth.token), {
+  credentialKey: ownerAuth.credential?.key || '',
+  credentialSource: ownerAuth.credential?.source || '',
+  status: ownerAuth.response?.status || 0
+});
+
+let ownerManifest = { status: 0, body: {} };
+let ownerPackage = { status: 0, bytes: Buffer.alloc(0), contentType: '' };
+if (ownerAuth.ok && ownerAuth.token) {
+  ownerManifest = await jsonFetch(`${zeroOs}/downloads/skyevault-agent/latest.json`, {
+    headers: ownerHeaders(ownerAuth.token)
+  });
+  ownerPackage = await bytesFetch(receipt.surfaces.agentPackage, {
+    headers: ownerHeaders(ownerAuth.token)
+  });
+}
+const livePackageSha = ownerPackage.bytes.length ? sha256(ownerPackage.bytes) : '';
+const manifestSha = ownerManifest.body?.release?.latestSha256 || ownerManifest.body?.release?.sha256 || '';
+check('Owner/shared-gate download returns the live Reape0r tarball', ownerPackage.status === 200
+  && ownerPackage.bytes.length > 0
+  && livePackageSha
+  && manifestSha
+  && livePackageSha === manifestSha, {
+  manifestStatus: ownerManifest.status,
+  packageStatus: ownerPackage.status,
+  bytes: ownerPackage.bytes.length,
+  sha256: livePackageSha,
+  manifestSha
 });
 
 const dropHome = await textFetch(drop, { headers: { accept: 'text/html' } });

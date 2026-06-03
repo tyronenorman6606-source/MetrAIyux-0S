@@ -379,6 +379,34 @@ select:focus {
 .skyemerit-panel strong {
   color: var(--sky-gold);
 }
+.skyemail-mailbox-claim {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(39, 242, 255, 0.26);
+  background: rgba(39, 242, 255, 0.07);
+  padding: 12px;
+}
+.skyemail-mailbox-claim[hidden] {
+  display: none;
+}
+.skyemail-mailbox-claim strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--sky-text);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.skyemail-mailbox-claim p {
+  margin: 0;
+  color: var(--sky-muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.mailbox-claim-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.82fr);
+  gap: 10px;
+}
 .legal-acceptance {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
@@ -649,6 +677,35 @@ select:focus {
   flex-wrap: wrap;
   gap: 6px;
   margin: 10px 0 14px;
+}
+.selected-fulfillment {
+  margin: 0 0 14px;
+}
+.fulfillment-panel {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(111, 242, 199, 0.22);
+  background: rgba(111, 242, 199, 0.07);
+  border-radius: 8px;
+}
+.fulfillment-panel div {
+  display: grid;
+  gap: 3px;
+}
+.fulfillment-panel span,
+.store-card-fulfillment {
+  color: var(--sky-muted);
+  font-size: 12px;
+}
+.fulfillment-panel strong {
+  color: var(--sky-text);
+  font-size: 13px;
+  line-height: 1.35;
+}
+.store-card-fulfillment {
+  display: block;
+  margin-top: 8px;
 }
 .compact-form {
   gap: 10px;
@@ -1236,6 +1293,17 @@ body.skypay-gateway-v2 .skyemerit-panel {
     rgba(241, 189, 74, 0.04);
 }
 
+body.skypay-gateway-v2 .skyemail-mailbox-claim {
+  border-color: rgba(50, 214, 255, 0.28);
+  background:
+    linear-gradient(90deg, rgba(50, 214, 255, 0.12), transparent),
+    rgba(247, 244, 234, 0.04);
+}
+
+body.skypay-gateway-v2 .skyemail-mailbox-claim strong {
+  color: var(--pay-ink);
+}
+
 body.skypay-gateway-v2 .legal-acceptance {
   border-color: rgba(247, 244, 234, 0.18);
   background: rgba(247, 244, 234, 0.052);
@@ -1424,11 +1492,12 @@ body.skypay-gateway-v2 .bob-trial-card {
     font-size: 1rem;
   }
 
-  body.skypay-gateway-v2 .proof-ticker,
-  body.skypay-gateway-v2 .route-matrix,
-  body.skypay-gateway-v2 .client-strip,
-  body.skypay-gateway-v2 .field-grid,
-  body.skypay-gateway-v2 .settlement-note,
+	  body.skypay-gateway-v2 .proof-ticker,
+	  body.skypay-gateway-v2 .route-matrix,
+	  body.skypay-gateway-v2 .client-strip,
+	  body.skypay-gateway-v2 .field-grid,
+	  body.skypay-gateway-v2 .mailbox-claim-row,
+	  body.skypay-gateway-v2 .settlement-note,
   body.skypay-gateway-v2 #includedUsage,
   body.skypay-gateway-v2 .path-rail {
     grid-template-columns: 1fr;

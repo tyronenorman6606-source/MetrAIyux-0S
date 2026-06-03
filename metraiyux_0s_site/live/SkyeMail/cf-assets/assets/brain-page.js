@@ -40,10 +40,10 @@
     if(!node) return;
     const plan = ai?.entitlement || {};
     const month = ai?.month || {};
-    const status = month.ai_call_allowed ? "FS27 Brain ready" : "local-only until SkyPay entitlement/gateway is active";
+    const status = month.ai_call_allowed ? "FS27 Brain ready" : "local-only until SkyePay entitlement/gateway is active";
     const remaining = month.calls_remaining === null || month.calls_remaining === undefined ? "unlimited" : String(month.calls_remaining);
     const lane = ai?.fs27_brain?.gateway_path || "/gateway-chat";
-    node.textContent = `${status}. Plan: ${plan.name || plan.id || "FS27 Brain"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}. Runtime: FS27/SkyGate Brain via ${lane}.`;
+    node.textContent = `${status}. Plan: ${plan.name || plan.id || "FS27 Brain"}. Calls remaining: ${remaining}. FS27 gateway: ${ai?.fs27_gateway_configured ? "ready" : "not configured"}. Runtime: SkyeGate FS27 Brain via ${lane}.`;
   }
 
   async function renderPlans(){
@@ -134,8 +134,9 @@
       model_mode: el("brainMode")?.value || "fs27_metered_v1",
       to: el("brainTo")?.value || "",
       subject: el("brainSubject")?.value || "",
-      message: prompt,
-      approved: Boolean(el("brainApproveSend")?.checked)
+      message: selected === "send_and_monitor" && el("brainUsePromptAsBody")?.checked ? prompt : "",
+      approved: Boolean(el("brainApproveSend")?.checked),
+      automation_consent: Boolean(el("brainAutomationConsent")?.checked)
     };
     if(state.urlMessageId) body.message_id = state.urlMessageId;
     const data = await apiFetch("/mail-brain", { method:"POST", body: JSON.stringify(body) });
@@ -191,13 +192,21 @@
       state.boot = await SMV.withBoot("brain", "Brain", "Local mailbox brain + FS27 metered Brain lane");
       bind();
       const returnedSession = params.get("session_id") || params.get("checkout_id") || params.get("stripe_session_id") || "";
-      if(returnedSession){
-        setText("brainStatus", "Claiming SkyPay Brain entitlement...");
-        await apiFetch("/mail-brain-claim", {
-          method:"POST",
-          body: JSON.stringify({ session_id: returnedSession, plan_id: params.get("plan") || params.get("offer") || "" })
-        }).catch((err)=> setText("brainStatus", err.message || "Entitlement claim failed."));
-      }
+	      if(returnedSession){
+	        setText("brainStatus", "Claiming SkyePay Brain entitlement...");
+	        const claim = await apiFetch("/mail-brain-claim", {
+	          method:"POST",
+	          body: JSON.stringify({ session_id: returnedSession, plan_id: params.get("plan") || params.get("offer") || "" })
+	        }).catch((err)=> setText("brainStatus", err.message || "Entitlement claim failed."));
+	        if(claim?.ok && window.SMV?.celebrateReceipt){
+	          window.SMV.celebrateReceipt({
+	            receiptId:claim.entitlement?.id || claim.session_id || returnedSession,
+	            triggerType:"owner-thank-you",
+	            intensity:"standard",
+	            message:"SkyeGate FS27 Brain lane unlocked. Thank you for upgrading SkyeMail."
+	          });
+	        }
+	      }
       await refreshBrain();
       if(state.urlMessageId){
         if(el("brainAction")) el("brainAction").value = "triage";

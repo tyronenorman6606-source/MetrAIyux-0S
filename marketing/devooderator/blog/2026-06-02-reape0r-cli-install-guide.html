@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reape0r CLI Install Guide | DevodeRator</title>
+  <meta name="description" content="The public Reape0r CLI field guide: SkyePay access, manual install, auto-install, sync, watch, verify, restore, receipts, plan quotas, and customer-safe proof commands.">
+  <link rel="icon" href="../assets/DevodeRator-logo.png">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="../index.html"><img class="brand-logo" src="../assets/DevodeRator-logo.png" alt="DevodeRator logo"><span>DevodeRator</span></a>
+      <div class="nav-links">
+        <a href="../index.html">Home</a>
+        <a class="active" href="2026-06-02-reape0r-cli-install-guide.html">Reape0r CLI</a>
+        <a href="2026-06-02-reape0r-demon-in-my-machine.html">Demon in my Machine</a>
+        <a href="2026-06-02-0s-week-of-repairs-reape0r-proof.html">Week Proof</a>
+        <a href="../bins/index.html">SkyeVault Bins</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="post-shell">
+    <p class="post-meta">June 2, 2026 - Reape0r - CLI field guide - SkyePay access - mutable current mirror - customer install proof</p>
+    <h1>Reape0r: the Autonomous Cloud Repo Mirror, from checkout to restore.</h1>
+    <p class="lede">
+      This is the public field guide for the daemon agent. A customer should be able to buy access, download the package, install it from an IDE terminal, run a first mirror, read the receipt links in the terminal, and understand exactly how to restore their codebase when the day goes sideways.
+    </p>
+
+    <article class="post-body">
+      <blockquote>
+        Reape0r is not a promise that a zip exists somewhere. Reape0r is a command-line custody lane: install, scan, mirror, verify, restore, and show the proof.
+      </blockquote>
+
+      <div class="receipt-box">
+        <strong>Live customer surfaces</strong>
+        <ul>
+          <li>Buy through SkyePay: <a href="https://skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html">skyegatefs27-citadeldb.graylondonskyes.workers.dev/skyevault-agent.html</a></li>
+          <li>Install center: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/">metraiyux-0s-full-system.graylondonskyes.workers.dev/skye-vault-os/agent/</a></li>
+          <li>Package manifest: <a href="https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/latest.json">/downloads/skyevault-agent/latest.json</a></li>
+        </ul>
+      </div>
+
+      <h2>What the customer is buying.</h2>
+      <p>
+        The customer buys a workspace-backed Reape0r access lane. SkyePay handles the order. FS27 and the shared 0S gate handle access. The installer does not create a new founder password, a second owner account, or a disconnected admin lane. The customer receives a package, a workspace key for uploads, and clear commands. Owner/admin operations stay behind the shared 0S gate.
+      </p>
+      <p>
+        The core behavior is simple: Reape0r keeps one mutable encrypted current mirror of the repo. The first run creates the current mirror. Later runs scan the repo again and replace the changed encrypted objects inside that same current mirror. When the customer downloads or restores, they are using the repaired current state, not a pile of manual delta packs.
+      </p>
+
+      <h2>Current plan and quota table.</h2>
+      <div class="receipt-box">
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Price</th>
+              <th>Workspaces</th>
+              <th>Vault storage</th>
+              <th>Files/month</th>
+              <th>Gate limits</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reape0r Starter Access</td>
+              <td>$49/month</td>
+              <td>1</td>
+              <td>1 GB</td>
+              <td>250</td>
+              <td>30 rpm, 500 rpd, 1 device, $50 monthly cap</td>
+            </tr>
+            <tr>
+              <td>Reape0r Pro Access</td>
+              <td>$149/month</td>
+              <td>3</td>
+              <td>25 GB</td>
+              <td>1,500</td>
+              <td>90 rpm, 2,500 rpd, 3 devices, $150 monthly cap</td>
+            </tr>
+            <tr>
+              <td>Reape0r Command Access</td>
+              <td>$499/month</td>
+              <td>10</td>
+              <td>100 GB</td>
+              <td>10,000</td>
+              <td>240 rpm, 10,000 rpd, 10 devices, $500 monthly cap</td>
+            </tr>
+            <tr>
+              <td>Auto-Install Add-On</td>
+              <td>$13 one time</td>
+              <td>Uses existing plan</td>
+              <td>Uses existing plan</td>
+              <td>One machine bootstrap</td>
+              <td>Writes env file, runs first current mirror, attempts watcher service</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Before the terminal.</h2>
+      <p>
+        The customer needs three things before running Reape0r: the package download, the workspace id, and a workspace upload key. They also need an unlock passphrase. The passphrase can be supplied through an environment variable, or Reape0r can generate one locally during auto-install and write it into a private env file. That env file is not for Git.
+      </p>
+      <details open>
+        <summary>Customer variables</summary>
+        <pre><code>export SKYEVAULT_DROP_URL="https://skyevault-drop.graylondonskyes.workers.dev"
+export SKYEVAULT_WORKSPACE_ID="your-workspace-id"
+export SKYEVAULT_PORTAL_KEY="your-workspace-upload-key"
+export SKYEVAULT_AGENT_PASSPHRASE="your-private-unlock-passphrase"
+export SKYEVAULT_REPO_PATH="$PWD"</code></pre>
+      </details>
+
+      <h2>Manual install from an IDE terminal.</h2>
+      <p>
+        Manual install is for users who are comfortable inside Bash. It extracts the package, runs doctor, initializes config, syncs the mutable current mirror, then starts watch mode when they are ready.
+      </p>
+      <pre><code>curl -L -o skyevault-agent-latest.tar.gz \
+  "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz"
+
+tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+
+node bin/skyevault-agent.mjs doctor
+node bin/skyevault-agent.mjs init \
+  --workspace="$SKYEVAULT_WORKSPACE_ID" \
+  --repo="$SKYEVAULT_REPO_PATH" \
+  --vault-url="$SKYEVAULT_DROP_URL"
+
+node bin/skyevault-agent.mjs sync --upload
+node bin/skyevault-agent.mjs status</code></pre>
+
+      <h2>Auto-install from an IDE terminal.</h2>
+      <p>
+        Auto-install is the $13 helper lane. It writes a private env file, configures the repo, runs doctor, performs the first mutable current sync unless the user disables it, and attempts to install a background watcher service for the machine. It still uses the customer's existing Reape0r plan. It is not a second vault plan.
+      </p>
+      <pre><code>curl -L -o skyevault-agent-latest.tar.gz \
+  "https://metraiyux-0s-full-system.graylondonskyes.workers.dev/downloads/skyevault-agent/releases/latest/skyevault-agent-latest.tar.gz"
+
+tar -xzf skyevault-agent-latest.tar.gz
+cd skyevault-agent
+
+SKYEVAULT_AGENT_AUTO_INSTALL=1 \
+SKYEVAULT_WORKSPACE_ID="$SKYEVAULT_WORKSPACE_ID" \
+SKYEVAULT_DROP_URL="$SKYEVAULT_DROP_URL" \
+SKYEVAULT_PORTAL_KEY="$SKYEVAULT_PORTAL_KEY" \
+SKYEVAULT_AGENT_PASSPHRASE="$SKYEVAULT_AGENT_PASSPHRASE" \
+SKYEVAULT_REPO_PATH="$SKYEVAULT_REPO_PATH" \
+./install.sh</code></pre>
+
+      <details>
+        <summary>Auto-install options</summary>
+        <pre><code># Skip the service attempt, but still write env/config and run first sync.
+SKYEVAULT_AGENT_AUTO_INSTALL=1 SKYEVAULT_AGENT_SERVICE_MODE=none ./install.sh
+
+# Keep the setup local and skip the first upload.
+SKYEVAULT_AGENT_AUTO_INSTALL=1 SKYEVAULT_AGENT_UPLOAD=0 ./install.sh
+
+# Machine-readable proof mode for CI.
+SKYEVAULT_AGENT_AUTO_INSTALL=1 SKYEVAULT_AGENT_JSON=1 ./install.sh</code></pre>
+      </details>
+
+      <h2>Day-to-day commands.</h2>
+      <p>
+        Normal commands print human output. Links are shown in terminal-friendly blue when the terminal supports it, and the same destinations are still printed as plain text for terminals that cannot display clickable links. Add <code>--json</code> when automation needs raw receipts.
+      </p>
+      <pre><code># See the latest mirror, receipt path, restore kit, upload state, and config.
+node bin/skyevault-agent.mjs status
+
+# Update the one mutable current mirror.
+node bin/skyevault-agent.mjs sync --upload
+
+# Keep it alive every ten minutes.
+node bin/skyevault-agent.mjs watch --interval-seconds=600 --upload
+
+# Verify the latest current receipt.
+node bin/skyevault-agent.mjs verify --receipt=/path/to/current-receipt.json
+
+# Restore into a repaired folder.
+node bin/skyevault-agent.mjs restore \
+  --receipt=/path/to/current-receipt.json \
+  --out=/tmp/repaired-repo</code></pre>
+
+      <h2>What good output looks like.</h2>
+      <p>
+        A successful Reape0r command should show the product name, status, workspace, repo, custody model, file count, byte count, changed count, digest, upload state, receipt link, restore-kit link, current manifest link, and next commands. That is the same proof shape I expect in chat, moved into the CLI where the customer needs it.
+      </p>
+      <div class="receipt-box">
+        <strong>Minimum proof a customer should see</strong>
+        <ul>
+          <li><code>Status: OK</code></li>
+          <li><code>Model: mutable-current-mirror</code></li>
+          <li><code>Receipt</code> link or file path</li>
+          <li><code>Restore kit</code> link or file path</li>
+          <li><code>Current manifest</code> link or file path</li>
+          <li>Upload state with uploaded/skipped/failed wording</li>
+          <li>Next commands for status, watch, or restore</li>
+        </ul>
+      </div>
+
+      <h2>How restore works in plain English.</h2>
+      <p>
+        The current receipt points at the current manifest. The current manifest points at encrypted current objects. Restore decrypts each object using the customer's unlock material and writes the repaired folder. The output folder should look like the repo state Reape0r saw during the last successful scan. If Reape0r runs every ten minutes, the normal loss window is the work that changed after the last scan and before the next one.
+      </p>
+      <p>
+        That is why mutable current matters. The buyer is not expected to collect an old base artifact plus a list of separate delta artifacts. The customer asks for the backup, and the restore lane is supposed to give the repaired current codebase.
+      </p>
+
+      <h2>Troubleshooting without panic.</h2>
+      <details>
+        <summary>Doctor says tar or git is missing</summary>
+        <p>Install the missing local dependency, then run <code>node bin/skyevault-agent.mjs doctor</code> again. Reape0r uses the local machine to scan and package repo state, so the basics must be present.</p>
+      </details>
+      <details>
+        <summary>Upload is skipped</summary>
+        <p>Most skipped uploads mean the package does not see <code>SKYEVAULT_PORTAL_KEY</code>. Re-source the env file or export the key again, then run <code>sync --upload</code>.</p>
+      </details>
+      <details>
+        <summary>Verify cannot unlock</summary>
+        <p>Set the same passphrase env var used at sync time, or point Reape0r at the local unlock file written during auto-install. Without the unlock material, the encrypted mirror stays closed.</p>
+      </details>
+      <details>
+        <summary>Restore folder is not empty</summary>
+        <p>Pick a new output folder. If you are intentionally restoring over an existing folder, use <code>--force</code> only after you understand what will be overwritten.</p>
+      </details>
+
+      <h2>The honest production standard.</h2>
+      <p>
+        A customer-facing daemon is not ready just because a page says download. It needs the payment lane, entitlement handoff, package manifest, archive checksum, install script, auto-install path, sync proof, verify proof, restore proof, no secret leakage, and live HTTP proof that the customer surfaces still answer. This is the bar Reape0r has to keep.
+      </p>
+      <div class="receipt-box">
+        <strong>Receipts to expect from release work</strong>
+        <ul>
+          <li><code>test-artifacts/skyevault-agent-package/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-platform/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-auto-install/latest.json</code></li>
+          <li><code>test-artifacts/skyevault-agent-sales-readiness/latest.json</code></li>
+        </ul>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">DevodeRator - Gray London Skyes - public build receipts, proof journals, and Reape0r field notes.</footer>
+</body>
+</html>

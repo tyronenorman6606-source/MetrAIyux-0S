@@ -7,7 +7,7 @@
   <script defer src="/assets/skye0s-onboard-bridge.js"></script>
   <script defer src="/assets/mail-ui.js"></script>
   <link rel="stylesheet" href="/assets/mail-ui.css" />
-  <title>Settings — SkyeMail Citadel</title>
+  <title>Settings — SkyeMail backed by Citadel Database and SkyeNet</title>
 </head>
 <body data-page-id="settings" data-page-name="Settings" data-page-hint="Profile, aliases, signatures, and vacation responder">
 <div class="wrap">
@@ -20,7 +20,7 @@
         <section class="card">
           <div class="badge" id="gmailStatus">Checking mailbox status…</div>
           <h1 class="h1">Profile, aliases, signatures, and auto-reply.</h1>
-          <p class="sub">Set your mailbox identity inside the app, choose a preferred send-as alias, sync signatures into the provider lane, and manage the vacation responder from the same command surface.</p>
+          <p class="sub">Set your mailbox identity inside the app, choose a preferred send-as alias, sync signatures into the SkyeMail routing lane, and manage the vacation responder from the same command surface.</p>
           <div class="btnrow">
             <button class="btn gold" id="saveBtn" type="button">Save App Settings</button>
             <button class="btn ok" id="syncBtn" type="button">Save + Sync Mail Settings</button>
@@ -49,7 +49,7 @@
           <div class="hr"></div>
           <div class="fieldgrid">
             <div><label for="signature_text">Signature text</label><textarea id="signature_text" placeholder="Plain text signature for quick insert and reply use."></textarea></div>
-            <div><label for="signature_html">Signature HTML</label><textarea id="signature_html" placeholder="HTML signature for provider send-as sync."></textarea></div>
+            <div><label for="signature_html">Signature HTML</label><textarea id="signature_html" placeholder="HTML signature for SkyeMail send-as sync."></textarea></div>
           </div>
         </section>
         <section class="card">
@@ -68,7 +68,7 @@
       <section class="card">
         <div class="kicker">Vacation responder</div>
         <div class="fieldgrid" style="margin-top:12px">
-          <div><label for="vacation_enabled">Enable auto reply</label><div class="toggleline"><input id="vacation_enabled" type="checkbox" />Turn on provider vacation responses</div></div>
+          <div><label for="vacation_enabled">Enable auto reply</label><div class="toggleline"><input id="vacation_enabled" type="checkbox" />Turn on SkyeMail vacation responses</div></div>
           <div><label for="vacation_restrict_contacts">Restrict responses</label><div class="toggleline"><input id="vacation_restrict_contacts" type="checkbox" />Reply only to contacts</div></div>
           <div><label for="vacation_restrict_domain">Domain-only responses</label><div class="toggleline"><input id="vacation_restrict_domain" type="checkbox" />Reply only inside the workspace domain</div></div>
           <div></div>

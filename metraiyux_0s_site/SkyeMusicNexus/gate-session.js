@@ -198,7 +198,7 @@
     session,
     headers,
     persist,
-    storageKey: STORAGE_OWNER
+    storageKey: "shared-0s-gate-bridge"
   };
 
   document.addEventListener("DOMContentLoaded", () => {

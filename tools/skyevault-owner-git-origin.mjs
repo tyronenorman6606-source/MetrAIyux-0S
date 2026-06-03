@@ -5,6 +5,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { cleanBearer, resolveZeroOsGateAuth } from './lib/zero-os-gate-auth.mjs';
 
 const repoRoot = path.resolve(new URL('..', import.meta.url).pathname);
 const rawArgs = process.argv.slice(2);
@@ -71,54 +72,7 @@ const requestedPort = Number(argValue('--port') || process.env.SKYEVAULT_GIT_REM
 const maxBuffer = Math.max(64, Number(process.env.SKYEVAULT_OWNER_GIT_MAX_BUFFER_MB || '256')) * 1024 * 1024;
 const ownerWorkspaceSlug = String(process.env.SKYEVAULT_OWNER_WORKSPACE_SLUG || 'metraiyux-0s').trim();
 const defaultZeroOsBase = 'https://metraiyux-0s-full-system.graylondonskyes.workers.dev';
-
-const GATE_BEARER_ENV_NAMES = [
-  'SKYEVAULT_GATE_BEARER',
-  'SKYEVAULT_ONE_AUTH_BEARER',
-  'ZERO_OS_GATE_SESSION',
-  'ZERO_OS_OWNER_SESSION',
-  'METRAIYUX_OWNER_GATE_SESSION',
-  'FREE99_GATE_SESSION',
-  'SKYGATE_SESSION_TOKEN',
-  'SKYE_GATE_SESSION',
-  'FS27_ADMIN_BEARER',
-  'SKYENET_AUTH',
-  'MCP_GATE_SESSION',
-  'QUANTUMSKYES_MCP_TOKEN',
-  'QUANTUMSKYES_MCP_TOKEN_OR_GATE_SESSION'
-];
-
-const OWNER_CODE_ENV_NAMES = [
-  'ZERO_OS_GATE_CODE',
-  'ZERO_OS_ADMIN_CODE',
-  'ZERO_OS_OWNER_CODE',
-  'METRAIYUX_OWNER_ADMIN_CODE',
-  'METRAIYUX_ADMIN_CODE',
-  'OWNER_ADMIN_CODE',
-  'OWNER_ADMIN_PASSWORD',
-  'FREE99_ADMIN_CODE',
-  'FREE99_ADMIN_PASSWORD',
-  'FREE99_GATE_CODE',
-  'FREE99_GATE_PASSWORD',
-  'FREE99_OWNER_CODE',
-  'FREE99_OWNER_PASSWORD',
-  'FS27_ADMIN_CODE',
-  'FS27_ADMIN_PASSWORD',
-  'FS27_OWNER_CODE',
-  'FS27_OWNER_PASSWORD',
-  'SKYGATE_ADMIN_CODE',
-  'SKYGATE_ADMIN_PASSWORD',
-  'SKYGATE_OWNER_CODE',
-  'SKYGATE_OWNER_PASSWORD',
-  'SKYGATEFS27_ADMIN_CODE',
-  'SKYGATEFS27_ADMIN_PASSWORD',
-  'SKYGATEFS27_OWNER_CODE',
-  'SKYGATEFS27_OWNER_PASSWORD',
-  'SKYE_GATE_ADMIN_CODE',
-  'SKYE_GATE_ADMIN_PASSWORD',
-  'SKYE_GATE_OWNER_CODE',
-  'SKYE_GATE_OWNER_PASSWORD'
-];
+const ownerGitGateSessionExport = 'SKYEVAULT_GATE_BEARER';
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -209,18 +163,6 @@ function mintOwnerToken() {
   return `skyevault-owner-${crypto.randomBytes(32).toString('hex')}`;
 }
 
-function cleanBearer(value) {
-  return String(value || '').replace(/^Bearer(?:\s+|$)/i, '').trim();
-}
-
-function firstEnv(names) {
-  for (const name of names) {
-    const value = cleanBearer(process.env[name]);
-    if (value) return { name, value };
-  }
-  return { name: '', value: '' };
-}
-
 function zeroOsBase() {
   return String(
     argValue('--0s-origin')
@@ -233,13 +175,18 @@ function zeroOsBase() {
 }
 
 function gateIntrospectUrl() {
-  return String(
-    argValue('--gate-introspect-url')
-    || process.env.SKYEVAULT_GATE_INTROSPECT_URL
+  const explicit = String(argValue('--gate-introspect-url') || '').trim();
+  if (explicit) return explicit.replace(/\/+$/, '');
+
+  const sharedZeroOsIntrospect = `${zeroOsBase()}/api/skygate/auth-introspect`;
+  const configuredDirect = String(
+    process.env.SKYEVAULT_GATE_INTROSPECT_URL
     || process.env.SKYEVAULT_FS27_INTROSPECT_API
     || process.env.METRAIYUX_0S_SKYGATE_FS27_INTROSPECT_ENDPOINT
-    || `${zeroOsBase()}/api/skygate/auth-introspect`
-  ).replace(/\/+$/, '');
+    || ''
+  ).trim();
+  const allowDirect = process.env.SKYEVAULT_OWNER_GIT_ALLOW_DIRECT_GATE_INTROSPECT === '1';
+  return (allowDirect && configuredDirect ? configuredDirect : sharedZeroOsIntrospect).replace(/\/+$/, '');
 }
 
 function useStaticTokenMode() {
@@ -250,34 +197,21 @@ function useStaticTokenMode() {
     || process.env.SKYEVAULT_OWNER_GIT_ALLOW_STATIC_TOKEN === '1';
 }
 
-async function postJson(url, body, headers = {}) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify(body)
-  });
-  const text = await response.text();
-  let data = {};
-  try { data = JSON.parse(text || '{}'); } catch { data = { ok: false, error: text.slice(0, 240) }; }
-  return { response, data, text };
-}
-
 async function obtainGateBearer() {
-  const direct = firstEnv(GATE_BEARER_ENV_NAMES);
-  if (direct.value) return { token: direct.value, source: direct.name, login: null };
-  const code = firstEnv(OWNER_CODE_ENV_NAMES);
-  if (!code.value) {
-    throw new Error('Shared 0S/FS27 gate credential is required. Set ZERO_OS_GATE_SESSION/SKYEVAULT_GATE_BEARER, or set the shared owner code in .env for /api/owner/admin-login.');
-  }
-  const login = await postJson(`${zeroOsBase()}/api/owner/admin-login`, { code: code.value });
-  const token = cleanBearer(login.data.gateToken || login.data.gateBearerToken || login.data.token || '');
-  if (!login.response.ok || !token) {
-    throw new Error(`Shared owner login failed through /api/owner/admin-login (${login.response.status}).`);
+  const auth = await resolveZeroOsGateAuth({
+    zeroOsBase: zeroOsBase(),
+    env: process.env,
+    envFiles: []
+  });
+  if (!auth.ok || !auth.token) {
+    throw new Error(auth.response?.body?.error || auth.response?.error || 'Shared 0S/FS27 gate credential is required. Set ZERO_OS_GATE_SESSION/SKYEVAULT_GATE_BEARER, or set the shared owner code in .env for /api/owner/admin-login.');
   }
   return {
-    token,
-    source: `owner-admin-login:${code.name}`,
-    login: { ok: true, status: login.response.status, via: login.data.via || 'owner-admin-login' }
+    token: auth.token,
+    source: `${auth.credential?.source || 'shared-gate'}:${auth.credential?.key || 'unknown'}`,
+    login: auth.credential?.source === 'owner-gate-exchange'
+      ? { ok: auth.response?.ok === true, status: auth.response?.status || 0, via: 'zero-os-owner-admin-login' }
+      : null
   };
 }
 
@@ -529,12 +463,22 @@ function writeRuntimeEnv(baseUrl, auth) {
   }, removeKeys);
 }
 
+function runningRuntimeMatchesAuth(auth) {
+  const runtime = readEnvFile(envFile);
+  if (auth.mode === 'gate') {
+    return runtime.SKYEVAULT_OWNER_GIT_AUTH_MODE === 'gate-introspection'
+      && String(runtime.SKYEVAULT_GATE_INTROSPECT_URL || '') === String(auth.gateIntrospectUrl || '');
+  }
+  return runtime.SKYEVAULT_OWNER_GIT_AUTH_MODE === 'static-token'
+    && Boolean(runtime.SKYEVAULT_GIT_REMOTE_TOKEN);
+}
+
 async function accessPayload() {
   const status = await startServer();
   const auth = await ownerAuth();
   const baseUrl = status.baseUrl;
   const cloneUrl = cloneUrlFor(baseUrl);
-  const gateSessionVar = GATE_BEARER_ENV_NAMES[0];
+  const gateSessionVar = ownerGitGateSessionExport;
   if (auth.mode === 'gate') {
     return {
       ok: true,
@@ -660,7 +604,7 @@ async function startServer() {
   const runningHealth = await health(baseUrl);
   const record = readPidRecord();
   if (runningHealth) {
-    if (runningHealth.auth !== auth.serverAuth) {
+    if (runningHealth.auth !== auth.serverAuth || !runningRuntimeMatchesAuth(auth)) {
       stopServer();
     } else {
       writeRuntimeEnv(baseUrl, auth);

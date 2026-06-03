@@ -1,0 +1,4248 @@
+{
+  "schema": "metraiyux.0s.app-deep-closure-scenarios.v2",
+  "generated_at": "2026-05-31T21:29:09.782Z",
+  "standard": "A mounted app is not closed by a 200 alone. This manifest requires each mounted app to have its own route/source/stress row plus a strict workflow-family behavior receipt or an app-family live proof with create/read/update-or-closeout/readback/stress/Founder Command or command-event evidence. Browser proof remains owner-handled until the owner re-enables it after non-browser closure.",
+  "scenario_defaults": {
+    "stateful_required_behaviors": [
+      "human_flow",
+      "create",
+      "read",
+      "update_or_closeout",
+      "receipt_readback",
+      "stress",
+      "founder_command_visible",
+      "telemetry_or_command_event"
+    ],
+    "read_only_required_behaviors": [
+      "human_flow",
+      "read",
+      "receipt_readback",
+      "stress",
+      "mutation_denial_or_not_applicable"
+    ]
+  },
+  "scenarios": [
+    {
+      "app_id": "0s-command-bridge",
+      "label": "0S Command Bridge exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /founder-command/apps/0s-command-bridge/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/founder-command/apps/0s-command-bridge/index.html",
+        "runtime behavior receipt family: command-bridge-all-lanes",
+        "Command Bridge write/readback entity: 0s-stateful:0s-command-bridge:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "admin",
+      "label": "Admin Automation OS mounted admin shell and Admin Brain receipt",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared owner gate login",
+        "mounted admin shell render",
+        "Admin Brain native receipt readback",
+        "route stress",
+        "Command Bridge telemetry event readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "admin-priority-stateful-proof",
+          "path": "test-artifacts/0s-priority-stateful-apps-live-http/0s-priority-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "admin-brain-automation",
+      "label": "Admin Brain Automation mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "admin",
+        "kaixu-codestudio",
+        "kaixu-codestudio-app",
+        "kaixu-codestudio-reports",
+        "music-drops",
+        "music-operator-stage",
+        "operator",
+        "webgrowthoperator",
+        "worker-asset-live-connectlog-relay13-operator-proof",
+        "worker-asset-live-houseoperations-skyebox-operator-proof",
+        "worker-asset-live-skye-media-center-operator-proof",
+        "worker-asset-live-skye-split-engine-operator-proof"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "admin: /admin/index.html",
+        "kaixu-codestudio: /Free99/apps/kaixu-codestudio/index.html",
+        "kaixu-codestudio-app: /Free99/apps/kaixu-codestudio/app/index.html",
+        "kaixu-codestudio-reports: /Free99/apps/kaixu-codestudio/reports/index.html",
+        "music-drops: /SkyeMusicNexus/public/drops.html",
+        "music-operator-stage: /SkyeMusicNexus/public/admin.html",
+        "operator: /operator/index.html",
+        "webgrowthoperator: /Marketing-Made-Easy/WebGrowthOperator/index.html",
+        "worker-asset-live-connectlog-relay13-operator-proof: /live/connectlog-relay13-operator-proof.html",
+        "worker-asset-live-houseoperations-skyebox-operator-proof: /live/houseoperations-skyebox-operator-proof.html",
+        "worker-asset-live-skye-media-center-operator-proof: /live/skye-media-center-operator-proof.html",
+        "worker-asset-live-skye-split-engine-operator-proof: /live/skye-split-engine-operator-proof.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "admin-brain-automation",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "ae-flow-founder-crm",
+      "label": "Ae Flow Founder Crm mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "ae-flowpro"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "ae-flowpro: /Marketing-Made-Easy/AE-FlowPro/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "ae-flow-founder-crm-live-http",
+          "path": "test-artifacts/ae-flow-founder-crm-live-http/ae-flow-founder-crm-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "ae-flowpro",
+      "label": "AE-FlowPro exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/AE-FlowPro/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/AE-FlowPro/index.html",
+        "runtime behavior receipt family: ae-flow-founder-crm",
+        "Command Bridge write/readback entity: 0s-stateful:ae-flowpro:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "arizona-growth-index",
+      "label": "Arizona Growth Index exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/arizona-growth-index/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/arizona-growth-index/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:arizona-growth-index:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "brain",
+      "label": "Cabinet Brain exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /local-brain.html",
+        "per-app source/provenance row: metraiyux_0s_site/local-brain.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:brain:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "brandid-offline",
+      "label": "BrandID Offline PWA exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/BrandID-Offline-PWA/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/BrandID-Offline-PWA/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:brandid-offline:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "broad-real-user-saas-skymail-skynet",
+      "label": "Broad Real User Saas Skymail Skynet mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "saas"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "saas: /saas/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "real-user-readiness",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-31T20-15-10-813Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "businesslaunchgo",
+      "label": "BusinessLaunchGo exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/BusinessLaunchGo/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/BusinessLaunchGo/index.html",
+        "runtime behavior receipt family: founder-company-enrollment",
+        "Command Bridge write/readback entity: 0s-stateful:businesslaunchgo:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "citadeldb",
+      "label": "CitadelDB mounted dual-write ledger flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared owner gate login",
+        "mounted CitadelDB render",
+        "dual-write receipt create",
+        "Citadel ledger readback",
+        "route stress",
+        "Command Bridge telemetry event readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "citadeldb-priority-stateful-proof",
+          "path": "test-artifacts/0s-priority-stateful-apps-live-http/0s-priority-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "command-bridge-all-lanes",
+      "label": "Command Bridge All Lanes mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "0s-command-bridge"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "0s-command-bridge: /founder-command/apps/0s-command-bridge/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "command-bridge-all-lanes",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "company-knowledge",
+      "label": "Company Knowledge mounted knowledge base flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared owner gate login",
+        "mounted Company Knowledge render",
+        "knowledge base create",
+        "knowledge item create and readback",
+        "context search",
+        "knowledge item delete closeout",
+        "route stress",
+        "Command Bridge telemetry event readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "company-knowledge-priority-stateful-proof",
+          "path": "test-artifacts/0s-priority-stateful-apps-live-http/0s-priority-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "content-engine-provider-dispatch",
+      "label": "Content Engine Provider Dispatch mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "arizona-growth-index",
+        "brandid-offline",
+        "kaixu-brandkit",
+        "marketing",
+        "media",
+        "skyewebcreatormax",
+        "skyewebcreatormax-builder",
+        "skyewebcreatormax-delivery",
+        "skyewebcreatormax-preview",
+        "skyewebcreatormax-workspace",
+        "worker-asset-live-marketing-made-easy-growth-suite"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "arizona-growth-index: /Marketing-Made-Easy/arizona-growth-index/index.html",
+        "brandid-offline: /Marketing-Made-Easy/BrandID-Offline-PWA/index.html",
+        "kaixu-brandkit: /Marketing-Made-Easy/kAIxUBrandKit/index.html",
+        "marketing: /Marketing-Made-Easy/index.html",
+        "media: /SkyeMediaCenter/index.html",
+        "skyewebcreatormax: /Marketing-Made-Easy/SkyeWebCreatorMax/index.html",
+        "skyewebcreatormax-builder: /Marketing-Made-Easy/SkyeWebCreatorMax/builder.html",
+        "skyewebcreatormax-delivery: /Marketing-Made-Easy/SkyeWebCreatorMax/delivery.html",
+        "skyewebcreatormax-preview: /Marketing-Made-Easy/SkyeWebCreatorMax/preview.html",
+        "skyewebcreatormax-workspace: /Marketing-Made-Easy/SkyeWebCreatorMax/builder-workspace.html",
+        "worker-asset-live-marketing-made-easy-growth-suite: /live/marketing-made-easy-growth-suite.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "content-engine-provider-dispatch",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "devisional-riftx",
+      "label": "SuperIDE / DeVisional Riftx exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /DeVisional%20Riftx/app/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/DeVisional Riftx/app/index.html",
+        "runtime behavior receipt family: skyenet-full-runtime",
+        "Command Bridge write/readback entity: 0s-stateful:devisional-riftx:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "doctor-ops-vault",
+      "label": "Doctor Ops Personal Vault exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/doctor-ops-personal-vault/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/doctor-ops-personal-vault/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:doctor-ops-vault:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "documorph",
+      "label": "Documorph exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/documorph/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/documorph/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:documorph:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "documorph-app",
+      "label": "Documorph App exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/documorph/app/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/documorph/app/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:documorph-app:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "external-provider-hardening",
+      "label": "External Provider Hardening mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "brain",
+        "citadeldb",
+        "company-knowledge",
+        "doctor-ops-vault",
+        "free99",
+        "houseoperations",
+        "houseoperations-skyebox",
+        "neural",
+        "skyeapi-aegiscore",
+        "skyeapi-website",
+        "skyearcade",
+        "skyehawk",
+        "skyeopsconsole",
+        "skyerrors",
+        "skyevaultos",
+        "skyevaultpro",
+        "skyevaultpro-docx",
+        "skyevaultpro-drive",
+        "skyevaultpro-founder",
+        "worker-asset-live-company-knowledge-layer-proof"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "brain: /local-brain.html",
+        "citadeldb: /citadeldb/index.html",
+        "company-knowledge: /admin/company-knowledge.html",
+        "doctor-ops-vault: /Free99/apps/doctor-ops-personal-vault/index.html",
+        "free99: /Free99/index.html",
+        "houseoperations: /HouseOperations/index.html",
+        "houseoperations-skyebox: /Free99/apps/skyebox-authenticator/index.html",
+        "neural: /neural-map.html",
+        "skyeapi-aegiscore: /Free99/apps/skyeapi-aegiscore/apps/console/index.html",
+        "skyeapi-website: /Free99/apps/skyeapi-aegiscore/apps/website/index.html",
+        "skyearcade: /Free99/apps/skyearcade/index.html",
+        "skyehawk: /skyehawk/index.html",
+        "skyeopsconsole: /Free99/apps/skyeopsconsole/index.html",
+        "skyerrors: /skyerrors/index.html",
+        "skyevaultos: /skye-vault-os/index.html",
+        "skyevaultpro: /Free99/apps/skyevaultpro/index.html",
+        "skyevaultpro-docx: /Free99/apps/skyevaultpro/apps/docx/index.html",
+        "skyevaultpro-drive: /Free99/apps/skyevaultpro/drive/index.html",
+        "skyevaultpro-founder: /Free99/apps/skyevaultpro/founder/index.html",
+        "worker-asset-live-company-knowledge-layer-proof: /live/company-knowledge-layer-proof.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "external-provider-hardening",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "founder-account-valley-crosswalk",
+      "label": "Founder Account Valley Crosswalk mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "business-card-factory",
+        "free-stack-flyer",
+        "free-stack-pitch",
+        "valley-verified"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "business-card-factory: /business-card-factory/index.html",
+        "free-stack-flyer: /sales/free-business-stack-flyer.html",
+        "free-stack-pitch: /sales/free-business-stack.html",
+        "valley-verified: /valley-verified/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "founder-command-accounts-crosswalk",
+          "path": "test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "business-card-factory-connectlog-stress",
+          "path": "test-artifacts/business-card-factory-connectlog-stress-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-free-stack-production-smoke",
+          "path": "test-artifacts/founder-command-free-stack/production-smoke-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "founder-calendar",
+      "label": "SuperIDE SkyeCalendar mounted calendar flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared owner gate login",
+        "mounted SkyeCalendar render",
+        "calendar event create",
+        "calendar ledger readback",
+        "route stress",
+        "Command Bridge telemetry event readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "founder-calendar-priority-stateful-proof",
+          "path": "test-artifacts/0s-priority-stateful-apps-live-http/0s-priority-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "founder-command",
+      "label": "Founder Command SkyEmail custody and account command flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared owner gate login",
+        "SkyEmail inventory refresh",
+        "mailbox custody sync",
+        "account upsert",
+        "operation attach",
+        "work-system readback",
+        "provider mailbox representation and missing-custody readback",
+        "no raw credential exposure"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "founder-command-accounts-crosswalk",
+          "path": "test-artifacts/founder-command-accounts-crosswalk/founder-command-accounts-crosswalk-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-skyemail-login-custody",
+          "path": "test-artifacts/founder-command-skyemail-login-custody/founder-command-skyemail-login-custody-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "founder-command-work-system",
+      "label": "Founder Command Work System mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "founder-calendar",
+        "founder-command"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "founder-calendar: /founder-command/apps/0s-calendar/index.html",
+        "founder-command: /founder-command/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "founder-command-work-system-live-http",
+          "path": "test-artifacts/founder-command-work-system/founder-command-work-system-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-skyemail-login-custody",
+          "path": "test-artifacts/founder-command-skyemail-login-custody/founder-command-skyemail-login-custody-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "founder-company-enrollment",
+      "label": "Founder Company Enrollment mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "businesslaunchgo"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "businesslaunchgo: /Marketing-Made-Easy/BusinessLaunchGo/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "founder-company-enrollment-live-http",
+          "path": "test-artifacts/founder-company-enrollment-live-http/founder-company-enrollment-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "free99",
+      "label": "Free99 Intake exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:free99:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "gate",
+      "label": "0S SkyGate exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /skyegate/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/skyegate/index.html",
+        "runtime behavior receipt family: shared-owner-gate",
+        "Command Bridge write/readback entity: 0s-stateful:gate:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "gate-signup",
+      "label": "Real user FS27 signup into 0S workspace",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "SaaS signup",
+        "FS27 signup",
+        "FS27 introspection",
+        "0S shared gate session",
+        "SkyeMail session import",
+        "SkyeNet status"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-31T20-15-10-813Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "auth-spine-guard",
+          "path": "test-artifacts/0s-auth-spine-guard/latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "houseoperations",
+      "label": "HouseOperations exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /HouseOperations/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/HouseOperations/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:houseoperations:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "houseoperations-skyebox",
+      "label": "HouseOperations SkyeBox exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyebox-authenticator/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyebox-authenticator/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:houseoperations-skyebox:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "kaixu-brandkit",
+      "label": "kAIxU BrandKit exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/kAIxUBrandKit/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/kAIxUBrandKit/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:kaixu-brandkit:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "kaixu-codestudio",
+      "label": "kAIxU CodeStudio exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/kaixu-codestudio/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/kaixu-codestudio/index.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:kaixu-codestudio:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "kaixu-codestudio-app",
+      "label": "kAIxU CodeStudio App exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/kaixu-codestudio/app/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/kaixu-codestudio/app/index.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:kaixu-codestudio-app:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "kaixu-codestudio-reports",
+      "label": "kAIxU CodeStudio Reports exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/kaixu-codestudio/reports/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/kaixu-codestudio/reports/index.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:kaixu-codestudio-reports:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "kaixu-storefront",
+      "label": "kAIxU Storefront exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/kaixu-storefront/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/kaixu-storefront/index.html",
+        "runtime behavior receipt family: skyepay-commerce-financial-ops",
+        "Command Bridge write/readback entity: 0s-stateful:kaixu-storefront:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "marketing",
+      "label": "Marketing Suite exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:marketing:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "media",
+      "label": "Media Center exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMediaCenter/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMediaCenter/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:media:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music",
+      "label": "SkyeMusicNexus exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/index.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-artist-stage",
+      "label": "SkyeMusicNexus Artist Stage exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/index.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-artist-stage:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-daw",
+      "label": "Music DAW exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/daw.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/daw.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-daw:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-discover",
+      "label": "Music Discover exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/discover.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/discover.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-discover:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-drops",
+      "label": "Music Drops exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/drops.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/drops.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:music-drops:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-exchange",
+      "label": "Music Exchange exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/exchange.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/exchange.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-exchange:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-exports",
+      "label": "Music Exports exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/exports.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/exports.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-exports:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-feed",
+      "label": "Music Feed exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/feed.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/feed.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-feed:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-operator-stage",
+      "label": "SkyeMusicNexus Operator Stage exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/admin.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/admin.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:music-operator-stage:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-player",
+      "label": "Music Player exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/player.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/player.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-player:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-releases",
+      "label": "Music Releases exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/releases.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/releases.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-releases:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-rights",
+      "label": "Music Rights exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/rights.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/rights.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-rights:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-stems",
+      "label": "Music Stems exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/stems.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/stems.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-stems:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "music-upload",
+      "label": "Music Upload exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeMusicNexus/public/upload.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeMusicNexus/public/upload.html",
+        "runtime behavior receipt family: nexus-ad-hire-workforce-job",
+        "Command Bridge write/readback entity: 0s-stateful:music-upload:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "neural",
+      "label": "Neural Map exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /neural-map.html",
+        "per-app source/provenance row: metraiyux_0s_site/neural-map.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:neural:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "nexus-ad-hire-workforce-job",
+      "label": "Nexus Ad Hire Workforce Job mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "music",
+        "music-artist-stage",
+        "music-daw",
+        "music-discover",
+        "music-exchange",
+        "music-exports",
+        "music-feed",
+        "music-player",
+        "music-releases",
+        "music-rights",
+        "music-stems",
+        "music-upload"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "music: /SkyeMusicNexus/index.html",
+        "music-artist-stage: /SkyeMusicNexus/public/index.html",
+        "music-daw: /SkyeMusicNexus/public/daw.html",
+        "music-discover: /SkyeMusicNexus/public/discover.html",
+        "music-exchange: /SkyeMusicNexus/public/exchange.html",
+        "music-exports: /SkyeMusicNexus/public/exports.html",
+        "music-feed: /SkyeMusicNexus/public/feed.html",
+        "music-player: /SkyeMusicNexus/public/player.html",
+        "music-releases: /SkyeMusicNexus/public/releases.html",
+        "music-rights: /SkyeMusicNexus/public/rights.html",
+        "music-stems: /SkyeMusicNexus/public/stems.html",
+        "music-upload: /SkyeMusicNexus/public/upload.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "founder-command-nexus-hire-workforce-live-http",
+          "path": "test-artifacts/founder-command-nexus-hire-workforce/founder-command-nexus-hire-workforce-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "operator",
+      "label": "Operator exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /operator/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/operator/index.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:operator:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "profit",
+      "label": "Profit Console exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeProfitConsole/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeProfitConsole/index.html",
+        "runtime behavior receipt family: skyepay-commerce-financial-ops",
+        "Command Bridge write/readback entity: 0s-stateful:profit:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "relay13-communications-center",
+      "label": "Relay13 Communications Center mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "connectlog",
+        "relay13",
+        "relay13-inbox",
+        "worker-asset-live-relay13-chat-hub"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "connectlog: /connectlog-v7.7-relay13-operator-proof/app.html",
+        "relay13: /relay13-core-v1.7-connectlog-operator-proof/public/index.html",
+        "relay13-inbox: /connectlog-v7.7-relay13-operator-proof/relay13-inbox.html",
+        "worker-asset-live-relay13-chat-hub: /live/relay13-chat-hub.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "relay13-communications-center",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "routex",
+      "label": "SkyeRouteX exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeRouteX/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeRouteX/index.html",
+        "runtime behavior receipt family: skyeroutex-workforce-depth",
+        "Command Bridge write/readback entity: 0s-stateful:routex:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "routex-workforce-command",
+      "label": "SkyeRouteX Workforce Command exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeRouteX/workforce-command-v0.4.0/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeRouteX/workforce-command-v0.4.0/index.html",
+        "runtime behavior receipt family: skyeroutex-workforce-depth",
+        "Command Bridge write/readback entity: 0s-stateful:routex-workforce-command:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "saas",
+      "label": "SaaS customer workspace, billing, SkyeMail status, and key-card flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "SaaS public signup",
+        "shared gate protected workspace create",
+        "zero-balance billing checkout",
+        "SkyeMail status rows",
+        "key-card rows"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-31T20-15-10-813Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "shared-owner-gate",
+      "label": "Shared Owner Gate mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "gate",
+        "gate-signup"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "gate: /skyegate/index.html",
+        "gate-signup: /gate/signup/"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "auth-spine-guard",
+          "path": "test-artifacts/0s-auth-spine-guard/latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "ai-gate-audit",
+          "path": "test-artifacts/ai-gate-audit/ai-gate-audit-latest.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "real-user-readiness",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-31T20-15-10-813Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyeapi-aegiscore",
+      "label": "SkyeAPI + AegisCore exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyeapi-aegiscore/apps/console/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyeapi-aegiscore/apps/console/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyeapi-aegiscore:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyeapi-website",
+      "label": "SkyeAPI Website exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyeapi-aegiscore/apps/website/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyeapi-aegiscore/apps/website/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyeapi-website:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyearcade",
+      "label": "SkyeArcade Sovereign Vault exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyearcade/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyearcade/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyearcade:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyecommerce",
+      "label": "SkyeCommerce exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeCommerce/",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeCommerce/index.html",
+        "runtime behavior receipt family: skyepay-commerce-financial-ops",
+        "Command Bridge write/readback entity: 0s-stateful:skyecommerce:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax",
+      "label": "SkyeDocxMax exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax-documents",
+      "label": "SkyeDocxMax Documents exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/documents.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/documents.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax-documents:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax-editor",
+      "label": "SkyeDocxMax Editor exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/editor.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/editor.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax-editor:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax-exports",
+      "label": "SkyeDocxMax Exports exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/exports.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/exports.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax-exports:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax-packages",
+      "label": "SkyeDocxMax Packages exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/packages.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/packages.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax-packages:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyedocxmax-templates",
+      "label": "SkyeDocxMax Templates exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeDocxMax/templates.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeDocxMax/templates.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:skyedocxmax-templates:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyehawk",
+      "label": "Skye Hawk Source Cockpit exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /skyehawk/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/skyehawk/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyehawk:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyemail",
+      "label": "SkyEmail live mailbox client flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "shared gate session import",
+        "mailbox selection",
+        "compose and send self-mail with image attachment",
+        "sync and search inbox",
+        "open message and thread",
+        "fetch attachment",
+        "star and unstar",
+        "trash and restore",
+        "draft save/get/delete",
+        "FS27 Brain metered call",
+        "SkyPay checkout",
+        "SkyeDocx/Calendar/CRM/SaaS/Commerce/PWA handoffs",
+        "telemetry summary"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "skyemail-human-production-smoke",
+          "path": "test-artifacts/skyemail-human-production-smoke/2026-05-31T20-16-16-093Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "skyemail-live-production-stress",
+          "path": "test-artifacts/skyemail-live-production-stress/2026-05-31T20-18-16-712Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        },
+        {
+          "id": "founder-command-skyemail-login-custody",
+          "path": "test-artifacts/founder-command-skyemail-login-custody/founder-command-skyemail-login-custody-live-http-latest.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyenet",
+      "label": "SkyeNet real-user publish flow",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "FS27 shared user session",
+        "workspace create",
+        "deploy init",
+        "file upload",
+        "deploy complete",
+        "route register",
+        "live uploaded marker readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "real-user-readiness",
+          "path": "test-artifacts/0s-real-user-readiness/2026-05-31T20-15-10-813Z/receipt.json",
+          "mode": "ok_true",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyenet-full-runtime",
+      "label": "Skyenet Full Runtime mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "content-forge",
+        "devisional-riftx",
+        "skyenet"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "content-forge: /live/skye-content-forge-publisher.html",
+        "devisional-riftx: /DeVisional%20Riftx/app/index.html",
+        "skyenet: /skyenet/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "skyenet-full-runtime",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyeopsconsole",
+      "label": "SkyeOpsConsole exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyeopsconsole/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyeopsconsole/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyeopsconsole:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyepay-commerce-financial-ops",
+      "label": "Skyepay Commerce Financial Ops mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "commercial-terms",
+        "kaixu-storefront",
+        "pricing",
+        "profit",
+        "skyecommerce",
+        "split",
+        "worker-asset-live-skyeprofitconsole-profit-console"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "commercial-terms: /pricing/index.html",
+        "kaixu-storefront: /Free99/apps/kaixu-storefront/index.html",
+        "pricing: /sales/pricing-offer-router.html",
+        "profit: /SkyeProfitConsole/index.html",
+        "skyecommerce: /SkyeCommerce/",
+        "split: /SkyeSplitEngine/index.html",
+        "worker-asset-live-skyeprofitconsole-profit-console: /live/skyeprofitconsole-profit-console.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "skyepay-commerce-financial-ops",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyeroutex-workforce-depth",
+      "label": "Skyeroutex Workforce Depth mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "routex",
+        "routex-workforce-command",
+        "worker-asset-live-skyeroutex-workforce-command"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "routex: /SkyeRouteX/index.html",
+        "routex-workforce-command: /SkyeRouteX/workforce-command-v0.4.0/index.html",
+        "worker-asset-live-skyeroutex-workforce-command: /live/skyeroutex-workforce-command.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "skyeroutex-workforce-depth",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyerrors",
+      "label": "SkyErrors exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /skyerrors/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/skyerrors/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyerrors:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyevaultos",
+      "label": "SkyeVaultOS exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /skye-vault-os/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/skye-vault-os/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyevaultos:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyevaultpro",
+      "label": "SkyeVaultPro exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyevaultpro/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyevaultpro/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyevaultpro:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyevaultpro-docx",
+      "label": "SkyeVaultPro Docx App exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyevaultpro/apps/docx/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyevaultpro/apps/docx/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyevaultpro-docx:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyevaultpro-drive",
+      "label": "SkyeVaultPro Drive exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyevaultpro/drive/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyevaultpro/drive/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyevaultpro-drive:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyevaultpro-founder",
+      "label": "SkyeVaultPro Founder exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/skyevaultpro/founder/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/skyevaultpro/founder/index.html",
+        "runtime behavior receipt family: external-provider-hardening",
+        "Command Bridge write/readback entity: 0s-stateful:skyevaultpro-founder:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyewebcreatormax",
+      "label": "SkyeWebCreatorMax exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeWebCreatorMax/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/index.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:skyewebcreatormax:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyewebcreatormax-builder",
+      "label": "SkyeWebCreatorMax Builder exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeWebCreatorMax/builder.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/builder.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:skyewebcreatormax-builder:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyewebcreatormax-delivery",
+      "label": "SkyeWebCreatorMax Delivery exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeWebCreatorMax/delivery.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/delivery.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:skyewebcreatormax-delivery:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyewebcreatormax-preview",
+      "label": "SkyeWebCreatorMax Preview exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeWebCreatorMax/preview.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/preview.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:skyewebcreatormax-preview:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skyewebcreatormax-workspace",
+      "label": "SkyeWebCreatorMax Workspace exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/SkyeWebCreatorMax/builder-workspace.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/SkyeWebCreatorMax/builder-workspace.html",
+        "runtime behavior receipt family: content-engine-provider-dispatch",
+        "Command Bridge write/readback entity: 0s-stateful:skyewebcreatormax-workspace:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "skymail-company-crm-lane",
+      "label": "Skymail Company Crm Lane mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "skyemail"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "skyemail: /live/SkyeMail/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "skymail-company-crm-lane",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs",
+      "label": "SovereignDocs exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-admin",
+      "label": "SovereignDocs Admin exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/admin/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/admin/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-admin:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-api",
+      "label": "SovereignDocs API exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/api/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/api/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-api:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-app",
+      "label": "SovereignDocs App exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/app/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/app/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-app:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-builder",
+      "label": "SovereignDocs Builder exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/builder/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/builder/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-builder:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-client-packet",
+      "label": "Sovereigndocs Client Packet mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "documorph",
+        "documorph-app",
+        "skyedocx-blog",
+        "skyedocxmax",
+        "skyedocxmax-documents",
+        "skyedocxmax-editor",
+        "skyedocxmax-exports",
+        "skyedocxmax-packages",
+        "skyedocxmax-templates",
+        "sovereigndocs",
+        "sovereigndocs-admin",
+        "sovereigndocs-api",
+        "sovereigndocs-app",
+        "sovereigndocs-builder",
+        "sovereigndocs-documents",
+        "sovereigndocs-official-sources",
+        "sovereigndocs-pricing",
+        "sovereigndocs-review",
+        "sovereigndocs-skyedocxmax",
+        "sovereigndocs-vault",
+        "sovereigndocs-workspace"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "documorph: /Free99/apps/documorph/index.html",
+        "documorph-app: /Free99/apps/documorph/app/index.html",
+        "skyedocx-blog: /Marketing-Made-Easy/SkyeDocxBlog/index.html",
+        "skyedocxmax: /Marketing-Made-Easy/SkyeDocxMax/index.html",
+        "skyedocxmax-documents: /Marketing-Made-Easy/SkyeDocxMax/documents.html",
+        "skyedocxmax-editor: /Marketing-Made-Easy/SkyeDocxMax/editor.html",
+        "skyedocxmax-exports: /Marketing-Made-Easy/SkyeDocxMax/exports.html",
+        "skyedocxmax-packages: /Marketing-Made-Easy/SkyeDocxMax/packages.html",
+        "skyedocxmax-templates: /Marketing-Made-Easy/SkyeDocxMax/templates.html",
+        "sovereigndocs: /Free99/apps/sovereigndocs/index.html",
+        "sovereigndocs-admin: /Free99/apps/sovereigndocs/admin/index.html",
+        "sovereigndocs-api: /Free99/apps/sovereigndocs/api/index.html",
+        "sovereigndocs-app: /Free99/apps/sovereigndocs/app/index.html",
+        "sovereigndocs-builder: /Free99/apps/sovereigndocs/builder/index.html",
+        "sovereigndocs-documents: /Free99/apps/sovereigndocs/documents/index.html",
+        "sovereigndocs-official-sources: /Free99/apps/sovereigndocs/official-sources/index.html",
+        "sovereigndocs-pricing: /Free99/apps/sovereigndocs/pricing/index.html",
+        "sovereigndocs-review: /Free99/apps/sovereigndocs/review-queue/index.html",
+        "sovereigndocs-skyedocxmax: /Free99/apps/sovereigndocs/skye-docx-max/index.html",
+        "sovereigndocs-vault: /Free99/apps/sovereigndocs/vault/index.html",
+        "sovereigndocs-workspace: /Free99/apps/sovereigndocs/workspace/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "sovereigndocs-client-packet",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-documents",
+      "label": "SovereignDocs Documents exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/documents/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/documents/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-documents:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-official-sources",
+      "label": "SovereignDocs Official Sources exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/official-sources/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/official-sources/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-official-sources:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-review",
+      "label": "SovereignDocs Review Queue exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/review-queue/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/review-queue/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-review:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-skyedocxmax",
+      "label": "SovereignDocs SkyeDocxMax exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/skye-docx-max/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/skye-docx-max/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-skyedocxmax:2026-05-31T21-16-27-205Z",
+        "proof basis: local-first mounted surface plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-vault",
+      "label": "SovereignDocs Vault exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/vault/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/vault/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-vault:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "sovereigndocs-workspace",
+      "label": "SovereignDocs Workspace exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Free99/apps/sovereigndocs/workspace/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Free99/apps/sovereigndocs/workspace/index.html",
+        "runtime behavior receipt family: sovereigndocs-client-packet",
+        "Command Bridge write/readback entity: 0s-stateful:sovereigndocs-workspace:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "split",
+      "label": "Split Engine exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /SkyeSplitEngine/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/SkyeSplitEngine/index.html",
+        "runtime behavior receipt family: skyepay-commerce-financial-ops",
+        "Command Bridge write/readback entity: 0s-stateful:split:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "valley-verified",
+      "label": "Valley Verified exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /valley-verified/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/valley-verified/index.html",
+        "runtime behavior receipt family: founder-account-valley-crosswalk",
+        "Command Bridge write/readback entity: 0s-stateful:valley-verified:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "valuation-deck-alignment",
+      "label": "Valuation Deck Alignment mounted app family",
+      "profile": "mixed_family",
+      "coverage_scope": "all_family_apps",
+      "covered_app_ids": [
+        "skaixu-code-evaluator"
+      ],
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event",
+        "mutation_denial_or_not_applicable"
+      ],
+      "human_paths": [
+        "shared FS27/SkyGate/Free99 unauthenticated gate and authenticated render for every mounted route in this family",
+        "per-mounted-app source file presence, source marker integrity, provenance hash, and non-browser route stress basis",
+        "workflow create/read/update-or-closeout/readback/stress proof where the family owns stateful behavior",
+        "Founder Command, Command Bridge, or owner ledger visibility for stateful workflow receipts",
+        "skaixu-code-evaluator: /Free99/apps/skaixu-code-evaluator/index.html"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "read-only-app-live-http",
+          "path": "test-artifacts/0s-read-only-apps-live-http/0s-read-only-apps-live-http-latest.json",
+          "mode": "read_only_app_proof",
+          "applies_to_profiles": [
+            "read_only_static",
+            "proof_asset"
+          ],
+          "required": true
+        },
+        {
+          "id": "operating-depth-closeout-behavior-proof",
+          "path": "test-artifacts/0s-operating-depth-closeout/0s-operating-depth-closeout-live-http-latest.json",
+          "mode": "behavior_proof",
+          "workflow_id": "valuation-deck-alignment",
+          "required": true
+        }
+      ]
+    },
+    {
+      "app_id": "webgrowthoperator",
+      "label": "WebGrowthOperator exact mounted stateful proof",
+      "profile": "stateful",
+      "behaviors": [
+        "human_flow",
+        "create",
+        "read",
+        "update_or_closeout",
+        "receipt_readback",
+        "stress",
+        "founder_command_visible",
+        "telemetry_or_command_event"
+      ],
+      "human_paths": [
+        "authenticated mounted route render and stress: /Marketing-Made-Easy/WebGrowthOperator/index.html",
+        "per-app source/provenance row: metraiyux_0s_site/Marketing-Made-Easy/WebGrowthOperator/index.html",
+        "runtime behavior receipt family: admin-brain-automation",
+        "Command Bridge write/readback entity: 0s-stateful:webgrowthoperator:2026-05-31T21-16-27-205Z",
+        "proof basis: mounted route/source stress plus family runtime receipt and Command Bridge telemetry readback"
+      ],
+      "evidence_receipts": [
+        {
+          "id": "per-app-route-source-stress-row",
+          "path": "test-artifacts/0s-per-app-operating-proof/0s-per-app-operating-proof-latest.json",
+          "mode": "per_app_row_ok",
+          "required": true
+        },
+        {
+          "id": "stateful-mounted-app-live-http",
+          "path": "test-artifacts/0s-stateful-apps-live-http/0s-stateful-apps-live-http-latest.json",
+          "mode": "stateful_app_proof",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

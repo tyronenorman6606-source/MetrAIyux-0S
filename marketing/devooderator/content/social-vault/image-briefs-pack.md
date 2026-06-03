@@ -86,11 +86,11 @@ Public-safe production briefs for generated social cards. Keep all imagery ficti
 - Avoid list: No real streaming platform screenshots, no copyrighted album art, no fake royalty numbers, no celebrity references, no visible song lyrics.
 - Alt text: Music studio command scene with a microphone and glowing abstract release pathways.
 
-## 8. Devooderator Content Vault
+## 8. DevodeRator Content Vault
 
 - Filename slug: `devooderator-content-vault`
 - Platform format: story
-- Objective: Frame Devooderator as the public content vault where build days become posts, cards, and proof-backed stories.
+- Objective: Frame DevodeRator as the public content vault where build days become posts, cards, and proof-backed stories.
 - Exact visible text overlay: `Turn build days into proof.`
 - Art direction: Founder diary meets secure media archive, shelves of abstract social cards, warm desk light, black glass vault drawers, editorial paper textures.
 - Composition: Vertical composition with a desk at bottom, stacked content cards rising like shelves, a subtle vault door curve in the background, overlay top-left.
@@ -142,6 +142,6 @@ Public-safe production briefs for generated social cards. Keep all imagery ficti
 - Exact visible text overlay: `ShYT happens. Skye keeps the sKache.`
 - Art direction: Bold editorial poster, storm-lit command room window, calm vault case on desk, gold proof tag, cyan recovery line, confident and slightly defiant.
 - Composition: Tall poster crop with storm outside in the upper half and a sealed recovery case in the lower half; overlay split into two short lines with strong hierarchy.
-- Subject: The Devooderator recovery philosophy as a public-safe brand poster.
+- Subject: The DevodeRator recovery philosophy as a public-safe brand poster.
 - Avoid list: No disaster gore, no broken customer data, no fear-based cybersecurity tropes, no real incident references, no secrets, no fake screenshots.
 - Alt text: Storm-lit command room poster with a sealed recovery case and proof tag on the desk.

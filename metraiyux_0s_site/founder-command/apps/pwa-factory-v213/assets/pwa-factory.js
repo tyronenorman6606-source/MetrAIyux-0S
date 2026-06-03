@@ -156,19 +156,7 @@
     let tracks = buildTrackRows(store.products || [], assets.assets || [], artist);
     if (mode === 'single') tracks = tracks.slice(-1);
     if (!tracks.length) {
-      tracks = [{
-        title: `${artist.stageName || artist.name || 'Artist'} Drop Placeholder`,
-        artistName: artist.stageName || artist.name || 'Skye Artist',
-        artistId: artist.artistId || '',
-        artistSlug: artist.slug || '',
-        priceCents: 444,
-        finalUrl: '',
-        previewUrl: '',
-        buyUrl: normalizePath(artist.storefront || `${artist.slug}/`),
-        contentType: 'audio/mpeg',
-        bytes: 0,
-        source: 'nexus-placeholder'
-      }];
+      throw new Error(`${artist.stageName || artist.name || 'Selected artist'} has no live SkyeMusicNexus product asset attached. Add a real Nexus product/asset or use the audio upload lane before minting a PWA.`);
     }
     return tracks;
   }
@@ -195,6 +183,7 @@
     } else {
       tracks = await loadArtistTracks(selected, mode);
     }
+    if (!tracks.length) throw new Error('No live SkyeMusicNexus tracks were available for this drop. Add real Nexus assets or use the audio upload lane before minting a PWA.');
     const title = mode === 'collective'
       ? 'Gray Gang Skye Radio'
       : `${artist.stageName || artist.name || 'Skye Artist'} ${mode === 'album' ? 'Album Drop' : 'Single Drop'}`;

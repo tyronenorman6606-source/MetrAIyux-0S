@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SkyeMail Security | Buyer Architecture Overview</title>
-  <meta name="description" content="Buyer-facing SkyeMail security overview for Citadel/SkyeNet mail routing, shared 0S gate access, sovereign keys, and sanitized proof records.">
+  <meta name="description" content="Buyer-facing SkyeMail security overview for Citadel Database and SkyeNet mail routing, shared 0S gate access, sovereign keys, and sanitized proof records.">
   <link rel="icon" href="/assets/skyes-over-london-deity-logo.png">
   <link rel="stylesheet" href="assets/marketing.css">
   <script type="module" src="assets/skyesol-living-background.js"></script>
@@ -28,7 +28,7 @@
       <div class="section-head">
         <p class="eyebrow">Buyer-safe architecture</p>
         <h1>Security overview without exposing private implementation source.</h1>
-        <p class="lead">Private implementation source is not public. This page explains the controls buyers need to understand: shared 0S gate access, Citadel/SkyeNet mail movement, sovereign-key boundaries, inbox storage, and proof records that do not publish secrets.</p>
+        <p class="lead">This buyer-facing security overview explains the controls clients need to understand: shared 0S gate access, Citadel Database and SkyeNet mail movement, sovereign-key boundaries, inbox storage, and proof records that do not publish secrets.</p>
       </div>
       <div class="actions">
         <a class="button primary" href="/tech-stack">View Tech Stack</a>
@@ -43,11 +43,11 @@
         <h2>The product boundary is public. The private implementation stays private.</h2>
       </div>
       <div class="grid two">
-        <article class="proof-item"><b>Shared 0S gate access</b><span>SkyeMail uses the same FS27/SkyGate/Free99 access lane as the rest of the 0S. Buyer and operator sessions come through the shared gate instead of a separate app password.</span></article>
+        <article class="proof-item"><b>Shared 0S gate access</b><span>SkyeMail uses the same SkyeGate FS27/Free99 access lane as the rest of the 0S. Buyer and operator sessions come through the shared gate instead of a separate app password.</span></article>
         <article class="proof-item"><b>Sovereign key boundary</b><span>Mailbox content is protected by the workspace key model. The client passphrase wraps the private unlock material, and private keys or passphrases are not published in proof pages.</span></article>
-        <article class="proof-item"><b>Citadel mail records</b><span>Inbound and outbound events are recorded as sovereign mail records so delivery, receipt, reply, failure, and sync state can be reviewed without exposing private message content.</span></article>
+        <article class="proof-item"><b>Citadel Database mail records</b><span>Inbound and outbound events are recorded as sovereign mail records so delivery, receipt, reply, failure, and sync state can be reviewed without exposing private message content.</span></article>
         <article class="proof-item"><b>SkyeNet operating lane</b><span>The app surface, inbox refresh, send lane, and operational checks run through the SkyeMail lane backed by Citadel and SkyeNet without exposing implementation internals.</span></article>
-        <article class="proof-item"><b>Provider connector boundary</b><span>Hosted mailbox connectors can move mail in and out, but OAuth tokens, provider secrets, webhook signing material, and owner service tokens stay out of buyer-facing pages.</span></article>
+        <article class="proof-item"><b>Mailbox routing boundary</b><span>Hosted mailbox connectors can move mail in and out, but OAuth tokens, private routing secrets, webhook signing material, and owner service tokens stay out of buyer-facing pages.</span></article>
         <article class="proof-item"><b>Sanitized proof</b><span>Public proof pages show live status, delivery outcomes, and release receipts with secret fields removed. They are evidence surfaces, not implementation dumps.</span></article>
       </div>
     </section>
@@ -60,7 +60,7 @@
       <div class="grid">
         <article class="step"><b>Access path</b><span>Confirm SkyeMail opens through the 0S gate and carries the selected mailbox into the inbox session.</span></article>
         <article class="step"><b>Mail path</b><span>Confirm live proof shows a send/read loop and that inbox actions operate on the selected hosted mailbox.</span></article>
-        <article class="step"><b>Secret boundary</b><span>Confirm public pages do not expose private keys, passphrases, tokens, provider secrets, or private implementation source.</span></article>
+        <article class="step"><b>Secret boundary</b><span>Confirm public pages do not expose private keys, passphrases, tokens, routing secrets, or private implementation source.</span></article>
       </div>
     </section>
   </main>

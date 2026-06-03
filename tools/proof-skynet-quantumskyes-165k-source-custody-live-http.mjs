@@ -191,6 +191,30 @@ function sourceIndexBody(records, firstPath, firstSha256) {
   })).join('\n')}\n`;
 }
 
+function chooseArbitrarySourceFileProofRecords(records, firstPath) {
+  const chosen = [];
+  const add = (record) => {
+    if (!record?.path || record.path === firstPath || chosen.some((item) => item.path === record.path)) return;
+    const size = Number(record.size || 0);
+    if (!size || size > 2 * 1024 * 1024) return;
+    chosen.push(record);
+  };
+  const selectors = [
+    (record) => record.path === '_shared/telemetry.js',
+    (record) => record.path === 'vendor/three/three.min.js',
+    (record) => record.path === 'assets/vendor/three.min.js',
+    (record) => record.path.endsWith('/package.json') && record.path.includes('runtime/standalone-apps/'),
+    (record) => record.path.endsWith('.html') && record.path.includes('runtime/standalone-apps/'),
+    (record) => record.path.endsWith('.md')
+  ];
+  for (const selector of selectors) add(records.find(selector));
+  for (const record of records) {
+    if (chosen.length >= 5) break;
+    if (/\.(?:js|json|html|css|md|txt)$/i.test(record.path)) add(record);
+  }
+  return chosen.slice(0, 5);
+}
+
 async function uploadPublicFile(token, relPath, localPath) {
   const body = await fs.readFile(localPath);
   const params = new URLSearchParams({ workspaceId: workspaceId, projectId, deploymentId, path: relPath });
@@ -224,8 +248,8 @@ async function putPart(uploadUrl, body, label) {
   throw new Error(`${label} failed.`);
 }
 
-async function uploadArchiveToSkyeNetR2(receipt, archiveKey, archiveStat) {
-  applyPrivateEnv(receipt.private_env);
+async function uploadArchiveToSkyeNetR2(privateEnv, archiveKey, archiveStat) {
+  applyPrivateEnv(privateEnv);
   const drive = await import('../SkyeVault-Drop/netlify/functions/_lib/google-drive.js');
   const archiveFileName = path.basename(archivePath);
   const archivePrefix = archiveKey.split('/').slice(0, -1).join('/');
@@ -318,7 +342,6 @@ async function main() {
       prior_skyevault_range_proof_ok: handoff.driveUpload?.rangeProof?.ok === true
     },
     credential_source: auth.credential?.key || auth.credential?.source || 'missing',
-    private_env: env,
     login: null,
     public_deploy: null,
     source_index: null,
@@ -332,6 +355,7 @@ async function main() {
     tree_vendor: null,
     search: null,
     source_file: null,
+    arbitrary_source_files: [],
     source_download_range: null,
     source_download_invalid_range: null,
     source_transfer_download: null,
@@ -344,8 +368,6 @@ async function main() {
     },
     failures: []
   };
-  delete receipt.private_env;
-
   if (records.length !== expectedFileCount) receipt.failures.push(`Recovered manifest count ${records.length} did not match expected ${expectedFileCount}.`);
   if (handoff.manifestFilesVerified !== expectedFileCount) receipt.failures.push(`Handoff verified count ${handoff.manifestFilesVerified} did not match expected ${expectedFileCount}.`);
   receipt.login = {
@@ -454,7 +476,7 @@ async function main() {
         body: JSON.stringify(linkPayload)
       });
       if (archiveLink.status === 404 && (archiveLink.body?.code === 'SOURCE_ARCHIVE_OBJECT_NOT_FOUND' || !archiveLink.body?.code)) {
-        receipt.archive_r2_upload = await uploadArchiveToSkyeNetR2({ ...receipt, private_env: env }, archiveKey, archiveStat);
+        receipt.archive_r2_upload = await uploadArchiveToSkyeNetR2(env, archiveKey, archiveStat);
         archiveLink = await apiJson(token, '/source-archive-link', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -584,6 +606,19 @@ async function main() {
         elapsed_ms: sourceFile.elapsed_ms
       };
 
+      for (const record of chooseArbitrarySourceFileProofRecords(records, firstRecord.path)) {
+        const arbitrary = await apiJson(token, `/source-file?${query.toString()}&path=${encodeURIComponent(record.path)}`);
+        receipt.arbitrary_source_files.push({
+          path: record.path,
+          status: arbitrary.status,
+          ok: Boolean(arbitrary.ok && arbitrary.body?.path === record.path && Number(arbitrary.body?.bytes || 0) > 0),
+          bytes: arbitrary.body?.bytes || 0,
+          content_type: arbitrary.body?.content_type || '',
+          code: arbitrary.body?.code || '',
+          elapsed_ms: arbitrary.elapsed_ms
+        });
+      }
+
       const range = await apiBytes(token, `/source-download?${query.toString()}`, {
         headers: { range: 'bytes=0-0', accept: 'application/octet-stream' }
       });
@@ -650,6 +685,10 @@ async function main() {
 
   for (const [key, value] of Object.entries(receipt)) {
     if (value && typeof value === 'object' && 'ok' in value && value.ok === false) receipt.failures.push(`${key} did not pass.`);
+  }
+  if (!receipt.arbitrary_source_files.length) receipt.failures.push('No arbitrary non-representative source files were proven through /source-file.');
+  for (const item of receipt.arbitrary_source_files) {
+    if (!item.ok) receipt.failures.push(`Arbitrary source-file read failed for ${item.path} (${item.code || item.status}).`);
   }
   for (const [key, value] of Object.entries(receipt.unauth || {})) {
     if (!value.ok) receipt.failures.push(`Unauthenticated ${key} endpoint was not rejected.`);
